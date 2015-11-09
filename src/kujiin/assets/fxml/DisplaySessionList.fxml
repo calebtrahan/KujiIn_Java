@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="658.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TableView fx:id="sessionsTableView" layoutX="10.0" layoutY="42.0" prefHeight="581.0" prefWidth="926.0">
+        <columns>
+          <TableColumn fx:id="DateColumn" prefWidth="84.0" style="-fx-alignment: center;" text="Date" />
+          <TableColumn fx:id="RinColumn" style="fx-alignment: center;" text="RIN" />
+            <TableColumn fx:id="KyoColumn" prefWidth="69.0" style="fx-alignment: center;" text="KYO" />
+            <TableColumn fx:id="TohColumn" prefWidth="77.0" style="fx-alignment: center;" text="TOH" />
+            <TableColumn fx:id="ShaColumn" prefWidth="75.0" style="fx-alignment: center;" text="SHA" />
+            <TableColumn fx:id="KaiColumn" prefWidth="74.0" style="fx-alignment: center;" text="KAI" />
+            <TableColumn fx:id="JinColumn" prefWidth="74.0" style="fx-alignment: center;" text="JIN" />
+            <TableColumn fx:id="RetsuColumn" prefWidth="77.0" style="fx-alignment: center;" text="RETSU" />
+            <TableColumn fx:id="ZaiColumn" prefWidth="73.0" style="fx-alignment: center;" text="ZAI" />
+            <TableColumn fx:id="ZenColumn" prefWidth="79.0" style="fx-alignment: center;" text="ZEN" />
+            <TableColumn fx:id="TotalColumn" prefWidth="155.0" style="fx-alignment: center;" text="TOTAL" />
+        </columns>
+      </TableView>
+      <Label alignment="CENTER" layoutX="7.0" layoutY="14.0" prefHeight="20.0" prefWidth="916.0" text="Your Sessions" textAlignment="CENTER" underline="true">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Button fx:id="CloseButton" layoutX="874.0" layoutY="627.0" mnemonicParsing="false" onMousePressed="#closeDialog" text="Close" />
+   </children>
+</AnchorPane>

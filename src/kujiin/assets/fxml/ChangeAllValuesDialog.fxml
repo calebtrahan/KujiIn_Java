@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="132.0" prefWidth="460.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <CheckBox fx:id="includepreandpostCheckBox" layoutX="17.0" layoutY="88.0" mnemonicParsing="false" text="Include Presession + Postsession" />
+      <Button fx:id="AcceptButton" layoutX="308.0" layoutY="84.0" mnemonicParsing="false" text="Accept" onMousePressed="#acceptbuttonpressed"/>
+      <Button fx:id="CancelButton" layoutX="381.0" layoutY="84.0" mnemonicParsing="false" text="Cancel" onMousePressed="#cancelbuttonpressed"/>
+      <TextField fx:id="changeAllValuesMinutesTextField" layoutX="245.0" layoutY="28.0" prefHeight="26.0" prefWidth="36.0" />
+      <Label alignment="CENTER_RIGHT" layoutX="71.0" layoutY="33.0" prefHeight="16.0" prefWidth="164.0" text="Change All Values To:" />
+      <Label layoutX="287.0" layoutY="33.0" prefHeight="16.0" prefWidth="102.0" text="Minute(s)" />
+   </children>
+</AnchorPane>

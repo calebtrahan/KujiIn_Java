@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="579.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button fx:id="returntoCreatorButton" layoutX="12.0" layoutY="410.0" mnemonicParsing="false" onMousePressed="#returntoCreator" text="Return To Creator" />
+      <Button fx:id="addmissingCutsButton" layoutX="271.0" layoutY="410.0" mnemonicParsing="false" onMousePressed="#addmissingcutstoSession" text="Add Missing Cuts To Session" />
+      <Label alignment="CENTER" layoutX="12.0" layoutY="14.0" prefHeight="33.0" prefWidth="582.0" text="Session Is Not Well-Formed">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="explanationLabel" alignment="CENTER" layoutX="275.0" layoutY="86.0" prefHeight="141.0" prefWidth="292.0" textAlignment="CENTER" wrapText="true" />
+      <ListView fx:id="sessionlistview" layoutX="14.0" layoutY="86.0" prefHeight="275.0" prefWidth="250.0" />
+      <Label layoutX="73.0" layoutY="56.0" text="Your Session Parts:">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="sessionmissingcutsLabel" alignment="TOP_CENTER" layoutX="275.0" layoutY="308.0" prefHeight="53.0" prefWidth="292.0" text="This Will Be The Missing Cuts" textAlignment="CENTER" />
+      <Button fx:id="CreateAnywayButton" layoutX="464.0" layoutY="410.0" mnemonicParsing="false" onMousePressed="#createSessionwithoutmissingcuts" text="Create Anyway" />
+      <Label layoutX="284.0" layoutY="281.0" text="Cuts Missing For A Well-Formed Session" underline="true">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

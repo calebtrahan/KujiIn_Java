@@ -1,0 +1,318 @@
+//    class Ambience {
+//        private ArrayList<SoundFile> ambiencesoundfiles;
+//        private Cut cut;
+//        private File ambiencedirectory;
+//        private int totalambiencefiles;
+//        private double totalduration; // In Seconds
+//        AmbienceOption ambienceOption;
+//
+//        Ambience(Cut cut) {
+//            this.cut = cut;
+//            ambiencedirectory = new File(Session.directoryambience, cut.name);
+//            ambiencesoundfiles = new ArrayList<>();
+////        ambienceOption = AmbienceOption.General;
+//        }
+//
+//        public void getambienceinfo() {
+//            System.out.println("Getting " + cut.name + "'s Ambience Info");
+////        totalduration = 0.0;
+//            if (ambiencesoundfiles.size() == 0) {
+//                try {
+//                    for (File i : ambiencedirectory.listFiles()) {
+//                        SoundFile tempsoundfile = new SoundFile(i);
+//                        if (tempsoundfile.isvalid()) {
+//                            ambiencesoundfiles.add(tempsoundfile);
+//                            totalduration += tempsoundfile.getDuration();
+//                        }
+//                    }
+//                } catch (NullPointerException ignored) {
+//                }
+//                totalambiencefiles = ambiencesoundfiles.size();
+//            } //else {totalduration = 0.0;}
+//        }
+//
+//        public ArrayList<SoundFile> getambiencesoundfiles() {
+//            return ambiencesoundfiles;
+//        }
+//
+//        public double getTotalduration() {
+//            System.out.println(String.format("Returning %d As %s's Total Duration", (int) totalduration, cut.name));
+//            return totalduration;
+//        }
+//
+////    public double getTotaldurationinseconds() {
+////        double totalduration = 0.0;
+////        for (SoundFile i : ambiencesoundfiles) totalduration += i.getDuration();
+////        return totalduration;
+////    }
+//
+//        public boolean hasanyAmbience() {
+//            try {
+//                for (File i : ambiencedirectory.listFiles()) {
+//                    if (Tools.supportedaudiofile(i)) {
+//                        return true;
+//                    }
+//                }
+//                return false;
+//            } catch (NullPointerException e) {
+//                return false;
+//            }
+//        }
+//
+//        public boolean haslongenoughAmbience(double durationtocheck) {
+//            getambienceinfo();
+//            return totalduration >= durationtocheck;
+//        }
+//
+//        public void addambiencetoprogram() {
+//
+//        }
+//
+//        public void editprogramsambience() {
+//
+//        }
+//
+//        public int getTotalambiencefiles() {
+//            return totalambiencefiles;
+//        }
+//
+//        public void setTotalambiencefiles(int totalambiencefiles) {
+//            this.totalambiencefiles = totalambiencefiles;
+//        }
+//    }
+
+public class Creator {
+//    ArrayList<MediaPlayer> entrainmentplaylist = new ArrayList<>();
+//    ArrayList<Cut> cutstoplay = new ArrayList<Cut>();
+//    ArrayList<SoundFile> soundFilesforaudiofiles = new ArrayList<>();
+//    ArrayList<String> entrainmenttemplist = new ArrayList<>();
+//    ArrayList<String> ambiencetemplist = new ArrayList<>();
+//    Integer rampduration = 2;
+//    Boolean ambienceenabled;
+//    CreatingSessionDialog dialog;
+//    CreateANewSession createsessiondialog;
+//    Session thissession;
+//
+//    public Creator(Session thissession, ArrayList<Cut> cutstoappendtoplay, Boolean ambienceenabled, CreateANewSession createsessiondialog) {
+//        this.thissession = thissession;
+//        this.ambienceenabled = ambienceenabled;
+//        this.createsessiondialog = createsessiondialog;
+//        cutstoplay = cutstoappendtoplay;
+//    }
+//
+//    public void create() {
+//        int progressparts = cutstoplay.size();
+//        if (ambienceenabled) {
+//            progressparts += cutstoplay.size() * 2;
+//        }
+//        dialog = new CreatingSessionDialog(null, this, progressparts);
+//        dialog.show();
+//        for (Cut i : cutstoplay) {
+//            i.create(ambienceenabled, cutstoplay);
+////            EntrainmentThread currentent = new EntrainmentThread(this, i, cutstoplay, 2);
+////            currentent.start();
+////            if (ambienceenabled) {
+////                AmbienceThread currentamb = new AmbienceThread(this, i, "specific");
+////                currentamb.start();
+//        }
+//    }
+//
+//    public Boolean sessionissuccessfullycreated() {
+//        Boolean allfilesexist = true;
+//        for (Cut i : cutstoplay) {
+//            File entrainmentfile = new File(Session.directorytemp, "Entrainment/" + i.name + ".mp3");
+//            File ambiencefile = new File(Session.directorytemp, "Ambience/" + i.name + ".mp3");
+//            ;
+//            if (!entrainmentfile.exists()) {
+//                allfilesexist = false;
+//                System.out.println(String.format("%s's Entrainment Doesn't Exist", i.name));
+//            }
+//            if (ambienceenabled) {
+//                if (!ambiencefile.exists()) {
+//                    allfilesexist = false;
+//                    System.out.println(String.format("%s's Ambience Doesn't Exist", i.name));
+//                }
+//            }
+//        }
+//        thissession.setCreated(allfilesexist);
+//        return allfilesexist;
+//    }
+//
+//    public void updateprogress() {
+//        dialog.updateprogress();
+//    }
+//
+//    public void displaycreatingmessage(String text) {
+//        dialog.displaymessage(text);
+//    }
+//
+//    public Boolean sessioniscreated() {
+//        boolean sessioncreated = false;
+//        if (cutstoplay.size() != 0) {
+//            for (Cut i : cutstoplay) {
+//                if (i.cutenabled()) {
+//                    sessioncreated = i.sessioniscreated(ambienceenabled);
+//                }
+//            }
+//        }
+//        return sessioncreated;
+//    }
+//}
+//    class AmbienceThread extends Thread {
+//        private Cut currentcut;
+//        private File temptextfile;
+//        private File tempfile;
+//        private File adjustedlengthfile;
+//        private File finalfile;
+//        private String ambienceoption;
+//        private ArrayList<SoundFile> ambiencelist;
+//        ArrayList<SoundFile> tempsoundfiles;
+//        Creator creator;
+//
+//        public AmbienceThread(Creator creator, Cut currentcut, String ambienceoption) {
+//            this.creator = creator;
+//            this.currentcut = currentcut;
+//            this.ambienceoption = ambienceoption;
+//            temptextfile = new File(Session.directorytemp, "/txt/" + currentcut.name + "Amb.txt");
+//            tempfile = new File(Session.directorytemp, "/Ambience/" + currentcut.name + "Temp.mp3");
+//            adjustedlengthfile = new File(Session.directorytemp, "/Ambience/" + currentcut.name + "AdjustedLength.mp3");
+//            finalfile = new File(Session.directorytemp, "/Ambience/" + this.currentcut.name + ".mp3");
+//            tempsoundfiles = currentcut.getambiencesoundfiles();
+//        }
+//        public void cleanupprevioussession() {
+//            if (tempfile.exists()) {tempfile.delete();}
+//            if (finalfile.exists()) {finalfile.delete();}
+//            if (adjustedlengthfile.exists()) {adjustedlengthfile.delete();}
+//            if (temptextfile.exists()) {temptextfile.delete();}
+//        }
+//
+//        @Override
+//        public void run() {
+//            creator.displaycreatingmessage(String.format("Building %s's Ambience", currentcut.name));
+//            cleanupprevioussession();
+//            generateambiencelist();
+//            generatespecificambience();
+//            creator.updateprogress();
+//            adjustlength();
+//            creator.updateprogress();
+////            applyaudiofilters();
+////            creator.updateprogress("Done Creating Ambience For " + currentcut.name);
+////        cleanupthissession();
+//        }
+//
+//
+//        private void generateambiencelist() {
+//
+//        }
+//
+//        private void generatespecificambience() {
+//
+//
+//        }
+//
+//        private void generategeneralambience() {
+//
+//        }
+//
+//        private void adjustlength() {
+//            // Seconds Are All Fucked Up!
+//
+//        }
+//
+//        private void applyaudiofilters() {
+//
+//        }
+//    }
+//
+//    class EntrainmentThread extends Thread {
+//        private File temptextfile;
+//        private File tempfile;
+//        private File finalfile;
+//        private ArrayList<File> entrainmentlist;
+//        private ArrayList<Cut> cutstoplay;
+//        private int partsforprogressupdates;
+//        private Cut currentcut;
+//        private int rampduration;
+//        private Creator creator;
+//
+//        public EntrainmentThread(Creator creator, Cut currentcut, ArrayList<Cut> cutstoplay, int rampdurationinminutes) {
+//            this.creator = creator;
+//            this.currentcut = currentcut;
+//            this.cutstoplay = cutstoplay;
+//            this.rampduration = rampdurationinminutes;
+//            temptextfile = new File(Session.directorytemp, "txt/" + currentcut.name + "Ent.txt");
+//            tempfile = new File(Session.directorytemp, "Entrainment/" + currentcut.name + "Temp.mp3");
+//            finalfile = new File(Session.directorytemp, "Entrainment/" + this.currentcut.name + ".mp3");
+//        }
+//
+//        @Override
+//        public void run() {
+//            if (cleanupprevioussession()) {
+//                creator.displaycreatingmessage(String.format("Building %s's Entrainment...", currentcut.name));
+//                generateentrainmentlist();
+//                createentrainment();
+////                addaudiofilterstoentrainment();
+////                cleanupthissession();
+//                creator.updateprogress();
+//            } else {System.out.println("Couldn't Delete Previous Session");}
+//        }
+//
+//        private boolean cleanupprevioussession() {
+//            try {
+//                if (temptextfile.exists()) {FileUtils.forceDelete(temptextfile);}
+//                if (tempfile.exists()) {FileUtils.forceDelete(tempfile);}
+//                if (finalfile.exists()) {FileUtils.forceDelete(finalfile);}
+//            } catch (IOException e) {e.printStackTrace();}
+//            boolean allfilesdelete = true;
+//            if (tempfile.exists()) {allfilesdelete = false;}
+//            if (temptextfile.exists()) {allfilesdelete = false;}
+//            if (finalfile.exists()) {allfilesdelete = false;}
+//            return allfilesdelete;
+//        }
+//
+//        private void createentrainment() {
+//            PrintWriter writer = null;
+//            try {
+//                writer = new PrintWriter(temptextfile);
+//                for (File k : entrainmentlist) {writer.println("file " + "\'" + k.getAbsolutePath() + "\'");}
+//                writer.close();
+//            } catch (FileNotFoundException ignored) {}
+//
+////            CommandLine concatenateentrainmentcmdlist = new CommandLine("ffmpeg");
+////            concatenateentrainmentcmdlist.addArgument("-f");
+////            concatenateentrainmentcmdlist.addArgument("concat");
+////            concatenateentrainmentcmdlist.addArgument("-i");
+////            concatenateentrainmentcmdlist.addArgument(temptextfile.getAbsolutePath());
+////            concatenateentrainmentcmdlist.addArgument("-c");
+////            concatenateentrainmentcmdlist.addArgument("copy");
+////            concatenateentrainmentcmdlist.addArgument(finalfile.getAbsolutePath());
+//////            System.out.println(concatenateentrainmentcmdlist.toString());
+////            ByteArrayOutputStream out=new ByteArrayOutputStream();
+////            ByteArrayOutputStream err=new ByteArrayOutputStream();
+////            DefaultExecutor executor = new DefaultExecutor();
+////            PumpStreamHandler handler=new PumpStreamHandler(out,err);
+////            executor.setStreamHandler(handler);
+////            try {int exitValue = executor.execute(concatenateentrainmentcmdlist);
+////            } catch (IOException ignored) {//e.printStackTrace();
+////            }
+////            if (! tempfile.exists()) {System.out.println(String.format("Couldn't Create %s Entrainment", tempfile.getAbsolutePath()));}
+//        }
+//
+//
+//        private void generateentrainmentlist() {
+//            entrainmentlist = new ArrayList<>();
+//
+//        }
+//
+//        private void addaudiofilterstoentrainment() {
+//
+//        }
+//
+//        private void cleanupthissession() {
+//            try {
+//                FileUtils.forceDelete(temptextfile);
+//                FileUtils.forceDelete(tempfile);
+//            } catch (IOException ignored) {}
+//        }
+//    }
+}

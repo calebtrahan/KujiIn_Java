@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="195.0" prefWidth="553.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="103.0" layoutY="44.0" prefHeight="30.0" prefWidth="347.0" text="This will change/add a new alert file to the program" />
+      <Label layoutX="5.0" layoutY="8.0" prefHeight="43.0" prefWidth="544.0" text="The 'alert file' is a short audible warning that is played in between cuts to let you know it's time to move on to the next cut" textAlignment="CENTER" wrapText="true" />
+      <Label layoutX="229.0" layoutY="84.0" text="New Alert File:" />
+      <TextField fx:id="alertfileTextField" layoutX="18.0" layoutY="117.0" prefHeight="26.0" prefWidth="523.0" text="Please Select..." />
+      <Button fx:id="openFileButton" layoutX="18.0" layoutY="158.0" mnemonicParsing="false" text="Open File" onMousePressed="#openandtestnewfile"/>
+      <Button fx:id="AcceptButton" layoutX="407.0" layoutY="158.0" mnemonicParsing="false" text="Accept" onMousePressed="#commitchanges"/>
+      <Button fx:id="CancelButton" layoutX="477.0" layoutY="158.0" mnemonicParsing="false" text="Cancel" onMousePressed="#cancel"/>
+   </children>
+</AnchorPane>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="661.0" prefWidth="546.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TableView fx:id="AmbienceListTableView" layoutX="12.0" layoutY="130.0" prefHeight="435.0" prefWidth="520.0">
+        <columns>
+          <TableColumn fx:id="NameColumn" prefWidth="375.0" text="Name" />
+          <TableColumn fx:id="DurationColumn" minWidth="0.0" prefWidth="155.0" text="Length" />
+        </columns>
+      </TableView>
+      <Label fx:id="CurrentlySelectedLabel" alignment="CENTER" layoutX="15.0" layoutY="100.0" prefHeight="16.0" prefWidth="520.0" text="No Ambience Loaded...." />
+      <Label alignment="CENTER_RIGHT" layoutX="73.0" layoutY="65.0" prefHeight="16.0" prefWidth="98.0" text="Select Cut:" />
+      <ChoiceBox fx:id="CutSelectChoiceBox" layoutX="180.0" layoutY="60.0" prefWidth="150.0" />
+      <Button fx:id="LoadCutsAmbienceButton" layoutX="355.0" layoutY="60.0" mnemonicParsing="false" onMousePressed="#populateCutTableView" text="Load Ambience" />
+      <Label alignment="CENTER" layoutX="16.0" layoutY="14.0" prefHeight="26.0" prefWidth="534.0" text="Ambience Editor">
+         <font>
+            <Font size="22.0" />
+         </font></Label>
+      <Button fx:id="AddButton" layoutX="418.0" layoutY="574.0" mnemonicParsing="false" onMousePressed="#addToTable" text="Add" />
+      <Button fx:id="RemoveButton" layoutX="468.0" layoutY="574.0" mnemonicParsing="false" onMousePressed="#removefromTable" text="Remove" />
+      <Button fx:id="PreviewButton" layoutX="283.0" layoutY="622.0" mnemonicParsing="false" onMousePressed="#preview" text="Start" />
+      <Label fx:id="PreviewCurrentTimeLabel" layoutX="39.0" layoutY="627.0" text="00:00" />
+      <Slider fx:id="PreviewSlider" layoutX="90.0" layoutY="627.0" />
+      <Label fx:id="PreviewTotalTimeLabel" layoutX="240.0" layoutY="627.0" text="00:00" />
+      <Button fx:id="CloseButton" layoutX="483.0" layoutY="630.0" mnemonicParsing="false" onMousePressed="#closewindow" text="Close" />
+      <Label fx:id="PreviewNameLabel" layoutX="36.0" layoutY="601.0" prefHeight="16.0" prefWidth="389.0" text="Select A File To Preview..." />
+      <Label alignment="CENTER" layoutX="37.0" layoutY="574.0" prefHeight="26.0" prefWidth="311.0" text="Preview Player" textAlignment="CENTER">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

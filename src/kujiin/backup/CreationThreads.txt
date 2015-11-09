@@ -1,0 +1,52 @@
+    class CreateEntrainment implements Runnable {
+        private Boolean entrainmentsuccessfullycreated;
+
+        @Override
+        public void run() {
+            thisession.displaycreationmessage(String.format("Now Creating %s's Entrainment", name));
+
+            if (generateentrainmentlists()) {
+                if (writeentrainmenttextfile()) {
+                     setEntrainmentsuccessfullycreated(concatenateentrainment());
+                    //        addaudiofiltersforentrainment();
+                } else {setEntrainmentsuccessfullycreated(false);}
+            } else {setEntrainmentsuccessfullycreated(false);}
+            thisession.updatecreationpercent();
+        }
+
+        public Boolean getEntrainmentsuccessfullycreated() {
+            return entrainmentsuccessfullycreated;
+        }
+
+        public void setEntrainmentsuccessfullycreated(Boolean entrainmentsuccessfullycreated) {
+            this.entrainmentsuccessfullycreated = entrainmentsuccessfullycreated;
+        }
+    }
+
+    class CreateAmbience implements Runnable {
+        private Boolean ambiencesuccessfullycreated;
+
+        @Override
+        public void run() {
+            thisession.displaycreationmessage(String.format("Now Creating %s's Ambience", name));
+
+            if (totalambienceduration > 0.0) {
+                if (generateambiencelist()) {
+                    if (writeambiencelisttotextfile()) {
+                        setAmbiencesuccessfullycreated(concatenateambience() && adjustambiencelength());
+                    } else {setAmbiencesuccessfullycreated(false);}
+                } else {setAmbiencesuccessfullycreated(false);}
+            }  else {setAmbiencesuccessfullycreated(false);}
+            thisession.updatecreationpercent();
+        }
+
+
+
+        public Boolean getAmbiencesuccessfullycreated() {
+            return ambiencesuccessfullycreated;
+        }
+
+        public void setAmbiencesuccessfullycreated(Boolean ambiencesuccessfullycreated) {
+            this.ambiencesuccessfullycreated = ambiencesuccessfullycreated;
+        }
+    }

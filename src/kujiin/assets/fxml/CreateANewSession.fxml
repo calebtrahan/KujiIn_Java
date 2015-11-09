@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="467.0" prefWidth="590.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TitledPane alignment="CENTER" collapsible="false" contentDisplay="CENTER" layoutX="14.0" layoutY="53.0" prefHeight="343.0" prefWidth="270.0" text="Durations You Would Like To Practice">
+         <content>
+            <VBox prefHeight="323.0" prefWidth="185.0">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Presession">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="pretime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label alignment="TOP_LEFT" text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Rin">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="rintime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label contentDisplay="CENTER" text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Kyo">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="kyotime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Toh">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="tohtime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="74.0" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Sha">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="shatime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="74.0" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Kai">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="kaitime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="106.0" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Jin">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="jintime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="106.0" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Retsu">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="retsutime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="138.0" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Zai">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="zaitime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="106.0" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Zen">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="zentime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="170.0" prefHeight="32.0" prefWidth="158.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="90.0" text="Postsession">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="posttime" prefHeight="25.0" prefWidth="34.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="minute(s)">
+                           <HBox.margin>
+                              <Insets left="10.0" top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </content>
+      </TitledPane>
+      <Label alignment="CENTER" layoutX="310.0" layoutY="214.0" prefHeight="21.0" prefWidth="242.0" text="Total Session Time" underline="true">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" layoutX="318.0" layoutY="306.0" prefHeight="21.0" prefWidth="242.0" text="Approximate Finish Time" underline="true">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="CancelButton" layoutX="515.0" layoutY="409.0" mnemonicParsing="false" onAction="#cancelsessioncreation" text="Cancel" />
+      <Button fx:id="CreateSessionButton" layoutX="366.0" layoutY="409.0" mnemonicParsing="false" onAction="#createsession" text="Create This Session" />
+      <Label fx:id="totalsessiontimeFormattedLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="308.0" layoutY="258.0" prefHeight="16.0" prefWidth="262.0" text="No Values Set" textAlignment="CENTER">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="approximatefinishtimeLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="308.0" layoutY="348.0" prefHeight="16.0" prefWidth="262.0" text="No Values Set" textAlignment="CENTER">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <CheckBox fx:id="AmbienceOptionCheckBox" layoutX="318.0" layoutY="168.0" mnemonicParsing="false" onAction="#checkambience" prefHeight="22.0" prefWidth="242.0" text="Add Ambience To Session?">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </CheckBox>
+      <Label alignment="CENTER" layoutX="12.0" layoutY="14.0" prefHeight="35.0" prefWidth="566.0" text="Custom Session Creator" textAlignment="CENTER">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" layoutX="310.0" layoutY="129.0" prefHeight="21.0" prefWidth="242.0" text="Ambience" underline="true">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="ChangeAllValuesButton" layoutX="14.0" layoutY="409.0" mnemonicParsing="false" onMousePressed="#changeallvalues" text="Change All Values" />
+      <Button fx:id="opensavedpresetButton" layoutX="368.0" layoutY="71.0" mnemonicParsing="false" onAction="#opensavedpreset" text="Open Saved Preset" />
+      <Button fx:id="SaveAsPresetButton" layoutX="169.0" layoutY="409.0" mnemonicParsing="false" onAction="#savethissessionaspreset" text="Save As Preset" />
+      <Label fx:id="sessioncreatorstatusbar" layoutX="12.0" layoutY="444.0" prefHeight="18.0" prefWidth="574.0" />
+   </children>
+</AnchorPane>

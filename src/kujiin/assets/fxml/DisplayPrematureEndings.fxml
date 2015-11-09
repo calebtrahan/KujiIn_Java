@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="696.0" prefWidth="893.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TableView fx:id="prematureendingTable" layoutX="12.0" layoutY="48.0" prefHeight="609.0" prefWidth="870.0">
+        <columns>
+          <TableColumn fx:id="DateColumn" prefWidth="75.0" text="Date" />
+          <TableColumn fx:id="LastCutPracticedColumn" prefWidth="135.0" text="Last Cut Practiced" />
+            <TableColumn fx:id="ExpectedSessionColumn" prefWidth="198.0" text="Expected Session" />
+            <TableColumn fx:id="ReasonColumn" prefWidth="461.0" text="Reason For Ending Prematurely" />
+        </columns>
+      </TableView>
+      <Button fx:id="CloseButton" layoutX="830.0" layoutY="664.0" mnemonicParsing="false" onMousePressed="#closeDialog" text="Close" />
+      <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" prefHeight="16.0" prefWidth="870.0" text="Premature Endings List" textAlignment="CENTER" underline="true">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

@@ -1,0 +1,107 @@
+package kujiin;
+
+import javafx.beans.InvalidationListener;
+import javafx.scene.control.Label;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
+import java.io.File;
+import java.util.ArrayList;
+
+public class Player {
+//    ArrayList<Media> entrainmentparts = new ArrayList<>();
+//    ArrayList<Media> ambienceparts = new ArrayList<>();
+    Integer partindex; // This Will Keep Track Of Which Cut (It's Index) To Grab Below (No Generators In Java!)
+    ArrayList<Cut> cutstoplay;
+    Cut currentcut;
+    Boolean ambienceenabled;
+    File entrainmentfile;
+    File ambiencefile;
+    Media entrainmentmedia;
+    Media ambiencemedia;
+    MediaPlayer entrainmentplayer;
+    MediaPlayer ambienceplayer;
+    Label PlayercurrentlyplayingLabel;
+    Label PlayercurrentcutprogressLabel;
+    Label PlayertotalsessionprogressLabel;
+    Integer totalseconds;
+    Root root;
+
+    public Player(ArrayList<Cut> cutstoplay, Boolean ambienceenabled, Root root) {
+        this.root = root;
+        this.cutstoplay = cutstoplay;
+        this.ambienceenabled = ambienceenabled;
+        PlayercurrentlyplayingLabel = root.PlayercurrentlyplayingLabel;
+        PlayercurrentcutprogressLabel = root.PlayercurrentcutprogressLabel;
+        PlayertotalsessionprogressLabel = root.PlayertotalsessionprogressLabel;
+        partindex = 0;
+        totalseconds = 0;
+    }
+
+    public void play() {
+        System.out.println("Called The Play Method");
+        currentcut = cutstoplay.get(partindex);
+        entrainmentfile = new File(Session.directorytemp, "Entrainment/" + currentcut.name + ".mp3");
+        entrainmentmedia = new Media(entrainmentfile.toURI().toString());
+        if (ambienceenabled) {
+            ambiencefile = new File(Session.directorytemp, "Ambience/" + currentcut.name + ".mp3");
+            ambiencemedia = new Media(ambiencefile.toURI().toString());
+        }
+        entrainmentplayer = new MediaPlayer(entrainmentmedia);
+        entrainmentplayer.play();
+        if (ambienceenabled) {
+            ambienceplayer = new MediaPlayer(ambiencemedia);
+            ambienceplayer.play();
+        }
+        partindex++;
+        // TODO Add Alert Here (Maybe Using Odd And Even Numbers?)
+        entrainmentplayer.setOnEndOfMedia(() -> {
+            System.out.println("Called End Of Media");
+            if (entrainmentplayer != null) {entrainmentplayer.dispose();}
+            if (ambienceplayer != null) {ambienceplayer.dispose();}
+            try {
+                currentcut = cutstoplay.get(partindex);
+                entrainmentfile = new File(Session.directorytemp, "Entrainment/" + currentcut.name + ".mp3");
+                entrainmentmedia = new Media(entrainmentfile.toURI().toString());
+                if (ambienceenabled) {
+                    ambiencefile = new File(Session.directorytemp, "Ambience/" + currentcut.name + ".mp3");
+                    ambiencemedia = new Media(ambiencefile.toURI().toString());
+                }
+                entrainmentplayer = new MediaPlayer(entrainmentmedia);
+                entrainmentplayer.play();
+                if (ambienceenabled) {
+                    ambienceplayer = new MediaPlayer(ambiencemedia);
+                    ambienceplayer.play();
+                }
+                partindex++;
+            } catch (ArrayIndexOutOfBoundsException e) {endofsession();}
+            System.out.println("Parts Was Incremented! It's Now At: " + partindex);
+        });
+        entrainmentplayer.currentTimeProperty().addListener(observable -> {updateplayerui();});
+        root.EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+        if (ambienceenabled) {
+            root.AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
+        }
+    }
+
+    public int gettotalduration() {
+        int totalduration = 0;
+        for (Cut i : cutstoplay) {
+            totalduration += i.getdurationinseconds();
+        }
+        return totalduration;
+    }
+
+    public void updateplayerui() {
+        // TODO CONTINUE HERE, THE TOTAL PROGRESS IS UPDATING FUCKED UP
+        int currenttimeseconds = (int) entrainmentplayer.getCurrentTime().toSeconds();
+        PlayercurrentlyplayingLabel.setText(currentcut.name);
+        PlayercurrentcutprogressLabel.setText(String.valueOf(Tools.formatcurrentcutprogress(currentcut, currenttimeseconds)));
+        PlayertotalsessionprogressLabel.setText(String.valueOf(Tools.formattotalprogress(totalseconds, gettotalduration())));
+        totalseconds ++;
+    }
+
+    public void endofsession() {
+        System.out.println("End Of Session!");
+    }
+}

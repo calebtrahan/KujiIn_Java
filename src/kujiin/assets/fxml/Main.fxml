@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane centerShape="false" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" pickOnBounds="false" prefHeight="483.0" prefWidth="879.0" scaleShape="false" snapToPixel="false" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.Root">
+   <children>
+      <MenuBar layoutX="3.0" prefHeight="29.0" prefWidth="879.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Tools">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#addambiencetoprogram" text="Add Ambience To Program" />
+              <MenuItem mnemonicParsing="false" onAction="#changealertfile" text="Change Alert File" />
+              <MenuItem mnemonicParsing="false" onAction="#editprogramsambience" text="Edit Program's Ambience" />
+              <MenuItem mnemonicParsing="false" onAction="#editreferencefiles" text="Edit Reference Files" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#howtouseprogram" text="How To Use This Program" />
+              <MenuItem mnemonicParsing="false" onAction="#aboutthisprogram" text="About" />
+              <MenuItem mnemonicParsing="false" onAction="#contactme" text="Contact Me" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <ProgressBar fx:id="goalsprogressbar" layoutX="586.0" layoutY="396.0" prefHeight="22.0" prefWidth="177.0" progress="0.0" />
+      <Label fx:id="goalscurrrentvalueLabel" alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="485.0" layoutY="398.0" prefHeight="17.0" prefWidth="91.0" text="99.99 hrs" textAlignment="CENTER" />
+      <Label fx:id="goalssettimeLabel" contentDisplay="CENTER" layoutX="776.0" layoutY="398.0" prefHeight="17.0" prefWidth="91.0" text="99.99 hrs" textAlignment="CENTER" />
+      <HBox alignment="BOTTOM_RIGHT" layoutX="464.0" layoutY="424.0" prefHeight="26.0" prefWidth="404.0">
+         <children>
+            <Button fx:id="newgoalButton" mnemonicParsing="false" onMousePressed="#setnewgoal" prefHeight="26.0" prefWidth="89.0" text="New Goal" />
+            <Button fx:id="goalpacingButton" mnemonicParsing="false" onMousePressed="#getgoalpacing" text="Pacing" />
+            <Button fx:id="viewcurrrentgoalsButton" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" text="View Current" />
+            <Button fx:id="viewcompletedgoalsButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onMousePressed="#viewcompletedgoals" text="View Completed" />
+         </children>
+      </HBox>
+      <TableView fx:id="progresstable" layoutX="487.0" layoutY="70.0" onSort="#gettotalprogress" prefHeight="242.0" prefWidth="375.0">
+        <columns>
+            <TableColumn fx:id="NumberColumn" prefWidth="32.0" style="-fx-alignment: center;" text="#" />
+          <TableColumn fx:id="NameColumn" prefWidth="162.0" style="-fx-alignment: center;" text="Name" />
+          <TableColumn fx:id="ProgressColumn" prefWidth="179.0" style="-fx-alignment: center;" text="Progress" />
+        </columns>
+      </TableView>
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="487.0" layoutY="41.0" prefHeight="29.0" prefWidth="377.0" text="Total Progress" textAlignment="CENTER">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" layoutX="114.0" layoutY="251.0" prefHeight="22.0" prefWidth="239.0" text="Session Player">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </Label>
+      <ProgressBar fx:id="CutProgressBar" layoutX="58.0" layoutY="334.0" prefHeight="20.0" prefWidth="124.0" progress="0.0" />
+      <ProgressBar fx:id="TotalProgressBar" layoutX="282.0" layoutY="333.0" prefHeight="20.0" prefWidth="124.0" progress="0.0" />
+      <Label fx:id="CutProgressTopLabel" alignment="CENTER" layoutX="38.0" layoutY="312.0" prefHeight="17.0" prefWidth="166.0" text="\%s Progress" />
+      <Label alignment="CENTER" layoutX="282.0" layoutY="312.0" prefHeight="17.0" prefWidth="124.0" text="Total Progress" textAlignment="CENTER" />
+      <Label fx:id="CutProgressLabelCurrent" layoutX="17.0" layoutY="336.0" text="00:00" />
+      <Label fx:id="TotalProgressLabelCurrent" layoutX="237.0" layoutY="335.0" text="00:00" />
+      <Label fx:id="CutProgressLabelTotal" layoutX="189.0" layoutY="335.0" text="99:99" />
+      <Label fx:id="TotalProgressLabelTotal" layoutX="413.0" layoutY="335.0" text="99:99" />
+      <Label layoutX="216.0" layoutY="371.0" prefHeight="17.0" prefWidth="54.0" text="Volume" />
+      <Label alignment="CENTER_RIGHT" layoutX="10.0" layoutY="390.0" prefHeight="17.0" prefWidth="89.0" text="Entrainment" />
+      <Slider fx:id="EntrainmentVolumeSlider" layoutX="103.0" layoutY="391.0" max="1.0" prefHeight="15.0" prefWidth="134.0" />
+      <Label alignment="CENTER_RIGHT" layoutX="246.0" layoutY="390.0" prefHeight="17.0" prefWidth="68.0" text="Ambience" />
+      <Slider fx:id="AmbienceVolumeSlider" layoutX="322.0" layoutY="389.0" max="1.0" prefHeight="20.0" prefWidth="124.0" />
+      <CheckBox fx:id="ReferenceFilesOption" layoutX="14.0" layoutY="426.0" mnemonicParsing="false" onAction="#setReferenceOption" prefHeight="22.0" prefWidth="177.0" text="Display Reference File" textAlignment="CENTER" wrapText="true" />
+      <Label fx:id="StatusBar" layoutX="1.0" layoutY="461.0" prefHeight="17.0" prefWidth="869.0" text="StatusBar" />
+      <HBox layoutX="19.0" layoutY="91.0" prefHeight="20.0" prefWidth="448.0">
+         <children>
+            <Label text="Pre" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Label text="RIN" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Label text="KYO" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Label text="TOH" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Label text="SHA" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Label text="KAI" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Label text="JIN" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Label text="RETSU" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Label prefHeight="20.0" prefWidth="30.0" text="ZAI" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label text="ZEN" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Label prefHeight="21.0" prefWidth="34.0" text="Post" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+      <Label alignment="CENTER" layoutX="139.0" layoutY="45.0" prefHeight="21.0" prefWidth="189.0" text="Session Creator">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <HBox alignment="CENTER" layoutX="9.0" layoutY="111.0" prefHeight="31.0" prefWidth="448.0">
+         <children>
+            <TextField fx:id="PreTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="RinTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="KyoTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="TohTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="ShaTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="KaiTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="JinTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="RetsuTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="ZaiTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="ZenTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="PostTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+         </children>
+      </HBox>
+      <Label layoutX="24.0" layoutY="144.0" text="Ambience In Session" />
+      <Label layoutX="318.0" layoutY="141.0" text="Total Session Time" />
+      <TextField fx:id="AmbienceEnabledTextField" alignment="CENTER" disable="true" layoutX="17.0" layoutY="164.0" prefHeight="26.0" prefWidth="146.0" text="No Session Created" />
+      <TextField fx:id="TotalSessionTimeTextField" alignment="CENTER" disable="true" layoutX="306.0" layoutY="161.0" prefHeight="26.0" prefWidth="146.0" text="No Session Created" />
+      <Label alignment="CENTER" layoutX="193.0" layoutY="144.0" prefHeight="41.0" prefWidth="103.0" text="Duration(s) In Minutes" textAlignment="CENTER" wrapText="true" />
+      <Label alignment="CENTER" layoutX="614.0" layoutY="365.0" prefHeight="28.0" prefWidth="124.0" text="Current Goal">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </Label>
+      <HBox alignment="CENTER_RIGHT" layoutX="206.0" layoutY="424.0" prefHeight="26.0" prefWidth="245.0">
+         <children>
+            <Button fx:id="PlayButton" mnemonicParsing="false" onMousePressed="#playsession" prefHeight="26.0" prefWidth="62.0" text="Play" />
+            <Button fx:id="PauseButton" mnemonicParsing="false" onMousePressed="#pausesession" text="Pause" />
+            <Button fx:id="StopButton" mnemonicParsing="false" onMousePressed="#stopsession" text="Stop" />
+         </children>
+      </HBox>
+      <Label layoutX="174.0" layoutY="296.0" text="Playback Progress" />
+      <HBox alignment="BOTTOM_RIGHT" layoutX="253.0" layoutY="200.0" prefHeight="31.0" prefWidth="200.0">
+         <children>
+            <Button fx:id="CreateButton" mnemonicParsing="false" onMousePressed="#createsession" prefHeight="26.0" prefWidth="98.0" text="Create New" />
+            <Button fx:id="ExportButton" mnemonicParsing="false" onMousePressed="#exportsession" prefHeight="26.0" prefWidth="98.0" text="Export" />
+         </children>
+      </HBox>
+      <HBox alignment="BOTTOM_RIGHT" layoutX="484.0" layoutY="318.0" prefHeight="31.0" prefWidth="377.0">
+         <children>
+            <Button fx:id="ListOfSessionsButton" mnemonicParsing="false" onMousePressed="#displaylistofsessions" prefHeight="29.0" prefWidth="124.0" text="List Of Sessions" />
+            <Button fx:id="PrematureEndingsButton" mnemonicParsing="false" onMousePressed="#displayprematureendings" prefHeight="29.0" prefWidth="201.0" text="List Of Premature Endings" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
