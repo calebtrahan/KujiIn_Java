@@ -172,17 +172,17 @@
       </Label>
       <HBox alignment="CENTER" layoutX="9.0" layoutY="111.0" prefHeight="31.0" prefWidth="448.0">
          <children>
-            <TextField fx:id="PreTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
-            <TextField fx:id="RinTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
-            <TextField fx:id="KyoTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
-            <TextField fx:id="TohTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
-            <TextField fx:id="ShaTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
-            <TextField fx:id="KaiTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
-            <TextField fx:id="JinTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
-            <TextField fx:id="RetsuTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
-            <TextField fx:id="ZaiTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
-            <TextField fx:id="ZenTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
-            <TextField fx:id="PostTime" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="PreTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="RinTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="KyoTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="TohTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="ShaTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="KaiTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="JinTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="RetsuTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="ZaiTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="ZenTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
+            <TextField fx:id="PostTime" alignment="CENTER" disable="true" editable="false" prefHeight="25.0" prefWidth="40.0" />
          </children>
       </HBox>
       <Label layoutX="24.0" layoutY="144.0" text="Ambience In Session" />
