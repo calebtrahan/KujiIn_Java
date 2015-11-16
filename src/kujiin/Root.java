@@ -2,13 +2,10 @@ package kujiin;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
 import kujiin.dialogs.*;
 
@@ -25,10 +22,10 @@ public class Root implements Initializable {
     // TODO Finish Pause() And Stop()
         // Maybe Set An Enum For What The Player Is Doing To Avoid A Million If Else Statements In Pause And Play?
     // TODO Find Out Why Goals Set Only Has 1 Column
-    // TODO Set Play Button To Resume Session When Paused
-    // TODO Make The 'Currently Loaded Session' Widget Box Into The Session Confirmation Dialog In The Python Version
+    // TODO Set Play Button To Resume This_Session When Paused
+    // TODO Make The 'Currently Loaded This_Session' Widget Box Into The This_Session Confirmation Dialog In The Python Version
 
-    // TODO On Startup See If Session Is Created (From Previous Run) If It Ask The User If They Want To Load This Session
+    // TODO On Startup See If This_Session Is Created (From Previous Run) If It Ask The User If They Want To Load This This_Session
 
     public TableView<Database.TotalProgressRow> progresstable;
     public Button CreateButton;
@@ -47,13 +44,8 @@ public class Root implements Initializable {
     public Button viewcompletedgoalsButton;
     public Button PauseButton;
     public Button StopButton;
-    public Label PlayercurrentcutprogressLabel;
-    public Label PlayertotalsessionprogressLabel;
-    public Slider EntrainmentVolumeSlider;
-    public Slider AmbienceVolumeSlider;
     public TableColumn<Database.TotalProgressRow, String> NameColumn;
     public TableColumn<Database.TotalProgressRow, String> ProgressColumn;
-    public Label PlayercurrentlyplayingLabelWithProgressPrefix;
     public TableColumn<Database.TotalProgressRow, Integer> NumberColumn;
     public TextField AmbienceEnabledTextField;
     public TextField TotalSessionTimeTextField;
@@ -75,7 +67,7 @@ public class Root implements Initializable {
     public Label CutProgressLabelTotal;
     public Label TotalProgressLabelTotal;
     public Label CutProgressTopLabel;
-    Session thissession;
+    This_Session thissession;
 //    Goals sessiongoals;
     Database sessiondatabase;
     Boolean readytoplay;
@@ -85,7 +77,7 @@ public class Root implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        thissession = new Session(this);
+        thissession = new This_Session(this);
 //        sessiongoals = new Goals(goalsprogressbar, goalscurrrentvalueLabel, goalssettimeLabel);
 //        sessiongoals.populategoalwidget();
         readytoplay = false;
@@ -93,8 +85,8 @@ public class Root implements Initializable {
         StatusBar.textProperty().addListener((observable, oldValue, newValue) -> {
             new Timeline(new KeyFrame(Duration.millis(3000), ae -> StatusBar.setText(""))).play();
         });
-        AmbienceEnabledTextField.setText("No Session Created");
-        TotalSessionTimeTextField.setText("No Session Created");
+        AmbienceEnabledTextField.setText("No This_Session Created");
+        TotalSessionTimeTextField.setText("No This_Session Created");
         settextfieldvalue(PreTime, 0);
         settextfieldvalue(RinTime, 0);
         settextfieldvalue(KyoTime, 0);
@@ -153,7 +145,7 @@ public class Root implements Initializable {
         try {
             if (thissession.cutsinsession.size() != 0) {
                 ArrayList<Integer> cuttimes = new ArrayList<>(11);
-                for (String i : Session.allnames) {
+                for (String i : This_Session.allnames) {
                     Integer duration = 0;
                     for (Cut x : thissession.cutsinsession) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
                     cuttimes.add(duration);
@@ -169,9 +161,9 @@ public class Root implements Initializable {
                 settextfieldvalue(ZaiTime, cuttimes.get(8));
                 settextfieldvalue(ZenTime, cuttimes.get(9));
                 settextfieldvalue(PostTime, cuttimes.get(10));
-                // TODO Get Session Information Here And Pass Into Root Boxes PRE-POSTTime
+                // TODO Get This_Session Information Here And Pass Into Root Boxes PRE-POSTTime
             }
-            // Set Ambience Enabled And Session Total Time
+            // Set Ambience Enabled And This_Session Total Time
             if (thissession.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes");}
             else {AmbienceEnabledTextField.setText("No");}
             TotalSessionTimeTextField.setText(thissession.gettotalsessionduration());
@@ -185,12 +177,12 @@ public class Root implements Initializable {
             sessioncurrentlybeingcreated = true;
             if (thissession.getCreated()) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Session Validation");
-                alert.setHeaderText("Session Is Already Created");
-                alert.setContentText("Overwrite Previous Session?");
+                alert.setTitle("This_Session Validation");
+                alert.setHeaderText("This_Session Is Already Created");
+                alert.setContentText("Overwrite Previous This_Session?");
                 Optional<ButtonType> result = alert.showAndWait();
                 if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
-                    Session.deleteprevioussession();
+                    This_Session.deleteprevioussession();
                 } else {
                     sessioncurrentlybeingcreated = false;
                     return;
@@ -203,7 +195,7 @@ public class Root implements Initializable {
                 getsessioninformation();
             }
         } else {
-            StatusBar.setText("Session Already Being Created");
+            StatusBar.setText("This_Session Already Being Created");
         }
     }
     public void exportsession(Event event) {thissession.export();}
@@ -217,27 +209,27 @@ public class Root implements Initializable {
     public void playsession(Event event) {
         if (thissession.getCreated()) {
             try {
-                StatusBar.setText("Session Playing...");
+                StatusBar.setText("This_Session Playing...");
                 thissession.play();
             } catch (NullPointerException e) {
-                StatusBar.setText("No Session Created. Create A Session First");
+                StatusBar.setText("No This_Session Created. Create A This_Session First");
             }
         } else {
-            StatusBar.setText("No Session Created");
+            StatusBar.setText("No This_Session Created");
         }
     }
     public void pausesession(Event event) {
         try {
             thissession.pause();
         } catch (NullPointerException e) {
-            StatusBar.setText("No Session Playing");
+            StatusBar.setText("No This_Session Playing");
         }
     }
     public void stopsession(Event event) {
         try {
             thissession.stop();
         } catch (NullPointerException e) {
-            StatusBar.setText("No Session Playing");
+            StatusBar.setText("No This_Session Playing");
         }
     }
     public void setReferenceOption(ActionEvent actionEvent) {

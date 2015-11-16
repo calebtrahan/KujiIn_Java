@@ -1,6 +1,8 @@
 package kujiin;
 
 import javafx.concurrent.Service;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import kujiin.dialogs.CreatingSessionDialog;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -12,8 +14,7 @@ import java.util.Random;
 
 //enum AmbienceOption {General, Specific};
 
-// TODO Continue Encapsulating This And Connect New Logic (Or Maybe Put Creating
-//  Threads In Session Or As Part Of Creating Session Dialog
+// TODO
 
 public class Cut {
     public String name;
@@ -34,25 +35,31 @@ public class Cut {
     private ArrayList<Double> ambiencefiledurations;
     private File ambiencedirectory;
     private double totalambienceduration;
-    private Session thisession;
+    private This_Session thisession;
     private Service<Void> entrainmentcreatorservice;
     private Service<Void> ambiencecreatorservice;
+    private int entrainmentplaycount;
+    private int ambienceplaycount;
+    private ArrayList<Media> entrainmentmedia;
+    private ArrayList<Media> ambiencemedia;
+    private MediaPlayer entrainmentplayer;
+    private MediaPlayer ambienceplayer;
+    public boolean ambienceenabled;
 
-
-    public Cut(int number, String name, Boolean ramp, int duration, Session thisession) {
+    public Cut(int number, String name, Boolean ramp, int duration, This_Session thisession) {
         this.number = number;
         this.name = name;
         this.ramp = ramp;
         if (this.ramp) { this.rampduration = 2;} // TODO This Can Be Set In Options
         this.duration = duration;
         this.thisession = thisession;
-        ambiencedirectory = new File(Session.directoryambience, name);
-        tempentrainmenttextfile = new File(Session.directorytemp, "txt/" + name + "Ent.txt");
-        tempentrainmentfile = new File(Session.directorytemp, "Entrainment/" + name + "Temp.mp3");
-        finalentrainmentfile = new File(Session.directorytemp, "Entrainment/" + name + ".mp3");
-        tempambiencetextfile = new File(Session.directorytemp, "txt/" + name + "Amb.txt");
-        tempambiencefile = new File(Session.directorytemp, "Ambience/" + name + "Temp.mp3");
-        finalambiencefile = new File(Session.directorytemp, "Ambience/" + name + ".mp3");
+        ambiencedirectory = new File(This_Session.directoryambience, name);
+        tempentrainmenttextfile = new File(This_Session.directorytemp, "txt/" + name + "Ent.txt");
+        tempentrainmentfile = new File(This_Session.directorytemp, "Entrainment/" + name + "Temp.mp3");
+        finalentrainmentfile = new File(This_Session.directorytemp, "Entrainment/" + name + ".mp3");
+        tempambiencetextfile = new File(This_Session.directorytemp, "txt/" + name + "Amb.txt");
+        tempambiencefile = new File(This_Session.directorytemp, "Ambience/" + name + "Temp.mp3");
+        finalambiencefile = new File(This_Session.directorytemp, "Ambience/" + name + ".mp3");
     }
 
     public Cut(String alertname) {
@@ -60,14 +67,12 @@ public class Cut {
     }
     // <-------------------------- GETTERS AND SETTERS ------------------------------------> //
 
-    // Converts Total Duration To Seconds
     public int getdurationinseconds() {
         int audiodurationinseconds;
         audiodurationinseconds = duration;
         if (number == 0 || number == 10) {audiodurationinseconds += rampduration;}
         return audiodurationinseconds * 60;
     }
-
     public String getcreatedtext() {
         StringBuilder text = new StringBuilder();
         text.append(name).append(": ");
@@ -77,45 +82,36 @@ public class Cut {
         }
         return text.toString();
     }
-
-    // Converts Total Duration To Minutes
     public int getdurationinminutes() {
         int audiodurationinseconds;
         audiodurationinseconds = duration;
         if (number == 0 || number == 10) {audiodurationinseconds += rampduration;}
         return audiodurationinseconds;
     }
-
-    // Setter For duration Field
     public void setDuration(int newduration) {
         this.duration = newduration;
     }
-
-    // Getter For totalambienceduration
     public double getTotalambienceduration() {
         return totalambienceduration;
     }
-
-    // Setter For totalambienceduration
     public void setTotalambienceduration(double totalambienceduration) {
         this.totalambienceduration = totalambienceduration;
     }
+    public void setAmbienceenabled(boolean ambienceenabled) {this.ambienceenabled = ambienceenabled;}
+    public boolean isAmbienceenabled() {return ambienceenabled;}
 
     // <-------------------------- GENERAL CREATION METHODS ---------------------------------> //
 
-    // Checks If Session Is Created
     public Boolean sessioniscreated(boolean ambienceenabled) {
         boolean cutisgood;
-        File entrainmentfile = new File(Session.directorytemp, "Entrainment/" + name + ".mp3");
+        File entrainmentfile = new File(This_Session.directorytemp, "Entrainment/" + name + ".mp3");
         cutisgood = entrainmentfile.exists();
         if (ambienceenabled) {
-            File ambiencefile = new File(Session.directorytemp, "Ambience/" + name + ".mp3");
+            File ambiencefile = new File(This_Session.directorytemp, "Ambience/" + name + ".mp3");
             cutisgood = ambiencefile.exists();
         }
         return cutisgood;
     }
-
-    // TODO Check If This Cut Has ANY Ambience At All
     public boolean hasanyAmbience() {
         ambiencefiles = new ArrayList<>();
         ambiencefiledurations = new ArrayList<>();
@@ -130,79 +126,57 @@ public class Cut {
         } catch (NullPointerException ignored) {return false;}
         return ambiencefiles.size() > 0;
     }
-
-    // Check If The Ambience Duration Is >= The Duration Needed
     public boolean hasenoughAmbience() {
         double a = 0;
         for (Double i : ambiencefiledurations) {a += i;}
         setTotalambienceduration(a);
         return a > (double) getdurationinseconds();
     }
-
-    // Clean Up Temp Files Used When During Cut's Creation
     public void cleanuptempfiles() {
         if (tempambiencefile.exists()) {tempambiencefile.delete();}
         if (tempentrainmentfile.exists()) {tempentrainmentfile.delete();}
         if (tempentrainmenttextfile.exists()) {tempentrainmenttextfile.delete();}
         if (tempambiencetextfile.exists()) {tempambiencetextfile.delete();}
     }
-
-    // Contains Services That Call The Methods That Call The Methods Below
-    public boolean create(Boolean ambienceenabled, ArrayList<Cut> cutstoplay, CreatingSessionDialog creatingsessiondialog) {
-        boolean entrainmentisgood = false;
-        boolean ambienceisgood = false;
-        this.cutstoplay = cutstoplay;
-        generateentrainmentlists();
-        writeentrainmenttextfile();
-        entrainmentisgood = buildentrainment();
-        if (ambienceenabled) {
-            generateambiencelist();
-            writeambiencelisttotextfile();
-            ambienceisgood = buildambience();
-        }
-        cleanuptempfiles();
-        return true;
-//        if (ambienceenabled) {return entrainmentisgood && ambienceisgood;}
-//        else {return entrainmentisgood;}
+    public boolean create() {
+        if (isAmbienceenabled()) {return makeEntrainmentList() && makeAmbienceList();}
+        else {return makeEntrainmentList();}
     }
-
-    // <-------------------------- CREATING ENTRAINMENT METHODS ----------------------------> //
-
-    // Generates A List Of How Many And Which Entrainment Files To Be Concatenated
-    public boolean generateentrainmentlists() {
+    public boolean makeEntrainmentList() {
         entrainmentlist = new ArrayList<>();
+        entrainmentmedia = new ArrayList<>();
         if (number == 0) {                                                                                              // Presession
             for (Integer z = 0; z < duration; z++) {
                 String filename = name + ".mp3";
-                File thisfile = new File(Session.directorymaincuts, filename);
+                File thisfile = new File(This_Session.directorymaincuts, filename);
                 entrainmentlist.add(thisfile);
             }
             String rampupfirstname = "ar" + cutstoplay.get(1).number + rampduration + ".mp3";
-            File ramptofirstcut = new File(Session.directoryrampup, rampupfirstname);
+            File ramptofirstcut = new File(This_Session.directoryrampup, rampupfirstname);
             entrainmentlist.add(ramptofirstcut);
         }
         else if (number == 10) {                                                                                        // PostSession
             String rampdowntopost =  "zr" +
                     cutstoplay.get(cutstoplay.size()-2).number + rampduration + ".mp3";
-            File thisfile = new File(Session.directoryrampdown, rampdowntopost);
+            File thisfile = new File(This_Session.directoryrampdown, rampdowntopost);
             entrainmentlist.add(thisfile);
             for (Integer g = 0; g < duration; g++) {
                 String postname = name + ".mp3";
-                File thatfile = new File(Session.directorymaincuts, postname);
+                File thatfile = new File(This_Session.directorymaincuts, postname);
                 entrainmentlist.add(thatfile);
             }
         }
-        else if (number == 3) {                                                                              // TOH
+        else if (number == 3) {                                                                                         // TOH
             Boolean postsessionisnext = false;
             if (cutstoplay.size() - cutstoplay.indexOf(this) <= 2) {postsessionisnext = true;}
-            File tohmainfile = new File(Session.directorymaincuts, "TOH.mp3");
+            File tohmainfile = new File(This_Session.directorymaincuts, "TOH.mp3");
             // TODO Add 3inpostsession for if going straight into TOH
-            File rampin1 = new File(Session.directorytohramp, "3in1.mp3");
-            File rampin2 = new File(Session.directorytohramp, "3in2.mp3");
-            File rampout1 = new File(Session.directorytohramp, "3out1.mp3");
-            File rampout2 = new File(Session.directorytohramp, "3out2.mp3");
-            File rampoutspecial1 = new File(Session.directorytohramp, "3outpostsession1.mp3");
-            File rampoutspecial2 = new File(Session.directorytohramp, "3outpostsession2.mp3");
+            File rampin1 = new File(This_Session.directorytohramp, "3in1.mp3");
+            File rampin2 = new File(This_Session.directorytohramp, "3in2.mp3");
+            File rampout1 = new File(This_Session.directorytohramp, "3out1.mp3");
+            File rampout2 = new File(This_Session.directorytohramp, "3out2.mp3");
+            File rampoutspecial1 = new File(This_Session.directorytohramp, "3outpostsession1.mp3");
+            File rampoutspecial2 = new File(This_Session.directorytohramp, "3outpostsession2.mp3");
             if (duration <= 5) {
                 entrainmentlist.add(rampin1);
                 for (int c = 0; c < duration - 2; c++) {
@@ -222,86 +196,20 @@ public class Cut {
         else {                                                                                                      // All Other Cuts
             String filename = name + ".mp3";
             for (int c = 0; c < duration; c++) {
-                File thisfile = new File(Session.directorymaincuts, filename);
+                File thisfile = new File(This_Session.directorymaincuts, filename);
                 entrainmentlist.add(thisfile);
             }
         }
-        int count = 0;
         System.out.println(name + "'s Entrainment List");
         for (File i : entrainmentlist) {
             System.out.println(i.getName());
         }
-        return entrainmentlist.size() > 0;
+        for (File i : entrainmentlist) {entrainmentmedia.add(new Media(i.toURI().toString()));}
+        return entrainmentmedia.size() > 0;
     }
-
-    // Writes The Above List To A File So FFMPEG Can Read It
-    public boolean writeentrainmenttextfile() {
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(tempentrainmenttextfile);
-            for (File k : entrainmentlist) {writer.println("file " + "\'" + k.getAbsolutePath() + "\'");}
-            writer.close();
-        } catch (FileNotFoundException ignored) {}
-        return tempentrainmenttextfile.exists();
-    }
-
-    // Calls FFMPEG To Actually Concatenate The Audio Files Into One File
-    public boolean buildentrainment() {
-        ArrayList<String> cmdarraylist = new ArrayList<>();
-        cmdarraylist.add("ffmpeg");
-        cmdarraylist.add("-f");
-        cmdarraylist.add("concat");
-        cmdarraylist.add("-i");
-        cmdarraylist.add(tempentrainmenttextfile.getAbsolutePath());
-        cmdarraylist.add("-c");
-        cmdarraylist.add("copy");
-        cmdarraylist.add(finalentrainmentfile.getAbsolutePath());
-        ProcessBuilder cmdlist = new ProcessBuilder(cmdarraylist);
-        try {
-            int count = 0;
-            while (true) {
-                final Process p;
-                p = cmdlist.start();
-                p.waitFor();
-                if (Tools.checkaudioduration(finalentrainmentfile, getdurationinseconds())) {break;}
-                else {
-                    if (count > 3) {return false;}
-                    else {count++;}
-                }
-            }
-        } catch (IOException | InterruptedException e) {e.printStackTrace();}
-        return finalentrainmentfile.exists();
-    }
-
-    // Adds Fade Filters To The Audio File For Postprocessing
-    public boolean addaudiofiltersforentrainment() {
-        CommandLine audiofilterentrainmentcmdlist = new CommandLine("ffmpeg");
-        audiofilterentrainmentcmdlist.addArgument("-i");
-        audiofilterentrainmentcmdlist.addArgument(tempentrainmentfile.getAbsolutePath());
-        audiofilterentrainmentcmdlist.addArgument("-af");
-        audiofilterentrainmentcmdlist.addArgument("afade=t=in:ss=0:d=10");
-//            audiofilterentrainmentcmdlist.addArgument("-af");
-//            audiofilterentrainmentcmdlist.addArgument("afade=t=out:st=" + (currentcut.getdurationinseconds() - 10) + ":d=10"); // INVALID ARGUMENT!
-        audiofilterentrainmentcmdlist.addArgument(finalentrainmentfile.getAbsolutePath());
-//            System.out.println(audiofilterentrainmentcmdlist.toString());
-        java.io.ByteArrayOutputStream out=new java.io.ByteArrayOutputStream();
-        java.io.ByteArrayOutputStream err=new java.io.ByteArrayOutputStream();
-        DefaultExecutor executor = new DefaultExecutor();
-        PumpStreamHandler handler=new PumpStreamHandler(out, err);
-        executor.setStreamHandler(handler);
-        try {int exitValue = executor.execute(audiofilterentrainmentcmdlist);
-        } catch (IOException ignored) {ignored.printStackTrace();}
-        tempentrainmentfile.delete();
-//        System.out.print(err.toString());
-        return finalentrainmentfile.exists();
-//        if (! final.exists()) {System.out.println(String.format("Couldn't Add Audio Filters And Create The Final File For %s Entrainment", finalfile.getAbsolutePath()));}
-    }
-
-    // <-------------------------- CREATING AMBIENCE METHODS -------------------------------> //
-
-    // Generates A List Of How Many And Which Ambience Files To Be Concatenated
-    public boolean generateambiencelist() {
+    public boolean makeAmbienceList() {
         ambiencelist = new ArrayList<>();
+        ambiencemedia = new ArrayList<>();
         // RANDOM!
         double currentduration = 0.0;
         double sessionduration = (double) getdurationinseconds();
@@ -370,11 +278,104 @@ public class Cut {
         for (File i : ambiencelist) {
             System.out.println(i.getName());
         }
-        return currentduration > sessionduration;
+        for (File i : ambiencelist) {
+            ambiencemedia.add(new Media(i.toURI().toString()));
+        }
+        return currentduration > sessionduration && ambiencemedia.size() > 0;
     }
 
-    // Writes The Above List To A File So FFMPEG Can Read It
-    public boolean writeambiencelisttotextfile() {
+    // <----------------------------------- PLAYBACK --------------------------------------> //
+
+    public void startplayback() {
+        entrainmentplaycount = 0;
+        ambienceplaycount = 0;
+        entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
+        entrainmentplayer.play();
+        entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
+        // If Ambience Enabled
+        ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
+        ambienceplayer.play();
+        ambienceplayer.setOnEndOfMedia(this::playnextambience);
+    }
+    public void playnextentrainment() {
+        entrainmentplaycount++;
+        entrainmentplayer.dispose();
+        entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
+        entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
+    }
+    public void playnextambience() {
+        ambienceplaycount++;
+        ambienceplayer.dispose();
+        ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
+        ambienceplayer.play();
+        ambienceplayer.setOnEndOfMedia(this::playnextambience);
+    }
+    public void stopplayingcut() {
+        entrainmentplayer.stop();
+        entrainmentplayer.dispose();
+        // If Ambience Enabled
+        ambienceplayer.stop();
+        ambienceplayer.dispose();
+    }
+
+    // <----------------------------------- EXPORT --------------------------------------> //
+
+    public boolean export() {System.out.println("Need To Work On This"); return false;}
+    public boolean concatanateentrainment() {
+    // Write Entrainment List To File For FFMPEG To Use
+        try {
+            PrintWriter writer = null;
+            writer = new PrintWriter(tempentrainmenttextfile);
+            for (File k : entrainmentlist) {writer.println("file " + "\'" + k.getAbsolutePath() + "\'");}
+            writer.close();
+            // Call FFMpeg To Concatenate The Files
+            ArrayList<String> cmdarraylist = new ArrayList<>();
+            cmdarraylist.add("ffmpeg");
+            cmdarraylist.add("-f");
+            cmdarraylist.add("concat");
+            cmdarraylist.add("-i");
+            cmdarraylist.add(tempentrainmenttextfile.getAbsolutePath());
+            cmdarraylist.add("-c");
+            cmdarraylist.add("copy");
+            cmdarraylist.add(finalentrainmentfile.getAbsolutePath());
+            ProcessBuilder cmdlist = new ProcessBuilder(cmdarraylist);
+            int count = 0;
+            while (true) {
+                final Process p;
+                p = cmdlist.start();
+                p.waitFor();
+                if (Tools.checkaudioduration(finalentrainmentfile, getdurationinseconds())) {break;}
+                else {
+                    if (count > 3) {return false;}
+                    else {count++;}
+                }
+            }
+//            CommandLine audiofilterentrainmentcmdlist = new CommandLine("ffmpeg");
+//            audiofilterentrainmentcmdlist.addArgument("-i");
+//            audiofilterentrainmentcmdlist.addArgument(tempentrainmentfile.getAbsolutePath());
+//            audiofilterentrainmentcmdlist.addArgument("-af");
+//            audiofilterentrainmentcmdlist.addArgument("afade=t=in:ss=0:d=10");
+//            audiofilterentrainmentcmdlist.addArgument("-af");
+//            audiofilterentrainmentcmdlist.addArgument("afade=t=out:st=" + (currentcut.getdurationinseconds() - 10) + ":d=10"); // INVALID ARGUMENT!
+//            audiofilterentrainmentcmdlist.addArgument(finalentrainmentfile.getAbsolutePath());
+//            System.out.println(audiofilterentrainmentcmdlist.toString());
+//            ByteArrayOutputStream out=new ByteArrayOutputStream();
+//            ByteArrayOutputStream err=new ByteArrayOutputStream();
+//            DefaultExecutor executor = new DefaultExecutor();
+//            PumpStreamHandler handler=new PumpStreamHandler(out, err);
+//            executor.setStreamHandler(handler);
+//            int exitValue = executor.execute(audiofilterentrainmentcmdlist);
+            tempentrainmentfile.delete();
+            return true;
+        } catch (IOException e) {
+            return false;
+        } catch (InterruptedException ignored) {
+            return false;
+        }
+
+    }
+    public boolean concatanateambience() {
+    // Write Ambience List To A Temp Text File For FFMPEG
         Tools.erasetextfile(tempambiencetextfile);
         PrintWriter writer = null;
         try {
@@ -382,11 +383,8 @@ public class Cut {
             for (File k : ambiencefiles) {writer.println("file " + "\'" + k.getAbsolutePath() + "\'");}
             writer.close();
         } catch (FileNotFoundException ignored) {}
-        return tempambiencetextfile.exists();
-    }
-
-    // Calls FFMPEG To Actually Concatenate The Audio Files Into One File
-    public boolean buildambience() {
+//        return tempambiencetextfile.exists();
+    // Call FFMPEG TO Create File
         ArrayList<String> concatenateambiencelist = new ArrayList<>();
         concatenateambiencelist.add("ffmpeg");
         concatenateambiencelist.add("-f");
@@ -412,7 +410,7 @@ public class Cut {
             if (count > 0) {
                 tempambiencefile.delete();
                 finalambiencefile.delete();
-                // generateambiencelist();
+                // makeAmbienceList();
                 // writeambiencelisttotextfile();
             }
             ProcessBuilder cmdlist = new ProcessBuilder(adjustlengthlist);
@@ -439,11 +437,8 @@ public class Cut {
                 else {count++;}
             }
         }
-    }
-
-    // Adds Fade Filters To The Audio File For Postprocessing
-    private boolean applyaudiofilters() {
-//        CommandLine audiofilterentrainmentcmdlist = new CommandLine("ffmpeg");
+    // Apply Audio Filters
+        //        CommandLine audiofilterentrainmentcmdlist = new CommandLine("ffmpeg");
 //        audiofilterentrainmentcmdlist.addArgument("-i");
 //        audiofilterentrainmentcmdlist.addArgument(adjustedlengthfile.getAbsolutePath());
 //        audiofilterentrainmentcmdlist.addArgument("-af");
@@ -459,8 +454,8 @@ public class Cut {
 //        try {
 //            FileUtils.forceDelete(adjustedlengthfile); FileUtils.forceDelete(temptextfile);} catch (IOException ignored) {}
 //        System.out.println("Done Applying Audio Filters For " + currentcut.name);
-        return false;
     }
-
+    public boolean mixentrainmentandambience() {return false;}
+    public File getmixedfile() {return null;}
 
 }

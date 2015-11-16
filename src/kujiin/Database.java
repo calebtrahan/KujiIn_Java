@@ -1,24 +1,16 @@
 package kujiin;
 
 import java.sql.*;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.Date;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TableView;
 import kujiin.dialogs.*;
-
-import javax.print.attribute.standard.DateTimeAtCompleted;
 
 public class Database {
     Connection c = null;
@@ -34,7 +26,7 @@ public class Database {
     public Database(Root root) {
         this.root = root;
         try {
-            this.c = DriverManager.getConnection("jdbc:sqlite:" + Session.sessiondatabase.getAbsolutePath());
+            this.c = DriverManager.getConnection("jdbc:sqlite:" + This_Session.sessiondatabase.getAbsolutePath());
             stmt = c.createStatement();
         }
         catch ( Exception e ) {System.err.println( e.getClass().getName() + ": " + e.getMessage() );}
@@ -160,7 +152,7 @@ public class Database {
         }
     }
 
-    // Create A New Session When Started Playback
+    // Create A New This_Session When Started Playback
     public void createnewsession() {
         try {
             PreparedStatement sql = c.prepareStatement("INSERT INTO Sessions ( DATEPRACTICED, Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Postsession, TOTAL ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
@@ -208,7 +200,7 @@ public class Database {
         }
     }
 
-    // Delete The Session From The Table If Cut Durations Are All Zero
+    // Delete The This_Session From The Table If Cut Durations Are All Zero
     public void deleteifsessionempty() throws SQLException {
         stmt = c.createStatement();
         ResultSet rs = stmt.executeQuery( "SELECT  Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen FROM Sessions WHERE ID=" + this.sessionid);
@@ -225,7 +217,7 @@ public class Database {
             if (rs.getInt("Zen") != 0) {sessionisempty = false; break;}
         }
         if (sessionisempty) {
-            // Delete This Session
+            // Delete This This_Session
             stmt.executeQuery("DELETE FROM Sessions WHERE ID=" + sessionid);
         }
     }
@@ -282,14 +274,14 @@ public class Database {
                 zen += rs.getInt("Zen");
             }
             durations = new ArrayList<>(Arrays.asList(rin, kyo, toh, sha, kai, jin, retsu, zai, zen));
-            ArrayList<String> names = new ArrayList<>(Session.allnames.subList(1, 10));
+            ArrayList<String> names = new ArrayList<>(This_Session.allnames.subList(1, 10));
             // Test Here To See If They Are All Zero
             for (int i = 0; i < names.size(); i++) {
                 String duration;
                 if (durations.get(i) > 0) {duration = Tools.minutestoformattedhoursandmins(durations.get(i));}
                 else {duration = "No Practiced Time";
                 }
-                allprogressrows.add(new TotalProgressRow(Session.allnames.indexOf(names.get(i)), names.get(i), duration));
+                allprogressrows.add(new TotalProgressRow(This_Session.allnames.indexOf(names.get(i)), names.get(i), duration));
             }
             root.progresstable.getItems().addAll(allprogressrows);
         } catch (SQLException e) {e.printStackTrace();}
@@ -299,7 +291,7 @@ public class Database {
     public double gettotalpracticedhours() {
         double minutes = 0.0;
         try {
-            ArrayList<String> cutnames = new ArrayList<>(Session.allnames.subList(1, 10));
+            ArrayList<String> cutnames = new ArrayList<>(This_Session.allnames.subList(1, 10));
             for (String i : cutnames) {
                 ResultSet rs = stmt.executeQuery("SELECT " + i + " FROM Sessions");
                 int count = 0;

@@ -13,7 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
-import kujiin.Session;
+import kujiin.This_Session;
 import kujiin.Tools;
 
 import java.io.File;
@@ -52,7 +52,7 @@ public class EditAmbienceDialog extends Stage implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ObservableList<String> allnames = FXCollections.observableArrayList();
-        allnames.addAll(Session.allnames);
+        allnames.addAll(This_Session.allnames);
         CutSelectChoiceBox.setItems(allnames);
         NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
@@ -132,7 +132,7 @@ public class EditAmbienceDialog extends Stage implements Initializable {
     public boolean getfiles() {
         boolean success;
         if (selectedcutname != null) {
-            File thisdirectory = new File(Session.directoryambience, selectedcutname);
+            File thisdirectory = new File(This_Session.directoryambience, selectedcutname);
             try {
                 for (File i : thisdirectory.listFiles()) {
                     // Test Here If A Valid Audio Ambient File
@@ -178,9 +178,9 @@ public class EditAmbienceDialog extends Stage implements Initializable {
         songListData.clear();
         AmbienceListTableView.getItems().clear();
         // Clear Old Data (Table + Observable Lists)
-        int index = Session.allnames.indexOf(CutSelectChoiceBox.getValue());
+        int index = This_Session.allnames.indexOf(CutSelectChoiceBox.getValue());
         if (index != 1) {
-            selectedcutname = Session.allnames.get(index);
+            selectedcutname = This_Session.allnames.get(index);
             if (getfiles()) {
                 AmbienceListTableView.getItems().addAll(songListData);
                 CurrentlySelectedLabel.setText(String.format("Now Displaying: %s's Ambience", selectedcutname));

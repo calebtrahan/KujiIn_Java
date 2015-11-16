@@ -9,7 +9,7 @@ public class Exporter {
         // TODO Create Thread Here To Combine Entrainment
         // TODO Create Thread Here To Combine Ambience (If Exists)
         // AFTER THESE ARE DONE:
-            // TODO Create Thread Here To Combine Entire Session Together
+            // TODO Create Thread Here To Combine Entire This_Session Together
 
     }
 }

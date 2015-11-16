@@ -102,7 +102,7 @@ public class Tools {
     }
 
     public static boolean testAlertFile() {
-        return Session.alertfile.exists() && Tools.getaudioduration(Session.alertfile) != 0.0;
+        return This_Session.alertfile.exists() && Tools.getaudioduration(This_Session.alertfile) != 0.0;
     }
 
     public static String formatlengthshort(int sec) {

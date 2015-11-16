@@ -26,7 +26,7 @@ public class CutInvocationDialog extends Stage implements Initializable{
     CutInvocationDialog(Parent parent) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CutInvocationDialog.fxml"));
         fxmlLoader.setController(this);
-        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating Session");}
+        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
         catch (IOException e) {e.printStackTrace();}
     }
 

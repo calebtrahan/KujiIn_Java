@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 // TODO Figure Out What Information To Store In XML
 // In Order To:
-    // Save/Load As Preset Into Session Creator From/To XML
-    // Set Session Progress Throughout Session (This Will Replace SQLITE3 And DB Storage)
+    // Save/Load As Preset Into This_Session Creator From/To XML
+    // Set This_Session Progress Throughout This_Session (This Will Replace SQLITE3 And DB Storage)
 @XmlAccessorType(XmlAccessType.PROPERTY)
 //@XmlType(propOrder = "Name", "Presession_Duration"...)
 public class Session {
@@ -130,15 +130,11 @@ public class Session {
     public Integer getTotal_Session_Duration() {
         return Total_Session_Duration;
     }
-    public void setTotal_Session_Duration(Integer total_Session_Duration) {
-        Total_Session_Duration = total_Session_Duration;
-    }
+    public void setTotal_Session_Duration(Integer total_Session_Duration) {Total_Session_Duration = total_Session_Duration;}
     public ArrayList<File> getPresession_Ambience() {
         return Presession_Ambience;
     }
-    public void setPresession_Ambience(ArrayList<File> presession_Ambience) {
-        Presession_Ambience = presession_Ambience;
-    }
+    public void setPresession_Ambience(ArrayList<File> presession_Ambience) {Presession_Ambience = presession_Ambience;}
     public ArrayList<File> getRin_Ambience() {
         return Rin_Ambience;
     }
@@ -213,6 +209,7 @@ public class Session {
         if (cutindex == 8) {setZai_Duration(duration);}
         if (cutindex == 9) {setZen_Duration(duration);}
         if (cutindex == 10) {setPostsession_Duration(duration);}
+        updatetotalsessionduration();
     }
     public void setcutambience(int cutindex, ArrayList<File> ambiencelist) {
         if (cutindex == 0) {setPresession_Ambience(ambiencelist);}
@@ -242,5 +239,10 @@ public class Session {
         allcuttimes.add(getZen_Duration());
         allcuttimes.add(getPostsession_Duration());
         return allcuttimes;
+    }
+    public void updatetotalsessionduration() {
+        Integer total = 0;
+        for (Integer i: getallcuttimes()) {total += i;}
+        setTotal_Session_Duration(total);
     }
 }

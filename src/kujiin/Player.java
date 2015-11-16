@@ -1,13 +1,11 @@
 package kujiin;
 
-import javafx.beans.InvalidationListener;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
-import javax.swing.text.html.Option;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -47,9 +45,9 @@ public class Player {
         }
         this.ambienceenabled = ambienceenabled;
 //        PlayercurrentlyplayingLabel = root.PlayercurrentlyplayingLabel;
-        PlayercurrentcutprogressLabel = root.PlayercurrentcutprogressLabel;
-        PlayertotalsessionprogressLabel = root.PlayertotalsessionprogressLabel;
-        PlayercurrentprogressLabelwithprefix = root.PlayercurrentlyplayingLabelWithProgressPrefix;
+//        PlayercurrentcutprogressLabel = root.PlayercurrentcutprogressLabel;
+//        PlayertotalsessionprogressLabel = root.PlayertotalsessionprogressLabel;
+//        PlayercurrentprogressLabelwithprefix = root.PlayercurrentlyplayingLabelWithProgressPrefix;
         partindex = 0;
         totalseconds = 0;
         this.database = database;
@@ -69,10 +67,10 @@ public class Player {
         System.out.println("Called Play Method");
         currentcut = cutstoplay.get(partindex);
         if (!currentcut.name.equals("Alert")) {
-            entrainmentfile = new File(Session.directorytemp, "Entrainment/" + currentcut.name + ".mp3");
+            entrainmentfile = new File(This_Session.directorytemp, "Entrainment/" + currentcut.name + ".mp3");
             entrainmentmedia = new Media(entrainmentfile.toURI().toString());
             if (ambienceenabled) {
-                ambiencefile = new File(Session.directorytemp, "Ambience/" + currentcut.name + ".mp3");
+                ambiencefile = new File(This_Session.directorytemp, "Ambience/" + currentcut.name + ".mp3");
                 ambiencemedia = new Media(ambiencefile.toURI().toString());
             }
             entrainmentplayer = new MediaPlayer(entrainmentmedia);
@@ -93,7 +91,7 @@ public class Player {
             }
             playerStatus = PlayerStatus.PLAYING;
         } else {
-            alertmedia = new Media(Session.alertfile.toURI().toString());
+            alertmedia = new Media(This_Session.alertfile.toURI().toString());
             alertplayer = new MediaPlayer(alertmedia);
             alertplayer.play();
             alertplayer.setOnEndOfMedia(() -> {
@@ -106,7 +104,7 @@ public class Player {
         }
     }
 
-    // TODO Continue Here Make It So Only One Version Of The Session Can Be Playing At A Time. And Pause/Stop/Resume Works
+    // TODO Continue Here Make It So Only One Version Of The This_Session Can Be Playing At A Time. And Pause/Stop/Resume Works
     public void playbuttonpressed() {
         System.out.println("Play Button Pressed");
         try {
@@ -118,7 +116,7 @@ public class Player {
                 // TODO Unbind root.StatusBar's Auto Off Delay Here
                 play();
             } else if (playerStatus == PlayerStatus.PLAYING || playerStatus == PlayerStatus.TRANSITIONING) {
-                root.StatusBar.setText("Session Already Playing");
+                root.StatusBar.setText("This_Session Already Playing");
             }
         } catch (ArrayIndexOutOfBoundsException e) {endofsession();}
     }
@@ -137,11 +135,11 @@ public class Player {
             entrainmentplayer.pause();
             playerStatus = PlayerStatus.PAUSED;
         } else if (playerStatus == PlayerStatus.PAUSED) {
-            root.StatusBar.setText("Session Already Paused");
+            root.StatusBar.setText("This_Session Already Paused");
         } else if (playerStatus == PlayerStatus.TRANSITIONING) {
             root.StatusBar.setText("Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Pause");
         } else if (playerStatus == PlayerStatus.NONE || playerStatus == PlayerStatus.STOPPED) {
-            root.StatusBar.setText("No Session Playing");
+            root.StatusBar.setText("No This_Session Playing");
         }
     }
 
@@ -150,7 +148,7 @@ public class Player {
             if (playerStatus == PlayerStatus.PLAYING) {pause();}
             Alert a = new Alert(Alert.AlertType.CONFIRMATION);
             a.setTitle("End Prematurely");
-            a.setContentText("Really End Session Before It's Finished?");
+            a.setContentText("Really End This_Session Before It's Finished?");
             Optional<ButtonType> b = a.showAndWait();
             if (b.isPresent() && b.get() == ButtonType.OK) {
                 // TODO Get Premature Ending Reason (If You Decide To Include It) Here
@@ -162,7 +160,7 @@ public class Player {
                 playerStatus = PlayerStatus.STOPPED;
             } else {play();}
         } else if (playerStatus == PlayerStatus.NONE || playerStatus == PlayerStatus.STOPPED) {
-            root.StatusBar.setText("No Session Playing");
+            root.StatusBar.setText("No This_Session Playing");
         } else if (playerStatus == PlayerStatus.TRANSITIONING) {
             root.StatusBar.setText("Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Stop");
         }
@@ -182,6 +180,6 @@ public class Player {
     }
 
     public void endofsession() {
-        System.out.println("End Of Session!");
+        System.out.println("End Of This_Session!");
     }
 }

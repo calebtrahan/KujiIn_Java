@@ -1,16 +1,10 @@
 package kujiin;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import kujiin.dialogs.CreatingSessionDialog;
 import kujiin.dialogs.SessionNotWellformedDialog;
 
@@ -21,19 +15,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class Session {
+public class This_Session {
     public static final File projectroot = new File(System.getProperty("user.dir"));
-    public static final File rootdirectory = new File(Session.projectroot, "src/kujiin/");
-    public static final File sounddirectory = new File(Session.rootdirectory, "assets/sound/");
-    public static final File directoryentrainment = new File(Session.sounddirectory, "entrainment/");
-    public static final File directoryambience = new File(Session.sounddirectory, "ambience/");
-    public static final File directorytemp = new File(Session.sounddirectory, "temp/");
-    public static final File directorymaincuts = new File(Session.directoryentrainment, "maincuts/");
-    public static final File directorytohramp = new File(Session.directoryentrainment, "tohramp/");
-    public static final File directoryrampdown = new File(Session.directoryentrainment, "ramp/down/");
-    public static final File directoryrampup = new File(Session.directoryentrainment, "ramp/up/");
-    public static final File alertfile = new File(Session.sounddirectory, "Alert.mp3");
-    public static final File logfile = new File(Session.rootdirectory, "assets/sessionlog.txt");
+    public static final File rootdirectory = new File(This_Session.projectroot, "src/kujiin/");
+    public static final File sounddirectory = new File(This_Session.rootdirectory, "assets/sound/");
+    public static final File directoryentrainment = new File(This_Session.sounddirectory, "entrainment/");
+    public static final File directoryambience = new File(This_Session.sounddirectory, "ambience/");
+    public static final File directorytemp = new File(This_Session.sounddirectory, "temp/");
+    public static final File directorymaincuts = new File(This_Session.directoryentrainment, "maincuts/");
+    public static final File directorytohramp = new File(This_Session.directoryentrainment, "tohramp/");
+    public static final File directoryrampdown = new File(This_Session.directoryentrainment, "ramp/down/");
+    public static final File directoryrampup = new File(This_Session.directoryentrainment, "ramp/up/");
+    public static final File alertfile = new File(This_Session.sounddirectory, "Alert.mp3");
+    public static final File logfile = new File(This_Session.rootdirectory, "assets/sessionlog.txt");
     public static final ArrayList<String> allnames = new ArrayList<>(Arrays.asList(
             "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
     public static final File sessiondatabase = new File(rootdirectory, "assets/database/sessiondatabase.db");
@@ -60,7 +54,7 @@ public class Session {
     Root root;
     Database sessiondb;
 
-    public Session(Root root) {
+    public This_Session(Root root) {
         sessiondb = new Database(root);
         sessiondb.getdetailedprogress();
         sessiondb.createtables();
@@ -81,13 +75,13 @@ public class Session {
     }
 
     public ObservableList<String> getsessiondetails() {
-        // TODO Session Details Go In Here
+        // TODO This_Session Details Go In Here
         return FXCollections.observableArrayList();
     }
 
     // <-------------------------------   GETTERS & SETTTERS  ----------------------> //
 
-    // Check If Session Is Created
+    // Check If This_Session Is Created
     public Boolean getCreated() {
         ArrayList<File> sessionpartsmissing = new ArrayList<>();
         ArrayList<String> variations = new ArrayList<>();
@@ -98,7 +92,7 @@ public class Session {
         if (cutsinsession.size() != 0) {
             for (Cut i : cutsinsession) {
                 for (String foldername : variations) {
-                    File folderdirectory = new File(Session.directorytemp, foldername);
+                    File folderdirectory = new File(This_Session.directorytemp, foldername);
                     File actualfile = new File(folderdirectory, i.name + ".mp3");
                     if (!actualfile.exists()) {
                         sessionpartsmissing.add(actualfile);
@@ -106,10 +100,10 @@ public class Session {
                 }
             }
         } else {
-            for (String i : Session.allnames) {
+            for (String i : This_Session.allnames) {
                 variations.add("Ambience");
                 for (String foldername : variations) {
-                    File folderdirectory = new File(Session.directorytemp, foldername);
+                    File folderdirectory = new File(This_Session.directorytemp, foldername);
                     File actualfile = new File(folderdirectory, i + ".mp3");
                     if (!actualfile.exists()) {
                         sessionpartsmissing.add(actualfile);
@@ -133,13 +127,13 @@ public class Session {
 
     // <-------------------------------   CREATION  -------------------------------> //
 
-    // Static Method To Delete Previous Session From Temp Files
+    // Static Method To Delete Previous This_Session From Temp Files
     public static void deleteprevioussession() {
         ArrayList<File> folders = new ArrayList<>();
-        folders.add(new File(Session.directorytemp, "Ambience"));
-        folders.add(new File(Session.directorytemp, "Entrainment"));
-        folders.add(new File(Session.directorytemp, "txt"));
-        folders.add(new File(Session.directorytemp, "Export"));
+        folders.add(new File(This_Session.directorytemp, "Ambience"));
+        folders.add(new File(This_Session.directorytemp, "Entrainment"));
+        folders.add(new File(This_Session.directorytemp, "txt"));
+        folders.add(new File(This_Session.directorytemp, "Export"));
         for (File i : folders) {
             try {
                 for (File x : i.listFiles()) {x.delete();}
@@ -199,7 +193,7 @@ public class Session {
                         b.setResizable(true);
                         b.showAndWait();
                         Alert c = new Alert(Alert.AlertType.INFORMATION);
-                        c.setHeaderText("Please Add Ambience To The Session");
+                        c.setHeaderText("Please Add Ambience To The This_Session");
                         c.setContentText("To Do This, Please Click Tools -> Add Ambience");
                         c.showAndWait();
                         ambienceenabled = false;
@@ -228,7 +222,7 @@ public class Session {
                             ambienceenabled = true;
                         }
                     }
-                    updateMessage("Done Checking Ambience. You Can Now Create This Session...");
+                    updateMessage("Done Checking Ambience. You Can Now Create This This_Session...");
                     return null;
                 }
             };
@@ -247,7 +241,7 @@ public class Session {
         return ambienceenabled;
     }
 
-    // Check If Session Is Well-Formed (Sequential Cuts With Proper Connects)
+    // Check If This_Session Is Well-Formed (Sequential Cuts With Proper Connects)
     public boolean sessioncreationwellformednesschecks(ArrayList<Integer> textfieldtimes) {
         boolean createsession = true;
         int lastcutindex = 0;
@@ -265,7 +259,7 @@ public class Session {
         }
         if (indexestochange.size() > 0) {
             ArrayList<String> cutsmissinglist = new ArrayList<>();
-            for (Integer x : indexestochange) {cutsmissinglist.add(Session.allnames.get(x));}
+            for (Integer x : indexestochange) {cutsmissinglist.add(This_Session.allnames.get(x));}
             StringBuilder cutsmissingtext = new StringBuilder();
             for (int i = 0; i < cutsmissinglist.size(); i++) {
                 cutsmissingtext.append(cutsmissinglist.get(i));
@@ -330,119 +324,104 @@ public class Session {
         return cutsinsession.size() > 0;
     }
 
-    // Create The Session
-    public void create(ArrayList<Integer> textfieldtimes, CreateANewSession createANewSession) {
-        Session.deleteprevioussession();
+    // Create The This_Session
+    public boolean create(ArrayList<Integer> textfieldtimes) {
+        This_Session.deleteprevioussession();
         if (sessioncreationwellformednesschecks(textfieldtimes)) {
             setupcutsinsession(textfieldtimes);
-            int sessionparts = 0;
-            if (ambienceenabled) {sessionparts += (cutsinsession.size() * 2);}
-            sessionparts += cutsinsession.size();
-            if (createANewSession != null) {this.createANewSession = createANewSession;}
-            creatingSessionDialog = new CreatingSessionDialog(null, this);
-            creatingSessionDialog.setSessionparts(sessionparts);
-            creatingSessionDialog.show();
-            Task<Boolean> task = new Task<Boolean>() {
-                @Override
-                protected Boolean call() throws Exception {
-                    for (Cut i : cutsinsession) {
-                        if (isCancelled()) {return false;}
-                        updateMessage("Currently Creating " + i.name);
-                        updateProgress((double) cutsinsession.indexOf(i), (double) cutsinsession.size() - 1);
-                        boolean cutcreatedsuccesfully = i.create(ambienceenabled, cutsinsession, creatingSessionDialog);
-                        if (! cutcreatedsuccesfully) {return false;}
-                        updateMessage("Finished Creating " + i.name);
-                    }
-                    return getCreated();
-                }
-            };
-            creatingSessionDialog.creatingsessionProgressBar.progressProperty().bind(task.progressProperty());
-            creatingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(task.messageProperty());
-            creatingSessionDialog.CancelButton.setOnAction(event -> task.cancel());
-            task.setOnSucceeded(event -> {
-                if (task.getValue()) {
-                    Alert a = new Alert(Alert.AlertType.INFORMATION);
-                    a.setTitle("Created Succeeded");
-                    a.setHeaderText("Creation Completed With No Errors");
-                    a.setContentText("You Can Now Play Or Export This Session");
-                    a.showAndWait();
-                    creatingSessionDialog.close();
-                    if (createANewSession != null) {
-                        createANewSession.close();
-                    }
-                } else {
-                    Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setTitle("Creation Failed");
-//                    String v = task.getException().getMessage();
-                    a.setHeaderText("Errors Occured While Trying To Create The Session. Please Try Again Or Contact Me For Support ");
-                    a.setContentText("Please Try Again Or Contact Me For Support");
-                    a.showAndWait();
-                    Session.deleteprevioussession();
-                    creatingSessionDialog.close();
-                }
-            });
-            task.setOnFailed(event -> {
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setTitle("Creation Failed");
-                String v = task.getException().getMessage();
-                a.setHeaderText("Errors Occured While Trying To Create The Session. The Main Exception I Encoured Was " + v);
-                a.setContentText("Please Try Again Or Contact Me For Support");
-                a.showAndWait();
-                Session.deleteprevioussession();
-                creatingSessionDialog.close();
-            });
-            task.setOnCancelled(event -> {
-                Alert a = new Alert(Alert.AlertType.WARNING);
-                a.setTitle("Creation Cancelled");
-                a.setHeaderText("You Cancelled The Session Creation");
-                a.setContentText("Re-Create To Play Or Export");
-                a.showAndWait();
-                Session.deleteprevioussession();
-                creatingSessionDialog.close();
-            });
-            new Thread(task).start();
-        }
+            boolean ok = true;
+            for (Cut i : cutsinsession) {
+                if (! i.create()) {ok = false; break;}
+            }
+            return ok;
+        } else {return false;}
     }
 
     // <------------------------------- PLAYBACK --------------------------------> //
 
-    // Plays The Session
     public void play() {
         if (getCreated()) {
             if (player == null) {player = new Player(cutsinsession, ambienceenabled, root, sessiondb);}
             player.playbuttonpressed();
         }
     }
-
-    // Pauses The Session
     public void pause() {
         player.pause();
-        // Pauses The Session
+        // Pauses The This_Session
     }
-
-    // Stops The Session
     public void stop() {
         player.stop();
     }
-
-    // Displays The Status Of The Playing Session On The Main UI
     public void displaystatus() {
 
     }
-
-    // Clean Up Session And Ask If User Wants To Export
     public void endofsession() {
 
     }
 
     // <------------------------------- EXPORT --------------------------------> //
-    // Export The Session
     public void export() {
-        // Exports The Session
+        // Exports The This_Session
+        Task<Boolean> task = new Task<Boolean>() {
+            @Override
+            protected Boolean call() throws Exception {
+                for (Cut i : cutsinsession) {
+                    if (isCancelled()) {return false;}
+                    updateMessage("Currently Creating " + i.name);
+                    updateProgress((double) cutsinsession.indexOf(i), (double) cutsinsession.size() - 1);
+                    boolean cutcreatedsuccesfully = i.export();
+                    if (! cutcreatedsuccesfully) {return false;}
+                    updateMessage("Finished Creating " + i.name);
+                }
+                return getCreated();
+            }
+        };
+        creatingSessionDialog.creatingsessionProgressBar.progressProperty().bind(task.progressProperty());
+        creatingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(task.messageProperty());
+        creatingSessionDialog.CancelButton.setOnAction(event -> task.cancel());
+        task.setOnSucceeded(event -> {
+            if (task.getValue()) {
+                Alert a = new Alert(Alert.AlertType.INFORMATION);
+                a.setTitle("Created Succeeded");
+                a.setHeaderText("Creation Completed With No Errors");
+                a.setContentText("You Can Now Play Or Export This This_Session");
+                a.showAndWait();
+                creatingSessionDialog.close();
+                if (createANewSession != null) {
+                    createANewSession.close();
+                }
+            } else {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Creation Failed");
+//                    String v = task.getException().getMessage();
+                a.setHeaderText("Errors Occured While Trying To Create The This_Session. Please Try Again Or Contact Me For Support ");
+                a.setContentText("Please Try Again Or Contact Me For Support");
+                a.showAndWait();
+                This_Session.deleteprevioussession();
+                creatingSessionDialog.close();
+            }
+        });
+        task.setOnFailed(event -> {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setTitle("Creation Failed");
+            String v = task.getException().getMessage();
+            a.setHeaderText("Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v);
+            a.setContentText("Please Try Again Or Contact Me For Support");
+            a.showAndWait();
+            This_Session.deleteprevioussession();
+            creatingSessionDialog.close();
+        });
+        task.setOnCancelled(event -> {
+            Alert a = new Alert(Alert.AlertType.WARNING);
+            a.setTitle("Creation Cancelled");
+            a.setHeaderText("You Cancelled The This_Session Creation");
+            a.setContentText("Re-Create To Play Or Export");
+            a.showAndWait();
+            This_Session.deleteprevioussession();
+            creatingSessionDialog.close();
+        });
     }
-
-    // Check If Session Export Succeeded
-    public void getexported() {}
+    public boolean getexported() {return false;}
 
     // <------------------------------- LOG FILES ------------------------------> //
 

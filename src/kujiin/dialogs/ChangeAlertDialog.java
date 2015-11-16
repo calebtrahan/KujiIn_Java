@@ -10,7 +10,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import kujiin.Session;
+import kujiin.This_Session;
 import kujiin.Tools;
 import org.apache.commons.io.FileUtils;
 
@@ -24,7 +24,7 @@ public class ChangeAlertDialog extends Stage {
     public Button AcceptButton;
     public Button CancelButton;
     private File newalertfile = null;
-    private File alertfileactual = Session.alertfile;
+    private File alertfileactual = This_Session.alertfile;
     private Boolean alertfilechanged = null;
 
     public ChangeAlertDialog(Parent parent) {
@@ -66,7 +66,7 @@ public class ChangeAlertDialog extends Stage {
     public void commitchanges(Event event) {
         if (newalertfile != null) {
             if (alertfileactual.exists()) {                                                                             // Change Alert File
-                File tempfile = new File(Session.sounddirectory, "AlertTemp.mp3");
+                File tempfile = new File(This_Session.sounddirectory, "AlertTemp.mp3");
                 try {
                     // Make A Temp File Copy In Case It Fails
                     FileUtils.copyFile(alertfileactual, tempfile);

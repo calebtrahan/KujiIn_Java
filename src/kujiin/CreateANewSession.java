@@ -3,7 +3,6 @@ package kujiin;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
@@ -44,15 +43,15 @@ public class CreateANewSession extends Stage implements Initializable {
     public Label sessioncreatorstatusbar;
     public Label totalsessiontimeFormattedLabel;
     public Label approximatefinishtimeLabel;
-    private Session thissession;
+    private This_Session thissession;
     private Service<Void> creationservice;
     ArrayList<Integer> textfieldvalues = new ArrayList<>();
 
-    CreateANewSession(Parent parent, Session thissession) {
+    CreateANewSession(Parent parent, This_Session thissession) {
         this.thissession = thissession;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kujiin/assets/fxml/CreateANewSession.fxml"));
         fxmlLoader.setController(this);
-        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Creator:");}
+        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("This_Session Creator:");}
         catch (IOException e) {e.printStackTrace();}
     }
 
@@ -61,7 +60,7 @@ public class CreateANewSession extends Stage implements Initializable {
         maketextfieldsnumericonly();
     }
 
-    // Set All Text Fields Numeric
+// Other Methods
     public void maketextfieldsnumericonly() {
         Tools.numericTextField(pretime);
         pretime.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -110,8 +109,6 @@ public class CreateANewSession extends Stage implements Initializable {
         sessioncreatorstatusbar.textProperty().addListener((observable, oldValue, newValue) -> {
             new Timeline(new KeyFrame(Duration.millis(3000), ae -> sessioncreatorstatusbar.setText(""))).play();});
     }
-
-    // Test If All TextFieldValues Are Zero
     public boolean gettextfieldvalues() {
         Boolean not_all_zeros = false;
         try {
@@ -134,8 +131,6 @@ public class CreateANewSession extends Stage implements Initializable {
         } catch (NumberFormatException ignored) {}
         return not_all_zeros;
     }
-
-    // Updates The Labels Showing Total Time And End Time Whenever A TextField Value Is Changed
     public void updatetotalsessiontime() {
         if (gettextfieldvalues()) {
             Integer totalsessiontime = 0;
@@ -147,8 +142,6 @@ public class CreateANewSession extends Stage implements Initializable {
             approximatefinishtimeLabel.setText(sdf.format(cal.getTime()));
         }
     }
-
-    // Checks Ambience When The Add Ambience Checkbox Is Ticked
     public void checkambience(ActionEvent actionEvent) {
         if (AmbienceOptionCheckBox.isSelected()) {
 //            sessioncreatorstatusbar.setText("Checking Ambience...Please Wait");
@@ -158,52 +151,36 @@ public class CreateANewSession extends Stage implements Initializable {
                 Alert a = new Alert(Alert.AlertType.INFORMATION);
                 a.setTitle("Cannot Calculate Ambience");
                 a.setHeaderText("All Cut Durations Are Zero");
-                a.setContentText("Please Set Your Session Durations Before Adding Ambience");
+                a.setContentText("Please Set Your This_Session Durations Before Adding Ambience");
                 a.showAndWait();
                 AmbienceOptionCheckBox.setSelected(false);
             }
         } else {thissession.setAmbienceenabled(false);}
     }
-
-    // Closes Threads And Creation Window When Clicking Cancel Button
     public void cancelsessioncreation(ActionEvent actionEvent) {this.close();}
-
-    // Called When Create Button Is Pressed
     public void createsession(ActionEvent actionEvent) {
         if (thissession.getCreated()) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Session Validation");
-            alert.setHeaderText("Session Is Already Created");
-            alert.setContentText("Really Overwrite Previous Session?");
+            alert.setTitle("This_Session Validation");
+            alert.setHeaderText("This_Session Is Already Created");
+            alert.setContentText("Really Overwrite Previous This_Session?");
             Optional<ButtonType> result = alert.showAndWait();
             if ((result.isPresent()) && (result.get() == ButtonType.CANCEL)) {return;}
         }
         if (gettextfieldvalues()) {
             if (Tools.sessionwellformednesschecks(textfieldvalues)) {
                 thissession.setAmbienceenabled(AmbienceOptionCheckBox.isSelected());
-                thissession.create(textfieldvalues, this);
+                thissession.create(textfieldvalues);
                 // TODO HERE!!
             }
         } else {
             Alert alert2 = new Alert(Alert.AlertType.ERROR);
-            alert2.setTitle("Cannot Create Session");
+            alert2.setTitle("Cannot Create This_Session");
             alert2.setHeaderText("At Least One Cut's Value Must Be > 0");
             alert2.setContentText("All Values For Cuts (Pre + Post Excluded) Are 0.");
             alert2.showAndWait();
         }
     }
-
-    // Called When Open Saved Preset Button Is Pressed
-    public void opensavedpreset(ActionEvent actionEvent) {
-        System.out.println("This Isn't Done Yet");
-    }
-
-    // Called When Save As Preset Button Is Pressed
-    public void savethissessionaspreset(ActionEvent actionEvent) {
-        System.out.println("This Isn't Done Yet");
-    }
-
-    // Changes All TextFieldValues
     public void changeallvalues(Event event) {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(null);
         changevaluesdialog.showAndWait();
@@ -225,4 +202,13 @@ public class CreateANewSession extends Stage implements Initializable {
             }
         }
     }
+
+// Presets
+    public void opensavedpreset(ActionEvent actionEvent) {
+        System.out.println("This Isn't Done Yet");
+    }
+    public void savethissessionaspreset(ActionEvent actionEvent) {
+        System.out.println("This Isn't Done Yet");
+    }
+
 }

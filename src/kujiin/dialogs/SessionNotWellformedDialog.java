@@ -9,7 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import kujiin.Session;
+import kujiin.This_Session;
 import kujiin.Tools;
 
 import java.io.IOException;
@@ -31,15 +31,15 @@ public class SessionNotWellformedDialog extends Stage {
     public SessionNotWellformedDialog(Parent parent, ArrayList<Integer> textfieldvalues, String cutsmissingtext, int lastcutindex) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionNotWellformedDialog.fxml"));
         fxmlLoader.setController(this);
-        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating Session");}
+        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
         catch (IOException e) {e.printStackTrace();}
         this.textfieldvalues = textfieldvalues;
         this.lastcutindex = lastcutindex;
         sessionmissingcutsLabel.setText(cutsmissingtext);
         populatelistview();
         explanationLabel.setText(("Your Practiced Cuts Do Not Connect! Due To The Nature Of The Kuji-In I Recommend " +
-                "Connecting All Cuts From RIN All The Way To Your Last Cut (") + Session.allnames.get(lastcutindex) +
-                ") Or Your Session Might Not Have The Energy It Needs");
+                "Connecting All Cuts From RIN All The Way To Your Last Cut (") + This_Session.allnames.get(lastcutindex) +
+                ") Or Your This_Session Might Not Have The Energy It Needs");
         setCreatesession(false);
     }
 
@@ -49,7 +49,7 @@ public class SessionNotWellformedDialog extends Stage {
         int count = 0;
         boolean thisitemmissing;
         for (int i = 0; i < textfieldvalues.size(); i++) {
-            String name = Session.allnames.get(i);
+            String name = This_Session.allnames.get(i);
             String minutes;
             if (i <= lastcutindex || i == textfieldvalues.size() - 1) {
                 thisitemmissing = false;
@@ -91,7 +91,7 @@ public class SessionNotWellformedDialog extends Stage {
     public void createSessionwithoutmissingcuts(Event event) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setTitle("Confirmation");
-        a.setHeaderText("This Will Create A Session That Isn't Well-Formed");
+        a.setHeaderText("This Will Create A This_Session That Isn't Well-Formed");
         a.setContentText("Really Create?");
         Optional<ButtonType> b = a.showAndWait();
         if (b.isPresent() && b.get() == ButtonType.OK) {

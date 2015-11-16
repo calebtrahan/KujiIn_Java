@@ -14,7 +14,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import kujiin.Session;
+import kujiin.This_Session;
 import kujiin.Tools;
 import org.apache.commons.io.FileUtils;
 
@@ -146,7 +146,7 @@ public class AddAmbienceDialog extends Stage implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        cutnames.addAll(Session.allnames);
+        cutnames.addAll(This_Session.allnames);
         SelectCutChoiceBox.setItems(cutnames);
         NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
@@ -174,9 +174,9 @@ public class AddAmbienceDialog extends Stage implements Initializable {
     }
 
     public void AddAmbienceToCut(Event event) {
-        int index = Session.allnames.indexOf(SelectCutChoiceBox.getValue());
+        int index = This_Session.allnames.indexOf(SelectCutChoiceBox.getValue());
         if (index != -1 && songListData.size() != 0) {
-            String name = Session.allnames.get(index);
+            String name = This_Session.allnames.get(index);
             Alert b = new Alert(Alert.AlertType.CONFIRMATION);
             b.setTitle("Confirmation");
             b.setHeaderText("Add All Of This Ambience?");
@@ -189,7 +189,7 @@ public class AddAmbienceDialog extends Stage implements Initializable {
                     filestoadd.add(i.getFile());
                 }
                 for (File i : filestoadd) {
-                    File destinationfile = new File(Session.directoryambience, name + "/" + i.getName());
+                    File destinationfile = new File(This_Session.directoryambience, name + "/" + i.getName());
                     try {
                         FileUtils.copyFile(i, destinationfile);
                     } catch (IOException e) {
