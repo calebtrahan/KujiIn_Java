@@ -19,6 +19,7 @@ public class This_Session {
     public static final File projectroot = new File(System.getProperty("user.dir"));
     public static final File rootdirectory = new File(This_Session.projectroot, "src/kujiin/");
     public static final File sounddirectory = new File(This_Session.rootdirectory, "assets/sound/");
+    public static final File xmldirectory = new File(This_Session.rootdirectory, "assets/xml/");
     public static final File directoryentrainment = new File(This_Session.sounddirectory, "entrainment/");
     public static final File directoryambience = new File(This_Session.sounddirectory, "ambience/");
     public static final File directorytemp = new File(This_Session.sounddirectory, "temp/");
@@ -28,6 +29,7 @@ public class This_Session {
     public static final File directoryrampup = new File(This_Session.directoryentrainment, "ramp/up/");
     public static final File alertfile = new File(This_Session.sounddirectory, "Alert.mp3");
     public static final File logfile = new File(This_Session.rootdirectory, "assets/sessionlog.txt");
+    public static final File sessionsxmlfile = new File(This_Session.xmldirectory, "sessions.xml");
     public static final ArrayList<String> allnames = new ArrayList<>(Arrays.asList(
             "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
     public static final File sessiondatabase = new File(rootdirectory, "assets/database/sessiondatabase.db");
@@ -52,12 +54,11 @@ public class This_Session {
     public CreateANewSession createANewSession;
     private CreatingSessionDialog creatingSessionDialog;
     Root root;
-    Database sessiondb;
 
     public This_Session(Root root) {
-        sessiondb = new Database(root);
-        sessiondb.getdetailedprogress();
-        sessiondb.createtables();
+//        sessiondb = new Database(root);
+//        sessiondb.getdetailedprogress();
+//        sessiondb.createtables();
 //        sessiondb.createnewsession();
         clearlogfile();
         this.root = root;

@@ -1,8 +1,12 @@
 package kujiin.util.xml;
 
+import kujiin.Tools;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 // TODO Figure Out What Information To Store In XML
@@ -37,7 +41,9 @@ public class Session {
     private ArrayList<File> Zai_Ambience;
     private ArrayList<File> Zen_Ambience;
     private ArrayList<File> Postsession_Ambience;
+    private String Last_Cut_Practiced_Before_Premature_Ending;
     private String Premature_Ending_Reason;
+    private String Expected_Session_List;
 
     public Session(String name, Integer presession_duration, Integer rin_duration, Integer kyo_duration, Integer toh_duration,
                    Integer sha_duration, Integer kai_duration, Integer jin_duration, Integer retsu_duration, Integer zai_duration, Integer zen_duration, Integer postsession_duration, Integer total_session_duration) {
@@ -54,9 +60,10 @@ public class Session {
         Zen_Duration = zen_duration;
         Postsession_Duration = postsession_duration;
         Total_Session_Duration = total_session_duration;
+        setDate_Practiced(Tools.gettodaysdate());
     }
-    public Session(String name) {}
-    public Session() {}
+    public Session(String name) {setDate_Practiced(Tools.gettodaysdate());}
+    public Session() {setDate_Practiced(Tools.gettodaysdate());}
 
 // Getters And Setters
     public String getName() {
@@ -203,6 +210,10 @@ public class Session {
     public void setDate_Practiced(String date_Practiced) {Date_Practiced = date_Practiced;}
     public String getPremature_Ending_Reason() {return Premature_Ending_Reason;}
     public void setPremature_Ending_Reason(String premature_Ending_Reason) {Premature_Ending_Reason = premature_Ending_Reason;}
+    public String getLast_Cut_Practiced_Before_Premature_Ending() {return Last_Cut_Practiced_Before_Premature_Ending;}
+    public void setLast_Cut_Practiced_Before_Premature_Ending(String last_Cut_Practiced_Before_Premature_Ending) {Last_Cut_Practiced_Before_Premature_Ending = last_Cut_Practiced_Before_Premature_Ending;}
+    public String getExpected_Session_List() {return Expected_Session_List;}
+    public void setExpected_Session_List(String expected_Session_List) {Expected_Session_List = expected_Session_List;}
 
 // Other Methods
     public void updatecutduration(int cutindex, int duration) {
@@ -218,6 +229,20 @@ public class Session {
         if (cutindex == 9) {setZen_Duration(duration);}
         if (cutindex == 10) {setPostsession_Duration(duration);}
 //        updatetotalsessionduration();
+    }
+    public int getcutduration(int cutindex) {
+        if (cutindex == 0) {return getPresession_Duration();}
+        if (cutindex == 1) {return getRin_Duration();}
+        if (cutindex == 2) {return getKyo_Duration();}
+        if (cutindex == 3) {return getToh_Duration();}
+        if (cutindex == 4) {return getSha_Duration();}
+        if (cutindex == 5) {return getKai_Duration();}
+        if (cutindex == 6) {return getJin_Duration();}
+        if (cutindex == 7) {return getRetsu_Duration();}
+        if (cutindex == 8) {return getZai_Duration();}
+        if (cutindex == 9) {return getZen_Duration();}
+        if (cutindex == 10) {return getPostsession_Duration();}
+        else {return 0;}
     }
     public void setcutambience(int cutindex, ArrayList<File> ambiencelist) {
         if (cutindex == 0) {setPresession_Ambience(ambiencelist);}
@@ -253,6 +278,31 @@ public class Session {
         for (Integer i: getallcuttimes()) {total += i;}
         setTotal_Session_Duration(total);
     }
-
+    public void writeprematureending(String lastcutpracticed, String reason) {
+        setLast_Cut_Practiced_Before_Premature_Ending(lastcutpracticed);
+        setPremature_Ending_Reason(reason);
+        ArrayList<Integer> expectedsessionlist = new ArrayList<>();
+        expectedsessionlist.add(getRin_Duration());
+        expectedsessionlist.add(getKyo_Duration());
+        expectedsessionlist.add(getToh_Duration());
+        expectedsessionlist.add(getSha_Duration());
+        expectedsessionlist.add(getKai_Duration());
+        expectedsessionlist.add(getJin_Duration());
+        expectedsessionlist.add(getRetsu_Duration());
+        expectedsessionlist.add(getZai_Duration());
+        expectedsessionlist.add(getZen_Duration());
+        StringBuilder text = new StringBuilder();
+        for (int i=0; i<expectedsessionlist.size(); i++) {
+            text.append(expectedsessionlist.get(i));
+            if (i < expectedsessionlist.size() - 1) {text.append(", ");}
+        }
+        setExpected_Session_List(text.toString());
+    }
+    public boolean sessionnotempty() {
+        int totaltime = 0;
+        for (int x=1; x<10;x++) {totaltime += getcutduration(x);}
+        return totaltime > 0;
+    }
+    public boolean wasendedPremature() {return getPremature_Ending_Reason() == null || getPremature_Ending_Reason().equals(new String());}
 
 }

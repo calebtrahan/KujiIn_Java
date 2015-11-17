@@ -24,6 +24,7 @@ import java.util.Random;
     // Create One Single Row (Or textfield) On The Main Display, Displaying:
         // Total Time Practiced
         // Total Sessions Practiced
+        // Average Session Length
         // Most Recent Practiced Session?
     // Move Buttons (List Session, List Premature Sessions) With New Button (Display Each Cut Progress)
 

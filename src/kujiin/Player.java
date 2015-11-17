@@ -21,7 +21,6 @@ public class Player {
     Boolean ambienceenabled;
     Root root;
     PlayerStatus playerStatus;
-    Database database;
     private Timeline currentcuttimeline;
     private int totalsecondselapsed;
     private int cutcount;

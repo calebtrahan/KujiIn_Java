@@ -9,8 +9,11 @@ import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.dialogs.*;
 import kujiin.util.xml.Session;
+import kujiin.util.xml.Sessions;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -28,7 +31,7 @@ public class Root implements Initializable {
 
     // TODO On Startup See If This_Session Is Created (From Previous Run) If It Ask The User If They Want To Load This This_Session
 
-    public TableView<Database.TotalProgressRow> progresstable;
+
     public Button CreateButton;
     public Label StatusBar;
     public Button ExportButton;
@@ -45,9 +48,7 @@ public class Root implements Initializable {
     public Button viewcompletedgoalsButton;
     public Button PauseButton;
     public Button StopButton;
-    public TableColumn<Database.TotalProgressRow, String> NameColumn;
-    public TableColumn<Database.TotalProgressRow, String> ProgressColumn;
-    public TableColumn<Database.TotalProgressRow, Integer> NumberColumn;
+
     public TextField AmbienceEnabledTextField;
     public TextField TotalSessionTimeTextField;
     public TextField PreTime;
@@ -70,9 +71,9 @@ public class Root implements Initializable {
     public Label CutProgressTopLabel;
     public Button VolumeButton;
     public Label TotalSessionLabel;
-    This_Session thissession;
+    This_Session this_session;
+    Sessions sessions;
 //    Goals sessiongoals;
-    Database sessiondatabase;
     Boolean readytoplay;
     CreateANewSession createsession;
     Boolean sessioncurrentlybeingcreated;
@@ -80,10 +81,12 @@ public class Root implements Initializable {
     private Session session;
     public static final double ENTRAINMENTVOLUME = 0.5;
     public static final double AMBIENCEVOLUME = 1.0;
+    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        thissession = new This_Session(this);
+        this_session = new This_Session(this);
 //        sessiongoals = new Goals(goalsprogressbar, goalscurrrentvalueLabel, goalssettimeLabel);
 //        sessiongoals.populategoalwidget();
         readytoplay = false;
@@ -142,19 +145,21 @@ public class Root implements Initializable {
 //            e.printStackTrace();
 //        }
     }
-    public void displaylistofsessions(Event event) {thissession.sessiondb.displaylistofsession();}
-    public void displayprematureendings(Event event) {thissession.sessiondb.displayprematureendings();}
+    public void displaylistofsessions(Event event) {
+        sessions.displaylistofsessions();}
+    public void displayprematureendings(Event event) {
+        sessions.displayprematureendings();}
 
     // <-------------------------- CREATED SESSION DETAILS WIDGET ---------------------------------------> //
 
     public void getsessioninformation() {
         try {
-            if (thissession.cutsinsession.size() != 0) {
+            if (this_session.cutsinsession.size() != 0) {
                 session = new Session();
                 ArrayList<Integer> cuttimes = new ArrayList<>(11);
                 for (String i : This_Session.allnames) {
                     Integer duration = 0;
-                    for (Cut x : thissession.cutsinsession) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
+                    for (Cut x : this_session.cutsinsession) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
                     cuttimes.add(duration);
                 }
                 session.updatecutduration(0, cuttimes.get(0));
@@ -182,9 +187,9 @@ public class Root implements Initializable {
                 // TODO Get This_Session Information Here And Pass Into Root Boxes PRE-POSTTime
             }
             // Set Ambience Enabled And This_Session Total Time
-            if (thissession.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes");}
+            if (this_session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes");}
             else {AmbienceEnabledTextField.setText("No");}
-            TotalSessionTimeTextField.setText(thissession.gettotalsessionduration());
+            TotalSessionTimeTextField.setText(this_session.gettotalsessionduration());
             readytoplay = true;
         } catch (ArrayIndexOutOfBoundsException e) {
             readytoplay = false;
@@ -193,7 +198,7 @@ public class Root implements Initializable {
     public void createsession(Event event) {
         if (! sessioncurrentlybeingcreated) {
             sessioncurrentlybeingcreated = true;
-            if (thissession.getCreated()) {
+            if (this_session.getCreated()) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("This_Session Validation");
                 alert.setHeaderText("This_Session Is Already Created");
@@ -206,15 +211,16 @@ public class Root implements Initializable {
                     return;
                 }
             }
-            createsession = new CreateANewSession(null, thissession);
+            createsession = new CreateANewSession(null, this_session);
             createsession.showAndWait();
-//            if (thissession.getCreated()) {getsessioninformation();}
+//            if (this_session.getCreated()) {getsessioninformation();}
             getsessioninformation();
         } else {
             StatusBar.setText("This_Session Already Being Created");
         }
     }
-    public void exportsession(Event event) {thissession.export();}
+    public void exportsession(Event event) {
+        this_session.export();}
     public void settextfieldvalue(TextField textField, Integer value) {
         if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
         else {textField.setText("-"); textField.setDisable(true);}
@@ -223,23 +229,23 @@ public class Root implements Initializable {
     // <----------------------------------- SESSION PLAYER WIDGET ---------------------------------------> //
 
     public void playsession(Event event) {
-        if (thissession != null) {
+        if (this_session != null) {
             StatusBar.setText("Starting Session Playback...");
-            thissession.play();
+            this_session.play();
         } else {
             StatusBar.setText("No Session Created");
         }
     }
     public void pausesession(Event event) {
         try {
-            thissession.pause();
+            this_session.pause();
         } catch (NullPointerException e) {
             StatusBar.setText("No This_Session Playing");
         }
     }
     public void stopsession(Event event) {
         try {
-            thissession.stop();
+            this_session.stop();
         } catch (NullPointerException e) {
             StatusBar.setText("No This_Session Playing");
         }
@@ -253,10 +259,18 @@ public class Root implements Initializable {
 
     // <-----------------------------------   GOALS WIDGET   --------------------------------------------> //
 
-    public void setnewgoal(Event event) {thissession.sessiondb.goals.setnewgoal();}
-    public void getgoalpacing(Event event) {thissession.sessiondb.goals.getgoalpacing();}
-    public void viewcurrentgoals(Event event) {thissession.sessiondb.goals.viewcurrentgoals();}
-    public void viewcompletedgoals(Event event) {thissession.sessiondb.goals.viewcompletedgoals();}
+    public void setnewgoal(Event event) {
+//        this_session.sessiondb.goals.setnewgoal();
+    }
+    public void getgoalpacing(Event event) {
+//        this_session.sessiondb.goals.getgoalpacing();
+    }
+    public void viewcurrentgoals(Event event) {
+//        this_session.sessiondb.goals.viewcurrentgoals();
+    }
+    public void viewcompletedgoals(Event event) {
+//        this_session.sessiondb.goals.viewcompletedgoals();
+    }
 
 
 }

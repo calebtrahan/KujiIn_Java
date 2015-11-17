@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
-import kujiin.Database;
 import kujiin.Goals;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ public class DisplayCompletedGoalsDialog extends Stage {
     private Goals goals;
     ObservableList<Goals.CompletedGoal> completedGoals = FXCollections.observableArrayList();
 
-    public DisplayCompletedGoalsDialog(Parent parent, Database sessiondb, Goals goals) {
+    public DisplayCompletedGoalsDialog(Parent parent, Goals goals) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCompletedGoals.fxml"));
         fxmlLoader.setController(this);
         try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Premature Endings");}

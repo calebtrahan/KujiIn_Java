@@ -6,7 +6,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import kujiin.Database;
 import kujiin.Goals;
 
 import java.io.IOException;
