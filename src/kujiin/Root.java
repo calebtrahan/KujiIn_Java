@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.dialogs.*;
+import kujiin.util.xml.Session;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -67,6 +68,8 @@ public class Root implements Initializable {
     public Label CutProgressLabelTotal;
     public Label TotalProgressLabelTotal;
     public Label CutProgressTopLabel;
+    public Button VolumeButton;
+    public Label TotalSessionLabel;
     This_Session thissession;
 //    Goals sessiongoals;
     Database sessiondatabase;
@@ -74,6 +77,9 @@ public class Root implements Initializable {
     CreateANewSession createsession;
     Boolean sessioncurrentlybeingcreated;
     ReferenceType referenceType;
+    private Session session;
+    public static final double ENTRAINMENTVOLUME = 0.5;
+    public static final double AMBIENCEVOLUME = 1.0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -85,8 +91,8 @@ public class Root implements Initializable {
         StatusBar.textProperty().addListener((observable, oldValue, newValue) -> {
             new Timeline(new KeyFrame(Duration.millis(3000), ae -> StatusBar.setText(""))).play();
         });
-        AmbienceEnabledTextField.setText("No This_Session Created");
-        TotalSessionTimeTextField.setText("No This_Session Created");
+        AmbienceEnabledTextField.setText("No Session Created");
+        TotalSessionTimeTextField.setText("No Session Created");
         settextfieldvalue(PreTime, 0);
         settextfieldvalue(RinTime, 0);
         settextfieldvalue(KyoTime, 0);
@@ -144,22 +150,34 @@ public class Root implements Initializable {
     public void getsessioninformation() {
         try {
             if (thissession.cutsinsession.size() != 0) {
+                session = new Session();
                 ArrayList<Integer> cuttimes = new ArrayList<>(11);
                 for (String i : This_Session.allnames) {
                     Integer duration = 0;
                     for (Cut x : thissession.cutsinsession) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
                     cuttimes.add(duration);
                 }
+                session.updatecutduration(0, cuttimes.get(0));
                 settextfieldvalue(PreTime, cuttimes.get(0));
+                session.updatecutduration(1, cuttimes.get(1));
                 settextfieldvalue(RinTime, cuttimes.get(1));
+                session.updatecutduration(2, cuttimes.get(2));
                 settextfieldvalue(KyoTime, cuttimes.get(2));
+                session.updatecutduration(3, cuttimes.get(3));
                 settextfieldvalue(TohTime, cuttimes.get(3));
+                session.updatecutduration(4, cuttimes.get(4));
                 settextfieldvalue(ShaTime, cuttimes.get(4));
+                session.updatecutduration(5, cuttimes.get(5));
                 settextfieldvalue(KaiTime, cuttimes.get(5));
+                session.updatecutduration(6, cuttimes.get(6));
                 settextfieldvalue(JinTime, cuttimes.get(6));
+                session.updatecutduration(7, cuttimes.get(7));
                 settextfieldvalue(RetsuTime, cuttimes.get(7));
+                session.updatecutduration(8, cuttimes.get(8));
                 settextfieldvalue(ZaiTime, cuttimes.get(8));
+                session.updatecutduration(9, cuttimes.get(9));
                 settextfieldvalue(ZenTime, cuttimes.get(9));
+                session.updatecutduration(10, cuttimes.get(10));
                 settextfieldvalue(PostTime, cuttimes.get(10));
                 // TODO Get This_Session Information Here And Pass Into Root Boxes PRE-POSTTime
             }
@@ -190,10 +208,8 @@ public class Root implements Initializable {
             }
             createsession = new CreateANewSession(null, thissession);
             createsession.showAndWait();
-            sessioncurrentlybeingcreated = false;
-            if (thissession.getCreated()) {
-                getsessioninformation();
-            }
+//            if (thissession.getCreated()) {getsessioninformation();}
+            getsessioninformation();
         } else {
             StatusBar.setText("This_Session Already Being Created");
         }
@@ -207,15 +223,11 @@ public class Root implements Initializable {
     // <----------------------------------- SESSION PLAYER WIDGET ---------------------------------------> //
 
     public void playsession(Event event) {
-        if (thissession.getCreated()) {
-            try {
-                StatusBar.setText("This_Session Playing...");
-                thissession.play();
-            } catch (NullPointerException e) {
-                StatusBar.setText("No This_Session Created. Create A This_Session First");
-            }
+        if (thissession != null) {
+            StatusBar.setText("Starting Session Playback...");
+            thissession.play();
         } else {
-            StatusBar.setText("No This_Session Created");
+            StatusBar.setText("No Session Created");
         }
     }
     public void pausesession(Event event) {
@@ -237,6 +249,7 @@ public class Root implements Initializable {
         reftype.showAndWait();
         referenceType = reftype.getReferenceType();
     }
+    public void adjustvolume(ActionEvent actionEvent) {}
 
     // <-----------------------------------   GOALS WIDGET   --------------------------------------------> //
 
@@ -244,5 +257,6 @@ public class Root implements Initializable {
     public void getgoalpacing(Event event) {thissession.sessiondb.goals.getgoalpacing();}
     public void viewcurrentgoals(Event event) {thissession.sessiondb.goals.viewcurrentgoals();}
     public void viewcompletedgoals(Event event) {thissession.sessiondb.goals.viewcompletedgoals();}
+
 
 }

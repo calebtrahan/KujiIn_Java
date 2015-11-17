@@ -13,6 +13,7 @@ import java.util.ArrayList;
 //@XmlType(propOrder = "Name", "Presession_Duration"...)
 public class Session {
     private String Name;
+    private String Date_Practiced;
     private Integer Presession_Duration;
     private Integer Rin_Duration;
     private Integer Kyo_Duration;
@@ -36,6 +37,7 @@ public class Session {
     private ArrayList<File> Zai_Ambience;
     private ArrayList<File> Zen_Ambience;
     private ArrayList<File> Postsession_Ambience;
+    private String Premature_Ending_Reason;
 
     public Session(String name, Integer presession_duration, Integer rin_duration, Integer kyo_duration, Integer toh_duration,
                    Integer sha_duration, Integer kai_duration, Integer jin_duration, Integer retsu_duration, Integer zai_duration, Integer zen_duration, Integer postsession_duration, Integer total_session_duration) {
@@ -53,6 +55,8 @@ public class Session {
         Postsession_Duration = postsession_duration;
         Total_Session_Duration = total_session_duration;
     }
+    public Session(String name) {}
+    public Session() {}
 
 // Getters And Setters
     public String getName() {
@@ -195,6 +199,10 @@ public class Session {
     public void setPostsession_Ambience(ArrayList<File> postsession_Ambience) {
         Postsession_Ambience = postsession_Ambience;
     }
+    public String getDate_Practiced() {return Date_Practiced;}
+    public void setDate_Practiced(String date_Practiced) {Date_Practiced = date_Practiced;}
+    public String getPremature_Ending_Reason() {return Premature_Ending_Reason;}
+    public void setPremature_Ending_Reason(String premature_Ending_Reason) {Premature_Ending_Reason = premature_Ending_Reason;}
 
 // Other Methods
     public void updatecutduration(int cutindex, int duration) {
@@ -209,7 +217,7 @@ public class Session {
         if (cutindex == 8) {setZai_Duration(duration);}
         if (cutindex == 9) {setZen_Duration(duration);}
         if (cutindex == 10) {setPostsession_Duration(duration);}
-        updatetotalsessionduration();
+//        updatetotalsessionduration();
     }
     public void setcutambience(int cutindex, ArrayList<File> ambiencelist) {
         if (cutindex == 0) {setPresession_Ambience(ambiencelist);}
@@ -245,4 +253,6 @@ public class Session {
         for (Integer i: getallcuttimes()) {total += i;}
         setTotal_Session_Duration(total);
     }
+
+
 }

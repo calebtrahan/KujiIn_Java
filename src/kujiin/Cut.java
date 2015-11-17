@@ -1,9 +1,15 @@
 package kujiin;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.concurrent.Service;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 import kujiin.dialogs.CreatingSessionDialog;
+import kujiin.util.TimeUtils;
+import kujiin.util.xml.Session;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -14,7 +20,12 @@ import java.util.Random;
 
 //enum AmbienceOption {General, Specific};
 
-// TODO
+// TODO Move Big Ass Table Widget On Main Display (And Move To A Separate Dialog)
+    // Create One Single Row (Or textfield) On The Main Display, Displaying:
+        // Total Time Practiced
+        // Total Sessions Practiced
+        // Most Recent Practiced Session?
+    // Move Buttons (List Session, List Premature Sessions) With New Button (Display Each Cut Progress)
 
 public class Cut {
     public String name;
@@ -45,6 +56,8 @@ public class Cut {
     private MediaPlayer entrainmentplayer;
     private MediaPlayer ambienceplayer;
     public boolean ambienceenabled;
+    private Timeline cuttimeline;
+    private int secondselapsed;
 
     public Cut(int number, String name, Boolean ramp, int duration, This_Session thisession) {
         this.number = number;
@@ -99,6 +112,8 @@ public class Cut {
     }
     public void setAmbienceenabled(boolean ambienceenabled) {this.ambienceenabled = ambienceenabled;}
     public boolean isAmbienceenabled() {return ambienceenabled;}
+    public Duration getthiscutduration() {return new Duration((double) getdurationinseconds() * 1000);}
+    public int getSecondselapsed() {return secondselapsed;}
 
     // <-------------------------- GENERAL CREATION METHODS ---------------------------------> //
 
@@ -138,7 +153,9 @@ public class Cut {
         if (tempentrainmenttextfile.exists()) {tempentrainmenttextfile.delete();}
         if (tempambiencetextfile.exists()) {tempambiencetextfile.delete();}
     }
-    public boolean create() {
+    public boolean create(ArrayList<Cut> cutstoplay, boolean ambienceenabled) {
+        setAmbienceenabled(ambienceenabled);
+        setCutstoplay(cutstoplay);
         if (isAmbienceenabled()) {return makeEntrainmentList() && makeAmbienceList();}
         else {return makeEntrainmentList();}
     }
@@ -200,10 +217,10 @@ public class Cut {
                 entrainmentlist.add(thisfile);
             }
         }
-        System.out.println(name + "'s Entrainment List");
-        for (File i : entrainmentlist) {
-            System.out.println(i.getName());
-        }
+//        System.out.println(name + "'s Entrainment List");
+//        for (File i : entrainmentlist) {
+//            System.out.println(i.getName());
+//        }
         for (File i : entrainmentlist) {entrainmentmedia.add(new Media(i.toURI().toString()));}
         return entrainmentmedia.size() > 0;
     }
@@ -274,13 +291,11 @@ public class Cut {
                 }
             }
         }
-        System.out.println(name + "'s Ambience");
-        for (File i : ambiencelist) {
-            System.out.println(i.getName());
-        }
-        for (File i : ambiencelist) {
-            ambiencemedia.add(new Media(i.toURI().toString()));
-        }
+//        System.out.println(name + "'s Ambience");
+//        for (File i : ambiencelist) {
+//            System.out.println(i.getName());
+//        }
+        for (File i : ambiencelist) {ambiencemedia.add(new Media(i.toURI().toString()));}
         return currentduration > sessionduration && ambiencemedia.size() > 0;
     }
 
@@ -291,16 +306,25 @@ public class Cut {
         ambienceplaycount = 0;
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
         entrainmentplayer.play();
+        entrainmentplayer.setVolume(Root.ENTRAINMENTVOLUME);
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
-        // If Ambience Enabled
-        ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
-        ambienceplayer.play();
-        ambienceplayer.setOnEndOfMedia(this::playnextambience);
+        if (ambienceenabled) {
+            System.out.println(ambiencemedia);
+            ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
+            ambienceplayer.play();
+//            ambienceplayer.setVolume(Root.AMBIENCEVOLUME);
+            ambienceplayer.setOnEndOfMedia(this::playnextambience);
+        }
+        cuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updatecuttime()));
+        cuttimeline.setCycleCount(Animation.INDEFINITE);
+        cuttimeline.play();
     }
     public void playnextentrainment() {
         entrainmentplaycount++;
         entrainmentplayer.dispose();
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
+        entrainmentplayer.play();
+        entrainmentplayer.setVolume(Root.ENTRAINMENTVOLUME);
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
     }
     public void playnextambience() {
@@ -308,15 +332,30 @@ public class Cut {
         ambienceplayer.dispose();
         ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
         ambienceplayer.play();
+        ambienceplayer.setVolume(Root.AMBIENCEVOLUME);
         ambienceplayer.setOnEndOfMedia(this::playnextambience);
+    }
+    public void pauseplayingcut() {
+        entrainmentplayer.pause();
+        if (ambienceenabled) {ambienceplayer.pause();}
+        cuttimeline.pause();
+    }
+    public void resumeplayingcut() {
+        entrainmentplayer.play();
+        if (ambienceenabled) {ambienceplayer.pause();}
+        cuttimeline.play();
     }
     public void stopplayingcut() {
         entrainmentplayer.stop();
         entrainmentplayer.dispose();
-        // If Ambience Enabled
-        ambienceplayer.stop();
-        ambienceplayer.dispose();
+        if (ambienceenabled) {
+            ambienceplayer.stop();
+            ambienceplayer.dispose();
+        }
     }
+    public void updatecuttime() {if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {secondselapsed++;}}
+    public String getcurrenttimeformatted() {return TimeUtils.formatlengthshort(secondselapsed + 1);}
+    public String gettotaltimeformatted() {return TimeUtils.formatlengthshort(getdurationinseconds());}
 
     // <----------------------------------- EXPORT --------------------------------------> //
 
@@ -458,4 +497,7 @@ public class Cut {
     public boolean mixentrainmentandambience() {return false;}
     public File getmixedfile() {return null;}
 
+    public void setCutstoplay(ArrayList<Cut> cutstoplay) {
+        this.cutstoplay = cutstoplay;
+    }
 }

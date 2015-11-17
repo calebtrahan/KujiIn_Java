@@ -331,7 +331,7 @@ public class This_Session {
             setupcutsinsession(textfieldtimes);
             boolean ok = true;
             for (Cut i : cutsinsession) {
-                if (! i.create()) {ok = false; break;}
+                if (! i.create(cutsinsession, ambienceenabled)) {ok = false; break;}
             }
             return ok;
         } else {return false;}
@@ -340,10 +340,8 @@ public class This_Session {
     // <------------------------------- PLAYBACK --------------------------------> //
 
     public void play() {
-        if (getCreated()) {
-            if (player == null) {player = new Player(cutsinsession, ambienceenabled, root, sessiondb);}
-            player.playbuttonpressed();
-        }
+        if (player == null) {player = new Player(cutsinsession, ambienceenabled, root);}
+        player.playbuttonpressed();
     }
     public void pause() {
         player.pause();

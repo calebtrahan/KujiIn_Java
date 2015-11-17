@@ -47,7 +47,7 @@ public class CreateANewSession extends Stage implements Initializable {
     private Service<Void> creationservice;
     ArrayList<Integer> textfieldvalues = new ArrayList<>();
 
-    CreateANewSession(Parent parent, This_Session thissession) {
+    public CreateANewSession(Parent parent, This_Session thissession) {
         this.thissession = thissession;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kujiin/assets/fxml/CreateANewSession.fxml"));
         fxmlLoader.setController(this);
@@ -124,10 +124,7 @@ public class CreateANewSession extends Stage implements Initializable {
             textfieldvalues.add(Integer.parseInt(zaitime.getText()));
             textfieldvalues.add(Integer.parseInt(zentime.getText()));
             textfieldvalues.add(Integer.parseInt(posttime.getText()));
-            for (Integer i : textfieldvalues) {
-                if (i > 0) {
-                    not_all_zeros = true;}
-            }
+            for (Integer i : textfieldvalues) {if (i > 0) {not_all_zeros = true;}}
         } catch (NumberFormatException ignored) {}
         return not_all_zeros;
     }
@@ -161,8 +158,8 @@ public class CreateANewSession extends Stage implements Initializable {
     public void createsession(ActionEvent actionEvent) {
         if (thissession.getCreated()) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("This_Session Validation");
-            alert.setHeaderText("This_Session Is Already Created");
+            alert.setTitle("Session Validation");
+            alert.setHeaderText("Session Is Already Created");
             alert.setContentText("Really Overwrite Previous This_Session?");
             Optional<ButtonType> result = alert.showAndWait();
             if ((result.isPresent()) && (result.get() == ButtonType.CANCEL)) {return;}
@@ -171,8 +168,10 @@ public class CreateANewSession extends Stage implements Initializable {
             if (Tools.sessionwellformednesschecks(textfieldvalues)) {
                 thissession.setAmbienceenabled(AmbienceOptionCheckBox.isSelected());
                 thissession.create(textfieldvalues);
+                super.close();
                 // TODO HERE!!
             }
+
         } else {
             Alert alert2 = new Alert(Alert.AlertType.ERROR);
             alert2.setTitle("Cannot Create This_Session");
