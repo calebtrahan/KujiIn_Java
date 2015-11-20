@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.dialogs.*;
+import kujiin.util.GuiUtils;
 import kujiin.util.xml.Session;
 import kujiin.util.xml.Sessions;
 
@@ -49,7 +50,6 @@ public class Root implements Initializable {
     public Button viewcompletedgoalsButton;
     public Button PauseButton;
     public Button StopButton;
-
     public TextField AmbienceEnabledTextField;
     public TextField TotalSessionTimeTextField;
     public TextField PreTime;
@@ -79,12 +79,10 @@ public class Root implements Initializable {
     public CheckBox PrePostSwitch;
     This_Session this_session;
     Sessions sessions;
-//    Goals sessiongoals;
     Boolean readytoplay;
     CreateANewSession createsession;
     Boolean sessioncurrentlybeingcreated;
     ReferenceType referenceType;
-    private Session session;
     public static final double ENTRAINMENTVOLUME = 0.5;
     public static final double AMBIENCEVOLUME = 1.0;
     public static final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -147,16 +145,20 @@ public class Root implements Initializable {
 
     // <-------------------------- DATABASE AND TOTAL PROGRESS WIDGET ------------------------------------> //
     public void updatetotalprogresswidget(ActionEvent actionEvent) {
-        AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins((int) sessions.getaveragesessiontimeinminutes(PrePostSwitch.isSelected())));
-        TotalTimePracticed.setText(Tools.minutestoformattedhoursandmins(sessions.getgrandtotaltimepracticedinminutes(PrePostSwitch.isSelected())));
-        NumberOfSessionsPracticed.setText(Integer.toString(sessions.getsessioncount()));
+        int averagesessionduration = (int) sessions.getaveragesessiontimeinminutes(PrePostSwitch.isSelected());
+        int totalminutespracticed = sessions.getgrandtotaltimepracticedinminutes(PrePostSwitch.isSelected());
+        int numberofsessionspracticed = sessions.getsessioncount();
+        String nonetext = "No Sessions Practiced";
+        if (averagesessionduration != 0) {AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins(averagesessionduration));}
+        else {AverageSessionDuration.setText(nonetext);}
+        if (totalminutespracticed != 0) {TotalTimePracticed.setText(Tools.minutestoformattedhoursandmins(totalminutespracticed));}
+        else {TotalTimePracticed.setText(nonetext);}
+        if (numberofsessionspracticed != 0) {NumberOfSessionsPracticed.setText(Integer.toString(numberofsessionspracticed));}
+        else {NumberOfSessionsPracticed.setText(nonetext);}
     }
-    public void displaylistofsessions(Event event) {
-        sessions.displaylistofsessions();}
-    public void displayprematureendings(Event event) {
-        sessions.displayprematureendings();}
-    public void showcutprogress(Event event) {
-    }
+    public void displaylistofsessions(Event event) {sessions.displaylistofsessions();}
+    public void displayprematureendings(Event event) {sessions.displayprematureendings();}
+    public void showcutprogress(Event event) {sessions.displaycutprogress();}
 
     // <-------------------------- CREATED SESSION DETAILS WIDGET ---------------------------------------> //
 
@@ -164,7 +166,7 @@ public class Root implements Initializable {
         try {
             boolean cutsinsession = this_session.cutsinsession.size() != 0;
             if (cutsinsession) {
-                session = new Session();
+                Session session = new Session();
                 ArrayList<Integer> cuttimes = new ArrayList<>(11);
                 for (String i : This_Session.allnames) {
                     Integer duration = 0;

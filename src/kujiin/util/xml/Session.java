@@ -41,6 +41,7 @@ public class Session {
     private ArrayList<File> Zai_Ambience;
     private ArrayList<File> Zen_Ambience;
     private ArrayList<File> Postsession_Ambience;
+    private Boolean Ended_Prematurely;
     private String Last_Cut_Practiced_Before_Premature_Ending;
     private String Premature_Ending_Reason;
     private String Expected_Session_List;
@@ -214,6 +215,8 @@ public class Session {
     public void setLast_Cut_Practiced_Before_Premature_Ending(String last_Cut_Practiced_Before_Premature_Ending) {Last_Cut_Practiced_Before_Premature_Ending = last_Cut_Practiced_Before_Premature_Ending;}
     public String getExpected_Session_List() {return Expected_Session_List;}
     public void setExpected_Session_List(String expected_Session_List) {Expected_Session_List = expected_Session_List;}
+    public Boolean getEnded_Prematurely() {return Ended_Prematurely;}
+    public void setEnded_Prematurely(Boolean ended_Prematurely) {Ended_Prematurely = ended_Prematurely;}
 
 // Other Methods
     public void updatecutduration(int cutindex, int duration) {

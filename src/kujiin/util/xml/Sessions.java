@@ -2,6 +2,7 @@ package kujiin.util.xml;
 
 import javafx.scene.control.Alert;
 import kujiin.This_Session;
+import kujiin.dialogs.DisplayCutTotalsDialog;
 import kujiin.dialogs.DisplayPrematureEndingsDialog;
 import kujiin.dialogs.DisplaySessionListDialog;
 import kujiin.util.GuiUtils;
@@ -46,7 +47,8 @@ public class Sessions {
         } catch (NullPointerException e) {return 0;}
     }
     public float getaveragesessiontimeinminutes(boolean includepreandpost) {
-        return (float) getgrandtotaltimepracticedinminutes(includepreandpost) / getSession().size();
+        try {return (float) getgrandtotaltimepracticedinminutes(includepreandpost) / getSession().size();}
+        catch (NullPointerException ignored) {return 0;}
     }
     public ArrayList<Session> getsessionwithprematureendings() {
         try {
@@ -58,19 +60,10 @@ public class Sessions {
         } catch (NullPointerException e) {return new ArrayList<>();}
     }
     public void displaylistofsessions() {
-        if (getSession() == null) {
-            GuiUtils.showinformationdialog("Cannot Display", "No Sessions", "No Sessions To Display");
+        if (getSession() == null || getSession().size() == 0) {
+            GuiUtils.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");
         } else {
-            if (getSession().size() > 0) {
-                DisplaySessionListDialog a = new DisplaySessionListDialog(null, getSession());
-                a.showAndWait();
-            } else {
-                Alert a = new Alert(Alert.AlertType.INFORMATION);
-                a.setTitle("No Sessions");
-                a.setHeaderText("Nothing To Display");
-                a.setContentText("No Sessions Practiced Yet");
-                a.showAndWait();
-            }
+            new DisplaySessionListDialog(null, getSession()).showAndWait();
         }
     }
     public void displayprematureendings() {
@@ -82,10 +75,13 @@ public class Sessions {
             GuiUtils.showinformationdialog("Cannot Display", "No Premature Endings", "No Premature Endings To Display");
         }
     }
+    public void displaycutprogress() {
+        if (getSession() != null) {new DisplayCutTotalsDialog(null, getSession());}
+        else {GuiUtils.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");}
+    }
     public int getsessioncount() {
         if (getSession() != null) {return getSession().size();}
         else {return 0;}
     }
-
 
 }
