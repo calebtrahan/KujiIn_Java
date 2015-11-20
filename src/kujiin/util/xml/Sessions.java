@@ -4,6 +4,7 @@ import javafx.scene.control.Alert;
 import kujiin.This_Session;
 import kujiin.dialogs.DisplayPrematureEndingsDialog;
 import kujiin.dialogs.DisplaySessionListDialog;
+import kujiin.util.GuiUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -19,7 +20,7 @@ import java.util.List;
 public class Sessions {
     private List<Session> Session;
 
-
+    public Sessions() {}
 
 // Getters And Setters
     public List<kujiin.util.xml.Session> getSession() {return Session;}
@@ -35,36 +36,41 @@ public class Sessions {
         }
     }
     public int getgrandtotaltimepracticedinminutes(boolean includepreandpost) {
-        int totalminutes = 0;
-        for (kujiin.util.xml.Session i : getSession()) {
-            if (includepreandpost) {
-                for (int x=0; x<11;x++) {totalminutes += i.getcutduration(x);}
-            } else {
-                for (int x=1; x<10;x++) {totalminutes += i.getcutduration(x);}
+        try {
+            int totalminutes = 0;
+            for (kujiin.util.xml.Session i : getSession()) {
+                if (includepreandpost) {for (int x=0; x<11;x++) {totalminutes += i.getcutduration(x);}}
+                else {for (int x=1; x<10;x++) {totalminutes += i.getcutduration(x);}}
             }
-        }
-        return totalminutes;
+            return totalminutes;
+        } catch (NullPointerException e) {return 0;}
     }
     public float getaveragesessiontimeinminutes(boolean includepreandpost) {
         return (float) getgrandtotaltimepracticedinminutes(includepreandpost) / getSession().size();
     }
     public ArrayList<Session> getsessionwithprematureendings() {
-        ArrayList<Session> sessionswithprematureendings = new ArrayList<>();
-        for (kujiin.util.xml.Session i : getSession()) {
-            if (i.wasendedPremature()) {sessionswithprematureendings.add(i);}
-        }
-        return sessionswithprematureendings;
+        try {
+            ArrayList<Session> sessionswithprematureendings = new ArrayList<>();
+            for (kujiin.util.xml.Session i : getSession()) {
+                if (i.wasendedPremature()) {sessionswithprematureendings.add(i);}
+            }
+            return sessionswithprematureendings;
+        } catch (NullPointerException e) {return new ArrayList<>();}
     }
     public void displaylistofsessions() {
-        if (getSession().size() > 0) {
-            DisplaySessionListDialog a = new DisplaySessionListDialog(null, getSession());
-            a.showAndWait();
+        if (getSession() == null) {
+            GuiUtils.showinformationdialog("Cannot Display", "No Sessions", "No Sessions To Display");
         } else {
-            Alert a = new Alert(Alert.AlertType.INFORMATION);
-            a.setTitle("No Sessions");
-            a.setHeaderText("Nothing To Display");
-            a.setContentText("No Sessions Practiced Yet");
-            a.showAndWait();
+            if (getSession().size() > 0) {
+                DisplaySessionListDialog a = new DisplaySessionListDialog(null, getSession());
+                a.showAndWait();
+            } else {
+                Alert a = new Alert(Alert.AlertType.INFORMATION);
+                a.setTitle("No Sessions");
+                a.setHeaderText("Nothing To Display");
+                a.setContentText("No Sessions Practiced Yet");
+                a.showAndWait();
+            }
         }
     }
     public void displayprematureendings() {
@@ -73,11 +79,13 @@ public class Sessions {
             DisplayPrematureEndingsDialog a = new DisplayPrematureEndingsDialog(null, prematuresessionlist);
             a.showAndWait();
         } else {
-            Alert a = new Alert(Alert.AlertType.INFORMATION);
-            a.setTitle("No Premature Endings");
-            a.setHeaderText("Nothing To Display");
-            a.setContentText("No Premature Endings. Great Work!");
-            a.showAndWait();
+            GuiUtils.showinformationdialog("Cannot Display", "No Premature Endings", "No Premature Endings To Display");
         }
     }
+    public int getsessioncount() {
+        if (getSession() != null) {return getSession().size();}
+        else {return 0;}
+    }
+
+
 }

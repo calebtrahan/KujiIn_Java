@@ -216,9 +216,9 @@
       </HBox>
       <Label layoutX="189.0" layoutY="245.0" text="Playback Progress" />
       <HBox alignment="BOTTOM_RIGHT" layoutX="8.0" layoutY="222.0" prefHeight="31.0" prefWidth="200.0" />
-      <HBox alignment="BOTTOM_RIGHT" layoutX="492.0" layoutY="191.0" prefHeight="29.0" prefWidth="340.0">
+      <HBox alignment="BOTTOM_RIGHT" layoutX="492.0" layoutY="215.0" prefHeight="29.0" prefWidth="340.0">
          <children>
-            <Button fx:id="ListOfSessionsButton1" mnemonicParsing="false" onMousePressed="#displaylistofsessions" prefHeight="20.0" prefWidth="144.0" text="Detailed Cut Progress">
+            <Button fx:id="ShowCutProgressButton" mnemonicParsing="false" onMousePressed="#showcutprogress" prefHeight="20.0" prefWidth="144.0" text="Detailed Cut Progress">
                <font>
                   <Font size="12.0" />
                </font>
@@ -234,10 +234,10 @@
          </children>
       </HBox>
       <Label layoutX="532.0" layoutY="95.0" text="Total Time Practiced" />
-      <TextField alignment="CENTER" disable="true" editable="false" layoutX="662.0" layoutY="90.0" text="99 Hrs 99 Mins" />
-      <TextField alignment="CENTER" disable="true" editable="false" layoutX="662.0" layoutY="126.0" text="125" />
+      <TextField fx:id="TotalTimePracticed" alignment="CENTER" disable="true" editable="false" layoutX="662.0" layoutY="90.0" text="99 Hrs 99 Mins" />
+      <TextField fx:id="NumberOfSessionsPracticed" alignment="CENTER" disable="true" editable="false" layoutX="662.0" layoutY="126.0" text="125" />
       <Label layoutX="513.0" layoutY="131.0" text="# Of Sessions Practiced" />
-      <TextField alignment="CENTER" disable="true" editable="false" layoutX="662.0" layoutY="161.0" text="99 Hrs 99 Mins" />
+      <TextField fx:id="AverageSessionDuration" alignment="CENTER" disable="true" editable="false" layoutX="662.0" layoutY="161.0" text="99 Hrs 99 Mins" />
       <Label layoutX="499.0" layoutY="166.0" text="Average Session Duration" />
       <VBox alignment="TOP_RIGHT" layoutX="335.0" layoutY="163.0" prefHeight="55.0" prefWidth="124.0">
          <children>
@@ -255,5 +255,6 @@
       <Label layoutX="516.0" layoutY="287.0" text="Current" />
       <Label layoutX="768.0" layoutY="287.0" text="Goal" />
       <ProgressBar fx:id="goalsprogressbar" layoutX="576.0" layoutY="304.0" prefHeight="28.0" prefWidth="166.0" progress="0.0" />
+      <CheckBox fx:id="PrePostSwitch" layoutX="596.0" layoutY="193.0" mnemonicParsing="false" onAction="#updatetotalprogresswidget" text="Include Presession And Postsession" />
    </children>
 </AnchorPane>

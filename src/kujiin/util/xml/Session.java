@@ -62,7 +62,7 @@ public class Session {
         Total_Session_Duration = total_session_duration;
         setDate_Practiced(Tools.gettodaysdate());
     }
-    public Session(String name) {setDate_Practiced(Tools.gettodaysdate());}
+    public Session(String name) {setDate_Practiced(Tools.gettodaysdate()); setName(name);}
     public Session() {setDate_Practiced(Tools.gettodaysdate());}
 
 // Getters And Setters

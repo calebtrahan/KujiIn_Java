@@ -11,6 +11,7 @@ import kujiin.dialogs.*;
 import kujiin.util.xml.Session;
 import kujiin.util.xml.Sessions;
 
+import javax.xml.bind.JAXBException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
@@ -71,6 +72,11 @@ public class Root implements Initializable {
     public Label CutProgressTopLabel;
     public Button VolumeButton;
     public Label TotalSessionLabel;
+    public Button ShowCutProgressButton;
+    public TextField AverageSessionDuration;
+    public TextField TotalTimePracticed;
+    public TextField NumberOfSessionsPracticed;
+    public CheckBox PrePostSwitch;
     This_Session this_session;
     Sessions sessions;
 //    Goals sessiongoals;
@@ -107,6 +113,9 @@ public class Root implements Initializable {
         settextfieldvalue(ZaiTime, 0);
         settextfieldvalue(ZenTime, 0);
         settextfieldvalue(PostTime, 0);
+        sessions = new Sessions();
+        try {sessions.populatefromxml();} catch (JAXBException ignored) {}
+        updatetotalprogresswidget(null);
     }
 
     // <----------------------------------------- TOP MENU ACTIONS ---------------------------------------> //
@@ -137,24 +146,24 @@ public class Root implements Initializable {
     public void contactme(ActionEvent actionEvent) {Tools.contactme();}
 
     // <-------------------------- DATABASE AND TOTAL PROGRESS WIDGET ------------------------------------> //
-
-    public void gettotalprogress(SortEvent<TableView<?>> tableViewSortEvent) {
-//        try {
-//            sessiondatabase.getdetailedprogress();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+    public void updatetotalprogresswidget(ActionEvent actionEvent) {
+        AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins((int) sessions.getaveragesessiontimeinminutes(PrePostSwitch.isSelected())));
+        TotalTimePracticed.setText(Tools.minutestoformattedhoursandmins(sessions.getgrandtotaltimepracticedinminutes(PrePostSwitch.isSelected())));
+        NumberOfSessionsPracticed.setText(Integer.toString(sessions.getsessioncount()));
     }
     public void displaylistofsessions(Event event) {
         sessions.displaylistofsessions();}
     public void displayprematureendings(Event event) {
         sessions.displayprematureendings();}
+    public void showcutprogress(Event event) {
+    }
 
     // <-------------------------- CREATED SESSION DETAILS WIDGET ---------------------------------------> //
 
     public void getsessioninformation() {
         try {
-            if (this_session.cutsinsession.size() != 0) {
+            boolean cutsinsession = this_session.cutsinsession.size() != 0;
+            if (cutsinsession) {
                 session = new Session();
                 ArrayList<Integer> cuttimes = new ArrayList<>(11);
                 for (String i : This_Session.allnames) {
@@ -187,9 +196,10 @@ public class Root implements Initializable {
                 // TODO Get This_Session Information Here And Pass Into Root Boxes PRE-POSTTime
             }
             // Set Ambience Enabled And This_Session Total Time
-            if (this_session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes");}
-            else {AmbienceEnabledTextField.setText("No");}
+            if (this_session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes"); AmbienceEnabledTextField.setDisable(false);}
+            else {AmbienceEnabledTextField.setText("No"); AmbienceEnabledTextField.setDisable(true);}
             TotalSessionTimeTextField.setText(this_session.gettotalsessionduration());
+            TotalSessionTimeTextField.setDisable(! cutsinsession);
             readytoplay = true;
         } catch (ArrayIndexOutOfBoundsException e) {
             readytoplay = false;
@@ -271,6 +281,7 @@ public class Root implements Initializable {
     public void viewcompletedgoals(Event event) {
 //        this_session.sessiondb.goals.viewcompletedgoals();
     }
+
 
 
 }
