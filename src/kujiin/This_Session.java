@@ -30,6 +30,8 @@ public class This_Session {
     public static final File alertfile = new File(This_Session.sounddirectory, "Alert.mp3");
     public static final File logfile = new File(This_Session.rootdirectory, "assets/sessionlog.txt");
     public static final File sessionsxmlfile = new File(This_Session.xmldirectory, "sessions.xml");
+    public static final File currentgoalsxmlfile = new File(This_Session.xmldirectory, "current_goals.xml");
+    public static final File completedgoalsxmlfile = new File(This_Session.xmldirectory, "completed_goals.xml");
     public static final ArrayList<String> allnames = new ArrayList<>(Arrays.asList(
             "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
     public static final File sessiondatabase = new File(rootdirectory, "assets/database/sessiondatabase.db");

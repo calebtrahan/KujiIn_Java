@@ -77,4 +77,5 @@ public class SetANewGoalDialog extends Stage {
     public void viewcurrentgoals(Event event) {
 //        goals.viewcurrentgoals();
     }
+
 }

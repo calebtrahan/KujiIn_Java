@@ -36,6 +36,11 @@ public class Sessions {
             setSession(noises1.getSession());
         }
     }
+    public void addtoxml() throws JAXBException {
+        if (This_Session.sessionsxmlfile.exists()) {
+
+        }
+    }
     public int getgrandtotaltimepracticedinminutes(boolean includepreandpost) {
         try {
             int totalminutes = 0;
