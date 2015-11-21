@@ -1,7 +1,13 @@
 package kujiin.util;
 
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class TimeUtils {
+    public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
     public static String formatlengthshort(int sec) {
         int hours = 0;
         int minutes = 0;
@@ -14,5 +20,11 @@ public class TimeUtils {
         } else {
             return String.format("%02d:%02d", minutes, seconds);
         }
+    }
+    public static LocalDate converttolocaldate(String dateformatted) {
+        return LocalDate.parse(dateformatted, dateFormat);
+    }
+    public static String convertfromlocaldatetostring(LocalDate localdate) {
+        return localdate.format(dateFormat);
     }
 }

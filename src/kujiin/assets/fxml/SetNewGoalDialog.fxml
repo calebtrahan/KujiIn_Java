@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="217.0" prefWidth="415.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="134.0" prefWidth="374.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label layoutX="195.0" layoutY="14.0" text="NEW GOAL" />
-      <Label fx:id="InformationLabel" alignment="CENTER" layoutX="3.0" layoutY="45.0" prefHeight="16.0" prefWidth="407.0" text="You Have Practiced For %s Hours. Please Set A New Goal" />
-      <Spinner fx:id="GoalHoursSpinner" layoutX="14.0" layoutY="127.0" prefHeight="26.0" prefWidth="100.0" />
-      <DatePicker fx:id="GoalDatePicker" layoutX="250.0" layoutY="127.0" prefHeight="26.0" prefWidth="155.0" />
-      <Label layoutX="298.0" layoutY="93.0" text="Goal Date" />
-      <Button fx:id="CancelButton" layoutX="346.0" layoutY="173.0" mnemonicParsing="false" onMousePressed="#cancelgoalsetting" text="Cancel" />
-      <Button fx:id="OKButton" layoutX="282.0" layoutY="173.0" mnemonicParsing="false" onMousePressed="#Accept" prefHeight="26.0" prefWidth="59.0" text="Accept" />
-      <Button fx:id="CurrentGoalsButton" layoutX="14.0" layoutY="173.0" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" prefHeight="26.0" prefWidth="135.0" text="View Current Goals" />
-      <Spinner fx:id="GoalMinutesSpinner" layoutX="131.0" layoutY="127.0" prefHeight="26.0" prefWidth="100.0" />
-      <Label layoutX="31.0" layoutY="93.0" text="Goal Hours" />
-      <Label layoutX="143.0" layoutY="93.0" text="Goal Minutes" />
+      <Label layoutX="145.0" layoutY="14.0" text="NEW GOAL">
+         <font>
+            <Font size="16.0" />
+         </font></Label>
+      <Spinner fx:id="GoalHoursSpinner" layoutX="14.0" layoutY="59.0" prefHeight="26.0" prefWidth="77.0" />
+      <DatePicker fx:id="GoalDatePicker" layoutX="204.0" layoutY="59.0" prefHeight="26.0" prefWidth="155.0" />
+      <Label layoutX="252.0" layoutY="41.0" text="Goal Date" />
+      <Button fx:id="CurrentGoalsButton" layoutX="13.0" layoutY="93.0" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" prefHeight="26.0" prefWidth="135.0" text="View Current Goals" />
+      <Spinner fx:id="GoalMinutesSpinner" layoutX="112.0" layoutY="59.0" prefHeight="26.0" prefWidth="77.0" />
+      <Label layoutX="35.0" layoutY="41.0" text="Hours" />
+      <Label layoutX="125.0" layoutY="41.0" text="Minutes" />
+      <HBox alignment="BOTTOM_RIGHT" layoutX="165.0" layoutY="88.0" prefHeight="36.0" prefWidth="200.0">
+         <children>
+            <Button fx:id="OKButton" mnemonicParsing="false" onMousePressed="#Accept" prefHeight="26.0" prefWidth="59.0" text="Accept" />
+            <Button fx:id="CancelButton" mnemonicParsing="false" onMousePressed="#cancelgoalsetting" text="Cancel" />
+         </children>
+      </HBox>
    </children>
 </AnchorPane>

@@ -9,12 +9,14 @@ import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.dialogs.*;
 import kujiin.util.GuiUtils;
+import kujiin.util.TimeUtils;
 import kujiin.util.xml.Session;
 import kujiin.util.xml.Sessions;
 
 import javax.xml.bind.JAXBException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -30,7 +32,6 @@ public class Root implements Initializable {
     // TODO Find Out Why Goals Set Only Has 1 Column
     // TODO Set Play Button To Resume This_Session When Paused
     // TODO Make The 'Currently Loaded This_Session' Widget Box Into The This_Session Confirmation Dialog In The Python Version
-
     // TODO On Startup See If This_Session Is Created (From Previous Run) If It Ask The User If They Want To Load This This_Session
 
 
@@ -85,8 +86,6 @@ public class Root implements Initializable {
     ReferenceType referenceType;
     public static final double ENTRAINMENTVOLUME = 0.5;
     public static final double AMBIENCEVOLUME = 1.0;
-    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-    public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

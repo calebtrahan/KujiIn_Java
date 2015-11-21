@@ -1,24 +1,33 @@
 package kujiin.util.xml;
 
+import kujiin.util.TimeUtils;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import java.time.LocalDate;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class CurrentGoal {
     private Integer ID;
     private String Date_Set;
     private String Date_Due;
-    private Integer Goal_Hours;
+    private double Goal_Hours;
 
     public CurrentGoal() {}
+
+    public CurrentGoal(LocalDate duedate, Double goalhours) {
+        setDate_Due(TimeUtils.convertfromlocaldatetostring(duedate));
+        setGoal_Hours(goalhours);
+        setDate_Set(TimeUtils.convertfromlocaldatetostring(LocalDate.now()));
+    }
 
 // Getters And Setters
     public String getDate_Set() {return Date_Set;}
     public void setDate_Set(String date_Set) {Date_Set = date_Set;}
     public String getDate_Due() {return Date_Due;}
     public void setDate_Due(String date_Due) {Date_Due = date_Due;}
-    public Integer getGoal_Hours() {return Goal_Hours;}
-    public void setGoal_Hours(Integer goal_Hours) {Goal_Hours = goal_Hours;}
+    public double getGoal_Hours() {return Goal_Hours;}
+    public void setGoal_Hours(Double goal_Hours) {Goal_Hours = goal_Hours;}
     public Integer getID() {return ID;}
     public void setID(Integer ID) {this.ID = ID;}
 
