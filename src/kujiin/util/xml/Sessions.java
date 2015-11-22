@@ -9,6 +9,7 @@ import kujiin.util.GuiUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -36,10 +37,16 @@ public class Sessions {
             setSession(noises1.getSession());
         }
     }
-    public void addtoxml() throws JAXBException {
-        if (This_Session.sessionsxmlfile.exists()) {
-
-        }
+    public void addnewsession(Session session) throws JAXBException {
+        if (This_Session.sessionsxmlfile.exists()) {populatefromxml();}
+        List<Session> sessionsList = getSession();
+        if (sessionsList == null) {sessionsList = new ArrayList<>();}
+        sessionsList.add(session);
+        setSession(sessionsList);
+        JAXBContext context = JAXBContext.newInstance(Sessions.class);
+        Marshaller createMarshaller = context.createMarshaller();
+        createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        createMarshaller.marshal(this, This_Session.sessionsxmlfile);
     }
     public int getgrandtotaltimepracticedinminutes(boolean includepreandpost) {
         try {

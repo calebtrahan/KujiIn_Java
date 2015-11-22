@@ -29,8 +29,8 @@ public class CurrentGoals {
             setCurrentGoal(currentGoals.getCurrentGoal());
         }
     }
-    public void addgoal(CurrentGoal newgoal) throws JAXBException {
-        populatefromxml();
+    public void addnewgoal(CurrentGoal newgoal) throws JAXBException {
+        if (This_Session.currentgoalsxmlfile.exists()) {populatefromxml();}
         List<CurrentGoal> newgoals = getCurrentGoal();
         int count = 0;
         if (newgoals != null && newgoals.size() > 0) {
