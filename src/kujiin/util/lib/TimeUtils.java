@@ -1,7 +1,6 @@
-package kujiin.util;
+package kujiin.util.lib;
 
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 

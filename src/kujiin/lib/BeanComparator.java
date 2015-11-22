@@ -1,7 +1,7 @@
-package kujiin.util;
+package kujiin.lib;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Method;
+import java.util.Comparator;
 
 /**
  *  A comparator to sort on the specified field of a given class.

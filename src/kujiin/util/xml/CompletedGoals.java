@@ -3,9 +3,9 @@ package kujiin.util.xml;
 
 import kujiin.This_Session;
 import kujiin.dialogs.DisplayCompletedGoalsDialog;
-import kujiin.util.BeanComparator;
-import kujiin.util.GuiUtils;
-import kujiin.util.TimeUtils;
+import kujiin.lib.BeanComparator;
+import kujiin.util.lib.GuiUtils;
+import kujiin.util.lib.TimeUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -67,7 +67,7 @@ public class CompletedGoals {
     }
     public void displaycompletedgoals() {
         if (getCompletedGoal() != null) {
-            DisplayCompletedGoalsDialog dcg = new DisplayCompletedGoalsDialog(null, getCompletedGoal());
+            DisplayCompletedGoalsDialog dcg = new DisplayCompletedGoalsDialog(getCompletedGoal());
             dcg.showAndWait();
         } else {GuiUtils.showinformationdialog("Cannot Display", "Cannot Display", "No Goals Completed Yet");}
     }

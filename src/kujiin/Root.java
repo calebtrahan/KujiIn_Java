@@ -2,22 +2,19 @@ package kujiin;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.dialogs.*;
-import kujiin.util.GuiUtils;
-import kujiin.util.TimeUtils;
+import kujiin.util.states.CreatorState;
 import kujiin.util.xml.Session;
 import kujiin.util.xml.Sessions;
 
 import javax.xml.bind.JAXBException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -78,25 +75,20 @@ public class Root implements Initializable {
     public TextField TotalTimePracticed;
     public TextField NumberOfSessionsPracticed;
     public CheckBox PrePostSwitch;
-    This_Session this_session;
-    Sessions sessions;
-    Boolean readytoplay;
-    CreateANewSession createsession;
-    Boolean sessioncurrentlybeingcreated;
-    ReferenceType referenceType;
+    private This_Session this_session;
+    private Sessions sessions;
+    private ReferenceType referenceType;
+    private CreatorState creatorState;
+    public ChangeListener statusbarautoofflistener;
     public static final double ENTRAINMENTVOLUME = 0.5;
     public static final double AMBIENCEVOLUME = 1.0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this_session = new This_Session(this);
-//        sessiongoals = new Goals(goalsprogressbar, goalscurrrentvalueLabel, goalssettimeLabel);
-//        sessiongoals.populategoalwidget();
-        readytoplay = false;
-        sessioncurrentlybeingcreated = false;
-        StatusBar.textProperty().addListener((observable, oldValue, newValue) -> {
-            new Timeline(new KeyFrame(Duration.millis(3000), ae -> StatusBar.setText(""))).play();
-        });
+        setCreatorState(CreatorState.IDLE);
+        statusbarautoofflistener = (observable, oldValue, newValue) -> new Timeline(new KeyFrame(Duration.millis(3000), ae -> StatusBar.setText(""))).play();
+        StatusBar.textProperty().addListener(statusbarautoofflistener);
         AmbienceEnabledTextField.setText("No Session Created");
         TotalSessionTimeTextField.setText("No Session Created");
         settextfieldvalue(PreTime, 0);
@@ -115,8 +107,15 @@ public class Root implements Initializable {
         updatetotalprogresswidget(null);
     }
 
-    // <----------------------------------------- TOP MENU ACTIONS ---------------------------------------> //
+// Getters And Setters
+    public CreatorState getCreatorState() {
+    return creatorState;
+}
+    public void setCreatorState(CreatorState creatorState) {
+        this.creatorState = creatorState;
+    }
 
+// Top Menu Actions
     public void changealertfile(ActionEvent actionEvent) {
         ChangeAlertDialog a = new ChangeAlertDialog(null);
         a.showAndWait();
@@ -142,7 +141,7 @@ public class Root implements Initializable {
     public void aboutthisprogram(ActionEvent actionEvent) {Tools.aboutthisprogram();}
     public void contactme(ActionEvent actionEvent) {Tools.contactme();}
 
-    // <-------------------------- DATABASE AND TOTAL PROGRESS WIDGET ------------------------------------> //
+// Database And Total Progress Widget
     public void updatetotalprogresswidget(ActionEvent actionEvent) {
         int averagesessionduration = (int) sessions.getaveragesessiontimeinminutes(PrePostSwitch.isSelected());
         int totalminutespracticed = sessions.getgrandtotaltimepracticedinminutes(PrePostSwitch.isSelected());
@@ -159,9 +158,8 @@ public class Root implements Initializable {
     public void displayprematureendings(Event event) {sessions.displayprematureendings();}
     public void showcutprogress(Event event) {sessions.displaycutprogress();}
 
-    // <-------------------------- CREATED SESSION DETAILS WIDGET ---------------------------------------> //
-
-    public void getsessioninformation() {
+// Created Session Widget
+    public boolean getsessioninformation() {
         try {
             boolean cutsinsession = this_session.cutsinsession.size() != 0;
             if (cutsinsession) {
@@ -201,33 +199,33 @@ public class Root implements Initializable {
             else {AmbienceEnabledTextField.setText("No"); AmbienceEnabledTextField.setDisable(true);}
             TotalSessionTimeTextField.setText(this_session.gettotalsessionduration());
             TotalSessionTimeTextField.setDisable(! cutsinsession);
-            readytoplay = true;
+            return true;
         } catch (ArrayIndexOutOfBoundsException e) {
-            readytoplay = false;
+            return false;
         }
     }
     public void createsession(Event event) {
-        if (! sessioncurrentlybeingcreated) {
-            sessioncurrentlybeingcreated = true;
-            if (this_session.getCreated()) {
+        if (creatorState == CreatorState.IDLE || creatorState == CreatorState.CREATED) {
+            if (creatorState == CreatorState.CREATED) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("This_Session Validation");
                 alert.setHeaderText("This_Session Is Already Created");
                 alert.setContentText("Overwrite Previous This_Session?");
                 Optional<ButtonType> result = alert.showAndWait();
-                if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
-                    This_Session.deleteprevioussession();
-                } else {
-                    sessioncurrentlybeingcreated = false;
-                    return;
+                if ((result.isPresent()) && (result.get() != ButtonType.OK)) {
+                    creatorState = CreatorState.IDLE; return;
                 }
             }
-            createsession = new CreateANewSession(null, this_session);
+            creatorState = CreatorState.CREATION_IN_PROGRESS;
+            CreateANewSession createsession = new CreateANewSession(null, this_session);
             createsession.showAndWait();
-//            if (this_session.getCreated()) {getsessioninformation();}
-            getsessioninformation();
+            if (getsessioninformation()) {creatorState = CreatorState.CREATED;}
+            else {
+                // TODO Show Creation Failed Alert Here
+                creatorState = CreatorState.IDLE;
+            }
         } else {
-            StatusBar.setText("This_Session Already Being Created");
+            StatusBar.setText("Session Creation In Progress");
         }
     }
     public void exportsession(Event event) {
@@ -237,8 +235,7 @@ public class Root implements Initializable {
         else {textField.setText("-"); textField.setDisable(true);}
     }
 
-    // <----------------------------------- SESSION PLAYER WIDGET ---------------------------------------> //
-
+// Session Player Widget
     public void playsession(Event event) {
         if (this_session != null) {
             StatusBar.setText("Starting Session Playback...");
@@ -267,11 +264,25 @@ public class Root implements Initializable {
         referenceType = reftype.getReferenceType();
     }
     public void adjustvolume(ActionEvent actionEvent) {}
+    public void disableplayerui(boolean value) {
+        if (value) {
+            CutProgressTopLabel.setText("No Session Created");
+            TotalSessionLabel.setText("No Session Created");
+        }
+        CutProgressLabelCurrent.setDisable(value);
+        CutProgressLabelTotal.setDisable(value);
+        TotalProgressLabelCurrent.setDisable(value);
+        TotalProgressLabelTotal.setDisable(value);
+        ReferenceFilesOption.setDisable(value);
+        VolumeButton.setDisable(value);
+        PlayButton.setDisable(value);
+        PauseButton.setDisable(value);
+        StopButton.setDisable(value);
+    }
 
-    // <-----------------------------------   GOALS WIDGET   --------------------------------------------> //
-
+// Goals Widget
     public void setnewgoal(Event event) {
-//        this_session.sessiondb.goals.setnewgoal();
+
     }
     public void getgoalpacing(Event event) {
 //        this_session.sessiondb.goals.getgoalpacing();
@@ -282,7 +293,4 @@ public class Root implements Initializable {
     public void viewcompletedgoals(Event event) {
 //        this_session.sessiondb.goals.viewcompletedgoals();
     }
-
-
-
 }

@@ -1,4 +1,4 @@
-package kujiin.util;
+package kujiin.util.lib;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;

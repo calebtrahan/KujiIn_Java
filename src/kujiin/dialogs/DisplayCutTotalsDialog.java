@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -25,7 +24,7 @@ public class DisplayCutTotalsDialog extends Stage {
     public TableColumn<TotalProgressRow, Integer> NumberColumn;
     private List<Session> allsessions;
 
-    public DisplayCutTotalsDialog(Parent parent, List<Session> allsessions) {
+    public DisplayCutTotalsDialog(List<Session> allsessions) {
         this.allsessions = allsessions;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCutTotalsDialog.fxml"));
         fxmlLoader.setController(this);
@@ -39,13 +38,12 @@ public class DisplayCutTotalsDialog extends Stage {
 
     public void populatetable() {
         ArrayList<TotalProgressRow> allrows = new ArrayList<>();
-        ArrayList<String> names = new ArrayList<>(This_Session.allnames.subList(1, 10));
         for (int i = 1; i < 10; i++) {
             int durationinmins = 0;
             for (Session x : allsessions) {durationinmins += x.getcutduration(i);}
             String duration;
             if (durationinmins > 0) {duration = Tools.minutestoformattedhoursandmins(durationinmins);}
-            else {duration = "No Practiced Time";}
+            else {duration = "-";}
             allrows.add(new TotalProgressRow(i, This_Session.allnames.get(i), duration));
         }
         progresstable.getItems().addAll(allrows);

@@ -1,6 +1,6 @@
 package kujiin.util.xml;
 
-import kujiin.util.TimeUtils;
+import kujiin.util.lib.TimeUtils;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

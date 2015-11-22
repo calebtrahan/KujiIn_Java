@@ -1,11 +1,10 @@
 package kujiin.util.xml;
 
-import javafx.scene.control.Alert;
 import kujiin.This_Session;
 import kujiin.dialogs.DisplayCutTotalsDialog;
 import kujiin.dialogs.DisplayPrematureEndingsDialog;
 import kujiin.dialogs.DisplaySessionListDialog;
-import kujiin.util.GuiUtils;
+import kujiin.util.lib.GuiUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -22,7 +21,10 @@ import java.util.List;
 public class Sessions {
     private List<Session> Session;
 
-    public Sessions() {}
+    public Sessions() {
+        try {populatefromxml();}
+        catch (JAXBException ignored) {}
+    }
 
 // Getters And Setters
     public List<kujiin.util.xml.Session> getSession() {return Session;}
@@ -88,7 +90,7 @@ public class Sessions {
         }
     }
     public void displaycutprogress() {
-        if (getSession() != null) {new DisplayCutTotalsDialog(null, getSession());}
+        if (getSession() != null) {new DisplayCutTotalsDialog(getSession());}
         else {GuiUtils.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");}
     }
     public int getsessioncount() {

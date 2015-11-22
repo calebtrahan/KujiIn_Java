@@ -9,7 +9,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
@@ -18,24 +17,22 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DisplayCompletedGoalsDialog extends Stage {
-
     public TableView<CompletedGoal> currentgoaltable;
     public TableColumn<CompletedGoal, Integer> NumberColumn;
     public TableColumn<CompletedGoal, String> GoalTimeColumn;
     public TableColumn<CompletedGoal, String> CompletedOnColumn;
     public Button CloseButton;
-    private ObservableList<CompletedGoal> completedGoals = FXCollections.observableArrayList();
 
-    public DisplayCompletedGoalsDialog(Parent parent, List<kujiin.util.xml.CompletedGoal> completedgoals) {
+    public DisplayCompletedGoalsDialog(List<kujiin.util.xml.CompletedGoal> completedgoals) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCompletedGoals.fxml"));
         fxmlLoader.setController(this);
         try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Completed Goals");}
         catch (IOException e) {e.printStackTrace();}
-        for (kujiin.util.xml.CompletedGoal i : completedgoals) {
-            completedGoals.add(new CompletedGoal(completedgoals.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Completed()));
-        }
+        ObservableList<CompletedGoal> completedGoals = FXCollections.observableArrayList();
+        completedGoals.addAll(completedgoals.stream().map(i -> new CompletedGoal(completedgoals.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Completed())).collect(Collectors.toList()));
         NumberColumn.setCellValueFactory(cellData -> cellData.getValue().goalid.asObject());
         GoalTimeColumn.setCellValueFactory(cellData -> cellData.getValue().goalhours);
         CompletedOnColumn.setCellValueFactory(cellData -> cellData.getValue().datecompleted);
@@ -43,7 +40,6 @@ public class DisplayCompletedGoalsDialog extends Stage {
     }
 
     public void closeDialog(Event event) {this.close();}
-
 
     public class CompletedGoal {
         public IntegerProperty goalid;

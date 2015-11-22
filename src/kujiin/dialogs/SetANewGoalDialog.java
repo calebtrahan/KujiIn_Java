@@ -2,12 +2,11 @@ package kujiin.dialogs;
 
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import kujiin.Tools;
-import kujiin.util.GuiUtils;
+import kujiin.util.lib.GuiUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -24,7 +23,7 @@ public class SetANewGoalDialog extends Stage {
     private Double goalhours;
     private Double alreadypracticedhours;
 
-    public SetANewGoalDialog(Parent parent, Double alreadypracticedhours) {
+    public SetANewGoalDialog(Double alreadypracticedhours) {
         this.alreadypracticedhours = alreadypracticedhours;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetNewGoalDialog.fxml"));
         fxmlLoader.setController(this);
@@ -35,7 +34,9 @@ public class SetANewGoalDialog extends Stage {
         GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0, 15));
         GoalMinutesSpinner.setEditable(true);
         GoalDatePicker.setValue(LocalDate.now());
-        InformationLabel.setText("You Have Practiced For " + alreadypracticedhours + " Hours. Please Set A New Goal");
+        if (alreadypracticedhours != 0.0) {
+            InformationLabel.setText("You Have Practiced For " + alreadypracticedhours + " Hours. Please Set A New Goal");
+        } else {InformationLabel.setText("Please Set A New Goal");}
     }
 
 // Getters And Setters
@@ -75,7 +76,7 @@ public class SetANewGoalDialog extends Stage {
         }
     }
     public void viewcurrentgoals(Event event) {
-//        goals.viewcurrentgoals();
+
     }
 
 }

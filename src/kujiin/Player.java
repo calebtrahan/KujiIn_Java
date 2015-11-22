@@ -8,7 +8,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import kujiin.util.TimeUtils;
+import kujiin.util.lib.TimeUtils;
+import kujiin.util.states.PlayerState;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -20,7 +21,7 @@ public class Player {
     Cut currentcut;
     Boolean ambienceenabled;
     Root root;
-    PlayerStatus playerStatus;
+    PlayerState playerState;
     private Timeline currentcuttimeline;
     private int totalsecondselapsed;
     private int cutcount;
@@ -30,7 +31,7 @@ public class Player {
         this.cutstoplay = cutstoplay;
         this.root = root;
         this.ambienceenabled = ambienceenabled;
-        playerStatus = PlayerStatus.NONE;
+        playerState = PlayerState.NONE;
     }
 
 // Player Controls
@@ -50,33 +51,33 @@ public class Player {
     public void playbuttonpressed() {
         System.out.println("Play Button Pressed");
         try {
-            if (playerStatus == PlayerStatus.PAUSED) {
+            if (playerState == PlayerState.PAUSED) {
                 currentcut.resumeplayingcut();
                 currentcuttimeline.play();
-                playerStatus = PlayerStatus.PLAYING;
-            } else if (playerStatus == PlayerStatus.NONE || playerStatus == PlayerStatus.STOPPED) {
+                playerState = PlayerState.PLAYING;
+            } else if (playerState == PlayerState.NONE || playerState == PlayerState.STOPPED) {
                 play();
-            } else if (playerStatus == PlayerStatus.PLAYING || playerStatus == PlayerStatus.TRANSITIONING) {
+            } else if (playerState == PlayerState.PLAYING || playerState == PlayerState.TRANSITIONING) {
                 root.StatusBar.setText("Session Already Playing");
             }
         } catch (ArrayIndexOutOfBoundsException e) {endofsession();}
     }
     public void pause() {
-        if (playerStatus == PlayerStatus.PLAYING) {
+        if (playerState == PlayerState.PLAYING) {
             currentcut.pauseplayingcut();
             currentcuttimeline.pause();
-            playerStatus = PlayerStatus.PAUSED;
-        } else if (playerStatus == PlayerStatus.PAUSED) {
+            playerState = PlayerState.PAUSED;
+        } else if (playerState == PlayerState.PAUSED) {
             root.StatusBar.setText("Session Is Already Paused");
-        } else if (playerStatus == PlayerStatus.TRANSITIONING) {
+        } else if (playerState == PlayerState.TRANSITIONING) {
             root.StatusBar.setText("Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Pause");
-        } else if (playerStatus == PlayerStatus.NONE || playerStatus == PlayerStatus.STOPPED) {
+        } else if (playerState == PlayerState.NONE || playerState == PlayerState.STOPPED) {
             root.StatusBar.setText("No Session Playing");
         }
     }
     public void stop() {
-        if (playerStatus == PlayerStatus.PLAYING || playerStatus == PlayerStatus.PAUSED) {
-            if (playerStatus == PlayerStatus.PLAYING) {pause();}
+        if (playerState == PlayerState.PLAYING || playerState == PlayerState.PAUSED) {
+            if (playerState == PlayerState.PLAYING) {pause();}
             Alert a = new Alert(Alert.AlertType.CONFIRMATION);
             a.setTitle("End Prematurely");
             a.setContentText("Really End This_Session Before It's Finished?");
@@ -84,11 +85,11 @@ public class Player {
             if (b.isPresent() && b.get() == ButtonType.OK) {
                 // TODO Get Premature Ending Reason (If You Decide To Include It) Here
                 // TODO Stop Session Here
-                playerStatus = PlayerStatus.STOPPED;
+                playerState = PlayerState.STOPPED;
             }
-        } else if (playerStatus == PlayerStatus.NONE || playerStatus == PlayerStatus.STOPPED) {
+        } else if (playerState == PlayerState.NONE || playerState == PlayerState.STOPPED) {
             root.StatusBar.setText("No This_Session Playing");
-        } else if (playerStatus == PlayerStatus.TRANSITIONING) {
+        } else if (playerState == PlayerState.TRANSITIONING) {
             root.StatusBar.setText("Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Stop");
         }
     }
@@ -97,26 +98,26 @@ public class Player {
         currentcut.startplayback();
         Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
         timeline.play();
-        playerStatus = PlayerStatus.PLAYING;
+        playerState = PlayerState.PLAYING;
     }
     public void progresstonextcut() {
-        if (playerStatus == PlayerStatus.TRANSITIONING) {
+        if (playerState == PlayerState.TRANSITIONING) {
             try {
                 cutcount++;
                 currentcut = cutstoplay.get(cutcount);
                 playthiscut();
             } catch (ArrayIndexOutOfBoundsException e) {endofsession();}
-        } else if (playerStatus == PlayerStatus.PLAYING) {
+        } else if (playerState == PlayerState.PLAYING) {
             currentcut.stopplayingcut();
             Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
             MediaPlayer alertplayer = new MediaPlayer(alertmedia);
             alertplayer.play();
-            playerStatus = PlayerStatus.TRANSITIONING;
+            playerState = PlayerState.TRANSITIONING;
             alertplayer.setOnEndOfMedia(() -> {alertplayer.stop(); alertplayer.dispose(); progresstonextcut();});
         }
     }
     public void updateplayerui() {
-        if (playerStatus == PlayerStatus.PLAYING) {
+        if (playerState == PlayerState.PLAYING) {
             totalsecondselapsed++;
             root.TotalProgressLabelCurrent.setText(TimeUtils.formatlengthshort(totalsecondselapsed));
             root.CutProgressLabelCurrent.setText(currentcut.getcurrenttimeformatted());
@@ -130,14 +131,14 @@ public class Player {
             }
             root.CutProgressTopLabel.setText(String.format("%s Progress", currentcut.name));
             root.StatusBar.setText("Now Playing: " + currentcut.name);
-        } else if (playerStatus == PlayerStatus.TRANSITIONING) {
+        } else if (playerState == PlayerState.TRANSITIONING) {
             root.CutProgressBar.setProgress(1.0);
             root.StatusBar.setText("Prepare For " + cutstoplay.get(currentcut.number + 1).name);
             root.CutProgressLabelCurrent.setText(currentcut.gettotaltimeformatted());
             root.CutProgressLabelTotal.setText(currentcut.gettotaltimeformatted());
-        } else if (playerStatus == PlayerStatus.PAUSED) {
+        } else if (playerState == PlayerState.PAUSED) {
 
-        } else if (playerStatus == PlayerStatus.STOPPED) {
+        } else if (playerState == PlayerState.STOPPED) {
 
         }
         // TODO Update Goals Widget Here While Session Is Playing
