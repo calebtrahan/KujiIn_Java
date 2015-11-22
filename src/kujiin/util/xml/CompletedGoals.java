@@ -2,7 +2,9 @@ package kujiin.util.xml;
 
 
 import kujiin.This_Session;
+import kujiin.dialogs.DisplayCompletedGoalsDialog;
 import kujiin.util.BeanComparator;
+import kujiin.util.GuiUtils;
 import kujiin.util.TimeUtils;
 
 import javax.xml.bind.JAXBContext;
@@ -17,7 +19,10 @@ import java.util.List;
 public class CompletedGoals {
     private List<CompletedGoal> CompletedGoal;
 
-    public CompletedGoals() {}
+    public CompletedGoals() {
+        try {populatefromxml();}
+        catch (JAXBException ignored) {}
+    }
 
 // Getters And Setters
     public List<kujiin.util.xml.CompletedGoal> getCompletedGoal() {return CompletedGoal;}
@@ -60,5 +65,10 @@ public class CompletedGoals {
             setCompletedGoal(completedGoalList);
         }
     }
-
+    public void displaycompletedgoals() {
+        if (getCompletedGoal() != null) {
+            DisplayCompletedGoalsDialog dcg = new DisplayCompletedGoalsDialog(null, getCompletedGoal());
+            dcg.showAndWait();
+        } else {GuiUtils.showinformationdialog("Cannot Display", "Cannot Display", "No Goals Completed Yet");}
+    }
 }

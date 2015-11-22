@@ -1,7 +1,9 @@
 package kujiin.util.xml;
 
 import kujiin.This_Session;
+import kujiin.dialogs.DisplayCurrentGoalsDialog;
 import kujiin.util.BeanComparator;
+import kujiin.util.GuiUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -83,6 +85,12 @@ public class CurrentGoals {
             }
             return null;
         } else {return null;}
+    }
+    public void displaycurrentgoals(double currentpracticedhours) {
+        if (getCurrentGoal() != null) {
+            DisplayCurrentGoalsDialog dcg = new DisplayCurrentGoalsDialog(null, getCurrentGoal(), currentpracticedhours);
+            dcg.showAndWait();
+        } else {GuiUtils.showinformationdialog("Cannot Display", "Cannot Display", "No Goals Currently Set");}
     }
 
 }

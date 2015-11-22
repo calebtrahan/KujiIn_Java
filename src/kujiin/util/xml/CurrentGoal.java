@@ -36,4 +36,9 @@ public class CurrentGoal {
         try {return currenthours >= getGoal_Hours();}
         catch (NullPointerException | ArithmeticException ignored) {return false;}
     }
+    public String getpercentagecompleted(double currenthours) {
+        float percent = (float) currenthours / (float) getGoal_Hours();
+        percent *= 100;
+        return String.format("%02f%", percent);
+    }
 }
