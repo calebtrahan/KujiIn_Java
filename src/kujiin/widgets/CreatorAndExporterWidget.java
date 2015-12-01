@@ -2,6 +2,8 @@ package kujiin.widgets;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import kujiin.ChangeSessionValues;
+import kujiin.This_Session;
 import kujiin.util.interfaces.Widget;
 import kujiin.util.states.CreatorState;
 import kujiin.util.states.ExporterState;
@@ -24,11 +26,13 @@ public class CreatorAndExporterWidget implements Widget{
     private TextField PostTime;
     private CreatorState creatorState;
     private ExporterState exporterState;
+    private ChangeSessionValues changeSessionValues;
+    private This_Session this_session;
 
     public CreatorAndExporterWidget(Button createButton, Button exportButton, TextField ambienceEnabledTextField,
                                     TextField totalSessionTimeTextField, TextField preTime, TextField rinTime, TextField kyoTime,
                                     TextField tohTime, TextField shaTime, TextField kaiTime, TextField jinTime,
-                                    TextField retsuTime, TextField zaiTime, TextField zenTime, TextField postTime) {
+                                    TextField retsuTime, TextField zaiTime, TextField zenTime, TextField postTime, This_Session this_session) {
         CreateButton = createButton;
         ExportButton = exportButton;
         AmbienceEnabledTextField = ambienceEnabledTextField;
@@ -44,12 +48,22 @@ public class CreatorAndExporterWidget implements Widget{
         ZaiTime = zaiTime;
         ZenTime = zenTime;
         PostTime = postTime;
-        creatorState = CreatorState.IDLE;
+        this.this_session = this_session;
+        creatorState = CreatorState.NOT_CREATED;
         exporterState = ExporterState.IDLE;
     }
 
+// Getters And Setters
+    public void setCreatorState(CreatorState creatorState) {this.creatorState = creatorState;}
+    public CreatorState getCreatorState() {return creatorState;}
+
 // Button Actions
-    public void createsession() {}
+    public void createsession() {
+        if (changeSessionValues == null) {
+            changeSessionValues = new ChangeSessionValues(this_session);}
+        changeSessionValues.showAndWait();
+
+    }
     public void exportsession() {}
 
 // Widget Implementation

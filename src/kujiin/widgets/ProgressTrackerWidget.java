@@ -3,7 +3,9 @@ package kujiin.widgets;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import kujiin.Tools;
 import kujiin.util.interfaces.Widget;
+import kujiin.util.xml.Sessions;
 
 public class ProgressTrackerWidget implements Widget {
     private TextField TotalTimePracticed;
@@ -13,6 +15,7 @@ public class ProgressTrackerWidget implements Widget {
     private Button DetailedCutProgressButton;
     private Button SessionListButton;
     private Button PrematureEndingsButton;
+    private Sessions sessions;
 
     public ProgressTrackerWidget(TextField totalTimePracticed, TextField numberOfSessionsPracticed,
                                  TextField averageSessionDuration, CheckBox preAndPostOption,
@@ -25,13 +28,18 @@ public class ProgressTrackerWidget implements Widget {
         DetailedCutProgressButton = detailedCutProgressButton;
         SessionListButton = sessionListButton;
         PrematureEndingsButton = prematureEndingsButton;
+        sessions = new Sessions();
+        updateui();
     }
+
+// Getters And Setters
+    public Sessions getSessions() {return sessions;}
+
 
 // Button Actions
     public void displaydetailedcutprogress() {}
     public void displaysessionlist() {}
     public void displayprematureendings() {}
-    public void toggleprepostsessionswitch() {}
 
 // Widget Implementation
     @Override
@@ -61,4 +69,17 @@ public class ProgressTrackerWidget implements Widget {
         AverageSessionDuration.setText("No Sessions Practiced");
     }
 
+// Other Methods
+    public void updateui() {
+        int averagesessionduration = (int) sessions.getaveragesessiontimeinminutes(PreAndPostOption.isSelected());
+        int totalminutespracticed = sessions.getgrandtotaltimepracticedinminutes(PreAndPostOption.isSelected());
+        int numberofsessionspracticed = sessions.getsessioncount();
+        String nonetext = "No Sessions Practiced";
+        if (averagesessionduration != 0) {AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins(averagesessionduration));}
+        else {AverageSessionDuration.setText(nonetext);}
+        if (totalminutespracticed != 0) {TotalTimePracticed.setText(Tools.minutestoformattedhoursandmins(totalminutespracticed));}
+        else {TotalTimePracticed.setText(nonetext);}
+        if (numberofsessionspracticed != 0) {NumberOfSessionsPracticed.setText(Integer.toString(numberofsessionspracticed));}
+        else {NumberOfSessionsPracticed.setText(nonetext);}
+    }
 }

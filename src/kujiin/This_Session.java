@@ -1,13 +1,30 @@
 package kujiin;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import kujiin.dialogs.CreatingSessionDialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import kujiin.dialogs.SessionNotWellformedDialog;
+import kujiin.util.lib.GuiUtils;
+import kujiin.util.lib.TimeUtils;
+import kujiin.util.states.PlayerState;
+import kujiin.util.xml.Session;
+import kujiin.util.xml.Sessions;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,41 +51,66 @@ public class This_Session {
     public static final File completedgoalsxmlfile = new File(This_Session.xmldirectory, "completed_goals.xml");
     public static final ArrayList<String> allnames = new ArrayList<>(Arrays.asList(
             "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
-    public static final File sessiondatabase = new File(rootdirectory, "assets/database/sessiondatabase.db");
-    Cut presession = new Cut(0, "Presession", true, 0, this);
-    Cut rin = new Cut(1, "RIN", false, 0, this);
-    Cut kyo = new Cut(2, "KYO", false, 0, this);
-    Cut toh = new Cut(3, "TOH", false, 0, this);
-    Cut sha = new Cut(4, "SHA", false, 0, this);
-    Cut jin = new Cut(6, "JIN", false, 0, this);
-    Cut kai = new Cut(5, "KAI", false, 0, this);
-    Cut retsu = new Cut(7, "RETSU", false, 0, this);
-    Cut zai = new Cut(8, "ZAI", false, 0, this);
-    Cut zen = new Cut(9, "ZEN", false, 0, this);
-    Cut postsession = new Cut(10, "Postsession", true, 0, this);
-    double totalduration;
-    ArrayList<Cut> cutsinsession;
-    Exporter exporter;
-    Player player;
-    private Boolean ambienceenabled;
-    // Creation Variables
-    private Boolean created;
-    public CreateANewSession createANewSession;
-    private CreatingSessionDialog creatingSessionDialog;
-    Root root;
+    private Cut presession = new Cut(0, "Presession", true, 0, this);
+    private Cut rin = new Cut(1, "RIN", false, 0, this);
+    private Cut kyo = new Cut(2, "KYO", false, 0, this);
+    private Cut toh = new Cut(3, "TOH", false, 0, this);
+    private Cut sha = new Cut(4, "SHA", false, 0, this);
+    private Cut jin = new Cut(6, "JIN", false, 0, this);
+    private Cut kai = new Cut(5, "KAI", false, 0, this);
+    private Cut retsu = new Cut(7, "RETSU", false, 0, this);
+    private Cut zai = new Cut(8, "ZAI", false, 0, this);
+    private Cut zen = new Cut(9, "ZEN", false, 0, this);
+    private Cut postsession = new Cut(10, "Postsession", true, 0, this);
+    private ArrayList<Cut> cutsinsession;
+    private boolean ambienceenabled;
+    private PlayerState playerState;
+    private ReferenceType referenceType;
+    // TODO Remove Creator State
+    private Cut currentcut;
+    private Timeline currentcuttimeline;
+    private Session TemporarySession;
+    private Sessions sessions;
+    private int totalsecondselapsed;
+    private int totalsecondsinsession;
+    private int cutcount;
+    private Label CutCurrentTime;
+    private Label CutTotalTime;
+    private Label SessionCurrentTime;
+    private Label SessionTotalTime;
+    private ProgressBar CutProgress;
+    private ProgressBar TotalProgress;
+    private Label CutPlayingText;
+    private Label SessionPlayingText;
+    private Label StatusBar;
 
-    public This_Session(Root root) {
-//        sessiondb = new Database(root);
-//        sessiondb.getdetailedprogress();
-//        sessiondb.createtables();
-//        sessiondb.createnewsession();
+    public This_Session(Sessions sessions, Label cutCurrentTime, Label cutTotalTime, Label sessionCurrentTime,
+                        Label sessionTotalTime, ProgressBar cutProgress, ProgressBar totalProgress, Label cutPlayingText,
+                        Label sessionPlayingText, Label statusBar) {
+        this.sessions = sessions;
+        CutCurrentTime = cutCurrentTime;
+        CutTotalTime = cutTotalTime;
+        SessionCurrentTime = sessionCurrentTime;
+        SessionTotalTime = sessionTotalTime;
+        CutProgress = cutProgress;
+        TotalProgress = totalProgress;
+        CutPlayingText = cutPlayingText;
+        SessionPlayingText = sessionPlayingText;
+        StatusBar = statusBar;
         clearlogfile();
-        this.root = root;
         cutsinsession = new ArrayList<>();
-        created = false;
         ambienceenabled = false;
-    }
+        setPlayerState(PlayerState.IDLE);
+        TemporarySession = new Session();
+   }
 
+// Getters And Setters
+    public void setAmbienceenabled(Boolean ambienceenabled) {
+        this.ambienceenabled = ambienceenabled;
+    }
+    public boolean getAmbienceenabled() {return ambienceenabled;}
+    public void setCutsinsession(ArrayList<Cut> cutsinsession) {this.cutsinsession = cutsinsession;}
+    public ArrayList<Cut> getCutsinsession() {return cutsinsession;}
     public String gettotalsessionduration() {
         Integer totaltime = 0;
         for (Cut i : cutsinsession) {
@@ -76,61 +118,27 @@ public class This_Session {
         }
         return Tools.minutestoformattedhoursandmins(totaltime);
     }
-
     public ObservableList<String> getsessiondetails() {
         // TODO This_Session Details Go In Here
         return FXCollections.observableArrayList();
     }
-
-    // <-------------------------------   GETTERS & SETTTERS  ----------------------> //
-
-    // Check If This_Session Is Created
-    public Boolean getCreated() {
-        ArrayList<File> sessionpartsmissing = new ArrayList<>();
-        ArrayList<String> variations = new ArrayList<>();
-        variations.add("Entrainment");
-        if (ambienceenabled) {
-            variations.add("Ambience");
-        }
-        if (cutsinsession.size() != 0) {
-            for (Cut i : cutsinsession) {
-                for (String foldername : variations) {
-                    File folderdirectory = new File(This_Session.directorytemp, foldername);
-                    File actualfile = new File(folderdirectory, i.name + ".mp3");
-                    if (!actualfile.exists()) {
-                        sessionpartsmissing.add(actualfile);
-                    }
-                }
-            }
-        } else {
-            for (String i : This_Session.allnames) {
-                variations.add("Ambience");
-                for (String foldername : variations) {
-                    File folderdirectory = new File(This_Session.directorytemp, foldername);
-                    File actualfile = new File(folderdirectory, i + ".mp3");
-                    if (!actualfile.exists()) {
-                        sessionpartsmissing.add(actualfile);
-                    }
-                }
-            }
-        }
-        return sessionpartsmissing.size() == 0;
+    public PlayerState getPlayerState() {return playerState;}
+    public void setPlayerState(PlayerState playerState) {this.playerState = playerState;}
+    public Cut getCurrentcut() {return currentcut;}
+    public void setCurrentcut(Cut currentcut) {this.currentcut = currentcut;}
+    public Timeline getCurrentcuttimeline() {return currentcuttimeline;}
+    public void setCurrentcuttimeline(Timeline currentcuttimeline) {this.currentcuttimeline = currentcuttimeline;}
+    public Sessions getSessions() {return sessions;}
+    public void setSessions(Sessions sessions) {this.sessions = sessions;}
+    public ReferenceType getReferenceType() {
+        return referenceType;
     }
-
-    // Setter For ambienceenabled
-    public void setAmbienceenabled(Boolean ambienceenabled) {
-        this.ambienceenabled = ambienceenabled;
+    public void setReferenceType(ReferenceType referenceType) {
+        this.referenceType = referenceType;
     }
+    public ArrayList<Cut> getallCuts() {return new ArrayList<>(Arrays.asList(presession, rin, kyo, toh, sha, kai, jin, retsu, zai, zen, postsession));}
 
-    public boolean getAmbienceenabled() {return ambienceenabled;}
-
-    // Getter For cutsinsession
-    public ArrayList<Cut> getCutsinsession() {return cutsinsession;}
-
-
-    // <-------------------------------   CREATION  -------------------------------> //
-
-    // Static Method To Delete Previous This_Session From Temp Files
+// Creation Methods
     public static void deleteprevioussession() {
         ArrayList<File> folders = new ArrayList<>();
         folders.add(new File(This_Session.directorytemp, "Ambience"));
@@ -143,8 +151,6 @@ public class This_Session {
             } catch (NullPointerException ignored) {}
         }
     }
-
-    // Check If There Are Any Cut Values (Rin - Zen) That Aren't Zero
     public boolean textfieldvaluesareOK(ArrayList<Integer> textfieldvalues) {
         for (int i = 0; i < textfieldvalues.size(); i++) {
             if (i != 0 && i != 10 && textfieldvalues.get(i) > 0) {
@@ -152,9 +158,7 @@ public class This_Session {
         }
         return false;
     }
-
-    // Check If Any Ambience Exists And If The Ambience Is Long Enough For The Textfieldvalues
-    public boolean checkifambienceisgood(ArrayList<Integer> textfieldvalues, CreateANewSession createsessionDialog) {
+    public boolean checkifambienceisgood(ArrayList<Integer> textfieldvalues, ChangeSessionValues createsessionDialog) {
         if (textfieldvaluesareOK(textfieldvalues)) {
             ArrayList<Cut> cutswithnoambience = new ArrayList<>();
             ArrayList<Cut> cutswithreducedambience = new ArrayList<>();
@@ -243,8 +247,6 @@ public class This_Session {
         }
         return ambienceenabled;
     }
-
-    // Check If This_Session Is Well-Formed (Sequential Cuts With Proper Connects)
     public boolean sessioncreationwellformednesschecks(ArrayList<Integer> textfieldtimes) {
         boolean createsession = true;
         int lastcutindex = 0;
@@ -281,8 +283,6 @@ public class This_Session {
         }
         return true;
     }
-
-    // Pass Durations From TextFieldValues Into Cuts For Creation
     public boolean setupcutsinsession(ArrayList<Integer> textfieldtimes) {
         presession.setDuration(textfieldtimes.get(0));
         rin.setDuration(textfieldtimes.get(1));
@@ -326,106 +326,263 @@ public class This_Session {
         cutsinsession.add(postsession);
         return cutsinsession.size() > 0;
     }
+    public void changesessionvalues() {
+        ChangeSessionValues changeSessionValues = new ChangeSessionValues(this);
+        changeSessionValues.showAndWait();
 
-    // Create The This_Session
+    }
     public boolean create(ArrayList<Integer> textfieldtimes) {
-        This_Session.deleteprevioussession();
         if (sessioncreationwellformednesschecks(textfieldtimes)) {
             setupcutsinsession(textfieldtimes);
             boolean ok = true;
-            for (Cut i : cutsinsession) {
-                if (! i.create(cutsinsession, ambienceenabled)) {ok = false; break;}
-            }
+            for (Cut i : cutsinsession) {if (! i.create(cutsinsession, ambienceenabled)) {ok = false; break;}}
             return ok;
         } else {return false;}
     }
 
-    // <------------------------------- PLAYBACK --------------------------------> //
 
-    public void play() {
-        if (player == null) {player = new Player(cutsinsession, ambienceenabled, root);}
-        player.playbuttonpressed();
-    }
-    public void pause() {
-        player.pause();
-        // Pauses The This_Session
-    }
-    public void stop() {
-        player.stop();
-    }
-    public void displaystatus() {
-
-    }
-    public void endofsession() {
-
-    }
-
-    // <------------------------------- EXPORT --------------------------------> //
+// Export
     public void export() {
         // Exports The This_Session
-        Task<Boolean> task = new Task<Boolean>() {
-            @Override
-            protected Boolean call() throws Exception {
-                for (Cut i : cutsinsession) {
-                    if (isCancelled()) {return false;}
-                    updateMessage("Currently Creating " + i.name);
-                    updateProgress((double) cutsinsession.indexOf(i), (double) cutsinsession.size() - 1);
-                    boolean cutcreatedsuccesfully = i.export();
-                    if (! cutcreatedsuccesfully) {return false;}
-                    updateMessage("Finished Creating " + i.name);
-                }
-                return getCreated();
-            }
-        };
-        creatingSessionDialog.creatingsessionProgressBar.progressProperty().bind(task.progressProperty());
-        creatingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(task.messageProperty());
-        creatingSessionDialog.CancelButton.setOnAction(event -> task.cancel());
-        task.setOnSucceeded(event -> {
-            if (task.getValue()) {
-                Alert a = new Alert(Alert.AlertType.INFORMATION);
-                a.setTitle("Created Succeeded");
-                a.setHeaderText("Creation Completed With No Errors");
-                a.setContentText("You Can Now Play Or Export This This_Session");
-                a.showAndWait();
-                creatingSessionDialog.close();
-                if (createANewSession != null) {
-                    createANewSession.close();
-                }
-            } else {
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setTitle("Creation Failed");
-//                    String v = task.getException().getMessage();
-                a.setHeaderText("Errors Occured While Trying To Create The This_Session. Please Try Again Or Contact Me For Support ");
-                a.setContentText("Please Try Again Or Contact Me For Support");
-                a.showAndWait();
-                This_Session.deleteprevioussession();
-                creatingSessionDialog.close();
-            }
-        });
-        task.setOnFailed(event -> {
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setTitle("Creation Failed");
-            String v = task.getException().getMessage();
-            a.setHeaderText("Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v);
-            a.setContentText("Please Try Again Or Contact Me For Support");
-            a.showAndWait();
-            This_Session.deleteprevioussession();
-            creatingSessionDialog.close();
-        });
-        task.setOnCancelled(event -> {
-            Alert a = new Alert(Alert.AlertType.WARNING);
-            a.setTitle("Creation Cancelled");
-            a.setHeaderText("You Cancelled The This_Session Creation");
-            a.setContentText("Re-Create To Play Or Export");
-            a.showAndWait();
-            This_Session.deleteprevioussession();
-            creatingSessionDialog.close();
-        });
+//        Task<Boolean> task = new Task<Boolean>() {
+//            @Override
+//            protected Boolean call() throws Exception {
+//                for (Cut i : cutsinsession) {
+//                    if (isCancelled()) {return false;}
+//                    updateMessage("Currently Creating " + i.name);
+//                    updateProgress((double) cutsinsession.indexOf(i), (double) cutsinsession.size() - 1);
+//                    boolean cutcreatedsuccesfully = i.export();
+//                    if (! cutcreatedsuccesfully) {return false;}
+//                    updateMessage("Finished Creating " + i.name);
+//                }
+//                return getCreated();
+//            }
+//        };
+//        creatingSessionDialog.creatingsessionProgressBar.progressProperty().bind(task.progressProperty());
+//        creatingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(task.messageProperty());
+//        creatingSessionDialog.CancelButton.setOnAction(event -> task.cancel());
+//        task.setOnSucceeded(event -> {
+//            if (task.getValue()) {
+//                Alert a = new Alert(Alert.AlertType.INFORMATION);
+//                a.setTitle("Created Succeeded");
+//                a.setHeaderText("Creation Completed With No Errors");
+//                a.setContentText("You Can Now Play Or Export This This_Session");
+//                a.showAndWait();
+//                creatingSessionDialog.close();
+//                if (createANewSession != null) {
+//                    createANewSession.close();
+//                }
+//            } else {
+//                Alert a = new Alert(Alert.AlertType.ERROR);
+//                a.setTitle("Creation Failed");
+////                    String v = task.getException().getMessage();
+//                a.setHeaderText("Errors Occured While Trying To Create The This_Session. Please Try Again Or Contact Me For Support ");
+//                a.setContentText("Please Try Again Or Contact Me For Support");
+//                a.showAndWait();
+//                This_Session.deleteprevioussession();
+//                creatingSessionDialog.close();
+//            }
+//        });
+//        task.setOnFailed(event -> {
+//            Alert a = new Alert(Alert.AlertType.ERROR);
+//            a.setTitle("Creation Failed");
+//            String v = task.getException().getMessage();
+//            a.setHeaderText("Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v);
+//            a.setContentText("Please Try Again Or Contact Me For Support");
+//            a.showAndWait();
+//            This_Session.deleteprevioussession();
+//            creatingSessionDialog.close();
+//        });
+//        task.setOnCancelled(event -> {
+//            Alert a = new Alert(Alert.AlertType.WARNING);
+//            a.setTitle("Creation Cancelled");
+//            a.setHeaderText("You Cancelled The This_Session Creation");
+//            a.setContentText("Re-Create To Play Or Export");
+//            a.showAndWait();
+//            This_Session.deleteprevioussession();
+//            creatingSessionDialog.close();
+//        });
     }
     public boolean getexported() {return false;}
 
-    // <------------------------------- LOG FILES ------------------------------> //
+// Playback
+    public void startplayback() {
+    totalsecondselapsed = 0;
+    totalsecondsinsession = 0;
+    for (Cut i : cutsinsession) {totalsecondsinsession += i.getdurationinseconds();}
+    SessionTotalTime.setText(TimeUtils.formatlengthshort(totalsecondsinsession));
+    currentcuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
+    currentcuttimeline.setCycleCount(Animation.INDEFINITE);
+    currentcuttimeline.play();
+    cutcount = 0;
+    currentcut = cutsinsession.get(cutcount);
+    playthiscut();
+}
+    public String play() {
+        switch (playerState) {
+            case IDLE:
+                TemporarySession = new Session();
+                startplayback();
+                return "Playing Session...";
+            case PAUSED:
+                currentcuttimeline.play();
+                currentcut.resumeplayingcut();
+                setPlayerState(PlayerState.PLAYING);
+                return "Resumsing Session...";
+            case STOPPED:
+                TemporarySession = new Session();
+                startplayback();
+            case PLAYING:
+                return "Already Playing";
+            case TRANSITIONING:
+                return "Transistioning To The Next Cut";
+            default:
+                return "";
+        }
+    }
+    public String pause() {
+        switch (playerState) {
+            case PLAYING:
+                currentcut.pauseplayingcut();
+                currentcuttimeline.pause();
+                setPlayerState(PlayerState.PAUSED);
+                return "Session Paused";
+            case PAUSED:
+                return "Already Paused";
+            case TRANSITIONING:
+                return "Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Pause";
+            default:
+                return "No Session Playing";
+        }
+    }
+    public String stop() {
+        switch (playerState) {
+            case PLAYING:
+                pause();
+                if (GuiUtils.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
+                    endsessionprematurely(sessions);
+                    currentcut.stopplayingcut();
+                    currentcuttimeline.stop();
+                    setPlayerState(PlayerState.STOPPED);
+                    resetthissession();
+                    return "Session Stopped";
+                } else {play(); return "";}
+            case PAUSED:
+                if (GuiUtils.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
+                    endsessionprematurely(sessions);
+                    currentcut.stopplayingcut();
+                    currentcuttimeline.stop();
+                    setPlayerState(PlayerState.STOPPED);
+                    resetthissession();
+                    return "Session Stopped";
+                } else {play(); return "";}
+            case IDLE:
+                return "No Session Playing, Cannot Stop";
+            case TRANSITIONING:
+                return "Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Stop";
+            default:
+                return "";
+        }
+    }
+    public void endsessionprematurely(Sessions Sessions) {
+        int secondsleft = currentcut.getdurationinseconds() / currentcut.getSecondselapsed();
+        int secondspracticed = currentcut.getdurationinseconds() - secondsleft;
+        Double minutes = Math.floor(secondspracticed / 60);
+        TemporarySession.updatecutduration(currentcut.number, minutes.intValue());
+        // TODO Get Premature Ending Reason (If You Decide To Include It) Here
+        String prematureendingreason = "";
+        TemporarySession.writeprematureending(currentcut.name, prematureendingreason);
+        try {Sessions.addnewsession(TemporarySession);}
+        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "XML Error", "Cannot Write This Practiced Session To XML File");}
+    }
+    public void updateplayerui() {
+        switch (playerState) {
+            case PLAYING:
+                totalsecondselapsed++;
+                SessionCurrentTime.setText(TimeUtils.formatlengthshort(totalsecondselapsed));
+                CutCurrentTime.setText(currentcut.getcurrenttimeformatted());
+                CutTotalTime.setText(currentcut.gettotaltimeformatted());
+                CutPlayingText.setText(String.format("%s Progress", currentcut.name));
+                SessionPlayingText.setText("Total Progress");
+                StatusBar.setText("Now Playing: " + currentcut.name);
+                if (currentcut.getSecondselapsed() != 0) {CutProgress.setProgress((float) currentcut.getSecondselapsed() / (float) currentcut.getdurationinseconds());}
+                if (totalsecondselapsed != 0) {TotalProgress.setProgress((float) totalsecondselapsed / (float) totalsecondsinsession);}
+            case TRANSITIONING:
+                CutProgress.setProgress(1.0);
+                StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);
+                CutCurrentTime.setText(currentcut.gettotaltimeformatted());
+                CutTotalTime.setText(currentcut.gettotaltimeformatted());
+            case PAUSED:
+                StatusBar.setText("Session Paused");
+            case STOPPED:
+                StatusBar.setText("Session Stopped");
+        }
+    }
+    public void playthiscut() {
+        Duration cutduration = currentcut.getthiscutduration();
+        currentcut.startplayback();
+        Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
+        timeline.play();
+        setPlayerState(PlayerState.PLAYING);
+    }
+    public void progresstonextcut() {
+        switch (playerState) {
+            case TRANSITIONING:
+                try {
+                    cutcount++;
+                    currentcut = cutsinsession.get(cutcount);
+                    playthiscut();
+                } catch (ArrayIndexOutOfBoundsException e) {endofsession();}
+            case PLAYING:
+                TemporarySession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+                currentcut.stopplayingcut();
+                Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
+                MediaPlayer alertplayer = new MediaPlayer(alertmedia);
+                alertplayer.play();
+                setPlayerState(PlayerState.TRANSITIONING);
+                alertplayer.setOnEndOfMedia(() -> {alertplayer.stop(); alertplayer.dispose(); progresstonextcut();});
+        }
+    }
+    public void endofsession() {}
+    public void resetthissession() {
+        currentcuttimeline = null;
+        TemporarySession = null;
+        cutcount = 0;
+        totalsecondselapsed = 0;
+        totalsecondsinsession = 0;
+//        resetallvalues();
+    }
 
+// Presets
+    public void loadpreset() {
+        File xmlfile = new FileChooser().showOpenDialog(null);
+        if (xmlfile != null) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(Session.class);
+                Unmarshaller createMarshaller = context.createUnmarshaller();
+                Session loadedsession = (Session) createMarshaller.unmarshal(xmlfile);
+                if (loadedsession != null) {
+                    setupcutsinsession(loadedsession.getallcuttimes());
+                    GuiUtils.showinformationdialog("Information", "Preset Loaded", "Your Preset Was Successfully Loaded");
+                }
+            } catch (JAXBException e) {GuiUtils.showerrordialog("Error", "Not A Valid Preset File", "Please Select A Valid Preset File");}
+        }
+    }
+    public void saveaspreset(Session session) {
+        // TODO Save One Individual Session As .xml File
+        File xmlfile = new FileChooser().showSaveDialog(null);
+        if (xmlfile != null) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(Session.class);
+                Marshaller createMarshaller = context.createMarshaller();
+                createMarshaller.marshal(session, xmlfile);
+                GuiUtils.showinformationdialog("Information", "Preset Saved", "Your Preset Was Successfully Saved");
+            } catch (JAXBException e) {GuiUtils.showerrordialog("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
+        }
+    }
+
+// Log Session
+    // TODO Create A Log That Logs Creating, Exporting And Troubleshoots And Issues With Session
     private static void clearlogfile() {
         try {
             FileWriter clearlog = new FileWriter(logfile);

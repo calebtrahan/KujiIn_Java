@@ -1,5 +1,5 @@
 package kujiin.util.states;
 
 public enum CreatorState {
-    IDLE, CREATION_IN_PROGRESS, CREATED
+    NOT_CREATED, CREATION_IN_PROGRESS, CREATED
 }

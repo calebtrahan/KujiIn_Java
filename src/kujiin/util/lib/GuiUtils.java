@@ -1,7 +1,11 @@
 package kujiin.util.lib;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.util.Duration;
 
 import java.util.Optional;
 
@@ -29,5 +33,10 @@ public class GuiUtils {
         a.setHeaderText(headertext);
         a.setContentText(contenttext);
         a.showAndWait();
+    }
+
+    public static void showtimedmessage(Label label, String text, double millis) {
+        label.setText(text);
+        new Timeline(new KeyFrame(Duration.millis(millis), ae -> label.setText(""))).play();
     }
 }

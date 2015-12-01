@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -50,24 +49,24 @@ public class CreatingSessionDialog extends Stage {
     }
 
     public void testifdone() {
-        if (currentpartcount == sessionparts) {
-            if (thisSession.getCreated()) {
-                // TODO Dialog -> "This_Session Successfully Created!"
-                Alert completed = new Alert(Alert.AlertType.INFORMATION);
-                completed.setTitle("This_Session Created");
-                completed.setHeaderText("Completed!");
-                completed.setContentText("This_Session Creation Complete With No Errors");
-                completed.showAndWait();
-                this.close();
-            } else {
-                Alert completed = new Alert(Alert.AlertType.ERROR);
-                completed.setTitle("This_Session Creation Failed");
-                completed.setHeaderText("Failed!");
-                completed.setContentText("This_Session Creation Failed");
-                completed.showAndWait();
-                this.close();
-            }
-        }
+//        if (currentpartcount == sessionparts) {
+//            if (thisSession.getCreated()) {
+//                // TODO Dialog -> "This_Session Successfully Created!"
+//                Alert completed = new Alert(Alert.AlertType.INFORMATION);
+//                completed.setTitle("This_Session Created");
+//                completed.setHeaderText("Completed!");
+//                completed.setContentText("This_Session Creation Complete With No Errors");
+//                completed.showAndWait();
+//                this.close();
+//            } else {
+//                Alert completed = new Alert(Alert.AlertType.ERROR);
+//                completed.setTitle("This_Session Creation Failed");
+//                completed.setHeaderText("Failed!");
+//                completed.setContentText("This_Session Creation Failed");
+//                completed.showAndWait();
+//                this.close();
+//            }
+//        }
     }
 
     public void displaymessage(String text) {

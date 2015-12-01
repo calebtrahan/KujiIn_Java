@@ -62,5 +62,11 @@ public class GoalsWidget implements Widget{
     }
 
 // Other Methods
-
+    public void updatewhilesessionplaying(double practicedhours) {
+        PracticedHours.setText(Double.toString(practicedhours));
+        CurrentGoalProgress.setProgress(getpercentage(practicedhours, currentGoals.getfirstcurrentgoal().getGoal_Hours()));
+    }
+    public float getpercentage(double practicedhours, double goalhours) {
+        return (float) practicedhours / (float) goalhours;
+    }
 }

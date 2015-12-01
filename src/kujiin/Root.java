@@ -8,15 +8,18 @@ import javafx.event.Event;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.util.Duration;
-import kujiin.dialogs.*;
-import kujiin.util.states.CreatorState;
+import kujiin.dialogs.AddAmbienceDialog;
+import kujiin.dialogs.ChangeAlertDialog;
+import kujiin.dialogs.EditAmbienceDialog;
+import kujiin.dialogs.EditReferenceFiles;
 import kujiin.util.xml.Session;
-import kujiin.util.xml.Sessions;
+import kujiin.widgets.CreatorAndExporterWidget;
+import kujiin.widgets.GoalsWidget;
+import kujiin.widgets.PlayerWidget;
+import kujiin.widgets.ProgressTrackerWidget;
 
-import javax.xml.bind.JAXBException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class Root implements Initializable {
@@ -32,7 +35,7 @@ public class Root implements Initializable {
     // TODO On Startup See If This_Session Is Created (From Previous Run) If It Ask The User If They Want To Load This This_Session
 
 
-    public Button CreateButton;
+    public Button EditValuesButton;
     public Label StatusBar;
     public Button ExportButton;
     public Button PlayButton;
@@ -75,44 +78,30 @@ public class Root implements Initializable {
     public TextField TotalTimePracticed;
     public TextField NumberOfSessionsPracticed;
     public CheckBox PrePostSwitch;
+    public Button LoadPresetButton;
+    public Button SavePresetButton;
     private This_Session this_session;
-    private Sessions sessions;
-    private ReferenceType referenceType;
-    private CreatorState creatorState;
     public ChangeListener statusbarautoofflistener;
+    private GoalsWidget goalsWidget;
+    private CreatorAndExporterWidget creatorAndExporterWidget;
+    private PlayerWidget playerWidget;
+    private ProgressTrackerWidget progressTrackerWidget;
     public static final double ENTRAINMENTVOLUME = 0.5;
     public static final double AMBIENCEVOLUME = 1.0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this_session = new This_Session(this);
-        setCreatorState(CreatorState.IDLE);
+        progressTrackerWidget = new ProgressTrackerWidget(TotalTimePracticed, NumberOfSessionsPracticed, AverageSessionDuration, PrePostSwitch, ShowCutProgressButton,
+                ListOfSessionsButton, PrematureEndingsButton);
+        this_session = new This_Session(progressTrackerWidget.getSessions(), CutProgressLabelCurrent, CutProgressLabelTotal, TotalProgressLabelCurrent, TotalProgressLabelTotal,
+                CutProgressBar, TotalProgressBar, CutProgressTopLabel, TotalSessionLabel, StatusBar);
         statusbarautoofflistener = (observable, oldValue, newValue) -> new Timeline(new KeyFrame(Duration.millis(3000), ae -> StatusBar.setText(""))).play();
         StatusBar.textProperty().addListener(statusbarautoofflistener);
-        AmbienceEnabledTextField.setText("No Session Created");
-        TotalSessionTimeTextField.setText("No Session Created");
-        settextfieldvalue(PreTime, 0);
-        settextfieldvalue(RinTime, 0);
-        settextfieldvalue(KyoTime, 0);
-        settextfieldvalue(TohTime, 0);
-        settextfieldvalue(ShaTime, 0);
-        settextfieldvalue(KaiTime, 0);
-        settextfieldvalue(JinTime, 0);
-        settextfieldvalue(RetsuTime, 0);
-        settextfieldvalue(ZaiTime, 0);
-        settextfieldvalue(ZenTime, 0);
-        settextfieldvalue(PostTime, 0);
-        sessions = new Sessions();
-        try {sessions.populatefromxml();} catch (JAXBException ignored) {}
-        updatetotalprogresswidget(null);
-    }
-
-// Getters And Setters
-    public CreatorState getCreatorState() {
-    return creatorState;
-}
-    public void setCreatorState(CreatorState creatorState) {
-        this.creatorState = creatorState;
+        goalsWidget = new GoalsWidget(newgoalButton, viewcurrrentgoalsButton, viewcompletedgoalsButton, goalscurrrentvalueLabel, goalssettimeLabel, goalsprogressbar);
+        creatorAndExporterWidget = new CreatorAndExporterWidget(EditValuesButton, ExportButton, AmbienceEnabledTextField, TotalSessionTimeTextField, PreTime, RinTime, KyoTime,
+                TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, PostTime, this_session);
+        playerWidget = new PlayerWidget(VolumeButton, PlayButton, PauseButton, StopButton, CutProgressTopLabel, TotalSessionLabel, CutProgressLabelCurrent, CutProgressLabelTotal,
+                TotalProgressLabelCurrent, TotalProgressLabelTotal, CutProgressBar, TotalProgressBar, ReferenceFilesOption, StatusBar, goalsWidget);
     }
 
 // Top Menu Actions
@@ -142,32 +131,21 @@ public class Root implements Initializable {
     public void contactme(ActionEvent actionEvent) {Tools.contactme();}
 
 // Database And Total Progress Widget
-    public void updatetotalprogresswidget(ActionEvent actionEvent) {
-        int averagesessionduration = (int) sessions.getaveragesessiontimeinminutes(PrePostSwitch.isSelected());
-        int totalminutespracticed = sessions.getgrandtotaltimepracticedinminutes(PrePostSwitch.isSelected());
-        int numberofsessionspracticed = sessions.getsessioncount();
-        String nonetext = "No Sessions Practiced";
-        if (averagesessionduration != 0) {AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins(averagesessionduration));}
-        else {AverageSessionDuration.setText(nonetext);}
-        if (totalminutespracticed != 0) {TotalTimePracticed.setText(Tools.minutestoformattedhoursandmins(totalminutespracticed));}
-        else {TotalTimePracticed.setText(nonetext);}
-        if (numberofsessionspracticed != 0) {NumberOfSessionsPracticed.setText(Integer.toString(numberofsessionspracticed));}
-        else {NumberOfSessionsPracticed.setText(nonetext);}
-    }
-    public void displaylistofsessions(Event event) {sessions.displaylistofsessions();}
-    public void displayprematureendings(Event event) {sessions.displayprematureendings();}
-    public void showcutprogress(Event event) {sessions.displaycutprogress();}
+    public void updatetotalprogresswidget(ActionEvent actionEvent) {progressTrackerWidget.updateui();}
+    public void displaylistofsessions(Event event) {progressTrackerWidget.getSessions().displaylistofsessions();}
+    public void displayprematureendings(Event event) {progressTrackerWidget.getSessions().displayprematureendings();}
+    public void showcutprogress(Event event) {progressTrackerWidget.getSessions().displaycutprogress();}
 
 // Created Session Widget
     public boolean getsessioninformation() {
         try {
-            boolean cutsinsession = this_session.cutsinsession.size() != 0;
+            boolean cutsinsession = this_session.getCutsinsession().size() != 0;
             if (cutsinsession) {
                 Session session = new Session();
                 ArrayList<Integer> cuttimes = new ArrayList<>(11);
                 for (String i : This_Session.allnames) {
                     Integer duration = 0;
-                    for (Cut x : this_session.cutsinsession) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
+                    for (Cut x : this_session.getCutsinsession()) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
                     cuttimes.add(duration);
                 }
                 session.updatecutduration(0, cuttimes.get(0));
@@ -204,32 +182,40 @@ public class Root implements Initializable {
             return false;
         }
     }
-    public void createsession(Event event) {
-        if (creatorState == CreatorState.IDLE || creatorState == CreatorState.CREATED) {
-            if (creatorState == CreatorState.CREATED) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("This_Session Validation");
-                alert.setHeaderText("This_Session Is Already Created");
-                alert.setContentText("Overwrite Previous This_Session?");
-                Optional<ButtonType> result = alert.showAndWait();
-                if ((result.isPresent()) && (result.get() != ButtonType.OK)) {
-                    creatorState = CreatorState.IDLE; return;
-                }
-            }
-            creatorState = CreatorState.CREATION_IN_PROGRESS;
-            CreateANewSession createsession = new CreateANewSession(null, this_session);
-            createsession.showAndWait();
-            if (getsessioninformation()) {creatorState = CreatorState.CREATED;}
-            else {
-                // TODO Show Creation Failed Alert Here
-                creatorState = CreatorState.IDLE;
-            }
-        } else {
-            StatusBar.setText("Session Creation In Progress");
-        }
+    public void loadpreset(ActionEvent actionEvent) {
     }
-    public void exportsession(Event event) {
-        this_session.export();}
+    public void savepreset(ActionEvent actionEvent) {
+
+    }
+    public void editsessionvalues(ActionEvent actionEvent) {
+
+    }
+    public void createsession(Event event) {
+
+//        if (creatorState == CreatorState.NOT_CREATED || creatorState == CreatorState.CREATED) {
+//            if (creatorState == CreatorState.CREATED) {
+//                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//                alert.setTitle("This_Session Validation");
+//                alert.setHeaderText("This_Session Is Already Created");
+//                alert.setContentText("Overwrite Previous This_Session?");
+//                Optional<ButtonType> result = alert.showAndWait();
+//                if ((result.isPresent()) && (result.get() != ButtonType.OK)) {
+//                    creatorState = CreatorState.NOT_CREATED; return;
+//                }
+//            }
+//            creatorState = CreatorState.CREATION_IN_PROGRESS;
+//            ChangeSessionValues createsession = new ChangeSessionValues(this_session);
+//            createsession.showAndWait();
+//            if (getsessioninformation()) {creatorState = CreatorState.CREATED;}
+//            else {
+//                // TODO Show Creation Failed Alert Here
+//                creatorState = CreatorState.NOT_CREATED;
+//            }
+//        } else {
+//            StatusBar.setText("Session Creation In Progress");
+//        }
+    }
+    public void exportsession(Event event) {this_session.export();}
     public void settextfieldvalue(TextField textField, Integer value) {
         if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
         else {textField.setText("-"); textField.setDisable(true);}
@@ -258,27 +244,8 @@ public class Root implements Initializable {
             StatusBar.setText("No This_Session Playing");
         }
     }
-    public void setReferenceOption(ActionEvent actionEvent) {
-        ReferenceTypeDialog reftype = new ReferenceTypeDialog(null, referenceType);
-        reftype.showAndWait();
-        referenceType = reftype.getReferenceType();
-    }
-    public void adjustvolume(ActionEvent actionEvent) {}
-    public void disableplayerui(boolean value) {
-        if (value) {
-            CutProgressTopLabel.setText("No Session Created");
-            TotalSessionLabel.setText("No Session Created");
-        }
-        CutProgressLabelCurrent.setDisable(value);
-        CutProgressLabelTotal.setDisable(value);
-        TotalProgressLabelCurrent.setDisable(value);
-        TotalProgressLabelTotal.setDisable(value);
-        ReferenceFilesOption.setDisable(value);
-        VolumeButton.setDisable(value);
-        PlayButton.setDisable(value);
-        PauseButton.setDisable(value);
-        StopButton.setDisable(value);
-    }
+    public void setReferenceOption(ActionEvent actionEvent) {playerWidget.setreferencetype();}
+    public void adjustvolume(ActionEvent actionEvent) {playerWidget.adjustvolume();}
 
 // Goals Widget
     public void setnewgoal(Event event) {
@@ -293,4 +260,6 @@ public class Root implements Initializable {
     public void viewcompletedgoals(Event event) {
 //        this_session.sessiondb.goals.viewcompletedgoals();
     }
+
+
 }

@@ -2,27 +2,25 @@ package kujiin;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.concurrent.Service;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.dialogs.ChangeAllValuesDialog;
+import kujiin.util.lib.GuiUtils;
 
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class CreateANewSession extends Stage implements Initializable {
+public class ChangeSessionValues extends Stage implements Initializable {
     public TextField pretime;
     public TextField rintime;
     public TextField kyotime;
@@ -38,18 +36,16 @@ public class CreateANewSession extends Stage implements Initializable {
     public Button CancelButton;
     public Button CreateSessionButton;
     public Button ChangeAllValuesButton;
-    public Button opensavedpresetButton;
-    public Button SaveAsPresetButton;
     public Label sessioncreatorstatusbar;
     public Label totalsessiontimeFormattedLabel;
     public Label approximatefinishtimeLabel;
-    private This_Session thissession;
-    private Service<Void> creationservice;
+//    private Service<Void> creationservice;
     ArrayList<Integer> textfieldvalues = new ArrayList<>();
+    private This_Session this_session;
 
-    public CreateANewSession(Parent parent, This_Session thissession) {
-        this.thissession = thissession;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kujiin/assets/fxml/CreateANewSession.fxml"));
+    public ChangeSessionValues(This_Session this_session) {
+        this.this_session = this_session;
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kujiin/assets/fxml/ChangeSessionValues.fxml"));
         fxmlLoader.setController(this);
         try {setScene(new Scene(fxmlLoader.load())); this.setTitle("This_Session Creator:");}
         catch (IOException e) {e.printStackTrace();}
@@ -58,6 +54,7 @@ public class CreateANewSession extends Stage implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         maketextfieldsnumericonly();
+        setpreviousvalues();
     }
 
 // Other Methods
@@ -143,7 +140,7 @@ public class CreateANewSession extends Stage implements Initializable {
         if (AmbienceOptionCheckBox.isSelected()) {
 //            sessioncreatorstatusbar.setText("Checking Ambience...Please Wait");
             if (gettextfieldvalues()) {
-                thissession.checkifambienceisgood(textfieldvalues, this);
+                this_session.checkifambienceisgood(textfieldvalues, this);
             } else {
                 Alert a = new Alert(Alert.AlertType.INFORMATION);
                 a.setTitle("Cannot Calculate Ambience");
@@ -152,33 +149,18 @@ public class CreateANewSession extends Stage implements Initializable {
                 a.showAndWait();
                 AmbienceOptionCheckBox.setSelected(false);
             }
-        } else {thissession.setAmbienceenabled(false);}
+        } else {this_session.setAmbienceenabled(false);}
     }
     public void cancelsessioncreation(ActionEvent actionEvent) {this.close();}
     public void createsession(ActionEvent actionEvent) {
-        if (thissession.getCreated()) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Session Validation");
-            alert.setHeaderText("Session Is Already Created");
-            alert.setContentText("Really Overwrite Previous This_Session?");
-            Optional<ButtonType> result = alert.showAndWait();
-            if ((result.isPresent()) && (result.get() == ButtonType.CANCEL)) {return;}
-        }
         if (gettextfieldvalues()) {
             if (Tools.sessionwellformednesschecks(textfieldvalues)) {
-                thissession.setAmbienceenabled(AmbienceOptionCheckBox.isSelected());
-                thissession.create(textfieldvalues);
+                this_session.setAmbienceenabled(AmbienceOptionCheckBox.isSelected());
+                this_session.create(textfieldvalues);
                 super.close();
-                // TODO HERE!!
             }
-
-        } else {
-            Alert alert2 = new Alert(Alert.AlertType.ERROR);
-            alert2.setTitle("Cannot Create This_Session");
-            alert2.setHeaderText("At Least One Cut's Value Must Be > 0");
-            alert2.setContentText("All Values For Cuts (Pre + Post Excluded) Are 0.");
-            alert2.showAndWait();
         }
+        else {GuiUtils.showerrordialog("Error", "Cannot Edit Values", "All Valued For Cuts (Pre + Post Exluded) Must Be > 0");}
     }
     public void changeallvalues(Event event) {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(null);
@@ -201,6 +183,20 @@ public class CreateANewSession extends Stage implements Initializable {
             }
         }
     }
+    public void setpreviousvalues() {
+        ArrayList<Cut> previousvalues = this_session.getallCuts();
+        pretime.setText(Integer.toString(previousvalues.get(0).duration));
+        rintime.setText(Integer.toString(previousvalues.get(1).duration));
+        kyotime.setText(Integer.toString(previousvalues.get(2).duration));
+        tohtime.setText(Integer.toString(previousvalues.get(3).duration));
+        shatime.setText(Integer.toString(previousvalues.get(4).duration));
+        kaitime.setText(Integer.toString(previousvalues.get(5).duration));
+        jintime.setText(Integer.toString(previousvalues.get(6).duration));
+        retsutime.setText(Integer.toString(previousvalues.get(7).duration));
+        zaitime.setText(Integer.toString(previousvalues.get(8).duration));
+        zentime.setText(Integer.toString(previousvalues.get(9).duration));
+        posttime.setText(Integer.toString(previousvalues.get(10).duration));
+    }
 
 // Presets
     public void opensavedpreset(ActionEvent actionEvent) {
@@ -209,5 +205,5 @@ public class CreateANewSession extends Stage implements Initializable {
     public void savethissessionaspreset(ActionEvent actionEvent) {
         System.out.println("This Isn't Done Yet");
     }
-
 }
+
