@@ -1,15 +1,15 @@
 package kujiin;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import kujiin.dialogs.ChangeAllValuesDialog;
 import kujiin.util.lib.GuiUtils;
 
@@ -36,10 +36,8 @@ public class ChangeSessionValues extends Stage implements Initializable {
     public Button CancelButton;
     public Button CreateSessionButton;
     public Button ChangeAllValuesButton;
-    public Label sessioncreatorstatusbar;
     public Label totalsessiontimeFormattedLabel;
     public Label approximatefinishtimeLabel;
-//    private Service<Void> creationservice;
     ArrayList<Integer> textfieldvalues = new ArrayList<>();
     private This_Session this_session;
 
@@ -47,7 +45,7 @@ public class ChangeSessionValues extends Stage implements Initializable {
         this.this_session = this_session;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kujiin/assets/fxml/ChangeSessionValues.fxml"));
         fxmlLoader.setController(this);
-        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("This_Session Creator:");}
+        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Edit This Session's Values");}
         catch (IOException e) {e.printStackTrace();}
     }
 
@@ -56,6 +54,8 @@ public class ChangeSessionValues extends Stage implements Initializable {
         maketextfieldsnumericonly();
         setpreviousvalues();
     }
+
+    public boolean getambienceenabled() {return AmbienceOptionCheckBox.isSelected();}
 
 // Other Methods
     public void maketextfieldsnumericonly() {
@@ -103,8 +103,6 @@ public class ChangeSessionValues extends Stage implements Initializable {
         posttime.textProperty().addListener((observable, oldValue, newValue) -> {
             updatetotalsessiontime();
         });
-        sessioncreatorstatusbar.textProperty().addListener((observable, oldValue, newValue) -> {
-            new Timeline(new KeyFrame(Duration.millis(3000), ae -> sessioncreatorstatusbar.setText(""))).play();});
     }
     public boolean gettextfieldvalues() {
         Boolean not_all_zeros = false;
@@ -138,18 +136,14 @@ public class ChangeSessionValues extends Stage implements Initializable {
     }
     public void checkambience(ActionEvent actionEvent) {
         if (AmbienceOptionCheckBox.isSelected()) {
-//            sessioncreatorstatusbar.setText("Checking Ambience...Please Wait");
             if (gettextfieldvalues()) {
                 this_session.checkifambienceisgood(textfieldvalues, this);
             } else {
-                Alert a = new Alert(Alert.AlertType.INFORMATION);
-                a.setTitle("Cannot Calculate Ambience");
-                a.setHeaderText("All Cut Durations Are Zero");
-                a.setContentText("Please Set Your This_Session Durations Before Adding Ambience");
-                a.showAndWait();
+                GuiUtils.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
                 AmbienceOptionCheckBox.setSelected(false);
             }
         } else {this_session.setAmbienceenabled(false);}
+        ambiencecheckboxswitch();
     }
     public void cancelsessioncreation(ActionEvent actionEvent) {this.close();}
     public void createsession(ActionEvent actionEvent) {
@@ -196,6 +190,12 @@ public class ChangeSessionValues extends Stage implements Initializable {
         zaitime.setText(Integer.toString(previousvalues.get(8).duration));
         zentime.setText(Integer.toString(previousvalues.get(9).duration));
         posttime.setText(Integer.toString(previousvalues.get(10).duration));
+        AmbienceOptionCheckBox.setSelected(this_session.getAmbienceenabled());
+        ambiencecheckboxswitch();
+    }
+    public void ambiencecheckboxswitch() {
+        if (AmbienceOptionCheckBox.isSelected()) {AmbienceOptionCheckBox.setText("Enabled");}
+        else {AmbienceOptionCheckBox.setText("Disabled");}
     }
 
 // Presets

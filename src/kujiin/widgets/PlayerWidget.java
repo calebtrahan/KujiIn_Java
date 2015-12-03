@@ -12,6 +12,8 @@ import kujiin.util.lib.GuiUtils;
 import kujiin.util.xml.Sessions;
 
 public class PlayerWidget implements Widget {
+    private CheckBox onOffSwitch;
+    private Label sessionPlayerTopLabel;
     private Button AdjustVolumeButton;
     private Button PlayButton;
     private Button PauseButton;
@@ -32,11 +34,13 @@ public class PlayerWidget implements Widget {
     // TODO Figure Out Where To Encapsulate The Play Logic (Here Or In Session)
         // So That Only One Session Is Actived At A Time, And We Don't Have Duplicates
 
-    public PlayerWidget(Button adjustVolumeButton, Button playButton, Button pauseButton, Button stopButton,
+    public PlayerWidget(CheckBox OnOffSwitch, Label SessionPlayerTopLabel, Button adjustVolumeButton, Button playButton, Button pauseButton, Button stopButton,
                         Label cutPlayingText, Label sessionPlayingText, Label cutCurrentTime, Label cutTotalTime,
                         Label sessionCurrentTime, Label sessionTotalTime, ProgressBar cutProgress,
                         ProgressBar totalProgress, CheckBox referenceFileCheckbox,
-                        Label statusbar, GoalsWidget goalsWidget) {
+                        Label statusbar, GoalsWidget goalsWidget, This_Session Session) {
+        onOffSwitch = OnOffSwitch;
+        sessionPlayerTopLabel = SessionPlayerTopLabel;
         AdjustVolumeButton = adjustVolumeButton;
         PlayButton = playButton;
         PauseButton = pauseButton;
@@ -52,6 +56,7 @@ public class PlayerWidget implements Widget {
         ReferenceFileCheckbox = referenceFileCheckbox;
         GoalsWidget = goalsWidget;
         StatusBar = statusbar;
+        this.Session = Session;
     }
 
 // Getters And Setters
@@ -64,9 +69,6 @@ public class PlayerWidget implements Widget {
 
 // Button Actions
     public void play(Sessions sessions) {
-        if (Session == null) {Session  = new This_Session(sessions, CutCurrentTime, CutTotalTime,
-                SessionCurrentTime, SessionTotalTime, CutProgress, TotalProgress, CutPlayingText,
-                SessionPlayingText, StatusBar);}
         GuiUtils.showtimedmessage(StatusBar, Session.play(), 3000);
     }
     public void pause() {
@@ -87,10 +89,35 @@ public class PlayerWidget implements Widget {
         reftype.showAndWait();
         referenceType = reftype.getReferenceType();
     }
+    public void statusSwitch() {
+        if (onOffSwitch.isSelected()) {enable();
+        } else {disable();}
+    }
 
 // Widget Implementation
     @Override
     public void disable() {
+        switch (Session.getPlayerState()) {
+            case PLAYING:
+                if (! GuiUtils.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
+                    onOffSwitch.setSelected(true);
+                    onOffSwitch.setText("ON");
+                    return;
+                }
+            case PAUSED:
+                if (! GuiUtils.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
+                    onOffSwitch.setSelected(true);
+                    onOffSwitch.setText("ON");
+                    return;
+                }
+            case TRANSITIONING:
+                StatusBar.setText("Transitioning, Please Wait Till The Next Cut To Turn Off The Player");
+                onOffSwitch.setSelected(true);
+                onOffSwitch.setText("ON");
+                return;
+        }
+        resetallvalues();
+        Session.resetthissession();
         AdjustVolumeButton.setDisable(true);
         PlayButton.setDisable(true);
         PauseButton.setDisable(true);
@@ -104,9 +131,17 @@ public class PlayerWidget implements Widget {
         CutProgress.setDisable(true);
         TotalProgress.setDisable(true);
         ReferenceFileCheckbox.setDisable(true);
+        sessionPlayerTopLabel.setDisable(true);
+        onOffSwitch.setText("OFF");
     }
     @Override
     public void enable() {
+        if (! Session.isValid()) {
+            GuiUtils.showinformationdialog("Information", "Cannot Enable Session Player", "Session (Above) Isn't Valid, All Cut Values Are 0");
+            onOffSwitch.setSelected(false);
+            onOffSwitch.setText("OFF");
+            return;
+        }
         AdjustVolumeButton.setDisable(false);
         PlayButton.setDisable(false);
         PauseButton.setDisable(false);
@@ -120,18 +155,26 @@ public class PlayerWidget implements Widget {
         CutProgress.setDisable(false);
         TotalProgress.setDisable(false);
         ReferenceFileCheckbox.setDisable(false);
+        sessionPlayerTopLabel.setDisable(false);
+        onOffSwitch.setText("ON");
+        readytoplay();
     }
     @Override
     public void resetallvalues() {
-        CutPlayingText.setText("No Session Created");
-        SessionPlayingText.setText("No Session Created");
+        CutPlayingText.setText("Player Disabled");
+        SessionPlayingText.setText("Player Disabled");
         CutCurrentTime.setText("--:--");
         CutTotalTime.setText("--:--");
         SessionCurrentTime.setText("--:--");
         SessionTotalTime.setText("--:--");
         CutProgress.setProgress(0.0);
         TotalProgress.setProgress(0.0);
-        ReferenceFileCheckbox.setText("No Session Playing");
+        ReferenceFileCheckbox.setText("Player Disabled");
+    }
+    public void readytoplay() {
+        CutPlayingText.setText("Ready To Play");
+        SessionPlayingText.setText("Ready To Play");
+        ReferenceFileCheckbox.setText("Ready To Play");
     }
 
 // Other methods

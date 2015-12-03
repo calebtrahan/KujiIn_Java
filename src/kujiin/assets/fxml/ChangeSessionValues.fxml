@@ -20,7 +20,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="pretime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="pretime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="55.0">
@@ -33,7 +33,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="rintime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="rintime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="57.0">
@@ -46,7 +46,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="kyotime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="kyotime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="55.0">
@@ -59,7 +59,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="tohtime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="tohtime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="53.0">
@@ -72,7 +72,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="shatime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="shatime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="54.0">
@@ -85,7 +85,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="kaitime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="kaitime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="51.0">
@@ -98,7 +98,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="jintime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="jintime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="55.0">
@@ -111,7 +111,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="retsutime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="retsutime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="54.0">
@@ -124,7 +124,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="zaitime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="zaitime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="54.0">
@@ -137,7 +137,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="zentime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="zentime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="54.0">
@@ -150,7 +150,7 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextField fx:id="posttime" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
+                        <TextField fx:id="posttime" alignment="CENTER" maxWidth="50.0" prefHeight="26.0" prefWidth="50.0" />
                      </children>
                   </VBox>
                </children>

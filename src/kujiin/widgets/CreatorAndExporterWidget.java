@@ -3,10 +3,13 @@ package kujiin.widgets;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import kujiin.ChangeSessionValues;
+import kujiin.Cut;
 import kujiin.This_Session;
 import kujiin.util.interfaces.Widget;
 import kujiin.util.states.CreatorState;
 import kujiin.util.states.ExporterState;
+
+import java.util.ArrayList;
 
 public class CreatorAndExporterWidget implements Widget{
     private Button CreateButton;
@@ -49,6 +52,7 @@ public class CreatorAndExporterWidget implements Widget{
         ZenTime = zenTime;
         PostTime = postTime;
         this.this_session = this_session;
+        setSessionInformation(this_session);
         creatorState = CreatorState.NOT_CREATED;
         exporterState = ExporterState.IDLE;
     }
@@ -65,6 +69,28 @@ public class CreatorAndExporterWidget implements Widget{
 
     }
     public void exportsession() {}
+    public void setSessionInformation(This_Session session) {
+        ArrayList<Cut> cutsinsession = session.getallCuts();
+        PreTime.setText(Integer.toString(cutsinsession.get(0).duration));
+        RinTime.setText(Integer.toString(cutsinsession.get(1).duration));
+        KyoTime.setText(Integer.toString(cutsinsession.get(2).duration));
+        TohTime.setText(Integer.toString(cutsinsession.get(3).duration));
+        ShaTime.setText(Integer.toString(cutsinsession.get(4).duration));
+        KaiTime.setText(Integer.toString(cutsinsession.get(5).duration));
+        JinTime.setText(Integer.toString(cutsinsession.get(6).duration));
+        RetsuTime.setText(Integer.toString(cutsinsession.get(7).duration));
+        ZaiTime.setText(Integer.toString(cutsinsession.get(8).duration));
+        ZenTime.setText(Integer.toString(cutsinsession.get(9).duration));
+        PostTime.setText(Integer.toString(cutsinsession.get(10).duration));
+        if (session.isValid()) {
+            if (session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes");}
+            else {AmbienceEnabledTextField.setText("No");}
+            TotalSessionTimeTextField.setText(session.gettotalsessionduration());
+        } else {
+            AmbienceEnabledTextField.setText("Not A Valid Session");
+            TotalSessionTimeTextField.setText("Not A Valid Session");
+        }
+    }
 
 // Widget Implementation
     @Override

@@ -1,17 +1,15 @@
 package kujiin;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.util.Duration;
 import kujiin.dialogs.AddAmbienceDialog;
 import kujiin.dialogs.ChangeAlertDialog;
 import kujiin.dialogs.EditAmbienceDialog;
 import kujiin.dialogs.EditReferenceFiles;
+import kujiin.util.lib.GuiUtils;
 import kujiin.util.xml.Session;
 import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.GoalsWidget;
@@ -80,6 +78,8 @@ public class Root implements Initializable {
     public CheckBox PrePostSwitch;
     public Button LoadPresetButton;
     public Button SavePresetButton;
+    public CheckBox SessionPlayerOnOffSwitch;
+    public Label SessionPlayerTopLabel;
     private This_Session this_session;
     public ChangeListener statusbarautoofflistener;
     private GoalsWidget goalsWidget;
@@ -95,13 +95,12 @@ public class Root implements Initializable {
                 ListOfSessionsButton, PrematureEndingsButton);
         this_session = new This_Session(progressTrackerWidget.getSessions(), CutProgressLabelCurrent, CutProgressLabelTotal, TotalProgressLabelCurrent, TotalProgressLabelTotal,
                 CutProgressBar, TotalProgressBar, CutProgressTopLabel, TotalSessionLabel, StatusBar);
-        statusbarautoofflistener = (observable, oldValue, newValue) -> new Timeline(new KeyFrame(Duration.millis(3000), ae -> StatusBar.setText(""))).play();
-        StatusBar.textProperty().addListener(statusbarautoofflistener);
         goalsWidget = new GoalsWidget(newgoalButton, viewcurrrentgoalsButton, viewcompletedgoalsButton, goalscurrrentvalueLabel, goalssettimeLabel, goalsprogressbar);
         creatorAndExporterWidget = new CreatorAndExporterWidget(EditValuesButton, ExportButton, AmbienceEnabledTextField, TotalSessionTimeTextField, PreTime, RinTime, KyoTime,
                 TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, PostTime, this_session);
-        playerWidget = new PlayerWidget(VolumeButton, PlayButton, PauseButton, StopButton, CutProgressTopLabel, TotalSessionLabel, CutProgressLabelCurrent, CutProgressLabelTotal,
-                TotalProgressLabelCurrent, TotalProgressLabelTotal, CutProgressBar, TotalProgressBar, ReferenceFilesOption, StatusBar, goalsWidget);
+        playerWidget = new PlayerWidget(SessionPlayerOnOffSwitch, SessionPlayerTopLabel, VolumeButton, PlayButton, PauseButton, StopButton, CutProgressTopLabel, TotalSessionLabel, CutProgressLabelCurrent, CutProgressLabelTotal,
+                TotalProgressLabelCurrent, TotalProgressLabelTotal, CutProgressBar, TotalProgressBar, ReferenceFilesOption, StatusBar, goalsWidget, this_session);
+        sessionplayerswitch(null);
     }
 
 // Top Menu Actions
@@ -109,9 +108,9 @@ public class Root implements Initializable {
         ChangeAlertDialog a = new ChangeAlertDialog(null);
         a.showAndWait();
         if (a.getAlertfilechanged()) {
-            StatusBar.setText("Alert File Changed Successfully");
+            GuiUtils.showtimedmessage(StatusBar, "Alert File Changed Successfully", 5000);
         } else {
-            StatusBar.setText("Changing The Alert File Failed");
+            GuiUtils.showtimedmessage(StatusBar, "Changing The Alert File Failed", 5000);
         }
     }
     public void addambiencetoprogram(ActionEvent actionEvent) {
@@ -188,7 +187,8 @@ public class Root implements Initializable {
 
     }
     public void editsessionvalues(ActionEvent actionEvent) {
-
+        this_session.changesessionvalues();
+        creatorAndExporterWidget.setSessionInformation(this_session);
     }
     public void createsession(Event event) {
 
@@ -222,28 +222,10 @@ public class Root implements Initializable {
     }
 
 // Session Player Widget
-    public void playsession(Event event) {
-        if (this_session != null) {
-            StatusBar.setText("Starting Session Playback...");
-            this_session.play();
-        } else {
-            StatusBar.setText("No Session Created");
-        }
-    }
-    public void pausesession(Event event) {
-        try {
-            this_session.pause();
-        } catch (NullPointerException e) {
-            StatusBar.setText("No This_Session Playing");
-        }
-    }
-    public void stopsession(Event event) {
-        try {
-            this_session.stop();
-        } catch (NullPointerException e) {
-            StatusBar.setText("No This_Session Playing");
-        }
-    }
+    public void sessionplayerswitch(ActionEvent actionEvent) {playerWidget.statusSwitch();}
+    public void playsession(Event event) {playerWidget.play(progressTrackerWidget.getSessions());}
+    public void pausesession(Event event) {playerWidget.pause();}
+    public void stopsession(Event event) {playerWidget.stop(progressTrackerWidget.getSessions());}
     public void setReferenceOption(ActionEvent actionEvent) {playerWidget.setreferencetype();}
     public void adjustvolume(ActionEvent actionEvent) {playerWidget.adjustvolume();}
 
@@ -260,6 +242,5 @@ public class Root implements Initializable {
     public void viewcompletedgoals(Event event) {
 //        this_session.sessiondb.goals.viewcompletedgoals();
     }
-
 
 }

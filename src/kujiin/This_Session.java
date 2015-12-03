@@ -137,6 +137,13 @@ public class This_Session {
         this.referenceType = referenceType;
     }
     public ArrayList<Cut> getallCuts() {return new ArrayList<>(Arrays.asList(presession, rin, kyo, toh, sha, kai, jin, retsu, zai, zen, postsession));}
+    public boolean isValid() {
+        int totaltime = 0;
+        for (Cut i : getallCuts()) {
+            if (i.number != 0 && i.number != 10) {totaltime += i.duration;}
+        }
+        return totaltime > 0;
+    }
 
 // Creation Methods
     public static void deleteprevioussession() {
@@ -233,9 +240,7 @@ public class This_Session {
                     return null;
                 }
             };
-            createsessionDialog.sessioncreatorstatusbar.textProperty().bind(task.messageProperty());
-            task.setOnSucceeded(event -> createsessionDialog.sessioncreatorstatusbar.textProperty().unbind());
-            task.setOnFailed(event -> createsessionDialog.sessioncreatorstatusbar.textProperty().unbind());
+            // TODO Display Task Message In A Modal Alert Dialog
             new Thread(task).start();
         } else {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
@@ -329,7 +334,7 @@ public class This_Session {
     public void changesessionvalues() {
         ChangeSessionValues changeSessionValues = new ChangeSessionValues(this);
         changeSessionValues.showAndWait();
-
+        setAmbienceenabled(changeSessionValues.getambienceenabled());
     }
     public boolean create(ArrayList<Integer> textfieldtimes) {
         if (sessioncreationwellformednesschecks(textfieldtimes)) {
@@ -339,7 +344,6 @@ public class This_Session {
             return ok;
         } else {return false;}
     }
-
 
 // Export
     public void export() {
