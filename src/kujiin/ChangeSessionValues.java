@@ -135,15 +135,18 @@ public class ChangeSessionValues extends Stage implements Initializable {
         }
     }
     public void checkambience(ActionEvent actionEvent) {
+        ambiencecheckboxswitch();
         if (AmbienceOptionCheckBox.isSelected()) {
             if (gettextfieldvalues()) {
+                CreateSessionButton.setDisable(true);
+                CancelButton.setDisable(true);
                 this_session.checkifambienceisgood(textfieldvalues, this);
             } else {
                 GuiUtils.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
                 AmbienceOptionCheckBox.setSelected(false);
+                ambiencecheckboxswitch();
             }
         } else {this_session.setAmbienceenabled(false);}
-        ambiencecheckboxswitch();
     }
     public void cancelsessioncreation(ActionEvent actionEvent) {this.close();}
     public void createsession(ActionEvent actionEvent) {
@@ -154,27 +157,25 @@ public class ChangeSessionValues extends Stage implements Initializable {
                 super.close();
             }
         }
-        else {GuiUtils.showerrordialog("Error", "Cannot Edit Values", "All Valued For Cuts (Pre + Post Exluded) Must Be > 0");}
+        else {GuiUtils.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid");}
     }
     public void changeallvalues(Event event) {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(null);
         changevaluesdialog.showAndWait();
         Integer min = changevaluesdialog.getminutes();
-        if (min != 0) {
-            String minutes = min.toString();
-            rintime.setText(minutes);
-            kyotime.setText(minutes);
-            tohtime.setText(minutes);
-            shatime.setText(minutes);
-            kaitime.setText(minutes);
-            jintime.setText(minutes);
-            retsutime.setText(minutes);
-            zaitime.setText(minutes);
-            zentime.setText(minutes);
-            if (changevaluesdialog.getcheckboxstate()) {
-                pretime.setText(minutes);
-                posttime.setText(minutes);
-            }
+        String minutes = min.toString();
+        rintime.setText(minutes);
+        kyotime.setText(minutes);
+        tohtime.setText(minutes);
+        shatime.setText(minutes);
+        kaitime.setText(minutes);
+        jintime.setText(minutes);
+        retsutime.setText(minutes);
+        zaitime.setText(minutes);
+        zentime.setText(minutes);
+        if (changevaluesdialog.getcheckboxstate()) {
+            pretime.setText(minutes);
+            posttime.setText(minutes);
         }
     }
     public void setpreviousvalues() {

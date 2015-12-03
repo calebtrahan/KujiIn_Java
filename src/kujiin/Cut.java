@@ -110,6 +110,8 @@ public class Cut {
     public boolean isAmbienceenabled() {return ambienceenabled;}
     public Duration getthiscutduration() {return new Duration((double) getdurationinseconds() * 1000);}
     public int getSecondselapsed() {return secondselapsed;}
+    public void setEntrainmentVolume(double volume) {}
+    public void setAmbienceVolume(double volume) {}
 
     // <-------------------------- GENERAL CREATION METHODS ---------------------------------> //
 
@@ -308,7 +310,7 @@ public class Cut {
             System.out.println(ambiencemedia);
             ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
             ambienceplayer.play();
-//            ambienceplayer.setVolume(Root.AMBIENCEVOLUME);
+            ambienceplayer.setVolume(Root.AMBIENCEVOLUME);
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
         }
         cuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updatecuttime()));
@@ -349,7 +351,20 @@ public class Cut {
             ambienceplayer.dispose();
         }
     }
-    public void updatecuttime() {if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {secondselapsed++;}}
+    public void updatecuttime() {
+        if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            secondselapsed++;
+            // TODO This Will Fadeout Volume
+//            if (secondselapsed <= getdurationinseconds() - Root.FADEDURATION) {
+//                int secondsleft = getdurationinseconds() - secondselapsed;
+//                float increment = Root.FADEDURATION / secondsleft;
+//                double entrainmentvolume = Root.ENTRAINMENTVOLUME - secondsleft / Root.FADEDURATION;
+//                if (entrainmentplayer != null) {}
+//                if (ambienceplayer != null) {}
+//            }
+            // TODO This FadeIn Volume
+        }
+    }
     public String getcurrenttimeformatted() {return TimeUtils.formatlengthshort(secondselapsed + 1);}
     public String gettotaltimeformatted() {return TimeUtils.formatlengthshort(getdurationinseconds());}
 

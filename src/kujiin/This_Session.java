@@ -14,6 +14,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import kujiin.dialogs.CheckingAmbienceDialog;
 import kujiin.dialogs.SessionNotWellformedDialog;
 import kujiin.util.lib.GuiUtils;
 import kujiin.util.lib.TimeUtils;
@@ -165,7 +166,7 @@ public class This_Session {
         }
         return false;
     }
-    public boolean checkifambienceisgood(ArrayList<Integer> textfieldvalues, ChangeSessionValues createsessionDialog) {
+    public void checkifambienceisgood(ArrayList<Integer> textfieldvalues, ChangeSessionValues changeSessionValues) {
         if (textfieldvaluesareOK(textfieldvalues)) {
             ArrayList<Cut> cutswithnoambience = new ArrayList<>();
             ArrayList<Cut> cutswithreducedambience = new ArrayList<>();
@@ -177,14 +178,10 @@ public class This_Session {
                     for (Integer i : textfieldvalues) {
                         if (i != 0) {
                             Cut thiscut = tempcuts[cutcount];
-                            updateMessage(String.format("Please Wait! Currently Checking %s's Ambience...", thiscut.name));
+                            updateMessage(String.format("Currently Checking %s...", thiscut.name));
                             if (thiscut.hasanyAmbience()) {
-                                if (!thiscut.hasenoughAmbience()) {
-                                    cutswithreducedambience.add(thiscut);
-                                }
-                            } else {
-                                cutswithnoambience.add(thiscut);
-                            }
+                                if (!thiscut.hasenoughAmbience()) {cutswithreducedambience.add(thiscut);}
+                            } else {cutswithnoambience.add(thiscut);}
                         }
                         cutcount++;
                     }
@@ -236,21 +233,43 @@ public class This_Session {
                             ambienceenabled = true;
                         }
                     }
-                    updateMessage("Done Checking Ambience. You Can Now Create This This_Session...");
+                    updateMessage("Done Checking Ambience");
                     return null;
                 }
             };
             // TODO Display Task Message In A Modal Alert Dialog
             new Thread(task).start();
+            final CheckingAmbienceDialog[] cad = new CheckingAmbienceDialog[1];
+            task.setOnRunning(event -> {
+                cad[0] = new CheckingAmbienceDialog();
+                cad[0].Message.textProperty().bind(task.messageProperty());
+                cad[0].CancelButton.setOnAction(ev -> task.cancel());
+                cad[0].showAndWait();
+            });
+            task.setOnSucceeded(event -> {
+                cad[0].close();
+                changeSessionValues.CreateSessionButton.setDisable(false);
+                changeSessionValues.CancelButton.setDisable(false);
+            });
+            task.setOnCancelled(event -> {
+                cad[0].close();
+                changeSessionValues.AmbienceOptionCheckBox.setSelected(false);
+                changeSessionValues.ambiencecheckboxswitch();
+                changeSessionValues.CreateSessionButton.setDisable(false);
+                changeSessionValues.CancelButton.setDisable(false);
+            });
+            task.setOnFailed(event -> {
+                cad[0].close();
+                changeSessionValues.AmbienceOptionCheckBox.setSelected(false);
+                changeSessionValues.ambiencecheckboxswitch();
+                changeSessionValues.CreateSessionButton.setDisable(false);
+                changeSessionValues.CancelButton.setDisable(false);
+            });
         } else {
-            Alert a = new Alert(Alert.AlertType.INFORMATION);
-            a.setTitle("Ambience Validation");
-            a.setHeaderText("Cannot Check Ambience");
-            a.setContentText("No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");
-            a.showAndWait();
-            ambienceenabled = false;
+            GuiUtils.showinformationdialog("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");
+            changeSessionValues.AmbienceOptionCheckBox.setSelected(false);
+            changeSessionValues.ambiencecheckboxswitch();
         }
-        return ambienceenabled;
     }
     public boolean sessioncreationwellformednesschecks(ArrayList<Integer> textfieldtimes) {
         boolean createsession = true;
@@ -411,17 +430,18 @@ public class This_Session {
 
 // Playback
     public void startplayback() {
-    totalsecondselapsed = 0;
-    totalsecondsinsession = 0;
-    for (Cut i : cutsinsession) {totalsecondsinsession += i.getdurationinseconds();}
-    SessionTotalTime.setText(TimeUtils.formatlengthshort(totalsecondsinsession));
-    currentcuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
-    currentcuttimeline.setCycleCount(Animation.INDEFINITE);
-    currentcuttimeline.play();
-    cutcount = 0;
-    currentcut = cutsinsession.get(cutcount);
-    playthiscut();
-}
+        System.out.println("Starting Playback");
+        totalsecondselapsed = 0;
+        totalsecondsinsession = 0;
+        for (Cut i : cutsinsession) {totalsecondsinsession += i.getdurationinseconds();}
+        SessionTotalTime.setText(TimeUtils.formatlengthshort(totalsecondsinsession));
+        currentcuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
+        currentcuttimeline.setCycleCount(Animation.INDEFINITE);
+        currentcuttimeline.play();
+        cutcount = 0;
+        currentcut = cutsinsession.get(cutcount);
+        playthiscut();
+    }
     public String play() {
         switch (playerState) {
             case IDLE:
@@ -500,26 +520,25 @@ public class This_Session {
         catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "XML Error", "Cannot Write This Practiced Session To XML File");}
     }
     public void updateplayerui() {
-        switch (playerState) {
-            case PLAYING:
-                totalsecondselapsed++;
-                SessionCurrentTime.setText(TimeUtils.formatlengthshort(totalsecondselapsed));
-                CutCurrentTime.setText(currentcut.getcurrenttimeformatted());
-                CutTotalTime.setText(currentcut.gettotaltimeformatted());
-                CutPlayingText.setText(String.format("%s Progress", currentcut.name));
-                SessionPlayingText.setText("Total Progress");
-                StatusBar.setText("Now Playing: " + currentcut.name);
-                if (currentcut.getSecondselapsed() != 0) {CutProgress.setProgress((float) currentcut.getSecondselapsed() / (float) currentcut.getdurationinseconds());}
-                if (totalsecondselapsed != 0) {TotalProgress.setProgress((float) totalsecondselapsed / (float) totalsecondsinsession);}
-            case TRANSITIONING:
-                CutProgress.setProgress(1.0);
-                StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);
-                CutCurrentTime.setText(currentcut.gettotaltimeformatted());
-                CutTotalTime.setText(currentcut.gettotaltimeformatted());
-            case PAUSED:
-                StatusBar.setText("Session Paused");
-            case STOPPED:
-                StatusBar.setText("Session Stopped");
+        if (playerState == PlayerState.PLAYING) {
+            totalsecondselapsed++;
+            CutPlayingText.setText(String.format("%s Progress", currentcut.name));
+            SessionPlayingText.setText("Total Progress");
+            CutCurrentTime.setText(currentcut.getcurrenttimeformatted());
+            CutTotalTime.setText(currentcut.gettotaltimeformatted());
+            SessionCurrentTime.setText(TimeUtils.formatlengthshort(totalsecondselapsed));
+            StatusBar.setText("Session Playing. Currently Practicing " + currentcut.name + "...");
+            if (currentcut.getSecondselapsed() != 0) {CutProgress.setProgress((float) currentcut.getSecondselapsed() / (float) currentcut.getdurationinseconds());}
+            if (totalsecondselapsed != 0) {TotalProgress.setProgress((float) totalsecondselapsed / (float) totalsecondsinsession);}
+        } else if (playerState == PlayerState.TRANSITIONING) {
+            CutProgress.setProgress(1.0);
+            StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);
+            CutCurrentTime.setText(currentcut.gettotaltimeformatted());
+            CutTotalTime.setText(currentcut.gettotaltimeformatted());
+        } else if (playerState == PlayerState.PAUSED) {
+            StatusBar.setText("Session Paused");
+        } else if (playerState == PlayerState.STOPPED) {
+            StatusBar.setText("Session Stopped");
         }
     }
     public void playthiscut() {
@@ -530,31 +549,29 @@ public class This_Session {
         setPlayerState(PlayerState.PLAYING);
     }
     public void progresstonextcut() {
-        switch (playerState) {
-            case TRANSITIONING:
-                try {
-                    cutcount++;
-                    currentcut = cutsinsession.get(cutcount);
-                    playthiscut();
-                } catch (ArrayIndexOutOfBoundsException e) {endofsession();}
-            case PLAYING:
-                TemporarySession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
-                currentcut.stopplayingcut();
-                Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
-                MediaPlayer alertplayer = new MediaPlayer(alertmedia);
-                alertplayer.play();
-                setPlayerState(PlayerState.TRANSITIONING);
-                alertplayer.setOnEndOfMedia(() -> {alertplayer.stop(); alertplayer.dispose(); progresstonextcut();});
+        if (playerState == PlayerState.TRANSITIONING) {
+            try {
+                cutcount++;
+                currentcut = cutsinsession.get(cutcount);
+                playthiscut();
+            } catch (ArrayIndexOutOfBoundsException ignored) {endofsession();}
+        } else if (playerState == PlayerState.PLAYING) {
+            TemporarySession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+            currentcut.stopplayingcut();
+            Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
+            MediaPlayer alertplayer = new MediaPlayer(alertmedia);
+            alertplayer.play();
+            setPlayerState(PlayerState.TRANSITIONING);
+            alertplayer.setOnEndOfMedia(() -> {alertplayer.stop(); alertplayer.dispose(); progresstonextcut();});
         }
     }
-    public void endofsession() {}
+    public void endofsession() {System.out.println("End of Session!");}
     public void resetthissession() {
         currentcuttimeline = null;
         TemporarySession = null;
         cutcount = 0;
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
-//        resetallvalues();
     }
 
 // Presets

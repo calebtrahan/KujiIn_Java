@@ -88,6 +88,7 @@ public class Root implements Initializable {
     private ProgressTrackerWidget progressTrackerWidget;
     public static final double ENTRAINMENTVOLUME = 0.5;
     public static final double AMBIENCEVOLUME = 1.0;
+    public static final int FADEDURATION = 10;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -96,7 +97,7 @@ public class Root implements Initializable {
         this_session = new This_Session(progressTrackerWidget.getSessions(), CutProgressLabelCurrent, CutProgressLabelTotal, TotalProgressLabelCurrent, TotalProgressLabelTotal,
                 CutProgressBar, TotalProgressBar, CutProgressTopLabel, TotalSessionLabel, StatusBar);
         goalsWidget = new GoalsWidget(newgoalButton, viewcurrrentgoalsButton, viewcompletedgoalsButton, goalscurrrentvalueLabel, goalssettimeLabel, goalsprogressbar);
-        creatorAndExporterWidget = new CreatorAndExporterWidget(EditValuesButton, ExportButton, AmbienceEnabledTextField, TotalSessionTimeTextField, PreTime, RinTime, KyoTime,
+        creatorAndExporterWidget = new CreatorAndExporterWidget(EditValuesButton, ExportButton, LoadPresetButton, SavePresetButton, AmbienceEnabledTextField, TotalSessionTimeTextField, PreTime, RinTime, KyoTime,
                 TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, PostTime, this_session);
         playerWidget = new PlayerWidget(SessionPlayerOnOffSwitch, SessionPlayerTopLabel, VolumeButton, PlayButton, PauseButton, StopButton, CutProgressTopLabel, TotalSessionLabel, CutProgressLabelCurrent, CutProgressLabelTotal,
                 TotalProgressLabelCurrent, TotalProgressLabelTotal, CutProgressBar, TotalProgressBar, ReferenceFilesOption, StatusBar, goalsWidget, this_session);

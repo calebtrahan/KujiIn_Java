@@ -14,6 +14,8 @@ import java.util.ArrayList;
 public class CreatorAndExporterWidget implements Widget{
     private Button CreateButton;
     private Button ExportButton;
+    private Button loadpresetbutton;
+    private Button savepresetbutton;
     private TextField AmbienceEnabledTextField;
     private TextField TotalSessionTimeTextField;
     private TextField PreTime;
@@ -32,12 +34,14 @@ public class CreatorAndExporterWidget implements Widget{
     private ChangeSessionValues changeSessionValues;
     private This_Session this_session;
 
-    public CreatorAndExporterWidget(Button createButton, Button exportButton, TextField ambienceEnabledTextField,
+    public CreatorAndExporterWidget(Button createButton, Button exportButton, Button loadpresetbutton, Button savepresetbutton, TextField ambienceEnabledTextField,
                                     TextField totalSessionTimeTextField, TextField preTime, TextField rinTime, TextField kyoTime,
                                     TextField tohTime, TextField shaTime, TextField kaiTime, TextField jinTime,
                                     TextField retsuTime, TextField zaiTime, TextField zenTime, TextField postTime, This_Session this_session) {
         CreateButton = createButton;
         ExportButton = exportButton;
+        this.loadpresetbutton = loadpresetbutton;
+        this.savepresetbutton = savepresetbutton;
         AmbienceEnabledTextField = ambienceEnabledTextField;
         TotalSessionTimeTextField = totalSessionTimeTextField;
         PreTime = preTime;
@@ -55,6 +59,7 @@ public class CreatorAndExporterWidget implements Widget{
         setSessionInformation(this_session);
         creatorState = CreatorState.NOT_CREATED;
         exporterState = ExporterState.IDLE;
+        disableeditingfortextfields();
     }
 
 // Getters And Setters
@@ -86,17 +91,32 @@ public class CreatorAndExporterWidget implements Widget{
             if (session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes");}
             else {AmbienceEnabledTextField.setText("No");}
             TotalSessionTimeTextField.setText(session.gettotalsessionduration());
+            enable();
         } else {
             AmbienceEnabledTextField.setText("Not A Valid Session");
             TotalSessionTimeTextField.setText("Not A Valid Session");
+            disable();
         }
+    }
+    public void disableeditingfortextfields() {
+        AmbienceEnabledTextField.setEditable(false);
+        TotalSessionTimeTextField.setEditable(false);
+        PreTime.setEditable(false);
+        RinTime.setEditable(false);
+        KyoTime.setEditable(false);
+        TohTime.setEditable(false);
+        ShaTime.setEditable(false);
+        KaiTime.setEditable(false);
+        JinTime.setEditable(false);
+        RetsuTime.setEditable(false);
+        ZaiTime.setEditable(false);
+        ZenTime.setEditable(false);
+        PostTime.setEditable(false);
     }
 
 // Widget Implementation
     @Override
     public void disable() {
-        CreateButton.setDisable(true);
-        ExportButton.setDisable(true);
         AmbienceEnabledTextField.setDisable(true);
         TotalSessionTimeTextField.setDisable(true);
         PreTime.setDisable(true);
@@ -111,10 +131,14 @@ public class CreatorAndExporterWidget implements Widget{
         ZenTime.setDisable(true);
         PostTime.setDisable(true);
     }
+    public void disablebuttons() {
+        CreateButton.setDisable(true);
+        ExportButton.setDisable(true);
+        loadpresetbutton.setDisable(true);
+        savepresetbutton.setDisable(true);
+    }
     @Override
     public void enable() {
-        CreateButton.setDisable(false);
-        ExportButton.setDisable(false);
         AmbienceEnabledTextField.setDisable(false);
         TotalSessionTimeTextField.setDisable(false);
         PreTime.setDisable(false);
@@ -128,6 +152,12 @@ public class CreatorAndExporterWidget implements Widget{
         ZaiTime.setDisable(false);
         ZenTime.setDisable(false);
         PostTime.setDisable(false);
+    }
+    public void enablebuttons() {
+        CreateButton.setDisable(false);
+        ExportButton.setDisable(false);
+        loadpresetbutton.setDisable(false);
+        savepresetbutton.setDisable(false);
     }
     @Override
     public void resetallvalues() {
