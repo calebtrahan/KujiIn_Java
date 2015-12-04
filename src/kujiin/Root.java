@@ -223,7 +223,16 @@ public class Root implements Initializable {
     }
 
 // Session Player Widget
-    public void sessionplayerswitch(ActionEvent actionEvent) {playerWidget.statusSwitch();}
+    public void sessionplayerswitch(ActionEvent actionEvent) {
+        playerWidget.statusSwitch();
+        if (playerWidget.isEnabled()) {
+            creatorAndExporterWidget.disable();
+            creatorAndExporterWidget.disablebuttons();
+        } else {
+            creatorAndExporterWidget.enable();
+            creatorAndExporterWidget.enablebuttons();
+        }
+    }
     public void playsession(Event event) {playerWidget.play(progressTrackerWidget.getSessions());}
     public void pausesession(Event event) {playerWidget.pause();}
     public void stopsession(Event event) {playerWidget.stop(progressTrackerWidget.getSessions());}

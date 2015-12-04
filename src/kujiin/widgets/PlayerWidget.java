@@ -66,6 +66,7 @@ public class PlayerWidget implements Widget {
     public void setReferenceType(ReferenceType referenceType) {
         this.referenceType = referenceType;
     }
+    public boolean isEnabled() {return onOffSwitch.isSelected();}
 
 // Button Actions
     public void play(Sessions sessions) {

@@ -112,6 +112,17 @@ public class Cut {
     public int getSecondselapsed() {return secondselapsed;}
     public void setEntrainmentVolume(double volume) {}
     public void setAmbienceVolume(double volume) {}
+    public File getReferenceFile(ReferenceType referenceType) {
+        if (referenceType == ReferenceType.html) {
+            String name = this.name + ".html";
+            return new File(This_Session.directoryreference, "html/" + name);
+        } else if (referenceType == ReferenceType.txt) {
+            String name = this.name + ".txt";
+            return new File(This_Session.directoryreference, "txt/" + name);
+        } else {
+            return null;
+        }
+    }
 
     // <-------------------------- GENERAL CREATION METHODS ---------------------------------> //
 

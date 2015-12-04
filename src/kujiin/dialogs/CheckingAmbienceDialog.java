@@ -17,5 +17,5 @@ public class CheckingAmbienceDialog extends Stage {
          fxmlLoader.setController(this);
          try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Checking Ambience");}
          catch (IOException e) {e.printStackTrace();}
-     }
+    }
 }

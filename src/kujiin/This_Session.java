@@ -6,10 +6,7 @@ import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
@@ -47,6 +44,7 @@ public class This_Session {
     public static final File directoryrampup = new File(This_Session.directoryentrainment, "ramp/up/");
     public static final File alertfile = new File(This_Session.sounddirectory, "Alert.mp3");
     public static final File logfile = new File(This_Session.rootdirectory, "assets/sessionlog.txt");
+    public static final File directoryreference = new File(This_Session.rootdirectory, "assets/reference/");
     public static final File sessionsxmlfile = new File(This_Session.xmldirectory, "sessions.xml");
     public static final File currentgoalsxmlfile = new File(This_Session.xmldirectory, "current_goals.xml");
     public static final File completedgoalsxmlfile = new File(This_Session.xmldirectory, "completed_goals.xml");
@@ -572,6 +570,16 @@ public class This_Session {
         cutcount = 0;
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
+    }
+
+// Reference Files
+    public void displayreferencefile() {
+        if (referenceType == null) {
+            // TODO Dialog Here To Set Reference Type
+        }
+        if (currentcut != null) {
+            TextArea a = new TextArea();
+        }
     }
 
 // Presets
