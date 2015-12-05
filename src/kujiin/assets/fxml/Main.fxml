@@ -70,7 +70,7 @@
       <Label fx:id="TotalProgressLabelCurrent" alignment="CENTER_RIGHT" layoutX="178.0" layoutY="320.0" prefHeight="16.0" prefWidth="40.0" text="--:--" />
       <Label fx:id="CutProgressLabelTotal" layoutX="397.0" layoutY="277.0" prefHeight="16.0" prefWidth="33.0" text="--:--" />
       <Label fx:id="TotalProgressLabelTotal" layoutX="397.0" layoutY="320.0" prefHeight="16.0" prefWidth="33.0" text="--:--" />
-      <CheckBox fx:id="ReferenceFilesOption" layoutX="20.0" layoutY="350.0" mnemonicParsing="false" onAction="#setReferenceOption" prefHeight="22.0" prefWidth="177.0" text="Display Reference File" textAlignment="CENTER" wrapText="true" />
+      <CheckBox fx:id="ReferenceFilesOption" layoutX="20.0" layoutY="350.0" mnemonicParsing="false" onAction="#setReferenceOption" prefHeight="22.0" prefWidth="216.0" text="Display Reference File" textAlignment="CENTER" wrapText="true" />
       <Label fx:id="StatusBar" layoutX="7.0" layoutY="380.0" prefHeight="17.0" prefWidth="844.0" />
       <HBox layoutX="19.0" layoutY="91.0" prefHeight="20.0" prefWidth="448.0">
          <children>
@@ -192,7 +192,7 @@
       </Label>
       <HBox alignment="CENTER_RIGHT" layoutX="196.0" layoutY="348.0" prefHeight="26.0" prefWidth="265.0">
          <children>
-            <Button fx:id="VolumeButton" mnemonicParsing="false" onAction="#adjustvolume" text="Adjust Volume">
+            <Button fx:id="VolumeButton" mnemonicParsing="false" onAction="#adjustvolume" text="Volume">
                <font>
                   <Font size="12.0" />
                </font></Button>

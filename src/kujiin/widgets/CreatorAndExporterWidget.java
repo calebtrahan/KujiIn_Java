@@ -71,7 +71,6 @@ public class CreatorAndExporterWidget implements Widget{
         if (changeSessionValues == null) {
             changeSessionValues = new ChangeSessionValues(this_session);}
         changeSessionValues.showAndWait();
-
     }
     public void exportsession() {}
     public void setSessionInformation(This_Session session) {

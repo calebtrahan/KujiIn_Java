@@ -1,6 +1,5 @@
 package kujiin;
 
-import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.Initializable;
@@ -81,7 +80,6 @@ public class Root implements Initializable {
     public CheckBox SessionPlayerOnOffSwitch;
     public Label SessionPlayerTopLabel;
     private This_Session this_session;
-    public ChangeListener statusbarautoofflistener;
     private GoalsWidget goalsWidget;
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private PlayerWidget playerWidget;
@@ -236,7 +234,7 @@ public class Root implements Initializable {
     public void playsession(Event event) {playerWidget.play(progressTrackerWidget.getSessions());}
     public void pausesession(Event event) {playerWidget.pause();}
     public void stopsession(Event event) {playerWidget.stop(progressTrackerWidget.getSessions());}
-    public void setReferenceOption(ActionEvent actionEvent) {playerWidget.setreferencetype();}
+    public void setReferenceOption(ActionEvent actionEvent) {playerWidget.displayreferencefile();}
     public void adjustvolume(ActionEvent actionEvent) {playerWidget.adjustvolume();}
 
 // Goals Widget

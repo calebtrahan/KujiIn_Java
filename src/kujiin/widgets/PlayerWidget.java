@@ -6,7 +6,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import kujiin.ReferenceType;
 import kujiin.This_Session;
-import kujiin.dialogs.ReferenceTypeDialog;
 import kujiin.util.interfaces.Widget;
 import kujiin.util.lib.GuiUtils;
 import kujiin.util.xml.Sessions;
@@ -85,11 +84,7 @@ public class PlayerWidget implements Widget {
         else {GuiUtils.showtimedmessage(StatusBar, "No Session Playing", 3000);}
     }
     public void adjustvolume() {}
-    public void setreferencetype() {
-        ReferenceTypeDialog reftype = new ReferenceTypeDialog(null, referenceType);
-        reftype.showAndWait();
-        referenceType = reftype.getReferenceType();
-    }
+    public void displayreferencefile() {Session.togglereferencedisplay(ReferenceFileCheckbox);}
     public void statusSwitch() {
         if (onOffSwitch.isSelected()) {enable();
         } else {disable();}
@@ -170,12 +165,12 @@ public class PlayerWidget implements Widget {
         SessionTotalTime.setText("--:--");
         CutProgress.setProgress(0.0);
         TotalProgress.setProgress(0.0);
-        ReferenceFileCheckbox.setText("Player Disabled");
+        ReferenceFileCheckbox.setText("Reference Display Disabled");
     }
     public void readytoplay() {
         CutPlayingText.setText("Ready To Play");
         SessionPlayingText.setText("Ready To Play");
-        ReferenceFileCheckbox.setText("Ready To Play");
+        ReferenceFileCheckbox.setText("Reference Display Disabled");
     }
 
 // Other methods

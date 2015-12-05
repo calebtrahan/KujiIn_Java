@@ -3,7 +3,6 @@ package kujiin;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.concurrent.Service;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -43,8 +42,6 @@ public class Cut {
     private File ambiencedirectory;
     private double totalambienceduration;
     private This_Session thisession;
-    private Service<Void> entrainmentcreatorservice;
-    private Service<Void> ambiencecreatorservice;
     private int entrainmentplaycount;
     private int ambienceplaycount;
     private ArrayList<Media> entrainmentmedia;
@@ -122,6 +119,9 @@ public class Cut {
         } else {
             return null;
         }
+    }
+    public void setCutstoplay(ArrayList<Cut> cutstoplay) {
+        this.cutstoplay = cutstoplay;
     }
 
     // <-------------------------- GENERAL CREATION METHODS ---------------------------------> //
@@ -519,7 +519,5 @@ public class Cut {
     public boolean mixentrainmentandambience() {return false;}
     public File getmixedfile() {return null;}
 
-    public void setCutstoplay(ArrayList<Cut> cutstoplay) {
-        this.cutstoplay = cutstoplay;
-    }
+
 }

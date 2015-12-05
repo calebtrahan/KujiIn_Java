@@ -12,6 +12,8 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import kujiin.dialogs.CheckingAmbienceDialog;
+import kujiin.dialogs.DisplayReference;
+import kujiin.dialogs.ReferenceTypeDialog;
 import kujiin.dialogs.SessionNotWellformedDialog;
 import kujiin.util.lib.GuiUtils;
 import kujiin.util.lib.TimeUtils;
@@ -64,8 +66,6 @@ public class This_Session {
     private ArrayList<Cut> cutsinsession;
     private boolean ambienceenabled;
     private PlayerState playerState;
-    private ReferenceType referenceType;
-    // TODO Remove Creator State
     private Cut currentcut;
     private Timeline currentcuttimeline;
     private Session TemporarySession;
@@ -82,6 +82,13 @@ public class This_Session {
     private Label CutPlayingText;
     private Label SessionPlayingText;
     private Label StatusBar;
+    // Reference
+    private DisplayReference displayReference;
+    private boolean referencedisplayoption;
+    private Boolean referencefullscreenoption;
+    private ReferenceType referenceType;
+    private double entrainmentvolume;
+    private double ambiencevolume;
 
     public This_Session(Sessions sessions, Label cutCurrentTime, Label cutTotalTime, Label sessionCurrentTime,
                         Label sessionTotalTime, ProgressBar cutProgress, ProgressBar totalProgress, Label cutPlayingText,
@@ -142,6 +149,11 @@ public class This_Session {
             if (i.number != 0 && i.number != 10) {totaltime += i.duration;}
         }
         return totaltime > 0;
+    }
+    public boolean isReferencedisplayoption() {return referencedisplayoption;}
+    public void setReferencedisplayoption(boolean referencedisplayoption) {this.referencedisplayoption = referencedisplayoption;}
+    public void setReferencefullscreenoption(Boolean referencefullscreenoption) {
+        this.referencefullscreenoption = referencefullscreenoption;
     }
 
 // Creation Methods
@@ -540,6 +552,7 @@ public class This_Session {
         }
     }
     public void playthiscut() {
+        if (isReferencedisplayoption()) {displayreferencefile();}
         Duration cutduration = currentcut.getthiscutduration();
         currentcut.startplayback();
         Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
@@ -554,6 +567,7 @@ public class This_Session {
                 playthiscut();
             } catch (ArrayIndexOutOfBoundsException ignored) {endofsession();}
         } else if (playerState == PlayerState.PLAYING) {
+            closereferencefile();
             TemporarySession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
             currentcut.stopplayingcut();
             Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
@@ -563,7 +577,7 @@ public class This_Session {
             alertplayer.setOnEndOfMedia(() -> {alertplayer.stop(); alertplayer.dispose(); progresstonextcut();});
         }
     }
-    public void endofsession() {System.out.println("End of Session!");}
+    public void endofsession() {closereferencefile(); System.out.println("End of Session!");}
     public void resetthissession() {
         currentcuttimeline = null;
         TemporarySession = null;
@@ -573,12 +587,32 @@ public class This_Session {
     }
 
 // Reference Files
-    public void displayreferencefile() {
-        if (referenceType == null) {
-            // TODO Dialog Here To Set Reference Type
+    public boolean choosereferencetype() {
+        ReferenceTypeDialog reftype = new ReferenceTypeDialog(referenceType, referencefullscreenoption);
+        reftype.showAndWait();
+        setReferenceType(reftype.getReferenceType());
+        setReferencefullscreenoption(reftype.getFullscreen());
+        setReferencedisplayoption(reftype.getEnabled());
+        return reftype.getEnabled();
+    }
+    public void togglereferencedisplay(CheckBox ReferenceFileCheckbox) {
+        if (ReferenceFileCheckbox.isSelected()) {
+            boolean value = choosereferencetype();
+            ReferenceFileCheckbox.setSelected(value);
+            if (value && playerState == PlayerState.PLAYING) {displayreferencefile();}
+            if (value) {ReferenceFileCheckbox.setText("Reference Display Enabled");}
+            else {ReferenceFileCheckbox.setText("Reference Display Disabled");}
         }
-        if (currentcut != null) {
-            TextArea a = new TextArea();
+    }
+    public void displayreferencefile() {
+        // TODO Open And Display Reference File
+        displayReference = new DisplayReference(currentcut, referenceType, referencefullscreenoption);
+        displayReference.show();
+    }
+    public void closereferencefile() {
+        if (displayReference != null) {
+            displayReference.close();
+            displayReference = null;
         }
     }
 
@@ -618,5 +652,7 @@ public class This_Session {
             clearlog.close();
         } catch (IOException ignored) {}
     }
+
+
 
 }
