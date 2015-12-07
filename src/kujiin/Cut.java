@@ -71,6 +71,7 @@ public class Cut {
     public Cut(String alertname) {
         name = alertname;
     }
+
     // <-------------------------- GETTERS AND SETTERS ------------------------------------> //
 
     public int getdurationinseconds() {
@@ -107,8 +108,8 @@ public class Cut {
     public boolean isAmbienceenabled() {return ambienceenabled;}
     public Duration getthiscutduration() {return new Duration((double) getdurationinseconds() * 1000);}
     public int getSecondselapsed() {return secondselapsed;}
-    public void setEntrainmentVolume(double volume) {}
-    public void setAmbienceVolume(double volume) {}
+    public MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
+    public MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
     public File getReferenceFile(ReferenceType referenceType) {
         if (referenceType == ReferenceType.html) {
             String name = this.name + ".html";
@@ -120,22 +121,10 @@ public class Cut {
             return null;
         }
     }
-    public void setCutstoplay(ArrayList<Cut> cutstoplay) {
-        this.cutstoplay = cutstoplay;
-    }
+    public void setCutstoplay(ArrayList<Cut> cutstoplay) {this.cutstoplay = cutstoplay;}
 
     // <-------------------------- GENERAL CREATION METHODS ---------------------------------> //
 
-    public Boolean sessioniscreated(boolean ambienceenabled) {
-        boolean cutisgood;
-        File entrainmentfile = new File(This_Session.directorytemp, "Entrainment/" + name + ".mp3");
-        cutisgood = entrainmentfile.exists();
-        if (ambienceenabled) {
-            File ambiencefile = new File(This_Session.directorytemp, "Ambience/" + name + ".mp3");
-            cutisgood = ambiencefile.exists();
-        }
-        return cutisgood;
-    }
     public boolean hasanyAmbience() {
         ambiencefiles = new ArrayList<>();
         ambiencefiledurations = new ArrayList<>();
@@ -315,13 +304,14 @@ public class Cut {
         ambienceplaycount = 0;
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
         entrainmentplayer.play();
-        entrainmentplayer.setVolume(Root.ENTRAINMENTVOLUME);
+        if (thisession.getSessionEntrainmentVolume() != null) {entrainmentplayer.setVolume(thisession.getSessionEntrainmentVolume());}
+        else {entrainmentplayer.setVolume(Root.ENTRAINMENTVOLUME);}
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         if (ambienceenabled) {
-            System.out.println(ambiencemedia);
             ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
             ambienceplayer.play();
-            ambienceplayer.setVolume(Root.AMBIENCEVOLUME);
+            if (thisession.getSessionAmbienceVolume() != null) {ambienceplayer.setVolume(thisession.getSessionAmbienceVolume());}
+            else {ambienceplayer.setVolume(Root.AMBIENCEVOLUME);}
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
         }
         cuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updatecuttime()));
@@ -518,6 +508,15 @@ public class Cut {
     }
     public boolean mixentrainmentandambience() {return false;}
     public File getmixedfile() {return null;}
-
+    public Boolean sessionreadyforFinalExport(boolean ambienceenabled) {
+        boolean cutisgood;
+        File entrainmentfile = new File(This_Session.directorytemp, "Entrainment/" + name + ".mp3");
+        cutisgood = entrainmentfile.exists();
+        if (ambienceenabled) {
+            File ambiencefile = new File(This_Session.directorytemp, "Ambience/" + name + ".mp3");
+            cutisgood = ambiencefile.exists();
+        }
+        return cutisgood;
+    }
 
 }

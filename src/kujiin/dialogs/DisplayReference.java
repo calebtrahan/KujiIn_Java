@@ -27,8 +27,9 @@ public class DisplayReference extends Stage {
         this.referenceType = referenceType;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
         fxmlLoader.setController(this);
-        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Checking Ambience");}
+        try {setScene(new Scene(fxmlLoader.load())); this.setTitle(currentcut.name + "'s Reference");}
         catch (IOException e) {e.printStackTrace();}
+        System.out.println(fullscreenoption);
         // TODO FullScreenOption Is null. Why?
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         double height = primaryScreenBounds.getHeight();
@@ -38,6 +39,7 @@ public class DisplayReference extends Stage {
         this.setFullScreen(true);
         ContentPane.setFitToWidth(true);
         ContentPane.setFitToHeight(true);
+        ContentPane.setStyle("-fx-background-color: #212526");
 //        } else {
 //            // TODO Set Adjusted Height And Width Here
 //        }

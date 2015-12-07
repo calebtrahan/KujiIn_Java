@@ -84,7 +84,7 @@ public class Root implements Initializable {
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private PlayerWidget playerWidget;
     private ProgressTrackerWidget progressTrackerWidget;
-    public static final double ENTRAINMENTVOLUME = 0.5;
+    public static final double ENTRAINMENTVOLUME = 0.6;
     public static final double AMBIENCEVOLUME = 1.0;
     public static final int FADEDURATION = 10;
 

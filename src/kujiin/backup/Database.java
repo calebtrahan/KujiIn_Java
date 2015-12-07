@@ -119,8 +119,8 @@
 ////                "Kyo INTEGER, " +
 ////                "Toh INTEGER, " +
 ////                "Sha INTEGER, " +
-////                "Kai INTEGER, " +
-////                "Jin INTEGER, " +
+////                "KAI INTEGER, " +
+////                "JIN INTEGER, " +
 ////                "Retsu INTEGER, " +
 ////                "Zai INTEGER, " +
 ////                "Zen INTEGER, " +
@@ -153,7 +153,7 @@
 ////     Create A New This_Session When Started Playback
 ////    public void createnewsession() {
 ////        try {
-////            PreparedStatement sql = c.prepareStatement("INSERT INTO Sessions ( DATEPRACTICED, Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Postsession, TOTAL ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+////            PreparedStatement sql = c.prepareStatement("INSERT INTO Sessions ( DATEPRACTICED, Presession, Rin, Kyo, Toh, Sha, KAI, JIN, Retsu, Zai, Zen, Postsession, TOTAL ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
 ////            sql.setString(1, Tools.gettodaysdate());
 ////            sql.setInt(2, 0);
 ////            sql.setInt(3, 0);
@@ -201,15 +201,15 @@
 ////    // Delete The This_Session From The Table If Cut Durations Are All Zero
 ////    public void deleteifsessionempty() throws SQLException {
 ////        stmt = c.createStatement();
-////        ResultSet rs = stmt.executeQuery( "SELECT  Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen FROM Sessions WHERE ID=" + this.sessionid);
+////        ResultSet rs = stmt.executeQuery( "SELECT  Rin, Kyo, Toh, Sha, KAI, JIN, Retsu, Zai, Zen FROM Sessions WHERE ID=" + this.sessionid);
 ////        boolean sessionisempty = true;
 ////        while ( rs.next() ) {
 ////            if (rs.getInt("Rin") != 0) {sessionisempty = false; break;}
 ////            if (rs.getInt("Kyo") != 0) {sessionisempty = false; break;}
 ////            if (rs.getInt("Toh") != 0) {sessionisempty = false; break;}
 ////            if (rs.getInt("Sha") != 0) {sessionisempty = false; break;}
-////            if (rs.getInt("Kai") != 0) {sessionisempty = false; break;}
-////            if (rs.getInt("Jin") != 0) {sessionisempty = false; break;}
+////            if (rs.getInt("KAI") != 0) {sessionisempty = false; break;}
+////            if (rs.getInt("JIN") != 0) {sessionisempty = false; break;}
 ////            if (rs.getInt("Retsu") != 0) {sessionisempty = false; break;}
 ////            if (rs.getInt("Zai") != 0) {sessionisempty = false; break;}
 ////            if (rs.getInt("Zen") != 0) {sessionisempty = false; break;}
@@ -262,8 +262,8 @@
 ////                kyo += rs.getInt("Kyo");
 ////                toh += rs.getInt("Toh");
 ////                sha += rs.getInt("Sha");
-////                kai += rs.getInt("Kai");
-////                jin += rs.getInt("Jin");
+////                kai += rs.getInt("KAI");
+////                jin += rs.getInt("JIN");
 ////                retsu += rs.getInt("Retsu");
 ////                zai += rs.getInt("Zai");
 ////                zen += rs.getInt("Zen");

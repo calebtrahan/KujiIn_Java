@@ -83,7 +83,7 @@ public class PlayerWidget implements Widget {
         }
         else {GuiUtils.showtimedmessage(StatusBar, "No Session Playing", 3000);}
     }
-    public void adjustvolume() {}
+    public void adjustvolume() {Session.adjustvolume();}
     public void displayreferencefile() {Session.togglereferencedisplay(ReferenceFileCheckbox);}
     public void statusSwitch() {
         if (onOffSwitch.isSelected()) {enable();

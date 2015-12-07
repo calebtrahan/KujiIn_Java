@@ -11,10 +11,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import kujiin.dialogs.CheckingAmbienceDialog;
-import kujiin.dialogs.DisplayReference;
-import kujiin.dialogs.ReferenceTypeDialog;
-import kujiin.dialogs.SessionNotWellformedDialog;
+import kujiin.dialogs.*;
 import kujiin.util.lib.GuiUtils;
 import kujiin.util.lib.TimeUtils;
 import kujiin.util.states.PlayerState;
@@ -82,13 +79,12 @@ public class This_Session {
     private Label CutPlayingText;
     private Label SessionPlayingText;
     private Label StatusBar;
-    // Reference
     private DisplayReference displayReference;
     private boolean referencedisplayoption;
     private Boolean referencefullscreenoption;
     private ReferenceType referenceType;
-    private double entrainmentvolume;
-    private double ambiencevolume;
+    private Double entrainmentvolume;
+    private Double ambiencevolume;
 
     public This_Session(Sessions sessions, Label cutCurrentTime, Label cutTotalTime, Label sessionCurrentTime,
                         Label sessionTotalTime, ProgressBar cutProgress, ProgressBar totalProgress, Label cutPlayingText,
@@ -130,12 +126,6 @@ public class This_Session {
     }
     public PlayerState getPlayerState() {return playerState;}
     public void setPlayerState(PlayerState playerState) {this.playerState = playerState;}
-    public Cut getCurrentcut() {return currentcut;}
-    public void setCurrentcut(Cut currentcut) {this.currentcut = currentcut;}
-    public Timeline getCurrentcuttimeline() {return currentcuttimeline;}
-    public void setCurrentcuttimeline(Timeline currentcuttimeline) {this.currentcuttimeline = currentcuttimeline;}
-    public Sessions getSessions() {return sessions;}
-    public void setSessions(Sessions sessions) {this.sessions = sessions;}
     public ReferenceType getReferenceType() {
         return referenceType;
     }
@@ -155,6 +145,10 @@ public class This_Session {
     public void setReferencefullscreenoption(Boolean referencefullscreenoption) {
         this.referencefullscreenoption = referencefullscreenoption;
     }
+    public void setSessionAmbienceVolume(Double volume) {entrainmentvolume = volume;}
+    public Double getSessionAmbienceVolume() {return ambiencevolume;}
+    public void setSessionEntrainmentVolume(Double volume) {ambiencevolume = volume;}
+    public Double getSessionEntrainmentVolume() {return entrainmentvolume;}
 
 // Creation Methods
     public static void deleteprevioussession() {
@@ -375,7 +369,7 @@ public class This_Session {
     }
 
 // Export
-    public void export() {
+    public boolean export() {
         // Exports The This_Session
 //        Task<Boolean> task = new Task<Boolean>() {
 //            @Override
@@ -435,10 +429,11 @@ public class This_Session {
 //            This_Session.deleteprevioussession();
 //            creatingSessionDialog.close();
 //        });
+        return false;
     }
-    public boolean getexported() {return false;}
 
 // Playback
+    // TODO Player Is Stopping Partially In (One Beep) Into Alert After TOH Ends, And Before SHA Starts
     public void startplayback() {
         System.out.println("Starting Playback");
         totalsecondselapsed = 0;
@@ -552,6 +547,7 @@ public class This_Session {
         }
     }
     public void playthiscut() {
+        System.out.println(TimeUtils.getformattedtime() + "> Clause 3");
         if (isReferencedisplayoption()) {displayreferencefile();}
         Duration cutduration = currentcut.getthiscutduration();
         currentcut.startplayback();
@@ -561,29 +557,54 @@ public class This_Session {
     }
     public void progresstonextcut() {
         if (playerState == PlayerState.TRANSITIONING) {
+            System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
             try {
                 cutcount++;
                 currentcut = cutsinsession.get(cutcount);
                 playthiscut();
             } catch (ArrayIndexOutOfBoundsException ignored) {endofsession();}
         } else if (playerState == PlayerState.PLAYING) {
+            System.out.println(TimeUtils.getformattedtime() + "> Clause 2");
             closereferencefile();
             TemporarySession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
             currentcut.stopplayingcut();
-            Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
-            MediaPlayer alertplayer = new MediaPlayer(alertmedia);
-            alertplayer.play();
-            setPlayerState(PlayerState.TRANSITIONING);
-            alertplayer.setOnEndOfMedia(() -> {alertplayer.stop(); alertplayer.dispose(); progresstonextcut();});
+            if (currentcut.number == 10) {setPlayerState(PlayerState.TRANSITIONING); progresstonextcut();}
+            else {
+                Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
+                MediaPlayer alertplayer = new MediaPlayer(alertmedia);
+                alertplayer.play();
+                setPlayerState(PlayerState.TRANSITIONING);
+                alertplayer.setOnEndOfMedia(() -> {
+                    alertplayer.stop();
+                    alertplayer.dispose();
+                    progresstonextcut();
+                });
+            }
         }
     }
-    public void endofsession() {closereferencefile(); System.out.println("End of Session!");}
+    public void endofsession() {
+        closereferencefile();
+        currentcuttimeline.stop();
+        setPlayerState(PlayerState.STOPPED);
+        try {sessions.addnewsession(TemporarySession);}
+        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
+        if (GuiUtils.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {export();}
+        // TODO Update Goal Widget
+    }
     public void resetthissession() {
         currentcuttimeline = null;
         TemporarySession = null;
         cutcount = 0;
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
+    }
+    public void adjustvolume() {
+        if (getPlayerState() == PlayerState.PLAYING) {
+            AdjustVolume av = new AdjustVolume(currentcut);
+            av.show();
+            if (av.getAmbienceVolume() != null) {setSessionAmbienceVolume(av.getAmbienceVolume());}
+            if (av.getEntrainmentVolume() != null) {setSessionEntrainmentVolume(av.getEntrainmentVolume());}
+        } else {GuiUtils.showtimedmessage(StatusBar, "Cannot Adjust Volume. No Session Playing", 5000);}
     }
 
 // Reference Files
