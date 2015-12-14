@@ -354,16 +354,27 @@ public class Cut {
     }
     public void updatecuttime() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            if (secondselapsed <= Root.FADEINDURATION) {
+                double ambienceincrement = thisession.getSessionAmbienceVolume() / Root.FADEINDURATION;
+                double ambiencevolume = secondselapsed * ambienceincrement;
+                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / Root.FADEINDURATION;
+                double entrainmentvolume = secondselapsed * entrainmentincrement;
+                getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+            }
+            else if (secondselapsed >= getdurationinseconds() - Root.FADEOUTDURATION) {
+                int secondsleft = getdurationinseconds() - secondselapsed;
+                double ambienceincrement = thisession.getSessionAmbienceVolume() / Root.FADEOUTDURATION;
+                double ambiencevolume =  secondsleft * ambienceincrement;
+                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / Root.FADEOUTDURATION;
+                double entrainmentvolume = secondsleft * entrainmentincrement;
+                getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+            } else {
+                getCurrentAmbiencePlayer().setVolume(thisession.getSessionAmbienceVolume());
+                getCurrentEntrainmentPlayer().setVolume(thisession.getSessionEntrainmentVolume());
+            }
             secondselapsed++;
-            // TODO This Will Fadeout Volume
-//            if (secondselapsed <= getdurationinseconds() - Root.FADEDURATION) {
-//                int secondsleft = getdurationinseconds() - secondselapsed;
-//                float increment = Root.FADEDURATION / secondsleft;
-//                double entrainmentvolume = Root.ENTRAINMENTVOLUME - secondsleft / Root.FADEDURATION;
-//                if (entrainmentplayer != null) {}
-//                if (ambienceplayer != null) {}
-//            }
-            // TODO This FadeIn Volume
         }
     }
     public String getcurrenttimeformatted() {return TimeUtils.formatlengthshort(secondselapsed + 1);}

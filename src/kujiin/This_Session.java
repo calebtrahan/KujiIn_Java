@@ -86,6 +86,7 @@ public class This_Session {
     private Double entrainmentvolume;
     private Double ambiencevolume;
 
+
     public This_Session(Sessions sessions, Label cutCurrentTime, Label cutTotalTime, Label sessionCurrentTime,
                         Label sessionTotalTime, ProgressBar cutProgress, ProgressBar totalProgress, Label cutPlayingText,
                         Label sessionPlayingText, Label statusBar) {
@@ -445,6 +446,8 @@ public class This_Session {
         currentcuttimeline.play();
         cutcount = 0;
         currentcut = cutsinsession.get(cutcount);
+        setSessionEntrainmentVolume(Root.ENTRAINMENTVOLUME);
+        setSessionAmbienceVolume(Root.AMBIENCEVOLUME);
         playthiscut();
     }
     public String play() {
@@ -457,7 +460,7 @@ public class This_Session {
                 currentcuttimeline.play();
                 currentcut.resumeplayingcut();
                 setPlayerState(PlayerState.PLAYING);
-                return "Resumsing Session...";
+                return "Resuming Session...";
             case STOPPED:
                 TemporarySession = new Session();
                 startplayback();
@@ -525,61 +528,73 @@ public class This_Session {
         catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "XML Error", "Cannot Write This Practiced Session To XML File");}
     }
     public void updateplayerui() {
-        if (playerState == PlayerState.PLAYING) {
-            totalsecondselapsed++;
-            CutPlayingText.setText(String.format("%s Progress", currentcut.name));
-            SessionPlayingText.setText("Total Progress");
-            CutCurrentTime.setText(currentcut.getcurrenttimeformatted());
-            CutTotalTime.setText(currentcut.gettotaltimeformatted());
-            SessionCurrentTime.setText(TimeUtils.formatlengthshort(totalsecondselapsed));
-            StatusBar.setText("Session Playing. Currently Practicing " + currentcut.name + "...");
-            if (currentcut.getSecondselapsed() != 0) {CutProgress.setProgress((float) currentcut.getSecondselapsed() / (float) currentcut.getdurationinseconds());}
-            if (totalsecondselapsed != 0) {TotalProgress.setProgress((float) totalsecondselapsed / (float) totalsecondsinsession);}
-        } else if (playerState == PlayerState.TRANSITIONING) {
-            CutProgress.setProgress(1.0);
-            StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);
-            CutCurrentTime.setText(currentcut.gettotaltimeformatted());
-            CutTotalTime.setText(currentcut.gettotaltimeformatted());
-        } else if (playerState == PlayerState.PAUSED) {
-            StatusBar.setText("Session Paused");
-        } else if (playerState == PlayerState.STOPPED) {
-            StatusBar.setText("Session Stopped");
+        try {
+            if (playerState == PlayerState.PLAYING) {
+                totalsecondselapsed++;
+                CutPlayingText.setText(String.format("%s Progress", currentcut.name));
+                SessionPlayingText.setText("Total Progress");
+                CutCurrentTime.setText(currentcut.getcurrenttimeformatted());
+                CutTotalTime.setText(currentcut.gettotaltimeformatted());
+                SessionCurrentTime.setText(TimeUtils.formatlengthshort(totalsecondselapsed));
+                StatusBar.setText("Session Playing. Currently Practicing " + currentcut.name + "...");
+                if (currentcut.getSecondselapsed() != 0) {CutProgress.setProgress((float) currentcut.getSecondselapsed() / (float) currentcut.getdurationinseconds());}
+                if (totalsecondselapsed != 0) {TotalProgress.setProgress((float) totalsecondselapsed / (float) totalsecondsinsession);}
+            } else if (playerState == PlayerState.TRANSITIONING) {
+                CutProgress.setProgress(1.0);
+                StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);
+                CutCurrentTime.setText(currentcut.gettotaltimeformatted());
+                CutTotalTime.setText(currentcut.gettotaltimeformatted());
+            } else if (playerState == PlayerState.PAUSED) {
+                StatusBar.setText("Session Paused");
+            } else if (playerState == PlayerState.STOPPED) {
+                StatusBar.setText("Session Stopped");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     public void playthiscut() {
-        System.out.println(TimeUtils.getformattedtime() + "> Clause 3");
-        if (isReferencedisplayoption()) {displayreferencefile();}
-        Duration cutduration = currentcut.getthiscutduration();
-        currentcut.startplayback();
-        Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
-        timeline.play();
-        setPlayerState(PlayerState.PLAYING);
+        try {
+            System.out.println(TimeUtils.getformattedtime() + "> Clause 3");
+            if (isReferencedisplayoption()) {displayreferencefile();}
+            Duration cutduration = currentcut.getthiscutduration();
+            currentcut.startplayback();
+            Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
+            timeline.play();
+            setPlayerState(PlayerState.PLAYING);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     public void progresstonextcut() {
-        if (playerState == PlayerState.TRANSITIONING) {
-            System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
-            try {
-                cutcount++;
-                currentcut = cutsinsession.get(cutcount);
-                playthiscut();
-            } catch (ArrayIndexOutOfBoundsException ignored) {endofsession();}
-        } else if (playerState == PlayerState.PLAYING) {
-            System.out.println(TimeUtils.getformattedtime() + "> Clause 2");
-            closereferencefile();
-            TemporarySession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
-            currentcut.stopplayingcut();
-            if (currentcut.number == 10) {setPlayerState(PlayerState.TRANSITIONING); progresstonextcut();}
-            else {
-                Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
-                MediaPlayer alertplayer = new MediaPlayer(alertmedia);
-                alertplayer.play();
-                setPlayerState(PlayerState.TRANSITIONING);
-                alertplayer.setOnEndOfMedia(() -> {
-                    alertplayer.stop();
-                    alertplayer.dispose();
-                    progresstonextcut();
-                });
+        try {
+            if (playerState == PlayerState.TRANSITIONING) {
+                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
+                try {
+                    cutcount++;
+                    currentcut = cutsinsession.get(cutcount);
+                    playthiscut();
+                } catch (ArrayIndexOutOfBoundsException e) {e.printStackTrace(); endofsession();}
+            } else if (playerState == PlayerState.PLAYING) {
+                System.out.println(TimeUtils.getformattedtime() + "> Clause 2");
+                closereferencefile();
+                TemporarySession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+                currentcut.stopplayingcut();
+                if (currentcut.number == 10) {setPlayerState(PlayerState.TRANSITIONING); progresstonextcut();}
+                else {
+                    Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
+                    MediaPlayer alertplayer = new MediaPlayer(alertmedia);
+                    alertplayer.play();
+                    setPlayerState(PlayerState.TRANSITIONING);
+                    alertplayer.setOnEndOfMedia(() -> {
+                        alertplayer.stop();
+                        alertplayer.dispose();
+                        progresstonextcut();
+                    });
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     public void endofsession() {
@@ -673,7 +688,5 @@ public class This_Session {
             clearlog.close();
         } catch (IOException ignored) {}
     }
-
-
 
 }

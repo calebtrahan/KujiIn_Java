@@ -24,13 +24,6 @@ public class Root implements Initializable {
     // TODO Check Ambience List Generators To Make Sure There Are No Repeats
         // Random Is Throwing java.lang.IllegalArgumentException: bound must be positive
         // Set Really High Durations, So You Can See If It Works For Really Long Sessions
-    // TODO Finish Pause() And Stop()
-        // Maybe Set An Enum For What The Player Is Doing To Avoid A Million If Else Statements In Pause And Play?
-    // TODO Find Out Why Goals Set Only Has 1 Column
-    // TODO Set Play Button To Resume This_Session When Paused
-    // TODO Make The 'Currently Loaded This_Session' Widget Box Into The This_Session Confirmation Dialog In The Python Version
-    // TODO On Startup See If This_Session Is Created (From Previous Run) If It Ask The User If They Want To Load This This_Session
-
 
     public Button EditValuesButton;
     public Label StatusBar;
@@ -84,9 +77,10 @@ public class Root implements Initializable {
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private PlayerWidget playerWidget;
     private ProgressTrackerWidget progressTrackerWidget;
-    public static final double ENTRAINMENTVOLUME = 0.6;
-    public static final double AMBIENCEVOLUME = 1.0;
-    public static final int FADEDURATION = 10;
+    public static Double ENTRAINMENTVOLUME = 0.6;
+    public static Double AMBIENCEVOLUME = 1.0;
+    public static Double FADEOUTDURATION = 10.0;
+    public static Double FADEINDURATION = 10.0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
