@@ -41,7 +41,6 @@ public class AddAmbienceDialog extends Stage implements Initializable {
     public Label previewTotalTimeLabel;
     public Button EditCurrentAmbienceButton;
     public Button CloseButton;
-    public ChoiceBox<String> SelectCutChoiceBox;
     public Button ClearTableButton;
     public Button addambiencetocutButton;
     public Slider VolumeSlider;
@@ -58,7 +57,7 @@ public class AddAmbienceDialog extends Stage implements Initializable {
         fxmlLoader.setController(this);
         try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Add Ambience");}
         catch (IOException e) {e.printStackTrace();}
-        if (cutname != null) {SelectCutChoiceBox.setValue(cutname);}
+//        if (cutname != null) {SelectCutChoiceBox.setValue(cutname);}
         filesadded = false;
     }
     public void addfilestotable(Event event) {
@@ -142,7 +141,7 @@ public class AddAmbienceDialog extends Stage implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         cutnames.addAll(This_Session.allnames);
-        SelectCutChoiceBox.setItems(cutnames);
+//        SelectCutChoiceBox.setItems(cutnames);
         NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
         AddAmbienceTable.getSelectionModel().selectedItemProperty().addListener(
@@ -173,7 +172,8 @@ public class AddAmbienceDialog extends Stage implements Initializable {
     }
 
     public void AddAmbienceToCut(Event event) {
-        int index = This_Session.allnames.indexOf(SelectCutChoiceBox.getValue());
+//        int index = This_Session.allnames.indexOf(SelectCutChoiceBox.getValue());
+        int index = 0;
         if (index != -1 && songListData.size() != 0) {
             String name = This_Session.allnames.get(index);
             Alert b = new Alert(Alert.AlertType.CONFIRMATION);

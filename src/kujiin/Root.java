@@ -6,8 +6,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import kujiin.dialogs.AddAmbienceDialog;
 import kujiin.dialogs.ChangeAlertDialog;
-import kujiin.dialogs.EditAmbienceDialog;
 import kujiin.dialogs.EditReferenceFiles;
+import kujiin.dialogs.SessionAmbienceEditor;
 import kujiin.util.lib.GuiUtils;
 import kujiin.util.xml.Session;
 import kujiin.widgets.CreatorAndExporterWidget;
@@ -111,8 +111,10 @@ public class Root implements Initializable {
         a.showAndWait();
     }
     public void editprogramsambience(ActionEvent actionEvent) {
-        EditAmbienceDialog a = new EditAmbienceDialog();
-        a.showAndWait();
+//        EditAmbienceDialog a = new EditAmbienceDialog();
+//        a.showAndWait();
+        SessionAmbienceEditor sae = new SessionAmbienceEditor();
+        sae.showAndWait();
     }
     public void editreferencefiles(ActionEvent actionEvent) {
         EditReferenceFiles a = new EditReferenceFiles(null);

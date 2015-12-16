@@ -64,14 +64,7 @@ public class EditAmbienceDialog extends Stage implements Initializable {
         this.setOnCloseRequest(event -> close());
     }
     public void closewindow(Event event) {this.close();}
-    @Override
-    public void close() {
-        super.close();
-        if (previewmediaplayer != null && previewmediaplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            previewmediaplayer.stop();
-            previewmediaplayer.dispose();
-        }
-    }
+
 
 // Preview Methods
     public void preview(Event event) {
