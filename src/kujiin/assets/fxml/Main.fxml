@@ -15,7 +15,6 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Tools">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#addambiencetoprogram" text="Add Ambience To Program" />
               <MenuItem mnemonicParsing="false" onAction="#changealertfile" text="Change Alert File" />
               <MenuItem mnemonicParsing="false" onAction="#editprogramsambience" text="Edit Program's Ambience" />
               <MenuItem mnemonicParsing="false" onAction="#editreferencefiles" text="Edit Reference Files" />
