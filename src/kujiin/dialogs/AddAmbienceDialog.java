@@ -51,6 +51,7 @@ public class AddAmbienceDialog extends Stage implements Initializable {
     public TableColumn<AmbienceSong, String> DurationColumn;
     private Media previewmedia = null;
     private MediaPlayer previewmediaplayer = null;
+    private boolean filesadded;
 
     public AddAmbienceDialog(String cutname) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AddAmbienceDialog.fxml"));
@@ -58,6 +59,7 @@ public class AddAmbienceDialog extends Stage implements Initializable {
         try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Add Ambience");}
         catch (IOException e) {e.printStackTrace();}
         if (cutname != null) {SelectCutChoiceBox.setValue(cutname);}
+        filesadded = false;
     }
     public void addfilestotable(Event event) {
         FileChooser a = new FileChooser();
@@ -131,11 +133,10 @@ public class AddAmbienceDialog extends Stage implements Initializable {
         if (total == null || currenttime == null) {previewSlider.setValue(0);}
         else {previewSlider.setValue(currenttime.toMillis() / total.toMillis());}
     }
-
-
-
     public void editcurrentambience(Event event) {
-
+        EditAmbienceDialog editAmbienceDialog = new EditAmbienceDialog();
+        editAmbienceDialog.showAndWait();
+        close();
     }
 
     @Override
@@ -149,16 +150,21 @@ public class AddAmbienceDialog extends Stage implements Initializable {
         this.setOnCloseRequest(event -> close());
     }
 
-    public void closebuttonpressed(Event event) {this.close();}
+    public void closebuttonpressed(Event event) {close();}
     public void cleartable(Event event) {
-        AddAmbienceTable.getSelectionModel().getTableView().getItems().clear();
-        previewmedia = null;
-        previewmediaplayer = null;
-        songListData.clear();
+        if (GuiUtils.getanswerdialog("Confirmation", "Clear Table", "Remove All Items From This Table?")) {
+            AddAmbienceTable.getSelectionModel().getTableView().getItems().clear();
+            previewmedia = null;
+            previewmediaplayer = null;
+            songListData.clear();
+        }
     }
 
     @Override
     public void close() {
+        if (AddAmbienceTable.getSelectionModel().getTableView().getItems().size() > 0 && ! filesadded) {
+            if (! GuiUtils.getanswerdialog("Confirmation", "Files Not Added", "Close Dialog Without Adding These Files")) {return;}
+        }
         if (previewmediaplayer != null) {
             previewmediaplayer.stop();
             previewmediaplayer.dispose();
@@ -195,6 +201,7 @@ public class AddAmbienceDialog extends Stage implements Initializable {
                 copyingfilesdialog.setTitle("Copying Files");
                 copyingfilesdialog.setHeaderText("Please Wait...");
                 copyservice.setOnSucceeded(event1 -> {
+                    filesadded = true;
                     System.out.println("Succeeded!");
                     copyingfilesdialog.contentTextProperty().unbind();
                     copyingfilesdialog.close();

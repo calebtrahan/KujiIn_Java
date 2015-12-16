@@ -21,7 +21,6 @@ import kujiin.util.lib.GuiUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class EditAmbienceDialog extends Stage implements Initializable {
@@ -106,29 +105,19 @@ public class EditAmbienceDialog extends Stage implements Initializable {
         else {PreviewSlider.setValue(currenttime.toMillis() / total.toMillis());}
     }
 
-
 // Table View Methods
     public void removefromTable(Event event) {
         int index = AmbienceListTableView.getSelectionModel().getSelectedIndex();
         if (index != -1) {
-            Alert b = new Alert(Alert.AlertType.CONFIRMATION);
-            b.setTitle("Removal Confirmation");
-            b.setHeaderText("Remove This Audio File?");
             String filename = songListData.get(index).getName();
-            b.setContentText(String.format("Really Remove %s From %s's Ambience?", filename, selectedcutname));
-            Optional<ButtonType> c = b.showAndWait();
-            if (c.get() == ButtonType.OK) {
-                songListData.get(index).getFile().delete();
-                AmbienceListTableView.getItems().remove(index);
-                songListData.remove(index);
+            if (GuiUtils.getanswerdialog("Confirmation", String.format("Remove '%s' From %s's Ambience?", filename, selectedcutname), "This Cannot Be Undone")) {
+                if (songListData.get(index).getFile().delete()) {
+                    AmbienceListTableView.getItems().remove(index);
+                    songListData.remove(index);
+                    populateCutTableView(null);
+                } else {GuiUtils.showerrordialog("Error", "Couldn't Delete '" + filename + "'", "Check File Permissions");}
             }
-        } else {
-            Alert a = new Alert(Alert.AlertType.WARNING);
-            a.setTitle("Nothing To Remove");
-            a.setHeaderText("Nothing To Remove");
-            a.setContentText("Select An Item From The Table To Remove");
-            a.showAndWait();
-        }
+        } else {GuiUtils.showinformationdialog("Information", "Nothing To Remove", "Select An Item To Remove");}
     }
     public void addToTable(Event event) {
         AddAmbienceDialog c = new AddAmbienceDialog(selectedcutname);
