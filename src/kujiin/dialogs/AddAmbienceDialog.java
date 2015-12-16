@@ -4,18 +4,21 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import kujiin.This_Session;
 import kujiin.Tools;
+import kujiin.util.lib.GuiUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -41,6 +44,7 @@ public class AddAmbienceDialog extends Stage implements Initializable {
     public ChoiceBox<String> SelectCutChoiceBox;
     public Button ClearTableButton;
     public Button addambiencetocutButton;
+    public Slider VolumeSlider;
     private ObservableList<AmbienceSong> songListData = FXCollections.observableArrayList();
     private ObservableList<String> cutnames = FXCollections.observableArrayList();
     public TableColumn<AmbienceSong, String> NameColumn;
@@ -48,51 +52,33 @@ public class AddAmbienceDialog extends Stage implements Initializable {
     private Media previewmedia = null;
     private MediaPlayer previewmediaplayer = null;
 
-    public AddAmbienceDialog(Parent parent) {
+    public AddAmbienceDialog(String cutname) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AddAmbienceDialog.fxml"));
         fxmlLoader.setController(this);
         try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Add Ambience");}
         catch (IOException e) {e.printStackTrace();}
+        if (cutname != null) {SelectCutChoiceBox.setValue(cutname);}
     }
-
-    public AddAmbienceDialog(Parent parent, String cutname) {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AddAmbienceDialog.fxml"));
-        fxmlLoader.setController(this);
-        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Add Ambience");}
-        catch (IOException e) {e.printStackTrace();}
-        SelectCutChoiceBox.setValue(cutname);
-    }
-
     public void addfilestotable(Event event) {
         FileChooser a = new FileChooser();
         List<File> files = a.showOpenMultipleDialog(this);
         ArrayList<File> notvalidfilenames = new ArrayList<>();
         if (files != null) {
             for (File i : files) {
-                if (i.getName().endsWith(".mp3") && Tools.getaudioduration(i) != 0.0) {
-                    songListData.add(new AmbienceSong(i.getName(), i));
-                } else {
-                    notvalidfilenames.add(i);
-                }
+                if (i.getName().endsWith(".mp3") && Tools.getaudioduration(i) != 0.0) {songListData.add(new AmbienceSong(i.getName(), i));}
+                else {notvalidfilenames.add(i);}
             }
         }
-        AddAmbienceTable.setItems(songListData);
+        if (songListData.size() > 0) {AddAmbienceTable.setItems(songListData);}
         if (notvalidfilenames.size() > 0) {
-            Alert b = new Alert(Alert.AlertType.WARNING);
-            b.setTitle("Couldn't Add All Files");
-            b.setHeaderText("These Files Couldn't Be Added:");
             StringBuilder c = new StringBuilder();
             for (File i : notvalidfilenames) {
                 c.append(i.getName());
-                if (i != notvalidfilenames.get(notvalidfilenames.size() - 1)) {
-                    c.append("\n");
-                }
+                if (i != notvalidfilenames.get(notvalidfilenames.size() - 1)) {c.append("\n");}
             }
-            b.setContentText(c.toString());
-            b.showAndWait();
+            GuiUtils.showinformationdialog("Information", "The Files Weren't Added Because They Are Unsupported", c.toString());
         }
     }
-
     public void removefilesfromtable(Event event) {
         int index = AddAmbienceTable.getSelectionModel().getSelectedIndex();
         if (index != -1) {
@@ -105,7 +91,6 @@ public class AddAmbienceDialog extends Stage implements Initializable {
             a.showAndWait();
         }
     }
-
     public void selectionchanged(AmbienceSong ambienceSong) {
         File tempfile = ambienceSong.getFile();
         if (previewmediaplayer != null) {
@@ -117,14 +102,19 @@ public class AddAmbienceDialog extends Stage implements Initializable {
         previewmedia = new Media(tempfile.toURI().toString());
         previewmediaplayer = new MediaPlayer(previewmedia);
     }
-
     public void previewselectedfile(Event event) {
         if (previewmedia != null && previewmediaplayer != null) {
             if (PreviewButton.getText().equals("Preview")) {
                 previewmediaplayer.play();
+                VolumeSlider.valueProperty().bindBidirectional(previewmediaplayer.volumeProperty());
+                previewSlider.valueChangingProperty().addListener((observable, oldValue, newValue) -> {
+                    double position = previewSlider.getValue();
+                    Duration seektothis = previewmediaplayer.getTotalDuration().multiply(position);
+                    previewmediaplayer.seek(seektothis);
+                });
                 previewmediaplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
                     previewCurrentTimeLabel.setText(Tools.formatlengthshort((int) newValue.toSeconds()));
-//                    previewSlider.setValue(previewmediaplayer.getCurrentTime().toMillis() / previewmediaplayer.getTotalDuration().toMillis());
+                    updatePositionSlider(previewmediaplayer.getCurrentTime());
                 });
                 PreviewButton.setText(" Stop ");
             } else {
@@ -132,13 +122,17 @@ public class AddAmbienceDialog extends Stage implements Initializable {
                 PreviewButton.setText("Preview");
             }
         } else {
-            Alert a = new Alert(Alert.AlertType.WARNING);
-            a.setTitle("No Item Selected");
-            a.setHeaderText("Nothing To Preview");
-            a.setContentText("Select An Item From The Table To Preview");
-            a.showAndWait();
+            GuiUtils.showinformationdialog("Information", "Nothing To Preview", "Select An Item From The Table");
         }
     }
+    public void updatePositionSlider(Duration currenttime) {
+        if (previewSlider.isValueChanging()) {return;}
+        Duration total = previewmediaplayer.getTotalDuration();
+        if (total == null || currenttime == null) {previewSlider.setValue(0);}
+        else {previewSlider.setValue(currenttime.toMillis() / total.toMillis());}
+    }
+
+
 
     public void editcurrentambience(Event event) {
 
@@ -156,7 +150,6 @@ public class AddAmbienceDialog extends Stage implements Initializable {
     }
 
     public void closebuttonpressed(Event event) {this.close();}
-
     public void cleartable(Event event) {
         AddAmbienceTable.getSelectionModel().getTableView().getItems().clear();
         previewmedia = null;
@@ -184,49 +177,45 @@ public class AddAmbienceDialog extends Stage implements Initializable {
             Optional<ButtonType> c = b.showAndWait();
             if (c.isPresent() && c.get() == ButtonType.OK) {
                 ArrayList<File> filestoadd = new ArrayList<>();
-                boolean addambiencestatus = true;
-                for (AmbienceSong i : songListData) {
-                    filestoadd.add(i.getFile());
-                }
-                for (File i : filestoadd) {
-                    File destinationfile = new File(This_Session.directoryambience, name + "/" + i.getName());
-                    try {
-                        FileUtils.copyFile(i, destinationfile);
-                    } catch (IOException e) {
-                        addambiencestatus = false;
-                        e.printStackTrace();
-                    }
-                }
-                if (addambiencestatus) {
-                    Alert a = new Alert(Alert.AlertType.INFORMATION);
-                    a.setTitle("Ambience Added");
-                    a.setHeaderText("Success!");
-                    a.setContentText("Your Selected Ambience Files Have Been Added To " + name + "'s Ambience");
-                    a.showAndWait();
-                } else {
-                    Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setTitle("Ambience Added");
-                    a.setHeaderText("Failure!");
-                    a.setContentText("An Error Occured While Adding Files To " + name + "'s Ambience. Check File Permissions.");
-                    a.showAndWait();
-                }
+                for (AmbienceSong i : songListData) {filestoadd.add(i.getFile());}
+                Service<Void> copyservice = new Service<Void>() {
+                    @Override
+                    protected Task<Void> createTask() {
+                        return new Task<Void>() {
+                            @Override
+                            protected Void call() throws Exception {
+                                for (File i : filestoadd) {
+                                    File filetocopy =  new File(This_Session.directoryambience, name + "/" + i.getName());
+                                    FileUtils.copyFile(i, filetocopy);
+                                    updateMessage(String.format("(%d/%d) -> Copying %s", filestoadd.indexOf(i) + 1, filestoadd.size(), filetocopy.getName()));
+                                }
+                                return null;
+                }};}};
+                Alert copyingfilesdialog = new Alert(Alert.AlertType.INFORMATION);
+                copyingfilesdialog.setTitle("Copying Files");
+                copyingfilesdialog.setHeaderText("Please Wait...");
+                copyservice.setOnSucceeded(event1 -> {
+                    System.out.println("Succeeded!");
+                    copyingfilesdialog.contentTextProperty().unbind();
+                    copyingfilesdialog.close();
+                    GuiUtils.showinformationdialog("Information", "Success", "Files Added To " + name + "'s Ambience");
+                    this.close();
+                });
+                copyservice.setOnFailed(event2 -> {
+                    System.out.println("Failed!");
+                    copyingfilesdialog.contentTextProperty().unbind();
+                    copyingfilesdialog.close();
+                    GuiUtils.showerrordialog("Error", "Failure", "Couldn't Add Files To " + name + "'s Ambience");
+                    this.close();
+                });
+                copyingfilesdialog.contentTextProperty().bind(copyservice.messageProperty());
+                copyingfilesdialog.show();
+                copyservice.start();
             }
         } else {
-            if (songListData.size() == 0) {
-                Alert a = new Alert(Alert.AlertType.WARNING);
-                a.setTitle("Nothing To Add");
-                a.setHeaderText("No Ambience To Add");
-                a.setContentText("Add Some Ambience To The Table First.");
-                a.showAndWait();
-            } else {
-                Alert a = new Alert(Alert.AlertType.WARNING);
-                a.setTitle("No Cut Selected");
-                a.setHeaderText("Cannot Add Ambience");
-                a.setContentText("Select A Cut To Add This Ambience To");
-                a.showAndWait();
-            }
+            if (songListData.size() == 0) {GuiUtils.showinformationdialog("Information", "No Ambience To Add", "Add Some Ambience To The Table First");}
+            else {GuiUtils.showinformationdialog("Information", "No Cut Selected", "Select A Cut To Add This Ambience To");}
         }
-
     }
 
     class AmbienceSong {

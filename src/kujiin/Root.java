@@ -111,7 +111,7 @@ public class Root implements Initializable {
         a.showAndWait();
     }
     public void editprogramsambience(ActionEvent actionEvent) {
-        EditAmbienceDialog a = new EditAmbienceDialog(null);
+        EditAmbienceDialog a = new EditAmbienceDialog();
         a.showAndWait();
     }
     public void editreferencefiles(ActionEvent actionEvent) {

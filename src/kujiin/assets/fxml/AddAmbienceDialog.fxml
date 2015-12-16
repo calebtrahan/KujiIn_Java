@@ -10,18 +10,20 @@
           <TableColumn fx:id="DurationColumn" minWidth="0.0" prefWidth="87.0" text="Duration" />
         </columns>
       </TableView>
-      <Button fx:id="addFilesButton" layoutX="12.0" layoutY="356.0" mnemonicParsing="false" onMousePressed="#addfilestotable" text="Add" />
-      <Button fx:id="RemoveFilesButton" layoutX="59.0" layoutY="356.0" mnemonicParsing="false" onMousePressed="#removefilesfromtable" text="Remove" />
-      <Button fx:id="PreviewButton" layoutX="355.0" layoutY="389.0" mnemonicParsing="false" onMousePressed="#previewselectedfile" text="Preview" />
-      <Slider fx:id="previewSlider" layoutX="223.0" layoutY="361.0" prefHeight="16.0" prefWidth="160.0" />
-      <Label fx:id="previewCurrentTimeLabel" layoutX="176.0" layoutY="361.0" text="00:00" />
-      <Label fx:id="previewTotalTimeLabel" layoutX="383.0" layoutY="361.0" text="00:00" />
+      <Button fx:id="addFilesButton" layoutX="12.0" layoutY="343.0" mnemonicParsing="false" onMousePressed="#addfilestotable" text="Add" />
+      <Button fx:id="RemoveFilesButton" layoutX="54.0" layoutY="343.0" mnemonicParsing="false" onMousePressed="#removefilesfromtable" text="Remove" />
+      <Button fx:id="PreviewButton" layoutX="355.0" layoutY="381.0" mnemonicParsing="false" onMousePressed="#previewselectedfile" text="Preview" />
+      <Slider fx:id="previewSlider" blockIncrement="0.1" layoutX="227.0" layoutY="355.0" majorTickUnit="0.1" max="1.0" minorTickCount="1" prefHeight="16.0" prefWidth="160.0" showTickMarks="true" />
+      <Label fx:id="previewCurrentTimeLabel" layoutX="180.0" layoutY="355.0" text="00:00" />
+      <Label fx:id="previewTotalTimeLabel" layoutX="387.0" layoutY="355.0" text="00:00" />
       <Button fx:id="CloseButton" layoutX="375.0" layoutY="464.0" mnemonicParsing="false" onMousePressed="#closebuttonpressed" text="Close" />
       <Label alignment="CENTER" layoutX="12.0" layoutY="14.0" prefHeight="16.0" prefWidth="409.0" text="List Of Ambience To Add To Program" />
       <Button fx:id="EditCurrentAmbienceButton" layoutX="12.0" layoutY="464.0" mnemonicParsing="false" onMousePressed="#editcurrentambience" text="Edit Existing Ambience" />
       <Label layoutX="12.0" layoutY="428.0" text="Select Cut To Add To:" />
       <ChoiceBox fx:id="SelectCutChoiceBox" layoutX="161.0" layoutY="423.0" prefHeight="26.0" prefWidth="148.0" />
-      <Button fx:id="ClearTableButton" layoutX="12.0" layoutY="389.0" mnemonicParsing="false" onMousePressed="#cleartable" prefHeight="26.0" prefWidth="118.0" text="Clear Table" />
-      <Button fx:id="addambiencetocutButton" layoutX="315.0" layoutY="423.0" mnemonicParsing="false" text="Add Ambience" onMousePressed="#AddAmbienceToCut"/>
+      <Button fx:id="ClearTableButton" layoutX="12.0" layoutY="368.0" mnemonicParsing="false" onMousePressed="#cleartable" prefHeight="26.0" prefWidth="109.0" text="Clear" />
+      <Button fx:id="addambiencetocutButton" layoutX="315.0" layoutY="423.0" mnemonicParsing="false" onMousePressed="#AddAmbienceToCut" text="Add Ambience" />
+      <Slider fx:id="VolumeSlider" blockIncrement="0.1" layoutX="227.0" layoutY="386.0" majorTickUnit="0.1" max="1.0" minorTickCount="1" prefHeight="16.0" prefWidth="103.0" showTickMarks="true" />
+      <Label layoutX="174.0" layoutY="386.0" text="Volume" />
    </children>
 </AnchorPane>

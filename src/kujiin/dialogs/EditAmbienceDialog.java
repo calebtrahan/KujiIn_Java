@@ -7,14 +7,16 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import kujiin.This_Session;
 import kujiin.Tools;
+import kujiin.util.lib.FileUtils;
+import kujiin.util.lib.GuiUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,18 +39,20 @@ public class EditAmbienceDialog extends Stage implements Initializable {
     public TableColumn<AmbienceSong, String> NameColumn;
     public TableColumn<AmbienceSong, String> DurationColumn;
     public Label PreviewNameLabel;
+    public Slider VolumeSlider;
     private ObservableList<AmbienceSong> songListData = FXCollections.observableArrayList();
     private String selectedcutname = null;
     private Media previewmedia = null;
     private MediaPlayer previewmediaplayer = null;
 
-    public EditAmbienceDialog(Parent parent) {
+    public EditAmbienceDialog() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/EditAmbienceDialog.fxml"));
         fxmlLoader.setController(this);
         try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Edit Current Ambience");}
         catch (IOException e) {e.printStackTrace();}
     }
 
+// Dialog Methods
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ObservableList<String> allnames = FXCollections.observableArrayList();
@@ -60,16 +64,31 @@ public class EditAmbienceDialog extends Stage implements Initializable {
                 (observable, oldValue, newValue) -> selectionchanged(newValue));
         this.setOnCloseRequest(event -> close());
     }
-
     public void closewindow(Event event) {this.close();}
+    @Override
+    public void close() {
+        super.close();
+        if (previewmediaplayer != null && previewmediaplayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            previewmediaplayer.stop();
+            previewmediaplayer.dispose();
+        }
+    }
 
+// Preview Methods
     public void preview(Event event) {
         if (previewmedia != null && previewmediaplayer != null) {
             if (PreviewButton.getText().equals("Start")) {
                 previewmediaplayer.play();
+                VolumeSlider.valueProperty().unbind();
+                VolumeSlider.valueProperty().bindBidirectional(previewmediaplayer.volumeProperty());
+                PreviewSlider.valueChangingProperty().addListener((observable, oldValue, newValue) -> {
+                    double position = PreviewSlider.getValue();
+                    Duration seektothis = previewmediaplayer.getTotalDuration().multiply(position);
+                    previewmediaplayer.seek(seektothis);
+                });
                 previewmediaplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
                     PreviewCurrentTimeLabel.setText(Tools.formatlengthshort((int) newValue.toSeconds()));
-//                    previewSlider.setValue(previewmediaplayer.getCurrentTime().toMillis() / previewmediaplayer.getTotalDuration().toMillis());
+                    updatePositionSlider(previewmediaplayer.getCurrentTime());
                 });
                 PreviewButton.setText(" Stop ");
             } else {
@@ -77,14 +96,18 @@ public class EditAmbienceDialog extends Stage implements Initializable {
                 PreviewButton.setText("Start");
             }
         } else {
-            Alert a = new Alert(Alert.AlertType.WARNING);
-            a.setTitle("No Item Selected");
-            a.setHeaderText("Nothing To Preview");
-            a.setContentText("Select An Item From The Table To Preview");
-            a.showAndWait();
+            GuiUtils.showinformationdialog("Information", "Nothing To Preview", "Select A File To Preview");
         }
     }
+    public void updatePositionSlider(Duration currenttime) {
+        if (PreviewSlider.isValueChanging()) {return;}
+        Duration total = previewmediaplayer.getTotalDuration();
+        if (total == null || currenttime == null) {PreviewSlider.setValue(0);}
+        else {PreviewSlider.setValue(currenttime.toMillis() / total.toMillis());}
+    }
 
+
+// Table View Methods
     public void removefromTable(Event event) {
         int index = AmbienceListTableView.getSelectionModel().getSelectedIndex();
         if (index != -1) {
@@ -107,58 +130,28 @@ public class EditAmbienceDialog extends Stage implements Initializable {
             a.showAndWait();
         }
     }
-
-    @Override
-    public void close() {
-        super.close();
-        if (previewmediaplayer != null && previewmediaplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            previewmediaplayer.stop();
-            previewmediaplayer.dispose();
-        }
-    }
-
     public void addToTable(Event event) {
-        if (selectedcutname != null) {
-            AddAmbienceDialog c = new AddAmbienceDialog(null, selectedcutname);
-            c.showAndWait();
-            getfiles();
-        } else {
-            AddAmbienceDialog b = new AddAmbienceDialog(null);
-            b.showAndWait();
-            getfiles();
-        }
+        AddAmbienceDialog c = new AddAmbienceDialog(selectedcutname);
+        c.showAndWait();
+        getfiles();
     }
-
     public boolean getfiles() {
-        boolean success;
         if (selectedcutname != null) {
             File thisdirectory = new File(This_Session.directoryambience, selectedcutname);
             try {
                 for (File i : thisdirectory.listFiles()) {
-                    // Test Here If A Valid Audio Ambient File
-                    songListData.add(new AmbienceSong(i.getName(), i));
+                    if (FileUtils.validaudiofile(i)) {songListData.add(new AmbienceSong(i.getName(), i));}
                 }
-                success = true;
+                return true;
             } catch (NullPointerException e) {
-                Alert a = new Alert(Alert.AlertType.WARNING);
-                a.setTitle("No Ambience");
-                a.setHeaderText("Cannot Load Ambience");
-                a.setContentText(selectedcutname + " Does Not Contain Any Ambience. Please Add Ambience By " +
-                        "Clicking The 'Add Ambience' Button");
-                a.showAndWait();
-                success = false;
+                GuiUtils.showinformationdialog("Information", selectedcutname + " Has No Ambience", "Please Add Ambience To " + selectedcutname);
+                return false;
             }
         } else {
-            Alert a = new Alert(Alert.AlertType.WARNING);
-            a.setTitle("Nothing Loaded");
-            a.setHeaderText("No Cut's Ambience Loaded");
-            a.setContentText("Please Load A Cut Before Using This Feature");
-            a.showAndWait();
-            success = false;
+            GuiUtils.showinformationdialog("Information", "No Cut Loaded", "Load A Cut's Ambience First");
+            return false;
         }
-        return success;
     }
-
     public void selectionchanged(AmbienceSong ambienceSong) {
         try {
             File tempfile = ambienceSong.getFile();
@@ -173,27 +166,21 @@ public class EditAmbienceDialog extends Stage implements Initializable {
             previewmediaplayer = new MediaPlayer(previewmedia);
         } catch (NullPointerException ignored) {}
     }
-
     public void populateCutTableView(Event event) {
-        songListData.clear();
-        AmbienceListTableView.getItems().clear();
-        // Clear Old Data (Table + Observable Lists)
-        int index = This_Session.allnames.indexOf(CutSelectChoiceBox.getValue());
-        if (index != 1) {
+        try {
+            songListData.clear();
+            AmbienceListTableView.getItems().clear();
+            // Clear Old Data (Table + Observable Lists)
+            int index = This_Session.allnames.indexOf(CutSelectChoiceBox.getValue());
             selectedcutname = This_Session.allnames.get(index);
             if (getfiles()) {
                 AmbienceListTableView.getItems().addAll(songListData);
                 CurrentlySelectedLabel.setText(String.format("Now Displaying: %s's Ambience", selectedcutname));
             }
-        } else {
-            Alert a = new Alert(Alert.AlertType.WARNING);
-            a.setTitle("No Selection");
-            a.setHeaderText("Cannot Load Ambience");
-            a.setContentText("Select A Cut From The Drop Down Menu");
-            a.showAndWait();
-        }
+        } catch (ArrayIndexOutOfBoundsException ignored) {GuiUtils.showinformationdialog("Information", "No Cut Selected", "Select A Cut To Load");}
     }
 
+// Subclass For Table
     class AmbienceSong {
         private StringProperty name;
         private StringProperty length;

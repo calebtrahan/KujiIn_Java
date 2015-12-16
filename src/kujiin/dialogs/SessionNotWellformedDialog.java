@@ -19,7 +19,7 @@ import java.util.Optional;
 public class SessionNotWellformedDialog extends Stage {
     public Button returntoCreatorButton;
     public Button addmissingCutsButton;
-    public ListView sessionlistview;
+    public ListView<Text> sessionlistview;
     public Label sessionmissingcutsLabel;
     public Button CreateAnywayButton;
     public Label explanationLabel;

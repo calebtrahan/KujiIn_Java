@@ -12,16 +12,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-//enum AmbienceOption {General, Specific};
-
-// TODO Move Big Ass Table Widget On Main Display (And Move To A Separate Dialog)
-    // Create One Single Row (Or textfield) On The Main Display, Displaying:
-        // Total Time Practiced
-        // Total Sessions Practiced
-        // Average Session Length
-        // Most Recent Practiced Session?
-    // Move Buttons (List Session, List Premature Sessions) With New Button (Display Each Cut Progress)
-
 public class Cut {
     public String name;
     public int number;
@@ -66,10 +56,6 @@ public class Cut {
         tempambiencetextfile = new File(This_Session.directorytemp, "txt/" + name + "Amb.txt");
         tempambiencefile = new File(This_Session.directorytemp, "Ambience/" + name + "Temp.mp3");
         finalambiencefile = new File(This_Session.directorytemp, "Ambience/" + name + ".mp3");
-    }
-
-    public Cut(String alertname) {
-        name = alertname;
     }
 
     // <-------------------------- GETTERS AND SETTERS ------------------------------------> //
@@ -304,15 +290,14 @@ public class Cut {
         ambienceplaycount = 0;
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
         entrainmentplayer.play();
-        if (thisession.getSessionEntrainmentVolume() != null) {entrainmentplayer.setVolume(thisession.getSessionEntrainmentVolume());}
-        else {entrainmentplayer.setVolume(Root.ENTRAINMENTVOLUME);}
+        entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         if (ambienceenabled) {
             ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
             ambienceplayer.play();
-            if (thisession.getSessionAmbienceVolume() != null) {ambienceplayer.setVolume(thisession.getSessionAmbienceVolume());}
-            else {ambienceplayer.setVolume(Root.AMBIENCEVOLUME);}
+            ambienceplayer.setVolume(0.0);
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
+            ambienceplayer.setOnError(this::errorduringplayback);
         }
         cuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updatecuttime()));
         cuttimeline.setCycleCount(Animation.INDEFINITE);
@@ -323,16 +308,25 @@ public class Cut {
         entrainmentplayer.dispose();
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
         entrainmentplayer.play();
-        entrainmentplayer.setVolume(Root.ENTRAINMENTVOLUME);
+//        entrainmentplayer.setVolume(Root.ENTRAINMENTVOLUME);
+        entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
     }
     public void playnextambience() {
-        ambienceplaycount++;
-        ambienceplayer.dispose();
-        ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
-        ambienceplayer.play();
-        ambienceplayer.setVolume(Root.AMBIENCEVOLUME);
-        ambienceplayer.setOnEndOfMedia(this::playnextambience);
+        // TODO Throwing Index Out Of Bounds Exception In Zen Ambience (And Not Playing Cause It Can't Load)
+            // Maybe timing is off in creating ambience lists?
+        try {
+            ambienceplaycount++;
+            ambienceplayer.dispose();
+            ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
+            ambienceplayer.play();
+//        ambienceplayer.setVolume(Root.AMBIENCEVOLUME);
+            ambienceplayer.setVolume(0.0);
+            ambienceplayer.setOnEndOfMedia(this::playnextambience);
+        } catch (IndexOutOfBoundsException ignored) {
+            System.out.println("Out Of Bounds In " + this.name + "Ambience List: ");
+            for (Media i : ambiencemedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
+        }
     }
     public void pauseplayingcut() {
         entrainmentplayer.pause();
@@ -376,6 +370,12 @@ public class Cut {
             }
             secondselapsed++;
         }
+    }
+    public void errorduringplayback() {
+        System.out.println("Ambience Player's Status Is " + ambienceplayer.getStatus());
+        System.out.println("Entrainment Player's Status Is " + entrainmentplayer.getStatus());
+        if (ambienceplayer.getStatus() != MediaPlayer.Status.PLAYING) {playnextambience();}
+        if (entrainmentplayer.getStatus() != MediaPlayer.Status.PLAYING) {playnextentrainment();}
     }
     public String getcurrenttimeformatted() {return TimeUtils.formatlengthshort(secondselapsed + 1);}
     public String gettotaltimeformatted() {return TimeUtils.formatlengthshort(getdurationinseconds());}

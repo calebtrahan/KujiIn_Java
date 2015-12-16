@@ -86,7 +86,6 @@ public class This_Session {
     private Double entrainmentvolume;
     private Double ambiencevolume;
 
-
     public This_Session(Sessions sessions, Label cutCurrentTime, Label cutTotalTime, Label sessionCurrentTime,
                         Label sessionTotalTime, ProgressBar cutProgress, ProgressBar totalProgress, Label cutPlayingText,
                         Label sessionPlayingText, Label statusBar) {
@@ -209,7 +208,7 @@ public class This_Session {
                         b.setResizable(true);
                         b.showAndWait();
                         Alert c = new Alert(Alert.AlertType.INFORMATION);
-                        c.setHeaderText("Please Add Ambience To The This_Session");
+                        c.setHeaderText("Please Add Ambience To The Session");
                         c.setContentText("To Do This, Please Click Tools -> Add Ambience");
                         c.showAndWait();
                         ambienceenabled = false;
@@ -277,7 +276,6 @@ public class This_Session {
         }
     }
     public boolean sessioncreationwellformednesschecks(ArrayList<Integer> textfieldtimes) {
-        boolean createsession = true;
         int lastcutindex = 0;
         for (int i = 0; i < textfieldtimes.size(); i++) {
             if (textfieldtimes.get(i) > 0) {lastcutindex = i;}
@@ -286,9 +284,7 @@ public class This_Session {
         ArrayList<Integer> indexestochange = new ArrayList<>();
         for (int i = 0; i < lastcutindex; i++) {
             if (i > 0) {
-                if (textfieldtimes.get(i) == 0) {
-                    indexestochange.add(i);
-                }
+                if (textfieldtimes.get(i) == 0) {indexestochange.add(i);}
             }
         }
         if (indexestochange.size() > 0) {
@@ -306,9 +302,7 @@ public class This_Session {
                 int invocationduration = notWellformedDialog.getInvocationduration();
                 for (int i : indexestochange) {textfieldtimes.set(i, invocationduration);}
                 return true;
-            } else {
-                return false;
-            }
+            } else {return false;}
         }
         return true;
     }
@@ -541,7 +535,7 @@ public class This_Session {
                 if (totalsecondselapsed != 0) {TotalProgress.setProgress((float) totalsecondselapsed / (float) totalsecondsinsession);}
             } else if (playerState == PlayerState.TRANSITIONING) {
                 CutProgress.setProgress(1.0);
-                StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);
+                if (currentcut.number != 10) {StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);}
                 CutCurrentTime.setText(currentcut.gettotaltimeformatted());
                 CutTotalTime.setText(currentcut.gettotaltimeformatted());
             } else if (playerState == PlayerState.PAUSED) {
@@ -549,9 +543,7 @@ public class This_Session {
             } else if (playerState == PlayerState.STOPPED) {
                 StatusBar.setText("Session Stopped");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {e.printStackTrace();}
     }
     public void playthiscut() {
         try {
@@ -575,24 +567,7 @@ public class This_Session {
                     currentcut = cutsinsession.get(cutcount);
                     playthiscut();
                 } catch (ArrayIndexOutOfBoundsException e) {e.printStackTrace(); endofsession();}
-            } else if (playerState == PlayerState.PLAYING) {
-                System.out.println(TimeUtils.getformattedtime() + "> Clause 2");
-                closereferencefile();
-                TemporarySession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
-                currentcut.stopplayingcut();
-                if (currentcut.number == 10) {setPlayerState(PlayerState.TRANSITIONING); progresstonextcut();}
-                else {
-                    Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
-                    MediaPlayer alertplayer = new MediaPlayer(alertmedia);
-                    alertplayer.play();
-                    setPlayerState(PlayerState.TRANSITIONING);
-                    alertplayer.setOnEndOfMedia(() -> {
-                        alertplayer.stop();
-                        alertplayer.dispose();
-                        progresstonextcut();
-                    });
-                }
-            }
+            } else if (playerState == PlayerState.PLAYING) {transition();}
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -620,6 +595,29 @@ public class This_Session {
             if (av.getAmbienceVolume() != null) {setSessionAmbienceVolume(av.getAmbienceVolume());}
             if (av.getEntrainmentVolume() != null) {setSessionEntrainmentVolume(av.getEntrainmentVolume());}
         } else {GuiUtils.showtimedmessage(StatusBar, "Cannot Adjust Volume. No Session Playing", 5000);}
+    }
+    public void transition() {
+        System.out.println(TimeUtils.getformattedtime() + "> Clause 2");
+        closereferencefile();
+        TemporarySession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+        currentcut.stopplayingcut();
+        if (currentcut.number == 10) {setPlayerState(PlayerState.TRANSITIONING); progresstonextcut();}
+        else {
+            Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
+            MediaPlayer alertplayer = new MediaPlayer(alertmedia);
+            alertplayer.play();
+            setPlayerState(PlayerState.TRANSITIONING);
+            alertplayer.setOnEndOfMedia(() -> {
+                alertplayer.stop();
+                alertplayer.dispose();
+                progresstonextcut();
+            });
+            alertplayer.setOnError(() -> {
+                System.out.println("Alert File Encountered An Error");
+                alertplayer.dispose();
+                progresstonextcut();
+            });
+        }
     }
 
 // Reference Files
