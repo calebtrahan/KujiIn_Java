@@ -110,7 +110,7 @@ public class Root implements Initializable {
         sae.showAndWait();
     }
     public void editreferencefiles(ActionEvent actionEvent) {
-        EditReferenceFiles a = new EditReferenceFiles(null);
+        EditReferenceFiles a = new EditReferenceFiles();
         a.showAndWait();
     }
     public void howtouseprogram(ActionEvent actionEvent) {Tools.howtouseprogram();}

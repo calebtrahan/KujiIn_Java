@@ -51,6 +51,7 @@ public class SessionAmbienceEditor extends Stage implements Initializable {
     public TableView<AmbienceSong> CurrentAmbienceTable;
     public TableColumn<AmbienceSong, String> Current_NameColumn;
     public TableColumn<AmbienceSong, String> Current_DurationColumn;
+    public TextField Current_TotalDuration;
     private String selectedcutname = null;
     private Media previewmedia = null;
     private MediaPlayer previewmediaplayer = null;
@@ -83,6 +84,15 @@ public class SessionAmbienceEditor extends Stage implements Initializable {
         try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Ambience Editor");}
         catch (IOException e) {e.printStackTrace();}
         CutSelectionBox.setOnAction(event -> selectandloadcut());
+        tempdirectory = new File(This_Session.directorytemp, "AmbienceEditor");
+    }
+    public SessionAmbienceEditor(String cutname) {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionAmbienceEditor.fxml"));
+        fxmlLoader.setController(this);
+        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Ambience Editor");}
+        catch (IOException e) {e.printStackTrace();}
+        CutSelectionBox.setOnAction(event -> selectandloadcut());
+        CutSelectionBox.getSelectionModel().select(This_Session.allnames.indexOf(cutname));
         tempdirectory = new File(This_Session.directorytemp, "AmbienceEditor");
     }
 
@@ -332,4 +342,5 @@ public class SessionAmbienceEditor extends Stage implements Initializable {
             return totaldurationshort;
         }
     }
+
 }

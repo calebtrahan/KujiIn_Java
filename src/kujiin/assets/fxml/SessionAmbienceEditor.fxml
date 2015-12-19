@@ -38,7 +38,7 @@
       <Label layoutX="178.0" layoutY="525.0" text="Volume" />
       <Button fx:id="PreviewStartButton" layoutX="14.0" layoutY="520.0" mnemonicParsing="false" onAction="#preview" text="Start" />
       <Button fx:id="CloseButton" layoutX="618.0" layoutY="520.0" mnemonicParsing="false" onAction="#closebuttonpressed" text="Close" />
-      <HBox alignment="TOP_RIGHT" layoutX="471.0" layoutY="435.0" prefHeight="35.0" prefWidth="200.0">
+      <HBox alignment="TOP_RIGHT" layoutX="534.0" layoutY="435.0" prefHeight="35.0" prefWidth="137.0">
          <children>
             <Button fx:id="CurrentAmbienceRemoveButton" mnemonicParsing="false" onAction="#removecurrentambience" text="Remove" />
             <Button fx:id="CurrentAmbiencePreviewButton" mnemonicParsing="false" onAction="#previewcurrentambience" text="Preview" />
@@ -58,5 +58,7 @@
             <TableColumn fx:id="Current_DurationColumn" prefWidth="75.0" text="Duration" />
          </columns>
       </TableView>
+      <Label layoutX="384.0" layoutY="440.0" text="Total Duration" />
+      <TextField fx:id="Current_TotalDuration" layoutX="361.0" layoutY="457.0" prefHeight="26.0" prefWidth="127.0" />
    </children>
 </AnchorPane>
