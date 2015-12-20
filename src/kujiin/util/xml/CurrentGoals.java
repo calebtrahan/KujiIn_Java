@@ -10,14 +10,19 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@XmlRootElement(name = "CurrentGoals")
+@XmlAccessorType(XmlAccessType.PROPERTY)
 public class CurrentGoals {
     private List<CurrentGoal> CurrentGoal;
 
-    public CurrentGoals() {}
+    public CurrentGoals() {try {populatefromxml();} catch (JAXBException ignored) {}}
 
 // Getters And Setters
     public List<kujiin.util.xml.CurrentGoal> getCurrentGoal() {return CurrentGoal;}
@@ -96,6 +101,10 @@ public class CurrentGoals {
     public void setnewgoal(double currentpracticedhours) {
         SetANewGoalDialog sngd = new SetANewGoalDialog(currentpracticedhours);
         sngd.showAndWait();
+        if (sngd.isAccepted()) {
+            try {addnewgoal(new CurrentGoal(sngd.getGoaldate(), sngd.getGoalhours()));}
+            catch (JAXBException e) {e.printStackTrace(); GuiUtils.showerrordialog("Error", "Couldn't Add This Goal", "Check File Permissions");}
+        }
     }
     public void currentgoalpacing(double currentpracticedhours) {
 

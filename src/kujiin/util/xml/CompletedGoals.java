@@ -11,11 +11,16 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@XmlRootElement(name = "Completed Goals")
+@XmlAccessorType(XmlAccessType.PROPERTY)
 public class CompletedGoals {
     private List<CompletedGoal> CompletedGoal;
 

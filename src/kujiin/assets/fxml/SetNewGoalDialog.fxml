@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
-
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="134.0" prefWidth="374.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label layoutX="145.0" layoutY="14.0" text="NEW GOAL">
+      <Label layoutX="13.0" layoutY="14.0" text="Set A New Goal">
          <font>
             <Font size="16.0" />
          </font></Label>
@@ -24,5 +23,6 @@
             <Button fx:id="CancelButton" mnemonicParsing="false" onMousePressed="#cancelgoalsetting" text="Cancel" />
          </children>
       </HBox>
+      <Label fx:id="InformationLabel" alignment="CENTER" layoutX="149.0" layoutY="16.0" prefHeight="16.0" prefWidth="214.0" text="Current Hours: %s Hours" />
    </children>
 </AnchorPane>

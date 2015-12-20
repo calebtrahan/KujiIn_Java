@@ -37,9 +37,13 @@ public class DisplayCurrentGoalsDialog extends Stage {
         ObservableList<CurrentGoalBinding> currentGoals = FXCollections.observableArrayList();
         currentGoals.addAll(currentGoalList.stream().map(i -> new CurrentGoalBinding(currentGoalList.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Set(), i.getpercentagecompleted(currentpracticedhours))).collect(Collectors.toList()));
         NumberColumn.setCellValueFactory(cellData -> cellData.getValue().goalid.asObject());
+        NumberColumn.setStyle("-fx-alignment: CENTER;");
         GoalTimeColumn.setCellValueFactory(cellData -> cellData.getValue().goalhours);
+        GoalTimeColumn.setStyle("-fx-alignment: CENTER;");
         DueDateColumn.setCellValueFactory(cellData -> cellData.getValue().duedate);
+        DueDateColumn.setStyle("-fx-alignment: CENTER;");
         PercentCompleteColumn.setCellValueFactory(cellData -> cellData.getValue().percentcomplete);
+        PercentCompleteColumn.setStyle("-fx-alignment: CENTER;");
         currentgoaltable.setItems(currentGoals);
     }
 

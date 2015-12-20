@@ -29,8 +29,8 @@
           </Menu>
         </menus>
       </MenuBar>
-      <Label fx:id="goalscurrrentvalueLabel" alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="507.0" layoutY="310.0" prefHeight="17.0" prefWidth="62.0" text="99.99 hrs" textAlignment="CENTER" />
-      <Label fx:id="goalssettimeLabel" contentDisplay="CENTER" layoutX="760.0" layoutY="307.0" prefHeight="17.0" prefWidth="58.0" text="99.99 hrs" textAlignment="CENTER" />
+      <Label fx:id="goalscurrrentvalueLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="507.0" layoutY="310.0" prefHeight="17.0" prefWidth="62.0" text="99.99 hrs" textAlignment="CENTER" />
+      <Label fx:id="goalssettimeLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="760.0" layoutY="307.0" prefHeight="17.0" prefWidth="58.0" text="99.99 hrs" textAlignment="CENTER" />
       <HBox alignment="BOTTOM_RIGHT" layoutX="482.0" layoutY="348.0" prefHeight="26.0" prefWidth="360.0">
          <children>
             <Button fx:id="newgoalButton" mnemonicParsing="false" onMousePressed="#setnewgoal" prefHeight="20.0" prefWidth="89.0" text="New Goal">

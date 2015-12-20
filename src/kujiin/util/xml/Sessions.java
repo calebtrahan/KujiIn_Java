@@ -58,7 +58,7 @@ public class Sessions {
                 else {for (int x=1; x<10;x++) {totalminutes += i.getcutduration(x);}}
             }
             return totalminutes;
-        } catch (NullPointerException e) {return 0;}
+        } catch (NullPointerException ignored) {return 0;}
     }
     public float getaveragesessiontimeinminutes(boolean includepreandpost) {
         try {return (float) getgrandtotaltimepracticedinminutes(includepreandpost) / getSession().size();}

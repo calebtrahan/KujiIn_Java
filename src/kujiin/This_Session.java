@@ -692,6 +692,4 @@ public class This_Session {
             clearlog.close();
         } catch (IOException ignored) {}
     }
-
-
 }

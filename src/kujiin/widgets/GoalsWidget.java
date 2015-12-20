@@ -31,11 +31,13 @@ public class GoalsWidget implements Widget{
         allpracticedsessions = Allpracticedsessions;
         currentGoals = new CurrentGoals();
         completedGoals = new CompletedGoals();
+        update();
     }
 
 // Button Actions
     public void setnewgoal() {
         currentGoals.setnewgoal(TimeUtils.convertminutestodecimalhours(allpracticedsessions.getgrandtotaltimepracticedinminutes(false)));
+        update();
     }
     public void displaycurrentgoals() {
         currentGoals.displaycurrentgoals(TimeUtils.convertminutestodecimalhours(allpracticedsessions.getgrandtotaltimepracticedinminutes(false)));
@@ -68,8 +70,8 @@ public class GoalsWidget implements Widget{
     }
     @Override
     public void resetallvalues() {
-        PracticedHours.setText("-");
-        CurrentGoalHours.setText("-");
+        PracticedHours.setText("-   ");
+        CurrentGoalHours.setText("  -");
         CurrentGoalProgress.setProgress(0.0);
     }
 
@@ -78,10 +80,10 @@ public class GoalsWidget implements Widget{
         try {
             Double practiced = TimeUtils.convertminutestodecimalhours(allpracticedsessions.getgrandtotaltimepracticedinminutes(false));
             Double goal = currentGoals.getfirstcurrentgoal().getGoal_Hours();
-            PracticedHours.setText(practiced.toString());
-            CurrentGoalHours.setText(goal.toString());
+            PracticedHours.setText(practiced.toString() + " hrs");
+            CurrentGoalHours.setText(goal.toString() + " hrs");
             CurrentGoalProgress.setProgress(practiced / goal);
-        } catch (Exception e) {e.printStackTrace();}
+        } catch (NullPointerException ignored) {resetallvalues();}
     }
     public void updatewhilesessionplaying(double practicedhours) {
         PracticedHours.setText(Double.toString(practicedhours));
