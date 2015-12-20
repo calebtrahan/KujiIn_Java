@@ -5,8 +5,6 @@ import kujiin.Tools;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 // TODO Figure Out What Information To Store In XML
@@ -231,7 +229,7 @@ public class Session {
         if (cutindex == 8) {setZai_Duration(duration);}
         if (cutindex == 9) {setZen_Duration(duration);}
         if (cutindex == 10) {setPostsession_Duration(duration);}
-//        updatetotalsessionduration();
+        updatetotalsessionduration();
     }
     public int getcutduration(int cutindex) {
         if (cutindex == 0) {return getPresession_Duration();}

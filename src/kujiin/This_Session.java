@@ -17,6 +17,7 @@ import kujiin.util.lib.TimeUtils;
 import kujiin.util.states.PlayerState;
 import kujiin.util.xml.Session;
 import kujiin.util.xml.Sessions;
+import kujiin.widgets.GoalsWidget;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -61,7 +62,7 @@ public class This_Session {
     private Cut zen = new Cut(9, "ZEN", false, 0, this);
     private Cut postsession = new Cut(10, "Postsession", true, 0, this);
     private ArrayList<Cut> cutsinsession;
-    private boolean ambienceenabled;
+    private Boolean ambienceenabled;
     private PlayerState playerState;
     private Cut currentcut;
     private Timeline currentcuttimeline;
@@ -80,11 +81,12 @@ public class This_Session {
     private Label SessionPlayingText;
     private Label StatusBar;
     private DisplayReference displayReference;
-    private boolean referencedisplayoption;
+    private Boolean referencedisplayoption;
     private Boolean referencefullscreenoption;
     private ReferenceType referenceType;
     private Double entrainmentvolume;
     private Double ambiencevolume;
+    private GoalsWidget goalsWidget;
 
     public This_Session(Sessions sessions, Label cutCurrentTime, Label cutTotalTime, Label sessionCurrentTime,
                         Label sessionTotalTime, ProgressBar cutProgress, ProgressBar totalProgress, Label cutPlayingText,
@@ -149,6 +151,8 @@ public class This_Session {
     public Double getSessionAmbienceVolume() {return ambiencevolume;}
     public void setSessionEntrainmentVolume(Double volume) {ambiencevolume = volume;}
     public Double getSessionEntrainmentVolume() {return entrainmentvolume;}
+    public GoalsWidget getGoalsWidget() {return goalsWidget;}
+    public void setGoalsWidget(GoalsWidget goalsWidget) {this.goalsWidget = goalsWidget;}
 
 // Creation Methods
     public static void deleteprevioussession() {
@@ -443,6 +447,7 @@ public class This_Session {
         setSessionEntrainmentVolume(Root.ENTRAINMENTVOLUME);
         setSessionAmbienceVolume(Root.AMBIENCEVOLUME);
         playthiscut();
+        sessions.createnewsession();
     }
     public String play() {
         switch (playerState) {
@@ -599,7 +604,8 @@ public class This_Session {
     public void transition() {
         System.out.println(TimeUtils.getformattedtime() + "> Clause 2");
         closereferencefile();
-        TemporarySession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+        sessions.getcurrentsession().updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+        goalsWidget.update();
         currentcut.stopplayingcut();
         if (currentcut.number == 10) {setPlayerState(PlayerState.TRANSITIONING); progresstonextcut();}
         else {
@@ -686,5 +692,6 @@ public class This_Session {
             clearlog.close();
         } catch (IOException ignored) {}
     }
+
 
 }

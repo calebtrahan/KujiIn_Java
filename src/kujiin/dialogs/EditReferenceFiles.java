@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import kujiin.This_Session;
 import kujiin.util.lib.FileUtils;
@@ -34,6 +35,7 @@ public class EditReferenceFiles extends Stage implements Initializable {
     public Label StatusBar;
     public Button SaveButton;
     public Button LoadButton;
+    public Button PreviewButton;
     private ObservableList<String> cutnames;
     private ObservableList<String> variations;
     private File htmldirectory = new File(This_Session.directoryreference, "html");
@@ -71,18 +73,26 @@ public class EditReferenceFiles extends Stage implements Initializable {
         try {
             Scanner sc1 = new Scanner(selectedfile);
             Scanner sc2 = new Scanner(MainTextArea.getText());
-            while (sc1.hasNext() && sc2.hasNext()) {
-                if (! sc1.next().equals(sc2.next())) {return false;}
-            }
+            while (sc1.hasNext() && sc2.hasNext()) {if (! sc1.next().equals(sc2.next())) {return false;}}
             return true;
         } catch (FileNotFoundException | NullPointerException ignored) {return false;}
     }
     private void textchanged() {
-    }
-    private void cleartextarea() {MainTextArea.clear();}
-    private void resetvariationsbox() {
-        CutVariationsChoiceBox.getItems().clear();
-        CutVariationsChoiceBox.setItems(variations);
+        if (selectedvariation != null && selectedcut != null) {
+            if (selectedvariation.equals("html")) {
+                StatusBar.setTextFill(Color.BLACK);
+                if (MainTextArea.getText().matches(".*\\<[^>]+>.*")) {StatusBar.setText("Valid .html File");}
+                else {StatusBar.setText("Not Valid .html");}
+            } else {
+                StatusBar.setTextFill(Color.RED);
+                if (MainTextArea.getText().length() == 0) {StatusBar.setText("No Text Entered");}
+                else {StatusBar.setText("");}
+            }
+        } else {
+            MainTextArea.clear();
+            StatusBar.setTextFill(Color.RED);
+            GuiUtils.showtimedmessage(StatusBar, "Select A Cut And Variation And Press 'Load' First", 3000);
+        }
     }
 
 // File Methods
@@ -111,4 +121,14 @@ public class EditReferenceFiles extends Stage implements Initializable {
         }
     }
 
+    public void preview(ActionEvent actionEvent) {
+        if (MainTextArea.getText().length() > 0 && selectedvariation != null) {
+            if (selectedvariation.equals("html")) {
+                DisplayReference dr = new DisplayReference(MainTextArea.getText());
+                dr.showAndWait();
+            } else {
+                GuiUtils.showinformationdialog("Information", "Preview Is For Html Content Not Available For Text Only", "Cannot Open Preview");
+            }
+        }
+    }
 }

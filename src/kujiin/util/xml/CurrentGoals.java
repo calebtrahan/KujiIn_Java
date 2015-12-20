@@ -97,4 +97,7 @@ public class CurrentGoals {
         SetANewGoalDialog sngd = new SetANewGoalDialog(currentpracticedhours);
         sngd.showAndWait();
     }
+    public void currentgoalpacing(double currentpracticedhours) {
+
+    }
 }

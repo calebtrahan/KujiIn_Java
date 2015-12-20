@@ -69,6 +69,7 @@ public class PlayerWidget implements Widget {
 
 // Button Actions
     public void play(Sessions sessions) {
+        Session.setGoalsWidget(GoalsWidget);
         GuiUtils.showtimedmessage(StatusBar, Session.play(), 3000);
     }
     public void pause() {

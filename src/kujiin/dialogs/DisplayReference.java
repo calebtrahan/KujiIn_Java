@@ -31,19 +31,36 @@ public class DisplayReference extends Stage {
         catch (IOException e) {e.printStackTrace();}
         System.out.println(fullscreenoption);
         // TODO FullScreenOption Is null. Why?
-        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-        double height = primaryScreenBounds.getHeight();
-        double width = primaryScreenBounds.getWidth();
-        this.setHeight(height);
-        this.setWidth(width);
-        this.setFullScreen(true);
-        ContentPane.setFitToWidth(true);
-        ContentPane.setFitToHeight(true);
-        ContentPane.setStyle("-fx-background-color: #212526");
+        setsizing(true);
 //        } else {
 //            // TODO Set Adjusted Height And Width Here
 //        }
         loadcontent();
+    }
+
+    public DisplayReference(String htmlcontent) {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
+        fxmlLoader.setController(this);
+        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Reference File Preview");}
+        catch (IOException e) {e.printStackTrace();}
+        setsizing(false);
+        WebView browser = new WebView();
+        WebEngine webEngine = browser.getEngine();
+        ContentPane.setContent(browser);
+        webEngine.loadContent(htmlcontent);
+    }
+
+    public void setsizing(boolean fullscreen) {
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+        double height = primaryScreenBounds.getHeight();
+        double width = primaryScreenBounds.getWidth();
+        if (! fullscreen) {height -= 200; width -= 200;}
+        this.setFullScreen(fullscreen);
+        this.setHeight(height);
+        this.setWidth(width);
+        ContentPane.setFitToWidth(true);
+        ContentPane.setFitToHeight(true);
+        ContentPane.setStyle("-fx-background-color: #212526");
     }
 
     public void loadcontent() {

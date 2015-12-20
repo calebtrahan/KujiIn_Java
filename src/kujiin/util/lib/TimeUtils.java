@@ -35,5 +35,16 @@ public class TimeUtils {
     public static String getformattedtime() {
         return "";
     }
+    public static Double convertminutestodecimalhours(int mins) {
+        int hours = mins / 60;
+        int minutes = mins % 60;
+        double decimalhours = minutes / 60;
+        decimalhours += hours;
+        return decimalhours;
+    }
+    public static int convertdecimalhourstominutes(double decimalhours) {
+        Double minutes = 60 * decimalhours;
+        return minutes.intValue();
+    }
 
 }

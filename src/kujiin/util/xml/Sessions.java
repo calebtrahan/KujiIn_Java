@@ -97,5 +97,9 @@ public class Sessions {
         if (getSession() != null) {return getSession().size();}
         else {return 0;}
     }
+    public void createnewsession() {
+        getSession().add(new Session("", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+    }
+    public Session getcurrentsession() {return getSession().get(getSession().size() - 1);}
 
 }

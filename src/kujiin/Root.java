@@ -87,7 +87,7 @@ public class Root implements Initializable {
                 ListOfSessionsButton, PrematureEndingsButton);
         this_session = new This_Session(progressTrackerWidget.getSessions(), CutProgressLabelCurrent, CutProgressLabelTotal, TotalProgressLabelCurrent, TotalProgressLabelTotal,
                 CutProgressBar, TotalProgressBar, CutProgressTopLabel, TotalSessionLabel, StatusBar);
-        goalsWidget = new GoalsWidget(newgoalButton, viewcurrrentgoalsButton, viewcompletedgoalsButton, goalscurrrentvalueLabel, goalssettimeLabel, goalsprogressbar);
+        goalsWidget = new GoalsWidget(newgoalButton, viewcurrrentgoalsButton, viewcompletedgoalsButton, goalscurrrentvalueLabel, goalssettimeLabel, goalsprogressbar, progressTrackerWidget.getSessions());
         creatorAndExporterWidget = new CreatorAndExporterWidget(EditValuesButton, ExportButton, LoadPresetButton, SavePresetButton, AmbienceEnabledTextField, TotalSessionTimeTextField, PreTime, RinTime, KyoTime,
                 TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, PostTime, this_session);
         playerWidget = new PlayerWidget(SessionPlayerOnOffSwitch, SessionPlayerTopLabel, VolumeButton, PlayButton, PauseButton, StopButton, CutProgressTopLabel, TotalSessionLabel, CutProgressLabelCurrent, CutProgressLabelTotal,
@@ -227,17 +227,9 @@ public class Root implements Initializable {
     public void adjustvolume(ActionEvent actionEvent) {playerWidget.adjustvolume();}
 
 // Goals Widget
-    public void setnewgoal(Event event) {
-
-    }
-    public void getgoalpacing(Event event) {
-//        this_session.sessiondb.goals.getgoalpacing();
-    }
-    public void viewcurrentgoals(Event event) {
-//        this_session.sessiondb.goals.viewcurrentgoals();
-    }
-    public void viewcompletedgoals(Event event) {
-//        this_session.sessiondb.goals.viewcompletedgoals();
-    }
+    public void setnewgoal(Event event) {goalsWidget.setnewgoal();}
+    public void getgoalpacing(Event event) {goalsWidget.goalpacing();}
+    public void viewcurrentgoals(Event event) {goalsWidget.displaycurrentgoals();}
+    public void viewcompletedgoals(Event event) {goalsWidget.displaycompletedgoals();}
 
 }

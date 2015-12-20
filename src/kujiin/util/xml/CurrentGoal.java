@@ -26,7 +26,7 @@ public class CurrentGoal {
     public void setDate_Set(String date_Set) {Date_Set = date_Set;}
     public String getDate_Due() {return Date_Due;}
     public void setDate_Due(String date_Due) {Date_Due = date_Due;}
-    public double getGoal_Hours() {return Goal_Hours;}
+    public Double getGoal_Hours() {return Goal_Hours;}
     public void setGoal_Hours(Double goal_Hours) {Goal_Hours = goal_Hours;}
     public Integer getID() {return ID;}
     public void setID(Integer ID) {this.ID = ID;}
