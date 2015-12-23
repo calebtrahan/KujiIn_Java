@@ -66,7 +66,6 @@ public class This_Session {
     private PlayerState playerState;
     private Cut currentcut;
     private Timeline currentcuttimeline;
-    private Session TemporarySession;
     private Sessions sessions;
     private int totalsecondselapsed;
     private int totalsecondsinsession;
@@ -105,7 +104,6 @@ public class This_Session {
         cutsinsession = new ArrayList<>();
         ambienceenabled = false;
         setPlayerState(PlayerState.IDLE);
-        TemporarySession = new Session();
    }
 
 // Getters And Setters
@@ -142,7 +140,7 @@ public class This_Session {
         }
         return totaltime > 0;
     }
-    public boolean isReferencedisplayoption() {return referencedisplayoption;}
+    public Boolean isReferencedisplayoption() {return referencedisplayoption;}
     public void setReferencedisplayoption(boolean referencedisplayoption) {this.referencedisplayoption = referencedisplayoption;}
     public void setReferencefullscreenoption(Boolean referencefullscreenoption) {
         this.referencefullscreenoption = referencefullscreenoption;
@@ -434,7 +432,6 @@ public class This_Session {
 // Playback
     // TODO Player Is Stopping Partially In (One Beep) Into Alert After TOH Ends, And Before SHA Starts
     public void startplayback() {
-        System.out.println("Starting Playback");
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
         for (Cut i : cutsinsession) {totalsecondsinsession += i.getdurationinseconds();}
@@ -452,7 +449,7 @@ public class This_Session {
     public String play() {
         switch (playerState) {
             case IDLE:
-                TemporarySession = new Session();
+                sessions.createnewsession();
                 startplayback();
                 return "Playing Session...";
             case PAUSED:
@@ -461,7 +458,7 @@ public class This_Session {
                 setPlayerState(PlayerState.PLAYING);
                 return "Resuming Session...";
             case STOPPED:
-                TemporarySession = new Session();
+                sessions.createnewsession();
                 startplayback();
             case PLAYING:
                 return "Already Playing";
@@ -519,12 +516,13 @@ public class This_Session {
         int secondsleft = currentcut.getdurationinseconds() / currentcut.getSecondselapsed();
         int secondspracticed = currentcut.getdurationinseconds() - secondsleft;
         Double minutes = Math.floor(secondspracticed / 60);
-        TemporarySession.updatecutduration(currentcut.number, minutes.intValue());
+
+        sessions.getcurrentsession().updatecutduration(currentcut.number, minutes.intValue());
         // TODO Get Premature Ending Reason (If You Decide To Include It) Here
         String prematureendingreason = "";
-        TemporarySession.writeprematureending(currentcut.name, prematureendingreason);
-        try {Sessions.addnewsession(TemporarySession);}
-        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "XML Error", "Cannot Write This Practiced Session To XML File");}
+        sessions.getcurrentsession().writeprematureending(currentcut.name, prematureendingreason);
+//        try {Sessions.addnewsession(TemporarySession);}
+//        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "XML Error", "Cannot Write This Practiced Session To XML File");}
     }
     public void updateplayerui() {
         try {
@@ -552,8 +550,8 @@ public class This_Session {
     }
     public void playthiscut() {
         try {
-            System.out.println(TimeUtils.getformattedtime() + "> Clause 3");
-            if (isReferencedisplayoption()) {displayreferencefile();}
+//            System.out.println(TimeUtils.getformattedtime() + "> Clause 3");
+            if (isReferencedisplayoption() != null) {displayreferencefile();}
             Duration cutduration = currentcut.getthiscutduration();
             currentcut.startplayback();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
@@ -566,7 +564,7 @@ public class This_Session {
     public void progresstonextcut() {
         try {
             if (playerState == PlayerState.TRANSITIONING) {
-                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
+//                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
                 try {
                     cutcount++;
                     currentcut = cutsinsession.get(cutcount);
@@ -581,14 +579,15 @@ public class This_Session {
         closereferencefile();
         currentcuttimeline.stop();
         setPlayerState(PlayerState.STOPPED);
-        try {sessions.addnewsession(TemporarySession);}
-        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
+        sessions.deletenonvalidsessions();
+//        try {sessions.addnewsession(TemporarySession);}
+//        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
         if (GuiUtils.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {export();}
         // TODO Update Goal Widget
     }
     public void resetthissession() {
         currentcuttimeline = null;
-        TemporarySession = null;
+        sessions.deletenonvalidsessions();
         cutcount = 0;
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
@@ -602,7 +601,7 @@ public class This_Session {
         } else {GuiUtils.showtimedmessage(StatusBar, "Cannot Adjust Volume. No Session Playing", 5000);}
     }
     public void transition() {
-        System.out.println(TimeUtils.getformattedtime() + "> Clause 2");
+//        System.out.println(TimeUtils.getformattedtime() + "> Clause 2");
         closereferencefile();
         sessions.getcurrentsession().updatecutduration(currentcut.number, currentcut.getdurationinminutes());
         goalsWidget.update();

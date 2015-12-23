@@ -22,7 +22,7 @@ import java.util.List;
 public class CurrentGoals {
     private List<CurrentGoal> CurrentGoal;
 
-    public CurrentGoals() {try {populatefromxml();} catch (JAXBException ignored) {}}
+    public CurrentGoals() {}
 
 // Getters And Setters
     public List<kujiin.util.xml.CurrentGoal> getCurrentGoal() {return CurrentGoal;}

@@ -274,6 +274,15 @@ public class Session {
         allcuttimes.add(getPostsession_Duration());
         return allcuttimes;
     }
+    public boolean sessionnotEmpty() {
+        int count = 0;
+        for (Integer i : getallcuttimes()) {
+            System.out.println(i);
+            if (count > 0 && count < 10) {if (i > 0) {return true;}}
+            count++;
+        }
+        return false;
+    }
     public void updatetotalsessionduration() {
         Integer total = 0;
         for (Integer i: getallcuttimes()) {total += i;}

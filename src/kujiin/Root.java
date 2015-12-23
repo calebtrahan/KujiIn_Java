@@ -3,7 +3,9 @@ package kujiin;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import kujiin.dialogs.ChangeAlertDialog;
 import kujiin.dialogs.EditReferenceFiles;
 import kujiin.dialogs.SessionAmbienceEditor;
@@ -215,6 +217,9 @@ public class Root implements Initializable {
         if (playerWidget.isEnabled()) {
             creatorAndExporterWidget.disable();
             creatorAndExporterWidget.disablebuttons();
+            Node node = (Node) actionEvent.getSource();
+            Stage stage = (Stage) node.getScene().getWindow();
+            stage.setOnCloseRequest(event -> progressTrackerWidget.getSessions().deletenonvalidsessions());
         } else {
             creatorAndExporterWidget.enable();
             creatorAndExporterWidget.enablebuttons();

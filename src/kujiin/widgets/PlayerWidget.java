@@ -172,6 +172,7 @@ public class PlayerWidget implements Widget {
         CutPlayingText.setText("Ready To Play");
         SessionPlayingText.setText("Ready To Play");
         ReferenceFileCheckbox.setText("Reference Display Disabled");
+        GuiUtils.showtimedmessage(StatusBar, "Turn Session Player Off To Edit This Session", 6000);
     }
 
 // Other methods

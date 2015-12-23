@@ -1,5 +1,7 @@
 package kujiin.widgets;
 
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -8,6 +10,8 @@ import kujiin.util.lib.TimeUtils;
 import kujiin.util.xml.CompletedGoals;
 import kujiin.util.xml.CurrentGoals;
 import kujiin.util.xml.Sessions;
+
+import javax.xml.bind.JAXBException;
 
 public class GoalsWidget implements Widget{
     private Button NewGoalButton;
@@ -31,7 +35,21 @@ public class GoalsWidget implements Widget{
         allpracticedsessions = Allpracticedsessions;
         currentGoals = new CurrentGoals();
         completedGoals = new CompletedGoals();
-        update();
+        Service<Void> getcurrentgoals = new Service<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        try {currentGoals.populatefromxml(); completedGoals.populatefromxml();} catch (JAXBException ignored) {}
+                        return null;
+                    }
+                };
+            }
+        };
+        getcurrentgoals.setOnSucceeded(event -> update());
+        getcurrentgoals.setOnFailed(event -> update());
+        getcurrentgoals.start();
     }
 
 // Button Actions

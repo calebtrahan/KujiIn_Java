@@ -24,10 +24,7 @@ import java.util.List;
 public class CompletedGoals {
     private List<CompletedGoal> CompletedGoal;
 
-    public CompletedGoals() {
-        try {populatefromxml();}
-        catch (JAXBException ignored) {}
-    }
+    public CompletedGoals() {}
 
 // Getters And Setters
     public List<kujiin.util.xml.CompletedGoal> getCompletedGoal() {return CompletedGoal;}

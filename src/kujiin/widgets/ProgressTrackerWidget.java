@@ -1,11 +1,15 @@
 package kujiin.widgets;
 
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import kujiin.Tools;
 import kujiin.util.interfaces.Widget;
 import kujiin.util.xml.Sessions;
+
+import javax.xml.bind.JAXBException;
 
 public class ProgressTrackerWidget implements Widget {
     private TextField TotalTimePracticed;
@@ -29,7 +33,23 @@ public class ProgressTrackerWidget implements Widget {
         SessionListButton = sessionListButton;
         PrematureEndingsButton = prematureEndingsButton;
         sessions = new Sessions();
-        updateui();
+        Service<Void> getsessions = new Service<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        try {sessions.populatefromxml();}
+                        catch (JAXBException ignored) {}
+                        return null;
+                    }
+                };
+            }
+        };
+        getsessions.setOnRunning(event -> loadingui());
+        getsessions.setOnFailed(event -> updateui());
+        getsessions.setOnSucceeded(event -> updateui());
+        getsessions.start();
     }
 
 // Getters And Setters
@@ -70,7 +90,13 @@ public class ProgressTrackerWidget implements Widget {
     }
 
 // Other Methods
+    public void loadingui() {
+        AverageSessionDuration.setText("Loading...");
+        TotalTimePracticed.setText("Loading...");
+        NumberOfSessionsPracticed.setText("Loading...");
+    }
     public void updateui() {
+        sessions.deletenonvalidsessions();
         int averagesessionduration = (int) sessions.getaveragesessiontimeinminutes(PreAndPostOption.isSelected());
         int totalminutespracticed = sessions.getgrandtotaltimepracticedinminutes(PreAndPostOption.isSelected());
         int numberofsessionspracticed = sessions.getsessioncount();

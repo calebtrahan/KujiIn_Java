@@ -21,10 +21,7 @@ import java.util.List;
 public class Sessions {
     private List<Session> Session;
 
-    public Sessions() {
-        try {populatefromxml();}
-        catch (JAXBException ignored) {}
-    }
+    public Sessions() {deletenonvalidsessions();}
 
 // Getters And Setters
     public List<kujiin.util.xml.Session> getSession() {return Session;}
@@ -45,6 +42,15 @@ public class Sessions {
         if (sessionsList == null) {sessionsList = new ArrayList<>();}
         sessionsList.add(session);
         setSession(sessionsList);
+        JAXBContext context = JAXBContext.newInstance(Sessions.class);
+        Marshaller createMarshaller = context.createMarshaller();
+        createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        createMarshaller.marshal(this, This_Session.sessionsxmlfile);
+    }
+    public void removesession(Session session) throws JAXBException {
+        List<Session> sessionList = getSession();
+        sessionList.remove(sessionList.indexOf(session));
+        setSession(sessionList);
         JAXBContext context = JAXBContext.newInstance(Sessions.class);
         Marshaller createMarshaller = context.createMarshaller();
         createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -98,8 +104,20 @@ public class Sessions {
         else {return 0;}
     }
     public void createnewsession() {
-        getSession().add(new Session("", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        try {addnewsession(new Session("", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
+        catch (JAXBException ignored) {
+            GuiUtils.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");
+        }
     }
     public Session getcurrentsession() {return getSession().get(getSession().size() - 1);}
-
+    public void deletenonvalidsessions() {
+        try {
+            for (kujiin.util.xml.Session i : getSession()) {
+                if (! i.sessionnotEmpty()) {
+                    try {removesession(i);}
+                    catch (JAXBException ignored) {}
+                }
+            }
+        } catch (NullPointerException ignored) {}
+    }
 }
