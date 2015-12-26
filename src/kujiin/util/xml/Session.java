@@ -7,10 +7,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.File;
 import java.util.ArrayList;
 
-// TODO Figure Out What Information To Store In XML
-// In Order To:
-    // Save/Load As Preset Into This_Session Creator From/To XML
-    // Set This_Session Progress Throughout This_Session (This Will Replace SQLITE3 And DB Storage)
 @XmlAccessorType(XmlAccessType.PROPERTY)
 //@XmlType(propOrder = "Name", "Presession_Duration"...)
 public class Session {
@@ -246,17 +242,20 @@ public class Session {
         else {return 0;}
     }
     public void setcutambience(int cutindex, ArrayList<File> ambiencelist) {
-        if (cutindex == 0) {setPresession_Ambience(ambiencelist);}
-        if (cutindex == 1) {setRin_Ambience(ambiencelist);}
-        if (cutindex == 2) {setKyo_Ambience(ambiencelist);}
-        if (cutindex == 3) {setToh_Ambience(ambiencelist);}
-        if (cutindex == 4) {setSha_Ambience(ambiencelist);}
-        if (cutindex == 5) {setKai_Ambience(ambiencelist);}
-        if (cutindex == 6) {setJin_Ambience(ambiencelist);}
-        if (cutindex == 7) {setRetsu_Ambience(ambiencelist);}
-        if (cutindex == 8) {setZai_Ambience(ambiencelist);}
-        if (cutindex == 9) {setZen_Ambience(ambiencelist);}
-        if (cutindex == 10) {setPostsession_Ambience(ambiencelist);}
+        switch (cutindex) {
+            case 0: setPresession_Ambience(ambiencelist);
+            case 1: setRin_Ambience(ambiencelist);
+            case 2: setKyo_Ambience(ambiencelist);
+            case 3: setToh_Ambience(ambiencelist);
+            case 4: setSha_Ambience(ambiencelist);
+            case 5: setKai_Ambience(ambiencelist);
+            case 6: setJin_Ambience(ambiencelist);
+            case 7: setRetsu_Ambience(ambiencelist);
+            case 8: setZai_Ambience(ambiencelist);
+            case 9: setZen_Ambience(ambiencelist);
+            case 10: setPostsession_Ambience(ambiencelist);
+            default: System.out.println("Can't Set Cut Ambience Not A Valid Index: " + cutindex);
+        }
     }
     public ArrayList<Integer> getallcuttimes() {
         ArrayList<Integer> allcuttimes = new ArrayList<>();
@@ -313,6 +312,6 @@ public class Session {
         for (int x=1; x<10;x++) {totaltime += getcutduration(x);}
         return totaltime > 0;
     }
-    public boolean wasendedPremature() {return getPremature_Ending_Reason() == null || getPremature_Ending_Reason().equals(new String());}
+    public boolean wasendedPremature() {return getPremature_Ending_Reason() == null || getPremature_Ending_Reason().equals("");}
 
 }
