@@ -1,9 +1,6 @@
 package kujiin.util.xml;
 
 import kujiin.This_Session;
-import kujiin.dialogs.DisplayCutTotalsDialog;
-import kujiin.dialogs.DisplayPrematureEndingsDialog;
-import kujiin.dialogs.DisplaySessionListDialog;
 import kujiin.util.lib.GuiUtils;
 
 import javax.xml.bind.JAXBContext;
@@ -70,7 +67,7 @@ public class Sessions {
         try {return (float) getgrandtotaltimepracticedinminutes(includepreandpost) / getSession().size();}
         catch (NullPointerException ignored) {return 0;}
     }
-    public ArrayList<Session> getsessionwithprematureendings() {
+    public ArrayList<Session> getsessionswithprematureendings() {
         try {
             ArrayList<Session> sessionswithprematureendings = new ArrayList<>();
             for (kujiin.util.xml.Session i : getSession()) {
@@ -78,26 +75,6 @@ public class Sessions {
             }
             return sessionswithprematureendings;
         } catch (NullPointerException e) {return new ArrayList<>();}
-    }
-    public void displaylistofsessions() {
-        if (getSession() == null || getSession().size() == 0) {
-            GuiUtils.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");
-        } else {
-            new DisplaySessionListDialog(null, getSession()).showAndWait();
-        }
-    }
-    public void displayprematureendings() {
-        ArrayList<Session> prematuresessionlist = getsessionwithprematureendings();
-        if (prematuresessionlist.size() > 0) {
-            DisplayPrematureEndingsDialog a = new DisplayPrematureEndingsDialog(null, prematuresessionlist);
-            a.showAndWait();
-        } else {
-            GuiUtils.showinformationdialog("Cannot Display", "No Premature Endings", "No Premature Endings To Display");
-        }
-    }
-    public void displaycutprogress() {
-        if (getSession() != null) {new DisplayCutTotalsDialog(getSession());}
-        else {GuiUtils.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");}
     }
     public int getsessioncount() {
         if (getSession() != null) {return getSession().size();}

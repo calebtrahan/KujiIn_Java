@@ -1,12 +1,10 @@
 package kujiin;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 // TODO Don't Create This_Session (Concatenate And Trim Audio Files) Unless Exporting
 // Instead:

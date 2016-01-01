@@ -12,7 +12,6 @@ import kujiin.util.xml.Sessions;
 
 public class PlayerWidget implements Widget {
     private CheckBox onOffSwitch;
-    private Label sessionPlayerTopLabel;
     private Button AdjustVolumeButton;
     private Button PlayButton;
     private Button PauseButton;
@@ -33,13 +32,12 @@ public class PlayerWidget implements Widget {
     // TODO Figure Out Where To Encapsulate The Play Logic (Here Or In Session)
         // So That Only One Session Is Actived At A Time, And We Don't Have Duplicates
 
-    public PlayerWidget(CheckBox OnOffSwitch, Label SessionPlayerTopLabel, Button adjustVolumeButton, Button playButton, Button pauseButton, Button stopButton,
+    public PlayerWidget(CheckBox OnOffSwitch, Button adjustVolumeButton, Button playButton, Button pauseButton, Button stopButton,
                         Label cutPlayingText, Label sessionPlayingText, Label cutCurrentTime, Label cutTotalTime,
                         Label sessionCurrentTime, Label sessionTotalTime, ProgressBar cutProgress,
                         ProgressBar totalProgress, CheckBox referenceFileCheckbox,
                         Label statusbar, GoalsWidget goalsWidget, This_Session Session) {
         onOffSwitch = OnOffSwitch;
-        sessionPlayerTopLabel = SessionPlayerTopLabel;
         AdjustVolumeButton = adjustVolumeButton;
         PlayButton = playButton;
         PauseButton = pauseButton;
@@ -128,7 +126,6 @@ public class PlayerWidget implements Widget {
         CutProgress.setDisable(true);
         TotalProgress.setDisable(true);
         ReferenceFileCheckbox.setDisable(true);
-        sessionPlayerTopLabel.setDisable(true);
         onOffSwitch.setText("OFF");
     }
     @Override
@@ -152,7 +149,6 @@ public class PlayerWidget implements Widget {
         CutProgress.setDisable(false);
         TotalProgress.setDisable(false);
         ReferenceFileCheckbox.setDisable(false);
-        sessionPlayerTopLabel.setDisable(false);
         onOffSwitch.setText("ON");
         readytoplay();
     }

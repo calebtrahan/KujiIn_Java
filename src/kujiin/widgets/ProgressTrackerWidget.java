@@ -6,10 +6,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import kujiin.Tools;
+import kujiin.dialogs.DisplayCutTotalsDialog;
+import kujiin.dialogs.DisplayPrematureEndingsDialog;
+import kujiin.dialogs.DisplaySessionListDialog;
 import kujiin.util.interfaces.Widget;
+import kujiin.util.lib.GuiUtils;
+import kujiin.util.xml.Session;
 import kujiin.util.xml.Sessions;
 
 import javax.xml.bind.JAXBException;
+import java.util.ArrayList;
 
 public class ProgressTrackerWidget implements Widget {
     private TextField TotalTimePracticed;
@@ -57,9 +63,22 @@ public class ProgressTrackerWidget implements Widget {
 
 
 // Button Actions
-    public void displaydetailedcutprogress() {}
-    public void displaysessionlist() {}
-    public void displayprematureendings() {}
+    public void displaydetailedcutprogress() {
+        if (sessions.getSession() != null) {new DisplayCutTotalsDialog(sessions.getSession());}
+        else {GuiUtils.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");}
+    }
+    public void displaysessionlist() {
+        if (sessions.getSession() == null || sessions.getSession().size() == 0) {
+            GuiUtils.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");
+        } else {new DisplaySessionListDialog(null, sessions.getSession()).showAndWait();}
+    }
+    public void displayprematureendings() {
+        ArrayList<Session> prematuresessionlist = sessions.getsessionswithprematureendings();
+        if (prematuresessionlist.size() > 0) {
+            DisplayPrematureEndingsDialog a = new DisplayPrematureEndingsDialog(null, prematuresessionlist);
+            a.showAndWait();
+        } else {GuiUtils.showinformationdialog("Cannot Display", "Nothing To Display", "No Premature Endings To Display");}
+    }
 
 // Widget Implementation
     @Override

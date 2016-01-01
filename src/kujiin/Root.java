@@ -42,8 +42,6 @@ public class Root implements Initializable {
     public Button viewcompletedgoalsButton;
     public Button PauseButton;
     public Button StopButton;
-    public TextField AmbienceEnabledTextField;
-    public TextField TotalSessionTimeTextField;
     public TextField PreTime;
     public TextField RinTime;
     public TextField KyoTime;
@@ -73,11 +71,16 @@ public class Root implements Initializable {
     public Button SavePresetButton;
     public CheckBox SessionPlayerOnOffSwitch;
     public Label SessionPlayerTopLabel;
+    public CheckBox AmbienceSwitch;
+    public TextField ApproximateEndTime;
+    public Button ChangeValuesButton;
+// Widget Classes
     private This_Session this_session;
     private GoalsWidget goalsWidget;
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private PlayerWidget playerWidget;
     private ProgressTrackerWidget progressTrackerWidget;
+// Volume Constants
     public static Double ENTRAINMENTVOLUME = 0.6;
     public static Double AMBIENCEVOLUME = 1.0;
     public static Double FADEOUTDURATION = 10.0;
@@ -90,10 +93,11 @@ public class Root implements Initializable {
         this_session = new This_Session(progressTrackerWidget.getSessions(), CutProgressLabelCurrent, CutProgressLabelTotal, TotalProgressLabelCurrent, TotalProgressLabelTotal,
                 CutProgressBar, TotalProgressBar, CutProgressTopLabel, TotalSessionLabel, StatusBar);
         goalsWidget = new GoalsWidget(newgoalButton, viewcurrrentgoalsButton, viewcompletedgoalsButton, goalscurrrentvalueLabel, goalssettimeLabel, goalsprogressbar, progressTrackerWidget.getSessions());
-        creatorAndExporterWidget = new CreatorAndExporterWidget(EditValuesButton, ExportButton, LoadPresetButton, SavePresetButton, AmbienceEnabledTextField, TotalSessionTimeTextField, PreTime, RinTime, KyoTime,
+        creatorAndExporterWidget = new CreatorAndExporterWidget(EditValuesButton, ExportButton, LoadPresetButton, SavePresetButton, AmbienceSwitch, TotalTimePracticed, ApproximateEndTime, PreTime, RinTime, KyoTime,
                 TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, PostTime, this_session);
-        playerWidget = new PlayerWidget(SessionPlayerOnOffSwitch, SessionPlayerTopLabel, VolumeButton, PlayButton, PauseButton, StopButton, CutProgressTopLabel, TotalSessionLabel, CutProgressLabelCurrent, CutProgressLabelTotal,
+        playerWidget = new PlayerWidget(SessionPlayerOnOffSwitch, VolumeButton, PlayButton, PauseButton, StopButton, CutProgressTopLabel, TotalSessionLabel, CutProgressLabelCurrent, CutProgressLabelTotal,
                 TotalProgressLabelCurrent, TotalProgressLabelTotal, CutProgressBar, TotalProgressBar, ReferenceFilesOption, StatusBar, goalsWidget, this_session);
+//        ChangeListener<Integer> updatevalue = (observable, oldValue, newValue) -> updatecreatorui();
         sessionplayerswitch(null);
     }
 
@@ -121,9 +125,9 @@ public class Root implements Initializable {
 
 // Database And Total Progress Widget
     public void updatetotalprogresswidget(ActionEvent actionEvent) {progressTrackerWidget.updateui();}
-    public void displaylistofsessions(Event event) {progressTrackerWidget.getSessions().displaylistofsessions();}
-    public void displayprematureendings(Event event) {progressTrackerWidget.getSessions().displayprematureendings();}
-    public void showcutprogress(Event event) {progressTrackerWidget.getSessions().displaycutprogress();}
+    public void displaylistofsessions(Event event) {progressTrackerWidget.displaysessionlist();}
+    public void displayprematureendings(Event event) {progressTrackerWidget.displayprematureendings();}
+    public void showcutprogress(Event event) {progressTrackerWidget.displaydetailedcutprogress();}
 
 // Created Session Widget
     public boolean getsessioninformation() {
@@ -162,10 +166,10 @@ public class Root implements Initializable {
                 // TODO Get This_Session Information Here And Pass Into Root Boxes PRE-POSTTime
             }
             // Set Ambience Enabled And This_Session Total Time
-            if (this_session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes"); AmbienceEnabledTextField.setDisable(false);}
-            else {AmbienceEnabledTextField.setText("No"); AmbienceEnabledTextField.setDisable(true);}
-            TotalSessionTimeTextField.setText(this_session.gettotalsessionduration());
-            TotalSessionTimeTextField.setDisable(! cutsinsession);
+//            if (this_session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes"); AmbienceEnabledTextField.setDisable(false);}
+//            else {AmbienceEnabledTextField.setText("No"); AmbienceEnabledTextField.setDisable(true);}
+//            TotalSessionTimeTextField.setText(this_session.gettotalsessionduration());
+//            TotalSessionTimeTextField.setDisable(! cutsinsession);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             return false;
@@ -210,6 +214,7 @@ public class Root implements Initializable {
         if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
         else {textField.setText("-"); textField.setDisable(true);}
     }
+    public void ambienceswitch(ActionEvent actionEvent) {creatorAndExporterWidget.ambienceswitch();}
 
 // Session Player Widget
     public void sessionplayerswitch(ActionEvent actionEvent) {
@@ -236,5 +241,6 @@ public class Root implements Initializable {
     public void getgoalpacing(Event event) {goalsWidget.goalpacing();}
     public void viewcurrentgoals(Event event) {goalsWidget.displaycurrentgoals();}
     public void viewcompletedgoals(Event event) {goalsWidget.displaycompletedgoals();}
+
 
 }
