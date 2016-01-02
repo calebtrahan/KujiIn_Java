@@ -189,9 +189,7 @@ public class Session {
     public void setZai_Ambience(ArrayList<File> zai_Ambience) {
         Zai_Ambience = zai_Ambience;
     }
-    public ArrayList<File> getZen_Ambience() {
-        return Zen_Ambience;
-    }
+    public ArrayList<File> getZen_Ambience() {return Zen_Ambience;}
     public void setZen_Ambience(ArrayList<File> zen_Ambience) {
         Zen_Ambience = zen_Ambience;
     }

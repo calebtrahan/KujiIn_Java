@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 public class CreatorAndExporterWidget implements Widget{
-    private Button CreateButton;
+    private Button changeallvaluesbutton;
     private Button ExportButton;
     private Button loadpresetbutton;
     private Button savepresetbutton;
@@ -54,12 +54,12 @@ public class CreatorAndExporterWidget implements Widget{
     private This_Session this_session;
     private ArrayList<Integer> textfieldtimes = new ArrayList<>(11);
 
-    // TODO Figure Out Why TotalSessionTime Isn't Updating With Updateui
-    public CreatorAndExporterWidget(Button createButton, Button exportButton, Button loadpresetbutton, Button savepresetbutton, CheckBox ambienceswitch,
+    // TODO Encapsulate All Creator And Exporter Logic Here (Maybe Put ChangeAllValues As A Subclass?)
+    public CreatorAndExporterWidget(Button changeallvaluesbutton, Button exportButton, Button loadpresetbutton, Button savepresetbutton, CheckBox ambienceswitch,
                                     TextField totalSessionTimeTextField, TextField approximateendtime, TextField preTime, TextField rinTime, TextField kyoTime,
                                     TextField tohTime, TextField shaTime, TextField kaiTime, TextField jinTime,
                                     TextField retsuTime, TextField zaiTime, TextField zenTime, TextField postTime, This_Session this_session) {
-        CreateButton = createButton;
+        this.changeallvaluesbutton = changeallvaluesbutton;
         ExportButton = exportButton;
         this.loadpresetbutton = loadpresetbutton;
         this.savepresetbutton = savepresetbutton;
@@ -103,7 +103,10 @@ public class CreatorAndExporterWidget implements Widget{
         }
         else {GuiUtils.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid"); return false;}
     }
-    public void exportsession() {}
+    public void exportsession() {
+        createsession();
+        // EXPORT HERE
+    }
 
 // Other Methods
     public void setSessionInformation(This_Session session) {
@@ -217,7 +220,9 @@ public class CreatorAndExporterWidget implements Widget{
 // Widget Implementation
     @Override
     public void disable() {
+        changeallvaluesbutton.setDisable(true);
         AmbienceSwitch.setDisable(true);
+        ApproximateEndTime.setDisable(true);
         TotalSessionTime.setDisable(true);
         PreTime.setDisable(true);
         RinTime.setDisable(true);
@@ -232,14 +237,15 @@ public class CreatorAndExporterWidget implements Widget{
         PostTime.setDisable(true);
     }
     public void disablebuttons() {
-        CreateButton.setDisable(true);
         ExportButton.setDisable(true);
         loadpresetbutton.setDisable(true);
         savepresetbutton.setDisable(true);
     }
     @Override
     public void enable() {
+        changeallvaluesbutton.setDisable(false);
         AmbienceSwitch.setDisable(false);
+        ApproximateEndTime.setDisable(false);
         TotalSessionTime.setDisable(false);
         PreTime.setDisable(false);
         RinTime.setDisable(false);

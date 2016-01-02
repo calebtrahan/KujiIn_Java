@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 @XmlRootElement(name = "Sessions")
@@ -95,7 +96,7 @@ public class Sessions {
                     catch (JAXBException ignored) {}
                 }
             }
-        } catch (NullPointerException ignored) {}
+        } catch (NullPointerException | ConcurrentModificationException ignored) {}
     }
 
 }

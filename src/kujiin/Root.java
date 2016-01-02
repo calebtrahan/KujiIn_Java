@@ -28,7 +28,6 @@ public class Root implements Initializable {
         // Random Is Throwing java.lang.IllegalArgumentException: bound must be positive
         // Set Really High Durations, So You Can See If It Works For Really Long Sessions
 
-    public Button EditValuesButton;
     public Label StatusBar;
     public Button ExportButton;
     public Button PlayButton;
@@ -76,7 +75,7 @@ public class Root implements Initializable {
     public TextField ApproximateEndTime;
     public Button ChangeValuesButton;
     public TextField TotalSessionTime;
-    // Widget Classes
+// Widget Classes
     private This_Session this_session;
     private GoalsWidget goalsWidget;
     private CreatorAndExporterWidget creatorAndExporterWidget;
@@ -97,10 +96,10 @@ public class Root implements Initializable {
         this_session = new This_Session(progressTrackerWidget.getSessions(), CutProgressLabelCurrent, CutProgressLabelTotal, TotalProgressLabelCurrent, TotalProgressLabelTotal,
                 CutProgressBar, TotalProgressBar, CutProgressTopLabel, TotalSessionLabel, StatusBar);
         goalsWidget = new GoalsWidget(newgoalButton, viewcurrrentgoalsButton, viewcompletedgoalsButton, goalscurrrentvalueLabel, goalssettimeLabel, goalsprogressbar, progressTrackerWidget.getSessions());
-        creatorAndExporterWidget = new CreatorAndExporterWidget(EditValuesButton, ExportButton, LoadPresetButton, SavePresetButton, AmbienceSwitch, TotalSessionTime, ApproximateEndTime, PreTime, RinTime, KyoTime,
+        creatorAndExporterWidget = new CreatorAndExporterWidget(ChangeValuesButton, ExportButton, LoadPresetButton, SavePresetButton, AmbienceSwitch, TotalSessionTime, ApproximateEndTime, PreTime, RinTime, KyoTime,
                 TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, PostTime, this_session);
         playerWidget = new PlayerWidget(SessionPlayerOnOffSwitch, VolumeButton, PlayButton, PauseButton, StopButton, CutProgressTopLabel, TotalSessionLabel, CutProgressLabelCurrent, CutProgressLabelTotal,
-                TotalProgressLabelCurrent, TotalProgressLabelTotal, CutProgressBar, TotalProgressBar, ReferenceFilesOption, StatusBar, goalsWidget, this_session);
+                TotalProgressLabelCurrent, TotalProgressLabelTotal, CutProgressBar, TotalProgressBar, ReferenceFilesOption, StatusBar, goalsWidget, this_session, creatorAndExporterWidget);
 //        ChangeListener<Integer> updatevalue = (observable, oldValue, newValue) -> updatecreatorui();
         sessionplayerswitch(null);
     }

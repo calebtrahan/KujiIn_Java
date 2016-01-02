@@ -28,15 +28,22 @@ public class PlayerWidget implements Widget {
     private GoalsWidget GoalsWidget;
     private Label StatusBar;
     private This_Session Session;
+    private CreatorAndExporterWidget creatorAndExporterWidget;
     private ReferenceType referenceType;
     // TODO Figure Out Where To Encapsulate The Play Logic (Here Or In Session)
         // So That Only One Session Is Actived At A Time, And We Don't Have Duplicates
+    // TODO !!!!!!!!!!!!!!!!!!!!! Set On (Ambience/Entrainment) Media Error
+        // Pause Whichever (ambience/entrainment) Is Working
+        // -> Alert Confirmation Dialog
+            //  (Ambience/Entrainment For $Cutname Failed)
+            //  Cannot Play $Songname
+            //  Retry Playing (Song name) [Start Over Playing The Cut Again] || Stop Playback Completely
 
     public PlayerWidget(CheckBox OnOffSwitch, Button adjustVolumeButton, Button playButton, Button pauseButton, Button stopButton,
                         Label cutPlayingText, Label sessionPlayingText, Label cutCurrentTime, Label cutTotalTime,
                         Label sessionCurrentTime, Label sessionTotalTime, ProgressBar cutProgress,
                         ProgressBar totalProgress, CheckBox referenceFileCheckbox,
-                        Label statusbar, GoalsWidget goalsWidget, This_Session Session) {
+                        Label statusbar, GoalsWidget goalsWidget, This_Session Session, CreatorAndExporterWidget creatorAndExporterWidget) {
         onOffSwitch = OnOffSwitch;
         AdjustVolumeButton = adjustVolumeButton;
         PlayButton = playButton;
@@ -54,6 +61,7 @@ public class PlayerWidget implements Widget {
         GoalsWidget = goalsWidget;
         StatusBar = statusbar;
         this.Session = Session;
+        this.creatorAndExporterWidget = creatorAndExporterWidget;
     }
 
 // Getters And Setters
@@ -130,6 +138,7 @@ public class PlayerWidget implements Widget {
     }
     @Override
     public void enable() {
+        if (! creatorAndExporterWidget.createsession()) {return;}
         if (! Session.isValid()) {
             GuiUtils.showinformationdialog("Information", "Cannot Enable Session Player", "Session (Above) Isn't Valid, All Cut Values Are 0");
             onOffSwitch.setSelected(false);
@@ -165,6 +174,7 @@ public class PlayerWidget implements Widget {
         ReferenceFileCheckbox.setText("Reference Display Disabled");
     }
     public void readytoplay() {
+
         CutPlayingText.setText("Ready To Play");
         SessionPlayingText.setText("Ready To Play");
         ReferenceFileCheckbox.setText("Reference Display Disabled");

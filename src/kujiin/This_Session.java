@@ -303,33 +303,15 @@ public class This_Session {
         zen.setDuration(textfieldtimes.get(9));
         postsession.setDuration(textfieldtimes.get(10));
         cutsinsession.add(presession);
-        if (rin.duration != 0) {
-            cutsinsession.add(rin);
-        }
-        if (kyo.duration != 0) {
-            cutsinsession.add(kyo);
-        }
-        if (toh.duration != 0) {
-            cutsinsession.add(toh);
-        }
-        if (sha.duration != 0) {
-            cutsinsession.add(sha);
-        }
-        if (kai.duration != 0) {
-            cutsinsession.add(kai);
-        }
-        if (jin.duration != 0) {
-            cutsinsession.add(jin);
-        }
-        if (retsu.duration != 0) {
-            cutsinsession.add(retsu);
-        }
-        if (zai.duration != 0) {
-            cutsinsession.add(zai);
-        }
-        if (zen.duration != 0) {
-            cutsinsession.add(zen);
-        }
+        if (rin.duration != 0) {cutsinsession.add(rin);}
+        if (kyo.duration != 0) {cutsinsession.add(kyo);}
+        if (toh.duration != 0) {cutsinsession.add(toh);}
+        if (sha.duration != 0) {cutsinsession.add(sha);}
+        if (kai.duration != 0) {cutsinsession.add(kai);}
+        if (jin.duration != 0) {cutsinsession.add(jin);}
+        if (retsu.duration != 0) {cutsinsession.add(retsu);}
+        if (zai.duration != 0) {cutsinsession.add(zai);}
+        if (zen.duration != 0) {cutsinsession.add(zen);}
         cutsinsession.add(postsession);
         return cutsinsession.size() > 0;
     }
@@ -578,7 +560,6 @@ public class This_Session {
         } else {GuiUtils.showtimedmessage(StatusBar, "Cannot Adjust Volume. No Session Playing", 5000);}
     }
     public void transition() {
-//        System.out.println(TimeUtils.getformattedtime() + "> Clause 2");
         closereferencefile();
         sessions.getcurrentsession().updatecutduration(currentcut.number, currentcut.getdurationinminutes());
         goalsWidget.update();
@@ -595,12 +576,23 @@ public class This_Session {
                 progresstonextcut();
             });
             alertplayer.setOnError(() -> {
-                System.out.println("Alert File Encountered An Error");
-                alertplayer.dispose();
-                progresstonextcut();
+                if (GuiUtils.getanswerdialog("Confirmation", "An Error Occured While Playing Alert File" +
+                        alertplayer.getMedia().getSource() + "'", "Retry Playing Alert File? (Pressing Cancel " +
+                        "Will Progress To The Next Cut)")) {
+                    alertplayer.stop();
+                    alertplayer.play();
+                } else {
+                    alertplayer.stop();
+                    alertplayer.dispose();
+                    progresstonextcut();
+                }
             });
         }
     }
+    public void error_endplayback() {
+
+    }
+
 
 // Reference Files
     public boolean choosereferencetype() {

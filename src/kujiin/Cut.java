@@ -6,6 +6,7 @@ import javafx.animation.Timeline;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import kujiin.util.lib.GuiUtils;
 import kujiin.util.lib.TimeUtils;
 
 import java.io.*;
@@ -349,31 +350,52 @@ public class Cut {
     public void updatecuttime() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             if (secondselapsed <= Root.FADEINDURATION) {
-                double ambienceincrement = thisession.getSessionAmbienceVolume() / Root.FADEINDURATION;
-                double ambiencevolume = secondselapsed * ambienceincrement;
                 double entrainmentincrement = thisession.getSessionEntrainmentVolume() / Root.FADEINDURATION;
                 double entrainmentvolume = secondselapsed * entrainmentincrement;
-                getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                 getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+                if (ambienceenabled) {
+                    double ambienceincrement = thisession.getSessionAmbienceVolume() / Root.FADEINDURATION;
+                    double ambiencevolume = secondselapsed * ambienceincrement;
+                    getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                }
             }
             else if (secondselapsed >= getdurationinseconds() - Root.FADEOUTDURATION) {
                 int secondsleft = getdurationinseconds() - secondselapsed;
-                double ambienceincrement = thisession.getSessionAmbienceVolume() / Root.FADEOUTDURATION;
-                double ambiencevolume =  secondsleft * ambienceincrement;
                 double entrainmentincrement = thisession.getSessionEntrainmentVolume() / Root.FADEOUTDURATION;
                 double entrainmentvolume = secondsleft * entrainmentincrement;
-                getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                 getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+                if (ambienceenabled) {
+                    double ambienceincrement = thisession.getSessionAmbienceVolume() / Root.FADEOUTDURATION;
+                    double ambiencevolume =  secondsleft * ambienceincrement;
+                    getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                }
             } else {
-                getCurrentAmbiencePlayer().setVolume(thisession.getSessionAmbienceVolume());
+                if (ambienceenabled) {getCurrentAmbiencePlayer().setVolume(thisession.getSessionAmbienceVolume());}
                 getCurrentEntrainmentPlayer().setVolume(thisession.getSessionEntrainmentVolume());
             }
             secondselapsed++;
         }
     }
+    public void entrainmenterror() {
+        // Pause Ambience If Exists
+        if (GuiUtils.getanswerdialog("Confirmation", "An Error Occured While Playing " + name +
+                "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
+                "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
+                entrainmentplayer.stop();
+                entrainmentplayer.play();
+                entrainmentplayer.setOnError(this::entrainmenterror);
+        } else {thisession.error_endplayback();}
+    }
+    public void ambienceerror() {
+        if (GuiUtils.getanswerdialog("Confirmation", "An Error Occured While Playing " + name +
+                        "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
+                "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
+            entrainmentplayer.stop();
+            entrainmentplayer.play();
+            entrainmentplayer.setOnError(this::entrainmenterror);
+        } else {thisession.error_endplayback();}
+    }
     public void errorduringplayback() {
-        System.out.println("Ambience Player's Status Is " + ambienceplayer.getStatus());
-        System.out.println("Entrainment Player's Status Is " + entrainmentplayer.getStatus());
         if (ambienceplayer.getStatus() != MediaPlayer.Status.PLAYING) {playnextambience();}
         if (entrainmentplayer.getStatus() != MediaPlayer.Status.PLAYING) {playnextentrainment();}
     }
