@@ -5,6 +5,7 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import kujiin.Root;
 import kujiin.Tools;
 import kujiin.dialogs.DisplayCutTotalsDialog;
 import kujiin.dialogs.DisplayPrematureEndingsDialog;
@@ -56,6 +57,9 @@ public class ProgressTrackerWidget implements Widget {
         getsessions.setOnFailed(event -> updateui());
         getsessions.setOnSucceeded(event -> updateui());
         getsessions.start();
+        TotalTimePracticed.setOnKeyTyped(Root.noneditabletextfield);
+        NumberOfSessionsPracticed.setOnKeyTyped(Root.noneditabletextfield);
+        AverageSessionDuration.setOnKeyTyped(Root.noneditabletextfield);
     }
 
 // Getters And Setters

@@ -2,9 +2,11 @@ package kujiin;
 
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import kujiin.dialogs.ChangeAlertDialog;
 import kujiin.dialogs.EditReferenceFiles;
@@ -70,11 +72,11 @@ public class Root implements Initializable {
     public Button LoadPresetButton;
     public Button SavePresetButton;
     public CheckBox SessionPlayerOnOffSwitch;
-    public Label SessionPlayerTopLabel;
     public CheckBox AmbienceSwitch;
     public TextField ApproximateEndTime;
     public Button ChangeValuesButton;
-// Widget Classes
+    public TextField TotalSessionTime;
+    // Widget Classes
     private This_Session this_session;
     private GoalsWidget goalsWidget;
     private CreatorAndExporterWidget creatorAndExporterWidget;
@@ -85,6 +87,8 @@ public class Root implements Initializable {
     public static Double AMBIENCEVOLUME = 1.0;
     public static Double FADEOUTDURATION = 10.0;
     public static Double FADEINDURATION = 10.0;
+// Event Handlers
+    public static final EventHandler<KeyEvent> noneditabletextfield = event -> GuiUtils.showinformationdialog("Information", "Can't Enter Text", "This Text Field Can't Be Edited");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -93,7 +97,7 @@ public class Root implements Initializable {
         this_session = new This_Session(progressTrackerWidget.getSessions(), CutProgressLabelCurrent, CutProgressLabelTotal, TotalProgressLabelCurrent, TotalProgressLabelTotal,
                 CutProgressBar, TotalProgressBar, CutProgressTopLabel, TotalSessionLabel, StatusBar);
         goalsWidget = new GoalsWidget(newgoalButton, viewcurrrentgoalsButton, viewcompletedgoalsButton, goalscurrrentvalueLabel, goalssettimeLabel, goalsprogressbar, progressTrackerWidget.getSessions());
-        creatorAndExporterWidget = new CreatorAndExporterWidget(EditValuesButton, ExportButton, LoadPresetButton, SavePresetButton, AmbienceSwitch, TotalTimePracticed, ApproximateEndTime, PreTime, RinTime, KyoTime,
+        creatorAndExporterWidget = new CreatorAndExporterWidget(EditValuesButton, ExportButton, LoadPresetButton, SavePresetButton, AmbienceSwitch, TotalSessionTime, ApproximateEndTime, PreTime, RinTime, KyoTime,
                 TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, PostTime, this_session);
         playerWidget = new PlayerWidget(SessionPlayerOnOffSwitch, VolumeButton, PlayButton, PauseButton, StopButton, CutProgressTopLabel, TotalSessionLabel, CutProgressLabelCurrent, CutProgressLabelTotal,
                 TotalProgressLabelCurrent, TotalProgressLabelTotal, CutProgressBar, TotalProgressBar, ReferenceFilesOption, StatusBar, goalsWidget, this_session);
@@ -180,10 +184,6 @@ public class Root implements Initializable {
     public void savepreset(ActionEvent actionEvent) {
 
     }
-    public void editsessionvalues(ActionEvent actionEvent) {
-        this_session.changesessionvalues();
-        creatorAndExporterWidget.setSessionInformation(this_session);
-    }
     public void createsession(Event event) {
 
 //        if (creatorState == CreatorState.NOT_CREATED || creatorState == CreatorState.CREATED) {
@@ -214,7 +214,8 @@ public class Root implements Initializable {
         if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
         else {textField.setText("-"); textField.setDisable(true);}
     }
-    public void ambienceswitch(ActionEvent actionEvent) {creatorAndExporterWidget.ambienceswitch();}
+    public void ambienceswitch(ActionEvent actionEvent) {creatorAndExporterWidget.checkambience();}
+    public void changeallcreatorvalues(ActionEvent actionEvent) {creatorAndExporterWidget.changeallvalues();}
 
 // Session Player Widget
     public void sessionplayerswitch(ActionEvent actionEvent) {
@@ -241,6 +242,5 @@ public class Root implements Initializable {
     public void getgoalpacing(Event event) {goalsWidget.goalpacing();}
     public void viewcurrentgoals(Event event) {goalsWidget.displaycurrentgoals();}
     public void viewcompletedgoals(Event event) {goalsWidget.displaycompletedgoals();}
-
 
 }

@@ -5,10 +5,12 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import kujiin.ChangeSessionValues;
+import kujiin.Root;
 import kujiin.This_Session;
 import kujiin.Tools;
+import kujiin.dialogs.ChangeAllValuesDialog;
 import kujiin.util.interfaces.Widget;
+import kujiin.util.lib.GuiUtils;
 import kujiin.util.states.CreatorState;
 import kujiin.util.states.ExporterState;
 
@@ -49,10 +51,10 @@ public class CreatorAndExporterWidget implements Widget{
     private IntegerProperty PostsessionValue = new SimpleIntegerProperty(0);
     private CreatorState creatorState;
     private ExporterState exporterState;
-    private ChangeSessionValues changeSessionValues;
     private This_Session this_session;
     private ArrayList<Integer> textfieldtimes = new ArrayList<>(11);
 
+    // TODO Figure Out Why TotalSessionTime Isn't Updating With Updateui
     public CreatorAndExporterWidget(Button createButton, Button exportButton, Button loadpresetbutton, Button savepresetbutton, CheckBox ambienceswitch,
                                     TextField totalSessionTimeTextField, TextField approximateendtime, TextField preTime, TextField rinTime, TextField kyoTime,
                                     TextField tohTime, TextField shaTime, TextField kaiTime, TextField jinTime,
@@ -82,6 +84,8 @@ public class CreatorAndExporterWidget implements Widget{
         maketextfieldsnumeric();
         textfieldtimes.addAll(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0));
         bindtextfieldstoproperties();
+        TotalSessionTime.setOnKeyTyped(Root.noneditabletextfield);
+        ApproximateEndTime.setOnKeyTyped(Root.noneditabletextfield);
     }
 
 // Getters And Setters
@@ -89,11 +93,15 @@ public class CreatorAndExporterWidget implements Widget{
     public CreatorState getCreatorState() {return creatorState;}
 
 // Button Actions
-    public void createsession() {
-
-//        if (changeSessionValues == null) {
-//            changeSessionValues = new ChangeSessionValues(this_session);}
-//        changeSessionValues.showAndWait();
+    public boolean createsession() {
+        if (gettextfieldtimes()) {
+            if (Tools.sessionwellformednesschecks(textfieldtimes)) {
+                this_session.setAmbienceenabled(AmbienceSwitch.isSelected());
+                this_session.create(textfieldtimes);
+                return true;
+            } else {return false;}
+        }
+        else {GuiUtils.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid"); return false;}
     }
     public void exportsession() {}
 
@@ -178,9 +186,32 @@ public class CreatorAndExporterWidget implements Widget{
         for (Integer i : textfieldtimes) {if (i > 0) {not_all_zeros = true;}}
         return  not_all_zeros;
     }
-    public void ambienceswitch() {
-        if (AmbienceSwitch.isSelected()) {AmbienceSwitch.setText("ON");}
-        else {AmbienceSwitch.setText("OFF");}
+    public void checkambience() {
+        if (AmbienceSwitch.isSelected()) {
+            if (gettextfieldtimes()) {
+                this_session.checkifambienceisgood(textfieldtimes);
+            } else {
+                GuiUtils.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
+                AmbienceSwitch.setSelected(false);
+            }
+        } else {this_session.setAmbienceenabled(false);}
+    }
+    public void changeallvalues() {
+        ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(null);
+        changevaluesdialog.showAndWait();
+        Integer min = changevaluesdialog.getminutes();
+        String minutes = min.toString();
+        RinTime.setText(minutes);
+        KyoTime.setText(minutes);
+        TohTime.setText(minutes);
+        ShaTime.setText(minutes);
+        KaiTime.setText(minutes);
+        JinTime.setText(minutes);
+        RetsuTime.setText(minutes);
+        ZaiTime.setText(minutes);
+        ZenTime.setText(minutes);
+        if (changevaluesdialog.getincludepresession()) {PreTime.setText(minutes);}
+        if (changevaluesdialog.getincludepostsession()) {PostTime.setText(minutes);}
     }
 
 // Widget Implementation

@@ -1,0 +1,148 @@
+//package kujiin;
+//
+//import javafx.fxml.FXMLLoader;
+//import javafx.scene.Scene;
+//import javafx.scene.control.Button;
+//import javafx.scene.control.CheckBox;
+//import javafx.scene.control.Label;
+//import javafx.scene.control.TextField;
+//import javafx.stage.Stage;
+//
+//import java.io.IOException;
+//import java.util.ArrayList;
+//
+//public class ChangeSessionValues extends Stage {
+//    public TextField pretime;
+//    public TextField rintime;
+//    public TextField kyotime;
+//    public TextField tohtime;
+//    public TextField shatime;
+//    public TextField kaitime;
+//    public TextField jintime;
+//    public TextField retsutime;
+//    public TextField zaitime;
+//    public TextField zentime;
+//    public TextField posttime;
+//    public CheckBox AmbienceOptionCheckBox;
+//    public Button CancelButton;
+//    public Button CreateSessionButton;
+//    public Button ChangeAllValuesButton;
+//    public Label totalsessiontimeFormattedLabel;
+//    public Label approximatefinishtimeLabel;
+//    ArrayList<Integer> textfieldvalues = new ArrayList<>();
+//    private This_Session this_session;
+//
+//    public ChangeSessionValues(This_Session this_session) {
+//        this.this_session = this_session;
+//        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kujiin/assets/fxml/ChangeSessionValues.fxml"));
+//        fxmlLoader.setController(this);
+//        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Edit This Session's Values");}
+//        catch (IOException e) {e.printStackTrace();}
+//    }
+
+//    @Override
+//    public void initialize(URL location, ResourceBundle resources) {maketextfieldsnumericonly();}
+//
+//    public boolean getambienceenabled() {return AmbienceOptionCheckBox.isSelected();}
+//
+//// Other Methods
+//    public void maketextfieldsnumericonly() {
+//        Tools.numericTextField(pretime);
+//        pretime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//        Tools.numericTextField(rintime);
+//        rintime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//        Tools.numericTextField(kyotime);
+//        kyotime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//        Tools.numericTextField(tohtime);
+//        tohtime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//        Tools.numericTextField(shatime);
+//        shatime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//        Tools.numericTextField(kaitime);
+//        kaitime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//        Tools.numericTextField(jintime);
+//        jintime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//        Tools.numericTextField(retsutime);
+//        retsutime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//        Tools.numericTextField(zaitime);
+//        zaitime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//        Tools.numericTextField(zentime);
+//        zentime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//        Tools.numericTextField(posttime);
+//        posttime.textProperty().addListener((observable, oldValue, newValue) -> {
+//            updatetotalsessiontime();
+//        });
+//    }
+//    public boolean gettextfieldvalues() {
+//        Boolean not_all_zeros = false;
+//        try {
+//            if (textfieldvalues != null) {textfieldvalues.clear();}
+//            textfieldvalues.add(Integer.parseInt(pretime.getText()));
+//            textfieldvalues.add(Integer.parseInt(rintime.getText()));
+//            textfieldvalues.add(Integer.parseInt(kyotime.getText()));
+//            textfieldvalues.add(Integer.parseInt(tohtime.getText()));
+//            textfieldvalues.add(Integer.parseInt(shatime.getText()));
+//            textfieldvalues.add(Integer.parseInt(kaitime.getText()));
+//            textfieldvalues.add(Integer.parseInt(jintime.getText()));
+//            textfieldvalues.add(Integer.parseInt(retsutime.getText()));
+//            textfieldvalues.add(Integer.parseInt(zaitime.getText()));
+//            textfieldvalues.add(Integer.parseInt(zentime.getText()));
+//            textfieldvalues.add(Integer.parseInt(posttime.getText()));
+//            for (Integer i : textfieldvalues) {if (i > 0) {not_all_zeros = true;}}
+//        } catch (NumberFormatException ignored) {}
+//        return not_all_zeros;
+//    }
+//    public void updatetotalsessiontime() {
+//        if (gettextfieldvalues()) {
+//            Integer totalsessiontime = 0;
+//            for (Integer i : textfieldvalues) {totalsessiontime += i;}
+//            totalsessiontimeFormattedLabel.setText(Tools.minutestoformattedhoursandmins(totalsessiontime));
+//            Calendar cal = Calendar.getInstance();
+//            cal.add(Calendar.MINUTE, totalsessiontime);
+//            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+//            approximatefinishtimeLabel.setText(sdf.format(cal.getTime()));
+//        }
+//    }
+//    public void checkambience(ActionEvent actionEvent) {
+//        ambiencecheckboxswitch();
+//        if (AmbienceOptionCheckBox.isSelected()) {
+//            if (gettextfieldvalues()) {
+//                CreateSessionButton.setDisable(true);
+//                CancelButton.setDisable(true);
+//                this_session.checkifambienceisgood(textfieldvalues);
+//            } else {
+//                GuiUtils.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
+//                AmbienceOptionCheckBox.setSelected(false);
+//                ambiencecheckboxswitch();
+//            }
+//        } else {this_session.setAmbienceenabled(false);}
+//    }
+//    public void cancelsessioncreation(ActionEvent actionEvent) {this.close();}
+//    public void createsession(ActionEvent actionEvent) {
+//        }
+//    public void changeallvalues(Event event) {
+//
+//    }
+
+// Presets
+//}
+

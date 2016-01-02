@@ -172,7 +172,7 @@ public class This_Session {
         }
         return false;
     }
-    public void checkifambienceisgood(ArrayList<Integer> textfieldvalues, ChangeSessionValues changeSessionValues) {
+    public void checkifambienceisgood(ArrayList<Integer> textfieldvalues) {
         if (textfieldvaluesareOK(textfieldvalues)) {
             ArrayList<Cut> cutswithnoambience = new ArrayList<>();
             ArrayList<Cut> cutswithreducedambience = new ArrayList<>();
@@ -252,29 +252,11 @@ public class This_Session {
                 cad[0].CancelButton.setOnAction(ev -> task.cancel());
                 cad[0].showAndWait();
             });
-            task.setOnSucceeded(event -> {
-                cad[0].close();
-                changeSessionValues.CreateSessionButton.setDisable(false);
-                changeSessionValues.CancelButton.setDisable(false);
-            });
-            task.setOnCancelled(event -> {
-                cad[0].close();
-                changeSessionValues.AmbienceOptionCheckBox.setSelected(false);
-                changeSessionValues.ambiencecheckboxswitch();
-                changeSessionValues.CreateSessionButton.setDisable(false);
-                changeSessionValues.CancelButton.setDisable(false);
-            });
-            task.setOnFailed(event -> {
-                cad[0].close();
-                changeSessionValues.AmbienceOptionCheckBox.setSelected(false);
-                changeSessionValues.ambiencecheckboxswitch();
-                changeSessionValues.CreateSessionButton.setDisable(false);
-                changeSessionValues.CancelButton.setDisable(false);
-            });
+            task.setOnSucceeded(event -> cad[0].close());
+            task.setOnCancelled(event -> cad[0].close());
+            task.setOnFailed(event -> cad[0].close());
         } else {
             GuiUtils.showinformationdialog("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");
-            changeSessionValues.AmbienceOptionCheckBox.setSelected(false);
-            changeSessionValues.ambiencecheckboxswitch();
         }
     }
     public boolean sessioncreationwellformednesschecks(ArrayList<Integer> textfieldtimes) {
@@ -350,11 +332,6 @@ public class This_Session {
         }
         cutsinsession.add(postsession);
         return cutsinsession.size() > 0;
-    }
-    public void changesessionvalues() {
-        ChangeSessionValues changeSessionValues = new ChangeSessionValues(this);
-        changeSessionValues.showAndWait();
-        setAmbienceenabled(changeSessionValues.getambienceenabled());
     }
     public boolean create(ArrayList<Integer> textfieldtimes) {
         if (sessioncreationwellformednesschecks(textfieldtimes)) {
