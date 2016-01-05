@@ -404,12 +404,18 @@ public class Cut {
 
     // <----------------------------------- EXPORT --------------------------------------> //
 
-    public boolean export() {System.out.println("Need To Work On This"); return false;}
+    public boolean export() {
+        concatanateentrainment();
+        if (ambienceenabled) {
+            concatanateambience();
+            mixentrainmentandambience();
+        }
+        return false;
+    }
     public boolean concatanateentrainment() {
     // Write Entrainment List To File For FFMPEG To Use
         try {
-            PrintWriter writer = null;
-            writer = new PrintWriter(tempentrainmenttextfile);
+            PrintWriter writer = new PrintWriter(tempentrainmenttextfile);
             for (File k : entrainmentlist) {writer.println("file " + "\'" + k.getAbsolutePath() + "\'");}
             writer.close();
             // Call FFMpeg To Concatenate The Files

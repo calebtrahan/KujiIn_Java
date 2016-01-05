@@ -5,6 +5,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
@@ -326,65 +327,75 @@ public class This_Session {
 
 // Export
     public boolean export() {
-        // Exports The This_Session
-//        Task<Boolean> task = new Task<Boolean>() {
-//            @Override
-//            protected Boolean call() throws Exception {
-//                for (Cut i : cutsinsession) {
-//                    if (isCancelled()) {return false;}
-//                    updateMessage("Currently Creating " + i.name);
-//                    updateProgress((double) cutsinsession.indexOf(i), (double) cutsinsession.size() - 1);
-//                    boolean cutcreatedsuccesfully = i.export();
-//                    if (! cutcreatedsuccesfully) {return false;}
-//                    updateMessage("Finished Creating " + i.name);
-//                }
-//                return getCreated();
-//            }
-//        };
-//        creatingSessionDialog.creatingsessionProgressBar.progressProperty().bind(task.progressProperty());
-//        creatingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(task.messageProperty());
-//        creatingSessionDialog.CancelButton.setOnAction(event -> task.cancel());
-//        task.setOnSucceeded(event -> {
-//            if (task.getValue()) {
-//                Alert a = new Alert(Alert.AlertType.INFORMATION);
-//                a.setTitle("Created Succeeded");
-//                a.setHeaderText("Creation Completed With No Errors");
-//                a.setContentText("You Can Now Play Or Export This This_Session");
-//                a.showAndWait();
-//                creatingSessionDialog.close();
-//                if (createANewSession != null) {
-//                    createANewSession.close();
-//                }
-//            } else {
-//                Alert a = new Alert(Alert.AlertType.ERROR);
-//                a.setTitle("Creation Failed");
-////                    String v = task.getException().getMessage();
-//                a.setHeaderText("Errors Occured While Trying To Create The This_Session. Please Try Again Or Contact Me For Support ");
-//                a.setContentText("Please Try Again Or Contact Me For Support");
-//                a.showAndWait();
-//                This_Session.deleteprevioussession();
-//                creatingSessionDialog.close();
-//            }
-//        });
-//        task.setOnFailed(event -> {
-//            Alert a = new Alert(Alert.AlertType.ERROR);
-//            a.setTitle("Creation Failed");
-//            String v = task.getException().getMessage();
-//            a.setHeaderText("Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v);
-//            a.setContentText("Please Try Again Or Contact Me For Support");
-//            a.showAndWait();
-//            This_Session.deleteprevioussession();
-//            creatingSessionDialog.close();
-//        });
-//        task.setOnCancelled(event -> {
-//            Alert a = new Alert(Alert.AlertType.WARNING);
-//            a.setTitle("Creation Cancelled");
-//            a.setHeaderText("You Cancelled The This_Session Creation");
-//            a.setContentText("Re-Create To Play Or Export");
-//            a.showAndWait();
-//            This_Session.deleteprevioussession();
-//            creatingSessionDialog.close();
-//        });
+        FileChooser fileChooser = new FileChooser();
+        File exportfile = fileChooser.showOpenDialog(null);
+        if (exportfile == null) {return false;}
+        ExportingSessionDialog exportingSessionDialog = new ExportingSessionDialog(this);
+        Service<Boolean> exporterservice = new Service<Boolean>() {
+            @Override
+            protected Task<Boolean> createTask() {
+                return new Task<Boolean>() {
+                    @Override
+                    protected Boolean call() throws Exception {
+                    // Combine Cut Entrainment + Ambience
+                        for (Cut i : cutsinsession) {
+                            if (isCancelled()) {return false;}
+                            updateMessage("Currently Creating " + i.name);
+                            updateProgress((double) cutsinsession.indexOf(i), (double) cutsinsession.size() - 1);
+                            boolean cutcreatedsuccesfully = i.export();
+                            if (!cutcreatedsuccesfully) {return false;}
+                            updateMessage("Finished Creating " + i.name);
+                        }
+                    // Combine Cut Files + Alert Files into Exportfile
+
+                    // Test Exportfile To Make Sure It's Not Zero And Doesn't Throw An Error When Opened In A Mediaplayer
+
+                        return exportfile.exists();
+                    }
+                };
+            }
+        };
+        exportingSessionDialog.creatingsessionProgressBar.progressProperty().bind(exporterservice.progressProperty());
+        exportingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(exporterservice.messageProperty());
+        exportingSessionDialog.CancelButton.setOnAction(event -> exporterservice.cancel());
+        exporterservice.setOnSucceeded(event -> {
+            if (exporterservice.getValue()) {
+                Alert a = new Alert(Alert.AlertType.INFORMATION);
+                a.setTitle("Export Succeeded");
+                a.setHeaderText("Creation Completed With No Errors");
+                a.setContentText("You Can Now Play Or Export This This_Session");
+                a.showAndWait();
+                exportingSessionDialog.close();
+            } else {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Creation Failed");
+//                    String v = task.getException().getMessage();
+                a.setHeaderText("Errors Occured While Trying To Create The This_Session. Please Try Again Or Contact Me For Support ");
+                a.setContentText("Please Try Again Or Contact Me For Support");
+                a.showAndWait();
+                This_Session.deleteprevioussession();
+                exportingSessionDialog.close();
+            }
+        });
+        exporterservice.setOnFailed(event -> {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setTitle("Creation Failed");
+            String v = exporterservice.getException().getMessage();
+            a.setHeaderText("Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v);
+            a.setContentText("Please Try Again Or Contact Me For Support");
+            a.showAndWait();
+            This_Session.deleteprevioussession();
+            exportingSessionDialog.close();
+        });
+        exporterservice.setOnCancelled(event -> {
+            Alert a = new Alert(Alert.AlertType.WARNING);
+            a.setTitle("Creation Cancelled");
+            a.setHeaderText("You Cancelled The This_Session Creation");
+            a.setContentText("Re-Create To Play Or Export");
+            a.showAndWait();
+            This_Session.deleteprevioussession();
+            exportingSessionDialog.close();
+        });
         return false;
     }
 

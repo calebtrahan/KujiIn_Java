@@ -14,6 +14,7 @@ import kujiin.util.lib.GuiUtils;
 import kujiin.util.states.CreatorState;
 import kujiin.util.states.ExporterState;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,6 +92,12 @@ public class CreatorAndExporterWidget implements Widget{
 // Getters And Setters
     public void setCreatorState(CreatorState creatorState) {this.creatorState = creatorState;}
     public CreatorState getCreatorState() {return creatorState;}
+    public ExporterState getExporterState() {
+        return exporterState;
+    }
+    public void setExporterState(ExporterState exporterState) {
+        this.exporterState = exporterState;
+    }
 
 // Button Actions
     public boolean createsession() {
@@ -103,9 +110,25 @@ public class CreatorAndExporterWidget implements Widget{
         }
         else {GuiUtils.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid"); return false;}
     }
+    public boolean checkforffmpeg() {
+        boolean good = false;
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(Arrays.asList("ffmpeg", "-version"));
+            final Process checkforffmpeg = processBuilder.start();
+            checkforffmpeg.waitFor();
+            good = checkforffmpeg.exitValue() == 0;
+        } catch (IOException ignored) {} catch (InterruptedException e) {
+            e.printStackTrace();
+            good = false;
+        }
+        return good;
+    }
     public void exportsession() {
-        createsession();
-        // EXPORT HERE
+        if (checkforffmpeg()) {
+            createsession();
+        } else {
+            GuiUtils.showerrordialog("Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
+        }
     }
 
 // Other Methods
@@ -200,21 +223,23 @@ public class CreatorAndExporterWidget implements Widget{
         } else {this_session.setAmbienceenabled(false);}
     }
     public void changeallvalues() {
-        ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(null);
+        ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog();
         changevaluesdialog.showAndWait();
-        Integer min = changevaluesdialog.getminutes();
-        String minutes = min.toString();
-        RinTime.setText(minutes);
-        KyoTime.setText(minutes);
-        TohTime.setText(minutes);
-        ShaTime.setText(minutes);
-        KaiTime.setText(minutes);
-        JinTime.setText(minutes);
-        RetsuTime.setText(minutes);
-        ZaiTime.setText(minutes);
-        ZenTime.setText(minutes);
-        if (changevaluesdialog.getincludepresession()) {PreTime.setText(minutes);}
-        if (changevaluesdialog.getincludepostsession()) {PostTime.setText(minutes);}
+        if (changevaluesdialog.getAccepted()) {
+            Integer min = changevaluesdialog.getminutes();
+            String minutes = min.toString();
+            RinTime.setText(minutes);
+            KyoTime.setText(minutes);
+            TohTime.setText(minutes);
+            ShaTime.setText(minutes);
+            KaiTime.setText(minutes);
+            JinTime.setText(minutes);
+            RetsuTime.setText(minutes);
+            ZaiTime.setText(minutes);
+            ZenTime.setText(minutes);
+            if (changevaluesdialog.getincludepresession()) {PreTime.setText(minutes);}
+            if (changevaluesdialog.getincludepostsession()) {PostTime.setText(minutes);}
+        }
     }
 
 // Widget Implementation
@@ -280,5 +305,4 @@ public class CreatorAndExporterWidget implements Widget{
         ZenTime.setText("-");
         PostTime.setText("-");
     }
-
 }

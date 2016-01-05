@@ -2,7 +2,6 @@ package kujiin.dialogs;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,7 +13,7 @@ import kujiin.This_Session;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class CreatingSessionDialog extends Stage {
+public class ExportingSessionDialog extends Stage {
     public ProgressBar creatingsessionProgressBar;
     public Label creatingsessionTextStatusBar;
     public Button CancelButton;
@@ -23,10 +22,10 @@ public class CreatingSessionDialog extends Stage {
     This_Session thisSession;
     ArrayList<Cut> cutsinsesession;
 
-    public CreatingSessionDialog(Parent parent, This_Session thisSession) {
+    public ExportingSessionDialog(This_Session thisSession) {
 //        this.cutsinsesession = cutsinsesession;
 //        percent = sessionpartialpercent / 100;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CreatingSessionDialog.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ExportingSessionDialog.fxml"));
         fxmlLoader.setController(this);
         try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
         catch (IOException e) {e.printStackTrace();}

@@ -4,7 +4,6 @@ package kujiin.dialogs;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -22,20 +21,30 @@ public class ChangeAllValuesDialog extends Stage implements Initializable {
     public TextField changeAllValuesMinutesTextField;
     public CheckBox PresessionCheckbox;
     public CheckBox PostsessionCheckBox;
+    private Boolean accepted;
 
-    public ChangeAllValuesDialog(Parent parent) {
+    public ChangeAllValuesDialog() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ChangeAllValuesDialog.fxml"));
         fxmlLoader.setController(this);
         try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Change All Values To:");}
         catch (IOException e) {e.printStackTrace();}
+        setAccepted(false);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Tools.numericTextField(changeAllValuesMinutesTextField);
     }
+// Getters And Setters
+    public Boolean getAccepted() {
+    return accepted;
+}
+    public void setAccepted(Boolean accepted) {
+        this.accepted = accepted;
+    }
 
-    public void acceptbuttonpressed(Event event) {this.close();}
+// Button Actions
+    public void acceptbuttonpressed(Event event) {setAccepted(true); this.close();}
     public void cancelbuttonpressed(Event event) {this.close();}
     public boolean getincludepresession() {return PresessionCheckbox.isSelected();}
     public boolean getincludepostsession() {return PostsessionCheckBox.isSelected();}
@@ -43,4 +52,5 @@ public class ChangeAllValuesDialog extends Stage implements Initializable {
         try {return Integer.parseInt(changeAllValuesMinutesTextField.getText());}
         catch (NumberFormatException e) {return 0;}
     }
+
 }

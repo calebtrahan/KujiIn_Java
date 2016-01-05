@@ -208,7 +208,7 @@ public class Root implements Initializable {
 //            StatusBar.setText("Session Creation In Progress");
 //        }
     }
-    public void exportsession(Event event) {this_session.export();}
+    public void exportsession(Event event) {creatorAndExporterWidget.exportsession();}
     public void settextfieldvalue(TextField textField, Integer value) {
         if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
         else {textField.setText("-"); textField.setDisable(true);}

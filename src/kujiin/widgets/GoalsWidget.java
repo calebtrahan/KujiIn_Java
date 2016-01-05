@@ -110,5 +110,4 @@ public class GoalsWidget implements Widget{
     public float getpercentage(double practicedhours, double goalhours) {
         return (float) practicedhours / (float) goalhours;
     }
-
 }
