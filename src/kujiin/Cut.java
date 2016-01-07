@@ -58,8 +58,7 @@ public class Cut {
         finalambiencefile = new File(This_Session.directorytemp, "Ambience/" + name + ".mp3");
     }
 
-    // <-------------------------- GETTERS AND SETTERS ------------------------------------> //
-
+// Getters And Setters
     public int getdurationinseconds() {
         int audiodurationinseconds;
         audiodurationinseconds = duration;
@@ -109,8 +108,7 @@ public class Cut {
     }
     public void setCutstoplay(ArrayList<Cut> cutstoplay) {this.cutstoplay = cutstoplay;}
 
-    // <-------------------------- GENERAL CREATION METHODS ---------------------------------> //
-
+// Creation
     public boolean hasanyAmbience() {
         ambiencefiles = new ArrayList<>();
         ambiencefiledurations = new ArrayList<>();
@@ -144,6 +142,7 @@ public class Cut {
         else {return makeEntrainmentList();}
     }
     public boolean makeEntrainmentList() {
+        // TODO Add 5 Min Entrainment Files, And Refactor This Here
         entrainmentlist = new ArrayList<>();
         entrainmentmedia = new ArrayList<>();
         if (number == 0) {                                                                                              // Presession
@@ -201,22 +200,18 @@ public class Cut {
                 entrainmentlist.add(thisfile);
             }
         }
-//        System.out.println(name + "'s Entrainment List");
-//        for (File i : entrainmentlist) {
-//            System.out.println(i.getName());
-//        }
         for (File i : entrainmentlist) {entrainmentmedia.add(new Media(i.toURI().toString()));}
         return entrainmentmedia.size() > 0;
     }
     public boolean makeAmbienceList() {
+        // TODO Check Ambience List Generators To Make Sure There Are No Repeats
+        // TODO Set Really High Durations, So You Can See If It Works For Really Long Sessions
         ambiencelist = new ArrayList<>();
         ambiencemedia = new ArrayList<>();
-        // RANDOM!
         double currentduration = 0.0;
         double sessionduration = (double) getdurationinseconds();
         Random randint = new Random();
         while (currentduration < sessionduration) {
-//            System.out.println("CurrentDuration (" + currentduration + ") Is Less Than SessionDuration (" + sessionduration + ")");
             File tempfile = ambiencefiles.get(randint.nextInt(ambiencefiles.size() - 1));
             double tempduration = ambiencefiledurations.get(ambiencefiles.indexOf(tempfile));
             if (hasenoughAmbience()) {
@@ -270,21 +265,22 @@ public class Cut {
                             currentduration += tempduration;
                         }
                     } else {
-                        System.out.println("Nothing Qualified, Your Logic Is Fucked Up");
+                        System.out.println("Your Ambience List Generator Logic Is Fucked Up");
                     }
                 }
             }
         }
-//        System.out.println(name + "'s Ambience");
-//        for (File i : ambiencelist) {
-//            System.out.println(i.getName());
-//        }
-        for (File i : ambiencelist) {ambiencemedia.add(new Media(i.toURI().toString()));}
+        System.out.println(name + "'s Ambience:");
+        int count = 1;
+        for (File i : ambiencelist) {
+            System.out.println(count + ") " + i.getName());
+            ambiencemedia.add(new Media(i.toURI().toString()));
+            count++;
+        }
         return currentduration > sessionduration && ambiencemedia.size() > 0;
     }
 
-    // <----------------------------------- PLAYBACK --------------------------------------> //
-
+// Playback
     public void startplayback() {
         entrainmentplaycount = 0;
         ambienceplaycount = 0;
@@ -348,23 +344,23 @@ public class Cut {
     }
     public void updatecuttime() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            if (secondselapsed <= MainController.FADEINDURATION) {
-                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / MainController.FADEINDURATION;
+            if (secondselapsed <= PlayerWidget.FADEINDURATION) {
+                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEINDURATION;
                 double entrainmentvolume = secondselapsed * entrainmentincrement;
                 getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
                 if (ambienceenabled) {
-                    double ambienceincrement = thisession.getSessionAmbienceVolume() / MainController.FADEINDURATION;
+                    double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEINDURATION;
                     double ambiencevolume = secondselapsed * ambienceincrement;
                     getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                 }
             }
-            else if (secondselapsed >= getdurationinseconds() - MainController.FADEOUTDURATION) {
+            else if (secondselapsed >= getdurationinseconds() - PlayerWidget.FADEOUTDURATION) {
                 int secondsleft = getdurationinseconds() - secondselapsed;
-                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / MainController.FADEOUTDURATION;
+                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEOUTDURATION;
                 double entrainmentvolume = secondsleft * entrainmentincrement;
                 getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
                 if (ambienceenabled) {
-                    double ambienceincrement = thisession.getSessionAmbienceVolume() / MainController.FADEOUTDURATION;
+                    double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEOUTDURATION;
                     double ambiencevolume =  secondsleft * ambienceincrement;
                     getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                 }
@@ -401,8 +397,7 @@ public class Cut {
     public String getcurrenttimeformatted() {return Tools.formatlengthshort(secondselapsed + 1);}
     public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
 
-    // <----------------------------------- EXPORT --------------------------------------> //
-
+// Export
     public boolean export() {
         concatanateentrainment();
         if (ambienceenabled) {

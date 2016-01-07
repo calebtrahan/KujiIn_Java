@@ -15,7 +15,6 @@ import java.util.Random;
 
 //enum AmbienceOption {General, Specific};
 
-// TODO Continue Encapsulating This And Connect New Logic (Or Maybe Put Creating
 //  Threads In Session Or As Part Of Creating Session Dialog
 
 public class Cut {
@@ -46,7 +45,7 @@ public class Cut {
         this.number = number;
         this.name = name;
         this.ramp = ramp;
-        if (this.ramp) { this.rampduration = 2;} // TODO This Can Be Set In Options
+        if (this.ramp) { this.rampduration = 2;}
         this.duration = duration;
         this.thisession = thisession;
         ambiencedirectory = new File(Session.directoryambience, name);
@@ -232,7 +231,6 @@ public class Cut {
             Boolean postsessionisnext = false;
             if (cutstoplay.size() - cutstoplay.indexOf(this) <= 2) {postsessionisnext = true;}
             File tohmainfile = new File(Session.directorymaincuts, "TOH.mp3");
-            // TODO Add 3inpostsession for if going straight into TOH
             File rampin1 = new File(Session.directorytohramp, "3in1.mp3");
             File rampin2 = new File(Session.directorytohramp, "3in2.mp3");
             File rampout1 = new File(Session.directorytohramp, "3out1.mp3");

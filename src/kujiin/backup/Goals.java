@@ -17,7 +17,6 @@
 //import java.util.ArrayList;
 //import java.util.Date;
 //
-//// TODO Refactor Goals Into XML Bindings (From Sqlite)
 //public class Goals {
 ////    Root root;
 ////    public ArrayList<CurrentGoal> currentgoals = new ArrayList<>();
@@ -131,9 +130,7 @@
 ////                }
 ////                if (idstomovetocompleted.size() > 0) {
 ////                    if (idstomovetocompleted.size() > 1) {
-////                        // TODO Dialog Here Multiple Goals Completed!!!
 ////                    } else {
-////                        // TODO Dialog Here Single Goal Completed!!!
 ////                    }
 ////                }
 ////            } catch (SQLException e) {e.printStackTrace();}

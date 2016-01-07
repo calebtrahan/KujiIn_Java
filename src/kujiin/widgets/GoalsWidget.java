@@ -161,7 +161,6 @@ public class GoalsWidget implements Widget{
             }
         }
     }
-
     public static class DisplayCurrentGoalsDialog extends Stage {
         public TableView<CurrentGoalBinding> currentgoaltable;
         public TableColumn<CurrentGoalBinding, Integer> NumberColumn;
@@ -204,7 +203,6 @@ public class GoalsWidget implements Widget{
             }
         }
     }
-
     public static class DisplayPrematureEndingsDialog extends Stage {
 
         public TableView<PrematureEnding> prematureendingTable;
@@ -249,7 +247,6 @@ public class GoalsWidget implements Widget{
         }
 
     }
-
     public static class GoalPacingDialog extends Stage implements Initializable {
 
         public GoalPacingDialog(Parent parent, CurrentGoal currentGoal) {
@@ -264,7 +261,6 @@ public class GoalsWidget implements Widget{
 
         }
     }
-
     public static class PrematureEndingDialog extends Stage {
 
         public PrematureEndingDialog() {
@@ -275,7 +271,6 @@ public class GoalsWidget implements Widget{
         }
 
     }
-
     public static class SetANewGoalDialog extends Stage {
         public Spinner<Integer> GoalHoursSpinner;
         public DatePicker GoalDatePicker;
@@ -351,4 +346,7 @@ public class GoalsWidget implements Widget{
 
 
     }
+    public static class SingleGoalComplete extends Stage {}
+    public static class MultipleGoalsComplete extends Stage {}
+
 }

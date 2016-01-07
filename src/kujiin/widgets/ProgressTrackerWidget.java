@@ -73,7 +73,6 @@ public class ProgressTrackerWidget implements Widget {
 // Getters And Setters
     public Sessions getSessions() {return sessions;}
 
-
 // Button Actions
     public void displaydetailedcutprogress() {
         if (sessions.getSession() != null) {new DisplayCutTotalsDialog(sessions.getSession());}
@@ -227,11 +226,10 @@ public class ProgressTrackerWidget implements Widget {
             }
 
             public String toString() {
-                String a = String.format("%s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s",
+                return String.format("%s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s",
                         id.getValue(), datepracticed.getValue(), presession.getValue(), rin.getValue(), kyo.getValue(),
                         toh.getValue(), sha.getValue(), kai.getValue(), jin.getValue(), retsu.getValue(), zai.getValue(),
                         zen.getValue(), postsession.getValue(), total.getValue());
-                return a;
             }
 
             public StringProperty getDatepracticed() {
@@ -239,8 +237,6 @@ public class ProgressTrackerWidget implements Widget {
             }
         }
     }
-
-
     public static class DisplayCutTotalsDialog extends Stage {
         public TableView<TotalProgressRow> progresstable;
         public TableColumn<TotalProgressRow, String> NameColumn;
@@ -285,4 +281,5 @@ public class ProgressTrackerWidget implements Widget {
             }
         }
     }
+
 }

@@ -36,10 +36,6 @@ import java.net.URL;
 import java.util.*;
 
 public class MainController implements Initializable {
-    // TODO Add Audio Filters To Entrainment + Ambience (They Are Fucking Up Saying They Can't Find The Codec Mp3)
-    // TODO Check Ambience List Generators To Make Sure There Are No Repeats
-        // Random Is Throwing java.lang.IllegalArgumentException: bound must be positive
-        // Set Really High Durations, So You Can See If It Works For Really Long Sessions
 
     public Label StatusBar;
     public Button ExportButton;
@@ -88,18 +84,12 @@ public class MainController implements Initializable {
     public TextField ApproximateEndTime;
     public Button ChangeValuesButton;
     public TextField TotalSessionTime;
-// Widget Classes
     private This_Session this_session;
     private GoalsWidget goalsWidget;
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private PlayerWidget playerWidget;
     private ProgressTrackerWidget progressTrackerWidget;
-// Volume Constants
-    public static Double ENTRAINMENTVOLUME = 0.6;
-    public static Double AMBIENCEVOLUME = 1.0;
-    public static Double FADEOUTDURATION = 10.0;
-    public static Double FADEINDURATION = 10.0;
-// Event Handlers
+    // Event Handlers
     public static final EventHandler<KeyEvent> noneditabletextfield = event -> Tools.showinformationdialog("Information", "Can't Enter Text", "This Text Field Can't Be Edited");
 
     @Override
@@ -179,7 +169,6 @@ public class MainController implements Initializable {
                 settextfieldvalue(ZenTime, cuttimes.get(9));
                 session.updatecutduration(10, cuttimes.get(10));
                 settextfieldvalue(PostTime, cuttimes.get(10));
-                // TODO Get This_Session Information Here And Pass Into Root Boxes PRE-POSTTime
             }
             // Set Ambience Enabled And This_Session Total Time
 //            if (this_session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes"); AmbienceEnabledTextField.setDisable(false);}
@@ -197,7 +186,6 @@ public class MainController implements Initializable {
 
     }
     public void createsession(Event event) {
-
 //        if (creatorState == CreatorState.NOT_CREATED || creatorState == CreatorState.CREATED) {
 //            if (creatorState == CreatorState.CREATED) {
 //                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -214,7 +202,6 @@ public class MainController implements Initializable {
 //            createsession.showAndWait();
 //            if (getsessioninformation()) {creatorState = CreatorState.CREATED;}
 //            else {
-//                // TODO Show Creation Failed Alert Here
 //                creatorState = CreatorState.NOT_CREATED;
 //            }
 //        } else {
@@ -485,7 +472,6 @@ public class MainController implements Initializable {
         private AmbienceSong selected_current_ambiencesong;
         private File tempdirectory;
 
-        // TODO Continue Setting This Up
         @Override
         public void initialize(URL location, ResourceBundle resources) {
             New_NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
@@ -693,7 +679,6 @@ public class MainController implements Initializable {
 
     // Other Methods
         public void preview(ActionEvent actionEvent) {
-            // TODO This Starts & Stops The File Passed Into The Preview Player
             if (previewmediaplayer != null && previewmedia != null) {
                 if (previewmediaplayer.getStatus() == MediaPlayer.Status.PLAYING) {
                     previewmediaplayer.stop();
@@ -772,4 +757,5 @@ public class MainController implements Initializable {
         }
 
     }
+
 }

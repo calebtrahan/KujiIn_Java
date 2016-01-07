@@ -55,7 +55,6 @@ public class CreatorAndExporterWidget implements Widget{
     private This_Session this_session;
     private ArrayList<Integer> textfieldtimes = new ArrayList<>(11);
 
-    // TODO Encapsulate All Creator And Exporter Logic Here (Maybe Put ChangeAllValues As A Subclass?)
     public CreatorAndExporterWidget(Button changeallvaluesbutton, Button exportButton, Button loadpresetbutton, Button savepresetbutton, CheckBox ambienceswitch,
                                     TextField totalSessionTimeTextField, TextField approximateendtime, TextField preTime, TextField rinTime, TextField kyoTime,
                                     TextField tohTime, TextField shaTime, TextField kaiTime, TextField jinTime,
@@ -308,6 +307,7 @@ public class CreatorAndExporterWidget implements Widget{
         PostTime.setText("-");
     }
 
+// Subclasses/Dialogs
     public static class ChangeAllValuesDialog extends Stage implements Initializable {
         public Button AcceptButton;
         public Button CancelButton;
@@ -347,7 +347,6 @@ public class CreatorAndExporterWidget implements Widget{
         }
 
     }
-
     public static class ExportingSessionDialog extends Stage {
         public ProgressBar creatingsessionProgressBar;
         public Label creatingsessionTextStatusBar;
@@ -385,7 +384,6 @@ public class CreatorAndExporterWidget implements Widget{
         public void testifdone() {
     //        if (currentpartcount == sessionparts) {
     //            if (thisSession.getCreated()) {
-    //                // TODO Dialog -> "This_Session Successfully Created!"
     //                Alert completed = new Alert(Alert.AlertType.INFORMATION);
     //                completed.setTitle("This_Session Created");
     //                completed.setHeaderText("Completed!");
@@ -407,7 +405,6 @@ public class CreatorAndExporterWidget implements Widget{
     //        Platform.runLater(() -> creatingsessionTextStatusBar.setText(text));
         }
     }
-
     public static class CheckingAmbienceDialog extends Stage {
         public Button CancelButton;
         public Label Message;
@@ -419,7 +416,6 @@ public class CreatorAndExporterWidget implements Widget{
              catch (IOException e) {e.printStackTrace();}
         }
     }
-
     public static class SessionNotWellformedDialog extends Stage {
         public Button returntoCreatorButton;
         public Button addmissingCutsButton;
@@ -518,7 +514,6 @@ public class CreatorAndExporterWidget implements Widget{
 
         public void setCreatesession(boolean createsession) {this.createsession = createsession;}
     }
-
     public static class CutInvocationDialog extends Stage implements Initializable{
         public Button CancelButton;
         public Button OKButton;
@@ -577,11 +572,12 @@ public class CreatorAndExporterWidget implements Widget{
         }
     }
 
+// Enums
     public enum CreatorState {
         NOT_CREATED, CREATION_IN_PROGRESS, CREATED
     }
-
     public enum ExporterState {
         IDLE, EXPORT_IN_PROGRESS, EXPORTED
     }
+
 }

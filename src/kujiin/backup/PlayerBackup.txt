@@ -54,7 +54,6 @@ public class Player {
             ambienceplayer.play();
         }
         partindex++;
-        // TODO Add Alert Here (Maybe Using Odd And Even Numbers?)
         entrainmentplayer.setOnEndOfMedia(() -> {
             System.out.println("Called End Of Media");
             if (entrainmentplayer != null) {entrainmentplayer.dispose();}
@@ -93,7 +92,6 @@ public class Player {
     }
 
     public void updateplayerui() {
-        // TODO CONTINUE HERE, THE TOTAL PROGRESS IS UPDATING FUCKED UP
         int currenttimeseconds = (int) entrainmentplayer.getCurrentTime().toSeconds();
         PlayercurrentlyplayingLabel.setText(currentcut.name);
         PlayercurrentcutprogressLabel.setText(String.valueOf(Tools.formatcurrentcutprogress(currentcut, currenttimeseconds)));

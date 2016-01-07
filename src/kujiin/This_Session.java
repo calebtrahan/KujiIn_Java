@@ -3,8 +3,6 @@ package kujiin;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.control.*;
@@ -118,10 +116,6 @@ public class This_Session {
             totaltime += i.getdurationinminutes();
         }
         return Tools.minutestoformattedhoursandmins(totaltime);
-    }
-    public ObservableList<String> getsessiondetails() {
-        // TODO This_Session Details Go In Here
-        return FXCollections.observableArrayList();
     }
     public PlayerWidget.PlayerState getPlayerState() {return playerState;}
     public void setPlayerState(PlayerWidget.PlayerState playerState) {this.playerState = playerState;}
@@ -242,7 +236,6 @@ public class This_Session {
                     return null;
                 }
             };
-            // TODO Display Task Message In A Modal Alert Dialog
             new Thread(task).start();
             final CreatorAndExporterWidget.CheckingAmbienceDialog[] cad = new CreatorAndExporterWidget.CheckingAmbienceDialog[1];
             task.setOnRunning(event -> {
@@ -280,7 +273,6 @@ public class This_Session {
             }
             CreatorAndExporterWidget.SessionNotWellformedDialog notWellformedDialog = new CreatorAndExporterWidget.SessionNotWellformedDialog(null, textfieldtimes, cutsmissingtext.toString(), lastcutindex);
             notWellformedDialog.showAndWait();
-            // TODO CONTINUE HERE
             if (notWellformedDialog.isCreatesession()) {
                 int invocationduration = notWellformedDialog.getInvocationduration();
                 for (int i : indexestochange) {textfieldtimes.set(i, invocationduration);}
@@ -398,7 +390,6 @@ public class This_Session {
     }
 
 // Playback
-    // TODO Player Is Stopping Partially In (One Beep) Into Alert After TOH Ends, And Before SHA Starts
     public void startplayback() {
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
@@ -409,8 +400,8 @@ public class This_Session {
         currentcuttimeline.play();
         cutcount = 0;
         currentcut = cutsinsession.get(cutcount);
-        setSessionEntrainmentVolume(MainController.ENTRAINMENTVOLUME);
-        setSessionAmbienceVolume(MainController.AMBIENCEVOLUME);
+        setSessionEntrainmentVolume(PlayerWidget.ENTRAINMENTVOLUME);
+        setSessionAmbienceVolume(PlayerWidget.AMBIENCEVOLUME);
         playthiscut();
         sessions.createnewsession();
     }
@@ -484,9 +475,8 @@ public class This_Session {
         int secondsleft = currentcut.getdurationinseconds() / currentcut.getSecondselapsed();
         int secondspracticed = currentcut.getdurationinseconds() - secondsleft;
         Double minutes = Math.floor(secondspracticed / 60);
-
         sessions.getcurrentsession().updatecutduration(currentcut.number, minutes.intValue());
-        // TODO Get Premature Ending Reason (If You Decide To Include It) Here
+        // TODO Get Premature Ending Reason Here
         String prematureendingreason = "";
         sessions.getcurrentsession().writeprematureending(currentcut.name, prematureendingreason);
 //        try {Sessions.addnewsession(TemporarySession);}
@@ -551,7 +541,7 @@ public class This_Session {
 //        try {sessions.addnewsession(TemporarySession);}
 //        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
         if (Tools.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {export();}
-        // TODO Update Goal Widget
+        // TODO Update Goal Widget Here
     }
     public void resetthissession() {
         currentcuttimeline = null;
@@ -603,7 +593,6 @@ public class This_Session {
 
     }
 
-
 // Reference Files
     public boolean choosereferencetype() {
         PlayerWidget.ReferenceTypeDialog reftype = new PlayerWidget.ReferenceTypeDialog(referenceType, referencefullscreenoption);
@@ -623,7 +612,6 @@ public class This_Session {
         }
     }
     public void displayreferencefile() {
-        // TODO Open And Display Reference File
         displayReference = new PlayerWidget.DisplayReference(currentcut, referenceType, referencefullscreenoption);
         displayReference.show();
     }
@@ -651,7 +639,6 @@ public class This_Session {
         }
     }
     public void saveaspreset(Session session) {
-        // TODO Save One Individual Session As .xml File
         File xmlfile = new FileChooser().showSaveDialog(null);
         if (xmlfile != null) {
             try {
@@ -661,11 +648,11 @@ public class This_Session {
                 Tools.showinformationdialog("Information", "Preset Saved", "Your Preset Was Successfully Saved");
             } catch (JAXBException e) {
                 Tools.showerrordialog("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
-        }
+        } else {Tools.showtimedmessage(StatusBar, "Canceled Saving Preset", 2000);}
     }
 
 // Log Session
-    // TODO Create A Log That Logs Creating, Exporting And Troubleshoots And Issues With Session
+    // TODO Create A Log File
     private static void clearlogfile() {
         try {
             FileWriter clearlog = new FileWriter(logfile);

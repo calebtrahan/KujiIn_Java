@@ -9,7 +9,10 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import kujiin.*;
+import kujiin.Cut;
+import kujiin.This_Session;
+import kujiin.Tools;
+import kujiin.Widget;
 import kujiin.xml.Sessions;
 
 import java.io.BufferedInputStream;
@@ -18,6 +21,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class PlayerWidget implements Widget {
+    public static Double ENTRAINMENTVOLUME = 0.6;
+    public static Double AMBIENCEVOLUME = 1.0;
+    public static Double FADEOUTDURATION = 10.0;
+    public static Double FADEINDURATION = 10.0;
     private CheckBox onOffSwitch;
     private Button AdjustVolumeButton;
     private Button PlayButton;
@@ -37,14 +44,6 @@ public class PlayerWidget implements Widget {
     private This_Session Session;
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private ReferenceType referenceType;
-    // TODO Figure Out Where To Encapsulate The Play Logic (Here Or In Session)
-        // So That Only One Session Is Actived At A Time, And We Don't Have Duplicates
-    // TODO !!!!!!!!!!!!!!!!!!!!! Set On (Ambience/Entrainment) Media Error
-        // Pause Whichever (ambience/entrainment) Is Working
-        // -> Alert Confirmation Dialog
-            //  (Ambience/Entrainment For $Cutname Failed)
-            //  Cannot Play $Songname
-            //  Retry Playing (Song name) [Start Over Playing The Cut Again] || Stop Playback Completely
 
     public PlayerWidget(CheckBox OnOffSwitch, Button adjustVolumeButton, Button playButton, Button pauseButton, Button stopButton,
                         Label cutPlayingText, Label sessionPlayingText, Label cutCurrentTime, Label cutTotalTime,
@@ -205,8 +204,8 @@ public class PlayerWidget implements Widget {
             else {AmbienceSlider.setDisable(true);}
             if (currentcut.getCurrentEntrainmentPlayer() != null) {currentcut.getCurrentEntrainmentPlayer().volumeProperty().bind(EntrainmentSlider.valueProperty());}
             else {EntrainmentSlider.setDisable(true);}
-            AmbienceSlider.setValue(MainController.AMBIENCEVOLUME);
-            EntrainmentSlider.setValue(MainController.ENTRAINMENTVOLUME);
+            AmbienceSlider.setValue(AMBIENCEVOLUME);
+            EntrainmentSlider.setValue(ENTRAINMENTVOLUME);
         }
 
         public Double getEntrainmentVolume() {return EntrainmentSlider.getValue();}
@@ -334,10 +333,13 @@ public class PlayerWidget implements Widget {
         }
 
     }
+
+// Enums
     public enum ReferenceType {
         html, txt
     }
     public enum PlayerState {
         PLAYING, PAUSED, STOPPED, TRANSITIONING, IDLE
     }
+
 }
