@@ -13,14 +13,18 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import kujiin.*;
+import kujiin.Cut;
+import kujiin.MainController;
+import kujiin.This_Session;
+import kujiin.Tools;
+import kujiin.interfaces.Widget;
 
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class CreatorAndExporterWidget implements Widget{
+public class CreatorAndExporterWidget implements Widget {
     private Button changeallvaluesbutton;
     private Button ExportButton;
     private Button loadpresetbutton;

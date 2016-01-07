@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import kujiin.Cut;
 import kujiin.This_Session;
 import kujiin.Tools;
-import kujiin.Widget;
+import kujiin.interfaces.Widget;
 import kujiin.xml.Sessions;
 
 import java.io.BufferedInputStream;

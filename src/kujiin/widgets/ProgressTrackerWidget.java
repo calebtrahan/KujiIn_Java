@@ -17,7 +17,7 @@ import javafx.stage.Stage;
 import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
-import kujiin.Widget;
+import kujiin.interfaces.Widget;
 import kujiin.xml.Session;
 import kujiin.xml.Sessions;
 

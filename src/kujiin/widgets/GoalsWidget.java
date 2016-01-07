@@ -17,7 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import kujiin.Tools;
-import kujiin.Widget;
+import kujiin.interfaces.Widget;
 import kujiin.xml.*;
 
 import javax.xml.bind.JAXBException;

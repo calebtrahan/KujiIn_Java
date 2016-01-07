@@ -1,4 +1,4 @@
-package kujiin;
+package kujiin.interfaces;
 
 public interface Widget {
 
