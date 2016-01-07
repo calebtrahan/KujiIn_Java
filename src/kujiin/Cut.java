@@ -6,8 +6,7 @@ import javafx.animation.Timeline;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import kujiin.util.lib.GuiUtils;
-import kujiin.util.lib.TimeUtils;
+import kujiin.widgets.PlayerWidget;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -97,11 +96,11 @@ public class Cut {
     public int getSecondselapsed() {return secondselapsed;}
     public MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
     public MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
-    public File getReferenceFile(ReferenceType referenceType) {
-        if (referenceType == ReferenceType.html) {
+    public File getReferenceFile(PlayerWidget.ReferenceType referenceType) {
+        if (referenceType == PlayerWidget.ReferenceType.html) {
             String name = this.name + ".html";
             return new File(This_Session.directoryreference, "html/" + name);
-        } else if (referenceType == ReferenceType.txt) {
+        } else if (referenceType == PlayerWidget.ReferenceType.txt) {
             String name = this.name + ".txt";
             return new File(This_Session.directoryreference, "txt/" + name);
         } else {
@@ -349,23 +348,23 @@ public class Cut {
     }
     public void updatecuttime() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            if (secondselapsed <= Root.FADEINDURATION) {
-                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / Root.FADEINDURATION;
+            if (secondselapsed <= MainController.FADEINDURATION) {
+                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / MainController.FADEINDURATION;
                 double entrainmentvolume = secondselapsed * entrainmentincrement;
                 getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
                 if (ambienceenabled) {
-                    double ambienceincrement = thisession.getSessionAmbienceVolume() / Root.FADEINDURATION;
+                    double ambienceincrement = thisession.getSessionAmbienceVolume() / MainController.FADEINDURATION;
                     double ambiencevolume = secondselapsed * ambienceincrement;
                     getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                 }
             }
-            else if (secondselapsed >= getdurationinseconds() - Root.FADEOUTDURATION) {
+            else if (secondselapsed >= getdurationinseconds() - MainController.FADEOUTDURATION) {
                 int secondsleft = getdurationinseconds() - secondselapsed;
-                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / Root.FADEOUTDURATION;
+                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / MainController.FADEOUTDURATION;
                 double entrainmentvolume = secondsleft * entrainmentincrement;
                 getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
                 if (ambienceenabled) {
-                    double ambienceincrement = thisession.getSessionAmbienceVolume() / Root.FADEOUTDURATION;
+                    double ambienceincrement = thisession.getSessionAmbienceVolume() / MainController.FADEOUTDURATION;
                     double ambiencevolume =  secondsleft * ambienceincrement;
                     getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                 }
@@ -378,7 +377,7 @@ public class Cut {
     }
     public void entrainmenterror() {
         // Pause Ambience If Exists
-        if (GuiUtils.getanswerdialog("Confirmation", "An Error Occured While Playing " + name +
+        if (Tools.getanswerdialog("Confirmation", "An Error Occured While Playing " + name +
                 "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
                 entrainmentplayer.stop();
@@ -387,7 +386,7 @@ public class Cut {
         } else {thisession.error_endplayback();}
     }
     public void ambienceerror() {
-        if (GuiUtils.getanswerdialog("Confirmation", "An Error Occured While Playing " + name +
+        if (Tools.getanswerdialog("Confirmation", "An Error Occured While Playing " + name +
                         "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             entrainmentplayer.stop();
@@ -399,8 +398,8 @@ public class Cut {
         if (ambienceplayer.getStatus() != MediaPlayer.Status.PLAYING) {playnextambience();}
         if (entrainmentplayer.getStatus() != MediaPlayer.Status.PLAYING) {playnextentrainment();}
     }
-    public String getcurrenttimeformatted() {return TimeUtils.formatlengthshort(secondselapsed + 1);}
-    public String gettotaltimeformatted() {return TimeUtils.formatlengthshort(getdurationinseconds());}
+    public String getcurrenttimeformatted() {return Tools.formatlengthshort(secondselapsed + 1);}
+    public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
 
     // <----------------------------------- EXPORT --------------------------------------> //
 

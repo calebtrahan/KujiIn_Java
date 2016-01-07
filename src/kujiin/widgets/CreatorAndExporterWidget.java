@@ -1,24 +1,24 @@
 package kujiin.widgets;
 
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
-import kujiin.Root;
-import kujiin.This_Session;
-import kujiin.Tools;
-import kujiin.dialogs.ChangeAllValuesDialog;
-import kujiin.util.interfaces.Widget;
-import kujiin.util.lib.GuiUtils;
-import kujiin.util.states.CreatorState;
-import kujiin.util.states.ExporterState;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import kujiin.*;
 
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
+import java.util.*;
 
 public class CreatorAndExporterWidget implements Widget{
     private Button changeallvaluesbutton;
@@ -85,8 +85,8 @@ public class CreatorAndExporterWidget implements Widget{
         maketextfieldsnumeric();
         textfieldtimes.addAll(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0));
         bindtextfieldstoproperties();
-        TotalSessionTime.setOnKeyTyped(Root.noneditabletextfield);
-        ApproximateEndTime.setOnKeyTyped(Root.noneditabletextfield);
+        TotalSessionTime.setOnKeyTyped(MainController.noneditabletextfield);
+        ApproximateEndTime.setOnKeyTyped(MainController.noneditabletextfield);
     }
 
 // Getters And Setters
@@ -108,7 +108,8 @@ public class CreatorAndExporterWidget implements Widget{
                 return true;
             } else {return false;}
         }
-        else {GuiUtils.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid"); return false;}
+        else {
+            Tools.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid"); return false;}
     }
     public boolean checkforffmpeg() {
         boolean good = false;
@@ -126,8 +127,9 @@ public class CreatorAndExporterWidget implements Widget{
     public void exportsession() {
         if (checkforffmpeg()) {
             createsession();
+
         } else {
-            GuiUtils.showerrordialog("Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
+            Tools.showerrordialog("Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
         }
     }
 
@@ -217,7 +219,7 @@ public class CreatorAndExporterWidget implements Widget{
             if (gettextfieldtimes()) {
                 this_session.checkifambienceisgood(textfieldtimes);
             } else {
-                GuiUtils.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
+                Tools.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
                 AmbienceSwitch.setSelected(false);
             }
         } else {this_session.setAmbienceenabled(false);}
@@ -304,5 +306,282 @@ public class CreatorAndExporterWidget implements Widget{
         ZaiTime.setText("-");
         ZenTime.setText("-");
         PostTime.setText("-");
+    }
+
+    public static class ChangeAllValuesDialog extends Stage implements Initializable {
+        public Button AcceptButton;
+        public Button CancelButton;
+        public TextField changeAllValuesMinutesTextField;
+        public CheckBox PresessionCheckbox;
+        public CheckBox PostsessionCheckBox;
+        private Boolean accepted;
+
+        public ChangeAllValuesDialog() {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ChangeAllValuesDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Change All Values To:");}
+            catch (IOException e) {e.printStackTrace();}
+            setAccepted(false);
+        }
+
+        @Override
+        public void initialize(URL url, ResourceBundle resourceBundle) {
+            Tools.numericTextField(changeAllValuesMinutesTextField);
+        }
+    // Getters And Setters
+        public Boolean getAccepted() {
+        return accepted;
+    }
+        public void setAccepted(Boolean accepted) {
+            this.accepted = accepted;
+        }
+
+    // Button Actions
+        public void acceptbuttonpressed(Event event) {setAccepted(true); this.close();}
+        public void cancelbuttonpressed(Event event) {this.close();}
+        public boolean getincludepresession() {return PresessionCheckbox.isSelected();}
+        public boolean getincludepostsession() {return PostsessionCheckBox.isSelected();}
+        public Integer getminutes() {
+            try {return Integer.parseInt(changeAllValuesMinutesTextField.getText());}
+            catch (NumberFormatException e) {return 0;}
+        }
+
+    }
+
+    public static class ExportingSessionDialog extends Stage {
+        public ProgressBar creatingsessionProgressBar;
+        public Label creatingsessionTextStatusBar;
+        public Button CancelButton;
+        private int sessionparts;
+        private int currentpartcount;
+        This_Session thisSession;
+        ArrayList<Cut> cutsinsesession;
+
+        public ExportingSessionDialog(This_Session thisSession) {
+    //        this.cutsinsesession = cutsinsesession;
+    //        percent = sessionpartialpercent / 100;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ExportingSessionDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
+            catch (IOException e) {e.printStackTrace();}
+    //        creatingsessionProgressBar.setProgress(0.0);
+            this.thisSession = thisSession;
+            currentpartcount = 0;
+        }
+
+        public void setSessionparts(int sessionparts) {this.sessionparts = sessionparts;}
+
+        public void updateprogress() {
+            currentpartcount += 1;
+            Platform.runLater(() -> {
+    //            System.out.println("Current Part Count: " + currentpartcount);
+    //            System.out.println("Total This_Session Parts: " + sessionparts);
+                double percent = currentpartcount / sessionparts;
+    //            creatingsessionProgressBar.setProgress(percent);
+                testifdone();
+            });
+        }
+
+        public void testifdone() {
+    //        if (currentpartcount == sessionparts) {
+    //            if (thisSession.getCreated()) {
+    //                // TODO Dialog -> "This_Session Successfully Created!"
+    //                Alert completed = new Alert(Alert.AlertType.INFORMATION);
+    //                completed.setTitle("This_Session Created");
+    //                completed.setHeaderText("Completed!");
+    //                completed.setContentText("This_Session Creation Complete With No Errors");
+    //                completed.showAndWait();
+    //                this.close();
+    //            } else {
+    //                Alert completed = new Alert(Alert.AlertType.ERROR);
+    //                completed.setTitle("This_Session Creation Failed");
+    //                completed.setHeaderText("Failed!");
+    //                completed.setContentText("This_Session Creation Failed");
+    //                completed.showAndWait();
+    //                this.close();
+    //            }
+    //        }
+        }
+
+        public void displaymessage(String text) {
+    //        Platform.runLater(() -> creatingsessionTextStatusBar.setText(text));
+        }
+    }
+
+    public static class CheckingAmbienceDialog extends Stage {
+        public Button CancelButton;
+        public Label Message;
+
+        public CheckingAmbienceDialog() {
+             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CheckingAmbienceDialog.fxml"));
+             fxmlLoader.setController(this);
+             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Checking Ambience");}
+             catch (IOException e) {e.printStackTrace();}
+        }
+    }
+
+    public static class SessionNotWellformedDialog extends Stage {
+        public Button returntoCreatorButton;
+        public Button addmissingCutsButton;
+        public ListView<Text> sessionlistview;
+        public Label sessionmissingcutsLabel;
+        public Button CreateAnywayButton;
+        public Label explanationLabel;
+        private ArrayList<Integer> textfieldvalues;
+        private int lastcutindex;
+        private int invocationduration;
+        private boolean createsession;
+
+        public SessionNotWellformedDialog(Parent parent, ArrayList<Integer> textfieldvalues, String cutsmissingtext, int lastcutindex) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionNotWellformedDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
+            catch (IOException e) {e.printStackTrace();}
+            this.textfieldvalues = textfieldvalues;
+            this.lastcutindex = lastcutindex;
+            sessionmissingcutsLabel.setText(cutsmissingtext);
+            populatelistview();
+            explanationLabel.setText(("Your Practiced Cuts Do Not Connect! Due To The Nature Of The Kuji-In I Recommend " +
+                    "Connecting All Cuts From RIN All The Way To Your Last Cut (") + This_Session.allnames.get(lastcutindex) +
+                    ") Or Your This_Session Might Not Have The Energy It Needs");
+            setCreatesession(false);
+        }
+
+        public void populatelistview() {
+            ArrayList<String> items = new ArrayList<>();
+            ObservableList<Text> sessionitems = FXCollections.observableArrayList();
+            int count = 0;
+            boolean thisitemmissing;
+            for (int i = 0; i < textfieldvalues.size(); i++) {
+                String name = This_Session.allnames.get(i);
+                String minutes;
+                if (i <= lastcutindex || i == textfieldvalues.size() - 1) {
+                    thisitemmissing = false;
+                    if (i == 0 || i == 10) {
+                        if (textfieldvalues.get(i) == 0) {
+                            minutes = "Ramp Only";
+                        } else {
+                            String time = Tools.minutestoformattedhoursandmins(textfieldvalues.get(i));
+                            minutes = String.format("%s + Ramp", time);
+                        }
+                    } else {
+                        if (textfieldvalues.get(i) == 0) {
+                            thisitemmissing = true;
+                            minutes = " Missing Value! ";
+                        }
+                        else {minutes = Tools.minutestoformattedhoursandmins(textfieldvalues.get(i));}
+                    }
+                    String txt = String.format("%d: %s (%s )", count + 1, name, minutes);
+                    Text item = new Text();
+                    item.setText(txt);
+                    if (thisitemmissing) item.setStyle("-fx-font-weight:bold; -fx-font-style: italic;");
+                    sessionitems.add(item);
+                    count++;
+                }
+            }
+            sessionlistview.setItems(sessionitems);
+        }
+
+        public void returntoCreator(Event event) {this.close();}
+
+        public void addmissingcutstoSession(Event event) {
+            CutInvocationDialog cutdurationdialog = new CutInvocationDialog(null);
+            cutdurationdialog.showAndWait();
+            setInvocationduration(cutdurationdialog.getCutinvocationduration());
+            setCreatesession(true);
+            this.close();
+        }
+
+        public void createSessionwithoutmissingcuts(Event event) {
+            Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+            a.setTitle("Confirmation");
+            a.setHeaderText("This Will Create A This_Session That Isn't Well-Formed");
+            a.setContentText("Really Create?");
+            Optional<ButtonType> b = a.showAndWait();
+            if (b.isPresent() && b.get() == ButtonType.OK) {
+                setCreatesession(true);
+                this.close();
+            }
+        }
+
+        public int getInvocationduration() {
+            return invocationduration;
+        }
+
+        public void setInvocationduration(int invocationduration) {
+            this.invocationduration = invocationduration;
+        }
+
+        public boolean isCreatesession() {
+            return createsession;
+        }
+
+        public void setCreatesession(boolean createsession) {this.createsession = createsession;}
+    }
+
+    public static class CutInvocationDialog extends Stage implements Initializable{
+        public Button CancelButton;
+        public Button OKButton;
+        public TextField cutinvocationminutesTextField;
+        private int cutinvocationduration;
+
+        CutInvocationDialog(Parent parent) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CutInvocationDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
+            catch (IOException e) {e.printStackTrace();}
+        }
+
+        @Override
+        public void initialize(URL location, ResourceBundle resources) {
+            Tools.numericTextField(cutinvocationminutesTextField);
+        }
+
+        public int getCutinvocationduration() {
+            return cutinvocationduration;
+        }
+
+        public void setCutinvocationduration(int cutinvocationduration) {
+            this.cutinvocationduration = cutinvocationduration;
+        }
+
+        public void CancelButtonPressed(Event event) {
+            setCutinvocationduration(0);
+            this.close();
+        }
+
+        public void OKButtonPressed(Event event) {
+            try {
+                int value = Integer.parseInt(cutinvocationminutesTextField.getText());
+                if (value != 0) {
+                    setCutinvocationduration(value);
+                    this.close();
+                } else {
+                    Alert continuewithzerovalue = new Alert(Alert.AlertType.CONFIRMATION);
+                    continuewithzerovalue.setHeaderText("Cut Invocation Value Is Zero");
+                    continuewithzerovalue.setContentText("Continue With Zero Value (These Cuts Won't Be Included)");
+                    continuewithzerovalue.setTitle("Confirmation");
+                    Optional<ButtonType> a = continuewithzerovalue.showAndWait();
+                    if (a.isPresent() && a.get() == ButtonType.OK) {
+                        setCutinvocationduration(0);
+                        this.close();
+                    }
+                }
+            } catch (NumberFormatException e) {
+                Alert error = new Alert(Alert.AlertType.ERROR);
+                error.setTitle("Error");
+                error.setHeaderText("Value Is Empty");
+                error.setContentText("Enter A Numeric Value Then Press OK");
+                error.showAndWait();
+            }
+        }
+    }
+
+    public enum CreatorState {
+        NOT_CREATED, CREATION_IN_PROGRESS, CREATED
+    }
+
+    public enum ExporterState {
+        IDLE, EXPORT_IN_PROGRESS, EXPORTED
     }
 }

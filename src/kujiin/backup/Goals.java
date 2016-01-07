@@ -5,10 +5,10 @@
 //import javafx.beans.property.SimpleStringProperty;
 //import javafx.beans.property.StringProperty;
 //import javafx.scene.control.Alert;
-//import kujiin.dialogs.DisplayCompletedGoalsDialog;
-//import kujiin.dialogs.DisplayCurrentGoalsDialog;
-//import kujiin.dialogs.GoalPacingDialog;
-//import kujiin.dialogs.SetANewGoalDialog;
+//import kujiin.widgets.GoalsWidget.DisplayCompletedGoalsDialog;
+//import kujiin.widgets.GoalsWidget.DisplayCurrentGoalsDialog;
+//import kujiin.widgets.GoalsWidget.GoalPacingDialog;
+//import kujiin.widgets.GoalsWidget.SetANewGoalDialog;
 //
 //import java.sql.PreparedStatement;
 //import java.sql.ResultSet;

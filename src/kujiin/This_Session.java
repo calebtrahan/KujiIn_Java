@@ -12,13 +12,11 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import kujiin.dialogs.*;
-import kujiin.util.lib.GuiUtils;
-import kujiin.util.lib.TimeUtils;
-import kujiin.util.states.PlayerState;
-import kujiin.util.xml.Session;
-import kujiin.util.xml.Sessions;
+import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.GoalsWidget;
+import kujiin.widgets.PlayerWidget;
+import kujiin.xml.Session;
+import kujiin.xml.Sessions;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -64,7 +62,7 @@ public class This_Session {
     private Cut postsession = new Cut(10, "Postsession", true, 0, this);
     private ArrayList<Cut> cutsinsession;
     private Boolean ambienceenabled;
-    private PlayerState playerState;
+    private PlayerWidget.PlayerState playerState;
     private Cut currentcut;
     private Timeline currentcuttimeline;
     private Sessions sessions;
@@ -80,10 +78,10 @@ public class This_Session {
     private Label CutPlayingText;
     private Label SessionPlayingText;
     private Label StatusBar;
-    private DisplayReference displayReference;
+    private PlayerWidget.DisplayReference displayReference;
     private Boolean referencedisplayoption;
     private Boolean referencefullscreenoption;
-    private ReferenceType referenceType;
+    private PlayerWidget.ReferenceType referenceType;
     private Double entrainmentvolume;
     private Double ambiencevolume;
     private GoalsWidget goalsWidget;
@@ -104,7 +102,7 @@ public class This_Session {
         clearlogfile();
         cutsinsession = new ArrayList<>();
         ambienceenabled = false;
-        setPlayerState(PlayerState.IDLE);
+        setPlayerState(PlayerWidget.PlayerState.IDLE);
    }
 
 // Getters And Setters
@@ -125,12 +123,12 @@ public class This_Session {
         // TODO This_Session Details Go In Here
         return FXCollections.observableArrayList();
     }
-    public PlayerState getPlayerState() {return playerState;}
-    public void setPlayerState(PlayerState playerState) {this.playerState = playerState;}
-    public ReferenceType getReferenceType() {
+    public PlayerWidget.PlayerState getPlayerState() {return playerState;}
+    public void setPlayerState(PlayerWidget.PlayerState playerState) {this.playerState = playerState;}
+    public PlayerWidget.ReferenceType getReferenceType() {
         return referenceType;
     }
-    public void setReferenceType(ReferenceType referenceType) {
+    public void setReferenceType(PlayerWidget.ReferenceType referenceType) {
         this.referenceType = referenceType;
     }
     public ArrayList<Cut> getallCuts() {return new ArrayList<>(Arrays.asList(presession, rin, kyo, toh, sha, kai, jin, retsu, zai, zen, postsession));}
@@ -246,9 +244,9 @@ public class This_Session {
             };
             // TODO Display Task Message In A Modal Alert Dialog
             new Thread(task).start();
-            final CheckingAmbienceDialog[] cad = new CheckingAmbienceDialog[1];
+            final CreatorAndExporterWidget.CheckingAmbienceDialog[] cad = new CreatorAndExporterWidget.CheckingAmbienceDialog[1];
             task.setOnRunning(event -> {
-                cad[0] = new CheckingAmbienceDialog();
+                cad[0] = new CreatorAndExporterWidget.CheckingAmbienceDialog();
                 cad[0].Message.textProperty().bind(task.messageProperty());
                 cad[0].CancelButton.setOnAction(ev -> task.cancel());
                 cad[0].showAndWait();
@@ -257,7 +255,7 @@ public class This_Session {
             task.setOnCancelled(event -> cad[0].close());
             task.setOnFailed(event -> cad[0].close());
         } else {
-            GuiUtils.showinformationdialog("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");
+            Tools.showinformationdialog("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");
         }
     }
     public boolean sessioncreationwellformednesschecks(ArrayList<Integer> textfieldtimes) {
@@ -280,7 +278,7 @@ public class This_Session {
                 cutsmissingtext.append(cutsmissinglist.get(i));
                 if (i != cutsmissinglist.size() - 1) {cutsmissingtext.append(", ");}
             }
-            SessionNotWellformedDialog notWellformedDialog = new SessionNotWellformedDialog(null, textfieldtimes, cutsmissingtext.toString(), lastcutindex);
+            CreatorAndExporterWidget.SessionNotWellformedDialog notWellformedDialog = new CreatorAndExporterWidget.SessionNotWellformedDialog(null, textfieldtimes, cutsmissingtext.toString(), lastcutindex);
             notWellformedDialog.showAndWait();
             // TODO CONTINUE HERE
             if (notWellformedDialog.isCreatesession()) {
@@ -330,7 +328,7 @@ public class This_Session {
         FileChooser fileChooser = new FileChooser();
         File exportfile = fileChooser.showOpenDialog(null);
         if (exportfile == null) {return false;}
-        ExportingSessionDialog exportingSessionDialog = new ExportingSessionDialog(this);
+        CreatorAndExporterWidget.ExportingSessionDialog exportingSessionDialog = new CreatorAndExporterWidget.ExportingSessionDialog(this);
         Service<Boolean> exporterservice = new Service<Boolean>() {
             @Override
             protected Task<Boolean> createTask() {
@@ -405,14 +403,14 @@ public class This_Session {
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
         for (Cut i : cutsinsession) {totalsecondsinsession += i.getdurationinseconds();}
-        SessionTotalTime.setText(TimeUtils.formatlengthshort(totalsecondsinsession));
+        SessionTotalTime.setText(Tools.formatlengthshort(totalsecondsinsession));
         currentcuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
         currentcuttimeline.setCycleCount(Animation.INDEFINITE);
         currentcuttimeline.play();
         cutcount = 0;
         currentcut = cutsinsession.get(cutcount);
-        setSessionEntrainmentVolume(Root.ENTRAINMENTVOLUME);
-        setSessionAmbienceVolume(Root.AMBIENCEVOLUME);
+        setSessionEntrainmentVolume(MainController.ENTRAINMENTVOLUME);
+        setSessionAmbienceVolume(MainController.AMBIENCEVOLUME);
         playthiscut();
         sessions.createnewsession();
     }
@@ -425,7 +423,7 @@ public class This_Session {
             case PAUSED:
                 currentcuttimeline.play();
                 currentcut.resumeplayingcut();
-                setPlayerState(PlayerState.PLAYING);
+                setPlayerState(PlayerWidget.PlayerState.PLAYING);
                 return "Resuming Session...";
             case STOPPED:
                 sessions.createnewsession();
@@ -443,7 +441,7 @@ public class This_Session {
             case PLAYING:
                 currentcut.pauseplayingcut();
                 currentcuttimeline.pause();
-                setPlayerState(PlayerState.PAUSED);
+                setPlayerState(PlayerWidget.PlayerState.PAUSED);
                 return "Session Paused";
             case PAUSED:
                 return "Already Paused";
@@ -457,20 +455,20 @@ public class This_Session {
         switch (playerState) {
             case PLAYING:
                 pause();
-                if (GuiUtils.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
+                if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
                     endsessionprematurely(sessions);
                     currentcut.stopplayingcut();
                     currentcuttimeline.stop();
-                    setPlayerState(PlayerState.STOPPED);
+                    setPlayerState(PlayerWidget.PlayerState.STOPPED);
                     resetthissession();
                     return "Session Stopped";
                 } else {play(); return "";}
             case PAUSED:
-                if (GuiUtils.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
+                if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
                     endsessionprematurely(sessions);
                     currentcut.stopplayingcut();
                     currentcuttimeline.stop();
-                    setPlayerState(PlayerState.STOPPED);
+                    setPlayerState(PlayerWidget.PlayerState.STOPPED);
                     resetthissession();
                     return "Session Stopped";
                 } else {play(); return "";}
@@ -496,24 +494,24 @@ public class This_Session {
     }
     public void updateplayerui() {
         try {
-            if (playerState == PlayerState.PLAYING) {
+            if (playerState == PlayerWidget.PlayerState.PLAYING) {
                 totalsecondselapsed++;
                 CutPlayingText.setText(String.format("%s Progress", currentcut.name));
                 SessionPlayingText.setText("Total Progress");
                 CutCurrentTime.setText(currentcut.getcurrenttimeformatted());
                 CutTotalTime.setText(currentcut.gettotaltimeformatted());
-                SessionCurrentTime.setText(TimeUtils.formatlengthshort(totalsecondselapsed));
+                SessionCurrentTime.setText(Tools.formatlengthshort(totalsecondselapsed));
                 StatusBar.setText("Session Playing. Currently Practicing " + currentcut.name + "...");
                 if (currentcut.getSecondselapsed() != 0) {CutProgress.setProgress((float) currentcut.getSecondselapsed() / (float) currentcut.getdurationinseconds());}
                 if (totalsecondselapsed != 0) {TotalProgress.setProgress((float) totalsecondselapsed / (float) totalsecondsinsession);}
-            } else if (playerState == PlayerState.TRANSITIONING) {
+            } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
                 CutProgress.setProgress(1.0);
                 if (currentcut.number != 10) {StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);}
                 CutCurrentTime.setText(currentcut.gettotaltimeformatted());
                 CutTotalTime.setText(currentcut.gettotaltimeformatted());
-            } else if (playerState == PlayerState.PAUSED) {
+            } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
                 StatusBar.setText("Session Paused");
-            } else if (playerState == PlayerState.STOPPED) {
+            } else if (playerState == PlayerWidget.PlayerState.STOPPED) {
                 StatusBar.setText("Session Stopped");
             }
         } catch (Exception e) {e.printStackTrace();}
@@ -526,21 +524,21 @@ public class This_Session {
             currentcut.startplayback();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
             timeline.play();
-            setPlayerState(PlayerState.PLAYING);
+            setPlayerState(PlayerWidget.PlayerState.PLAYING);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     public void progresstonextcut() {
         try {
-            if (playerState == PlayerState.TRANSITIONING) {
+            if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
 //                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
                 try {
                     cutcount++;
                     currentcut = cutsinsession.get(cutcount);
                     playthiscut();
                 } catch (ArrayIndexOutOfBoundsException e) {e.printStackTrace(); endofsession();}
-            } else if (playerState == PlayerState.PLAYING) {transition();}
+            } else if (playerState == PlayerWidget.PlayerState.PLAYING) {transition();}
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -548,11 +546,11 @@ public class This_Session {
     public void endofsession() {
         closereferencefile();
         currentcuttimeline.stop();
-        setPlayerState(PlayerState.STOPPED);
+        setPlayerState(PlayerWidget.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
 //        try {sessions.addnewsession(TemporarySession);}
 //        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
-        if (GuiUtils.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {export();}
+        if (Tools.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {export();}
         // TODO Update Goal Widget
     }
     public void resetthissession() {
@@ -563,31 +561,32 @@ public class This_Session {
         totalsecondsinsession = 0;
     }
     public void adjustvolume() {
-        if (getPlayerState() == PlayerState.PLAYING) {
-            AdjustVolume av = new AdjustVolume(currentcut);
+        if (getPlayerState() == PlayerWidget.PlayerState.PLAYING) {
+            PlayerWidget.AdjustVolume av = new PlayerWidget.AdjustVolume(currentcut);
             av.show();
             if (av.getAmbienceVolume() != null) {setSessionAmbienceVolume(av.getAmbienceVolume());}
             if (av.getEntrainmentVolume() != null) {setSessionEntrainmentVolume(av.getEntrainmentVolume());}
-        } else {GuiUtils.showtimedmessage(StatusBar, "Cannot Adjust Volume. No Session Playing", 5000);}
+        } else {
+            Tools.showtimedmessage(StatusBar, "Cannot Adjust Volume. No Session Playing", 5000);}
     }
     public void transition() {
         closereferencefile();
         sessions.getcurrentsession().updatecutduration(currentcut.number, currentcut.getdurationinminutes());
         goalsWidget.update();
         currentcut.stopplayingcut();
-        if (currentcut.number == 10) {setPlayerState(PlayerState.TRANSITIONING); progresstonextcut();}
+        if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
         else {
             Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
             MediaPlayer alertplayer = new MediaPlayer(alertmedia);
             alertplayer.play();
-            setPlayerState(PlayerState.TRANSITIONING);
+            setPlayerState(PlayerWidget.PlayerState.TRANSITIONING);
             alertplayer.setOnEndOfMedia(() -> {
                 alertplayer.stop();
                 alertplayer.dispose();
                 progresstonextcut();
             });
             alertplayer.setOnError(() -> {
-                if (GuiUtils.getanswerdialog("Confirmation", "An Error Occured While Playing Alert File" +
+                if (Tools.getanswerdialog("Confirmation", "An Error Occured While Playing Alert File" +
                         alertplayer.getMedia().getSource() + "'", "Retry Playing Alert File? (Pressing Cancel " +
                         "Will Progress To The Next Cut)")) {
                     alertplayer.stop();
@@ -607,7 +606,7 @@ public class This_Session {
 
 // Reference Files
     public boolean choosereferencetype() {
-        ReferenceTypeDialog reftype = new ReferenceTypeDialog(referenceType, referencefullscreenoption);
+        PlayerWidget.ReferenceTypeDialog reftype = new PlayerWidget.ReferenceTypeDialog(referenceType, referencefullscreenoption);
         reftype.showAndWait();
         setReferenceType(reftype.getReferenceType());
         setReferencefullscreenoption(reftype.getFullscreen());
@@ -618,14 +617,14 @@ public class This_Session {
         if (ReferenceFileCheckbox.isSelected()) {
             boolean value = choosereferencetype();
             ReferenceFileCheckbox.setSelected(value);
-            if (value && playerState == PlayerState.PLAYING) {displayreferencefile();}
+            if (value && playerState == PlayerWidget.PlayerState.PLAYING) {displayreferencefile();}
             if (value) {ReferenceFileCheckbox.setText("Reference Display Enabled");}
             else {ReferenceFileCheckbox.setText("Reference Display Disabled");}
         }
     }
     public void displayreferencefile() {
         // TODO Open And Display Reference File
-        displayReference = new DisplayReference(currentcut, referenceType, referencefullscreenoption);
+        displayReference = new PlayerWidget.DisplayReference(currentcut, referenceType, referencefullscreenoption);
         displayReference.show();
     }
     public void closereferencefile() {
@@ -645,9 +644,10 @@ public class This_Session {
                 Session loadedsession = (Session) createMarshaller.unmarshal(xmlfile);
                 if (loadedsession != null) {
                     setupcutsinsession(loadedsession.getallcuttimes());
-                    GuiUtils.showinformationdialog("Information", "Preset Loaded", "Your Preset Was Successfully Loaded");
+                    Tools.showinformationdialog("Information", "Preset Loaded", "Your Preset Was Successfully Loaded");
                 }
-            } catch (JAXBException e) {GuiUtils.showerrordialog("Error", "Not A Valid Preset File", "Please Select A Valid Preset File");}
+            } catch (JAXBException e) {
+                Tools.showerrordialog("Error", "Not A Valid Preset File", "Please Select A Valid Preset File");}
         }
     }
     public void saveaspreset(Session session) {
@@ -658,8 +658,9 @@ public class This_Session {
                 JAXBContext context = JAXBContext.newInstance(Session.class);
                 Marshaller createMarshaller = context.createMarshaller();
                 createMarshaller.marshal(session, xmlfile);
-                GuiUtils.showinformationdialog("Information", "Preset Saved", "Your Preset Was Successfully Saved");
-            } catch (JAXBException e) {GuiUtils.showerrordialog("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
+                Tools.showinformationdialog("Information", "Preset Saved", "Your Preset Was Successfully Saved");
+            } catch (JAXBException e) {
+                Tools.showerrordialog("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
         }
     }
 

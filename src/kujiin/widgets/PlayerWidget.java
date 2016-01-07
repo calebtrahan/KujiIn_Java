@@ -1,14 +1,21 @@
 package kujiin.widgets;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import kujiin.ReferenceType;
-import kujiin.This_Session;
-import kujiin.util.interfaces.Widget;
-import kujiin.util.lib.GuiUtils;
-import kujiin.util.xml.Sessions;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import kujiin.*;
+import kujiin.xml.Sessions;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class PlayerWidget implements Widget {
     private CheckBox onOffSwitch;
@@ -76,19 +83,22 @@ public class PlayerWidget implements Widget {
 // Button Actions
     public void play(Sessions sessions) {
         Session.setGoalsWidget(GoalsWidget);
-        GuiUtils.showtimedmessage(StatusBar, Session.play(), 3000);
+        Tools.showtimedmessage(StatusBar, Session.play(), 3000);
     }
     public void pause() {
-        if (Session != null) {GuiUtils.showtimedmessage(StatusBar, Session.pause(), 3000);}
-        else {GuiUtils.showtimedmessage(StatusBar, "No Session Playing", 3000);}
+        if (Session != null) {
+            Tools.showtimedmessage(StatusBar, Session.pause(), 3000);}
+        else {
+            Tools.showtimedmessage(StatusBar, "No Session Playing", 3000);}
     }
     public void stop(Sessions Sessions) {
         if (Session != null) {
             String message = Session.stop();
-            GuiUtils.showtimedmessage(StatusBar, message, 3000);
+            Tools.showtimedmessage(StatusBar, message, 3000);
             if (message.equals("Session Stopped")) {resetallvalues();}
         }
-        else {GuiUtils.showtimedmessage(StatusBar, "No Session Playing", 3000);}
+        else {
+            Tools.showtimedmessage(StatusBar, "No Session Playing", 3000);}
     }
     public void adjustvolume() {Session.adjustvolume();}
     public void displayreferencefile() {Session.togglereferencedisplay(ReferenceFileCheckbox);}
@@ -102,13 +112,13 @@ public class PlayerWidget implements Widget {
     public void disable() {
         switch (Session.getPlayerState()) {
             case PLAYING:
-                if (! GuiUtils.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
+                if (! Tools.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
                     onOffSwitch.setSelected(true);
                     onOffSwitch.setText("ON");
                     return;
                 }
             case PAUSED:
-                if (! GuiUtils.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
+                if (! Tools.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
                     onOffSwitch.setSelected(true);
                     onOffSwitch.setText("ON");
                     return;
@@ -140,7 +150,7 @@ public class PlayerWidget implements Widget {
     public void enable() {
         if (! creatorAndExporterWidget.createsession()) {return;}
         if (! Session.isValid()) {
-            GuiUtils.showinformationdialog("Information", "Cannot Enable Session Player", "Session (Above) Isn't Valid, All Cut Values Are 0");
+            Tools.showinformationdialog("Information", "Cannot Enable Session Player", "Session (Above) Isn't Valid, All Cut Values Are 0");
             onOffSwitch.setSelected(false);
             onOffSwitch.setText("OFF");
             return;
@@ -178,9 +188,156 @@ public class PlayerWidget implements Widget {
         CutPlayingText.setText("Ready To Play");
         SessionPlayingText.setText("Ready To Play");
         ReferenceFileCheckbox.setText("Reference Display Disabled");
-        GuiUtils.showtimedmessage(StatusBar, "Turn Session Player Off To Edit This Session", 6000);
+        Tools.showtimedmessage(StatusBar, "Turn Session Player Off To Edit This Session", 6000);
     }
 
-// Other methods
+// Subclasses/Dialogs
+    public static class AdjustVolume extends Stage {
+        public Slider EntrainmentSlider;
+        public Slider AmbienceSlider;
 
+        public AdjustVolume(Cut currentcut) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AdjustSessionVolume.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Adjust Session Volume");}
+            catch (IOException e) {e.printStackTrace();}
+            if (currentcut.getCurrentAmbiencePlayer() != null) {currentcut.getCurrentAmbiencePlayer().volumeProperty().bind(AmbienceSlider.valueProperty());}
+            else {AmbienceSlider.setDisable(true);}
+            if (currentcut.getCurrentEntrainmentPlayer() != null) {currentcut.getCurrentEntrainmentPlayer().volumeProperty().bind(EntrainmentSlider.valueProperty());}
+            else {EntrainmentSlider.setDisable(true);}
+            AmbienceSlider.setValue(MainController.AMBIENCEVOLUME);
+            EntrainmentSlider.setValue(MainController.ENTRAINMENTVOLUME);
+        }
+
+        public Double getEntrainmentVolume() {return EntrainmentSlider.getValue();}
+        public Double getAmbienceVolume() {return AmbienceSlider.getValue();}
+
+    }
+    public static class DisplayReference extends Stage {
+        public ScrollPane ContentPane;
+        private Cut currentcut;
+        private ReferenceType referenceType;
+
+        public DisplayReference(Cut currentcut, ReferenceType referenceType, Boolean fullscreenoption) {
+            this.currentcut = currentcut;
+            this.referenceType = referenceType;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle(currentcut.name + "'s Reference");}
+            catch (IOException e) {e.printStackTrace();}
+            System.out.println(fullscreenoption);
+            // TODO FullScreenOption Is null. Why?
+            setsizing(true);
+    //        } else {
+    //            // TODO Set Adjusted Height And Width Here
+    //        }
+            loadcontent();
+        }
+
+        public DisplayReference(String htmlcontent) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Reference File Preview");}
+            catch (IOException e) {e.printStackTrace();}
+            setsizing(false);
+            WebView browser = new WebView();
+            WebEngine webEngine = browser.getEngine();
+            ContentPane.setContent(browser);
+            webEngine.loadContent(htmlcontent);
+        }
+
+        public void setsizing(boolean fullscreen) {
+            Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+            double height = primaryScreenBounds.getHeight();
+            double width = primaryScreenBounds.getWidth();
+            if (! fullscreen) {height -= 200; width -= 200;}
+            this.setFullScreen(fullscreen);
+            this.setHeight(height);
+            this.setWidth(width);
+            ContentPane.setFitToWidth(true);
+            ContentPane.setFitToHeight(true);
+            ContentPane.setStyle("-fx-background-color: #212526");
+        }
+
+        public void loadcontent() {
+            File referencefile = currentcut.getReferenceFile(referenceType);
+            System.out.println("Passing " + referencefile.getAbsolutePath() + " Into The Content Pane");
+            if (referenceType == ReferenceType.txt) {
+                StringBuilder sb = new StringBuilder();
+                try (FileInputStream fis = new FileInputStream(referencefile);
+                     BufferedInputStream bis = new BufferedInputStream(fis)) {
+                    while (bis.available() > 0) {sb.append((char) bis.read());}
+                } catch (Exception e) {e.printStackTrace();}
+                TextArea ta = new TextArea();
+                ta.setText(sb.toString());
+                ta.setWrapText(true);
+                ContentPane.setContent(ta);
+            } else if (referenceType == ReferenceType.html) {
+                WebView browser = new WebView();
+                WebEngine webEngine = browser.getEngine();
+                ContentPane.setContent(browser);
+                webEngine.load(referencefile.toURI().toString());
+            }
+        }
+    }
+    public static class ReferenceTypeDialog extends Stage {
+        public Button AcceptButton;
+        public RadioButton HTMLOption;
+        public RadioButton TextOption;
+        public Button CancelButton;
+        public CheckBox FullScreenOption;
+        private ReferenceType referenceType = null;
+        private Boolean fullscreen = null;
+        private Boolean enabled;
+
+        public ReferenceTypeDialog (ReferenceType referenceType, Boolean fullscreenoption) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceTypeDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select A Reference Type Variation");}
+            catch (IOException e) {e.printStackTrace();}
+            if (referenceType != null) {
+                if (referenceType == ReferenceType.txt) {TextOption.setSelected(true);}
+                else if (referenceType == ReferenceType.html) {HTMLOption.setSelected(true);}
+            }
+            if (fullscreenoption != null) {FullScreenOption.setSelected(fullscreenoption);}
+        }
+
+    // Getters And Setters
+        public ReferenceType getReferenceType() {
+            return referenceType;
+        }
+        public Boolean getFullscreen() {return fullscreen;}
+        public Boolean getEnabled() {
+            return enabled;
+        }
+        public void setEnabled(Boolean enabled) {
+            this.enabled = enabled;
+        }
+
+    // Button Actions
+        public void selecthtml(ActionEvent actionEvent) {
+            if (HTMLOption.isSelected()) {TextOption.setSelected(false);}
+        }
+        public void selecttxt(ActionEvent actionEvent) {
+            if (TextOption.isSelected()) {HTMLOption.setSelected(false);}
+        }
+        public void accept(ActionEvent actionEvent) {
+            if (HTMLOption.isSelected()) {referenceType = ReferenceType.html;}
+            else if (TextOption.isSelected()) {referenceType = ReferenceType.txt;}
+            setFullScreen(FullScreenOption.isSelected());
+            setEnabled(true);
+            this.close();
+        }
+        public void cancel(ActionEvent actionEvent) {
+            setEnabled(false);
+            this.close();
+        }
+
+    }
+    public enum ReferenceType {
+        html, txt
+    }
+    public enum PlayerState {
+        PLAYING, PAUSED, STOPPED, TRANSITIONING, IDLE
+    }
 }

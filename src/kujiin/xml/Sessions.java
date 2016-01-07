@@ -1,7 +1,7 @@
-package kujiin.util.xml;
+package kujiin.xml;
 
 import kujiin.This_Session;
-import kujiin.util.lib.GuiUtils;
+import kujiin.Tools;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -22,8 +22,8 @@ public class Sessions {
     public Sessions() {deletenonvalidsessions();}
 
 // Getters And Setters
-    public List<kujiin.util.xml.Session> getSession() {return Session;}
-    public void setSession(List<kujiin.util.xml.Session> session) {Session = session;}
+    public List<kujiin.xml.Session> getSession() {return Session;}
+    public void setSession(List<kujiin.xml.Session> session) {Session = session;}
 
 // Other Methods
     public void populatefromxml() throws JAXBException {
@@ -57,7 +57,7 @@ public class Sessions {
     public int getgrandtotaltimepracticedinminutes(boolean includepreandpost) {
         try {
             int totalminutes = 0;
-            for (kujiin.util.xml.Session i : getSession()) {
+            for (kujiin.xml.Session i : getSession()) {
                 if (includepreandpost) {for (int x=0; x<11;x++) {totalminutes += i.getcutduration(x);}}
                 else {for (int x=1; x<10;x++) {totalminutes += i.getcutduration(x);}}
             }
@@ -71,7 +71,7 @@ public class Sessions {
     public ArrayList<Session> getsessionswithprematureendings() {
         try {
             ArrayList<Session> sessionswithprematureendings = new ArrayList<>();
-            for (kujiin.util.xml.Session i : getSession()) {
+            for (kujiin.xml.Session i : getSession()) {
                 if (i.wasendedPremature()) {sessionswithprematureendings.add(i);}
             }
             return sessionswithprematureendings;
@@ -84,13 +84,13 @@ public class Sessions {
     public void createnewsession() {
         try {addnewsession(new Session("", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
         catch (JAXBException ignored) {
-            GuiUtils.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");
+            Tools.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");
         }
     }
     public Session getcurrentsession() {return getSession().get(getSession().size() - 1);}
     public void deletenonvalidsessions() {
         try {
-            for (kujiin.util.xml.Session i : getSession()) {
+            for (kujiin.xml.Session i : getSession()) {
                 if (! i.sessionnotEmpty()) {
                     try {removesession(i);}
                     catch (JAXBException ignored) {}

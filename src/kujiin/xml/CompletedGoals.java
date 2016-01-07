@@ -1,11 +1,10 @@
-package kujiin.util.xml;
+package kujiin.xml;
 
 
 import kujiin.This_Session;
-import kujiin.dialogs.DisplayCompletedGoalsDialog;
+import kujiin.Tools;
 import kujiin.lib.BeanComparator;
-import kujiin.util.lib.GuiUtils;
-import kujiin.util.lib.TimeUtils;
+import kujiin.widgets.GoalsWidget;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -27,8 +26,8 @@ public class CompletedGoals {
     public CompletedGoals() {}
 
 // Getters And Setters
-    public List<kujiin.util.xml.CompletedGoal> getCompletedGoal() {return CompletedGoal;}
-    public void setCompletedGoal(List<kujiin.util.xml.CompletedGoal> completedGoal) {CompletedGoal = completedGoal;}
+    public List<kujiin.xml.CompletedGoal> getCompletedGoal() {return CompletedGoal;}
+    public void setCompletedGoal(List<kujiin.xml.CompletedGoal> completedGoal) {CompletedGoal = completedGoal;}
 
 // XML Interaction
     public void populatefromxml() throws JAXBException {
@@ -53,15 +52,15 @@ public class CompletedGoals {
     }
     public boolean goalcompleted(CurrentGoal currentGoal) {
         double hours = currentGoal.getGoal_Hours();
-        kujiin.util.xml.CompletedGoal newcompletedgoal = new CompletedGoal();
-        newcompletedgoal.setDate_Completed(TimeUtils.convertfromlocaldatetostring(LocalDate.now()));
+        kujiin.xml.CompletedGoal newcompletedgoal = new CompletedGoal();
+        newcompletedgoal.setDate_Completed(Tools.convertfromlocaldatetostring(LocalDate.now()));
         newcompletedgoal.setGoal_Hours(hours);
         try {addcompletedgoal(newcompletedgoal); return true;}
         catch (JAXBException ignored) {return false;}
     }
     public void sortcompletedgoals() {
         if (getCompletedGoal() != null) {
-            BeanComparator bc = new BeanComparator(kujiin.util.xml.CompletedGoal.class, "getGoal_Hours");
+            BeanComparator bc = new BeanComparator(kujiin.xml.CompletedGoal.class, "getGoal_Hours");
             List<CompletedGoal> completedGoalList = getCompletedGoal();
             Collections.sort(completedGoalList, bc);
             setCompletedGoal(completedGoalList);
@@ -69,8 +68,9 @@ public class CompletedGoals {
     }
     public void displaycompletedgoals() {
         if (getCompletedGoal() != null) {
-            DisplayCompletedGoalsDialog dcg = new DisplayCompletedGoalsDialog(getCompletedGoal());
+            GoalsWidget.DisplayCompletedGoalsDialog dcg = new GoalsWidget.DisplayCompletedGoalsDialog(getCompletedGoal());
             dcg.showAndWait();
-        } else {GuiUtils.showinformationdialog("Cannot Display", "Cannot Display", "No Goals Completed Yet");}
+        } else {
+            Tools.showinformationdialog("Cannot Display", "Cannot Display", "No Goals Completed Yet");}
     }
 }

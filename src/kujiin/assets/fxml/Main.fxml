@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane centerShape="false" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" pickOnBounds="false" prefHeight="404.0" prefWidth="851.0" scaleShape="false" snapToPixel="false" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.Root">
+<AnchorPane centerShape="false" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" pickOnBounds="false" prefHeight="404.0" prefWidth="851.0" scaleShape="false" snapToPixel="false" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.MainController">
    <children>
       <MenuBar layoutX="3.0" prefHeight="29.0" prefWidth="851.0">
         <menus>

@@ -1,6 +1,6 @@
-package kujiin.util.xml;
+package kujiin.xml;
 
-import kujiin.util.lib.TimeUtils;
+import kujiin.Tools;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -16,9 +16,9 @@ public class CurrentGoal {
     public CurrentGoal() {}
 
     public CurrentGoal(LocalDate duedate, Double goalhours) {
-        setDate_Due(TimeUtils.convertfromlocaldatetostring(duedate));
+        setDate_Due(Tools.convertfromlocaldatetostring(duedate));
         setGoal_Hours(goalhours);
-        setDate_Set(TimeUtils.convertfromlocaldatetostring(LocalDate.now()));
+        setDate_Set(Tools.convertfromlocaldatetostring(LocalDate.now()));
     }
 
 // Getters And Setters

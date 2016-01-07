@@ -1,10 +1,9 @@
-package kujiin.util.xml;
+package kujiin.xml;
 
 import kujiin.This_Session;
-import kujiin.dialogs.DisplayCurrentGoalsDialog;
-import kujiin.dialogs.SetANewGoalDialog;
+import kujiin.Tools;
 import kujiin.lib.BeanComparator;
-import kujiin.util.lib.GuiUtils;
+import kujiin.widgets.GoalsWidget;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -25,8 +24,8 @@ public class CurrentGoals {
     public CurrentGoals() {}
 
 // Getters And Setters
-    public List<kujiin.util.xml.CurrentGoal> getCurrentGoal() {return CurrentGoal;}
-    public void setCurrentGoal(List<kujiin.util.xml.CurrentGoal> currentGoal) {CurrentGoal = currentGoal;}
+    public List<kujiin.xml.CurrentGoal> getCurrentGoal() {return CurrentGoal;}
+    public void setCurrentGoal(List<kujiin.xml.CurrentGoal> currentGoal) {CurrentGoal = currentGoal;}
 
 // Other Methods
     public void populatefromxml() throws JAXBException {
@@ -68,7 +67,7 @@ public class CurrentGoals {
     public boolean deletegoal(Integer id) {
         if (goalsexist()) {
             List<CurrentGoal> templist = getCurrentGoal();
-            for (kujiin.util.xml.CurrentGoal i : templist) {
+            for (kujiin.xml.CurrentGoal i : templist) {
                 if (i.getID().equals(id)) {templist.remove(i); return true;}
             }
             return false;
@@ -76,17 +75,17 @@ public class CurrentGoals {
     }
     public void sortcurrentgoals() {
         if (getCurrentGoal() != null) {
-            BeanComparator bc = new BeanComparator(kujiin.util.xml.CurrentGoal.class, "getGoal_Hours");
+            BeanComparator bc = new BeanComparator(kujiin.xml.CurrentGoal.class, "getGoal_Hours");
             List<CurrentGoal> currentGoalsList = getCurrentGoal();
             Collections.sort(currentGoalsList, bc);
             setCurrentGoal(currentGoalsList);
         }
         int count = 1;
-        for (kujiin.util.xml.CurrentGoal i : getCurrentGoal()) {i.setID(count); count++;}
+        for (kujiin.xml.CurrentGoal i : getCurrentGoal()) {i.setID(count); count++;}
     }
     public CurrentGoal getgoal(Integer id) {
         if (getCurrentGoal() != null && getCurrentGoal().size() > 0) {
-            for (kujiin.util.xml.CurrentGoal i : getCurrentGoal()) {
+            for (kujiin.xml.CurrentGoal i : getCurrentGoal()) {
                 if (i.getID().equals(id)) {return i;}
             }
             return null;
@@ -94,16 +93,17 @@ public class CurrentGoals {
     }
     public void displaycurrentgoals(double currentpracticedhours) {
         if (getCurrentGoal() != null) {
-            DisplayCurrentGoalsDialog dcg = new DisplayCurrentGoalsDialog(null, getCurrentGoal(), currentpracticedhours);
+            GoalsWidget.DisplayCurrentGoalsDialog dcg = new GoalsWidget.DisplayCurrentGoalsDialog(null, getCurrentGoal(), currentpracticedhours);
             dcg.showAndWait();
-        } else {GuiUtils.showinformationdialog("Cannot Display", "Cannot Display", "No Goals Currently Set");}
+        } else {
+            Tools.showinformationdialog("Cannot Display", "Cannot Display", "No Goals Currently Set");}
     }
     public void setnewgoal(double currentpracticedhours) {
-        SetANewGoalDialog sngd = new SetANewGoalDialog(currentpracticedhours);
+        GoalsWidget.SetANewGoalDialog sngd = new GoalsWidget.SetANewGoalDialog(currentpracticedhours);
         sngd.showAndWait();
         if (sngd.isAccepted()) {
             try {addnewgoal(new CurrentGoal(sngd.getGoaldate(), sngd.getGoalhours()));}
-            catch (JAXBException e) {e.printStackTrace(); GuiUtils.showerrordialog("Error", "Couldn't Add This Goal", "Check File Permissions");}
+            catch (JAXBException e) {e.printStackTrace(); Tools.showerrordialog("Error", "Couldn't Add This Goal", "Check File Permissions");}
         }
     }
     public void currentgoalpacing(double currentpracticedhours) {

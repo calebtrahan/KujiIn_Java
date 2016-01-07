@@ -1,4 +1,4 @@
-package kujiin.util.xml;
+package kujiin.xml;
 
 import kujiin.Tools;
 
