@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -38,6 +39,8 @@ public class GoalsWidget implements Widget{
     private Sessions allpracticedsessions;
     private CurrentGoals currentGoals;
     private CompletedGoals completedGoals;
+
+    // TODO Make Goals For Individual Cuts Rin-Zen And Integerate Into Goal Widget (And Keep Existing Total Hour Goal)
 
     public GoalsWidget(Button newGoalButton, Button currentGoalsButton, Button completedGoalsButton, Label practicedHours, Label currentGoalHours,
                        ProgressBar currentGoalProgress, Sessions Allpracticedsessions) {
@@ -169,7 +172,7 @@ public class GoalsWidget implements Widget{
         public TableColumn<CurrentGoalBinding, String> PercentCompleteColumn;
         public Button CloseButton;
 
-        public DisplayCurrentGoalsDialog(Parent parent, List<CurrentGoal> currentGoalList, double currentpracticedhours) {
+        public DisplayCurrentGoalsDialog(List<CurrentGoal> currentGoalList, double currentpracticedhours) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCurrentGoals.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Current Goals");}
@@ -188,20 +191,6 @@ public class GoalsWidget implements Widget{
         }
 
         public void closeDialog(Event event) {this.close();}
-
-        public class CurrentGoalBinding {
-            private IntegerProperty goalid;
-            private StringProperty goalhours;
-            private StringProperty duedate;
-            private StringProperty percentcomplete;
-
-            public CurrentGoalBinding(int id, String goalhours, String duedate, String percentcomplete) {
-                this.goalid = new SimpleIntegerProperty(id);
-                this.goalhours = new SimpleStringProperty(goalhours);
-                this.duedate = new SimpleStringProperty(duedate);
-                this.percentcomplete = new SimpleStringProperty(percentcomplete);
-            }
-        }
     }
     public static class DisplayPrematureEndingsDialog extends Stage {
 
@@ -248,18 +237,57 @@ public class GoalsWidget implements Widget{
 
     }
     public static class GoalPacingDialog extends Stage implements Initializable {
+        public Label SelectedGoalHours;
+        public Button SelectADiffferentGoalButton;
+        public Spinner<Integer> DaysSpinner;
+        public Button CalculateButton;
+        public Button CloseButton;
+        private CurrentGoal currentGoal;
+        private List<CurrentGoal> currentGoals;
+        private double alreadypracticedhours;
 
-        public GoalPacingDialog(Parent parent, CurrentGoal currentGoal) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCompletedGoals.fxml"));
+        public GoalPacingDialog(CurrentGoal currentGoal, List<CurrentGoal> currentGoals, double alreadypracticedhours) {
+            this.currentGoal = currentGoal;
+            this.currentGoals = currentGoals;
+            this.alreadypracticedhours = alreadypracticedhours;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalPacingDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Premature Endings");}
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Goal Pacing");}
             catch (IOException e) {e.printStackTrace();}
+            SelectedGoalHours.setText(currentGoal.getGoal_Hours() + " Hours");
         }
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
-
+            DaysSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
         }
+
+    // Getters And Setters
+        public CurrentGoal getCurrentGoal() {
+            return currentGoal;
+        }
+        public void setCurrentGoal(CurrentGoal currentGoal) {
+            this.currentGoal = currentGoal;
+        }
+
+    // Button Actions
+        public void selectanewgoal(ActionEvent actionEvent) {
+            SelectGoalDialog selectGoalDialog = new SelectGoalDialog(currentGoals, alreadypracticedhours);
+            selectGoalDialog.showAndWait();
+            setCurrentGoal(selectGoalDialog.getSelectedgoal());
+            if (getCurrentGoal() == null) {return;}
+            SelectedGoalHours.setText(getCurrentGoal().getGoal_Hours() + " Hours");
+        }
+        public void calculate(ActionEvent actionEvent) {
+            if (getCurrentGoal() == null) {Tools.showerrordialog("Error", "No Goal Selected", "Please Select A Goal"); return;}
+            if (DaysSpinner.getValue() == 0) {Tools.showerrordialog("Error", "Cannot Calculate", "Days Cannot Be 0"); return;}
+            Double goalhours = getCurrentGoal().getGoal_Hours();
+            Double days = (double) DaysSpinner.getValue();
+            Float hourstopractice = goalhours.floatValue() / days.floatValue();
+            Tools.showinformationdialog("Calculation", "Your Estimated Practice Time Needed Is", hourstopractice.intValue() + " Hours For " + days.intValue() + "Days To Achieve This Goal");
+        }
+        public void closedialog(ActionEvent actionEvent) {close();}
+
     }
     public static class PrematureEndingDialog extends Stage {
 
@@ -270,6 +298,53 @@ public class GoalsWidget implements Widget{
             } catch (IOException e) {e.printStackTrace();}
         }
 
+    }
+    public static class SelectGoalDialog extends Stage {
+        public TableView<CurrentGoalBinding> currentgoaltable;
+        public TableColumn<CurrentGoalBinding, Integer> NumberColumn;
+        public TableColumn<CurrentGoalBinding, String> GoalTimeColumn;
+        public TableColumn<CurrentGoalBinding, String> DueDateColumn;
+        public TableColumn<CurrentGoalBinding, String> PercentCompleteColumn;
+        public Button SelectButton;
+        public Button CancelButton;
+        public CurrentGoal selectedgoal;
+        private List<CurrentGoal> currentGoalList;
+
+        public SelectGoalDialog(List<CurrentGoal> currentGoalList, double currentpracticedhours) {
+            this.currentGoalList = currentGoalList;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SelectGoalDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select A Goal");}
+            catch (IOException e) {e.printStackTrace();}
+            ObservableList<CurrentGoalBinding> currentGoals = FXCollections.observableArrayList();
+            currentGoals.addAll(currentGoalList.stream().map(i -> new CurrentGoalBinding(currentGoalList.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Set(), i.getpercentagecompleted(currentpracticedhours))).collect(Collectors.toList()));
+            NumberColumn.setCellValueFactory(cellData -> cellData.getValue().goalid.asObject());
+            NumberColumn.setStyle("-fx-alignment: CENTER;");
+            GoalTimeColumn.setCellValueFactory(cellData -> cellData.getValue().goalhours);
+            GoalTimeColumn.setStyle("-fx-alignment: CENTER;");
+            DueDateColumn.setCellValueFactory(cellData -> cellData.getValue().duedate);
+            DueDateColumn.setStyle("-fx-alignment: CENTER;");
+            PercentCompleteColumn.setCellValueFactory(cellData -> cellData.getValue().percentcomplete);
+            PercentCompleteColumn.setStyle("-fx-alignment: CENTER;");
+            currentgoaltable.setItems(currentGoals);
+        }
+
+    // Getters And Setters
+        public CurrentGoal getSelectedgoal() {
+            return selectedgoal;
+        }
+        public void setSelectedgoal(CurrentGoal selectedgoal) {
+            this.selectedgoal = selectedgoal;
+        }
+
+    // Button Actions
+        public void closeDialog(ActionEvent actionEvent) {close();}
+        public void selectgoal(ActionEvent actionEvent) {
+            int index = currentgoaltable.getSelectionModel().getSelectedIndex();
+            if (index == -1) {Tools.showinformationdialog("Information", "No Goal Selected", "Select A Goal"); return;}
+            setSelectedgoal(currentGoalList.get(index));
+            close();
+        }
     }
     public static class SetANewGoalDialog extends Stage {
         public Spinner<Integer> GoalHoursSpinner;
@@ -346,7 +421,32 @@ public class GoalsWidget implements Widget{
 
 
     }
-    public static class SingleGoalComplete extends Stage {}
-    public static class MultipleGoalsComplete extends Stage {}
+    public static class GoalCompleted extends Stage {
+        public Label GoalHours;
+        public Button CloseButton;
+        public Label CurrentHoursLabel;
 
+        public GoalCompleted(CurrentGoal currentGoal, Double currentpracticedhours) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalCompleted.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Goal Achieved");}
+            catch (IOException e) {e.printStackTrace();}
+            GoalHours.setText(currentGoal.getGoal_Hours().toString());
+            CurrentHoursLabel.setText(currentpracticedhours.toString());
+            CloseButton.setOnAction(event -> close());
+        }
+    }
+    public static class CurrentGoalBinding {
+        private IntegerProperty goalid;
+        private StringProperty goalhours;
+        private StringProperty duedate;
+        private StringProperty percentcomplete;
+
+        public CurrentGoalBinding(int id, String goalhours, String duedate, String percentcomplete) {
+            this.goalid = new SimpleIntegerProperty(id);
+            this.goalhours = new SimpleStringProperty(goalhours);
+            this.duedate = new SimpleStringProperty(duedate);
+            this.percentcomplete = new SimpleStringProperty(percentcomplete);
+        }
+    }
 }

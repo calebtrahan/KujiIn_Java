@@ -93,7 +93,7 @@ public class CurrentGoals {
     }
     public void displaycurrentgoals(double currentpracticedhours) {
         if (getCurrentGoal() != null) {
-            GoalsWidget.DisplayCurrentGoalsDialog dcg = new GoalsWidget.DisplayCurrentGoalsDialog(null, getCurrentGoal(), currentpracticedhours);
+            GoalsWidget.DisplayCurrentGoalsDialog dcg = new GoalsWidget.DisplayCurrentGoalsDialog(getCurrentGoal(), currentpracticedhours);
             dcg.showAndWait();
         } else {
             Tools.showinformationdialog("Cannot Display", "Cannot Display", "No Goals Currently Set");}
