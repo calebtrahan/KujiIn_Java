@@ -3,7 +3,6 @@ package kujiin.xml;
 import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.lib.BeanComparator;
-import kujiin.widgets.GoalsWidget;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -34,6 +33,13 @@ public class CurrentGoals {
             Unmarshaller createMarshaller = context.createUnmarshaller();
             CurrentGoals currentGoals = (CurrentGoals) createMarshaller.unmarshal(This_Session.currentgoalsxmlfile);
             setCurrentGoal(currentGoals.getCurrentGoal());
+        }
+    }
+    public void writecurrentgoalstoxml() throws JAXBException {
+        if (This_Session.currentgoalsxmlfile.exists()) {
+            JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
+            Marshaller createMarshaller = context.createMarshaller();
+            createMarshaller.marshal(getCurrentGoal(), This_Session.currentgoalsxmlfile);
         }
     }
     public void addnewgoal(CurrentGoal newgoal) throws JAXBException {
@@ -91,22 +97,26 @@ public class CurrentGoals {
             return null;
         } else {return null;}
     }
-    public void displaycurrentgoals(double currentpracticedhours) {
-        if (getCurrentGoal() != null) {
-            GoalsWidget.DisplayCurrentGoalsDialog dcg = new GoalsWidget.DisplayCurrentGoalsDialog(getCurrentGoal(), currentpracticedhours);
-            dcg.showAndWait();
-        } else {
-            Tools.showinformationdialog("Cannot Display", "Cannot Display", "No Goals Currently Set");}
-    }
-    public void setnewgoal(double currentpracticedhours) {
-        GoalsWidget.SetANewGoalDialog sngd = new GoalsWidget.SetANewGoalDialog(currentpracticedhours);
-        sngd.showAndWait();
-        if (sngd.isAccepted()) {
-            try {addnewgoal(new CurrentGoal(sngd.getGoaldate(), sngd.getGoalhours()));}
-            catch (JAXBException e) {e.printStackTrace(); Tools.showerrordialog("Error", "Couldn't Add This Goal", "Check File Permissions");}
+    public void checkforcompletedgoals(double currentpracticedhours, CompletedGoals completedGoals) {
+        int oldsize = getCurrentGoal().size();
+        List<CurrentGoal> newgoalslist = getCurrentGoal();
+        for (kujiin.xml.CurrentGoal i : getCurrentGoal()) {
+            if (currentpracticedhours >= i.getGoal_Hours()) {
+                CompletedGoal completedGoal = new CompletedGoal();
+                completedGoal.setDate_Completed(Tools.gettodaysdate());
+                completedGoal.setGoal_Hours(i.getGoal_Hours());
+                try {completedGoals.addcompletedgoal(completedGoal);}
+                catch (JAXBException ignored) {
+                    Tools.showerrordialog("Error", "Cannot Complete This Goal", "Check File Permissions");
+                    return;
+                }
+                newgoalslist.remove(i);
+            }
         }
-    }
-    public void currentgoalpacing(double currentpracticedhours) {
-
+        setCurrentGoal(newgoalslist);
+        if (getCurrentGoal().size() != oldsize) {
+            try {writecurrentgoalstoxml();}
+            catch (JAXBException ignored) {Tools.showerrordialog("Error", "Cannot Write Current Goals To XML File", "Check File Permissions");}
+        }
     }
 }

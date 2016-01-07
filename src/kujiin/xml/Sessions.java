@@ -64,6 +64,9 @@ public class Sessions {
             return totalminutes;
         } catch (NullPointerException ignored) {return 0;}
     }
+    public double getgrandtotaltimeindecimalhours(boolean includepreandpost) {
+        return Tools.convertminutestodecimalhours(getgrandtotaltimepracticedinminutes(includepreandpost));
+    }
     public float getaveragesessiontimeinminutes(boolean includepreandpost) {
         try {return (float) getgrandtotaltimepracticedinminutes(includepreandpost) / getSession().size();}
         catch (NullPointerException ignored) {return 0;}

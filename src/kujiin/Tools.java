@@ -76,6 +76,23 @@ public class Tools {
         NumberFormat numberFormat = new DecimalFormat("#0.00");
         return Double.parseDouble(numberFormat.format(newval));
     }
+    public static String minstoformattedlonghoursandminutes(int mins) {
+        int hours = mins / 60;
+        int minutes = mins % 60;
+        StringBuilder stringbuilder = new StringBuilder();
+        if (hours > 0) {
+            stringbuilder.append(hours);
+            stringbuilder.append(" Hour");
+            if (hours > 1) {stringbuilder.append("s");}
+            if (minutes > 0) {stringbuilder.append(" ");}
+        }
+        if (minutes > 0) {
+            stringbuilder.append(minutes);
+            stringbuilder.append(" Minute");
+            if (minutes > 1) {stringbuilder.append("s");}
+        }
+        return stringbuilder.toString();
+    }
     public static String minutestoformattedhoursandmins(int min) {
         int hours = min / 60;
         int minutes = min % 60;

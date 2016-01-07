@@ -4,7 +4,6 @@ package kujiin.xml;
 import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.lib.BeanComparator;
-import kujiin.widgets.GoalsWidget;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -65,12 +64,5 @@ public class CompletedGoals {
             Collections.sort(completedGoalList, bc);
             setCompletedGoal(completedGoalList);
         }
-    }
-    public void displaycompletedgoals() {
-        if (getCompletedGoal() != null) {
-            GoalsWidget.DisplayCompletedGoalsDialog dcg = new GoalsWidget.DisplayCompletedGoalsDialog(getCompletedGoal());
-            dcg.showAndWait();
-        } else {
-            Tools.showinformationdialog("Cannot Display", "Cannot Display", "No Goals Completed Yet");}
     }
 }

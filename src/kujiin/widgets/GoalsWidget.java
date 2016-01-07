@@ -72,17 +72,26 @@ public class GoalsWidget implements Widget{
 
 // Button Actions
     public void setnewgoal() {
-        currentGoals.setnewgoal(Tools.convertminutestodecimalhours(allpracticedsessions.getgrandtotaltimepracticedinminutes(false)));
+        SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(allpracticedsessions.getgrandtotaltimeindecimalhours(false));
+        setANewGoalDialog.showAndWait();
+        if (setANewGoalDialog.isAccepted()) {
+            try {currentGoals.addnewgoal(new CurrentGoal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
+            catch (JAXBException ignored) {Tools.showerrordialog("Error", "Couldn't Add Goal", "Check File Permissions");}
+        }
         update();
     }
     public void displaycurrentgoals() {
-        currentGoals.displaycurrentgoals(Tools.convertminutestodecimalhours(allpracticedsessions.getgrandtotaltimepracticedinminutes(false)));
+        List<CurrentGoal> currentGoalslist = currentGoals.getCurrentGoal();
+        if (currentGoalslist == null) {Tools.showinformationdialog("Information", "No Goals To Display", "Set A New Goal First"); return;}
+        new DisplayCurrentGoalsDialog(currentGoalslist, allpracticedsessions.getgrandtotaltimeindecimalhours(false)).showAndWait();
     }
     public void displaycompletedgoals() {
-        completedGoals.displaycompletedgoals();
+        List<CompletedGoal> goalslist = completedGoals.getCompletedGoal();
+        if (goalslist == null) {Tools.showinformationdialog("Information", "No Goals To Display", "Set A New Goal First"); return;}
+        new DisplayCompletedGoalsDialog(goalslist).showAndWait();
     }
     public void goalpacing() {
-        currentGoals.currentgoalpacing(Tools.convertminutestodecimalhours(allpracticedsessions.getgrandtotaltimepracticedinminutes(false)));
+        new GoalPacingDialog(currentGoals.getfirstcurrentgoal(), currentGoals.getCurrentGoal(), allpracticedsessions.getgrandtotaltimeindecimalhours(false)).showAndWait();
     }
 
 // Widget Implementation
@@ -284,7 +293,10 @@ public class GoalsWidget implements Widget{
             Double goalhours = getCurrentGoal().getGoal_Hours();
             Double days = (double) DaysSpinner.getValue();
             Float hourstopractice = goalhours.floatValue() / days.floatValue();
-            Tools.showinformationdialog("Calculation", "Your Estimated Practice Time Needed Is", hourstopractice.intValue() + " Hours For " + days.intValue() + "Days To Achieve This Goal");
+            int minsaday = Tools.convertdecimalhourstominutes(hourstopractice.doubleValue());
+            String formattedgoalhours = Tools.minstoformattedlonghoursandminutes(Tools.convertdecimalhourstominutes(goalhours));
+            Tools.showinformationdialog("Calculation", "To Reach " + formattedgoalhours + " In " + days.intValue() + " Days:",
+                    "Practice For " + Tools.minstoformattedlonghoursandminutes(minsaday) + " A Day");
         }
         public void closedialog(ActionEvent actionEvent) {close();}
 
