@@ -3,9 +3,13 @@ package kujiin;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
@@ -25,7 +29,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
 
 public class This_Session {
     public static final File projectroot = new File(System.getProperty("user.dir"));
@@ -165,25 +168,44 @@ public class This_Session {
         }
         return false;
     }
-    public void checkifambienceisgood(ArrayList<Integer> textfieldvalues) {
+    public void checkifambienceisgood(ArrayList<Integer> textfieldvalues, CheckBox ambiencecheckbox) {
         if (textfieldvaluesareOK(textfieldvalues)) {
             ArrayList<Cut> cutswithnoambience = new ArrayList<>();
             ArrayList<Cut> cutswithreducedambience = new ArrayList<>();
             Cut[] tempcuts = {presession, rin, kyo, toh, sha, kai, jin, retsu, zai, zen, postsession};
-            Task<Void> task = new Task<Void>() {
+            Service<Void> ambiencecheckerservice = new Service<Void>() {
                 @Override
-                protected Void call() throws Exception {
-                    int cutcount = 0;
-                    for (Integer i : textfieldvalues) {
-                        if (i != 0) {
-                            Cut thiscut = tempcuts[cutcount];
-                            updateMessage(String.format("Currently Checking %s...", thiscut.name));
-                            if (thiscut.hasanyAmbience()) {
-                                if (!thiscut.hasenoughAmbience()) {cutswithreducedambience.add(thiscut);}
-                            } else {cutswithnoambience.add(thiscut);}
+                protected Task<Void> createTask() {
+                    return new Task<Void>() {
+                        @Override
+                        protected Void call() throws Exception {
+                            int cutcount = 0;
+                            for (Integer i : textfieldvalues) {
+                                if (i != 0) {
+                                    Cut thiscut = tempcuts[cutcount];
+                                    updateMessage(String.format("Currently Checking %s...", thiscut.name));
+                                    if (thiscut.getambiencefiles()) {
+                                        if (!thiscut.hasenoughAmbience(i * 60)) {cutswithreducedambience.add(thiscut);}
+                                    } else {cutswithnoambience.add(thiscut);}
+                                }
+                                cutcount++;
+                            }
+                            updateMessage("Done Checking Ambience");
+                            return null;
                         }
-                        cutcount++;
-                    }
+                    };
+                }
+            };
+            final CreatorAndExporterWidget.CheckingAmbienceDialog[] cad = new CreatorAndExporterWidget.CheckingAmbienceDialog[1];
+            ambiencecheckerservice.setOnRunning(event -> {
+                cad[0] = new CreatorAndExporterWidget.CheckingAmbienceDialog();
+                cad[0].Message.textProperty().bind(ambiencecheckerservice.messageProperty());
+                cad[0].CancelButton.setOnAction(ev -> ambiencecheckerservice.cancel());
+                cad[0].showAndWait();
+            });
+            ambiencecheckerservice.setOnSucceeded(event -> {
+                cad[0].close();
+                Platform.runLater(() -> {
                     if (cutswithnoambience.size() > 0) {
                         StringBuilder a = new StringBuilder();
                         for (int i = 0; i < cutswithnoambience.size(); i++) {
@@ -192,64 +214,54 @@ public class This_Session {
                                 a.append(", ");
                             }
                         }
-                        Alert b = new Alert(Alert.AlertType.ERROR);
-                        b.setTitle("Error");
-                        b.setHeaderText("Cannot Add Ambience");
                         if (cutswithnoambience.size() > 1) {
-                            b.setContentText(String.format("%s Have No Ambience At All", a.toString()));
+                            Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
+                            if (Tools.getanswerdialog("Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
+                                MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor();
+                                ambienceEditor.showAndWait();
+                            }
                         } else {
-                            b.setContentText(String.format("%s Has No Ambience At All", a.toString()));
+                            Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
+                            if (Tools.getanswerdialog("Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
+                                MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(cutswithnoambience.get(0).name);
+                                ambienceEditor.showAndWait();
+                            }
                         }
-                        b.setResizable(true);
-                        b.showAndWait();
-                        Alert c = new Alert(Alert.AlertType.INFORMATION);
-                        c.setHeaderText("Please Add Ambience To The Session");
-                        c.setContentText("To Do This, Please Click Tools -> Add Ambience");
-                        c.showAndWait();
-                        ambienceenabled = false;
+                        ambiencecheckbox.setSelected(false);
                     } else {
                         if (cutswithreducedambience.size() > 0) {
                             StringBuilder a = new StringBuilder();
+                            int count = 1;
                             for (int i = 0; i < cutswithreducedambience.size(); i++) {
                                 a.append("\n");
                                 Cut thiscut = cutswithreducedambience.get(i);
-                                String formattedcurrentduration = Tools.minutestoformattedhoursandmins((int) thiscut.getTotalambienceduration());
-                                String formattedexpectedduration = Tools.minutestoformattedhoursandmins(cutswithreducedambience.get(i).getdurationinminutes());
-                                a.append(thiscut.name).append("(Found: ").append(formattedcurrentduration).append(" | Expected: ").append(formattedexpectedduration).append(")");
+                                String formattedcurrentduration = Tools.minutestoformattedhoursandmins((int) thiscut.getTotalambienceduration() / 60);
+                                String formattedexpectedduration = Tools.minutestoformattedhoursandmins(textfieldvalues.get(This_Session.allnames.indexOf(cutswithreducedambience.get(i).name)));
+                                a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
+                                count++;
                             }
-                            Alert b = new Alert(Alert.AlertType.CONFIRMATION);
-                            b.setResizable(true);
-                            b.setTitle("Error");
                             if (cutswithreducedambience.size() == 1) {
-                                b.setHeaderText(String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()));
+                                ambiencecheckbox.setSelected(Tools.getanswerdialog("Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
                             } else {
-                                b.setHeaderText(String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()));
+                                ambiencecheckbox.setSelected(Tools.getanswerdialog("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
                             }
-                            b.setContentText("Shuffle And Loop Ambience For These Cuts?");
-                            Optional<ButtonType> c = b.showAndWait();
-                            ambienceenabled = c.isPresent() && c.get() == ButtonType.OK;
                         } else {
-                            ambienceenabled = true;
+                            ambiencecheckbox.setSelected(true);
                         }
                     }
-                    updateMessage("Done Checking Ambience");
-                    return null;
-                }
-            };
-            new Thread(task).start();
-            final CreatorAndExporterWidget.CheckingAmbienceDialog[] cad = new CreatorAndExporterWidget.CheckingAmbienceDialog[1];
-            task.setOnRunning(event -> {
-                cad[0] = new CreatorAndExporterWidget.CheckingAmbienceDialog();
-                cad[0].Message.textProperty().bind(task.messageProperty());
-                cad[0].CancelButton.setOnAction(ev -> task.cancel());
-                cad[0].showAndWait();
+                });
             });
-            task.setOnSucceeded(event -> cad[0].close());
-            task.setOnCancelled(event -> cad[0].close());
-            task.setOnFailed(event -> cad[0].close());
-        } else {
-            Tools.showinformationdialog("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");
-        }
+            ambiencecheckerservice.setOnCancelled(event -> {
+                cad[0].close();
+                ambiencecheckbox.setSelected(false);
+            });
+            ambiencecheckerservice.setOnFailed(event -> {
+                cad[0].close();
+                Tools.showerrordialog("Error", "Couldn't Check Ambience", "Check Ambience Folder Read Permissions");
+                ambiencecheckbox.setSelected(false);
+            });
+            ambiencecheckerservice.start();
+        } else {Tools.showinformationdialog("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
     public boolean sessioncreationwellformednesschecks(ArrayList<Integer> textfieldtimes) {
         int lastcutindex = 0;
@@ -259,9 +271,7 @@ public class This_Session {
         // Get NonSequential Cuts
         ArrayList<Integer> indexestochange = new ArrayList<>();
         for (int i = 0; i < lastcutindex; i++) {
-            if (i > 0) {
-                if (textfieldtimes.get(i) == 0) {indexestochange.add(i);}
-            }
+            if (i > 0) {if (textfieldtimes.get(i) == 0) {indexestochange.add(i);}}
         }
         if (indexestochange.size() > 0) {
             ArrayList<String> cutsmissinglist = new ArrayList<>();
@@ -310,7 +320,9 @@ public class This_Session {
         if (sessioncreationwellformednesschecks(textfieldtimes)) {
             setupcutsinsession(textfieldtimes);
             boolean ok = true;
-            for (Cut i : cutsinsession) {if (! i.create(cutsinsession, ambienceenabled)) {ok = false; break;}}
+            for (Cut i : cutsinsession) {
+                if (! i.create(cutsinsession, ambienceenabled)) {ok = false; break;}
+            }
             return ok;
         } else {return false;}
     }

@@ -107,7 +107,9 @@ public class CreatorAndExporterWidget implements Widget {
         if (gettextfieldtimes()) {
             if (Tools.sessionwellformednesschecks(textfieldtimes)) {
                 this_session.setAmbienceenabled(AmbienceSwitch.isSelected());
-                this_session.create(textfieldtimes);
+                if (! this_session.create(textfieldtimes)) {
+                    Tools.showerrordialog("Error", "Session Creation Failed", "Please Try Again");
+                }
                 return true;
             } else {return false;}
         }
@@ -128,9 +130,9 @@ public class CreatorAndExporterWidget implements Widget {
         return good;
     }
     public void exportsession() {
+        System.out.println("In Export Session Method");
         if (checkforffmpeg()) {
             createsession();
-
         } else {
             Tools.showerrordialog("Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
         }
@@ -220,7 +222,7 @@ public class CreatorAndExporterWidget implements Widget {
     public void checkambience() {
         if (AmbienceSwitch.isSelected()) {
             if (gettextfieldtimes()) {
-                this_session.checkifambienceisgood(textfieldtimes);
+                this_session.checkifambienceisgood(textfieldtimes, AmbienceSwitch);
             } else {
                 Tools.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
                 AmbienceSwitch.setSelected(false);

@@ -260,7 +260,7 @@
          </font>
       </Button>
       <Label layoutX="353.0" layoutY="42.0" text="Export Session" />
-      <Button fx:id="ChangeValuesButton" layoutX="14.0" layoutY="171.0" mnemonicParsing="false" onAction="#changeallcreatorvalues" onMousePressed="#exportsession" prefHeight="23.0" prefWidth="132.0" text="Change All Values">
+      <Button fx:id="ChangeValuesButton" layoutX="14.0" layoutY="171.0" mnemonicParsing="false" onAction="#changeallcreatorvalues" prefHeight="23.0" prefWidth="132.0" text="Change All Values">
          <font>
             <Font size="12.0" />
          </font>

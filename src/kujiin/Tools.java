@@ -13,9 +13,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Optional;
+import java.util.*;
 
 
 public class Tools {
@@ -26,7 +24,9 @@ public class Tools {
 
     }
     public static void aboutthisprogram() {}
-    public static void contactme() {}
+    public static void contactme() {
+
+    }
 
 // Gui Utils
     public static void numericTextField(TextField txtfield) {
@@ -304,4 +304,11 @@ public class Tools {
                 || file.getName().endsWith(".aif") || file.getName().endsWith(".aiff") || file.getName().endsWith("m4a");
     }
 
+// List Utils
+    public static List<?> shufflelist(List<?> list, int times) {
+        for (int i = 0; i < times; i++) {
+            Collections.shuffle(list);
+        }
+        return list;
+    }
 }

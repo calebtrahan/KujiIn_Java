@@ -208,7 +208,9 @@ public class MainController implements Initializable {
 //            StatusBar.setText("Session Creation In Progress");
 //        }
     }
-    public void exportsession(Event event) {creatorAndExporterWidget.exportsession();}
+    public void exportsession(Event event) {
+        creatorAndExporterWidget.exportsession();
+    }
     public void settextfieldvalue(TextField textField, Integer value) {
         if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
         else {textField.setText("-"); textField.setDisable(true);}
@@ -253,7 +255,7 @@ public class MainController implements Initializable {
         private Boolean alertfilechanged = null;
 
         public ChangeAlertDialog(Parent parent) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ChangeAlertDialog.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeAlertDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select An Ambience Type Variation");}
             catch (IOException e) {e.printStackTrace();}
@@ -329,7 +331,7 @@ public class MainController implements Initializable {
         }
         public void setAlertfilechanged(Boolean alertfilechanged) {this.alertfilechanged = alertfilechanged;}
     }
-    public static class EditReferenceFiles extends Stage implements Initializable {
+    public static class EditReferenceFiles extends Stage {
 
         public ChoiceBox<String> CutNamesChoiceBox;
         public ChoiceBox<String> CutVariationsChoiceBox;
@@ -349,7 +351,7 @@ public class MainController implements Initializable {
         private String selectedvariation;
 
         public EditReferenceFiles() {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/EditReferenceFiles.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/EditReferenceFiles.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select An Ambience Type Variation");}
             catch (IOException e) {e.printStackTrace();}
@@ -362,10 +364,6 @@ public class MainController implements Initializable {
             CutVariationsChoiceBox.setItems(variations);
         }
 
-        @Override
-        public void initialize(URL location, ResourceBundle resources) {
-
-        }
         public void closewindow(Event event) {
             // Check If Unsaved Text
             this.close();
@@ -489,7 +487,7 @@ public class MainController implements Initializable {
         }
 
         public SessionAmbienceEditor() {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionAmbienceEditor.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Ambience Editor");}
             catch (IOException e) {e.printStackTrace();}
@@ -756,6 +754,18 @@ public class MainController implements Initializable {
             }
         }
 
+    }
+    public static class SimpleTextDialog extends Stage {
+        public Label Message;
+
+        public SimpleTextDialog(String toptitle, String message) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleTextDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle(toptitle);}
+            catch (IOException e) {e.printStackTrace();}
+            Message.setText(message);
+            Message.setWrapText(true);
+        }
     }
 
 }

@@ -11,6 +11,7 @@ import kujiin.widgets.PlayerWidget;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Cut {
     public String name;
@@ -109,7 +110,7 @@ public class Cut {
     public void setCutstoplay(ArrayList<Cut> cutstoplay) {this.cutstoplay = cutstoplay;}
 
 // Creation
-    public boolean hasanyAmbience() {
+    public boolean getambiencefiles() {
         ambiencefiles = new ArrayList<>();
         ambiencefiledurations = new ArrayList<>();
         try {
@@ -123,11 +124,12 @@ public class Cut {
         } catch (NullPointerException ignored) {return false;}
         return ambiencefiles.size() > 0;
     }
-    public boolean hasenoughAmbience() {
+    public boolean hasenoughAmbience(int secondstocheck) {
         double a = 0;
         for (Double i : ambiencefiledurations) {a += i;}
         setTotalambienceduration(a);
-        return a > (double) getdurationinseconds();
+        System.out.println(a + " Is Greater Than " + secondstocheck);
+        return a > (double) secondstocheck;
     }
     public void cleanuptempfiles() {
         if (tempambiencefile.exists()) {tempambiencefile.delete();}
@@ -140,144 +142,124 @@ public class Cut {
         setCutstoplay(cutstoplay);
         if (isAmbienceenabled()) {return makeEntrainmentList() && makeAmbienceList();}
         else {return makeEntrainmentList();}
+
     }
     public boolean makeEntrainmentList() {
+        File rampin1 = new File(This_Session.directorytohramp, "3in1.mp3");
+        File rampin2 = new File(This_Session.directorytohramp, "3in2.mp3");
+        File rampout1 = new File(This_Session.directorytohramp, "3out1.mp3");
+        File rampout2 = new File(This_Session.directorytohramp, "3out2.mp3");
+        File rampoutspecial1 = new File(This_Session.directorytohramp, "3outpostsession1.mp3");
+        File rampoutspecial2 = new File(This_Session.directorytohramp, "3outpostsession2.mp3");
         // TODO Add 5 Min Entrainment Files, And Refactor This Here
         entrainmentlist = new ArrayList<>();
         entrainmentmedia = new ArrayList<>();
-        if (number == 0) {                                                                                              // Presession
-            for (Integer z = 0; z < duration; z++) {
-                String filename = name + ".mp3";
-                File thisfile = new File(This_Session.directorymaincuts, filename);
-                entrainmentlist.add(thisfile);
+        int fivetimes = 0;
+        int singletimes = 0;
+        if (duration != 0) {
+            fivetimes = duration / 5;
+            singletimes = duration % 5;
+        }
+        if (number == 3) {
+            int adjustedduration = duration;
+            if (duration <= 5) adjustedduration -= 2;
+            else adjustedduration -= 4;
+            fivetimes = adjustedduration / 5;
+            singletimes = adjustedduration % 5;
+        }
+        for (int i = 0; i < fivetimes; i++) {
+            String filename = name + "5.mp3";
+            File thisfile = new File(This_Session.directorymaincuts, filename);
+            entrainmentlist.add(thisfile);
+        }
+        for (int i = 0; i < singletimes; i++) {
+            String filename = name + "1.mp3";
+            File thisfile = new File(This_Session.directorymaincuts, filename);
+            entrainmentlist.add(thisfile);
+        }
+        Tools.shufflelist(entrainmentlist, 5);
+        if (number == 3) {
+            File rampinfile;
+            File rampoutfile;
+            if (duration <= 5) {rampinfile = rampin1; rampoutfile = rampout1;}
+            else {rampinfile = rampin2; rampoutfile = rampout2;}
+            if (cutstoplay.size() - cutstoplay.indexOf(this) <= 2) {
+                if (duration <= 5) entrainmentlist.add(rampoutspecial1);
+                else entrainmentlist.add(rampoutspecial2);
+            } else {
+                entrainmentlist.add(0, rampinfile);
+                entrainmentlist.add(rampoutfile);
             }
+        }
+        if (number == 0) {
             String rampupfirstname = "ar" + cutstoplay.get(1).number + rampduration + ".mp3";
             File ramptofirstcut = new File(This_Session.directoryrampup, rampupfirstname);
             entrainmentlist.add(ramptofirstcut);
         }
-        else if (number == 10) {                                                                                        // PostSession
+        if (number == 10) {
             String rampdowntopost =  "zr" +
                     cutstoplay.get(cutstoplay.size()-2).number + rampduration + ".mp3";
             File thisfile = new File(This_Session.directoryrampdown, rampdowntopost);
-            entrainmentlist.add(thisfile);
-            for (Integer g = 0; g < duration; g++) {
-                String postname = name + ".mp3";
-                File thatfile = new File(This_Session.directorymaincuts, postname);
-                entrainmentlist.add(thatfile);
-            }
+            entrainmentlist.add(0, thisfile);
         }
-        else if (number == 3) {                                                                                         // TOH
-            Boolean postsessionisnext = false;
-            if (cutstoplay.size() - cutstoplay.indexOf(this) <= 2) {postsessionisnext = true;}
-            File tohmainfile = new File(This_Session.directorymaincuts, "TOH.mp3");
-            // TODO Add 3inpostsession for if going straight into TOH
-            File rampin1 = new File(This_Session.directorytohramp, "3in1.mp3");
-            File rampin2 = new File(This_Session.directorytohramp, "3in2.mp3");
-            File rampout1 = new File(This_Session.directorytohramp, "3out1.mp3");
-            File rampout2 = new File(This_Session.directorytohramp, "3out2.mp3");
-            File rampoutspecial1 = new File(This_Session.directorytohramp, "3outpostsession1.mp3");
-            File rampoutspecial2 = new File(This_Session.directorytohramp, "3outpostsession2.mp3");
-            if (duration <= 5) {
-                entrainmentlist.add(rampin1);
-                for (int c = 0; c < duration - 2; c++) {
-                    entrainmentlist.add(tohmainfile);
-                }
-                if (postsessionisnext) {entrainmentlist.add(rampoutspecial1);}
-                else {entrainmentlist.add(rampout1);}
-            } else {
-                entrainmentlist.add(rampin2);
-                for (int c = 0; c < duration - 4; c++) {
-                    entrainmentlist.add(tohmainfile);
-                }
-                if (postsessionisnext) {entrainmentlist.add(rampoutspecial2);}
-                else {entrainmentlist.add(rampout2);}
-            }
+        for (File i : entrainmentlist) {
+            entrainmentmedia.add(new Media(i.toURI().toString()));
         }
-        else {                                                                                                      // All Other Cuts
-            String filename = name + ".mp3";
-            for (int c = 0; c < duration; c++) {
-                File thisfile = new File(This_Session.directorymaincuts, filename);
-                entrainmentlist.add(thisfile);
-            }
-        }
-        for (File i : entrainmentlist) {entrainmentmedia.add(new Media(i.toURI().toString()));}
         return entrainmentmedia.size() > 0;
     }
     public boolean makeAmbienceList() {
-        // TODO Check Ambience List Generators To Make Sure There Are No Repeats
+        // TODO Ambience Hangs On Higher Than 10 Numbers
         // TODO Set Really High Durations, So You Can See If It Works For Really Long Sessions
         ambiencelist = new ArrayList<>();
         ambiencemedia = new ArrayList<>();
-        double currentduration = 0.0;
-        double sessionduration = (double) getdurationinseconds();
-        Random randint = new Random();
-        while (currentduration < sessionduration) {
-            File tempfile = ambiencefiles.get(randint.nextInt(ambiencefiles.size() - 1));
-            double tempduration = ambiencefiledurations.get(ambiencefiles.indexOf(tempfile));
-            if (hasenoughAmbience()) {
-                for (int i = 0; i < ambiencefiles.size(); i++) {
-                    if (currentduration < sessionduration) {
-                        ambiencelist.add(ambiencefiles.get(i));
-                        currentduration += tempduration;
-                    } else {break;}
-                }
-            } else {
-                if (ambiencelist.size() < ambiencefiles.size()) {                                                       // Shouldn't Need To Repeat
-//                        System.out.println("Conditional 1");
-                    if (!ambiencelist.contains(tempfile)) {
+        Double currentduration = 0.0;
+        Double sessionduration = (double) getdurationinseconds();
+    // Ambience Is >= Session Duration
+        if (hasenoughAmbience(getdurationinseconds())) {
+            for (File i : ambiencefiles) {
+                if (currentduration < sessionduration) {
+                    ambiencelist.add(i);
+                    currentduration += ambiencefiledurations.get(ambiencefiles.indexOf(i));
+                } else {break;}
+            }
+    // Shuffle/Loop Ambience Randomly
+        } else {
+            Random randint = new Random();
+            while (currentduration < sessionduration) {
+                File tempfile = ambiencefiles.get(randint.nextInt(ambiencefiles.size() - 1));
+                double tempduration = ambiencefiledurations.get(ambiencefiles.indexOf(tempfile));
+                int size = ambiencelist.size();
+                if (size == 0) {
+                    ambiencelist.add(tempfile);
+                    currentduration += tempduration;
+                } else if (size == 1) {
+                    ambiencelist.add(tempfile);
+                    currentduration += tempduration;
+                } else if (size == 2) {
+                    if (!tempfile.equals(ambiencelist.get(size - 1))) {
                         ambiencelist.add(tempfile);
                         currentduration += tempduration;
                     }
-                } else {
-                    int size = ambiencelist.size();
-                    if (ambiencefiles.size() == 1) {
-//                            System.out.println("Conditional 2");
+                } else if (size == 3) {
+                    if (!tempfile.equals(ambiencelist.get(size - 1)) && !tempfile.equals(ambiencelist.get(size - 2))) {
                         ambiencelist.add(tempfile);
                         currentduration += tempduration;
-                    } else if (ambiencefiles.size() < 3) {
-//                            System.out.println("Conditional 3");
-                        if ( ! tempfile.equals(ambiencelist.get(size - 1))) {
-                            ambiencelist.add(tempfile);
-                            currentduration += tempduration;
-                        }
-                    } else if (ambiencefiles.size() < 4) {
-//                            System.out.println("Conditional 4");
-                        if (! tempfile.equals(ambiencelist.get(size - 1)) &&
-                                ! tempfile.equals(ambiencelist.get(size - 2))) {
-                            ambiencelist.add(tempfile);
-                            currentduration += tempduration;
-                        }
-                    } else if (ambiencefiles.size() <= 5) {
-//                            System.out.println("Conditional 5");
-                        if (! tempfile.equals(ambiencelist.get(size - 1)) &&
-                                ! tempfile.equals(ambiencelist.get(size - 2)) &&
-                                ! tempfile.equals(ambiencelist.get(size - 3))) {
-                            ambiencelist.add(tempfile);
-                            currentduration += tempduration;
-                        }
-                    } else if (ambiencefiles.size() >= 6) {
-//                            System.out.println("Conditional 6");
-                        if (! tempfile.equals(ambiencelist.get(size - 1)) &&
-                                ! tempfile.equals(ambiencelist.get(size - 2)) &&
-                                ! tempfile.equals(ambiencelist.get(size - 3)) &&
-                                ! tempfile.equals(ambiencelist.get(size - 4))) {
-                            ambiencelist.add(tempfile);
-                            currentduration += tempduration;
-                        }
-                    } else {
-                        System.out.println("Your Ambience List Generator Logic Is Fucked Up");
+                    }
+                } else if (size <= 5) {
+                    if (!tempfile.equals(ambiencelist.get(size - 1)) && !tempfile.equals(ambiencelist.get(size - 2)) && !tempfile.equals(ambiencelist.get(size - 3))) {
+                        ambiencelist.add(tempfile);
+                        currentduration += tempduration;
+                    }
+                } else if (size > 5) {
+                    if (!tempfile.equals(ambiencelist.get(size - 1)) && !tempfile.equals(ambiencelist.get(size - 2)) && !tempfile.equals(ambiencelist.get(size - 3)) && !tempfile.equals(ambiencelist.get(size - 4))) {
+                        ambiencelist.add(tempfile);
+                        currentduration += tempduration;
                     }
                 }
             }
         }
-        System.out.println(name + "'s Ambience:");
-        int count = 1;
-        for (File i : ambiencelist) {
-            System.out.println(count + ") " + i.getName());
-            ambiencemedia.add(new Media(i.toURI().toString()));
-            count++;
-        }
-        return currentduration > sessionduration && ambiencemedia.size() > 0;
+        ambiencemedia.addAll(ambiencelist.stream().map(i -> new Media(i.toURI().toString())).collect(Collectors.toList()));
+        return ambiencemedia.size() > 0;
     }
 
 // Playback
