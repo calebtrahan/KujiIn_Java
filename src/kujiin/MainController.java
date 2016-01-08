@@ -767,5 +767,16 @@ public class MainController implements Initializable {
             Message.setWrapText(true);
         }
     }
+    public static class SimpleTextDialogWithCancelButton extends Stage {
+        public Button CancelButton;
+        public Label Message;
 
+        public SimpleTextDialogWithCancelButton(String titletext, String message) {
+             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SimpleTextDialogWithCancelButton.fxml"));
+             fxmlLoader.setController(this);
+             try {setScene(new Scene(fxmlLoader.load())); this.setTitle(titletext);}
+             catch (IOException e) {e.printStackTrace();}
+             Message.setText(message);
+        }
+    }
 }

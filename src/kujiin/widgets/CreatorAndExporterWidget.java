@@ -411,17 +411,6 @@ public class CreatorAndExporterWidget implements Widget {
     //        Platform.runLater(() -> creatingsessionTextStatusBar.setText(text));
         }
     }
-    public static class CheckingAmbienceDialog extends Stage {
-        public Button CancelButton;
-        public Label Message;
-
-        public CheckingAmbienceDialog() {
-             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CheckingAmbienceDialog.fxml"));
-             fxmlLoader.setController(this);
-             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Checking Ambience");}
-             catch (IOException e) {e.printStackTrace();}
-        }
-    }
     public static class SessionNotWellformedDialog extends Stage {
         public Button returntoCreatorButton;
         public Button addmissingCutsButton;

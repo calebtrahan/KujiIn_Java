@@ -196,9 +196,9 @@ public class This_Session {
                     };
                 }
             };
-            final CreatorAndExporterWidget.CheckingAmbienceDialog[] cad = new CreatorAndExporterWidget.CheckingAmbienceDialog[1];
+            final MainController.SimpleTextDialogWithCancelButton[] cad = new MainController.SimpleTextDialogWithCancelButton[1];
             ambiencecheckerservice.setOnRunning(event -> {
-                cad[0] = new CreatorAndExporterWidget.CheckingAmbienceDialog();
+                cad[0] = new MainController.SimpleTextDialogWithCancelButton("Checking Ambience", "");
                 cad[0].Message.textProperty().bind(ambiencecheckerservice.messageProperty());
                 cad[0].CancelButton.setOnAction(ev -> ambiencecheckerservice.cancel());
                 cad[0].showAndWait();
@@ -210,9 +210,7 @@ public class This_Session {
                         StringBuilder a = new StringBuilder();
                         for (int i = 0; i < cutswithnoambience.size(); i++) {
                             a.append(cutswithnoambience.get(i).name);
-                            if (i != cutswithnoambience.size() - 1) {
-                                a.append(", ");
-                            }
+                            if (i != cutswithnoambience.size() - 1) {a.append(", ");}
                         }
                         if (cutswithnoambience.size() > 1) {
                             Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
@@ -320,9 +318,39 @@ public class This_Session {
         if (sessioncreationwellformednesschecks(textfieldtimes)) {
             setupcutsinsession(textfieldtimes);
             boolean ok = true;
-            for (Cut i : cutsinsession) {
-                if (! i.create(cutsinsession, ambienceenabled)) {ok = false; break;}
-            }
+            final MainController.SimpleTextDialogWithCancelButton[] sdcb = new MainController.SimpleTextDialogWithCancelButton[1];
+            Service<Void> creationservice = new Service<Void>() {
+                @Override
+                protected Task<Void> createTask() {
+                    return new Task<Void>() {
+                        @Override
+                        protected Void call() throws Exception {
+                            for (Cut i : cutsinsession) {
+                                updateMessage("Creating" + i.name);
+                                if (! i.create(cutsinsession, ambienceenabled)) {cancel();}
+                            }
+                            return null;
+                        }
+                    };
+                }
+            };
+            creationservice.setOnRunning(event -> {
+                sdcb[0] = new MainController.SimpleTextDialogWithCancelButton("Creating Session", "");
+                sdcb[0].Message.textProperty().bind(creationservice.messageProperty());
+                sdcb[0].CancelButton.setOnAction(ev -> creationservice.cancel());
+            });
+            creationservice.setOnCancelled(event -> {
+                // TODO Reset Session Here
+                sdcb[0].close();
+            });
+            creationservice.setOnSucceeded(event -> {
+                sdcb[0].close();
+            });
+            creationservice.setOnFailed(event -> {
+                Platform.runLater(() -> Tools.showerrordialog("Error", "Session Creation Failed", "Check Sound File Read Permissions"));
+                // TODO Reset Session Here
+                sdcb[0].close();
+            });
             return ok;
         } else {return false;}
     }
