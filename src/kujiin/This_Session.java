@@ -6,7 +6,6 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -14,19 +13,13 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.GoalsWidget;
 import kujiin.widgets.PlayerWidget;
-import kujiin.xml.Session;
 import kujiin.xml.Sessions;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -86,21 +79,20 @@ public class This_Session {
     private Double entrainmentvolume;
     private Double ambiencevolume;
     private GoalsWidget goalsWidget;
+    private MainController Root;
 
-    public This_Session(Sessions sessions, Label cutCurrentTime, Label cutTotalTime, Label sessionCurrentTime,
-                        Label sessionTotalTime, ProgressBar cutProgress, ProgressBar totalProgress, Label cutPlayingText,
-                        Label sessionPlayingText, Label statusBar) {
-        this.sessions = sessions;
-        CutCurrentTime = cutCurrentTime;
-        CutTotalTime = cutTotalTime;
-        SessionCurrentTime = sessionCurrentTime;
-        SessionTotalTime = sessionTotalTime;
-        CutProgress = cutProgress;
-        TotalProgress = totalProgress;
-        CutPlayingText = cutPlayingText;
-        SessionPlayingText = sessionPlayingText;
-        StatusBar = statusBar;
-        clearlogfile();
+    public This_Session(MainController mainController) {
+        Root = mainController;
+        this.sessions = Root.getProgressTrackerWidget().getSessions();
+        CutCurrentTime = Root.CutProgressLabelCurrent;
+        CutTotalTime = Root.CutProgressLabelTotal;
+        SessionCurrentTime = Root.TotalProgressLabelCurrent;
+        SessionTotalTime = Root.TotalProgressLabelTotal;
+        CutProgress = Root.CutProgressBar;
+        TotalProgress = Root.TotalProgressBar;
+        CutPlayingText = Root.CutProgressTopLabel;
+        SessionPlayingText = Root.TotalSessionLabel;
+        StatusBar = Root.StatusBar;
         cutsinsession = new ArrayList<>();
         ambienceenabled = false;
         setPlayerState(PlayerWidget.PlayerState.IDLE);
@@ -184,7 +176,7 @@ public class This_Session {
                                 if (i != 0) {
                                     Cut thiscut = tempcuts[cutcount];
                                     updateMessage(String.format("Currently Checking %s...", thiscut.name));
-                                    if (thiscut.getambiencefiles()) {
+                                    if (thiscut.getambienceindirectory()) {
                                         if (!thiscut.hasenoughAmbience(i * 60)) {cutswithreducedambience.add(thiscut);}
                                     } else {cutswithnoambience.add(thiscut);}
                                 }
@@ -196,58 +188,56 @@ public class This_Session {
                     };
                 }
             };
-            final MainController.SimpleTextDialogWithCancelButton[] cad = new MainController.SimpleTextDialogWithCancelButton[1];
+            final SimpleTextDialogWithCancelButton[] cad = new SimpleTextDialogWithCancelButton[1];
             ambiencecheckerservice.setOnRunning(event -> {
-                cad[0] = new MainController.SimpleTextDialogWithCancelButton("Checking Ambience", "");
+                cad[0] = new SimpleTextDialogWithCancelButton("Checking Ambience", "Checking Ambience", "");
                 cad[0].Message.textProperty().bind(ambiencecheckerservice.messageProperty());
                 cad[0].CancelButton.setOnAction(ev -> ambiencecheckerservice.cancel());
                 cad[0].showAndWait();
             });
             ambiencecheckerservice.setOnSucceeded(event -> {
                 cad[0].close();
-                Platform.runLater(() -> {
-                    if (cutswithnoambience.size() > 0) {
-                        StringBuilder a = new StringBuilder();
-                        for (int i = 0; i < cutswithnoambience.size(); i++) {
-                            a.append(cutswithnoambience.get(i).name);
-                            if (i != cutswithnoambience.size() - 1) {a.append(", ");}
+                if (cutswithnoambience.size() > 0) {
+                    StringBuilder a = new StringBuilder();
+                    for (int i = 0; i < cutswithnoambience.size(); i++) {
+                        a.append(cutswithnoambience.get(i).name);
+                        if (i != cutswithnoambience.size() - 1) {a.append(", ");}
+                    }
+                    if (cutswithnoambience.size() > 1) {
+                        Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
+                        if (Tools.getanswerdialog("Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
+                            MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor();
+                            ambienceEditor.showAndWait();
                         }
-                        if (cutswithnoambience.size() > 1) {
-                            Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
-                            if (Tools.getanswerdialog("Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
-                                MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor();
-                                ambienceEditor.showAndWait();
-                            }
-                        } else {
-                            Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
-                            if (Tools.getanswerdialog("Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
-                                MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(cutswithnoambience.get(0).name);
-                                ambienceEditor.showAndWait();
-                            }
-                        }
-                        ambiencecheckbox.setSelected(false);
                     } else {
-                        if (cutswithreducedambience.size() > 0) {
-                            StringBuilder a = new StringBuilder();
-                            int count = 1;
-                            for (int i = 0; i < cutswithreducedambience.size(); i++) {
-                                a.append("\n");
-                                Cut thiscut = cutswithreducedambience.get(i);
-                                String formattedcurrentduration = Tools.minutestoformattedhoursandmins((int) thiscut.getTotalambienceduration() / 60);
-                                String formattedexpectedduration = Tools.minutestoformattedhoursandmins(textfieldvalues.get(This_Session.allnames.indexOf(cutswithreducedambience.get(i).name)));
-                                a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
-                                count++;
-                            }
-                            if (cutswithreducedambience.size() == 1) {
-                                ambiencecheckbox.setSelected(Tools.getanswerdialog("Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
-                            } else {
-                                ambiencecheckbox.setSelected(Tools.getanswerdialog("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
-                            }
-                        } else {
-                            ambiencecheckbox.setSelected(true);
+                        Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
+                        if (Tools.getanswerdialog("Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
+                            MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(cutswithnoambience.get(0).name);
+                            ambienceEditor.showAndWait();
                         }
                     }
-                });
+                    ambiencecheckbox.setSelected(false);
+                } else {
+                    if (cutswithreducedambience.size() > 0) {
+                        StringBuilder a = new StringBuilder();
+                        int count = 1;
+                        for (int i = 0; i < cutswithreducedambience.size(); i++) {
+                            a.append("\n");
+                            Cut thiscut = cutswithreducedambience.get(i);
+                            String formattedcurrentduration = Tools.minutestoformattedhoursandmins((int) thiscut.getTotalambienceduration() / 60);
+                            String formattedexpectedduration = Tools.minutestoformattedhoursandmins(textfieldvalues.get(This_Session.allnames.indexOf(cutswithreducedambience.get(i).name)));
+                            a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
+                            count++;
+                        }
+                        if (cutswithreducedambience.size() == 1) {
+                            ambiencecheckbox.setSelected(Tools.getanswerdialog("Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
+                        } else {
+                            ambiencecheckbox.setSelected(Tools.getanswerdialog("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
+                        }
+                    } else {
+                        ambiencecheckbox.setSelected(true);
+                    }
+                }
             });
             ambiencecheckerservice.setOnCancelled(event -> {
                 cad[0].close();
@@ -314,11 +304,10 @@ public class This_Session {
         cutsinsession.add(postsession);
         return cutsinsession.size() > 0;
     }
-    public boolean create(ArrayList<Integer> textfieldtimes) {
+    public void create(ArrayList<Integer> textfieldtimes) {
         if (sessioncreationwellformednesschecks(textfieldtimes)) {
             setupcutsinsession(textfieldtimes);
-            boolean ok = true;
-            final MainController.SimpleTextDialogWithCancelButton[] sdcb = new MainController.SimpleTextDialogWithCancelButton[1];
+            final SimpleTextDialogWithCancelButton[] sdcb = new SimpleTextDialogWithCancelButton[1];
             Service<Void> creationservice = new Service<Void>() {
                 @Override
                 protected Task<Void> createTask() {
@@ -326,16 +315,16 @@ public class This_Session {
                         @Override
                         protected Void call() throws Exception {
                             for (Cut i : cutsinsession) {
-                                updateMessage("Creating" + i.name);
-                                if (! i.create(cutsinsession, ambienceenabled)) {cancel();}
+                                updateMessage("Creating " + i.name);
+                                if (! i.build(cutsinsession, ambienceenabled)) {cancel();}
+                                updateMessage("Finished Creating " + i.name);
                             }
                             return null;
-                        }
-                    };
+                    }};
                 }
             };
             creationservice.setOnRunning(event -> {
-                sdcb[0] = new MainController.SimpleTextDialogWithCancelButton("Creating Session", "");
+                sdcb[0] = new SimpleTextDialogWithCancelButton("Creating Session", "Creating Session", "");
                 sdcb[0].Message.textProperty().bind(creationservice.messageProperty());
                 sdcb[0].CancelButton.setOnAction(ev -> creationservice.cancel());
             });
@@ -351,8 +340,14 @@ public class This_Session {
                 // TODO Reset Session Here
                 sdcb[0].close();
             });
-            return ok;
-        } else {return false;}
+            creationservice.start();
+        }
+    }
+    public void resetambience() {
+        for (Cut i : getallCuts()) {
+            i.reset();
+            i.setAmbienceenabled(false);
+        }
     }
 
 // Export
@@ -389,40 +384,19 @@ public class This_Session {
         exportingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(exporterservice.messageProperty());
         exportingSessionDialog.CancelButton.setOnAction(event -> exporterservice.cancel());
         exporterservice.setOnSucceeded(event -> {
-            if (exporterservice.getValue()) {
-                Alert a = new Alert(Alert.AlertType.INFORMATION);
-                a.setTitle("Export Succeeded");
-                a.setHeaderText("Creation Completed With No Errors");
-                a.setContentText("You Can Now Play Or Export This This_Session");
-                a.showAndWait();
-                exportingSessionDialog.close();
-            } else {
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setTitle("Creation Failed");
-//                    String v = task.getException().getMessage();
-                a.setHeaderText("Errors Occured While Trying To Create The This_Session. Please Try Again Or Contact Me For Support ");
-                a.setContentText("Please Try Again Or Contact Me For Support");
-                a.showAndWait();
-                This_Session.deleteprevioussession();
-                exportingSessionDialog.close();
-            }
+            if (exporterservice.getValue()) {Tools.showinformationdialog("Information", "Export Succeeded", "File Saved To: ");}
+            else {Tools.showerrordialog("Error", "Errors Occured During Export", "Please Try Again Or Contact Me For Support");}
+            exportingSessionDialog.close();
         });
         exporterservice.setOnFailed(event -> {
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setTitle("Creation Failed");
             String v = exporterservice.getException().getMessage();
-            a.setHeaderText("Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v);
-            a.setContentText("Please Try Again Or Contact Me For Support");
-            a.showAndWait();
+            Tools.showerrordialog("Error", "Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v,
+                    "Please Try Again Or Contact Me For Support");
             This_Session.deleteprevioussession();
             exportingSessionDialog.close();
         });
         exporterservice.setOnCancelled(event -> {
-            Alert a = new Alert(Alert.AlertType.WARNING);
-            a.setTitle("Creation Cancelled");
-            a.setHeaderText("You Cancelled The This_Session Creation");
-            a.setContentText("Re-Create To Play Or Export");
-            a.showAndWait();
+            Tools.showinformationdialog("Cancelled", "Export Cancelled", "You Cancelled Export");
             This_Session.deleteprevioussession();
             exportingSessionDialog.close();
         });
@@ -453,7 +427,7 @@ public class This_Session {
                 return "Playing Session...";
             case PAUSED:
                 currentcuttimeline.play();
-                currentcut.resumeplayingcut();
+                currentcut.resume();
                 setPlayerState(PlayerWidget.PlayerState.PLAYING);
                 return "Resuming Session...";
             case STOPPED:
@@ -470,7 +444,7 @@ public class This_Session {
     public String pause() {
         switch (playerState) {
             case PLAYING:
-                currentcut.pauseplayingcut();
+                currentcut.pause();
                 currentcuttimeline.pause();
                 setPlayerState(PlayerWidget.PlayerState.PAUSED);
                 return "Session Paused";
@@ -488,7 +462,7 @@ public class This_Session {
                 pause();
                 if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
                     endsessionprematurely(sessions);
-                    currentcut.stopplayingcut();
+                    currentcut.stop();
                     currentcuttimeline.stop();
                     setPlayerState(PlayerWidget.PlayerState.STOPPED);
                     resetthissession();
@@ -497,7 +471,7 @@ public class This_Session {
             case PAUSED:
                 if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
                     endsessionprematurely(sessions);
-                    currentcut.stopplayingcut();
+                    currentcut.stop();
                     currentcuttimeline.stop();
                     setPlayerState(PlayerWidget.PlayerState.STOPPED);
                     resetthissession();
@@ -550,8 +524,8 @@ public class This_Session {
         try {
 //            System.out.println(TimeUtils.getformattedtime() + "> Clause 3");
             if (isReferencedisplayoption() != null) {displayreferencefile();}
-            Duration cutduration = currentcut.getthiscutduration();
-            currentcut.startplayback();
+            Duration cutduration = currentcut.getDuration();
+            currentcut.start();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
             timeline.play();
             setPlayerState(PlayerWidget.PlayerState.PLAYING);
@@ -603,7 +577,7 @@ public class This_Session {
         closereferencefile();
         sessions.getcurrentsession().updatecutduration(currentcut.number, currentcut.getdurationinminutes());
         goalsWidget.update();
-        currentcut.stopplayingcut();
+        currentcut.stop();
         if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
         else {
             Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
@@ -660,43 +634,5 @@ public class This_Session {
             displayReference.close();
             displayReference = null;
         }
-    }
-
-// Presets
-    public void loadpreset() {
-        File xmlfile = new FileChooser().showOpenDialog(null);
-        if (xmlfile != null) {
-            try {
-                JAXBContext context = JAXBContext.newInstance(Session.class);
-                Unmarshaller createMarshaller = context.createUnmarshaller();
-                Session loadedsession = (Session) createMarshaller.unmarshal(xmlfile);
-                if (loadedsession != null) {
-                    setupcutsinsession(loadedsession.getallcuttimes());
-                    Tools.showinformationdialog("Information", "Preset Loaded", "Your Preset Was Successfully Loaded");
-                }
-            } catch (JAXBException e) {
-                Tools.showerrordialog("Error", "Not A Valid Preset File", "Please Select A Valid Preset File");}
-        }
-    }
-    public void saveaspreset(Session session) {
-        File xmlfile = new FileChooser().showSaveDialog(null);
-        if (xmlfile != null) {
-            try {
-                JAXBContext context = JAXBContext.newInstance(Session.class);
-                Marshaller createMarshaller = context.createMarshaller();
-                createMarshaller.marshal(session, xmlfile);
-                Tools.showinformationdialog("Information", "Preset Saved", "Your Preset Was Successfully Saved");
-            } catch (JAXBException e) {
-                Tools.showerrordialog("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
-        } else {Tools.showtimedmessage(StatusBar, "Canceled Saving Preset", 2000);}
-    }
-
-// Log Session
-    // TODO Create A Log File
-    private static void clearlogfile() {
-        try {
-            FileWriter clearlog = new FileWriter(logfile);
-            clearlog.close();
-        } catch (IOException ignored) {}
     }
 }

@@ -36,17 +36,14 @@ public class ProgressTrackerWidget implements Widget {
     private Button PrematureEndingsButton;
     private Sessions sessions;
 
-    public ProgressTrackerWidget(TextField totalTimePracticed, TextField numberOfSessionsPracticed,
-                                 TextField averageSessionDuration, CheckBox preAndPostOption,
-                                 Button detailedCutProgressButton, Button sessionListButton,
-                                 Button prematureEndingsButton) {
-        TotalTimePracticed = totalTimePracticed;
-        NumberOfSessionsPracticed = numberOfSessionsPracticed;
-        AverageSessionDuration = averageSessionDuration;
-        PreAndPostOption = preAndPostOption;
-        DetailedCutProgressButton = detailedCutProgressButton;
-        SessionListButton = sessionListButton;
-        PrematureEndingsButton = prematureEndingsButton;
+    public ProgressTrackerWidget(MainController mainController) {
+        TotalTimePracticed = mainController.TotalTimePracticed;
+        NumberOfSessionsPracticed = mainController.NumberOfSessionsPracticed;
+        AverageSessionDuration = mainController.AverageSessionDuration;
+        PreAndPostOption = mainController.PrePostSwitch;
+        DetailedCutProgressButton = mainController.ShowCutProgressButton;
+        SessionListButton = mainController.ListOfSessionsButton;
+        PrematureEndingsButton = mainController.PrematureEndingsButton;
         sessions = new Sessions();
         Service<Void> getsessions = new Service<Void>() {
             @Override

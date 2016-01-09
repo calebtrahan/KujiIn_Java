@@ -89,22 +89,51 @@ public class MainController implements Initializable {
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private PlayerWidget playerWidget;
     private ProgressTrackerWidget progressTrackerWidget;
-    // Event Handlers
+
+
+// Event Handlers
     public static final EventHandler<KeyEvent> noneditabletextfield = event -> Tools.showinformationdialog("Information", "Can't Enter Text", "This Text Field Can't Be Edited");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        progressTrackerWidget = new ProgressTrackerWidget(TotalTimePracticed, NumberOfSessionsPracticed, AverageSessionDuration, PrePostSwitch, ShowCutProgressButton,
-                ListOfSessionsButton, PrematureEndingsButton);
-        this_session = new This_Session(progressTrackerWidget.getSessions(), CutProgressLabelCurrent, CutProgressLabelTotal, TotalProgressLabelCurrent, TotalProgressLabelTotal,
-                CutProgressBar, TotalProgressBar, CutProgressTopLabel, TotalSessionLabel, StatusBar);
-        goalsWidget = new GoalsWidget(newgoalButton, viewcurrrentgoalsButton, viewcompletedgoalsButton, goalscurrrentvalueLabel, goalssettimeLabel, goalsprogressbar, progressTrackerWidget.getSessions());
-        creatorAndExporterWidget = new CreatorAndExporterWidget(ChangeValuesButton, ExportButton, LoadPresetButton, SavePresetButton, AmbienceSwitch, TotalSessionTime, ApproximateEndTime, PreTime, RinTime, KyoTime,
-                TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, PostTime, this_session);
-        playerWidget = new PlayerWidget(SessionPlayerOnOffSwitch, VolumeButton, PlayButton, PauseButton, StopButton, CutProgressTopLabel, TotalSessionLabel, CutProgressLabelCurrent, CutProgressLabelTotal,
-                TotalProgressLabelCurrent, TotalProgressLabelTotal, CutProgressBar, TotalProgressBar, ReferenceFilesOption, StatusBar, goalsWidget, this_session, creatorAndExporterWidget);
-//        ChangeListener<Integer> updatevalue = (observable, oldValue, newValue) -> updatecreatorui();
+        setProgressTrackerWidget(new ProgressTrackerWidget(this));
+        setThis_session(new This_Session(this));
+        setGoalsWidget(new GoalsWidget(this));
+        setCreatorAndExporterWidget(new CreatorAndExporterWidget(this));
+        setPlayerWidget(new PlayerWidget(this));
         sessionplayerswitch(null);
+    }
+
+// Getters And Setters
+    public GoalsWidget getGoalsWidget() {
+    return goalsWidget;
+}
+    public void setGoalsWidget(GoalsWidget goalsWidget) {
+        this.goalsWidget = goalsWidget;
+    }
+    public This_Session getThis_session() {
+        return this_session;
+    }
+    public void setThis_session(This_Session this_session) {
+        this.this_session = this_session;
+    }
+    public CreatorAndExporterWidget getCreatorAndExporterWidget() {
+        return creatorAndExporterWidget;
+    }
+    public void setCreatorAndExporterWidget(CreatorAndExporterWidget creatorAndExporterWidget) {
+        this.creatorAndExporterWidget = creatorAndExporterWidget;
+    }
+    public PlayerWidget getPlayerWidget() {
+        return playerWidget;
+    }
+    public void setPlayerWidget(PlayerWidget playerWidget) {
+        this.playerWidget = playerWidget;
+    }
+    public ProgressTrackerWidget getProgressTrackerWidget() {
+        return progressTrackerWidget;
+    }
+    public void setProgressTrackerWidget(ProgressTrackerWidget progressTrackerWidget) {
+        this.progressTrackerWidget = progressTrackerWidget;
     }
 
 // Top Menu Actions
@@ -271,14 +300,9 @@ public class MainController implements Initializable {
                 if (newfile.toString().endsWith(".mp3")) {
                     double duration = Tools.getaudioduration(newfile);
                     if (duration > 10000) {
-                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                        alert.setTitle("Alert File Validation");
-                        alert.setHeaderText("Alert File Longer Than 10 Seconds");
-                        String msg = String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
-                                "Really Use It?", duration);
-                        alert.setContentText(msg);
-                        Optional<ButtonType> result = alert.showAndWait();
-                        if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+                        if (Tools.getanswerdialog("Validation", "Alert File Is longer Than 10 Seconds",
+                                String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
+                                "Really Use It?", duration))) {
                             alertfileTextField.setText(newfile.getName());
                             newalertfile = newfile;
                         }
@@ -308,13 +332,7 @@ public class MainController implements Initializable {
                 }
                 setAlertfilechanged(Tools.testAlertFile());
                 this.close();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("No Alert File Opened");
-                alert.setHeaderText("No Alert File Opened");
-                alert.setContentText("You Need To Open An Alert File First");
-                alert.showAndWait();
-            }
+            } else {Tools.showerrordialog("Error", "No Alert File Opened", "Open An Alert File First");}
         }
 
         public void cancel(Event event) {
@@ -755,28 +773,16 @@ public class MainController implements Initializable {
         }
 
     }
-    public static class SimpleTextDialog extends Stage {
-        public Label Message;
-
-        public SimpleTextDialog(String toptitle, String message) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleTextDialog.fxml"));
-            fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle(toptitle);}
-            catch (IOException e) {e.printStackTrace();}
-            Message.setText(message);
-            Message.setWrapText(true);
-        }
-    }
-    public static class SimpleTextDialogWithCancelButton extends Stage {
-        public Button CancelButton;
-        public Label Message;
-
-        public SimpleTextDialogWithCancelButton(String titletext, String message) {
-             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SimpleTextDialogWithCancelButton.fxml"));
-             fxmlLoader.setController(this);
-             try {setScene(new Scene(fxmlLoader.load())); this.setTitle(titletext);}
-             catch (IOException e) {e.printStackTrace();}
-             Message.setText(message);
-        }
-    }
+//    public static class SimpleTextDialogWithCancelButton extends Stage {
+//        public Button CancelButton;
+//        public Label Message;
+//
+//        public SimpleTextDialogWithCancelButton(Parent parent, String titletext, String message) {
+//             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SimpleTextDialogWithCancelButton.fxml"));
+//             fxmlLoader.setController(this);
+//             try {setScene(new Scene(parent, fxmlLoader.load())); this.setTitle(titletext);}
+//             catch (IOException e) {e.printStackTrace();}
+//             Message.setText(message);
+//        }
+//    }
 }

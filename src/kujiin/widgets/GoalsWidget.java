@@ -16,6 +16,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import kujiin.MainController;
 import kujiin.Tools;
 import kujiin.interfaces.Widget;
 import kujiin.xml.*;
@@ -30,6 +31,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class GoalsWidget implements Widget{
+    private MainController Root;
     private Button NewGoalButton;
     private Button CurrentGoalsButton;
     private Button CompletedGoalsButton;
@@ -42,15 +44,15 @@ public class GoalsWidget implements Widget{
 
     // TODO Make Goals For Individual Cuts Rin-Zen And Integerate Into Goal Widget (And Keep Existing Total Hour Goal)
 
-    public GoalsWidget(Button newGoalButton, Button currentGoalsButton, Button completedGoalsButton, Label practicedHours, Label currentGoalHours,
-                       ProgressBar currentGoalProgress, Sessions Allpracticedsessions) {
-        NewGoalButton = newGoalButton;
-        CurrentGoalsButton = currentGoalsButton;
-        CompletedGoalsButton = completedGoalsButton;
-        PracticedHours = practicedHours;
-        CurrentGoalHours = currentGoalHours;
-        CurrentGoalProgress = currentGoalProgress;
-        allpracticedsessions = Allpracticedsessions;
+    public GoalsWidget(MainController mainController) {
+        Root = mainController;
+        NewGoalButton = Root.newgoalButton;
+        CurrentGoalsButton = Root.viewcurrrentgoalsButton;
+        CompletedGoalsButton = Root.viewcompletedgoalsButton;
+        PracticedHours = Root.goalscurrrentvalueLabel;
+        CurrentGoalHours = Root.goalssettimeLabel;
+        CurrentGoalProgress = Root.goalsprogressbar;
+        allpracticedsessions = Root.getProgressTrackerWidget().getSessions();
         currentGoals = new CurrentGoals();
         completedGoals = new CompletedGoals();
         Service<Void> getcurrentgoals = new Service<Void>() {

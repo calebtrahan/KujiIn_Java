@@ -12,20 +12,32 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import kujiin.Cut;
 import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.interfaces.Widget;
+import kujiin.xml.Session;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.ResourceBundle;
 
 public class CreatorAndExporterWidget implements Widget {
+    private MainController Root;
     private Button changeallvaluesbutton;
+    private Button exportButton;
     private Button ExportButton;
     private Button loadpresetbutton;
     private Button savepresetbutton;
@@ -57,31 +69,32 @@ public class CreatorAndExporterWidget implements Widget {
     private CreatorState creatorState;
     private ExporterState exporterState;
     private This_Session this_session;
+    private Label StatusBar;
     private ArrayList<Integer> textfieldtimes = new ArrayList<>(11);
 
-    public CreatorAndExporterWidget(Button changeallvaluesbutton, Button exportButton, Button loadpresetbutton, Button savepresetbutton, CheckBox ambienceswitch,
-                                    TextField totalSessionTimeTextField, TextField approximateendtime, TextField preTime, TextField rinTime, TextField kyoTime,
-                                    TextField tohTime, TextField shaTime, TextField kaiTime, TextField jinTime,
-                                    TextField retsuTime, TextField zaiTime, TextField zenTime, TextField postTime, This_Session this_session) {
-        this.changeallvaluesbutton = changeallvaluesbutton;
-        ExportButton = exportButton;
-        this.loadpresetbutton = loadpresetbutton;
-        this.savepresetbutton = savepresetbutton;
-        AmbienceSwitch = ambienceswitch;
-        TotalSessionTime = totalSessionTimeTextField;
-        ApproximateEndTime = approximateendtime;
-        PreTime = preTime;
-        RinTime = rinTime;
-        KyoTime = kyoTime;
-        TohTime = tohTime;
-        ShaTime = shaTime;
-        KaiTime = kaiTime;
-        JinTime = jinTime;
-        RetsuTime = retsuTime;
-        ZaiTime = zaiTime;
-        ZenTime = zenTime;
-        PostTime = postTime;
-        this.this_session = this_session;
+    public CreatorAndExporterWidget(MainController mainController) {
+        Root = mainController;
+        this.exportButton = Root.ExportButton;
+        this.loadpresetbutton = Root.LoadPresetButton;
+        this.savepresetbutton = Root.SavePresetButton;
+        this.changeallvaluesbutton = Root.ChangeValuesButton;
+        ExportButton = Root.ExportButton;
+        AmbienceSwitch = Root.AmbienceSwitch;
+        TotalSessionTime = Root.TotalSessionTime;
+        ApproximateEndTime = Root.ApproximateEndTime;
+        PreTime = Root.PreTime;
+        RinTime = Root.RinTime;
+        KyoTime = Root.KyoTime;
+        TohTime = Root.TohTime;
+        ShaTime = Root.ShaTime;
+        KaiTime = Root.KaiTime;
+        JinTime = Root.JinTime;
+        RetsuTime = Root.RetsuTime;
+        ZaiTime = Root.ZaiTime;
+        ZenTime = Root.ZenTime;
+        PostTime = Root.PostTime;
+        this_session = Root.getThis_session();
+        StatusBar = Root.StatusBar;
         setSessionInformation(this_session);
         creatorState = CreatorState.NOT_CREATED;
         exporterState = ExporterState.IDLE;
@@ -107,14 +120,11 @@ public class CreatorAndExporterWidget implements Widget {
         if (gettextfieldtimes()) {
             if (Tools.sessionwellformednesschecks(textfieldtimes)) {
                 this_session.setAmbienceenabled(AmbienceSwitch.isSelected());
-                if (! this_session.create(textfieldtimes)) {
-                    Tools.showerrordialog("Error", "Session Creation Failed", "Please Try Again");
-                }
+                this_session.create(textfieldtimes);
                 return true;
             } else {return false;}
         }
-        else {
-            Tools.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid"); return false;}
+        else {Tools.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid"); return false;}
     }
     public boolean checkforffmpeg() {
         boolean good = false;
@@ -130,7 +140,6 @@ public class CreatorAndExporterWidget implements Widget {
         return good;
     }
     public void exportsession() {
-        System.out.println("In Export Session Method");
         if (checkforffmpeg()) {
             createsession();
         } else {
@@ -162,20 +171,6 @@ public class CreatorAndExporterWidget implements Widget {
 //            TotalSessionTime.setText("Not A Valid Session");
 //            disable();
 //        }
-    }
-    public void disableeditingfortextfields() {
-        TotalSessionTime.setEditable(false);
-        PreTime.setEditable(false);
-        RinTime.setEditable(false);
-        KyoTime.setEditable(false);
-        TohTime.setEditable(false);
-        ShaTime.setEditable(false);
-        KaiTime.setEditable(false);
-        JinTime.setEditable(false);
-        RetsuTime.setEditable(false);
-        ZaiTime.setEditable(false);
-        ZenTime.setEditable(false);
-        PostTime.setEditable(false);
     }
     public void bindtextfieldstoproperties() {
         PreTime.textProperty().addListener((observable, oldValue, newValue) -> {PresessionValue.set(Integer.valueOf(newValue)); textfieldtimes.set(0, PresessionValue.get()); updatecreatorui();});
@@ -213,6 +208,11 @@ public class CreatorAndExporterWidget implements Widget {
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
             ApproximateEndTime.setText(sdf.format(cal.getTime()));
         }
+        if (AmbienceSwitch.isSelected()) {
+            AmbienceSwitch.setSelected(false);
+            this_session.resetambience();
+            Tools.showinformationdialog("Information", "Unselected Ambience Because Values Are Changed", "Set All Desired Session Values First, Then Check The Ambience Box Last");
+        }
     }
     public boolean gettextfieldtimes() {
         Boolean not_all_zeros = false;
@@ -227,7 +227,10 @@ public class CreatorAndExporterWidget implements Widget {
                 Tools.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
                 AmbienceSwitch.setSelected(false);
             }
-        } else {this_session.setAmbienceenabled(false);}
+        } else {
+            this_session.resetambience();
+            this_session.setAmbienceenabled(false);
+        }
     }
     public void changeallvalues() {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog();
@@ -311,6 +314,35 @@ public class CreatorAndExporterWidget implements Widget {
         ZaiTime.setText("-");
         ZenTime.setText("-");
         PostTime.setText("-");
+    }
+
+// Presets
+    public void loadpreset() {
+    File xmlfile = new FileChooser().showOpenDialog(null);
+    if (xmlfile != null) {
+        try {
+            JAXBContext context = JAXBContext.newInstance(Session.class);
+            Unmarshaller createMarshaller = context.createUnmarshaller();
+            Session loadedsession = (Session) createMarshaller.unmarshal(xmlfile);
+            if (loadedsession != null) {
+                this_session.setupcutsinsession(loadedsession.getallcuttimes());
+                Tools.showinformationdialog("Information", "Preset Loaded", "Your Preset Was Successfully Loaded");
+            }
+        } catch (JAXBException e) {
+            Tools.showerrordialog("Error", "Not A Valid Preset File", "Please Select A Valid Preset File");}
+    }
+}
+    public void saveaspreset(Session session) {
+        File xmlfile = new FileChooser().showSaveDialog(null);
+        if (xmlfile != null) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(Session.class);
+                Marshaller createMarshaller = context.createMarshaller();
+                createMarshaller.marshal(session, xmlfile);
+                Tools.showinformationdialog("Information", "Preset Saved", "Your Preset Was Successfully Saved");
+            } catch (JAXBException e) {
+                Tools.showerrordialog("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
+        } else {Tools.showtimedmessage(StatusBar, "Canceled Saving Preset", 2000);}
     }
 
 // Subclasses/Dialogs
@@ -484,12 +516,7 @@ public class CreatorAndExporterWidget implements Widget {
         }
 
         public void createSessionwithoutmissingcuts(Event event) {
-            Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-            a.setTitle("Confirmation");
-            a.setHeaderText("This Will Create A This_Session That Isn't Well-Formed");
-            a.setContentText("Really Create?");
-            Optional<ButtonType> b = a.showAndWait();
-            if (b.isPresent() && b.get() == ButtonType.OK) {
+            if (Tools.getanswerdialog("Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
                 setCreatesession(true);
                 this.close();
             }
@@ -547,23 +574,12 @@ public class CreatorAndExporterWidget implements Widget {
                     setCutinvocationduration(value);
                     this.close();
                 } else {
-                    Alert continuewithzerovalue = new Alert(Alert.AlertType.CONFIRMATION);
-                    continuewithzerovalue.setHeaderText("Cut Invocation Value Is Zero");
-                    continuewithzerovalue.setContentText("Continue With Zero Value (These Cuts Won't Be Included)");
-                    continuewithzerovalue.setTitle("Confirmation");
-                    Optional<ButtonType> a = continuewithzerovalue.showAndWait();
-                    if (a.isPresent() && a.get() == ButtonType.OK) {
+                    if (Tools.getanswerdialog("Confirmation", "Cut Invocation Value Is 0", "Continue With Zero Value (These Cuts Won't Be Included)" )) {
                         setCutinvocationduration(0);
                         this.close();
                     }
                 }
-            } catch (NumberFormatException e) {
-                Alert error = new Alert(Alert.AlertType.ERROR);
-                error.setTitle("Error");
-                error.setHeaderText("Value Is Empty");
-                error.setContentText("Enter A Numeric Value Then Press OK");
-                error.showAndWait();
-            }
+            } catch (NumberFormatException e) {Tools.showerrordialog("Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
         }
     }
 

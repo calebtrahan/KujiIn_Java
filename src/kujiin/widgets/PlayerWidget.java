@@ -10,6 +10,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import kujiin.Cut;
+import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.interfaces.Widget;
@@ -25,6 +26,7 @@ public class PlayerWidget implements Widget {
     public static Double AMBIENCEVOLUME = 1.0;
     public static Double FADEOUTDURATION = 10.0;
     public static Double FADEINDURATION = 10.0;
+    private MainController Root;
     private CheckBox onOffSwitch;
     private Button AdjustVolumeButton;
     private Button PlayButton;
@@ -45,29 +47,26 @@ public class PlayerWidget implements Widget {
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private ReferenceType referenceType;
 
-    public PlayerWidget(CheckBox OnOffSwitch, Button adjustVolumeButton, Button playButton, Button pauseButton, Button stopButton,
-                        Label cutPlayingText, Label sessionPlayingText, Label cutCurrentTime, Label cutTotalTime,
-                        Label sessionCurrentTime, Label sessionTotalTime, ProgressBar cutProgress,
-                        ProgressBar totalProgress, CheckBox referenceFileCheckbox,
-                        Label statusbar, GoalsWidget goalsWidget, This_Session Session, CreatorAndExporterWidget creatorAndExporterWidget) {
-        onOffSwitch = OnOffSwitch;
-        AdjustVolumeButton = adjustVolumeButton;
-        PlayButton = playButton;
-        PauseButton = pauseButton;
-        StopButton = stopButton;
-        CutPlayingText = cutPlayingText;
-        SessionPlayingText = sessionPlayingText;
-        CutCurrentTime = cutCurrentTime;
-        CutTotalTime = cutTotalTime;
-        SessionCurrentTime = sessionCurrentTime;
-        SessionTotalTime = sessionTotalTime;
-        CutProgress = cutProgress;
-        TotalProgress = totalProgress;
-        ReferenceFileCheckbox = referenceFileCheckbox;
-        GoalsWidget = goalsWidget;
-        StatusBar = statusbar;
-        this.Session = Session;
-        this.creatorAndExporterWidget = creatorAndExporterWidget;
+    public PlayerWidget(MainController mainController) {
+        Root = mainController;
+        onOffSwitch = Root.SessionPlayerOnOffSwitch;
+        AdjustVolumeButton = Root.VolumeButton;
+        PlayButton = Root.PlayButton;
+        PauseButton = Root.PauseButton;
+        StopButton = Root.StopButton;
+        CutPlayingText = Root.CutProgressTopLabel;
+        SessionPlayingText = Root.TotalSessionLabel;
+        CutCurrentTime = Root.CutProgressLabelCurrent;
+        CutTotalTime = Root.CutProgressLabelTotal;
+        SessionCurrentTime = Root.TotalProgressLabelCurrent;
+        SessionTotalTime = Root.TotalProgressLabelTotal;
+        CutProgress = Root.CutProgressBar;
+        TotalProgress = Root.TotalProgressBar;
+        ReferenceFileCheckbox = Root.ReferenceFilesOption;
+        GoalsWidget = Root.getGoalsWidget();
+        StatusBar = Root.StatusBar;
+        Session = Root.getThis_session();
+        creatorAndExporterWidget = Root.getCreatorAndExporterWidget();
     }
 
 // Getters And Setters

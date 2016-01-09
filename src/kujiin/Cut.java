@@ -14,9 +14,10 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Cut {
+    private This_Session thisession;
     public String name;
     public int number;
-    public Boolean ramp;
+    public boolean ramp;
     public int rampduration;
     public int duration;
     private File tempentrainmenttextfile;
@@ -32,7 +33,6 @@ public class Cut {
     private ArrayList<Double> ambiencefiledurations;
     private File ambiencedirectory;
     private double totalambienceduration;
-    private This_Session thisession;
     private int entrainmentplaycount;
     private int ambienceplaycount;
     private ArrayList<Media> entrainmentmedia;
@@ -60,27 +60,6 @@ public class Cut {
     }
 
 // Getters And Setters
-    public int getdurationinseconds() {
-        int audiodurationinseconds;
-        audiodurationinseconds = duration;
-        if (number == 0 || number == 10) {audiodurationinseconds += rampduration;}
-        return audiodurationinseconds * 60;
-    }
-    public String getcreatedtext() {
-        StringBuilder text = new StringBuilder();
-        text.append(name).append(": ");
-        text.append(Tools.minutestoformattedhoursandmins(getdurationinminutes()));
-        if (number == 0 || number == 10) {
-            text.append(" (").append(rampduration).append(" Min. Ramp").append(")");
-        }
-        return text.toString();
-    }
-    public int getdurationinminutes() {
-        int audiodurationinseconds;
-        audiodurationinseconds = duration;
-        if (number == 0 || number == 10) {audiodurationinseconds += rampduration;}
-        return audiodurationinseconds;
-    }
     public void setDuration(int newduration) {
         this.duration = newduration;
     }
@@ -92,10 +71,6 @@ public class Cut {
     }
     public void setAmbienceenabled(boolean ambienceenabled) {this.ambienceenabled = ambienceenabled;}
     public boolean isAmbienceenabled() {return ambienceenabled;}
-    public Duration getthiscutduration() {return new Duration((double) getdurationinseconds() * 1000);}
-    public int getSecondselapsed() {return secondselapsed;}
-    public MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
-    public MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
     public File getReferenceFile(PlayerWidget.ReferenceType referenceType) {
         if (referenceType == PlayerWidget.ReferenceType.html) {
             String name = this.name + ".html";
@@ -109,8 +84,23 @@ public class Cut {
     }
     public void setCutstoplay(ArrayList<Cut> cutstoplay) {this.cutstoplay = cutstoplay;}
 
+// Getters For Cut Information
+    public Duration getDuration() {return new Duration((double) getdurationinseconds() * 1000);}
+    public int getdurationinseconds() {
+    int audiodurationinseconds;
+    audiodurationinseconds = duration;
+    if (number == 0 || number == 10) {audiodurationinseconds += rampduration;}
+    return audiodurationinseconds * 60;
+}
+    public int getdurationinminutes() {
+        int audiodurationinseconds;
+        audiodurationinseconds = duration;
+        if (number == 0 || number == 10) {audiodurationinseconds += rampduration;}
+        return audiodurationinseconds;
+    }
+
 // Creation
-    public boolean getambiencefiles() {
+    public boolean getambienceindirectory() {
         ambiencefiles = new ArrayList<>();
         ambiencefiledurations = new ArrayList<>();
         try {
@@ -128,23 +118,16 @@ public class Cut {
         double a = 0;
         for (Double i : ambiencefiledurations) {a += i;}
         setTotalambienceduration(a);
-        System.out.println(a + " Is Greater Than " + secondstocheck);
         return a > (double) secondstocheck;
     }
-    public void cleanuptempfiles() {
-        if (tempambiencefile.exists()) {tempambiencefile.delete();}
-        if (tempentrainmentfile.exists()) {tempentrainmentfile.delete();}
-        if (tempentrainmenttextfile.exists()) {tempentrainmenttextfile.delete();}
-        if (tempambiencetextfile.exists()) {tempambiencetextfile.delete();}
-    }
-    public boolean create(ArrayList<Cut> cutstoplay, boolean ambienceenabled) {
+    public boolean build(ArrayList<Cut> cutstoplay, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
         setCutstoplay(cutstoplay);
-        if (isAmbienceenabled()) {return makeEntrainmentList() && makeAmbienceList();}
-        else {return makeEntrainmentList();}
+        if (isAmbienceenabled()) {return buildEntrainment() && buildAmbience();}
+        else {return buildEntrainment();}
 
     }
-    public boolean makeEntrainmentList() {
+    public boolean buildEntrainment() {
         File rampin1 = new File(This_Session.directorytohramp, "3in1.mp3");
         File rampin2 = new File(This_Session.directorytohramp, "3in2.mp3");
         File rampout1 = new File(This_Session.directorytohramp, "3out1.mp3");
@@ -207,7 +190,7 @@ public class Cut {
         }
         return entrainmentmedia.size() > 0;
     }
-    public boolean makeAmbienceList() {
+    public boolean buildAmbience() {
         // TODO Ambience Hangs On Higher Than 10 Numbers
         // TODO Set Really High Durations, So You Can See If It Works For Really Long Sessions
         ambiencelist = new ArrayList<>();
@@ -261,69 +244,20 @@ public class Cut {
         ambiencemedia.addAll(ambiencelist.stream().map(i -> new Media(i.toURI().toString())).collect(Collectors.toList()));
         return ambiencemedia.size() > 0;
     }
+    public void reset() {
+        if (entrainmentlist != null) entrainmentlist.clear();
+        if (entrainmentmedia != null) entrainmentmedia.clear();
+        if (ambiencelist != null) ambiencelist.clear();
+        if (ambiencemedia != null) ambiencemedia.clear();
+    }
 
 // Playback
-    public void startplayback() {
-        entrainmentplaycount = 0;
-        ambienceplaycount = 0;
-        entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
-        entrainmentplayer.play();
-        entrainmentplayer.setVolume(0.0);
-        entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
-        if (ambienceenabled) {
-            ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
-            ambienceplayer.play();
-            ambienceplayer.setVolume(0.0);
-            ambienceplayer.setOnEndOfMedia(this::playnextambience);
-            ambienceplayer.setOnError(this::errorduringplayback);
-        }
-        cuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updatecuttime()));
-        cuttimeline.setCycleCount(Animation.INDEFINITE);
-        cuttimeline.play();
-    }
-    public void playnextentrainment() {
-        entrainmentplaycount++;
-        entrainmentplayer.dispose();
-        entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
-        entrainmentplayer.play();
-//        entrainmentplayer.setVolume(Root.ENTRAINMENTVOLUME);
-        entrainmentplayer.setVolume(0.0);
-        entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
-    }
-    public void playnextambience() {
-        // TODO Throwing Index Out Of Bounds Exception In Zen Ambience (And Not Playing Cause It Can't Load)
-            // Maybe timing is off in creating ambience lists?
-        try {
-            ambienceplaycount++;
-            ambienceplayer.dispose();
-            ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
-            ambienceplayer.play();
-//        ambienceplayer.setVolume(Root.AMBIENCEVOLUME);
-            ambienceplayer.setVolume(0.0);
-            ambienceplayer.setOnEndOfMedia(this::playnextambience);
-        } catch (IndexOutOfBoundsException ignored) {
-            System.out.println("Out Of Bounds In " + this.name + "Ambience List: ");
-            for (Media i : ambiencemedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
-        }
-    }
-    public void pauseplayingcut() {
-        entrainmentplayer.pause();
-        if (ambienceenabled) {ambienceplayer.pause();}
-        cuttimeline.pause();
-    }
-    public void resumeplayingcut() {
-        entrainmentplayer.play();
-        if (ambienceenabled) {ambienceplayer.pause();}
-        cuttimeline.play();
-    }
-    public void stopplayingcut() {
-        entrainmentplayer.stop();
-        entrainmentplayer.dispose();
-        if (ambienceenabled) {
-            ambienceplayer.stop();
-            ambienceplayer.dispose();
-        }
-    }
+    // ------- Playback Info -------- //
+    public MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
+    public MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
+    public int getSecondselapsed() {return secondselapsed;}
+    public String getcurrenttimeformatted() {return Tools.formatlengthshort(secondselapsed + 1);}
+    public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
     public void updatecuttime() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             if (secondselapsed <= PlayerWidget.FADEINDURATION) {
@@ -353,6 +287,69 @@ public class Cut {
             secondselapsed++;
         }
     }
+    // --------- Controls ---------- //
+    public void start() {
+        entrainmentplaycount = 0;
+        ambienceplaycount = 0;
+        entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
+        entrainmentplayer.play();
+        entrainmentplayer.setVolume(0.0);
+        entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
+        if (ambienceenabled) {
+            ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
+            ambienceplayer.play();
+            ambienceplayer.setVolume(0.0);
+            ambienceplayer.setOnEndOfMedia(this::playnextambience);
+            ambienceplayer.setOnError(this::playnextfilebecauseoferror);
+        }
+        cuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updatecuttime()));
+        cuttimeline.setCycleCount(Animation.INDEFINITE);
+        cuttimeline.play();
+    }
+    public void pause() {
+        entrainmentplayer.pause();
+        if (ambienceenabled) {ambienceplayer.pause();}
+        cuttimeline.pause();
+    }
+    public void resume() {
+        entrainmentplayer.play();
+        if (ambienceenabled) {ambienceplayer.pause();}
+        cuttimeline.play();
+    }
+    public void stop() {
+        entrainmentplayer.stop();
+        entrainmentplayer.dispose();
+        if (ambienceenabled) {
+            ambienceplayer.stop();
+            ambienceplayer.dispose();
+        }
+    }
+    public void playnextentrainment() {
+        entrainmentplaycount++;
+        entrainmentplayer.dispose();
+        entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
+        entrainmentplayer.play();
+//        entrainmentplayer.setVolume(Root.ENTRAINMENTVOLUME);
+        entrainmentplayer.setVolume(0.0);
+        entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
+    }
+    public void playnextambience() {
+        // TODO Throwing Index Out Of Bounds Exception In Zen Ambience (And Not Playing Cause It Can't Load)
+            // Maybe timing is off in creating ambience lists?
+        try {
+            ambienceplaycount++;
+            ambienceplayer.dispose();
+            ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
+            ambienceplayer.play();
+//        ambienceplayer.setVolume(Root.AMBIENCEVOLUME);
+            ambienceplayer.setVolume(0.0);
+            ambienceplayer.setOnEndOfMedia(this::playnextambience);
+        } catch (IndexOutOfBoundsException ignored) {
+            System.out.println("Out Of Bounds In " + this.name + "Ambience List: ");
+            for (Media i : ambiencemedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
+        }
+    }
+    // ------ Error Handling ------- //
     public void entrainmenterror() {
         // Pause Ambience If Exists
         if (Tools.getanswerdialog("Confirmation", "An Error Occured While Playing " + name +
@@ -372,12 +369,10 @@ public class Cut {
             entrainmentplayer.setOnError(this::entrainmenterror);
         } else {thisession.error_endplayback();}
     }
-    public void errorduringplayback() {
+    public void playnextfilebecauseoferror() {
         if (ambienceplayer.getStatus() != MediaPlayer.Status.PLAYING) {playnextambience();}
         if (entrainmentplayer.getStatus() != MediaPlayer.Status.PLAYING) {playnextentrainment();}
     }
-    public String getcurrenttimeformatted() {return Tools.formatlengthshort(secondselapsed + 1);}
-    public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
 
 // Export
     public boolean export() {
@@ -476,7 +471,7 @@ public class Cut {
             if (count > 0) {
                 tempambiencefile.delete();
                 finalambiencefile.delete();
-                // makeAmbienceList();
+                // buildAmbience();
                 // writeambiencelisttotextfile();
             }
             ProcessBuilder cmdlist = new ProcessBuilder(adjustlengthlist);
@@ -532,6 +527,12 @@ public class Cut {
             cutisgood = ambiencefile.exists();
         }
         return cutisgood;
+    }
+    public void cleanuptempfiles() {
+        if (tempambiencefile.exists()) {tempambiencefile.delete();}
+        if (tempentrainmentfile.exists()) {tempentrainmentfile.delete();}
+        if (tempentrainmenttextfile.exists()) {tempentrainmenttextfile.delete();}
+        if (tempambiencetextfile.exists()) {tempambiencetextfile.delete();}
     }
 
 }
