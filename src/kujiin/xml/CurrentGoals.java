@@ -26,29 +26,28 @@ public class CurrentGoals {
     public List<kujiin.xml.CurrentGoal> getCurrentGoal() {return CurrentGoal;}
     public void setCurrentGoal(List<kujiin.xml.CurrentGoal> currentGoal) {CurrentGoal = currentGoal;}
 
-// Other Methods
-    public void populatefromxml() throws JAXBException {
-        if (This_Session.currentgoalsxmlfile.exists()) {
-            JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
-            Unmarshaller createMarshaller = context.createUnmarshaller();
-            CurrentGoals currentGoals = (CurrentGoals) createMarshaller.unmarshal(This_Session.currentgoalsxmlfile);
-            setCurrentGoal(currentGoals.getCurrentGoal());
-        }
+// XML Processing
+    public void unmarshall() throws JAXBException {
+    if (This_Session.currentgoalsxmlfile.exists()) {
+        JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
+        Unmarshaller createMarshaller = context.createUnmarshaller();
+        CurrentGoals currentGoals = (CurrentGoals) createMarshaller.unmarshal(This_Session.currentgoalsxmlfile);
+        setCurrentGoal(currentGoals.getCurrentGoal());
     }
-    public void writecurrentgoalstoxml() throws JAXBException {
-        if (This_Session.currentgoalsxmlfile.exists()) {
-            JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
-            Marshaller createMarshaller = context.createMarshaller();
-            createMarshaller.marshal(getCurrentGoal(), This_Session.currentgoalsxmlfile);
-        }
+}
+    public void marshall() throws JAXBException {
+        JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
+        Marshaller createMarshaller = context.createMarshaller();
+        createMarshaller.marshal(getCurrentGoal(), This_Session.currentgoalsxmlfile);
     }
-    public void addnewgoal(CurrentGoal newgoal) throws JAXBException {
-        if (This_Session.currentgoalsxmlfile.exists()) {populatefromxml();}
+    public void addgoal(CurrentGoal newgoal) throws JAXBException {
+        if (This_Session.currentgoalsxmlfile.exists()) {
+            unmarshall();}
         List<CurrentGoal> newgoals = getCurrentGoal();
         int count = 0;
         if (newgoals != null && newgoals.size() > 0) {
             sortcurrentgoals();
-            count = getlastcurrentgoal().getID();
+            count = getgoalbyindex(getCurrentGoal().size() - 1).getID();
         } else {newgoals = new ArrayList<>();}
         newgoal.setID(count + 1);
         newgoals.add(newgoal);
@@ -57,18 +56,6 @@ public class CurrentGoals {
         Marshaller createMarshaller = context.createMarshaller();
         createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         createMarshaller.marshal(this, This_Session.currentgoalsxmlfile);
-    }
-    public CurrentGoal getfirstcurrentgoal() {
-        if (getCurrentGoal() == null) {return null;}
-        else {return getCurrentGoal().get(0);}
-    }
-    public CurrentGoal getlastcurrentgoal() {
-        if (getCurrentGoal() == null) {return null;}
-        else {return getCurrentGoal().get(getCurrentGoal().size() - 1);}
-    }
-    public List<CurrentGoal> getallcurrentgoals() {return getCurrentGoal();}
-    public boolean goalsexist() {
-        return getCurrentGoal() != null && getCurrentGoal().size() > 0;
     }
     public boolean deletegoal(Integer id) {
         if (goalsexist()) {
@@ -89,7 +76,36 @@ public class CurrentGoals {
         int count = 1;
         for (kujiin.xml.CurrentGoal i : getCurrentGoal()) {i.setID(count); count++;}
     }
-    public CurrentGoal getgoal(Integer id) {
+    public void checkifcompleted(double currentpracticedhours, CompletedGoals completedGoals) {
+        int oldsize = getCurrentGoal().size();
+        List<CurrentGoal> newgoalslist = getCurrentGoal();
+        for (kujiin.xml.CurrentGoal i : getCurrentGoal()) {
+            if (currentpracticedhours >= i.getGoal_Hours()) {
+                if (! completedGoals.goalcompleted(i)) {
+                    Tools.showerrordialog("Error", "Cannot Complete This Goal", "Check File Permissions");
+                } else {newgoalslist.remove(i);}
+            }
+        }
+        if (getCurrentGoal().size() != oldsize) {
+            completedGoals.sortcompletedgoals();
+            setCurrentGoal(newgoalslist);
+            try {marshall();}
+            catch (JAXBException ignored) {Tools.showerrordialog("Error", "Cannot Write Current Goals To XML File", "Check File Permissions");}
+        }
+    }
+
+// Goal Information Getters
+    public CurrentGoal getgoalbyindex(Integer index) {
+        try {
+            if (getCurrentGoal() == null) {return null;}
+            else {return getCurrentGoal().get(index);}
+        } catch (ArrayIndexOutOfBoundsException ignored) {return null;}
+    }
+    public List<CurrentGoal> getallgoals() {return getCurrentGoal();}
+    public boolean goalsexist() {
+        return getCurrentGoal() != null && getCurrentGoal().size() > 0;
+    }
+    public CurrentGoal getgoalbyid(Integer id) {
         if (getCurrentGoal() != null && getCurrentGoal().size() > 0) {
             for (kujiin.xml.CurrentGoal i : getCurrentGoal()) {
                 if (i.getID().equals(id)) {return i;}
@@ -97,26 +113,5 @@ public class CurrentGoals {
             return null;
         } else {return null;}
     }
-    public void checkforcompletedgoals(double currentpracticedhours, CompletedGoals completedGoals) {
-        int oldsize = getCurrentGoal().size();
-        List<CurrentGoal> newgoalslist = getCurrentGoal();
-        for (kujiin.xml.CurrentGoal i : getCurrentGoal()) {
-            if (currentpracticedhours >= i.getGoal_Hours()) {
-                CompletedGoal completedGoal = new CompletedGoal();
-                completedGoal.setDate_Completed(Tools.gettodaysdate());
-                completedGoal.setGoal_Hours(i.getGoal_Hours());
-                try {completedGoals.addcompletedgoal(completedGoal);}
-                catch (JAXBException ignored) {
-                    Tools.showerrordialog("Error", "Cannot Complete This Goal", "Check File Permissions");
-                    return;
-                }
-                newgoalslist.remove(i);
-            }
-        }
-        setCurrentGoal(newgoalslist);
-        if (getCurrentGoal().size() != oldsize) {
-            try {writecurrentgoalstoxml();}
-            catch (JAXBException ignored) {Tools.showerrordialog("Error", "Cannot Write Current Goals To XML File", "Check File Permissions");}
-        }
-    }
+
 }

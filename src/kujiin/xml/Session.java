@@ -10,7 +10,6 @@ import java.util.ArrayList;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 //@XmlType(propOrder = "Name", "Presession_Duration"...)
 public class Session {
-    private String Name;
     private String Date_Practiced;
     private Integer Presession_Duration;
     private Integer Rin_Duration;
@@ -40,9 +39,8 @@ public class Session {
     private String Premature_Ending_Reason;
     private String Expected_Session_List;
 
-    public Session(String name, Integer presession_duration, Integer rin_duration, Integer kyo_duration, Integer toh_duration,
+    public Session(Integer presession_duration, Integer rin_duration, Integer kyo_duration, Integer toh_duration,
                    Integer sha_duration, Integer kai_duration, Integer jin_duration, Integer retsu_duration, Integer zai_duration, Integer zen_duration, Integer postsession_duration, Integer total_session_duration) {
-        Name = name;
         Presession_Duration = presession_duration;
         Rin_Duration = rin_duration;
         Kyo_Duration = kyo_duration;
@@ -57,16 +55,9 @@ public class Session {
         Total_Session_Duration = total_session_duration;
         setDate_Practiced(Tools.gettodaysdate());
     }
-    public Session(String name) {setDate_Practiced(Tools.gettodaysdate()); setName(name);}
     public Session() {setDate_Practiced(Tools.gettodaysdate());}
 
 // Getters And Setters
-    public String getName() {
-        return Name;
-    }
-    public void setName(String name) {
-        Name = name;
-    }
     public Integer getPresession_Duration() {
         return Presession_Duration;
     }
@@ -304,11 +295,6 @@ public class Session {
             if (i < expectedsessionlist.size() - 1) {text.append(", ");}
         }
         setExpected_Session_List(text.toString());
-    }
-    public boolean sessionnotempty() {
-        int totaltime = 0;
-        for (int x=1; x<10;x++) {totaltime += getcutduration(x);}
-        return totaltime > 0;
     }
     public boolean wasendedPremature() {return getPremature_Ending_Reason() == null || getPremature_Ending_Reason().equals("");}
 

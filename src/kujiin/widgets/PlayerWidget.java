@@ -26,7 +26,6 @@ public class PlayerWidget implements Widget {
     public static Double AMBIENCEVOLUME = 1.0;
     public static Double FADEOUTDURATION = 10.0;
     public static Double FADEINDURATION = 10.0;
-    private MainController Root;
     private CheckBox onOffSwitch;
     private Button AdjustVolumeButton;
     private Button PlayButton;
@@ -48,25 +47,24 @@ public class PlayerWidget implements Widget {
     private ReferenceType referenceType;
 
     public PlayerWidget(MainController mainController) {
-        Root = mainController;
-        onOffSwitch = Root.SessionPlayerOnOffSwitch;
-        AdjustVolumeButton = Root.VolumeButton;
-        PlayButton = Root.PlayButton;
-        PauseButton = Root.PauseButton;
-        StopButton = Root.StopButton;
-        CutPlayingText = Root.CutProgressTopLabel;
-        SessionPlayingText = Root.TotalSessionLabel;
-        CutCurrentTime = Root.CutProgressLabelCurrent;
-        CutTotalTime = Root.CutProgressLabelTotal;
-        SessionCurrentTime = Root.TotalProgressLabelCurrent;
-        SessionTotalTime = Root.TotalProgressLabelTotal;
-        CutProgress = Root.CutProgressBar;
-        TotalProgress = Root.TotalProgressBar;
-        ReferenceFileCheckbox = Root.ReferenceFilesOption;
-        GoalsWidget = Root.getGoalsWidget();
-        StatusBar = Root.StatusBar;
-        Session = Root.getThis_session();
-        creatorAndExporterWidget = Root.getCreatorAndExporterWidget();
+        onOffSwitch = mainController.SessionPlayerOnOffSwitch;
+        AdjustVolumeButton = mainController.VolumeButton;
+        PlayButton = mainController.PlayButton;
+        PauseButton = mainController.PauseButton;
+        StopButton = mainController.StopButton;
+        CutPlayingText = mainController.CutProgressTopLabel;
+        SessionPlayingText = mainController.TotalSessionLabel;
+        CutCurrentTime = mainController.CutProgressLabelCurrent;
+        CutTotalTime = mainController.CutProgressLabelTotal;
+        SessionCurrentTime = mainController.TotalProgressLabelCurrent;
+        SessionTotalTime = mainController.TotalProgressLabelTotal;
+        CutProgress = mainController.CutProgressBar;
+        TotalProgress = mainController.TotalProgressBar;
+        ReferenceFileCheckbox = mainController.ReferenceFilesOption;
+        GoalsWidget = mainController.getGoalsWidget();
+        StatusBar = mainController.StatusBar;
+        Session = mainController.getThis_session();
+        creatorAndExporterWidget = mainController.getCreatorAndExporterWidget();
     }
 
 // Getters And Setters

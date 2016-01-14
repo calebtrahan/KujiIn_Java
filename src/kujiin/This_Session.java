@@ -489,11 +489,11 @@ public class This_Session {
         int secondsleft = currentcut.getdurationinseconds() / currentcut.getSecondselapsed();
         int secondspracticed = currentcut.getdurationinseconds() - secondsleft;
         Double minutes = Math.floor(secondspracticed / 60);
-        sessions.getcurrentsession().updatecutduration(currentcut.number, minutes.intValue());
+        sessions.getsession(sessions.sessionscount() - 1).updatecutduration(currentcut.number, minutes.intValue());
         // TODO Get Premature Ending Reason Here
         String prematureendingreason = "";
-        sessions.getcurrentsession().writeprematureending(currentcut.name, prematureendingreason);
-//        try {Sessions.addnewsession(TemporarySession);}
+        sessions.getsession(sessions.sessionscount() - 1).writeprematureending(currentcut.name, prematureendingreason);
+//        try {Sessions.addsession(TemporarySession);}
 //        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "XML Error", "Cannot Write This Practiced Session To XML File");}
     }
     public void updateplayerui() {
@@ -552,7 +552,7 @@ public class This_Session {
         currentcuttimeline.stop();
         setPlayerState(PlayerWidget.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
-//        try {sessions.addnewsession(TemporarySession);}
+//        try {sessions.addsession(TemporarySession);}
 //        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
         if (Tools.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {export();}
         // TODO Update Goal Widget Here
@@ -575,7 +575,7 @@ public class This_Session {
     }
     public void transition() {
         closereferencefile();
-        sessions.getcurrentsession().updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+        sessions.getsession(sessions.sessionscount() - 1).updatecutduration(currentcut.number, currentcut.getdurationinminutes());
         goalsWidget.update();
         currentcut.stop();
         if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}

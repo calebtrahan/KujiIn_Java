@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class CompletedGoal {
+    private Integer ID;
     private Double Goal_Hours;
     private String Date_Completed;
 
@@ -15,7 +16,11 @@ public class CompletedGoal {
     public void setGoal_Hours(Double goal_Hours) {Goal_Hours = goal_Hours;}
     public String getDate_Completed() {return Date_Completed;}
     public void setDate_Completed(String date_Completed) {Date_Completed = date_Completed;}
-
-// Other Methods
+    public Integer getID() {
+        return ID;
+    }
+    public void setID(Integer ID) {
+        this.ID = ID;
+    }
 
 }

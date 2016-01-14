@@ -31,7 +31,6 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class GoalsWidget implements Widget{
-    private MainController Root;
     private Button NewGoalButton;
     private Button CurrentGoalsButton;
     private Button CompletedGoalsButton;
@@ -45,14 +44,13 @@ public class GoalsWidget implements Widget{
     // TODO Make Goals For Individual Cuts Rin-Zen And Integerate Into Goal Widget (And Keep Existing Total Hour Goal)
 
     public GoalsWidget(MainController mainController) {
-        Root = mainController;
-        NewGoalButton = Root.newgoalButton;
-        CurrentGoalsButton = Root.viewcurrrentgoalsButton;
-        CompletedGoalsButton = Root.viewcompletedgoalsButton;
-        PracticedHours = Root.goalscurrrentvalueLabel;
-        CurrentGoalHours = Root.goalssettimeLabel;
-        CurrentGoalProgress = Root.goalsprogressbar;
-        allpracticedsessions = Root.getProgressTrackerWidget().getSessions();
+        NewGoalButton = mainController.newgoalButton;
+        CurrentGoalsButton = mainController.viewcurrrentgoalsButton;
+        CompletedGoalsButton = mainController.viewcompletedgoalsButton;
+        PracticedHours = mainController.goalscurrrentvalueLabel;
+        CurrentGoalHours = mainController.goalssettimeLabel;
+        CurrentGoalProgress = mainController.goalsprogressbar;
+        allpracticedsessions = mainController.getProgressTrackerWidget().getSessions();
         currentGoals = new CurrentGoals();
         completedGoals = new CompletedGoals();
         Service<Void> getcurrentgoals = new Service<Void>() {
@@ -61,7 +59,7 @@ public class GoalsWidget implements Widget{
                 return new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
-                        try {currentGoals.populatefromxml(); completedGoals.populatefromxml();} catch (JAXBException ignored) {}
+                        try {currentGoals.unmarshall(); completedGoals.unmarshall();} catch (JAXBException ignored) {}
                         return null;
                     }
                 };
@@ -74,10 +72,10 @@ public class GoalsWidget implements Widget{
 
 // Button Actions
     public void setnewgoal() {
-        SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(allpracticedsessions.getgrandtotaltimeindecimalhours(false));
+        SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(allpracticedsessions.totalpracticetimeinhours(false));
         setANewGoalDialog.showAndWait();
         if (setANewGoalDialog.isAccepted()) {
-            try {currentGoals.addnewgoal(new CurrentGoal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
+            try {currentGoals.addgoal(new CurrentGoal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
             catch (JAXBException ignored) {Tools.showerrordialog("Error", "Couldn't Add Goal", "Check File Permissions");}
         }
         update();
@@ -85,7 +83,7 @@ public class GoalsWidget implements Widget{
     public void displaycurrentgoals() {
         List<CurrentGoal> currentGoalslist = currentGoals.getCurrentGoal();
         if (currentGoalslist == null) {Tools.showinformationdialog("Information", "No Goals To Display", "Set A New Goal First"); return;}
-        new DisplayCurrentGoalsDialog(currentGoalslist, allpracticedsessions.getgrandtotaltimeindecimalhours(false)).showAndWait();
+        new DisplayCurrentGoalsDialog(currentGoalslist, allpracticedsessions.totalpracticetimeinhours(false)).showAndWait();
     }
     public void displaycompletedgoals() {
         List<CompletedGoal> goalslist = completedGoals.getCompletedGoal();
@@ -93,7 +91,8 @@ public class GoalsWidget implements Widget{
         new DisplayCompletedGoalsDialog(goalslist).showAndWait();
     }
     public void goalpacing() {
-        new GoalPacingDialog(currentGoals.getfirstcurrentgoal(), currentGoals.getCurrentGoal(), allpracticedsessions.getgrandtotaltimeindecimalhours(false)).showAndWait();
+
+//        new GoalPacingDialog(currentGoals.getgoalbyindex(0), currentGoals.getCurrentGoal(), allpracticedsessions.totalpracticetimeinhours(false)).showAndWait();
     }
 
 // Widget Implementation
@@ -125,8 +124,8 @@ public class GoalsWidget implements Widget{
 // Other Methods
     public void update() {
         try {
-            Double practiced = Tools.convertminutestodecimalhours(allpracticedsessions.getgrandtotaltimepracticedinminutes(false));
-            Double goal = currentGoals.getfirstcurrentgoal().getGoal_Hours();
+            Double practiced = Tools.convertminutestodecimalhours(allpracticedsessions.totalpracticetimeinminutes(false));
+            Double goal = currentGoals.getgoalbyindex(0).getGoal_Hours();
             PracticedHours.setText(practiced.toString() + " hrs");
             CurrentGoalHours.setText(goal.toString() + " hrs");
             CurrentGoalProgress.setProgress(practiced / goal);
@@ -134,7 +133,7 @@ public class GoalsWidget implements Widget{
     }
     public void updatewhilesessionplaying(double practicedhours) {
         PracticedHours.setText(Double.toString(practicedhours));
-        CurrentGoalProgress.setProgress(getpercentage(practicedhours, currentGoals.getfirstcurrentgoal().getGoal_Hours()));
+        CurrentGoalProgress.setProgress(getpercentage(practicedhours, currentGoals.getgoalbyid(0).getGoal_Hours()));
     }
     public float getpercentage(double practicedhours, double goalhours) {
         return (float) practicedhours / (float) goalhours;
@@ -304,11 +303,14 @@ public class GoalsWidget implements Widget{
 
     }
     public static class PrematureEndingDialog extends Stage {
+        public TextArea Reason;
+        public Button AcceptButton;
+        public Button CancelButton;
 
         public PrematureEndingDialog() {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplaySessionList.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/PrematureEndingDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("New Goal");
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Ending Session Prematurely");
             } catch (IOException e) {e.printStackTrace();}
         }
 

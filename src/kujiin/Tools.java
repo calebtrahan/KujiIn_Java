@@ -94,17 +94,29 @@ public class Tools {
         return stringbuilder.toString();
     }
     public static String minutestoformattedhoursandmins(int min) {
-        int hours = min / 60;
-        int minutes = min % 60;
-        StringBuilder text = new StringBuilder();
-        if (hours > 0) {
-            text.append(hours).append(" Hour");
-            if (hours > 1) {text.append("s");}}
-        if (minutes > 0) {
-            if (hours > 0) {text.append(" ");}
-            text.append(minutes).append(" Minute");
-            if (minutes > 1) {text.append("s");}}
-        return text.toString();
+        if (min > 0) {
+            int hours = min / 60;
+            int minutes = min % 60;
+            StringBuilder text = new StringBuilder();
+            if (hours > 0) {
+                text.append(hours).append(" Hour");
+                if (hours > 1) {
+                    text.append("s");
+                }
+            }
+            if (minutes > 0) {
+                if (hours > 0) {
+                    text.append(" ");
+                }
+                text.append(minutes).append(" Minute");
+                if (minutes > 1) {
+                    text.append("s");
+                }
+            }
+            return text.toString();
+        } else {
+            return "0 Minutes";
+        }
     }
     public static String secondstominutesandseconds(int secs) {
         int seconds;

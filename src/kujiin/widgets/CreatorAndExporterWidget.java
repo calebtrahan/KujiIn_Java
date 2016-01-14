@@ -35,7 +35,6 @@ import java.util.Calendar;
 import java.util.ResourceBundle;
 
 public class CreatorAndExporterWidget implements Widget {
-    private MainController Root;
     private Button changeallvaluesbutton;
     private Button exportButton;
     private Button ExportButton;
@@ -66,48 +65,42 @@ public class CreatorAndExporterWidget implements Widget {
     private IntegerProperty ZaiValue = new SimpleIntegerProperty(0);
     private IntegerProperty ZenValue = new SimpleIntegerProperty(0);
     private IntegerProperty PostsessionValue = new SimpleIntegerProperty(0);
-    private CreatorState creatorState;
     private ExporterState exporterState;
     private This_Session this_session;
     private Label StatusBar;
     private ArrayList<Integer> textfieldtimes = new ArrayList<>(11);
 
     public CreatorAndExporterWidget(MainController mainController) {
-        Root = mainController;
-        this.exportButton = Root.ExportButton;
-        this.loadpresetbutton = Root.LoadPresetButton;
-        this.savepresetbutton = Root.SavePresetButton;
-        this.changeallvaluesbutton = Root.ChangeValuesButton;
-        ExportButton = Root.ExportButton;
-        AmbienceSwitch = Root.AmbienceSwitch;
-        TotalSessionTime = Root.TotalSessionTime;
-        ApproximateEndTime = Root.ApproximateEndTime;
-        PreTime = Root.PreTime;
-        RinTime = Root.RinTime;
-        KyoTime = Root.KyoTime;
-        TohTime = Root.TohTime;
-        ShaTime = Root.ShaTime;
-        KaiTime = Root.KaiTime;
-        JinTime = Root.JinTime;
-        RetsuTime = Root.RetsuTime;
-        ZaiTime = Root.ZaiTime;
-        ZenTime = Root.ZenTime;
-        PostTime = Root.PostTime;
-        this_session = Root.getThis_session();
-        StatusBar = Root.StatusBar;
-        setSessionInformation(this_session);
-        creatorState = CreatorState.NOT_CREATED;
+        this.exportButton = mainController.ExportButton;
+        this.loadpresetbutton = mainController.LoadPresetButton;
+        this.savepresetbutton = mainController.SavePresetButton;
+        this.changeallvaluesbutton = mainController.ChangeValuesButton;
+        ExportButton = mainController.ExportButton;
+        AmbienceSwitch = mainController.AmbienceSwitch;
+        TotalSessionTime = mainController.TotalSessionTime;
+        ApproximateEndTime = mainController.ApproximateEndTime;
+        PreTime = mainController.PreTime;
+        RinTime = mainController.RinTime;
+        KyoTime = mainController.KyoTime;
+        TohTime = mainController.TohTime;
+        ShaTime = mainController.ShaTime;
+        KaiTime = mainController.KaiTime;
+        JinTime = mainController.JinTime;
+        RetsuTime = mainController.RetsuTime;
+        ZaiTime = mainController.ZaiTime;
+        ZenTime = mainController.ZenTime;
+        PostTime = mainController.PostTime;
+        this_session = mainController.getThis_session();
+        StatusBar = mainController.StatusBar;
         exporterState = ExporterState.IDLE;
-        maketextfieldsnumeric();
+        setuptextfields();
         textfieldtimes.addAll(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0));
-        bindtextfieldstoproperties();
         TotalSessionTime.setOnKeyTyped(MainController.noneditabletextfield);
         ApproximateEndTime.setOnKeyTyped(MainController.noneditabletextfield);
+        updatecreatorui();
     }
 
 // Getters And Setters
-    public void setCreatorState(CreatorState creatorState) {this.creatorState = creatorState;}
-    public CreatorState getCreatorState() {return creatorState;}
     public ExporterState getExporterState() {
         return exporterState;
     }
@@ -126,19 +119,6 @@ public class CreatorAndExporterWidget implements Widget {
         }
         else {Tools.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid"); return false;}
     }
-    public boolean checkforffmpeg() {
-        boolean good = false;
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(Arrays.asList("ffmpeg", "-version"));
-            final Process checkforffmpeg = processBuilder.start();
-            checkforffmpeg.waitFor();
-            good = checkforffmpeg.exitValue() == 0;
-        } catch (IOException ignored) {} catch (InterruptedException e) {
-            e.printStackTrace();
-            good = false;
-        }
-        return good;
-    }
     public void exportsession() {
         if (checkforffmpeg()) {
             createsession();
@@ -148,44 +128,20 @@ public class CreatorAndExporterWidget implements Widget {
     }
 
 // Other Methods
-    public void setSessionInformation(This_Session session) {
-//        ArrayList<Cut> cutsinsession = session.getallCuts();
-//        PreTime.setText(Integer.toString(cutsinsession.get(0).duration));
-//        RinTime.setText(Integer.toString(cutsinsession.get(1).duration));
-//        KyoTime.setText(Integer.toString(cutsinsession.get(2).duration));
-//        TohTime.setText(Integer.toString(cutsinsession.get(3).duration));
-//        ShaTime.setText(Integer.toString(cutsinsession.get(4).duration));
-//        KaiTime.setText(Integer.toString(cutsinsession.get(5).duration));
-//        JinTime.setText(Integer.toString(cutsinsession.get(6).duration));
-//        RetsuTime.setText(Integer.toString(cutsinsession.get(7).duration));
-//        ZaiTime.setText(Integer.toString(cutsinsession.get(8).duration));
-//        ZenTime.setText(Integer.toString(cutsinsession.get(9).duration));
-//        PostTime.setText(Integer.toString(cutsinsession.get(10).duration));
-//        if (session.isValid()) {
-//            if (session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes");}
-//            else {AmbienceEnabledTextField.setText("No");}
-//            TotalSessionTime.setText(session.gettotalsessionduration());
-//            enable();
-//        } else {
-//            AmbienceEnabledTextField.setText("Not A Valid Session");
-//            TotalSessionTime.setText("Not A Valid Session");
-//            disable();
-//        }
+    public boolean checkforffmpeg() {
+    boolean good = false;
+    try {
+        ProcessBuilder processBuilder = new ProcessBuilder(Arrays.asList("ffmpeg", "-version"));
+        final Process checkforffmpeg = processBuilder.start();
+        checkforffmpeg.waitFor();
+        good = checkforffmpeg.exitValue() == 0;
+    } catch (IOException ignored) {} catch (InterruptedException e) {
+        e.printStackTrace();
+        good = false;
     }
-    public void bindtextfieldstoproperties() {
-        PreTime.textProperty().addListener((observable, oldValue, newValue) -> {PresessionValue.set(Integer.valueOf(newValue)); textfieldtimes.set(0, PresessionValue.get()); updatecreatorui();});
-        RinTime.textProperty().addListener((observable, oldValue, newValue) -> {RinValue.set(Integer.valueOf(newValue)); textfieldtimes.set(1, RinValue.get()); updatecreatorui();});
-        KyoTime.textProperty().addListener((observable, oldValue, newValue) -> {KyoValue.set(Integer.valueOf(newValue)); textfieldtimes.set(2, KyoValue.get()); updatecreatorui();});
-        TohTime.textProperty().addListener((observable, oldValue, newValue) -> {TohValue.set(Integer.valueOf(newValue)); textfieldtimes.set(3, TohValue.get()); updatecreatorui();});
-        ShaTime.textProperty().addListener((observable, oldValue, newValue) -> {ShaValue.set(Integer.valueOf(newValue)); textfieldtimes.set(4, ShaValue.get()); updatecreatorui();});
-        KaiTime.textProperty().addListener((observable, oldValue, newValue) -> {KaiValue.set(Integer.valueOf(newValue)); textfieldtimes.set(5, KaiValue.get()); updatecreatorui();});
-        JinTime.textProperty().addListener((observable, oldValue, newValue) -> {JinValue.set(Integer.valueOf(newValue)); textfieldtimes.set(6, JinValue.get()); updatecreatorui();});
-        RetsuTime.textProperty().addListener((observable, oldValue, newValue) -> {RetsuValue.set(Integer.valueOf(newValue)); textfieldtimes.set(7, RetsuValue.get()); updatecreatorui();});
-        ZaiTime.textProperty().addListener((observable, oldValue, newValue) -> {ZaiValue.set(Integer.valueOf(newValue)); textfieldtimes.set(8, ZaiValue.get()); updatecreatorui();});
-        ZenTime.textProperty().addListener((observable, oldValue, newValue) -> {ZenValue.set(Integer.valueOf(newValue)); textfieldtimes.set(9, ZenValue.get()); updatecreatorui();});
-        PostTime.textProperty().addListener((observable, oldValue, newValue) -> {PostsessionValue.set(Integer.valueOf(newValue)); textfieldtimes.set(10, PostsessionValue.get()); updatecreatorui();});
-    }
-    public void maketextfieldsnumeric() {
+    return good;
+}
+    public void setuptextfields() {
         Tools.numericTextField(PreTime);
         Tools.numericTextField(RinTime);
         Tools.numericTextField(KyoTime);
@@ -197,6 +153,68 @@ public class CreatorAndExporterWidget implements Widget {
         Tools.numericTextField(ZaiTime);
         Tools.numericTextField(ZenTime);
         Tools.numericTextField(PostTime);
+        PreTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {PresessionValue.set(Integer.valueOf(newValue)); textfieldtimes.set(0, PresessionValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {PreTime.setText("0"); PresessionValue.set(0); textfieldtimes.set(0, 0); updatecreatorui();}
+        });
+        RinTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {RinValue.set(Integer.valueOf(newValue)); textfieldtimes.set(1, RinValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {RinTime.setText("0"); RinValue.set(0); textfieldtimes.set(1, 0); updatecreatorui();}
+        });
+        KyoTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {KyoValue.set(Integer.valueOf(newValue)); textfieldtimes.set(2, KyoValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {KyoTime.setText("0"); KyoValue.set(0); textfieldtimes.set(2, 0); updatecreatorui();}
+        });
+        TohTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {TohValue.set(Integer.valueOf(newValue)); textfieldtimes.set(3, TohValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {TohTime.setText("0"); TohValue.set(0); textfieldtimes.set(3, 0); updatecreatorui();}
+        });
+        ShaTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {ShaValue.set(Integer.valueOf(newValue)); textfieldtimes.set(4, ShaValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {ShaTime.setText("0"); ShaValue.set(0); textfieldtimes.set(4, 0); updatecreatorui();}
+        });
+        KaiTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {KaiValue.set(Integer.valueOf(newValue)); textfieldtimes.set(5, KaiValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {KaiTime.setText("0"); KaiValue.set(0); textfieldtimes.set(5, 0); updatecreatorui();}
+        });
+        JinTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {JinValue.set(Integer.valueOf(newValue)); textfieldtimes.set(6, JinValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {JinTime.setText("0"); JinValue.set(0); textfieldtimes.set(6, 0); updatecreatorui();}
+        });
+        RetsuTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {RetsuValue.set(Integer.valueOf(newValue)); textfieldtimes.set(7, RetsuValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {RetsuTime.setText("0"); RetsuValue.set(0); textfieldtimes.set(7, 0); updatecreatorui();}
+        });
+        ZaiTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {ZaiValue.set(Integer.valueOf(newValue)); textfieldtimes.set(8, ZaiValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {ZaiTime.setText("0"); ZaiValue.set(0); textfieldtimes.set(8, 0); updatecreatorui();}
+        });
+        ZenTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {ZenValue.set(Integer.valueOf(newValue)); textfieldtimes.set(9, ZenValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {ZenTime.setText("0"); ZenValue.set(0); textfieldtimes.set(9, 0); updatecreatorui();}
+        });
+        PostTime.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {PostsessionValue.set(Integer.valueOf(newValue)); textfieldtimes.set(10, PostsessionValue.get()); updatecreatorui();}
+            catch (NumberFormatException ignored) {PostTime.setText("0"); PostsessionValue.set(0); textfieldtimes.set(10, 0); updatecreatorui();}
+        });
+        PreTime.setTooltip(new Tooltip("Minutes To Meditate Before Practicing Selected Cut(s). There Is A 2 Minute Ramp Into Whichever First Cut You Are Working On"));
+        RinTime.setTooltip(new Tooltip("Minutes You Want To Practice RIN"));
+        KyoTime.setTooltip(new Tooltip("Minutes You Want To Practice KYO"));
+        TohTime.setTooltip(new Tooltip("Minutes You Want To Practice TOH"));
+        ShaTime.setTooltip(new Tooltip("Minutes You Want To Practice SHA"));
+        KaiTime.setTooltip(new Tooltip("Minutes You Want To Practice KAI"));
+        JinTime.setTooltip(new Tooltip("Minutes You Want To Practice JIN"));
+        RetsuTime.setTooltip(new Tooltip("Minutes ou Want To Practice RETSU"));
+        ZaiTime.setTooltip(new Tooltip("Minutes You Want To Practice ZAI"));
+        ZenTime.setTooltip(new Tooltip("Minutes You Want To Practice ZEN"));
+        PostTime.setTooltip(new Tooltip("Minutes To Meditate After Practicing Selected Cut(s). There Is A 2 Minute Ramp Out Of The Last Cut You Are Working On"));
+        TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
+        ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
+        AmbienceSwitch.setTooltip(new Tooltip("Check This After You Set All Values To Check For And Enable Ambience For This Session"));
+        changeallvaluesbutton.setTooltip(new Tooltip("Change All Cut Values Simultaneously"));
+        loadpresetbutton.setTooltip(new Tooltip("Load A Saved Preset"));
+        savepresetbutton.setTooltip(new Tooltip("Save This Session As A Preset"));
+        exportButton.setTooltip(new Tooltip("Export This Session To .mp3 For Use Without The Program"));
     }
     public void updatecreatorui() {
         if (gettextfieldtimes()) {
@@ -207,6 +225,9 @@ public class CreatorAndExporterWidget implements Widget {
             cal.add(Calendar.MINUTE, totalsessiontime);
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
             ApproximateEndTime.setText(sdf.format(cal.getTime()));
+        } else {
+            TotalSessionTime.setText("0 Minutes");
+            ApproximateEndTime.setText("-");
         }
         if (AmbienceSwitch.isSelected()) {
             AmbienceSwitch.setSelected(false);
@@ -584,9 +605,6 @@ public class CreatorAndExporterWidget implements Widget {
     }
 
 // Enums
-    public enum CreatorState {
-        NOT_CREATED, CREATION_IN_PROGRESS, CREATED
-    }
     public enum ExporterState {
         IDLE, EXPORT_IN_PROGRESS, EXPORTED
     }

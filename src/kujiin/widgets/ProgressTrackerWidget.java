@@ -51,7 +51,7 @@ public class ProgressTrackerWidget implements Widget {
                 return new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
-                        try {sessions.populatefromxml();}
+                        try {sessions.unmarshall();}
                         catch (JAXBException ignored) {}
                         return null;
                     }
@@ -126,9 +126,9 @@ public class ProgressTrackerWidget implements Widget {
     }
     public void updateui() {
         sessions.deletenonvalidsessions();
-        int averagesessionduration = (int) sessions.getaveragesessiontimeinminutes(PreAndPostOption.isSelected());
-        int totalminutespracticed = sessions.getgrandtotaltimepracticedinminutes(PreAndPostOption.isSelected());
-        int numberofsessionspracticed = sessions.getsessioncount();
+        int averagesessionduration = sessions.averagepracticetimeinminutes(PreAndPostOption.isSelected());
+        int totalminutespracticed = sessions.totalpracticetimeinminutes(PreAndPostOption.isSelected());
+        int numberofsessionspracticed = sessions.sessionscount();
         String nonetext = "No Sessions Practiced";
         if (averagesessionduration != 0) {AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins(averagesessionduration));}
         else {AverageSessionDuration.setText(nonetext);}

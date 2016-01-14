@@ -181,7 +181,7 @@
          </children>
       </HBox>
       <Label layoutX="349.0" layoutY="144.0" text="Total Time" />
-      <TextField fx:id="TotalSessionTime" alignment="CENTER" editable="false" layoutX="307.0" layoutY="169.0" prefHeight="26.0" prefWidth="146.0" text="No Session Created" />
+      <TextField fx:id="TotalSessionTime" alignment="CENTER" editable="false" layoutX="307.0" layoutY="169.0" prefHeight="26.0" prefWidth="146.0" />
       <Label alignment="CENTER" layoutX="597.0" layoutY="255.0" prefHeight="28.0" prefWidth="124.0" text="Current Goal">
          <font>
             <Font size="19.0" />
@@ -238,7 +238,7 @@
       <CheckBox fx:id="SessionPlayerOnOffSwitch" layoutX="404.0" layoutY="246.0" mnemonicParsing="false" onAction="#sessionplayerswitch" text="OFF" />
       <CheckBox fx:id="AmbienceSwitch" layoutX="102.0" layoutY="143.0" mnemonicParsing="false" onAction="#ambienceswitch" prefHeight="18.0" prefWidth="23.0" />
       <Label layoutX="172.0" layoutY="144.0" text="Approximate End Time" />
-      <TextField fx:id="ApproximateEndTime" alignment="CENTER" editable="false" layoutX="160.0" layoutY="170.0" prefHeight="26.0" prefWidth="146.0" text="No Session Created" />
+      <TextField fx:id="ApproximateEndTime" alignment="CENTER" editable="false" layoutX="160.0" layoutY="170.0" prefHeight="26.0" prefWidth="146.0" />
       <Label layoutX="49.0" layoutY="42.0" text="Presets" />
       <HBox alignment="BOTTOM_RIGHT" layoutX="19.0" layoutY="59.0" prefHeight="28.0" prefWidth="105.0">
          <children>

@@ -25,8 +25,8 @@ public class Sessions {
     public List<kujiin.xml.Session> getSession() {return Session;}
     public void setSession(List<kujiin.xml.Session> session) {Session = session;}
 
-// Other Methods
-    public void populatefromxml() throws JAXBException {
+// XML Processing
+    public void unmarshall() throws JAXBException {
         if (This_Session.sessionsxmlfile.exists()) {
             JAXBContext context = JAXBContext.newInstance(Sessions.class);
             Unmarshaller createMarshaller = context.createUnmarshaller();
@@ -34,16 +34,22 @@ public class Sessions {
             setSession(noises1.getSession());
         }
     }
-    public void addnewsession(Session session) throws JAXBException {
-        if (This_Session.sessionsxmlfile.exists()) {populatefromxml();}
+    public void marshall() throws JAXBException {
+        JAXBContext context = JAXBContext.newInstance(Sessions.class);
+        Marshaller createMarshaller = context.createMarshaller();
+        createMarshaller.marshal(getSession(), This_Session.sessionsxmlfile);
+    }
+    public void createnewsession() {
+        try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
+        catch (JAXBException ignored) {Tools.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
+    }
+    public void addsession(Session session) throws JAXBException {
+        if (This_Session.sessionsxmlfile.exists()) {unmarshall();}
         List<Session> sessionsList = getSession();
         if (sessionsList == null) {sessionsList = new ArrayList<>();}
         sessionsList.add(session);
         setSession(sessionsList);
-        JAXBContext context = JAXBContext.newInstance(Sessions.class);
-        Marshaller createMarshaller = context.createMarshaller();
-        createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        createMarshaller.marshal(this, This_Session.sessionsxmlfile);
+        marshall();
     }
     public void removesession(Session session) throws JAXBException {
         List<Session> sessionList = getSession();
@@ -54,7 +60,19 @@ public class Sessions {
         createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         createMarshaller.marshal(this, This_Session.sessionsxmlfile);
     }
-    public int getgrandtotaltimepracticedinminutes(boolean includepreandpost) {
+    public void deletenonvalidsessions() {
+        try {
+            for (kujiin.xml.Session i : getSession()) {
+                if (! i.sessionnotEmpty()) {
+                    try {removesession(i);}
+                    catch (JAXBException ignored) {}
+                }
+            }
+        } catch (NullPointerException | ConcurrentModificationException ignored) {}
+    }
+
+// Session Information Getters
+    public int totalpracticetimeinminutes(boolean includepreandpost) {
         try {
             int totalminutes = 0;
             for (kujiin.xml.Session i : getSession()) {
@@ -64,11 +82,11 @@ public class Sessions {
             return totalminutes;
         } catch (NullPointerException ignored) {return 0;}
     }
-    public double getgrandtotaltimeindecimalhours(boolean includepreandpost) {
-        return Tools.convertminutestodecimalhours(getgrandtotaltimepracticedinminutes(includepreandpost));
+    public double totalpracticetimeinhours(boolean includepreandpost) {
+        return Tools.convertminutestodecimalhours(totalpracticetimeinminutes(includepreandpost));
     }
-    public float getaveragesessiontimeinminutes(boolean includepreandpost) {
-        try {return (float) getgrandtotaltimepracticedinminutes(includepreandpost) / getSession().size();}
+    public int averagepracticetimeinminutes(boolean includepreandpost) {
+        try {return totalpracticetimeinminutes(includepreandpost) / getSession().size();}
         catch (NullPointerException ignored) {return 0;}
     }
     public ArrayList<Session> getsessionswithprematureendings() {
@@ -80,26 +98,12 @@ public class Sessions {
             return sessionswithprematureendings;
         } catch (NullPointerException e) {return new ArrayList<>();}
     }
-    public int getsessioncount() {
+    public int sessionscount() {
         if (getSession() != null) {return getSession().size();}
         else {return 0;}
     }
-    public void createnewsession() {
-        try {addnewsession(new Session("", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
-        catch (JAXBException ignored) {
-            Tools.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");
-        }
-    }
-    public Session getcurrentsession() {return getSession().get(getSession().size() - 1);}
-    public void deletenonvalidsessions() {
-        try {
-            for (kujiin.xml.Session i : getSession()) {
-                if (! i.sessionnotEmpty()) {
-                    try {removesession(i);}
-                    catch (JAXBException ignored) {}
-                }
-            }
-        } catch (NullPointerException | ConcurrentModificationException ignored) {}
+    public Session getsession(int index) {
+        return getSession().get(index);
     }
 
 }
