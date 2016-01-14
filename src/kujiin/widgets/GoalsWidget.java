@@ -91,8 +91,7 @@ public class GoalsWidget implements Widget{
         new DisplayCompletedGoalsDialog(goalslist).showAndWait();
     }
     public void goalpacing() {
-
-//        new GoalPacingDialog(currentGoals.getgoalbyindex(0), currentGoals.getCurrentGoal(), allpracticedsessions.totalpracticetimeinhours(false)).showAndWait();
+        new GoalPacingDialog(currentGoals.getgoalbyindex(0), currentGoals.getCurrentGoal(), allpracticedsessions.totalpracticetimeinhours(false)).showAndWait();
     }
 
 // Widget Implementation
