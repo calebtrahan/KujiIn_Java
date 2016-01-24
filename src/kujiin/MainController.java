@@ -38,7 +38,8 @@ import java.util.*;
 
 public class MainController implements Initializable {
 
-    public Label StatusBar;
+    public Label CreatorStatusBar;
+    public Label PlayerStatusBar;
     public Button ExportButton;
     public Button PlayButton;
     public Button ListOfSessionsButton;
@@ -104,6 +105,7 @@ public class MainController implements Initializable {
         setPlayerWidget(new PlayerWidget(this));
         setSessionOptions(new Options());
         sessionplayerswitch(null);
+        CreatorStatusBar.setText("");
     }
 
 // Getters And Setters
@@ -149,9 +151,9 @@ public class MainController implements Initializable {
         ChangeAlertDialog a = new ChangeAlertDialog(null);
         a.showAndWait();
         if (a.getAlertfilechanged()) {
-            Tools.showtimedmessage(StatusBar, "Alert File Changed Successfully", 5000);
+            Tools.showtimedmessage(PlayerStatusBar, "Alert File Changed Successfully", 5000);
         } else {
-            Tools.showtimedmessage(StatusBar, "Changing The Alert File Failed", 5000);
+            Tools.showtimedmessage(PlayerStatusBar, "Changing The Alert File Failed", 5000);
         }
     }
     public void editprogramsambience(ActionEvent actionEvent) {
@@ -242,7 +244,7 @@ public class MainController implements Initializable {
 //                creatorState = CreatorState.NOT_CREATED;
 //            }
 //        } else {
-//            StatusBar.setText("Session Creation In Progress");
+//            PlayerStatusBar.setText("Session Creation In Progress");
 //        }
     }
     public void exportsession(Event event) {

@@ -93,7 +93,7 @@ public class This_Session {
         TotalProgress = Root.TotalProgressBar;
         CutPlayingText = Root.CutProgressTopLabel;
         SessionPlayingText = Root.TotalSessionLabel;
-        StatusBar = Root.StatusBar;
+        StatusBar = Root.PlayerStatusBar;
         cutsinsession = new ArrayList<>();
         ambienceenabled = false;
         setPlayerState(PlayerWidget.PlayerState.IDLE);

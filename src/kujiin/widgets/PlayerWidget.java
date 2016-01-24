@@ -62,7 +62,7 @@ public class PlayerWidget implements Widget {
         TotalProgress = mainController.TotalProgressBar;
         ReferenceFileCheckbox = mainController.ReferenceFilesOption;
         GoalsWidget = mainController.getGoalsWidget();
-        StatusBar = mainController.StatusBar;
+        StatusBar = mainController.PlayerStatusBar;
         Session = mainController.getThis_session();
         creatorAndExporterWidget = mainController.getCreatorAndExporterWidget();
     }

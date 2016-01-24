@@ -70,7 +70,10 @@
       <Label fx:id="CutProgressLabelTotal" layoutX="398.0" layoutY="287.0" prefHeight="16.0" prefWidth="68.0" text="--:--" />
       <Label fx:id="TotalProgressLabelTotal" layoutX="397.0" layoutY="320.0" prefHeight="16.0" prefWidth="68.0" text="--:--" />
       <CheckBox fx:id="ReferenceFilesOption" alignment="CENTER_RIGHT" layoutX="19.0" layoutY="350.0" mnemonicParsing="false" onAction="#setReferenceOption" prefHeight="22.0" prefWidth="189.0" text="Display Reference File" textAlignment="RIGHT" wrapText="true" />
-      <Label fx:id="StatusBar" layoutX="7.0" layoutY="380.0" prefHeight="17.0" prefWidth="844.0" />
+      <Label fx:id="PlayerStatusBar" layoutX="19.0" layoutY="374.0" prefHeight="17.0" prefWidth="457.0">
+         <font>
+            <Font size="10.0" />
+         </font></Label>
       <HBox layoutX="19.0" layoutY="91.0" prefHeight="20.0" prefWidth="448.0">
          <children>
             <Label text="Pre" textAlignment="CENTER">
@@ -266,5 +269,9 @@
          </font>
       </Button>
       <Label layoutX="31.0" layoutY="144.0" text="Ambience:" />
+      <Label fx:id="CreatorStatusBar" layoutX="15.0" layoutY="203.0" prefHeight="16.0" prefWidth="440.0">
+         <font>
+            <Font size="10.0" />
+         </font></Label>
    </children>
 </AnchorPane>

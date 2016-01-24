@@ -71,10 +71,10 @@ public class CreatorAndExporterWidget implements Widget {
     private ArrayList<Integer> textfieldtimes = new ArrayList<>(11);
 
     public CreatorAndExporterWidget(MainController mainController) {
-        this.exportButton = mainController.ExportButton;
-        this.loadpresetbutton = mainController.LoadPresetButton;
-        this.savepresetbutton = mainController.SavePresetButton;
-        this.changeallvaluesbutton = mainController.ChangeValuesButton;
+        exportButton = mainController.ExportButton;
+        loadpresetbutton = mainController.LoadPresetButton;
+        savepresetbutton = mainController.SavePresetButton;
+        changeallvaluesbutton = mainController.ChangeValuesButton;
         ExportButton = mainController.ExportButton;
         AmbienceSwitch = mainController.AmbienceSwitch;
         TotalSessionTime = mainController.TotalSessionTime;
@@ -91,7 +91,7 @@ public class CreatorAndExporterWidget implements Widget {
         ZenTime = mainController.ZenTime;
         PostTime = mainController.PostTime;
         this_session = mainController.getThis_session();
-        StatusBar = mainController.StatusBar;
+        StatusBar = mainController.CreatorStatusBar;
         exporterState = ExporterState.IDLE;
         setuptextfields();
         textfieldtimes.addAll(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0));
@@ -111,7 +111,7 @@ public class CreatorAndExporterWidget implements Widget {
 // Button Actions
     public boolean createsession() {
         if (gettextfieldtimes()) {
-            if (Tools.sessionwellformednesschecks(textfieldtimes)) {
+            if (this_session.sessioncreationwellformednesschecks(textfieldtimes)) {
                 this_session.setAmbienceenabled(AmbienceSwitch.isSelected());
                 this_session.create(textfieldtimes);
                 return true;
@@ -225,14 +225,15 @@ public class CreatorAndExporterWidget implements Widget {
             cal.add(Calendar.MINUTE, totalsessiontime);
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
             ApproximateEndTime.setText(sdf.format(cal.getTime()));
+            Tools.showtimedmessage(StatusBar, "Turn Session Player On To Play This Session, Or Export By Pressing 'Export' Button", 5000);
         } else {
-            TotalSessionTime.setText("0 Minutes");
+            TotalSessionTime.setText("-");
             ApproximateEndTime.setText("-");
         }
         if (AmbienceSwitch.isSelected()) {
             AmbienceSwitch.setSelected(false);
             this_session.resetallcuts();
-            Tools.showinformationdialog("Information", "Unselected Ambience Because Values Are Changed", "Set All Desired Session Values First, Then Check The Ambience Box Last");
+            Tools.showtimedmessage(StatusBar, "Session Values Changed, Ambience Unselected", 5000);
         }
     }
     public boolean gettextfieldtimes() {
@@ -291,6 +292,7 @@ public class CreatorAndExporterWidget implements Widget {
         ZaiTime.setDisable(true);
         ZenTime.setDisable(true);
         PostTime.setDisable(true);
+        Tools.showtimedmessage(StatusBar, "Creator Disabled While Session Player Enabled", 10000);
     }
     public void disablebuttons() {
         ExportButton.setDisable(true);

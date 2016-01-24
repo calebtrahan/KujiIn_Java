@@ -172,10 +172,6 @@ public class Tools {
     }
 
 // Session Utils
-    public static Boolean sessionwellformednesschecks(ArrayList<Integer> cutsinsession) {
-        // TODO This Method Will Check For Sequential Cuts And Make Sure It is Well-Formed Before Calling The Creator
-        return true;
-    }
     public static void formatcurrentcutprogress(Cut currentcut, int currenttimeinseconds, Label currentlabel, ProgressBar currentprogress, Label totallabel) {
         int totalduration = currentcut.getdurationinminutes();
         String formattedtotalduration =  String.format("%02d:00", totalduration);
