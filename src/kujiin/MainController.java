@@ -26,6 +26,7 @@ import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.GoalsWidget;
 import kujiin.widgets.PlayerWidget;
 import kujiin.widgets.ProgressTrackerWidget;
+import kujiin.xml.Options;
 import kujiin.xml.Session;
 import org.apache.commons.io.FileUtils;
 
@@ -89,7 +90,7 @@ public class MainController implements Initializable {
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private PlayerWidget playerWidget;
     private ProgressTrackerWidget progressTrackerWidget;
-
+    private Options SessionOptions;
 
 // Event Handlers
     public static final EventHandler<KeyEvent> noneditabletextfield = event -> Tools.showinformationdialog("Information", "Can't Enter Text", "This Text Field Can't Be Edited");
@@ -101,6 +102,7 @@ public class MainController implements Initializable {
         setGoalsWidget(new GoalsWidget(this));
         setCreatorAndExporterWidget(new CreatorAndExporterWidget(this));
         setPlayerWidget(new PlayerWidget(this));
+        setSessionOptions(new Options());
         sessionplayerswitch(null);
     }
 
@@ -134,6 +136,12 @@ public class MainController implements Initializable {
     }
     public void setProgressTrackerWidget(ProgressTrackerWidget progressTrackerWidget) {
         this.progressTrackerWidget = progressTrackerWidget;
+    }
+    public Options getSessionOptions() {
+        return SessionOptions;
+    }
+    public void setSessionOptions(Options sessionOptions) {
+        SessionOptions = sessionOptions;
     }
 
 // Top Menu Actions
@@ -273,7 +281,7 @@ public class MainController implements Initializable {
     public void viewcurrentgoals(Event event) {goalsWidget.displaycurrentgoals();}
     public void viewcompletedgoals(Event event) {goalsWidget.displaycompletedgoals();}
 
-// Menu Tools/Dialogs
+    // Menu Tools/Dialogs
     public static class ChangeAlertDialog extends Stage {
         public TextField alertfileTextField;
         public Button openFileButton;

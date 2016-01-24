@@ -305,8 +305,10 @@ public class GoalsWidget implements Widget{
         public TextArea Reason;
         public Button AcceptButton;
         public Button CancelButton;
+        private kujiin.xml.Options Options;
 
-        public PrematureEndingDialog() {
+        public PrematureEndingDialog(Options options) {
+            Options = options;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/PrematureEndingDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Ending Session Prematurely");
@@ -321,7 +323,7 @@ public class GoalsWidget implements Widget{
             this.close();
         }
         public void rejected(ActionEvent actionEvent) {
-            // TODO Dialog To Disable Premature Ending Dialog In Options Here
+            Options.setPrematureendings(! Tools.getanswerdialog("Disable Premature Endings", "Disable Premature Endings Dialog", "This Will Keep This Session From Displaying In The Future"));
             Reason.setText("");
             this.close();
         }

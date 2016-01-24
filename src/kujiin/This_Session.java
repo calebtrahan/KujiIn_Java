@@ -41,6 +41,7 @@ public class This_Session {
     public static final File sessionsxmlfile = new File(This_Session.xmldirectory, "sessions.xml");
     public static final File currentgoalsxmlfile = new File(This_Session.xmldirectory, "current_goals.xml");
     public static final File completedgoalsxmlfile = new File(This_Session.xmldirectory, "completed_goals.xml");
+    public static final File optionsxmlfile = new File(This_Session.xmldirectory, "options.xml");
     public static final ArrayList<String> allnames = new ArrayList<>(Arrays.asList(
             "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
     private Cut presession = new Cut(0, "Presession", true, 0, this);
@@ -490,8 +491,11 @@ public class This_Session {
         int secondspracticed = currentcut.getdurationinseconds() - secondsleft;
         Double minutes = Math.floor(secondspracticed / 60);
         sessions.getsession(sessions.sessionscount() - 1).updatecutduration(currentcut.number, minutes.intValue());
-        GoalsWidget.PrematureEndingDialog ped = new GoalsWidget.PrematureEndingDialog();
-        String prematureendingreason = ped.getReason();
+        String prematureendingreason;
+        if (Root.getSessionOptions().getPrematureendings()) {
+            GoalsWidget.PrematureEndingDialog ped = new GoalsWidget.PrematureEndingDialog(Root.getSessionOptions());
+            prematureendingreason = ped.getReason();
+        } else {prematureendingreason = "";}
         if (prematureendingreason != null) {
             sessions.getsession(sessions.sessionscount() - 1).writeprematureending(currentcut.name, prematureendingreason);
         }
