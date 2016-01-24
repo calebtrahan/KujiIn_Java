@@ -319,4 +319,10 @@ public class Tools {
         }
         return list;
     }
+
+// Log Utils
+    public static boolean sendstacktracetodeveloper(String stacktrace) {
+        // TODO Email Stacktrace To Me
+        return false;
+    }
 }

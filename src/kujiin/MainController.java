@@ -801,14 +801,14 @@ public class MainController implements Initializable {
 
         public void exit(ActionEvent actionEvent) {
             if (NotifyMeCheckbox.isSelected()) {
-                // TODO Send Stacktrace And Log To my Email
+                Tools.sendstacktracetodeveloper(StackTraceTextField.getText());
             }
             this.close();
             System.exit(1);
         }
         public void continueprogram(ActionEvent actionEvent) {
             if (NotifyMeCheckbox.isSelected()) {
-                // TODO Send Stacktrace And Log To my Email
+                Tools.sendstacktracetodeveloper(StackTraceTextField.getText());
             }
             this.close();
         }
