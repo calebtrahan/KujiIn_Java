@@ -106,24 +106,24 @@ public class PlayerWidget implements Widget {
 // Widget Implementation
     @Override
     public void disable() {
-        switch (Session.getPlayerState()) {
-            case PLAYING:
-                if (! Tools.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
-                    onOffSwitch.setSelected(true);
-                    onOffSwitch.setText("ON");
-                    return;
-                }
-            case PAUSED:
-                if (! Tools.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
-                    onOffSwitch.setSelected(true);
-                    onOffSwitch.setText("ON");
-                    return;
-                }
-            case TRANSITIONING:
-                StatusBar.setText("Transitioning, Please Wait Till The Next Cut To Turn Off The Player");
+        PlayerState playerState = Session.getPlayerState();
+        if (playerState == PlayerState.PLAYING) {
+            if (! Tools.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
                 onOffSwitch.setSelected(true);
                 onOffSwitch.setText("ON");
                 return;
+            }
+        } else if (playerState == PlayerState.PAUSED) {
+            if (! Tools.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
+                onOffSwitch.setSelected(true);
+                onOffSwitch.setText("ON");
+                return;
+            }
+        } else if (playerState == PlayerState.TRANSITIONING) {
+            StatusBar.setText("Transitioning, Please Wait Till The Next Cut To Turn Off The Player");
+            onOffSwitch.setSelected(true);
+            onOffSwitch.setText("ON");
+            return;
         }
         resetallvalues();
         Session.resetthissession();
@@ -191,22 +191,44 @@ public class PlayerWidget implements Widget {
     public static class AdjustVolume extends Stage {
         public Slider EntrainmentSlider;
         public Slider AmbienceSlider;
+        public Label EntrainmentPercentage;
+        public Label AmbiencePercentage;
 
         public AdjustVolume(Cut currentcut) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AdjustSessionVolume.fxml"));
-            fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Adjust Session Volume");}
-            catch (IOException e) {e.printStackTrace();}
-            if (currentcut.getCurrentAmbiencePlayer() != null) {currentcut.getCurrentAmbiencePlayer().volumeProperty().bind(AmbienceSlider.valueProperty());}
-            else {AmbienceSlider.setDisable(true);}
-            if (currentcut.getCurrentEntrainmentPlayer() != null) {currentcut.getCurrentEntrainmentPlayer().volumeProperty().bind(EntrainmentSlider.valueProperty());}
-            else {EntrainmentSlider.setDisable(true);}
-            AmbienceSlider.setValue(AMBIENCEVOLUME);
-            EntrainmentSlider.setValue(ENTRAINMENTVOLUME);
-        }
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AdjustSessionVolume.fxml"));
+                fxmlLoader.setController(this);
+                try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Adjust Session Volume");}
+                catch (IOException e) {e.printStackTrace();}
+                if (currentcut.getCurrentAmbiencePlayer() != null) {
+                    currentcut.getCurrentAmbiencePlayer().volumeProperty().bind(AmbienceSlider.valueProperty());
+                    AmbienceSlider.setValue(AMBIENCEVOLUME);
+                    AmbiencePercentage.setText(new Double(AMBIENCEVOLUME * 100).intValue() + "%");
+                    AmbienceSlider.setOnMouseClicked(event -> {
+                        Double value = AmbienceSlider.getValue() * 100;
+                        AmbiencePercentage.setText(value.intValue() + "%");
+                    });
+                }
+                else {
+                    AmbienceSlider.setDisable(true);
+                    AmbiencePercentage.setText("-");
+                }
+                if (currentcut.getCurrentEntrainmentPlayer() != null) {
+                    currentcut.getCurrentEntrainmentPlayer().volumeProperty().bind(EntrainmentSlider.valueProperty());
+                    EntrainmentSlider.setValue(ENTRAINMENTVOLUME);
+                    EntrainmentPercentage.setText(new Double(ENTRAINMENTVOLUME * 100).intValue() + "%");
+                    EntrainmentSlider.setOnMouseClicked(event -> {
+                        Double value = EntrainmentSlider.getValue() * 100;
+                        EntrainmentPercentage.setText(value.intValue() + "%");
+                    });
+                }
+                else {
+                    EntrainmentSlider.setDisable(true);
+                    EntrainmentPercentage.setText("-");
+                }
+            }
 
-        public Double getEntrainmentVolume() {return EntrainmentSlider.getValue();}
-        public Double getAmbienceVolume() {return AmbienceSlider.getValue();}
+            public Double getEntrainmentVolume() {return EntrainmentSlider.getValue();}
+            public Double getAmbienceVolume() {return AmbienceSlider.getValue();}
 
     }
     public static class DisplayReference extends Stage {

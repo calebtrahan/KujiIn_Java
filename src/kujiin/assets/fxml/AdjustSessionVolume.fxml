@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="103.0" prefWidth="242.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
@@ -10,5 +8,7 @@
       <Label layoutX="64.0" layoutY="14.0" text="Entrainment Volume" />
       <Label layoutX="70.0" layoutY="56.0" text="Ambience Volume" />
       <Slider fx:id="AmbienceSlider" blockIncrement="0.1" layoutX="14.0" layoutY="72.0" majorTickUnit="0.1" max="1.0" minorTickCount="1" prefHeight="16.0" prefWidth="218.0" showTickMarks="true" />
+      <Label fx:id="EntrainmentPercentage" alignment="CENTER_RIGHT" layoutX="188.0" layoutY="14.0" prefHeight="16.0" prefWidth="42.0" text="100%" />
+      <Label fx:id="AmbiencePercentage" alignment="CENTER_RIGHT" layoutX="188.0" layoutY="56.0" prefHeight="16.0" prefWidth="42.0" text="100%" />
    </children>
 </AnchorPane>

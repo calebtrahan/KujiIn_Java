@@ -41,6 +41,7 @@ public class CurrentGoals {
         createMarshaller.marshal(getCurrentGoal(), This_Session.currentgoalsxmlfile);
     }
     public void addgoal(CurrentGoal newgoal) throws JAXBException {
+        System.out.println("Adding New Goal");
         if (This_Session.currentgoalsxmlfile.exists()) {
             unmarshall();}
         List<CurrentGoal> newgoals = getCurrentGoal();

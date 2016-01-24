@@ -260,30 +260,32 @@ public class Cut {
     public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
     public void updatecuttime() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            if (secondselapsed <= PlayerWidget.FADEINDURATION) {
-                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEINDURATION;
-                double entrainmentvolume = secondselapsed * entrainmentincrement;
-                getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
-                if (ambienceenabled) {
-                    double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEINDURATION;
-                    double ambiencevolume = secondselapsed * ambienceincrement;
-                    getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+            try {
+                if (secondselapsed <= PlayerWidget.FADEINDURATION) {
+                    double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEINDURATION;
+                    double entrainmentvolume = secondselapsed * entrainmentincrement;
+                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+                    if (ambienceenabled) {
+                        double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEINDURATION;
+                        double ambiencevolume = secondselapsed * ambienceincrement;
+                        getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                    }
                 }
-            }
-            else if (secondselapsed >= getdurationinseconds() - PlayerWidget.FADEOUTDURATION) {
-                int secondsleft = getdurationinseconds() - secondselapsed;
-                double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEOUTDURATION;
-                double entrainmentvolume = secondsleft * entrainmentincrement;
-                getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
-                if (ambienceenabled) {
-                    double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEOUTDURATION;
-                    double ambiencevolume =  secondsleft * ambienceincrement;
-                    getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                else if (secondselapsed >= getdurationinseconds() - PlayerWidget.FADEOUTDURATION) {
+                    int secondsleft = getdurationinseconds() - secondselapsed;
+                    double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEOUTDURATION;
+                    double entrainmentvolume = secondsleft * entrainmentincrement;
+                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+                    if (ambienceenabled) {
+                        double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEOUTDURATION;
+                        double ambiencevolume =  secondsleft * ambienceincrement;
+                        getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                    }
+                } else {
+                        if (ambienceenabled) {getCurrentAmbiencePlayer().setVolume(thisession.getSessionAmbienceVolume());}
+                        getCurrentEntrainmentPlayer().setVolume(thisession.getSessionEntrainmentVolume());
                 }
-            } else {
-                if (ambienceenabled) {getCurrentAmbiencePlayer().setVolume(thisession.getSessionAmbienceVolume());}
-                getCurrentEntrainmentPlayer().setVolume(thisession.getSessionEntrainmentVolume());
-            }
+            } catch (RuntimeException ignored) {}
             secondselapsed++;
         }
     }
@@ -348,6 +350,12 @@ public class Cut {
             System.out.println("Out Of Bounds In " + this.name + "Ambience List: ");
             for (Media i : ambiencemedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
         }
+    }
+    public void setentrainmentvolume(Double volume) {
+
+    }
+    public void setambiencevolume(Double volume) {
+
     }
     // ------ Error Handling ------- //
     public void entrainmenterror() {

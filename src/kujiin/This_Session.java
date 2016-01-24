@@ -420,69 +420,71 @@ public class This_Session {
         sessions.createnewsession();
     }
     public String play() {
-        switch (playerState) {
-            case IDLE:
-                sessions.createnewsession();
-                startplayback();
-                return "Playing Session...";
-            case PAUSED:
-                currentcuttimeline.play();
-                currentcut.resume();
-                setPlayerState(PlayerWidget.PlayerState.PLAYING);
-                return "Resuming Session...";
-            case STOPPED:
-                sessions.createnewsession();
-                startplayback();
-            case PLAYING:
-                return "Already Playing";
-            case TRANSITIONING:
-                return "Transistioning To The Next Cut";
-            default:
-                return "";
+        if (playerState == PlayerWidget.PlayerState.IDLE) {
+            sessions.createnewsession();
+            startplayback();
+            return "Playing Session...";
+        }
+        else if(playerState == PlayerWidget.PlayerState.PAUSED) {
+            currentcuttimeline.play();
+            currentcut.resume();
+            setPlayerState(PlayerWidget.PlayerState.PLAYING);
+            return "Resuming Session...";
+        }
+        else if(playerState == PlayerWidget.PlayerState.STOPPED) {
+            sessions.createnewsession();
+            startplayback();
+            return "Playing Session...";
+        }
+        else if(playerState == PlayerWidget.PlayerState.PLAYING) {
+            return "Already Playing";
+        }
+        else if(playerState == PlayerWidget.PlayerState.TRANSITIONING) {
+            return "Transistioning To The Next Cut";
+        } else {
+            return "";
         }
     }
     public String pause() {
-        switch (playerState) {
-            case PLAYING:
-                currentcut.pause();
-                currentcuttimeline.pause();
-                setPlayerState(PlayerWidget.PlayerState.PAUSED);
-                return "Session Paused";
-            case PAUSED:
-                return "Already Paused";
-            case TRANSITIONING:
-                return "Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Pause";
-            default:
-                return "No Session Playing";
+        if (playerState == PlayerWidget.PlayerState.PLAYING) {
+            currentcut.pause();
+            currentcuttimeline.pause();
+            setPlayerState(PlayerWidget.PlayerState.PAUSED);
+            return "Session Paused";
+        } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
+            return "Already Paused";
+        } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
+            return "Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Pause";
+        } else {
+            return "No Session Playing";
         }
     }
     public String stop() {
-        switch (playerState) {
-            case PLAYING:
-                pause();
-                if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
-                    endsessionprematurely(sessions);
-                    currentcut.stop();
-                    currentcuttimeline.stop();
-                    setPlayerState(PlayerWidget.PlayerState.STOPPED);
-                    resetthissession();
-                    return "Session Stopped";
-                } else {play(); return "";}
-            case PAUSED:
-                if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
-                    endsessionprematurely(sessions);
-                    currentcut.stop();
-                    currentcuttimeline.stop();
-                    setPlayerState(PlayerWidget.PlayerState.STOPPED);
-                    resetthissession();
-                    return "Session Stopped";
-                } else {play(); return "";}
-            case IDLE:
-                return "No Session Playing, Cannot Stop";
-            case TRANSITIONING:
-                return "Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Stop";
-            default:
-                return "";
+        if (playerState == PlayerWidget.PlayerState.PLAYING) {
+            pause();
+            if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
+                endsessionprematurely(sessions);
+                currentcut.stop();
+                currentcuttimeline.stop();
+                setPlayerState(PlayerWidget.PlayerState.STOPPED);
+                resetthissession();
+                return "Session Stopped";
+            } else {play(); return "";}
+        } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
+            if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
+                endsessionprematurely(sessions);
+                currentcut.stop();
+                currentcuttimeline.stop();
+                setPlayerState(PlayerWidget.PlayerState.STOPPED);
+                resetthissession();
+                return "Session Stopped";
+            } else {play(); return "";}
+        } else if (playerState == PlayerWidget.PlayerState.IDLE) {
+            return "No Session Playing, Cannot Stop";
+        } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
+            return "Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Stop";
+        } else {
+            return "";
         }
     }
     public void endsessionprematurely(Sessions Sessions) {

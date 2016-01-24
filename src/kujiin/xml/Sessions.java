@@ -9,6 +9,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
@@ -17,7 +18,8 @@ import java.util.List;
 @XmlRootElement(name = "Sessions")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Sessions {
-    private List<Session> Session;
+    @XmlElement(name = "Session")
+    private List<Session> Session = null;
 
     public Sessions() {deletenonvalidsessions();}
 
@@ -37,16 +39,23 @@ public class Sessions {
     public void marshall() throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(Sessions.class);
         Marshaller createMarshaller = context.createMarshaller();
-        createMarshaller.marshal(getSession(), This_Session.sessionsxmlfile);
+        createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        createMarshaller.marshal(this, This_Session.sessionsxmlfile);
     }
     public void createnewsession() {
         try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
-        catch (JAXBException ignored) {Tools.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
+        catch (JAXBException e) {
+            e.printStackTrace();
+            Tools.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
+    // TODO 4 Sessions Are Being Added Instead Of One (Probably Those Switch() case Statements Being Broke)
     public void addsession(Session session) throws JAXBException {
+        System.out.println("Called Add Session!!");
         if (This_Session.sessionsxmlfile.exists()) {unmarshall();}
         List<Session> sessionsList = getSession();
-        if (sessionsList == null) {sessionsList = new ArrayList<>();}
+        if (sessionsList != null && sessionsList.size() > 0) {
+            sortsessions();
+        } else {sessionsList = new ArrayList<>();}
         sessionsList.add(session);
         setSession(sessionsList);
         marshall();
@@ -70,6 +79,9 @@ public class Sessions {
             }
         } catch (NullPointerException | ConcurrentModificationException ignored) {}
     }
+    public void sortsessions() {
+        // TODO Sort Sessions By Practice Date
+    }
 
 // Session Information Getters
     public int totalpracticetimeinminutes(boolean includepreandpost) {
@@ -87,7 +99,7 @@ public class Sessions {
     }
     public int averagepracticetimeinminutes(boolean includepreandpost) {
         try {return totalpracticetimeinminutes(includepreandpost) / getSession().size();}
-        catch (NullPointerException ignored) {return 0;}
+        catch (NullPointerException | ArithmeticException ignored) {return 0;}
     }
     public ArrayList<Session> getsessionswithprematureendings() {
         try {
