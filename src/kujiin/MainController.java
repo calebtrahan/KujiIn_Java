@@ -86,7 +86,7 @@ public class MainController implements Initializable {
     public TextField ApproximateEndTime;
     public Button ChangeValuesButton;
     public TextField TotalSessionTime;
-    private This_Session this_session;
+    private This_Session session;
     private GoalsWidget goalsWidget;
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private PlayerWidget playerWidget;
@@ -99,7 +99,7 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setProgressTrackerWidget(new ProgressTrackerWidget(this));
-        setThis_session(new This_Session(this));
+        setSession(new This_Session(this));
         setGoalsWidget(new GoalsWidget(this));
         setCreatorAndExporterWidget(new CreatorAndExporterWidget(this));
         setPlayerWidget(new PlayerWidget(this));
@@ -115,11 +115,11 @@ public class MainController implements Initializable {
     public void setGoalsWidget(GoalsWidget goalsWidget) {
         this.goalsWidget = goalsWidget;
     }
-    public This_Session getThis_session() {
-        return this_session;
+    public This_Session getSession() {
+        return session;
     }
-    public void setThis_session(This_Session this_session) {
-        this.this_session = this_session;
+    public void setSession(This_Session session) {
+        this.session = session;
     }
     public CreatorAndExporterWidget getCreatorAndExporterWidget() {
         return creatorAndExporterWidget;
@@ -177,13 +177,13 @@ public class MainController implements Initializable {
 // Created Session Widget
     public boolean getsessioninformation() {
         try {
-            boolean cutsinsession = this_session.getCutsinsession().size() != 0;
+            boolean cutsinsession = session.getCutsinsession().size() != 0;
             if (cutsinsession) {
                 Session session = new Session();
                 ArrayList<Integer> cuttimes = new ArrayList<>(11);
                 for (String i : This_Session.allnames) {
                     Integer duration = 0;
-                    for (Cut x : this_session.getCutsinsession()) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
+                    for (Cut x : this.session.getCutsinsession()) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
                     cuttimes.add(duration);
                 }
                 session.updatecutduration(0, cuttimes.get(0));
@@ -210,9 +210,9 @@ public class MainController implements Initializable {
                 settextfieldvalue(PostTime, cuttimes.get(10));
             }
             // Set Ambience Enabled And This_Session Total Time
-//            if (this_session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes"); AmbienceEnabledTextField.setDisable(false);}
+//            if (session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes"); AmbienceEnabledTextField.setDisable(false);}
 //            else {AmbienceEnabledTextField.setText("No"); AmbienceEnabledTextField.setDisable(true);}
-//            TotalSessionTimeTextField.setText(this_session.gettotalsessionduration());
+//            TotalSessionTimeTextField.setText(session.gettotalsessionduration());
 //            TotalSessionTimeTextField.setDisable(! cutsinsession);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -237,7 +237,7 @@ public class MainController implements Initializable {
 //                }
 //            }
 //            creatorState = CreatorState.CREATION_IN_PROGRESS;
-//            ChangeSessionValues createsession = new ChangeSessionValues(this_session);
+//            ChangeSessionValues createsession = new ChangeSessionValues(session);
 //            createsession.showAndWait();
 //            if (getsessioninformation()) {creatorState = CreatorState.CREATED;}
 //            else {

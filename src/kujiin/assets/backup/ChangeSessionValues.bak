@@ -30,10 +30,10 @@
 //    public Label totalsessiontimeFormattedLabel;
 //    public Label approximatefinishtimeLabel;
 //    ArrayList<Integer> textfieldvalues = new ArrayList<>();
-//    private This_Session this_session;
+//    private This_Session session;
 //
-//    public ChangeSessionValues(This_Session this_session) {
-//        this.this_session = this_session;
+//    public ChangeSessionValues(This_Session session) {
+//        this.session = session;
 //        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kujiin/assets/fxml/ChangeSessionValues.fxml"));
 //        fxmlLoader.setController(this);
 //        try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Edit This Session's Values");}
@@ -128,13 +128,13 @@
 //            if (gettextfieldvalues()) {
 //                CreateSessionButton.setDisable(true);
 //                CancelButton.setDisable(true);
-//                this_session.checkifambienceisgood(textfieldvalues);
+//                session.checkifambienceisgood(textfieldvalues);
 //            } else {
 //                GuiUtils.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
 //                AmbienceOptionCheckBox.setSelected(false);
 //                ambiencecheckboxswitch();
 //            }
-//        } else {this_session.setAmbienceenabled(false);}
+//        } else {session.setAmbienceenabled(false);}
 //    }
 //    public void cancelsessioncreation(ActionEvent actionEvent) {this.close();}
 //    public void createsession(ActionEvent actionEvent) {

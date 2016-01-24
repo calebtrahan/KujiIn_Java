@@ -312,7 +312,7 @@ public class Cut {
     }
     public void resume() {
         entrainmentplayer.play();
-        if (ambienceenabled) {ambienceplayer.pause();}
+        if (ambienceenabled) {ambienceplayer.play();}
         cuttimeline.play();
     }
     public void stop() {

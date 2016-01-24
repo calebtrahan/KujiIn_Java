@@ -63,7 +63,7 @@ public class PlayerWidget implements Widget {
         ReferenceFileCheckbox = mainController.ReferenceFilesOption;
         GoalsWidget = mainController.getGoalsWidget();
         StatusBar = mainController.PlayerStatusBar;
-        Session = mainController.getThis_session();
+        Session = mainController.getSession();
         creatorAndExporterWidget = mainController.getCreatorAndExporterWidget();
     }
 

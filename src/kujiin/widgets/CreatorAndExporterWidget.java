@@ -66,7 +66,7 @@ public class CreatorAndExporterWidget implements Widget {
     private IntegerProperty ZenValue = new SimpleIntegerProperty(0);
     private IntegerProperty PostsessionValue = new SimpleIntegerProperty(0);
     private ExporterState exporterState;
-    private This_Session this_session;
+    private This_Session session;
     private Label StatusBar;
     private ArrayList<Integer> textfieldtimes = new ArrayList<>(11);
 
@@ -90,7 +90,7 @@ public class CreatorAndExporterWidget implements Widget {
         ZaiTime = mainController.ZaiTime;
         ZenTime = mainController.ZenTime;
         PostTime = mainController.PostTime;
-        this_session = mainController.getThis_session();
+        session = mainController.getSession();
         StatusBar = mainController.CreatorStatusBar;
         exporterState = ExporterState.IDLE;
         setuptextfields();
@@ -111,9 +111,9 @@ public class CreatorAndExporterWidget implements Widget {
 // Button Actions
     public boolean createsession() {
         if (gettextfieldtimes()) {
-            if (this_session.sessioncreationwellformednesschecks(textfieldtimes)) {
-                this_session.setAmbienceenabled(AmbienceSwitch.isSelected());
-                this_session.create(textfieldtimes);
+            if (session.sessioncreationwellformednesschecks(textfieldtimes)) {
+                session.setAmbienceenabled(AmbienceSwitch.isSelected());
+                session.create(textfieldtimes);
                 return true;
             } else {return false;}
         }
@@ -232,7 +232,7 @@ public class CreatorAndExporterWidget implements Widget {
         }
         if (AmbienceSwitch.isSelected()) {
             AmbienceSwitch.setSelected(false);
-            this_session.resetallcuts();
+            session.resetallcuts();
             Tools.showtimedmessage(StatusBar, "Session Values Changed, Ambience Unselected", 5000);
         }
     }
@@ -244,14 +244,14 @@ public class CreatorAndExporterWidget implements Widget {
     public void checkambience() {
         if (AmbienceSwitch.isSelected()) {
             if (gettextfieldtimes()) {
-                this_session.checkifambienceisgood(textfieldtimes, AmbienceSwitch);
+                session.checkifambienceisgood(textfieldtimes, AmbienceSwitch);
             } else {
                 Tools.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
                 AmbienceSwitch.setSelected(false);
             }
         } else {
-            this_session.resetallcuts();
-            this_session.setAmbienceenabled(false);
+            session.resetallcuts();
+            session.setAmbienceenabled(false);
         }
     }
     public void changeallvalues() {
@@ -341,23 +341,24 @@ public class CreatorAndExporterWidget implements Widget {
 
 // Presets
     public void loadpreset() {
-    File xmlfile = new FileChooser().showOpenDialog(null);
-    if (xmlfile != null) {
-        try {
-            JAXBContext context = JAXBContext.newInstance(Session.class);
-            Unmarshaller createMarshaller = context.createUnmarshaller();
-            Session loadedsession = (Session) createMarshaller.unmarshal(xmlfile);
-            if (loadedsession != null) {
-                this_session.setupcutsinsession(loadedsession.getallcuttimes());
-                Tools.showinformationdialog("Information", "Preset Loaded", "Your Preset Was Successfully Loaded");
-            }
-        } catch (JAXBException e) {
-            Tools.showerrordialog("Error", "Not A Valid Preset File", "Please Select A Valid Preset File");}
+        File xmlfile = new FileChooser().showOpenDialog(null);
+        if (xmlfile != null && xmlfile.getName().endsWith(".xml")) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(Session.class);
+                Unmarshaller createMarshaller = context.createUnmarshaller();
+                Session loadedsession = (Session) createMarshaller.unmarshal(xmlfile);
+                if (loadedsession != null) {
+                    session.setupcutsinsession(loadedsession.getallcuttimes());
+                    Tools.showinformationdialog("Information", "Preset Loaded", "Your Preset Was Successfully Loaded");
+                } else {
+                    Tools.showinformationdialog("Invalid Preset File", "Invalid Preset File", "Cannot Load File");
+                }
+            } catch (JAXBException e) {Tools.showerrordialog("Error", "Not A Valid Preset File", "Please Select A Valid Preset File");}
+        }
     }
-}
     public void saveaspreset(Session session) {
         File xmlfile = new FileChooser().showSaveDialog(null);
-        if (xmlfile != null) {
+        if (xmlfile != null  && xmlfile.getName().endsWith(".xml")) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Session.class);
                 Marshaller createMarshaller = context.createMarshaller();
