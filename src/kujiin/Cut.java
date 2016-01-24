@@ -47,7 +47,7 @@ public class Cut {
         this.number = number;
         this.name = name;
         this.ramp = ramp;
-        if (this.ramp) { this.rampduration = 2;} // TODO This Can Be Set In Options
+        if (this.ramp) { this.rampduration = 2;}
         this.duration = duration;
         this.thisession = thisession;
         ambiencedirectory = new File(This_Session.directoryambience, name);
@@ -134,7 +134,6 @@ public class Cut {
         File rampout2 = new File(This_Session.directorytohramp, "3out2.mp3");
         File rampoutspecial1 = new File(This_Session.directorytohramp, "3outpostsession1.mp3");
         File rampoutspecial2 = new File(This_Session.directorytohramp, "3outpostsession2.mp3");
-        // TODO Add 5 Min Entrainment Files, And Refactor This Here
         entrainmentlist = new ArrayList<>();
         entrainmentmedia = new ArrayList<>();
         int fivetimes = 0;
@@ -191,8 +190,6 @@ public class Cut {
         return entrainmentmedia.size() > 0;
     }
     public boolean buildAmbience() {
-        // TODO Ambience Hangs On Higher Than 10 Numbers
-        // TODO Set Really High Durations, So You Can See If It Works For Really Long Sessions
         ambiencelist = new ArrayList<>();
         ambiencemedia = new ArrayList<>();
         Double currentduration = 0.0;
@@ -336,8 +333,7 @@ public class Cut {
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
     }
     public void playnextambience() {
-        // TODO Throwing Index Out Of Bounds Exception In Zen Ambience (And Not Playing Cause It Can't Load)
-            // Maybe timing is off in creating ambience lists?
+        // Maybe timing is off in creating ambience lists?
         try {
             ambienceplaycount++;
             ambienceplayer.dispose();
@@ -437,8 +433,10 @@ public class Cut {
             tempentrainmentfile.delete();
             return true;
         } catch (IOException e) {
+            new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());
             return false;
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
+            new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());
             return false;
         }
 
@@ -451,7 +449,7 @@ public class Cut {
             writer = new PrintWriter(tempambiencetextfile);
             for (File k : ambiencefiles) {writer.println("file " + "\'" + k.getAbsolutePath() + "\'");}
             writer.close();
-        } catch (FileNotFoundException ignored) {}
+        } catch (FileNotFoundException e) {new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());}
 //        return tempambiencetextfile.exists();
     // Call FFMPEG TO Create File
         ArrayList<String> concatenateambiencelist = new ArrayList<>();
@@ -498,7 +496,7 @@ public class Cut {
                 concatenate.waitFor();
                 adjustlength = cmdlist.start();
                 adjustlength.waitFor();
-            } catch (IOException | InterruptedException e) {e.printStackTrace();}
+            } catch (IOException | InterruptedException e) {new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());}
             boolean filegood = Tools.checkaudioduration(finalambiencefile, getdurationinseconds());
             if (filegood) {return true;}
             else {

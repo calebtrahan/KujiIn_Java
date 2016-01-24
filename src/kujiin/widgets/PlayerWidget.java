@@ -243,12 +243,7 @@ public class PlayerWidget implements Widget {
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle(currentcut.name + "'s Reference");}
             catch (IOException e) {e.printStackTrace();}
-            System.out.println(fullscreenoption);
-            // TODO FullScreenOption Is null. Why?
-            setsizing(true);
-    //        } else {
-    //            // TODO Set Adjusted Height And Width Here
-    //        }
+            setsizing(fullscreenoption);
             loadcontent();
         }
 
@@ -276,10 +271,8 @@ public class PlayerWidget implements Widget {
             ContentPane.setFitToHeight(true);
             ContentPane.setStyle("-fx-background-color: #212526");
         }
-
         public void loadcontent() {
             File referencefile = currentcut.getReferenceFile(referenceType);
-            System.out.println("Passing " + referencefile.getAbsolutePath() + " Into The Content Pane");
             if (referenceType == ReferenceType.txt) {
                 StringBuilder sb = new StringBuilder();
                 try (FileInputStream fis = new FileInputStream(referencefile);
@@ -305,13 +298,13 @@ public class PlayerWidget implements Widget {
         public Button CancelButton;
         public CheckBox FullScreenOption;
         private ReferenceType referenceType = null;
-        private Boolean fullscreen = null;
+        private Boolean fullscreen;
         private Boolean enabled;
 
         public ReferenceTypeDialog (ReferenceType referenceType, Boolean fullscreenoption) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceTypeDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select A Reference Type Variation");}
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Reference Type Variation");}
             catch (IOException e) {e.printStackTrace();}
             if (referenceType != null) {
                 if (referenceType == ReferenceType.txt) {TextOption.setSelected(true);}
@@ -325,6 +318,9 @@ public class PlayerWidget implements Widget {
             return referenceType;
         }
         public Boolean getFullscreen() {return fullscreen;}
+        public void setFullscreen(Boolean fullscreen) {
+            this.fullscreen = fullscreen;
+        }
         public Boolean getEnabled() {
             return enabled;
         }
@@ -342,7 +338,7 @@ public class PlayerWidget implements Widget {
         public void accept(ActionEvent actionEvent) {
             if (HTMLOption.isSelected()) {referenceType = ReferenceType.html;}
             else if (TextOption.isSelected()) {referenceType = ReferenceType.txt;}
-            setFullScreen(FullScreenOption.isSelected());
+            setFullscreen(FullScreenOption.isSelected());
             setEnabled(true);
             this.close();
         }
@@ -350,10 +346,9 @@ public class PlayerWidget implements Widget {
             setEnabled(false);
             this.close();
         }
-
     }
 
-// Enums
+// Enumerators
     public enum ReferenceType {
         html, txt
     }

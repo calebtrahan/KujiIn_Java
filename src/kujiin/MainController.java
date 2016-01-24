@@ -287,7 +287,7 @@ public class MainController implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeAlertDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select An Ambience Type Variation");}
-            catch (IOException e) {e.printStackTrace();}
+            catch (IOException e) {new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());}
             if (alertfileactual.exists()) {this.setTitle("Change Alert File");}
             else {this.setTitle("Add A New Alert File");}
             alertfileTextField.setEditable(false);
@@ -372,7 +372,7 @@ public class MainController implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/EditReferenceFiles.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select An Ambience Type Variation");}
-            catch (IOException e) {e.printStackTrace();}
+            catch (IOException e) {new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());}
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
             cutnames = FXCollections.observableArrayList();
             variations = FXCollections.observableArrayList();
@@ -770,6 +770,37 @@ public class MainController implements Initializable {
             public String getTotaldurationshort() {
                 return totaldurationshort;
             }
+        }
+
+    }
+    public static class ExceptionDialog extends Stage {
+        public TextArea StackTraceTextField;
+        public Button CloseButton;
+        public Button ContinueButton;
+        public CheckBox NotifyMeCheckbox;
+        public Label TopText;
+
+        public ExceptionDialog(String exceptionname, String stacktrace) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ExceptionDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Error Occured");}
+            catch (IOException e) {e.printStackTrace();}
+            TopText.setText(exceptionname + " Occured");
+            StackTraceTextField.setText(stacktrace);
+        }
+
+        public void exit(ActionEvent actionEvent) {
+            if (NotifyMeCheckbox.isSelected()) {
+                // TODO Send Stacktrace And Log To my Email
+            }
+            this.close();
+            System.exit(1);
+        }
+        public void continueprogram(ActionEvent actionEvent) {
+            if (NotifyMeCheckbox.isSelected()) {
+                // TODO Send Stacktrace And Log To my Email
+            }
+            this.close();
         }
 
     }

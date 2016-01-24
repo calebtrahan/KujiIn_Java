@@ -313,6 +313,18 @@ public class GoalsWidget implements Widget{
             } catch (IOException e) {e.printStackTrace();}
         }
 
+        public String getReason() {
+            if (! Reason.getText().isEmpty()) {return Reason.getText();}
+            else {return null;}
+        }
+        public void accepted(ActionEvent actionEvent) {
+            this.close();
+        }
+        public void rejected(ActionEvent actionEvent) {
+            // TODO Dialog To Disable Premature Ending Dialog In Options Here
+            Reason.setText("");
+            this.close();
+        }
     }
     public static class SelectGoalDialog extends Stage {
         public TableView<CurrentGoalBinding> currentgoaltable;

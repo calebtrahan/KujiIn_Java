@@ -48,9 +48,7 @@ public class Sessions {
             e.printStackTrace();
             Tools.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
-    // TODO 4 Sessions Are Being Added Instead Of One (Probably Those Switch() case Statements Being Broke)
     public void addsession(Session session) throws JAXBException {
-        System.out.println("Called Add Session!!");
         if (This_Session.sessionsxmlfile.exists()) {unmarshall();}
         List<Session> sessionsList = getSession();
         if (sessionsList != null && sessionsList.size() > 0) {

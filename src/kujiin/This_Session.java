@@ -329,7 +329,7 @@ public class This_Session {
                 sdcb[0].CancelButton.setOnAction(ev -> creationservice.cancel());
             });
             creationservice.setOnCancelled(event -> {
-                // TODO Reset Session Here
+                resetallcuts();
                 sdcb[0].close();
             });
             creationservice.setOnSucceeded(event -> {
@@ -337,13 +337,13 @@ public class This_Session {
             });
             creationservice.setOnFailed(event -> {
                 Platform.runLater(() -> Tools.showerrordialog("Error", "Session Creation Failed", "Check Sound File Read Permissions"));
-                // TODO Reset Session Here
+                resetallcuts();
                 sdcb[0].close();
             });
             creationservice.start();
         }
     }
-    public void resetambience() {
+    public void resetallcuts() {
         for (Cut i : getallCuts()) {
             i.reset();
             i.setAmbienceenabled(false);
@@ -421,7 +421,6 @@ public class This_Session {
     }
     public String play() {
         if (playerState == PlayerWidget.PlayerState.IDLE) {
-            sessions.createnewsession();
             startplayback();
             return "Playing Session...";
         }
@@ -432,7 +431,6 @@ public class This_Session {
             return "Resuming Session...";
         }
         else if(playerState == PlayerWidget.PlayerState.STOPPED) {
-            sessions.createnewsession();
             startplayback();
             return "Playing Session...";
         }
@@ -463,7 +461,7 @@ public class This_Session {
         if (playerState == PlayerWidget.PlayerState.PLAYING) {
             pause();
             if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
-                endsessionprematurely(sessions);
+                endsessionprematurely();
                 currentcut.stop();
                 currentcuttimeline.stop();
                 setPlayerState(PlayerWidget.PlayerState.STOPPED);
@@ -472,7 +470,7 @@ public class This_Session {
             } else {play(); return "";}
         } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
             if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
-                endsessionprematurely(sessions);
+                endsessionprematurely();
                 currentcut.stop();
                 currentcuttimeline.stop();
                 setPlayerState(PlayerWidget.PlayerState.STOPPED);
@@ -487,16 +485,16 @@ public class This_Session {
             return "";
         }
     }
-    public void endsessionprematurely(Sessions Sessions) {
+    public void endsessionprematurely() {
         int secondsleft = currentcut.getdurationinseconds() / currentcut.getSecondselapsed();
         int secondspracticed = currentcut.getdurationinseconds() - secondsleft;
         Double minutes = Math.floor(secondspracticed / 60);
         sessions.getsession(sessions.sessionscount() - 1).updatecutduration(currentcut.number, minutes.intValue());
-        // TODO Get Premature Ending Reason Here
-        String prematureendingreason = "";
-        sessions.getsession(sessions.sessionscount() - 1).writeprematureending(currentcut.name, prematureendingreason);
-//        try {Sessions.addsession(TemporarySession);}
-//        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "XML Error", "Cannot Write This Practiced Session To XML File");}
+        GoalsWidget.PrematureEndingDialog ped = new GoalsWidget.PrematureEndingDialog();
+        String prematureendingreason = ped.getReason();
+        if (prematureendingreason != null) {
+            sessions.getsession(sessions.sessionscount() - 1).writeprematureending(currentcut.name, prematureendingreason);
+        }
     }
     public void updateplayerui() {
         try {
@@ -524,7 +522,6 @@ public class This_Session {
     }
     public void playthiscut() {
         try {
-//            System.out.println(TimeUtils.getformattedtime() + "> Clause 3");
             if (isReferencedisplayoption() != null) {displayreferencefile();}
             Duration cutduration = currentcut.getDuration();
             currentcut.start();
@@ -557,7 +554,7 @@ public class This_Session {
 //        try {sessions.addsession(TemporarySession);}
 //        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
         if (Tools.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {export();}
-        // TODO Update Goal Widget Here
+        Root.getGoalsWidget().update();
     }
     public void resetthissession() {
         currentcuttimeline = null;

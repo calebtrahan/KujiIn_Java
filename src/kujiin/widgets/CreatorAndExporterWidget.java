@@ -231,7 +231,7 @@ public class CreatorAndExporterWidget implements Widget {
         }
         if (AmbienceSwitch.isSelected()) {
             AmbienceSwitch.setSelected(false);
-            this_session.resetambience();
+            this_session.resetallcuts();
             Tools.showinformationdialog("Information", "Unselected Ambience Because Values Are Changed", "Set All Desired Session Values First, Then Check The Ambience Box Last");
         }
     }
@@ -249,7 +249,7 @@ public class CreatorAndExporterWidget implements Widget {
                 AmbienceSwitch.setSelected(false);
             }
         } else {
-            this_session.resetambience();
+            this_session.resetallcuts();
             this_session.setAmbienceenabled(false);
         }
     }
