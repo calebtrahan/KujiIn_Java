@@ -219,11 +219,8 @@ public class MainController implements Initializable {
             return false;
         }
     }
-    public void loadpreset(ActionEvent actionEvent) {
-    }
-    public void savepreset(ActionEvent actionEvent) {
-
-    }
+    public void loadpreset(ActionEvent actionEvent) {creatorAndExporterWidget.loadpreset();}
+    public void savepreset(ActionEvent actionEvent) {creatorAndExporterWidget.saveaspreset(progressTrackerWidget.getSessions().getsession(progressTrackerWidget.getSessions().sessionscount() - 1));}
     public void createsession(Event event) {
 //        if (creatorState == CreatorState.NOT_CREATED || creatorState == CreatorState.CREATED) {
 //            if (creatorState == CreatorState.CREATED) {
