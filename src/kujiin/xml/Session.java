@@ -231,18 +231,17 @@ public class Session {
         else {return 0;}
     }
     public void setcutambience(int cutindex, ArrayList<File> ambiencelist) {
-        int i = cutindex;
-        if (i == 0) setPresession_Ambience(ambiencelist);
-        if (i == 1) setRin_Ambience(ambiencelist);
-        if (i == 2) setKyo_Ambience(ambiencelist);
-        if (i == 3) setToh_Ambience(ambiencelist);
-        if (i == 4) setSha_Ambience(ambiencelist);
-        if (i == 5) setKai_Ambience(ambiencelist);
-        if (i == 6) setJin_Ambience(ambiencelist);
-        if (i == 7) setRetsu_Ambience(ambiencelist);
-        if (i == 8) setZen_Ambience(ambiencelist);
-        if (i == 9) setPostsession_Ambience(ambiencelist);
-        if (i == 10) System.out.println("Can't Set Cut Ambience Not A Valid Index: " + cutindex);
+        if (cutindex == 0) setPresession_Ambience(ambiencelist);
+        if (cutindex == 1) setRin_Ambience(ambiencelist);
+        if (cutindex == 2) setKyo_Ambience(ambiencelist);
+        if (cutindex == 3) setToh_Ambience(ambiencelist);
+        if (cutindex == 4) setSha_Ambience(ambiencelist);
+        if (cutindex == 5) setKai_Ambience(ambiencelist);
+        if (cutindex == 6) setJin_Ambience(ambiencelist);
+        if (cutindex == 7) setRetsu_Ambience(ambiencelist);
+        if (cutindex == 8) setZen_Ambience(ambiencelist);
+        if (cutindex == 9) setPostsession_Ambience(ambiencelist);
+        if (cutindex == 10) System.out.println("Can't Set Cut Ambience Not A Valid Index: " + cutindex);
     }
     public ArrayList<Integer> getallcuttimes() {
         ArrayList<Integer> allcuttimes = new ArrayList<>();
