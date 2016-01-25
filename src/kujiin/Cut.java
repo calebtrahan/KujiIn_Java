@@ -264,7 +264,9 @@ public class Cut {
     public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
     public void updatecuttime() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-//            try {
+            System.out.println(getCurrentEntrainmentPlayer().getVolume());
+//
+//  try {
             // TODO Use Javafx timeline to fade in fadeout audio (IF not 0.0)
 //                Double fadeinduration =
 //                Double fadeoutduration = thisession.Root.getSessionOptions().getFadeoutduration();
@@ -357,16 +359,18 @@ public class Cut {
             ambienceplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
                 double fadeoutstarttime = getdurationinseconds() - fadeoutduration;
                 if (newValue.toMillis() >= fadeoutstarttime * 1000 && ! ambiencefadeoutplayed) {
-                    new Timeline(new KeyFrame(Duration.millis(fadeoutstarttime * 1000), event -> new Transition() {
-                        {setCycleDuration(new Duration(fadeoutduration * 1000));}
-                        @Override
-                        protected void interpolate(double frac) {
-                            // TODO Get Fadeout Working (Correct The Math Here And Above In Entrainment FadeOut)
-                            double millistillend = new Duration(getdurationinseconds() * 1000).toSeconds() - newValue.toSeconds();
-                            double ambiencevolume = frac * thisession.getSessionAmbienceVolume();
-//                            getCurrentAmbiencePlayer().setVolume(ambiencevolume);
-                        }
-                    }.play()));
+                    new Timeline(new KeyFrame(Duration.millis(fadeoutstarttime * 1000), event -> {
+                        fadeoutambience = new Transition() {
+                            {setCycleDuration(new Duration(fadeoutduration * 1000));}
+                            @Override
+                            protected void interpolate(double frac) {
+                                // TODO Get Fadeout Working (Correct The Math Here And Above In Entrainment FadeOut)
+
+                            }
+                        };
+                        fadeoutambience.setAutoReverse(true);
+                        fadeoutambience.play();
+                    }));
                     ambiencefadeoutplayed = true;
                 } else {ambiencefadeoutplayed = false;}
             });
