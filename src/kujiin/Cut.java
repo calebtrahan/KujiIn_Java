@@ -3,6 +3,7 @@ package kujiin;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.animation.Transition;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -42,6 +43,12 @@ public class Cut {
     public boolean ambienceenabled;
     private Timeline cuttimeline;
     private int secondselapsed;
+    private Animation fadeinentrainment;
+    private Animation fadeoutentrainment;
+    private Animation fadeinambience;
+    private Animation fadeoutambience;
+    private boolean entrainmentfadeoutplayed;
+    private boolean ambiencefadeoutplayed;
 
     public Cut(int number, String name, Boolean ramp, int duration, This_Session thisession) {
         this.number = number;
@@ -257,33 +264,41 @@ public class Cut {
     public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
     public void updatecuttime() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            try {
-                if (secondselapsed <= PlayerWidget.FADEINDURATION) {
-                    double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEINDURATION;
-                    double entrainmentvolume = secondselapsed * entrainmentincrement;
-                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
-                    if (ambienceenabled) {
-                        double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEINDURATION;
-                        double ambiencevolume = secondselapsed * ambienceincrement;
-                        getCurrentAmbiencePlayer().setVolume(ambiencevolume);
-                    }
-                }
-                else if (secondselapsed >= getdurationinseconds() - PlayerWidget.FADEOUTDURATION) {
-                    int secondsleft = getdurationinseconds() - secondselapsed;
-                    double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEOUTDURATION;
-                    double entrainmentvolume = secondsleft * entrainmentincrement;
-                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
-                    if (ambienceenabled) {
-                        double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEOUTDURATION;
-                        double ambiencevolume =  secondsleft * ambienceincrement;
-                        getCurrentAmbiencePlayer().setVolume(ambiencevolume);
-                    }
-                } else {
-                        if (ambienceenabled) {getCurrentAmbiencePlayer().setVolume(thisession.getSessionAmbienceVolume());}
-                        getCurrentEntrainmentPlayer().setVolume(thisession.getSessionEntrainmentVolume());
-                }
-            } catch (RuntimeException ignored) {}
+//            try {
+            // TODO Use Javafx timeline to fade in fadeout audio (IF not 0.0)
+//                Double fadeinduration =
+//                Double fadeoutduration = thisession.Root.getSessionOptions().getFadeoutduration();
+//                if (fadeinduration > 0.0 && secondselapsed <= fadeoutduration) {
+//                    if (! fadeinplayed) {
+//
+//                        fadeinplayed = true;
+//                    }
+////                    double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEINDURATION;
+////                    double entrainmentvolume = secondselapsed * entrainmentincrement;
+////                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+////                    if (ambienceenabled) {
+////                        double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEINDURATION;
+////                        double ambiencevolume = secondselapsed * ambienceincrement;
+////                        getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+////                    }
+//                }
+//                else if (secondselapsed >= getdurationinseconds() - PlayerWidget.FADEOUTDURATION) {
+//                    int secondsleft = getdurationinseconds() - secondselapsed;
+//                    double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEOUTDURATION;
+//                    double entrainmentvolume = secondsleft * entrainmentincrement;
+//                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+//                    if (ambienceenabled) {
+//                        double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEOUTDURATION;
+//                        double ambiencevolume =  secondsleft * ambienceincrement;
+//                        getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+//                    }
+//                } else {
+//                if (ambienceenabled) {getCurrentAmbiencePlayer().setVolume(thisession.getSessionAmbienceVolume());}
+//                getCurrentEntrainmentPlayer().setVolume(thisession.getSessionEntrainmentVolume());
+//                }
+//            } catch (RuntimeException ignored) {}
             secondselapsed++;
+//        }
         }
     }
     // --------- Controls ---------- //
@@ -293,11 +308,68 @@ public class Cut {
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
         entrainmentplayer.play();
         entrainmentplayer.setVolume(0.0);
+        double fadeinduration = thisession.Root.getSessionOptions().getFadeinduration();
+        double fadeoutduration = thisession.Root.getSessionOptions().getFadeoutduration();
+    // Set Entrainment Fadein
+        if (fadeinduration > 0.0) {
+            entrainmentplayer.setOnPlaying(() -> {
+                fadeinentrainment = new Transition() {
+                    {setCycleDuration(new Duration(fadeinduration * 1000));}
+                    @Override
+                    protected void interpolate(double frac) {
+                        double entrainmentvolume = frac * thisession.getSessionEntrainmentVolume();
+                        getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+                    }
+                };
+                fadeinentrainment.play();
+            });
+        }
+    // Set Entrainment Fade Out
+        entrainmentplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+            double fadeoutstarttime = getdurationinseconds() - fadeoutduration;
+            if (newValue.toMillis() >= fadeoutstarttime * 1000 && ! entrainmentfadeoutplayed) {
+                new Timeline(new KeyFrame(Duration.millis(fadeoutstarttime * 1000), event -> new Transition() {
+                    {setCycleDuration(new Duration(fadeoutduration * 1000));}
+                    @Override
+                    protected void interpolate(double frac) {
+                        double entrainmentvolume = frac * thisession.getSessionEntrainmentVolume();
+                        getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+                    }
+                }.play()));
+                entrainmentfadeoutplayed = true;
+            } else {entrainmentfadeoutplayed = false;}
+        });
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         if (ambienceenabled) {
             ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
             ambienceplayer.play();
             ambienceplayer.setVolume(0.0);
+    // Set Ambience Fade In
+            ambienceplayer.setOnPlaying(() -> new Transition() {
+                {setCycleDuration(new Duration(thisession.Root.getSessionOptions().getFadeinduration() * 1000));}
+                @Override
+                protected void interpolate(double frac) {
+                    double ambiencevolume = frac * thisession.getSessionAmbienceVolume();
+                    getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                }
+            }.play());
+    // Set Ambience Fade Out
+            ambienceplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                double fadeoutstarttime = getdurationinseconds() - fadeoutduration;
+                if (newValue.toMillis() >= fadeoutstarttime * 1000 && ! ambiencefadeoutplayed) {
+                    new Timeline(new KeyFrame(Duration.millis(fadeoutstarttime * 1000), event -> new Transition() {
+                        {setCycleDuration(new Duration(fadeoutduration * 1000));}
+                        @Override
+                        protected void interpolate(double frac) {
+                            // TODO Get Fadeout Working (Correct The Math Here And Above In Entrainment FadeOut)
+                            double millistillend = new Duration(getdurationinseconds() * 1000).toSeconds() - newValue.toSeconds();
+                            double ambiencevolume = frac * thisession.getSessionAmbienceVolume();
+//                            getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                        }
+                    }.play()));
+                    ambiencefadeoutplayed = true;
+                } else {ambiencefadeoutplayed = false;}
+            });
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::playnextfilebecauseoferror);
         }

@@ -22,10 +22,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class PlayerWidget implements Widget {
-    public static Double ENTRAINMENTVOLUME = 0.6;
-    public static Double AMBIENCEVOLUME = 1.0;
-    public static Double FADEOUTDURATION = 10.0;
-    public static Double FADEINDURATION = 10.0;
     private CheckBox onOffSwitch;
     private Button AdjustVolumeButton;
     private Button PlayButton;
@@ -194,18 +190,19 @@ public class PlayerWidget implements Widget {
         public Label EntrainmentPercentage;
         public Label AmbiencePercentage;
 
-        public AdjustVolume(Cut currentcut) {
+        public AdjustVolume(Cut currentcut, This_Session session) {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AdjustSessionVolume.fxml"));
                 fxmlLoader.setController(this);
                 try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Adjust Session Volume");}
                 catch (IOException e) {e.printStackTrace();}
                 if (currentcut.getCurrentAmbiencePlayer() != null) {
                     currentcut.getCurrentAmbiencePlayer().volumeProperty().bind(AmbienceSlider.valueProperty());
-                    AmbienceSlider.setValue(AMBIENCEVOLUME);
-                    AmbiencePercentage.setText(new Double(AMBIENCEVOLUME * 100).intValue() + "%");
+                    AmbienceSlider.setValue(session.getSessionAmbienceVolume());
+                    AmbiencePercentage.setText(new Double(session.getSessionAmbienceVolume() * 100).intValue() + "%");
                     AmbienceSlider.setOnMouseClicked(event -> {
                         Double value = AmbienceSlider.getValue() * 100;
                         AmbiencePercentage.setText(value.intValue() + "%");
+                        session.setSessionAmbienceVolume(AmbienceSlider.getValue());
                     });
                 }
                 else {
@@ -214,11 +211,12 @@ public class PlayerWidget implements Widget {
                 }
                 if (currentcut.getCurrentEntrainmentPlayer() != null) {
                     currentcut.getCurrentEntrainmentPlayer().volumeProperty().bind(EntrainmentSlider.valueProperty());
-                    EntrainmentSlider.setValue(ENTRAINMENTVOLUME);
-                    EntrainmentPercentage.setText(new Double(ENTRAINMENTVOLUME * 100).intValue() + "%");
+                    EntrainmentSlider.setValue(session.getSessionEntrainmentVolume());
+                    EntrainmentPercentage.setText(new Double(session.getSessionEntrainmentVolume() * 100).intValue() + "%");
                     EntrainmentSlider.setOnMouseClicked(event -> {
                         Double value = EntrainmentSlider.getValue() * 100;
                         EntrainmentPercentage.setText(value.intValue() + "%");
+                        session.setSessionEntrainmentVolume(EntrainmentSlider.getValue());
                     });
                 }
                 else {

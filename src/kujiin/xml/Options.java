@@ -17,6 +17,10 @@ public class Options {
     private Boolean helpdialogs;
     private Boolean tooltips;
     private Boolean prematureendings;
+    private Double entrainemntvolume;
+    private Double ambiencevolume;
+    private Double fadeinduration;
+    private Double fadeoutduration;
 
     public Options() {
         try {unmarshall();} catch (JAXBException ignored) {}
@@ -47,6 +51,30 @@ public class Options {
     public void setPrematureendings(Boolean prematureendings) {
         this.prematureendings = prematureendings;
     }
+    public Double getEntrainemntvolume() {
+        return entrainemntvolume;
+    }
+    public void setEntrainemntvolume(Double entrainemntvolume) {
+        this.entrainemntvolume = entrainemntvolume;
+    }
+    public Double getAmbiencevolume() {
+        return ambiencevolume;
+    }
+    public void setAmbiencevolume(Double ambiencevolume) {
+        this.ambiencevolume = ambiencevolume;
+    }
+    public Double getFadeinduration() {
+        return fadeinduration;
+    }
+    public void setFadeinduration(Double fadeinduration) {
+        this.fadeinduration = fadeinduration;
+    }
+    public Double getFadeoutduration() {
+        return fadeoutduration;
+    }
+    public void setFadeoutduration(Double fadeoutduration) {
+        this.fadeoutduration = fadeoutduration;
+    }
 
     public void unmarshall() throws JAXBException {
         if (This_Session.optionsxmlfile.exists()) {
@@ -58,12 +86,20 @@ public class Options {
                 setHelpdialogs(options.getHelpdialogs());
                 setTooltips(options.getTooltips());
                 setPrematureendings(options.getPrematureendings());
+                setEntrainemntvolume(options.getEntrainemntvolume());
+                setAmbiencevolume(options.getAmbiencevolume());
+                setFadeinduration(options.getFadeinduration());
+                setFadeoutduration(options.getFadeoutduration());
             }
         } else {
             setDefaultinvocationtime(3);
             setHelpdialogs(true);
             setTooltips(true);
             setPrematureendings(true);
+            setEntrainemntvolume(0.6);
+            setAmbiencevolume(1.0);
+            setFadeinduration(10.0);
+            setFadeoutduration(10.0);
             marshall();
         }
     }
@@ -73,4 +109,5 @@ public class Options {
         createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         createMarshaller.marshal(this, This_Session.optionsxmlfile);
     }
+
 }

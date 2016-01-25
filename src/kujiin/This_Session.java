@@ -80,7 +80,7 @@ public class This_Session {
     private Double entrainmentvolume;
     private Double ambiencevolume;
     private GoalsWidget goalsWidget;
-    private MainController Root;
+    public MainController Root;
 
     public This_Session(MainController mainController) {
         Root = mainController;
@@ -415,8 +415,8 @@ public class This_Session {
         currentcuttimeline.play();
         cutcount = 0;
         currentcut = cutsinsession.get(cutcount);
-        setSessionEntrainmentVolume(PlayerWidget.ENTRAINMENTVOLUME);
-        setSessionAmbienceVolume(PlayerWidget.AMBIENCEVOLUME);
+        setSessionEntrainmentVolume(Root.getSessionOptions().getEntrainemntvolume());
+        setSessionAmbienceVolume(Root.getSessionOptions().getAmbiencevolume());
         playthiscut();
         sessions.createnewsession();
     }
@@ -569,7 +569,7 @@ public class This_Session {
     }
     public void adjustvolume() {
         if (getPlayerState() == PlayerWidget.PlayerState.PLAYING) {
-            PlayerWidget.AdjustVolume av = new PlayerWidget.AdjustVolume(currentcut);
+            PlayerWidget.AdjustVolume av = new PlayerWidget.AdjustVolume(currentcut, this);
             av.show();
             if (av.getAmbienceVolume() != null) {setSessionAmbienceVolume(av.getAmbienceVolume());}
             if (av.getEntrainmentVolume() != null) {setSessionEntrainmentVolume(av.getEntrainmentVolume());}
