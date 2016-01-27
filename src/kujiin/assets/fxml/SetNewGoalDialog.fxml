@@ -4,25 +4,26 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="134.0" prefWidth="374.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="157.0" prefWidth="371.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label layoutX="13.0" layoutY="14.0" text="Set A New Goal">
+      <Label layoutX="129.0" layoutY="10.0" text="Set A New Goal">
          <font>
             <Font size="16.0" />
          </font></Label>
-      <Spinner fx:id="GoalHoursSpinner" layoutX="14.0" layoutY="59.0" prefHeight="26.0" prefWidth="77.0" />
-      <DatePicker fx:id="GoalDatePicker" layoutX="204.0" layoutY="59.0" prefHeight="26.0" prefWidth="155.0" />
-      <Label layoutX="252.0" layoutY="41.0" text="Goal Date" />
-      <Button fx:id="CurrentGoalsButton" layoutX="13.0" layoutY="93.0" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" prefHeight="26.0" prefWidth="135.0" text="View Current Goals" />
-      <Spinner fx:id="GoalMinutesSpinner" layoutX="112.0" layoutY="59.0" prefHeight="26.0" prefWidth="77.0" />
-      <Label layoutX="35.0" layoutY="41.0" text="Hours" />
-      <Label layoutX="125.0" layoutY="41.0" text="Minutes" />
-      <HBox alignment="BOTTOM_RIGHT" layoutX="165.0" layoutY="88.0" prefHeight="36.0" prefWidth="200.0">
+      <Spinner fx:id="GoalHoursSpinner" layoutX="11.0" layoutY="84.0" prefHeight="26.0" prefWidth="77.0" />
+      <DatePicker fx:id="GoalDatePicker" layoutX="201.0" layoutY="84.0" prefHeight="26.0" prefWidth="155.0" />
+      <Label layoutX="249.0" layoutY="66.0" text="Goal Date" />
+      <Button fx:id="CurrentGoalsButton" layoutX="10.0" layoutY="122.0" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" prefHeight="26.0" prefWidth="135.0" text="View Current Goals" />
+      <Spinner fx:id="GoalMinutesSpinner" layoutX="109.0" layoutY="84.0" prefHeight="26.0" prefWidth="77.0" />
+      <Label layoutX="32.0" layoutY="66.0" text="Hours" />
+      <Label layoutX="122.0" layoutY="66.0" text="Minutes" />
+      <HBox alignment="BOTTOM_RIGHT" layoutX="162.0" layoutY="113.0" prefHeight="36.0" prefWidth="200.0">
          <children>
             <Button fx:id="OKButton" mnemonicParsing="false" onMousePressed="#Accept" prefHeight="26.0" prefWidth="59.0" text="Accept" />
             <Button fx:id="CancelButton" mnemonicParsing="false" onMousePressed="#cancelgoalsetting" text="Cancel" />
          </children>
       </HBox>
-      <Label fx:id="InformationLabel" alignment="CENTER" layoutX="149.0" layoutY="16.0" prefHeight="16.0" prefWidth="214.0" text="Current Hours: %s Hours" />
+      <Label layoutX="77.0" layoutY="38.0" text="Select A Cut:" />
+      <ComboBox fx:id="CutComboBox" layoutX="161.0" layoutY="33.0" prefHeight="26.0" prefWidth="135.0" />
    </children>
 </AnchorPane>

@@ -115,5 +115,12 @@ public class Sessions {
     public Session getsession(int index) {
         return getSession().get(index);
     }
-
+    public int gettotalcutpracticetimeinminutes(int cutindex) {
+        int minutes;
+        if (cutindex != 10) {
+            minutes = 0;
+            for (Session i : getSession()) {minutes += i.getcutduration(cutindex);}
+        } else {minutes = totalpracticetimeinminutes(false);}
+        return minutes;
+    }
 }

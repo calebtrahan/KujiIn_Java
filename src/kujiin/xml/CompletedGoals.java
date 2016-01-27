@@ -19,13 +19,80 @@ import java.util.List;
 @XmlRootElement(name = "Completed Goals")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class CompletedGoals {
-    private List<CompletedGoal> CompletedGoal;
+    private List<CompletedGoal> RinGoals;
+    private List<CompletedGoal> KyoGoals;
+    private List<CompletedGoal> TohGoals;
+    private List<CompletedGoal> ShaGoals;
+    private List<CompletedGoal> KaiGoals;
+    private List<CompletedGoal> JinGoals;
+    private List<CompletedGoal> RetsuGoals;
+    private List<CompletedGoal> ZaiGoals;
+    private List<CompletedGoal> ZenGoals;
+    private List<CompletedGoal> TotalGoals;
 
     public CompletedGoals() {}
 
 // Getters And Setters
-    public List<kujiin.xml.CompletedGoal> getCompletedGoal() {return CompletedGoal;}
-    public void setCompletedGoal(List<kujiin.xml.CompletedGoal> completedGoal) {CompletedGoal = completedGoal;}
+    public List<CompletedGoal> getRinGoals() {
+    return RinGoals;
+}
+    public void setRinGoals(List<CompletedGoal> rinGoals) {
+        RinGoals = rinGoals;
+    }
+    public List<CompletedGoal> getKyoGoals() {
+        return KyoGoals;
+    }
+    public void setKyoGoals(List<CompletedGoal> kyoGoals) {
+        KyoGoals = kyoGoals;
+    }
+    public List<CompletedGoal> getTohGoals() {
+        return TohGoals;
+    }
+    public void setTohGoals(List<CompletedGoal> tohGoals) {
+        TohGoals = tohGoals;
+    }
+    public List<CompletedGoal> getShaGoals() {
+        return ShaGoals;
+    }
+    public void setShaGoals(List<CompletedGoal> shaGoals) {
+        ShaGoals = shaGoals;
+    }
+    public List<CompletedGoal> getKaiGoals() {
+        return KaiGoals;
+    }
+    public void setKaiGoals(List<CompletedGoal> kaiGoals) {
+        KaiGoals = kaiGoals;
+    }
+    public List<CompletedGoal> getJinGoals() {
+        return JinGoals;
+    }
+    public void setJinGoals(List<CompletedGoal> jinGoals) {
+        JinGoals = jinGoals;
+    }
+    public List<CompletedGoal> getRetsuGoals() {
+        return RetsuGoals;
+    }
+    public void setRetsuGoals(List<CompletedGoal> retsuGoals) {
+        RetsuGoals = retsuGoals;
+    }
+    public List<CompletedGoal> getZaiGoals() {
+        return ZaiGoals;
+    }
+    public void setZaiGoals(List<CompletedGoal> zaiGoals) {
+        ZaiGoals = zaiGoals;
+    }
+    public List<CompletedGoal> getZenGoals() {
+        return ZenGoals;
+    }
+    public void setZenGoals(List<CompletedGoal> zenGoals) {
+        ZenGoals = zenGoals;
+    }
+    public List<CompletedGoal> getTotalGoals() {
+        return TotalGoals;
+    }
+    public void setTotalGoals(List<CompletedGoal> totalGoals) {
+        TotalGoals = totalGoals;
+    }
 
 // XML Processing
     public void unmarshall() throws JAXBException {
@@ -33,63 +100,80 @@ public class CompletedGoals {
             JAXBContext context = JAXBContext.newInstance(CompletedGoals.class);
             Unmarshaller createMarshaller = context.createUnmarshaller();
             CompletedGoals completedGoals = (CompletedGoals) createMarshaller.unmarshal(This_Session.completedgoalsxmlfile);
-            setCompletedGoal(completedGoals.getCompletedGoal());
+            setRinGoals(completedGoals.getRinGoals());
+            setKyoGoals(completedGoals.getKyoGoals());
+            setTohGoals(completedGoals.getTohGoals());
+            setShaGoals(completedGoals.getShaGoals());
+            setKaiGoals(completedGoals.getKaiGoals());
+            setJinGoals(completedGoals.getJinGoals());
+            setRetsuGoals(completedGoals.getRetsuGoals());
+            setZaiGoals(completedGoals.getZaiGoals());
+            setZenGoals(completedGoals.getZenGoals());
+            setTotalGoals(completedGoals.getTotalGoals());
         }
     }
     public void marshall() throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(CompletedGoals.class);
         Marshaller createMarshaller = context.createMarshaller();
-        createMarshaller.marshal(getCompletedGoal(), This_Session.completedgoalsxmlfile);
+        createMarshaller.marshal(this, This_Session.completedgoalsxmlfile);
     }
-    public void addgoal(CompletedGoal completedGoal) throws JAXBException {
+    public void add(int cutindex, CompletedGoal completedGoal) throws JAXBException {
         if (This_Session.completedgoalsxmlfile.exists()) {
-            List<CompletedGoal> completedGoalsList = getCompletedGoal();
+            List<CompletedGoal> completedGoalsList = getallcutgoals(cutindex);
             if (completedGoalsList == null) {completedGoalsList = new ArrayList<>();}
             completedGoalsList.add(completedGoal);
-            setCompletedGoal(completedGoalsList);
-            JAXBContext context = JAXBContext.newInstance(CompletedGoals.class);
-            Marshaller createMarshaller = context.createMarshaller();
-            createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, This_Session.completedgoalsxmlfile);
+            update(sort(completedGoalsList), cutindex);
+            marshall();
         }
     }
-    public void sortcompletedgoals() {
+    public List<CompletedGoal> sort(List<CompletedGoal> goallist) {
         try {
             BeanComparator bc = new BeanComparator(kujiin.xml.CompletedGoal.class, "getGoal_Hours");
-            List<CompletedGoal> completedGoalList = getCompletedGoal();
-            Collections.sort(completedGoalList, bc);
-            setCompletedGoal(completedGoalList);
+            Collections.sort(goallist, bc);
             int count = 1;
-            for (kujiin.xml.CompletedGoal i : getCompletedGoal()) {i.setID(count); count++;}
-        } catch (NullPointerException ignored) {}
+            for (kujiin.xml.CompletedGoal i : goallist) {i.setID(count); count++;}
+            return goallist;
+        } catch (NullPointerException ignored) {return null;}
     }
-    public boolean goalcompleted(CurrentGoal currentGoal) {
+    public boolean completegoal(int cutindex, CurrentGoal currentGoal) {
         double hours = currentGoal.getGoal_Hours();
         CompletedGoal newcompletedgoal = new CompletedGoal();
         newcompletedgoal.setDate_Completed(Tools.gettodaysdate());
         newcompletedgoal.setGoal_Hours(hours);
-        try {addgoal(newcompletedgoal); return true;}
+        try {
+            add(cutindex, newcompletedgoal); return true;}
         catch (JAXBException ignored) {return false;}
     }
-
-// Goal Information Getters
-    public CompletedGoal getgoalbyindex(Integer index) {
-    try {
-        if (getCompletedGoal() == null) {return null;}
-        else {return getCompletedGoal().get(index);}
-    } catch (ArrayIndexOutOfBoundsException ignored) {return null;}
-}
-    public List<CompletedGoal> getallgoals() {return getCompletedGoal();}
-    public boolean goalsexist() {
-        return getCompletedGoal() != null && getCompletedGoal().size() > 0;
+    public List<CompletedGoal> getallcutgoals(int cutindex) {
+        if (cutindex == 0) return RinGoals;
+        if (cutindex == 1) return KyoGoals;
+        if (cutindex == 2) return TohGoals;
+        if (cutindex == 3) return ShaGoals;
+        if (cutindex == 4) return KaiGoals;
+        if (cutindex == 5) return JinGoals;
+        if (cutindex == 6) return RetsuGoals;
+        if (cutindex == 7) return ZaiGoals;
+        if (cutindex == 8) return ZenGoals;
+        if (cutindex == 9) return TotalGoals;
+        else return null;
     }
-    public CompletedGoal getgoalbyid(Integer id) {
-        if (getCompletedGoal() != null && getCompletedGoal().size() > 0) {
-            for (kujiin.xml.CompletedGoal i : getCompletedGoal()) {
-                if (i.getID().equals(id)) {return i;}
-            }
-            return null;
-        } else {return null;}
+    public CompletedGoal getgoal(int cutindex, int goalindex) {
+        try {return getallcutgoals(cutindex).get(goalindex);}
+        catch (ArrayIndexOutOfBoundsException ignored) {return null;}
     }
-
+    public void update(List<CompletedGoal> cutgoallist, int cutindex) {
+        if (cutindex == 0) setRinGoals(cutgoallist);
+        if (cutindex == 1) setKyoGoals(cutgoallist);
+        if (cutindex == 2) setTohGoals(cutgoallist);
+        if (cutindex == 3) setShaGoals(cutgoallist);
+        if (cutindex == 4) setKaiGoals(cutgoallist);
+        if (cutindex == 5) setJinGoals(cutgoallist);
+        if (cutindex == 6) setRetsuGoals(cutgoallist);
+        if (cutindex == 7) setZaiGoals(cutgoallist);
+        if (cutindex == 8) setZenGoals(cutgoallist);
+        if (cutindex == 9) setTotalGoals(cutgoallist);
+    }
+    public boolean goalsexist(int cutindex) {
+        return getallcutgoals(cutindex) != null && getallcutgoals(cutindex).size() > 0;
+    }
 }

@@ -36,10 +36,13 @@ public class GoalsWidget implements Widget{
     private Button CompletedGoalsButton;
     private Label PracticedHours;
     private Label CurrentGoalHours;
+    private Label TopLabel;
+    private ComboBox<String> CutSelectorComboBox;
     private ProgressBar CurrentGoalProgress;
     private Sessions allpracticedsessions;
     private CurrentGoals currentGoals;
     private CompletedGoals completedGoals;
+    public static String[] GOALCUTNAMES = {"Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Total"};
 
     // TODO Make Goals For Individual Cuts Rin-Zen And Integerate Into Goal Widget (And Keep Existing Total Hour Goal)
 
@@ -50,9 +53,14 @@ public class GoalsWidget implements Widget{
         PracticedHours = mainController.goalscurrrentvalueLabel;
         CurrentGoalHours = mainController.goalssettimeLabel;
         CurrentGoalProgress = mainController.goalsprogressbar;
+        CutSelectorComboBox = mainController.GoalCutComboBox;
+        TopLabel = mainController.GoalTopLabel;
         allpracticedsessions = mainController.getProgressTrackerWidget().getSessions();
         currentGoals = new CurrentGoals();
         completedGoals = new CompletedGoals();
+        ObservableList<String> cutnames = FXCollections.observableArrayList(GOALCUTNAMES);
+        CutSelectorComboBox.setItems(cutnames);
+        CutSelectorComboBox.setOnAction(this::cutselectionchanged);
         Service<Void> getcurrentgoals = new Service<Void>() {
             @Override
             protected Task<Void> createTask() {
@@ -72,26 +80,72 @@ public class GoalsWidget implements Widget{
 
 // Button Actions
     public void setnewgoal() {
-        SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(allpracticedsessions.totalpracticetimeinhours(false));
+        int cutindex = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
+        if (cutindex == -1) {Tools.showinformationdialog("Information","No Cut Selected", "Select A Cut To Add A Goal To"); return;}
+        SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(cutindex, allpracticedsessions);
         setANewGoalDialog.showAndWait();
         if (setANewGoalDialog.isAccepted()) {
-            try {currentGoals.addgoal(new CurrentGoal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
+            try {currentGoals.add(cutindex, new CurrentGoal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
             catch (JAXBException ignored) {Tools.showerrordialog("Error", "Couldn't Add Goal", "Check File Permissions");}
         }
         update();
     }
     public void displaycurrentgoals() {
-        List<CurrentGoal> currentGoalslist = currentGoals.getCurrentGoal();
+        int index = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
+        if (index == -1) {
+            Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Display Current Goals");
+        } else if (! currentGoals.goalsexist(index)) {
+            String cutname = GOALCUTNAMES[index];
+            Tools.showinformationdialog("Information", "No Goals Exist For " + cutname, "Please Add A Goal For " + cutname);
+        } else {
+            List<CurrentGoal> goalslist = currentGoals.getallcutgoals(index);
+            new DisplayCurrentGoalsDialog(goalslist, allpracticedsessions.gettotalcutpracticetimeinminutes(index)).showAndWait();
+        }
+        List<CurrentGoal> currentGoalslist = currentGoals.getTotalGoals();
         if (currentGoalslist == null) {Tools.showinformationdialog("Information", "No Goals To Display", "Set A New Goal First"); return;}
-        new DisplayCurrentGoalsDialog(currentGoalslist, allpracticedsessions.totalpracticetimeinhours(false)).showAndWait();
+        new DisplayCurrentGoalsDialog(currentGoalslist, allpracticedsessions.gettotalcutpracticetimeinminutes(index)).showAndWait();
     }
     public void displaycompletedgoals() {
-        List<CompletedGoal> goalslist = completedGoals.getCompletedGoal();
-        if (goalslist == null) {Tools.showinformationdialog("Information", "No Goals To Display", "Set A New Goal First"); return;}
-        new DisplayCompletedGoalsDialog(goalslist).showAndWait();
+        int index = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
+        if (index == -1) {
+            Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Display Completed Goals");
+        } else if (! completedGoals.goalsexist(index)) {
+            String cutname = GOALCUTNAMES[index];
+            Tools.showinformationdialog("Information", "No Goals Completed For " + cutname, "Complete A Goal For " + cutname);
+        } else {
+            List<CompletedGoal> goalslist = completedGoals.getallcutgoals(index);
+            new DisplayCompletedGoalsDialog(goalslist).showAndWait();
+        }
     }
     public void goalpacing() {
-        new GoalPacingDialog(currentGoals.getgoalbyindex(0), currentGoals.getCurrentGoal(), allpracticedsessions.totalpracticetimeinhours(false)).showAndWait();
+        int index = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
+        if (index == -1) {
+            Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Calculate Goal Pacing");
+        } else {
+            new GoalPacingDialog(currentGoals.getgoal(index, 0), currentGoals.getTotalGoals(), allpracticedsessions.gettotalcutpracticetimeinminutes(index)).showAndWait();
+        }
+    }
+    public void cutselectionchanged(ActionEvent actionEvent) {
+        update();
+    }
+    public void update() {
+        try {
+            int index = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
+            if (index == -1) {resetallvalues();}
+            else {
+                String cutname = GOALCUTNAMES[index];
+                if (!currentGoals.goalsexist(index)) {
+                    if (Tools.getanswerdialog("Information", "No Goals Exist For " + cutname, "Add A Goal For " + cutname + "?")) {setnewgoal();}
+                    else {resetallvalues(); return;}
+                }
+                Double practiced = Tools.convertminutestodecimalhours(allpracticedsessions.gettotalcutpracticetimeinminutes(index));
+                Double goal = currentGoals.getgoal(index, 0).getGoal_Hours();
+                PracticedHours.setText(practiced.toString() + " hrs");
+                CurrentGoalHours.setText(goal.toString() + " hrs");
+                CurrentGoalProgress.setProgress(practiced / goal);
+                TopLabel.setText(cutname + " 's Current Goal");
+            }
+        } catch (NullPointerException ignored) {resetallvalues();}
     }
 
 // Widget Implementation
@@ -115,27 +169,11 @@ public class GoalsWidget implements Widget{
     }
     @Override
     public void resetallvalues() {
+//        CutSelectorComboBox.getSelectionModel().clearSelection();
         PracticedHours.setText("-   ");
         CurrentGoalHours.setText("  -");
         CurrentGoalProgress.setProgress(0.0);
-    }
-
-// Other Methods
-    public void update() {
-        try {
-            Double practiced = Tools.convertminutestodecimalhours(allpracticedsessions.totalpracticetimeinminutes(false));
-            Double goal = currentGoals.getgoalbyindex(0).getGoal_Hours();
-            PracticedHours.setText(practiced.toString() + " hrs");
-            CurrentGoalHours.setText(goal.toString() + " hrs");
-            CurrentGoalProgress.setProgress(practiced / goal);
-        } catch (NullPointerException ignored) {resetallvalues();}
-    }
-    public void updatewhilesessionplaying(double practicedhours) {
-        PracticedHours.setText(Double.toString(practicedhours));
-        CurrentGoalProgress.setProgress(getpercentage(practicedhours, currentGoals.getgoalbyid(0).getGoal_Hours()));
-    }
-    public float getpercentage(double practicedhours, double goalhours) {
-        return (float) practicedhours / (float) goalhours;
+        TopLabel.setText("Select A Cut...");
     }
 
 // Subclasses/Dialogs
@@ -376,38 +414,31 @@ public class GoalsWidget implements Widget{
         }
     }
     public static class SetANewGoalDialog extends Stage {
+        private final Sessions sessions;
         public Spinner<Integer> GoalHoursSpinner;
         public DatePicker GoalDatePicker;
         public Button CancelButton;
         public Button OKButton;
         public Button CurrentGoalsButton;
         public Spinner<Integer> GoalMinutesSpinner;
-        public Label InformationLabel;
+        public ComboBox<String> CutComboBox;
         private LocalDate goaldate;
         private Double goalhours;
 
-        public SetANewGoalDialog(Double alreadypracticedhours) {
+        public SetANewGoalDialog(int cutindex, Sessions sessions) {
+            this.sessions = sessions;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetNewGoalDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("New Goal");}
             catch (IOException e) {e.printStackTrace();}
-            int hours;
-            int minutes;
-            if (alreadypracticedhours != 0.0) {
-                InformationLabel.setText("Current Practiced Hours: " + alreadypracticedhours + " Hours");
-                int totalminutes = Tools.convertdecimalhourstominutes(alreadypracticedhours);
-                hours = totalminutes / 60;
-                minutes = totalminutes % 60;
-            } else {
-                InformationLabel.setText("Current Practiced Hours: 0.0 Hours");
-                hours = 0;
-                minutes = 0;
-            }
-            GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(hours, Integer.MAX_VALUE, 0, 1));
             GoalHoursSpinner.setEditable(true);
-            GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(minutes, 59, 0, 15));
             GoalMinutesSpinner.setEditable(true);
             GoalDatePicker.setValue(LocalDate.now());
+            ObservableList<String> cutnames = FXCollections.observableArrayList(GOALCUTNAMES);
+            CutComboBox.setItems(cutnames);
+            CutComboBox.setOnAction(this::cutselected);
+            CutComboBox.getSelectionModel().select(cutindex);
+            cutselected(null);
         }
 
     // Getters And Setters
@@ -447,8 +478,16 @@ public class GoalsWidget implements Widget{
         public void viewcurrentgoals(Event event) {
 
         }
-
-
+        public void cutselected(ActionEvent actionEvent) {
+            int index = CutComboBox.getSelectionModel().getSelectedIndex();
+            int minutes = sessions.gettotalcutpracticetimeinminutes(index);
+            int hrs = minutes / 60;
+            int mins = minutes % 60;
+            GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(hrs, Integer.MAX_VALUE, 0, 1));
+            GoalHoursSpinner.getValueFactory().setValue(hrs);
+            GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(mins, 59, 0, 5));
+            GoalMinutesSpinner.getValueFactory().setValue(mins);
+        }
     }
     public static class GoalCompleted extends Stage {
         public Label GoalHours;

@@ -86,6 +86,8 @@ public class MainController implements Initializable {
     public TextField ApproximateEndTime;
     public Button ChangeValuesButton;
     public TextField TotalSessionTime;
+    public ComboBox<String> GoalCutComboBox;
+    public Label GoalTopLabel;
     private This_Session session;
     private GoalsWidget goalsWidget;
     private CreatorAndExporterWidget creatorAndExporterWidget;

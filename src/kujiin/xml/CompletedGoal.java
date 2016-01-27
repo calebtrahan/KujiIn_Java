@@ -11,6 +11,10 @@ public class CompletedGoal {
 
     public CompletedGoal() {}
 
+    // TODO Finish Refactoring Current And Completed Goals To Support All Cuts
+        // Update Main UI So I Can Select Cuts
+        // Create A Flow Chart Showing Each Cut Progress (In Relation To Total)
+        // Totals Are The Mathmatical Total Of Rin-Zen's Highest Goal?
 // Getters And Setters
     public Double getGoal_Hours() {return Goal_Hours;}
     public void setGoal_Hours(Double goal_Hours) {Goal_Hours = goal_Hours;}

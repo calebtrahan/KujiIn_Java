@@ -39,6 +39,8 @@ public class CurrentGoal {
     public String getpercentagecompleted(double currenthours) {
         float percent = (float) currenthours / getGoal_Hours().floatValue();
         percent *= 100;
+//        return (float) practicedhours / (float) goalhours;
         return String.format("%.2f", percent) + "%";
     }
+
 }
