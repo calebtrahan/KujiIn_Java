@@ -11,6 +11,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -91,27 +92,36 @@ public class CurrentGoals {
         TotalGoals = totalGoals;}
 
 // XML Processing
-    public void unmarshall() throws JAXBException {
+    public void unmarshall() {
     if (This_Session.currentgoalsxmlfile.exists()) {
-        JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
-        Unmarshaller createMarshaller = context.createUnmarshaller();
-        CurrentGoals currentGoals = (CurrentGoals) createMarshaller.unmarshal(This_Session.currentgoalsxmlfile);
-        setRinGoals(currentGoals.getRinGoals());
-        setKyoGoals(currentGoals.getKyoGoals());
-        setTohGoals(currentGoals.getTohGoals());
-        setShaGoals(currentGoals.getShaGoals());
-        setKaiGoals(currentGoals.getKaiGoals());
-        setJinGoals(currentGoals.getJinGoals());
-        setRetsuGoals(currentGoals.getRetsuGoals());
-        setZaiGoals(currentGoals.getZaiGoals());
-        setZenGoals(currentGoals.getZenGoals());
-        setTotalGoals(currentGoals.getTotalGoals());
+        try {
+            JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
+            Unmarshaller createMarshaller = context.createUnmarshaller();
+            CurrentGoals currentGoals = (CurrentGoals) createMarshaller.unmarshal(This_Session.currentgoalsxmlfile);
+            setRinGoals(currentGoals.getRinGoals());
+            setKyoGoals(currentGoals.getKyoGoals());
+            setTohGoals(currentGoals.getTohGoals());
+            setShaGoals(currentGoals.getShaGoals());
+            setKaiGoals(currentGoals.getKaiGoals());
+            setJinGoals(currentGoals.getJinGoals());
+            setRetsuGoals(currentGoals.getRetsuGoals());
+            setZaiGoals(currentGoals.getZaiGoals());
+            setZenGoals(currentGoals.getZenGoals());
+            setTotalGoals(currentGoals.getTotalGoals());
+        } catch (JAXBException e) {
+            Tools.showinformationdialog("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + This_Session.currentgoalsxmlfile.getAbsolutePath());
+        }
     }
 }
-    public void marshall() throws JAXBException {
-        JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
-        Marshaller createMarshaller = context.createMarshaller();
-        createMarshaller.marshal(this, This_Session.currentgoalsxmlfile);
+    public void marshall() {
+        try {
+            JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
+            Marshaller createMarshaller = context.createMarshaller();
+            createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            createMarshaller.marshal(this, This_Session.currentgoalsxmlfile);
+        } catch (JAXBException e) {
+            Tools.showinformationdialog("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + This_Session.currentgoalsxmlfile.getAbsolutePath());
+        }
     }
     public void add(int cutindex, CurrentGoal newgoal) throws JAXBException {
         List<CurrentGoal> newgoals = getallcutgoals(cutindex);
@@ -148,7 +158,7 @@ public class CurrentGoals {
     public void checkifgoalscompleted(int cutindex, double currentpracticedhours, CompletedGoals completedGoals) {
         List<CurrentGoal> cutgoals = getallcutgoals(cutindex);
         int oldsize = cutgoals.size();
-        for (kujiin.xml.CurrentGoal i : cutgoals) {
+        for (CurrentGoal i : cutgoals) {
             if (goaliscompleted(i, currentpracticedhours)) {
                 if (! completedGoals.completegoal(cutindex, i)) {
                     Tools.showerrordialog("Error", "Cannot Complete This Goal", "Check File Permissions");
@@ -157,8 +167,7 @@ public class CurrentGoals {
         }
         if (cutgoals.size() != oldsize) {
             update(sort(cutgoals), cutindex);
-            try {marshall();}
-            catch (JAXBException ignored) {Tools.showerrordialog("Error", "Cannot Write Current Goals To XML File", "Check File Permissions");}
+            marshall();
         }
     }
     public List<CurrentGoal> getallcutgoals(int cutindex) {
@@ -192,5 +201,44 @@ public class CurrentGoals {
     }
     public boolean goalsexist(int cutindex) {
         return getallcutgoals(cutindex) != null && getallcutgoals(cutindex).size() > 0;
+    }
+
+    @XmlAccessorType(XmlAccessType.PROPERTY)
+    public static class CurrentGoal {
+        private Integer ID;
+        private String Date_Set;
+        private String Date_Due;
+        private double Goal_Hours;
+
+        public CurrentGoal() {}
+
+        public CurrentGoal(LocalDate duedate, Double goalhours) {
+            setDate_Due(Tools.convertfromlocaldatetostring(duedate));
+            setGoal_Hours(goalhours);
+            setDate_Set(Tools.convertfromlocaldatetostring(LocalDate.now()));
+        }
+
+        // Getters And Setters
+        public String getDate_Set() {return Date_Set;}
+        public void setDate_Set(String date_Set) {Date_Set = date_Set;}
+        public String getDate_Due() {return Date_Due;}
+        public void setDate_Due(String date_Due) {Date_Due = date_Due;}
+        public Double getGoal_Hours() {return Goal_Hours;}
+        public void setGoal_Hours(Double goal_Hours) {Goal_Hours = goal_Hours;}
+        public Integer getID() {return ID;}
+        public void setID(Integer ID) {this.ID = ID;}
+
+        // Other Methods
+        public boolean isCompleted(Integer currenthours) {
+            try {return currenthours >= getGoal_Hours();}
+            catch (NullPointerException | ArithmeticException ignored) {return false;}
+        }
+        public String getpercentagecompleted(double currenthours) {
+            float percent = (float) currenthours / getGoal_Hours().floatValue();
+            percent *= 100;
+//        return (float) practicedhours / (float) goalhours;
+            return String.format("%.2f", percent) + "%";
+        }
+
     }
 }

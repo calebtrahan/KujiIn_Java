@@ -28,19 +28,27 @@ public class Sessions {
     public void setSession(List<kujiin.xml.Session> session) {Session = session;}
 
 // XML Processing
-    public void unmarshall() throws JAXBException {
+    public void unmarshall() {
         if (This_Session.sessionsxmlfile.exists()) {
-            JAXBContext context = JAXBContext.newInstance(Sessions.class);
-            Unmarshaller createMarshaller = context.createUnmarshaller();
-            Sessions noises1 = (Sessions) createMarshaller.unmarshal(This_Session.sessionsxmlfile);
-            setSession(noises1.getSession());
+            try {
+                JAXBContext context = JAXBContext.newInstance(Sessions.class);
+                Unmarshaller createMarshaller = context.createUnmarshaller();
+                Sessions noises1 = (Sessions) createMarshaller.unmarshal(This_Session.sessionsxmlfile);
+                setSession(noises1.getSession());
+            } catch (JAXBException e) {
+                Tools.showinformationdialog("Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + This_Session.sessionsxmlfile.getAbsolutePath());
+            }
         }
     }
-    public void marshall() throws JAXBException {
-        JAXBContext context = JAXBContext.newInstance(Sessions.class);
-        Marshaller createMarshaller = context.createMarshaller();
-        createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        createMarshaller.marshal(this, This_Session.sessionsxmlfile);
+    public void marshall() {
+        try {
+            JAXBContext context = JAXBContext.newInstance(Sessions.class);
+            Marshaller createMarshaller = context.createMarshaller();
+            createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            createMarshaller.marshal(this, This_Session.sessionsxmlfile);
+        } catch (JAXBException e) {
+            Tools.showinformationdialog("Information", "Couldn't Save Sessions XML File", "Check Write File Permissions Of " + This_Session.sessionsxmlfile.getAbsolutePath());
+        }
     }
     public void createnewsession() {
         try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}

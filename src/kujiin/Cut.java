@@ -269,7 +269,7 @@ public class Cut {
 //  try {
             // TODO Use Javafx timeline to fade in fadeout audio (IF not 0.0)
 //                Double fadeinduration =
-//                Double fadeoutduration = thisession.Root.getSessionOptions().getFadeoutduration();
+//                Double fadeoutduration = thisession.Root.getOptions().getFadeoutduration();
 //                if (fadeinduration > 0.0 && secondselapsed <= fadeoutduration) {
 //                    if (! fadeinplayed) {
 //
@@ -310,8 +310,8 @@ public class Cut {
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
         entrainmentplayer.play();
         entrainmentplayer.setVolume(0.0);
-        double fadeinduration = thisession.Root.getSessionOptions().getFadeinduration();
-        double fadeoutduration = thisession.Root.getSessionOptions().getFadeoutduration();
+        double fadeinduration = thisession.Root.getOptions().getSessionOptions().getFadeinduration();
+        double fadeoutduration = thisession.Root.getOptions().getSessionOptions().getFadeoutduration();
     // Set Entrainment Fadein
         if (fadeinduration > 0.0) {
             entrainmentplayer.setOnPlaying(() -> {
@@ -348,7 +348,7 @@ public class Cut {
             ambienceplayer.setVolume(0.0);
     // Set Ambience Fade In
             ambienceplayer.setOnPlaying(() -> new Transition() {
-                {setCycleDuration(new Duration(thisession.Root.getSessionOptions().getFadeinduration() * 1000));}
+                {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeinduration() * 1000));}
                 @Override
                 protected void interpolate(double frac) {
                     double ambiencevolume = frac * thisession.getSessionAmbienceVolume();

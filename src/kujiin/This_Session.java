@@ -415,8 +415,8 @@ public class This_Session {
         currentcuttimeline.play();
         cutcount = 0;
         currentcut = cutsinsession.get(cutcount);
-        setSessionEntrainmentVolume(Root.getSessionOptions().getEntrainemntvolume());
-        setSessionAmbienceVolume(Root.getSessionOptions().getAmbiencevolume());
+        setSessionEntrainmentVolume(Root.getOptions().getSessionOptions().getEntrainmentvolume());
+        setSessionAmbienceVolume(Root.getOptions().getSessionOptions().getAmbiencevolume());
         playthiscut();
         sessions.createnewsession();
     }
@@ -492,8 +492,8 @@ public class This_Session {
         Double minutes = Math.floor(secondspracticed / 60);
         sessions.getsession(sessions.sessionscount() - 1).updatecutduration(currentcut.number, minutes.intValue());
         String prematureendingreason;
-        if (Root.getSessionOptions().getPrematureendings()) {
-            GoalsWidget.PrematureEndingDialog ped = new GoalsWidget.PrematureEndingDialog(Root.getSessionOptions());
+        if (Root.getOptions().getSessionOptions().getPrematureendings()) {
+            GoalsWidget.PrematureEndingDialog ped = new GoalsWidget.PrematureEndingDialog(Root.getOptions());
             prematureendingreason = ped.getReason();
         } else {prematureendingreason = "";}
         if (prematureendingreason != null) {

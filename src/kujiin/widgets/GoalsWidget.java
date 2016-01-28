@@ -67,7 +67,7 @@ public class GoalsWidget implements Widget{
                 return new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
-                        try {currentGoals.unmarshall(); completedGoals.unmarshall();} catch (JAXBException ignored) {}
+                        completedGoals.unmarshall();
                         return null;
                     }
                 };
@@ -85,7 +85,7 @@ public class GoalsWidget implements Widget{
         SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(cutindex, allpracticedsessions);
         setANewGoalDialog.showAndWait();
         if (setANewGoalDialog.isAccepted()) {
-            try {currentGoals.add(cutindex, new CurrentGoal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
+            try {currentGoals.add(cutindex, new CurrentGoals.CurrentGoal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
             catch (JAXBException ignored) {Tools.showerrordialog("Error", "Couldn't Add Goal", "Check File Permissions");}
         }
         update();
@@ -98,10 +98,10 @@ public class GoalsWidget implements Widget{
             String cutname = GOALCUTNAMES[index];
             Tools.showinformationdialog("Information", "No Goals Exist For " + cutname, "Please Add A Goal For " + cutname);
         } else {
-            List<CurrentGoal> goalslist = currentGoals.getallcutgoals(index);
+            List<CurrentGoals.CurrentGoal> goalslist = currentGoals.getallcutgoals(index);
             new DisplayCurrentGoalsDialog(goalslist, allpracticedsessions.gettotalcutpracticetimeinminutes(index)).showAndWait();
         }
-        List<CurrentGoal> currentGoalslist = currentGoals.getTotalGoals();
+        List<CurrentGoals.CurrentGoal> currentGoalslist = currentGoals.getTotalGoals();
         if (currentGoalslist == null) {Tools.showinformationdialog("Information", "No Goals To Display", "Set A New Goal First"); return;}
         new DisplayCurrentGoalsDialog(currentGoalslist, allpracticedsessions.gettotalcutpracticetimeinminutes(index)).showAndWait();
     }
@@ -113,7 +113,7 @@ public class GoalsWidget implements Widget{
             String cutname = GOALCUTNAMES[index];
             Tools.showinformationdialog("Information", "No Goals Completed For " + cutname, "Complete A Goal For " + cutname);
         } else {
-            List<CompletedGoal> goalslist = completedGoals.getallcutgoals(index);
+            List<CompletedGoals.CompletedGoal> goalslist = completedGoals.getallcutgoals(index);
             new DisplayCompletedGoalsDialog(goalslist).showAndWait();
         }
     }
@@ -184,7 +184,7 @@ public class GoalsWidget implements Widget{
         public TableColumn<CompletedGoal, String> CompletedOnColumn;
         public Button CloseButton;
 
-        public DisplayCompletedGoalsDialog(List<kujiin.xml.CompletedGoal> completedgoals) {
+        public DisplayCompletedGoalsDialog(List<CompletedGoals.CompletedGoal> completedgoals) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCompletedGoals.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Completed Goals");}
@@ -219,7 +219,7 @@ public class GoalsWidget implements Widget{
         public TableColumn<CurrentGoalBinding, String> PercentCompleteColumn;
         public Button CloseButton;
 
-        public DisplayCurrentGoalsDialog(List<CurrentGoal> currentGoalList, double currentpracticedhours) {
+        public DisplayCurrentGoalsDialog(List<CurrentGoals.CurrentGoal> currentGoalList, double currentpracticedhours) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCurrentGoals.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Current Goals");}
@@ -289,11 +289,11 @@ public class GoalsWidget implements Widget{
         public Spinner<Integer> DaysSpinner;
         public Button CalculateButton;
         public Button CloseButton;
-        private CurrentGoal currentGoal;
-        private List<CurrentGoal> currentGoals;
+        private CurrentGoals.CurrentGoal currentGoal;
+        private List<CurrentGoals.CurrentGoal> currentGoals;
         private double alreadypracticedhours;
 
-        public GoalPacingDialog(CurrentGoal currentGoal, List<CurrentGoal> currentGoals, double alreadypracticedhours) {
+        public GoalPacingDialog(CurrentGoals.CurrentGoal currentGoal, List<CurrentGoals.CurrentGoal> currentGoals, double alreadypracticedhours) {
             this.currentGoal = currentGoal;
             this.currentGoals = currentGoals;
             this.alreadypracticedhours = alreadypracticedhours;
@@ -310,10 +310,10 @@ public class GoalsWidget implements Widget{
         }
 
     // Getters And Setters
-        public CurrentGoal getCurrentGoal() {
+        public CurrentGoals.CurrentGoal getCurrentGoal() {
             return currentGoal;
         }
-        public void setCurrentGoal(CurrentGoal currentGoal) {
+        public void setCurrentGoal(CurrentGoals.CurrentGoal currentGoal) {
             this.currentGoal = currentGoal;
         }
 
@@ -361,7 +361,7 @@ public class GoalsWidget implements Widget{
             this.close();
         }
         public void rejected(ActionEvent actionEvent) {
-            Options.setPrematureendings(! Tools.getanswerdialog("Disable Premature Endings", "Disable Premature Endings Dialog", "This Will Keep This Session From Displaying In The Future"));
+            Options.getSessionOptions().setPrematureendings(! Tools.getanswerdialog("Disable Premature Endings", "Disable Premature Endings Dialog", "This Will Keep This Session From Displaying In The Future"));
             Reason.setText("");
             this.close();
         }
@@ -374,10 +374,10 @@ public class GoalsWidget implements Widget{
         public TableColumn<CurrentGoalBinding, String> PercentCompleteColumn;
         public Button SelectButton;
         public Button CancelButton;
-        public CurrentGoal selectedgoal;
-        private List<CurrentGoal> currentGoalList;
+        public CurrentGoals.CurrentGoal selectedgoal;
+        private List<CurrentGoals.CurrentGoal> currentGoalList;
 
-        public SelectGoalDialog(List<CurrentGoal> currentGoalList, double currentpracticedhours) {
+        public SelectGoalDialog(List<CurrentGoals.CurrentGoal> currentGoalList, double currentpracticedhours) {
             this.currentGoalList = currentGoalList;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SelectGoalDialog.fxml"));
             fxmlLoader.setController(this);
@@ -397,10 +397,10 @@ public class GoalsWidget implements Widget{
         }
 
     // Getters And Setters
-        public CurrentGoal getSelectedgoal() {
+        public CurrentGoals.CurrentGoal getSelectedgoal() {
             return selectedgoal;
         }
-        public void setSelectedgoal(CurrentGoal selectedgoal) {
+        public void setSelectedgoal(CurrentGoals.CurrentGoal selectedgoal) {
             this.selectedgoal = selectedgoal;
         }
 
@@ -494,7 +494,7 @@ public class GoalsWidget implements Widget{
         public Button CloseButton;
         public Label CurrentHoursLabel;
 
-        public GoalCompleted(CurrentGoal currentGoal, Double currentpracticedhours) {
+        public GoalCompleted(CurrentGoals.CurrentGoal currentGoal, Double currentpracticedhours) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalCompleted.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Goal Achieved");}

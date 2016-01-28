@@ -93,7 +93,7 @@ public class MainController implements Initializable {
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private PlayerWidget playerWidget;
     private ProgressTrackerWidget progressTrackerWidget;
-    private Options SessionOptions;
+    private Options Options;
 
 // Event Handlers
     public static final EventHandler<KeyEvent> noneditabletextfield = event -> Tools.showinformationdialog("Information", "Can't Enter Text", "This Text Field Can't Be Edited");
@@ -105,7 +105,8 @@ public class MainController implements Initializable {
         setGoalsWidget(new GoalsWidget(this));
         setCreatorAndExporterWidget(new CreatorAndExporterWidget(this));
         setPlayerWidget(new PlayerWidget(this));
-        setSessionOptions(new Options());
+        setOptions(new Options());
+        getOptions().unmarshall();
         sessionplayerswitch(null);
         CreatorStatusBar.setText("");
     }
@@ -141,11 +142,11 @@ public class MainController implements Initializable {
     public void setProgressTrackerWidget(ProgressTrackerWidget progressTrackerWidget) {
         this.progressTrackerWidget = progressTrackerWidget;
     }
-    public Options getSessionOptions() {
-        return SessionOptions;
+    public Options getOptions() {
+        return Options;
     }
-    public void setSessionOptions(Options sessionOptions) {
-        SessionOptions = sessionOptions;
+    public void setOptions(Options options) {
+        Options = options;
     }
 
 // Top Menu Actions

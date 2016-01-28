@@ -21,7 +21,6 @@ import kujiin.interfaces.Widget;
 import kujiin.xml.Session;
 import kujiin.xml.Sessions;
 
-import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +50,7 @@ public class ProgressTrackerWidget implements Widget {
                 return new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
-                        try {sessions.unmarshall();}
-                        catch (JAXBException ignored) {}
+                        sessions.unmarshall();
                         return null;
                     }
                 };

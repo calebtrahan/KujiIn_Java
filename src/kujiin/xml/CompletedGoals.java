@@ -95,27 +95,35 @@ public class CompletedGoals {
     }
 
 // XML Processing
-    public void unmarshall() throws JAXBException {
+    public void unmarshall() {
         if (This_Session.completedgoalsxmlfile.exists()) {
-            JAXBContext context = JAXBContext.newInstance(CompletedGoals.class);
-            Unmarshaller createMarshaller = context.createUnmarshaller();
-            CompletedGoals completedGoals = (CompletedGoals) createMarshaller.unmarshal(This_Session.completedgoalsxmlfile);
-            setRinGoals(completedGoals.getRinGoals());
-            setKyoGoals(completedGoals.getKyoGoals());
-            setTohGoals(completedGoals.getTohGoals());
-            setShaGoals(completedGoals.getShaGoals());
-            setKaiGoals(completedGoals.getKaiGoals());
-            setJinGoals(completedGoals.getJinGoals());
-            setRetsuGoals(completedGoals.getRetsuGoals());
-            setZaiGoals(completedGoals.getZaiGoals());
-            setZenGoals(completedGoals.getZenGoals());
-            setTotalGoals(completedGoals.getTotalGoals());
+            try {
+                JAXBContext context = JAXBContext.newInstance(CompletedGoals.class);
+                Unmarshaller createMarshaller = context.createUnmarshaller();
+                CompletedGoals completedGoals = (CompletedGoals) createMarshaller.unmarshal(This_Session.completedgoalsxmlfile);
+                setRinGoals(completedGoals.getRinGoals());
+                setKyoGoals(completedGoals.getKyoGoals());
+                setTohGoals(completedGoals.getTohGoals());
+                setShaGoals(completedGoals.getShaGoals());
+                setKaiGoals(completedGoals.getKaiGoals());
+                setJinGoals(completedGoals.getJinGoals());
+                setRetsuGoals(completedGoals.getRetsuGoals());
+                setZaiGoals(completedGoals.getZaiGoals());
+                setZenGoals(completedGoals.getZenGoals());
+                setTotalGoals(completedGoals.getTotalGoals());
+            } catch (JAXBException e) {
+                Tools.showinformationdialog("Information", "Couldn't Open Completed Goals XML File", "Check Read File Permissions Of " + This_Session.completedgoalsxmlfile.getAbsolutePath());
+            }
         }
     }
-    public void marshall() throws JAXBException {
-        JAXBContext context = JAXBContext.newInstance(CompletedGoals.class);
-        Marshaller createMarshaller = context.createMarshaller();
-        createMarshaller.marshal(this, This_Session.completedgoalsxmlfile);
+    public void marshall() {
+        try {
+            JAXBContext context = JAXBContext.newInstance(CompletedGoals.class);
+            Marshaller createMarshaller = context.createMarshaller();
+            createMarshaller.marshal(this, This_Session.completedgoalsxmlfile);
+        } catch (JAXBException e) {
+            Tools.showinformationdialog("Information", "Couldn't Save Completed Goals XML File", "Check Write File Permissions Of " + This_Session.completedgoalsxmlfile.getAbsolutePath());
+        }
     }
     public void add(int cutindex, CompletedGoal completedGoal) throws JAXBException {
         if (This_Session.completedgoalsxmlfile.exists()) {
@@ -128,14 +136,14 @@ public class CompletedGoals {
     }
     public List<CompletedGoal> sort(List<CompletedGoal> goallist) {
         try {
-            BeanComparator bc = new BeanComparator(kujiin.xml.CompletedGoal.class, "getGoal_Hours");
+            BeanComparator bc = new BeanComparator(CompletedGoal.class, "getGoal_Hours");
             Collections.sort(goallist, bc);
             int count = 1;
-            for (kujiin.xml.CompletedGoal i : goallist) {i.setID(count); count++;}
+            for (CompletedGoal i : goallist) {i.setID(count); count++;}
             return goallist;
         } catch (NullPointerException ignored) {return null;}
     }
-    public boolean completegoal(int cutindex, CurrentGoal currentGoal) {
+    public boolean completegoal(int cutindex, CurrentGoals.CurrentGoal currentGoal) {
         double hours = currentGoal.getGoal_Hours();
         CompletedGoal newcompletedgoal = new CompletedGoal();
         newcompletedgoal.setDate_Completed(Tools.gettodaysdate());
@@ -175,5 +183,31 @@ public class CompletedGoals {
     }
     public boolean goalsexist(int cutindex) {
         return getallcutgoals(cutindex) != null && getallcutgoals(cutindex).size() > 0;
+    }
+
+    @XmlAccessorType(XmlAccessType.PROPERTY)
+    public static class CompletedGoal {
+        private Integer ID;
+        private Double Goal_Hours;
+        private String Date_Completed;
+
+        public CompletedGoal() {}
+
+        // TODO Finish Refactoring Current And Completed Goals To Support All Cuts
+        // Update Main UI So I Can Select Cuts
+        // Create A Flow Chart Showing Each Cut Progress (In Relation To Total)
+        // Totals Are The Mathmatical Total Of Rin-Zen's Highest Goal?
+// Getters And Setters
+        public Double getGoal_Hours() {return Goal_Hours;}
+        public void setGoal_Hours(Double goal_Hours) {Goal_Hours = goal_Hours;}
+        public String getDate_Completed() {return Date_Completed;}
+        public void setDate_Completed(String date_Completed) {Date_Completed = date_Completed;}
+        public Integer getID() {
+            return ID;
+        }
+        public void setID(Integer ID) {
+            this.ID = ID;
+        }
+
     }
 }

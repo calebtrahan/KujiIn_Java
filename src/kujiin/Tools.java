@@ -18,8 +18,9 @@ import java.util.*;
 
 public class Tools {
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+    public static final String[] SUPPORTEDAUDIOFORMATS = {"mp3", "aac", "wav", "aif", "aiff", "m4a"};
 
-// Menu Action Methods
+// Menu Actions
     public static void howtouseprogram() {
 
     }
@@ -239,9 +240,6 @@ public class Tools {
     public static boolean testAlertFile() {
         return This_Session.alertfile.exists() && Tools.getaudioduration(This_Session.alertfile) != 0.0;
     }
-    public static Boolean supportedaudiofile(File file) {
-        return file.getAbsolutePath().endsWith(".mp3");
-    }
     public static double getaudioduration(File audiofile) {
         try {
             Runtime rt = Runtime.getRuntime();
@@ -310,6 +308,16 @@ public class Tools {
     public static boolean validaudiofile(File file) {
         return file.getName().endsWith(".mp3") || file.getName().endsWith(".aac") || file.getName().endsWith(".wav")
                 || file.getName().endsWith(".aif") || file.getName().endsWith(".aiff") || file.getName().endsWith("m4a");
+    }
+    public static String supportedaudiotext() {
+        StringBuilder s = new StringBuilder();
+        for (String i : SUPPORTEDAUDIOFORMATS) {
+            s.append(".").append(i);
+            if (! Objects.equals(i, SUPPORTEDAUDIOFORMATS[SUPPORTEDAUDIOFORMATS.length - 1])) {
+                s.append(", ");
+            }
+        }
+        return s.toString();
     }
 
 // List Utils

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<options>
-    <ambiencevolume>1.0</ambiencevolume>
-    <defaultinvocationtime>3</defaultinvocationtime>
-    <entrainemntvolume>0.6</entrainemntvolume>
-    <fadeinduration>10.0</fadeinduration>
-    <fadeoutduration>10.0</fadeoutduration>
-    <helpdialogs>true</helpdialogs>
-    <prematureendings>true</prematureendings>
-    <tooltips>true</tooltips>
-</options>
+<Options>
+    <appearanceOptions/>
+    <programOptions>
+        <helpdialogs>true</helpdialogs>
+        <tooltips>true</tooltips>
+    </programOptions>
+    <sessionOptions>
+        <ambiencevolume>1.0</ambiencevolume>
+        <entrainmentvolume>0.6</entrainmentvolume>
+        <fadeinduration>10.0</fadeinduration>
+        <fadeoutduration>10.0</fadeoutduration>
+        <prematureendings>true</prematureendings>
+    </sessionOptions>
+</Options>
