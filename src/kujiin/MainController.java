@@ -88,11 +88,11 @@ public class MainController implements Initializable {
     public TextField TotalSessionTime;
     public ComboBox<String> GoalCutComboBox;
     public Label GoalTopLabel;
-    private This_Session session;
-    private GoalsWidget goalsWidget;
-    private CreatorAndExporterWidget creatorAndExporterWidget;
-    private PlayerWidget playerWidget;
-    private ProgressTrackerWidget progressTrackerWidget;
+    private This_Session Session;
+    private GoalsWidget Goals;
+    private CreatorAndExporterWidget CreatorAndExporter;
+    private PlayerWidget Player;
+    private ProgressTrackerWidget ProgressTracker;
     private Options Options;
 
 // Event Handlers
@@ -100,47 +100,50 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setProgressTrackerWidget(new ProgressTrackerWidget(this));
+        setProgressTracker(new ProgressTrackerWidget(this));
         setSession(new This_Session(this));
-        setGoalsWidget(new GoalsWidget(this));
-        setCreatorAndExporterWidget(new CreatorAndExporterWidget(this));
-        setPlayerWidget(new PlayerWidget(this));
+        setGoals(new GoalsWidget(this));
+        setCreatorAndExporter(new CreatorAndExporterWidget(this));
+        setPlayer(new PlayerWidget(this));
         setOptions(new Options());
         getOptions().unmarshall();
         sessionplayerswitch(null);
         CreatorStatusBar.setText("");
     }
+    public Boolean cleanup() {
+        return getPlayer().cleanup() && getGoals().cleanup() && getCreatorAndExporter().cleanup() && getProgressTracker().cleanup();
+    }
 
 // Getters And Setters
-    public GoalsWidget getGoalsWidget() {
-    return goalsWidget;
+    public GoalsWidget getGoals() {
+    return Goals;
 }
-    public void setGoalsWidget(GoalsWidget goalsWidget) {
-        this.goalsWidget = goalsWidget;
+    public void setGoals(GoalsWidget goals) {
+        this.Goals = goals;
     }
     public This_Session getSession() {
-        return session;
+        return Session;
     }
     public void setSession(This_Session session) {
-        this.session = session;
+        this.Session = session;
     }
-    public CreatorAndExporterWidget getCreatorAndExporterWidget() {
-        return creatorAndExporterWidget;
+    public CreatorAndExporterWidget getCreatorAndExporter() {
+        return CreatorAndExporter;
     }
-    public void setCreatorAndExporterWidget(CreatorAndExporterWidget creatorAndExporterWidget) {
-        this.creatorAndExporterWidget = creatorAndExporterWidget;
+    public void setCreatorAndExporter(CreatorAndExporterWidget creatorAndExporter) {
+        this.CreatorAndExporter = creatorAndExporter;
     }
-    public PlayerWidget getPlayerWidget() {
-        return playerWidget;
+    public PlayerWidget getPlayer() {
+        return Player;
     }
-    public void setPlayerWidget(PlayerWidget playerWidget) {
-        this.playerWidget = playerWidget;
+    public void setPlayer(PlayerWidget player) {
+        this.Player = player;
     }
-    public ProgressTrackerWidget getProgressTrackerWidget() {
-        return progressTrackerWidget;
+    public ProgressTrackerWidget getProgressTracker() {
+        return ProgressTracker;
     }
-    public void setProgressTrackerWidget(ProgressTrackerWidget progressTrackerWidget) {
-        this.progressTrackerWidget = progressTrackerWidget;
+    public void setProgressTracker(ProgressTrackerWidget progressTracker) {
+        this.ProgressTracker = progressTracker;
     }
     public Options getOptions() {
         return Options;
@@ -172,21 +175,25 @@ public class MainController implements Initializable {
     public void contactme(ActionEvent actionEvent) {Tools.contactme();}
 
 // Database And Total Progress Widget
-    public void updatetotalprogresswidget(ActionEvent actionEvent) {progressTrackerWidget.updateui();}
-    public void displaylistofsessions(Event event) {progressTrackerWidget.displaysessionlist();}
-    public void displayprematureendings(Event event) {progressTrackerWidget.displayprematureendings();}
-    public void showcutprogress(Event event) {progressTrackerWidget.displaydetailedcutprogress();}
+    public void updatetotalprogresswidget(ActionEvent actionEvent) {
+        ProgressTracker.updateui();}
+    public void displaylistofsessions(Event event) {
+        ProgressTracker.displaysessionlist();}
+    public void displayprematureendings(Event event) {
+        ProgressTracker.displayprematureendings();}
+    public void showcutprogress(Event event) {
+        ProgressTracker.displaydetailedcutprogress();}
 
 // Created Session Widget
     public boolean getsessioninformation() {
         try {
-            boolean cutsinsession = session.getCutsinsession().size() != 0;
+            boolean cutsinsession = Session.getCutsinsession().size() != 0;
             if (cutsinsession) {
                 Session session = new Session();
                 ArrayList<Integer> cuttimes = new ArrayList<>(11);
                 for (String i : kujiin.xml.Options.allnames) {
                     Integer duration = 0;
-                    for (Cut x : this.session.getCutsinsession()) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
+                    for (Cut x : this.Session.getCutsinsession()) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
                     cuttimes.add(duration);
                 }
                 session.updatecutduration(0, cuttimes.get(0));
@@ -213,17 +220,19 @@ public class MainController implements Initializable {
                 settextfieldvalue(PostTime, cuttimes.get(10));
             }
             // Set Ambience Enabled And This_Session Total Time
-//            if (session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes"); AmbienceEnabledTextField.setDisable(false);}
+//            if (Session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes"); AmbienceEnabledTextField.setDisable(false);}
 //            else {AmbienceEnabledTextField.setText("No"); AmbienceEnabledTextField.setDisable(true);}
-//            TotalSessionTimeTextField.setText(session.gettotalsessionduration());
+//            TotalSessionTimeTextField.setText(Session.gettotalsessionduration());
 //            TotalSessionTimeTextField.setDisable(! cutsinsession);
             return true;
         } catch (ArrayIndexOutOfBoundsException e) {
             return false;
         }
     }
-    public void loadpreset(ActionEvent actionEvent) {creatorAndExporterWidget.loadpreset();}
-    public void savepreset(ActionEvent actionEvent) {creatorAndExporterWidget.saveaspreset(progressTrackerWidget.getSessions().getsession(progressTrackerWidget.getSessions().sessionscount() - 1));}
+    public void loadpreset(ActionEvent actionEvent) {
+        CreatorAndExporter.loadpreset();}
+    public void savepreset(ActionEvent actionEvent) {
+        CreatorAndExporter.saveaspreset(ProgressTracker.getSessions().getsession(ProgressTracker.getSessions().sessionscount() - 1));}
     public void createsession(Event event) {
 //        if (creatorState == CreatorState.NOT_CREATED || creatorState == CreatorState.CREATED) {
 //            if (creatorState == CreatorState.CREATED) {
@@ -237,7 +246,7 @@ public class MainController implements Initializable {
 //                }
 //            }
 //            creatorState = CreatorState.CREATION_IN_PROGRESS;
-//            ChangeSessionValues createsession = new ChangeSessionValues(session);
+//            ChangeSessionValues createsession = new ChangeSessionValues(Session);
 //            createsession.showAndWait();
 //            if (getsessioninformation()) {creatorState = CreatorState.CREATED;}
 //            else {
@@ -248,40 +257,51 @@ public class MainController implements Initializable {
 //        }
     }
     public void exportsession(Event event) {
-        creatorAndExporterWidget.exportsession();
+        CreatorAndExporter.exportsession();
     }
     public void settextfieldvalue(TextField textField, Integer value) {
         if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
         else {textField.setText("-"); textField.setDisable(true);}
     }
-    public void ambienceswitch(ActionEvent actionEvent) {creatorAndExporterWidget.checkambience();}
-    public void changeallcreatorvalues(ActionEvent actionEvent) {creatorAndExporterWidget.changeallvalues();}
+    public void ambienceswitch(ActionEvent actionEvent) {
+        CreatorAndExporter.checkambience();}
+    public void changeallcreatorvalues(ActionEvent actionEvent) {
+        CreatorAndExporter.changeallvalues();}
 
 // Session Player Widget
     public void sessionplayerswitch(ActionEvent actionEvent) {
-        playerWidget.statusSwitch();
-        if (playerWidget.isEnabled()) {
-            creatorAndExporterWidget.disable();
-            creatorAndExporterWidget.disablebuttons();
+        Player.statusSwitch();
+        if (Player.isEnabled()) {
+            CreatorAndExporter.disable();
+            CreatorAndExporter.disablebuttons();
             Node node = (Node) actionEvent.getSource();
             Stage stage = (Stage) node.getScene().getWindow();
-            stage.setOnCloseRequest(event -> progressTrackerWidget.getSessions().deletenonvalidsessions());
+            stage.setOnCloseRequest(event -> ProgressTracker.getSessions().deletenonvalidsessions());
         } else {
-            creatorAndExporterWidget.enable();
-            creatorAndExporterWidget.enablebuttons();
+            CreatorAndExporter.enable();
+            CreatorAndExporter.enablebuttons();
         }
     }
-    public void playsession(Event event) {playerWidget.play(progressTrackerWidget.getSessions());}
-    public void pausesession(Event event) {playerWidget.pause();}
-    public void stopsession(Event event) {playerWidget.stop(progressTrackerWidget.getSessions());}
-    public void setReferenceOption(ActionEvent actionEvent) {playerWidget.displayreferencefile();}
-    public void adjustvolume(ActionEvent actionEvent) {playerWidget.adjustvolume();}
+    public void playsession(Event event) {
+        Player.play(ProgressTracker.getSessions());}
+    public void pausesession(Event event) {
+        Player.pause();}
+    public void stopsession(Event event) {
+        Player.stop(ProgressTracker.getSessions());}
+    public void setReferenceOption(ActionEvent actionEvent) {
+        Player.displayreferencefile();}
+    public void adjustvolume(ActionEvent actionEvent) {
+        Player.adjustvolume();}
 
 // Goals Widget
-    public void setnewgoal(Event event) {goalsWidget.setnewgoal();}
-    public void getgoalpacing(Event event) {goalsWidget.goalpacing();}
-    public void viewcurrentgoals(Event event) {goalsWidget.displaycurrentgoals();}
-    public void viewcompletedgoals(Event event) {goalsWidget.displaycompletedgoals();}
+    public void setnewgoal(Event event) {
+        Goals.setnewgoal();}
+    public void getgoalpacing(Event event) {
+        Goals.goalpacing();}
+    public void viewcurrentgoals(Event event) {
+        Goals.displaycurrentgoals();}
+    public void viewcompletedgoals(Event event) {
+        Goals.displaycompletedgoals();}
 
     // Menu Tools/Dialogs
     public static class ChangeAlertDialog extends Stage {

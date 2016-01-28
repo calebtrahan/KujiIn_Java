@@ -57,10 +57,10 @@ public class PlayerWidget implements Widget {
         CutProgress = mainController.CutProgressBar;
         TotalProgress = mainController.TotalProgressBar;
         ReferenceFileCheckbox = mainController.ReferenceFilesOption;
-        GoalsWidget = mainController.getGoalsWidget();
+        GoalsWidget = mainController.getGoals();
         StatusBar = mainController.PlayerStatusBar;
         Session = mainController.getSession();
-        creatorAndExporterWidget = mainController.getCreatorAndExporterWidget();
+        creatorAndExporterWidget = mainController.getCreatorAndExporter();
     }
 
 // Getters And Setters
@@ -175,6 +175,12 @@ public class PlayerWidget implements Widget {
         TotalProgress.setProgress(0.0);
         ReferenceFileCheckbox.setText("Reference Display Disabled");
     }
+    @Override
+    public Boolean cleanup() {
+        Session.stop();
+        return Session.getPlayerState() != PlayerState.PLAYING;
+    }
+
     public void readytoplay() {
 
         CutPlayingText.setText("Ready To Play");

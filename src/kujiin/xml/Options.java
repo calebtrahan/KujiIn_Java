@@ -128,6 +128,7 @@ public class Options {
             marshall();
         } else {Tools.showinformationdialog("Information", "Not A Valid Audio File", "Supported Audio Formats: " + Tools.supportedaudiotext());}
     }
+    public void cleanup() {}
 
 // Subclasses
     @XmlAccessorType(XmlAccessType.PROPERTY)

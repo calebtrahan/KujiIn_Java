@@ -339,8 +339,16 @@ public class CreatorAndExporterWidget implements Widget {
         ZenTime.setText("-");
         PostTime.setText("-");
     }
+    @Override
+    public Boolean cleanup() {
+        boolean currentlyexporting = getExporterState() == ExporterState.EXPORT_IN_PROGRESS;
+        if (currentlyexporting) {
+            Tools.showinformationdialog("Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
+        }
+        return ! currentlyexporting;
+    }
 
-// Presets
+    // Presets
     public void loadpreset() {
         File xmlfile = new FileChooser().showOpenDialog(null);
         if (xmlfile != null && xmlfile.getName().endsWith(".xml")) {

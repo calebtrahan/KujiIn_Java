@@ -65,7 +65,7 @@ public class This_Session {
 
     public This_Session(MainController mainController) {
         Root = mainController;
-        this.sessions = Root.getProgressTrackerWidget().getSessions();
+        this.sessions = Root.getProgressTracker().getSessions();
         CutCurrentTime = Root.CutProgressLabelCurrent;
         CutTotalTime = Root.CutProgressLabelTotal;
         SessionCurrentTime = Root.TotalProgressLabelCurrent;
@@ -476,7 +476,9 @@ public class This_Session {
         if (Root.getOptions().getSessionOptions().getPrematureendings()) {
             GoalsWidget.PrematureEndingDialog ped = new GoalsWidget.PrematureEndingDialog(Root.getOptions());
             prematureendingreason = ped.getReason();
-        } else {prematureendingreason = "";}
+        } else {
+            prematureendingreason = "";
+        }
         if (prematureendingreason != null) {
             sessions.getsession(sessions.sessionscount() - 1).writeprematureending(currentcut.name, prematureendingreason);
         }
@@ -539,7 +541,7 @@ public class This_Session {
 //        try {sessions.addsession(TemporarySession);}
 //        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
         if (Tools.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {export();}
-        Root.getGoalsWidget().update();
+        Root.getGoals().update();
     }
     public void resetthissession() {
         currentcuttimeline = null;

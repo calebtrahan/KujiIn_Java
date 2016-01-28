@@ -115,8 +115,12 @@ public class ProgressTrackerWidget implements Widget {
         NumberOfSessionsPracticed.setText("0");
         AverageSessionDuration.setText("No Sessions Practiced");
     }
+    @Override
+    public Boolean cleanup() {
+        return true;
+    }
 
-// Other Methods
+    // Other Methods
     public void loadingui() {
         AverageSessionDuration.setText("Loading...");
         TotalTimePracticed.setText("Loading...");

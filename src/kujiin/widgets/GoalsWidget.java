@@ -55,7 +55,7 @@ public class GoalsWidget implements Widget{
         CurrentGoalProgress = mainController.goalsprogressbar;
         CutSelectorComboBox = mainController.GoalCutComboBox;
         TopLabel = mainController.GoalTopLabel;
-        allpracticedsessions = mainController.getProgressTrackerWidget().getSessions();
+        allpracticedsessions = mainController.getProgressTracker().getSessions();
         currentGoals = new CurrentGoals();
         completedGoals = new CompletedGoals();
         ObservableList<String> cutnames = FXCollections.observableArrayList(GOALCUTNAMES);
@@ -146,6 +146,11 @@ public class GoalsWidget implements Widget{
                 TopLabel.setText(cutname + " 's Current Goal");
             }
         } catch (NullPointerException ignored) {resetallvalues();}
+    }
+    public Boolean cleanup() {
+        currentGoals.marshall();
+        completedGoals.marshall();
+        return true;
     }
 
 // Widget Implementation

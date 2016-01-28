@@ -8,19 +8,26 @@ import javafx.stage.Stage;
 
 
 public class Main extends Application {
+    private MainController Root;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("assets/fxml/Main.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/Main.fxml"));
+        Parent root = fxmlLoader.load();
+        Root = fxmlLoader.getController();
         primaryStage.setTitle("Kuji-In");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-        primaryStage.setOnCloseRequest(event -> System.exit(0));
     }
-
 
     public static void main(String[] args) {
         launch(args);
     }
 
+    @Override
+    public void stop() throws Exception {
+        if (Root.cleanup()) {
+            super.stop();
+        }
+    }
 }
