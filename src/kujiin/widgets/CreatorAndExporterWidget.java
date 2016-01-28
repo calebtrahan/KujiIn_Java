@@ -19,6 +19,7 @@ import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.interfaces.Widget;
+import kujiin.xml.Options;
 import kujiin.xml.Session;
 
 import javax.xml.bind.JAXBContext;
@@ -489,7 +490,7 @@ public class CreatorAndExporterWidget implements Widget {
             sessionmissingcutsLabel.setText(cutsmissingtext);
             populatelistview();
             explanationLabel.setText(("Your Practiced Cuts Do Not Connect! Due To The Nature Of The Kuji-In I Recommend " +
-                    "Connecting All Cuts From RIN All The Way To Your Last Cut (") + This_Session.allnames.get(lastcutindex) +
+                    "Connecting All Cuts From RIN All The Way To Your Last Cut (") + Options.allnames.get(lastcutindex) +
                     ") Or Your This_Session Might Not Have The Energy It Needs");
             setCreatesession(false);
         }
@@ -500,7 +501,7 @@ public class CreatorAndExporterWidget implements Widget {
             int count = 0;
             boolean thisitemmissing;
             for (int i = 0; i < textfieldvalues.size(); i++) {
-                String name = This_Session.allnames.get(i);
+                String name = Options.allnames.get(i);
                 String minutes;
                 if (i <= lastcutindex || i == textfieldvalues.size() - 1) {
                     thisitemmissing = false;

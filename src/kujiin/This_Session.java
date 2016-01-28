@@ -17,6 +17,7 @@ import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.GoalsWidget;
 import kujiin.widgets.PlayerWidget;
+import kujiin.xml.Options;
 import kujiin.xml.Sessions;
 
 import java.io.File;
@@ -24,26 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class This_Session {
-    public static final File projectroot = new File(System.getProperty("user.dir"));
-    public static final File rootdirectory = new File(This_Session.projectroot, "src/kujiin/");
-    public static final File sounddirectory = new File(This_Session.rootdirectory, "assets/sound/");
-    public static final File xmldirectory = new File(This_Session.rootdirectory, "assets/xml/");
-    public static final File directoryentrainment = new File(This_Session.sounddirectory, "entrainment/");
-    public static final File directoryambience = new File(This_Session.sounddirectory, "ambience/");
-    public static final File directorytemp = new File(This_Session.sounddirectory, "temp/");
-    public static final File directorymaincuts = new File(This_Session.directoryentrainment, "maincuts/");
-    public static final File directorytohramp = new File(This_Session.directoryentrainment, "tohramp/");
-    public static final File directoryrampdown = new File(This_Session.directoryentrainment, "ramp/down/");
-    public static final File directoryrampup = new File(This_Session.directoryentrainment, "ramp/up/");
-    public static final File alertfile = new File(This_Session.sounddirectory, "Alert.mp3");
-    public static final File logfile = new File(This_Session.rootdirectory, "assets/sessionlog.txt");
-    public static final File directoryreference = new File(This_Session.rootdirectory, "assets/reference/");
-    public static final File sessionsxmlfile = new File(This_Session.xmldirectory, "sessions.xml");
-    public static final File currentgoalsxmlfile = new File(This_Session.xmldirectory, "current_goals.xml");
-    public static final File completedgoalsxmlfile = new File(This_Session.xmldirectory, "completed_goals.xml");
-    public static final File optionsxmlfile = new File(This_Session.xmldirectory, "options.xml");
-    public static final ArrayList<String> allnames = new ArrayList<>(Arrays.asList(
-            "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
     private Cut presession = new Cut(0, "Presession", true, 0, this);
     private Cut rin = new Cut(1, "RIN", false, 0, this);
     private Cut kyo = new Cut(2, "KYO", false, 0, this);
@@ -144,10 +125,10 @@ public class This_Session {
 // Creation Methods
     public static void deleteprevioussession() {
         ArrayList<File> folders = new ArrayList<>();
-        folders.add(new File(This_Session.directorytemp, "Ambience"));
-        folders.add(new File(This_Session.directorytemp, "Entrainment"));
-        folders.add(new File(This_Session.directorytemp, "txt"));
-        folders.add(new File(This_Session.directorytemp, "Export"));
+        folders.add(new File(Options.directorytemp, "Ambience"));
+        folders.add(new File(Options.directorytemp, "Entrainment"));
+        folders.add(new File(Options.directorytemp, "txt"));
+        folders.add(new File(Options.directorytemp, "Export"));
         for (File i : folders) {
             try {
                 for (File x : i.listFiles()) {x.delete();}
@@ -226,7 +207,7 @@ public class This_Session {
                             a.append("\n");
                             Cut thiscut = cutswithreducedambience.get(i);
                             String formattedcurrentduration = Tools.minutestoformattedhoursandmins((int) thiscut.getTotalambienceduration() / 60);
-                            String formattedexpectedduration = Tools.minutestoformattedhoursandmins(textfieldvalues.get(This_Session.allnames.indexOf(cutswithreducedambience.get(i).name)));
+                            String formattedexpectedduration = Tools.minutestoformattedhoursandmins(textfieldvalues.get(Options.allnames.indexOf(cutswithreducedambience.get(i).name)));
                             a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }
@@ -264,7 +245,7 @@ public class This_Session {
         }
         if (indexestochange.size() > 0) {
             ArrayList<String> cutsmissinglist = new ArrayList<>();
-            for (Integer x : indexestochange) {cutsmissinglist.add(This_Session.allnames.get(x));}
+            for (Integer x : indexestochange) {cutsmissinglist.add(Options.allnames.get(x));}
             StringBuilder cutsmissingtext = new StringBuilder();
             for (int i = 0; i < cutsmissinglist.size(); i++) {
                 cutsmissingtext.append(cutsmissinglist.get(i));
@@ -583,7 +564,7 @@ public class This_Session {
         currentcut.stop();
         if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
         else {
-            Media alertmedia = new Media(This_Session.alertfile.toURI().toString());
+            Media alertmedia = new Media(Options.alertfile.toURI().toString());
             MediaPlayer alertplayer = new MediaPlayer(alertmedia);
             alertplayer.play();
             setPlayerState(PlayerWidget.PlayerState.TRANSITIONING);

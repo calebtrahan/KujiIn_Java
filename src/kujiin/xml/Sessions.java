@@ -1,6 +1,5 @@
 package kujiin.xml;
 
-import kujiin.This_Session;
 import kujiin.Tools;
 
 import javax.xml.bind.JAXBContext;
@@ -29,14 +28,14 @@ public class Sessions {
 
 // XML Processing
     public void unmarshall() {
-        if (This_Session.sessionsxmlfile.exists()) {
+        if (Options.sessionsxmlfile.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Sessions.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
-                Sessions noises1 = (Sessions) createMarshaller.unmarshal(This_Session.sessionsxmlfile);
+                Sessions noises1 = (Sessions) createMarshaller.unmarshal(Options.sessionsxmlfile);
                 setSession(noises1.getSession());
             } catch (JAXBException e) {
-                Tools.showinformationdialog("Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + This_Session.sessionsxmlfile.getAbsolutePath());
+                Tools.showinformationdialog("Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.sessionsxmlfile.getAbsolutePath());
             }
         }
     }
@@ -45,9 +44,9 @@ public class Sessions {
             JAXBContext context = JAXBContext.newInstance(Sessions.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, This_Session.sessionsxmlfile);
+            createMarshaller.marshal(this, Options.sessionsxmlfile);
         } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Save Sessions XML File", "Check Write File Permissions Of " + This_Session.sessionsxmlfile.getAbsolutePath());
+            Tools.showinformationdialog("Information", "Couldn't Save Sessions XML File", "Check Write File Permissions Of " + Options.sessionsxmlfile.getAbsolutePath());
         }
     }
     public void createnewsession() {
@@ -57,7 +56,7 @@ public class Sessions {
             Tools.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
     public void addsession(Session session) throws JAXBException {
-        if (This_Session.sessionsxmlfile.exists()) {unmarshall();}
+        if (Options.sessionsxmlfile.exists()) {unmarshall();}
         List<Session> sessionsList = getSession();
         if (sessionsList != null && sessionsList.size() > 0) {
             sortsessions();
@@ -73,7 +72,7 @@ public class Sessions {
         JAXBContext context = JAXBContext.newInstance(Sessions.class);
         Marshaller createMarshaller = context.createMarshaller();
         createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        createMarshaller.marshal(this, This_Session.sessionsxmlfile);
+        createMarshaller.marshal(this, Options.sessionsxmlfile);
     }
     public void deletenonvalidsessions() {
         try {

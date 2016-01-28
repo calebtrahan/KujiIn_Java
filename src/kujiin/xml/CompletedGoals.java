@@ -1,7 +1,6 @@
 package kujiin.xml;
 
 
-import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.lib.BeanComparator;
 
@@ -96,11 +95,11 @@ public class CompletedGoals {
 
 // XML Processing
     public void unmarshall() {
-        if (This_Session.completedgoalsxmlfile.exists()) {
+        if (Options.completedgoalsxmlfile.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(CompletedGoals.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
-                CompletedGoals completedGoals = (CompletedGoals) createMarshaller.unmarshal(This_Session.completedgoalsxmlfile);
+                CompletedGoals completedGoals = (CompletedGoals) createMarshaller.unmarshal(Options.completedgoalsxmlfile);
                 setRinGoals(completedGoals.getRinGoals());
                 setKyoGoals(completedGoals.getKyoGoals());
                 setTohGoals(completedGoals.getTohGoals());
@@ -112,7 +111,7 @@ public class CompletedGoals {
                 setZenGoals(completedGoals.getZenGoals());
                 setTotalGoals(completedGoals.getTotalGoals());
             } catch (JAXBException e) {
-                Tools.showinformationdialog("Information", "Couldn't Open Completed Goals XML File", "Check Read File Permissions Of " + This_Session.completedgoalsxmlfile.getAbsolutePath());
+                Tools.showinformationdialog("Information", "Couldn't Open Completed Goals XML File", "Check Read File Permissions Of " + Options.completedgoalsxmlfile.getAbsolutePath());
             }
         }
     }
@@ -120,13 +119,13 @@ public class CompletedGoals {
         try {
             JAXBContext context = JAXBContext.newInstance(CompletedGoals.class);
             Marshaller createMarshaller = context.createMarshaller();
-            createMarshaller.marshal(this, This_Session.completedgoalsxmlfile);
+            createMarshaller.marshal(this, Options.completedgoalsxmlfile);
         } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Save Completed Goals XML File", "Check Write File Permissions Of " + This_Session.completedgoalsxmlfile.getAbsolutePath());
+            Tools.showinformationdialog("Information", "Couldn't Save Completed Goals XML File", "Check Write File Permissions Of " + Options.completedgoalsxmlfile.getAbsolutePath());
         }
     }
     public void add(int cutindex, CompletedGoal completedGoal) throws JAXBException {
-        if (This_Session.completedgoalsxmlfile.exists()) {
+        if (Options.completedgoalsxmlfile.exists()) {
             List<CompletedGoal> completedGoalsList = getallcutgoals(cutindex);
             if (completedGoalsList == null) {completedGoalsList = new ArrayList<>();}
             completedGoalsList.add(completedGoal);

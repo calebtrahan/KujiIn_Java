@@ -6,6 +6,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.util.Duration;
+import kujiin.xml.Options;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -238,7 +239,7 @@ public class Tools {
 
 // Audio Utils
     public static boolean testAlertFile() {
-        return This_Session.alertfile.exists() && Tools.getaudioduration(This_Session.alertfile) != 0.0;
+        return Options.alertfile.exists() && Tools.getaudioduration(Options.alertfile) != 0.0;
     }
     public static double getaudioduration(File audiofile) {
         try {

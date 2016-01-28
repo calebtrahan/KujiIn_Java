@@ -2,7 +2,6 @@ package kujiin.xml;
 
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
-import kujiin.This_Session;
 import kujiin.Tools;
 
 import javax.xml.bind.JAXBContext;
@@ -13,11 +12,34 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 @XmlRootElement(name = "Options")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Options {
-    /// Default Values
+// Directory Constants
+    public static final File projectroot = new File(System.getProperty("user.dir"));
+    public static final File rootdirectory = new File(projectroot, "src/kujiin/");
+    public static final File directoryreference = new File(rootdirectory, "assets/reference/");
+    public static final File logfile = new File(rootdirectory, "assets/sessionlog.txt");
+    public static final File xmldirectory = new File(rootdirectory, "assets/xml/");
+    public static final File optionsxmlfile = new File(xmldirectory, "options.xml");
+    public static final File completedgoalsxmlfile = new File(xmldirectory, "completed_goals.xml");
+    public static final File currentgoalsxmlfile = new File(xmldirectory, "current_goals.xml");
+    public static final File sessionsxmlfile = new File(xmldirectory, "sessions.xml");
+    public static final File sounddirectory = new File(rootdirectory, "assets/sound/");
+    public static final File alertfile = new File(sounddirectory, "Alert.mp3");
+    public static final File directorytemp = new File(sounddirectory, "temp/");
+    public static final File directoryambience = new File(sounddirectory, "ambience/");
+    public static final File directoryentrainment = new File(sounddirectory, "entrainment/");
+    public static final File directoryrampup = new File(directoryentrainment, "ramp/up/");
+    public static final File directoryrampdown = new File(directoryentrainment, "ramp/down/");
+    public static final File directorytohramp = new File(directoryentrainment, "tohramp/");
+    public static final File directorymaincuts = new File(directoryentrainment, "maincuts/");
+    public static final ArrayList<String> allnames = new ArrayList<>(Arrays.asList(
+            "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
+/// Default Option Values
     private static final Boolean TOOLTIPS = true;
     private static final Boolean HELPDIALOGS = true;
     private static final Double ENTRAINMENTVOLUME = 0.6; // Default Entrainment Volume (Textfield -> In Percentage)
@@ -55,18 +77,18 @@ public class Options {
 
 // XML Processing
     public void unmarshall() {
-        if (This_Session.optionsxmlfile.exists()) {
+        if (optionsxmlfile.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(kujiin.xml.Options.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
-                kujiin.xml.Options options = (kujiin.xml.Options) unmarshaller.unmarshal(This_Session.optionsxmlfile);
+                kujiin.xml.Options options = (kujiin.xml.Options) unmarshaller.unmarshal(optionsxmlfile);
                 setProgramOptions(options.getProgramOptions());
                 setSessionOptions(options.getSessionOptions());
                 setAppearanceOptions(options.getAppearanceOptions());
             } catch (JAXBException e) {
                 e.printStackTrace();
                 Platform.runLater(() -> Tools.showinformationdialog("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
-                        This_Session.optionsxmlfile.getName()));
+                        optionsxmlfile.getName()));
             }
         } else {
             kujiin.xml.Options.ProgramOptions programOptions = new ProgramOptions();
@@ -92,9 +114,9 @@ public class Options {
             JAXBContext context = JAXBContext.newInstance(Options.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, This_Session.optionsxmlfile);
+            createMarshaller.marshal(this, optionsxmlfile);
         } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Save Options", "Check Write File Permissions Of " + This_Session.optionsxmlfile.getAbsolutePath());
+            Tools.showinformationdialog("Information", "Couldn't Save Options", "Check Write File Permissions Of " + optionsxmlfile.getAbsolutePath());
         }
     }
     public void getnewAlertFile() {

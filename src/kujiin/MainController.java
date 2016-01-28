@@ -184,7 +184,7 @@ public class MainController implements Initializable {
             if (cutsinsession) {
                 Session session = new Session();
                 ArrayList<Integer> cuttimes = new ArrayList<>(11);
-                for (String i : This_Session.allnames) {
+                for (String i : kujiin.xml.Options.allnames) {
                     Integer duration = 0;
                     for (Cut x : this.session.getCutsinsession()) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
                     cuttimes.add(duration);
@@ -290,7 +290,7 @@ public class MainController implements Initializable {
         public Button AcceptButton;
         public Button CancelButton;
         private File newalertfile = null;
-        private File alertfileactual = This_Session.alertfile;
+        private File alertfileactual = kujiin.xml.Options.alertfile;
         private Boolean alertfilechanged = null;
 
         public ChangeAlertDialog(Parent parent) {
@@ -327,7 +327,7 @@ public class MainController implements Initializable {
         public void commitchanges(Event event) {
             if (newalertfile != null) {
                 if (alertfileactual.exists()) {                                                                             // Change Alert File
-                    File tempfile = new File(This_Session.sounddirectory, "AlertTemp.mp3");
+                    File tempfile = new File(kujiin.xml.Options.sounddirectory, "AlertTemp.mp3");
                     try {
                         // Make A Temp File Copy In Case It Fails
                         FileUtils.copyFile(alertfileactual, tempfile);
@@ -372,8 +372,8 @@ public class MainController implements Initializable {
         public Button PreviewButton;
         private ObservableList<String> cutnames;
         private ObservableList<String> variations;
-        private File htmldirectory = new File(This_Session.directoryreference, "html");
-        private File txtdirectory = new File(This_Session.directoryreference, "txt");
+        private File htmldirectory = new File(kujiin.xml.Options.directoryreference, "html");
+        private File txtdirectory = new File(kujiin.xml.Options.directoryreference, "txt");
         private File selectedfile;
         private String selectedcut;
         private String selectedvariation;
@@ -386,7 +386,7 @@ public class MainController implements Initializable {
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
             cutnames = FXCollections.observableArrayList();
             variations = FXCollections.observableArrayList();
-            cutnames.addAll(This_Session.allnames);
+            cutnames.addAll(kujiin.xml.Options.allnames);
             variations.addAll(Arrays.asList("html", "txt"));
             CutNamesChoiceBox.setItems(cutnames);
             CutVariationsChoiceBox.setItems(variations);
@@ -509,7 +509,7 @@ public class MainController implements Initializable {
             CurrentAmbienceTable.getSelectionModel().selectedItemProperty().addListener(
                     (observable, oldValue, newValue) -> currentselectionchanged(newValue));
             ObservableList<String> allnames = FXCollections.observableArrayList();
-            allnames.addAll(This_Session.allnames);
+            allnames.addAll(kujiin.xml.Options.allnames);
             CutSelectionBox.setItems(allnames);
             this.setOnCloseRequest(event -> close());
         }
@@ -520,7 +520,7 @@ public class MainController implements Initializable {
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Ambience Editor");}
             catch (IOException e) {e.printStackTrace();}
             CutSelectionBox.setOnAction(event -> selectandloadcut());
-            tempdirectory = new File(This_Session.directorytemp, "AmbienceEditor");
+            tempdirectory = new File(kujiin.xml.Options.directorytemp, "AmbienceEditor");
         }
         public SessionAmbienceEditor(String cutname) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionAmbienceEditor.fxml"));
@@ -528,8 +528,8 @@ public class MainController implements Initializable {
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Ambience Editor");}
             catch (IOException e) {e.printStackTrace();}
             CutSelectionBox.setOnAction(event -> selectandloadcut());
-            CutSelectionBox.getSelectionModel().select(This_Session.allnames.indexOf(cutname));
-            tempdirectory = new File(This_Session.directorytemp, "AmbienceEditor");
+            CutSelectionBox.getSelectionModel().select(kujiin.xml.Options.allnames.indexOf(cutname));
+            tempdirectory = new File(kujiin.xml.Options.directorytemp, "AmbienceEditor");
         }
 
     // Transfer Methods
@@ -542,7 +542,7 @@ public class MainController implements Initializable {
                         return new Task<Void>() {
                             @Override
                             protected Void call() throws Exception {
-                                File cutdirectory = new File(This_Session.directoryambience, selectedcutname);
+                                File cutdirectory = new File(kujiin.xml.Options.directoryambience, selectedcutname);
                                 File newfile = new File(cutdirectory, selected_new_ambiencesong.name.getValue());
                                 FileUtils.copyFile(selected_new_ambiencesong.getFile(), newfile);
                                 return null;
@@ -649,8 +649,8 @@ public class MainController implements Initializable {
             }
             current_songlist.clear();
             CurrentAmbienceTable.getItems().clear();
-            int index = This_Session.allnames.indexOf(CutSelectionBox.getValue());
-            selectedcutname = This_Session.allnames.get(index);
+            int index = kujiin.xml.Options.allnames.indexOf(CutSelectionBox.getValue());
+            selectedcutname = kujiin.xml.Options.allnames.get(index);
             if (getcurrentambiencefiles()) {
                 CurrentAmbienceTable.getItems().addAll(current_songlist);
                 CutSelectionLabel.setText(selectedcutname + "'s Ambience");
@@ -687,7 +687,7 @@ public class MainController implements Initializable {
         public void currentselectionchanged(AmbienceSong ambiencesong) {selected_current_ambiencesong = ambiencesong;}
         public boolean getcurrentambiencefiles() {
             if (selectedcutname != null) {
-                File thisdirectory = new File(This_Session.directoryambience, selectedcutname);
+                File thisdirectory = new File(kujiin.xml.Options.directoryambience, selectedcutname);
                 try {
                     for (File i : thisdirectory.listFiles()) {
                         if (Tools.validaudiofile(i)) {current_songlist.add(new AmbienceSong(i.getName(), i));}

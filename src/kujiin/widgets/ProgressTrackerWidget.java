@@ -15,9 +15,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import kujiin.MainController;
-import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.interfaces.Widget;
+import kujiin.xml.Options;
 import kujiin.xml.Session;
 import kujiin.xml.Sessions;
 
@@ -259,7 +259,7 @@ public class ProgressTrackerWidget implements Widget {
                 String duration;
                 if (durationinmins > 0) {duration = Tools.minutestoformattedhoursandmins(durationinmins);}
                 else {duration = "-";}
-                allrows.add(new TotalProgressRow(i, This_Session.allnames.get(i), duration));
+                allrows.add(new TotalProgressRow(i, Options.allnames.get(i), duration));
             }
             progresstable.getItems().addAll(allrows);
         }

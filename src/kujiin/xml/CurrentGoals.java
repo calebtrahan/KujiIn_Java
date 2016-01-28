@@ -1,6 +1,5 @@
 package kujiin.xml;
 
-import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.lib.BeanComparator;
 
@@ -93,11 +92,11 @@ public class CurrentGoals {
 
 // XML Processing
     public void unmarshall() {
-    if (This_Session.currentgoalsxmlfile.exists()) {
+    if (Options.currentgoalsxmlfile.exists()) {
         try {
             JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
             Unmarshaller createMarshaller = context.createUnmarshaller();
-            CurrentGoals currentGoals = (CurrentGoals) createMarshaller.unmarshal(This_Session.currentgoalsxmlfile);
+            CurrentGoals currentGoals = (CurrentGoals) createMarshaller.unmarshal(Options.currentgoalsxmlfile);
             setRinGoals(currentGoals.getRinGoals());
             setKyoGoals(currentGoals.getKyoGoals());
             setTohGoals(currentGoals.getTohGoals());
@@ -109,7 +108,7 @@ public class CurrentGoals {
             setZenGoals(currentGoals.getZenGoals());
             setTotalGoals(currentGoals.getTotalGoals());
         } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + This_Session.currentgoalsxmlfile.getAbsolutePath());
+            Tools.showinformationdialog("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.currentgoalsxmlfile.getAbsolutePath());
         }
     }
 }
@@ -118,9 +117,9 @@ public class CurrentGoals {
             JAXBContext context = JAXBContext.newInstance(CurrentGoals.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, This_Session.currentgoalsxmlfile);
+            createMarshaller.marshal(this, Options.currentgoalsxmlfile);
         } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + This_Session.currentgoalsxmlfile.getAbsolutePath());
+            Tools.showinformationdialog("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.currentgoalsxmlfile.getAbsolutePath());
         }
     }
     public void add(int cutindex, CurrentGoal newgoal) throws JAXBException {
