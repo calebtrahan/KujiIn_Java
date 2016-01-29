@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Line?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="462.0" prefWidth="542.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ScrollPane layoutX="7.0" layoutY="8.0" prefHeight="424.0" prefWidth="528.0" AnchorPane.bottomAnchor="36.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="8.0">
+         <content>
+            <VBox prefHeight="407.0" prefWidth="482.0">
+               <children>
+                  <HBox alignment="CENTER_LEFT" prefHeight="28.0" prefWidth="487.0">
+                     <children>
+                        <Label prefHeight="16.0" prefWidth="63.0" text="General" />
+                        <Line endX="300.0" startX="-100.0" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Line>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="391.0">
+                     <children>
+                        <CheckBox fx:id="TooltipsCheckBox" mnemonicParsing="false" text="Show Tooltips">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </CheckBox>
+                        <CheckBox fx:id="HelpDialogsCheckBox" mnemonicParsing="false" text="Show Help Dialogs">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </CheckBox>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="28.0" prefWidth="487.0">
+                     <children>
+                        <Label prefHeight="16.0" prefWidth="63.0" text="Session" />
+                        <Line endX="300.0" startX="-100.0" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Line>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="41.0" prefWidth="537.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="73.0" text="Alert File:" />
+                        <TextField fx:id="AlertFileTextField" prefHeight="26.0" prefWidth="212.0" text="Please Select...">
+                           <HBox.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Button fx:id="AlertFileSelectButton" mnemonicParsing="false" text="Open File" onAction="#openandtestnewfile"/>
+                     </children>
+                  </HBox>
+                  <CheckBox fx:id="PrematureEndingCheckbox" mnemonicParsing="false" text="Catch Premature Ending Reason (If Session Ended Before Finished)">
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="20.0" top="5.0" />
+                     </VBox.margin>
+                  </CheckBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="28.0" prefWidth="487.0">
+                     <children>
+                        <Label prefHeight="16.0" prefWidth="63.0" text="Playback" />
+                        <Line endX="300.0" startX="-100.0" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Line>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="200.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="80.0" text="Fade In:" />
+                        <TextField fx:id="FadeInValue" prefWidth="40.0">
+                           <HBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="seconds" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="537.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="80.0" text="Fade Out:" />
+                        <TextField fx:id="FadeOutValue" prefWidth="40.0">
+                           <HBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="seconds" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="166.0">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="42.0" prefWidth="80.0" text="Entrainment Volume:" textAlignment="RIGHT" wrapText="true">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="EntrainmentVolumePercentage" prefHeight="26.0" prefWidth="39.0">
+                           <HBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="\%" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="412.0">
+                     <children>
+                        <Label prefHeight="34.0" prefWidth="80.0" text="Ambience Volume" textAlignment="RIGHT" wrapText="true" />
+                        <TextField fx:id="AmbienceVolumePercentage" prefWidth="40.0">
+                           <HBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="\%" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="28.0" prefWidth="487.0">
+                     <children>
+                        <Label prefHeight="16.0" prefWidth="78.0" text="Appearance" />
+                        <Line endX="300.0" startX="-100.0" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Line>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="52.0" prefWidth="290.0">
+                     <children>
+                        <Label text="Select Theme:">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                        <ChoiceBox fx:id="ProgramThemeChoiceBox" prefWidth="150.0">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </ChoiceBox>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </content></ScrollPane>
+      <HBox alignment="BOTTOM_RIGHT" layoutX="288.0" layoutY="426.0" prefHeight="28.0" prefWidth="247.0">
+         <children>
+            <Button fx:id="ApplyButton" mnemonicParsing="false" text="Apply" onAction="#apply"/>
+            <Button fx:id="AcceptButton" mnemonicParsing="false" text="Accept" onAction="#accept"/>
+            <Button fx:id="CancelButton" mnemonicParsing="false" text="Cancel" onAction="#cancel"/>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

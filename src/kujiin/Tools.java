@@ -2,8 +2,6 @@ package kujiin;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.xml.Options;
@@ -31,15 +29,10 @@ public class Tools {
     }
 
 // Gui Utils
-    public static void numericTextField(TextField txtfield) {
-        txtfield.setText("0");
-        txtfield.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable,
-                                String oldValue, String newValue) {
-                try {if (newValue.matches("\\d*")) {Integer.parseInt(newValue);}  else {txtfield.setText(oldValue);}}
-                catch (Exception e) {txtfield.setText("");}}
-        });
+    public static void integerTextField(TextField txtfield) {
+        txtfield.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {if (newValue.matches("\\d*")) {Integer.parseInt(newValue);}  else {txtfield.setText(oldValue);}}
+            catch (Exception e) {txtfield.setText("");}});
     }
     public static boolean getanswerdialog(String titletext, String headertext, String contenttext) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);

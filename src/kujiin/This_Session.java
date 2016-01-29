@@ -607,8 +607,8 @@ public class This_Session {
             boolean value = choosereferencetype();
             ReferenceFileCheckbox.setSelected(value);
             if (value && playerState == PlayerWidget.PlayerState.PLAYING) {displayreferencefile();}
-            if (value) {ReferenceFileCheckbox.setText("Reference Display Enabled");}
-            else {ReferenceFileCheckbox.setText("Reference Display Disabled");}
+            if (value) {ReferenceFileCheckbox.setText("Display Reference");}
+            else {ReferenceFileCheckbox.setText("Display Reference");}
         }
     }
     public void displayreferencefile() {

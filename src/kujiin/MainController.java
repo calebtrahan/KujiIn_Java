@@ -37,7 +37,6 @@ import java.net.URL;
 import java.util.*;
 
 public class MainController implements Initializable {
-
     public Label CreatorStatusBar;
     public Label PlayerStatusBar;
     public Button ExportButton;
@@ -321,27 +320,6 @@ public class MainController implements Initializable {
             if (alertfileactual.exists()) {this.setTitle("Change Alert File");}
             else {this.setTitle("Add A New Alert File");}
             alertfileTextField.setEditable(false);
-        }
-
-        public void openandtestnewfile(Event event) {
-            FileChooser a = new FileChooser();
-            File newfile = a.showOpenDialog(this);
-            if (newfile != null) {
-                if (newfile.toString().endsWith(".mp3")) {
-                    double duration = Tools.getaudioduration(newfile);
-                    if (duration > 10000) {
-                        if (Tools.getanswerdialog("Validation", "Alert File Is longer Than 10 Seconds",
-                                String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
-                                "Really Use It?", duration))) {
-                            alertfileTextField.setText(newfile.getName());
-                            newalertfile = newfile;
-                        }
-                    } else {
-                        alertfileTextField.setText(newfile.getName());
-                        newalertfile = newfile;
-                    }
-                }
-            }
         }
 
         public void commitchanges(Event event) {
@@ -834,16 +812,120 @@ public class MainController implements Initializable {
         }
 
     }
-//    public static class SimpleTextDialogWithCancelButton extends Stage {
-//        public Button CancelButton;
-//        public Label Message;
-//
-//        public SimpleTextDialogWithCancelButton(Parent parent, String titletext, String message) {
-//             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SimpleTextDialogWithCancelButton.fxml"));
-//             fxmlLoader.setController(this);
-//             try {setScene(new Scene(parent, fxmlLoader.load())); this.setTitle(titletext);}
-//             catch (IOException e) {e.printStackTrace();}
-//             Message.setText(message);
-//        }
-//    }
+    public static class ChangeProgramOptions extends Stage implements Initializable {
+        public CheckBox TooltipsCheckBox;
+        public CheckBox HelpDialogsCheckBox;
+        public TextField AlertFileTextField;
+        public Button AlertFileSelectButton;
+        public CheckBox PrematureEndingCheckbox;
+        public TextField FadeInValue;
+        public TextField FadeOutValue;
+        public TextField EntrainmentVolumePercentage;
+        public TextField AmbienceVolumePercentage;
+        public ChoiceBox ProgramThemeChoiceBox;
+        public Button ApplyButton;
+        public Button AcceptButton;
+        public Button CancelButton;
+        private kujiin.xml.Options Options;
+        private File AlertFile;
+        private boolean valuechanged;
+
+        @Override
+        public void initialize(URL location, ResourceBundle resources) {
+            Tools.integerTextField(FadeInValue);
+            Tools.integerTextField(FadeOutValue);
+            Tools.integerTextField(EntrainmentVolumePercentage);
+            Tools.integerTextField(AmbienceVolumePercentage);
+            TooltipsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+            HelpDialogsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+            PrematureEndingCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+            FadeInValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+            FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+            EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+            AmbienceVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+        }
+
+        public ChangeProgramOptions(Options sessionoptions) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Error Occured");}
+            catch (IOException e) {e.printStackTrace();}
+            Options = sessionoptions;
+            TooltipsCheckBox.setSelected(Options.getProgramOptions().getTooltips());
+            HelpDialogsCheckBox.setSelected(Options.getProgramOptions().getHelpdialogs());
+            String oldalertfilelocation = Options.getSessionOptions().getAlertfilelocation();
+            if (oldalertfilelocation != null) {
+                AlertFile = new File(oldalertfilelocation);
+                if (AlertFile.exists()) {
+                    if (Tools.validaudiofile(AlertFile)) {
+                        String audioduration = Tools.formatlengthshort((int) Tools.getaudioduration(AlertFile));
+                        AlertFileTextField.setText(String.format("%s (%s)", AlertFile.getName(), audioduration));
+                    } else {Tools.showinformationdialog("Information", "Old Alert File Is Unsupported", "Please Select A New One");}
+                } else {
+                    AlertFile = null;
+                    AlertFileTextField.setText("Select A New Alert File...");
+                }
+            }
+            PrematureEndingCheckbox.setSelected(Options.getSessionOptions().getPrematureendings());
+            FadeInValue.setText(Options.getSessionOptions().getFadeinduration().toString());
+            FadeOutValue.setText(Options.getSessionOptions().getFadeoutduration().toString());
+            EntrainmentVolumePercentage.setText(Options.getSessionOptions().getEntrainmentvolume().toString());
+            AmbienceVolumePercentage.setText(Options.getSessionOptions().getAmbiencevolume().toString());
+        }
+
+    // Button Actions
+        public void apply(ActionEvent actionEvent) {
+            Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
+            Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
+            Options.getSessionOptions().setPrematureendings(PrematureEndingCheckbox.isSelected());
+            Options.getSessionOptions().setFadeoutduration(new Double(FadeInValue.getText()));
+            Options.getSessionOptions().setFadeinduration(new Double(FadeOutValue.getText()));
+            if (AlertFile != null) {
+                Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());
+            }
+            valuechanged = false;
+            ApplyButton.setDisable(true);
+        }
+        public void accept(ActionEvent actionEvent) {
+            apply(null);
+            close();
+        }
+        public void cancel(ActionEvent actionEvent) {
+            close();
+        }
+        public void changedvalue() {
+            ApplyButton.setDisable(false);
+            valuechanged = true;
+        }
+        public void openandtestnewfile(ActionEvent actionEvent) {
+            FileChooser a = new FileChooser();
+            File newfile = a.showOpenDialog(this);
+            if (newfile != null) {
+                if (Tools.validaudiofile(newfile)) {
+                    double duration = Tools.getaudioduration(newfile);
+                    if (duration > 10000) {
+                        if (Tools.getanswerdialog("Validation", "Alert File Is longer Than 10 Seconds",
+                                String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
+                                        "Really Use It?", duration))) {
+                            AlertFileTextField.setText(String.format("%s (%s)", newfile.getName(), Tools.formatlengthshort((int) duration)));
+                            AlertFile = newfile;
+                        }
+                    } else {
+                        AlertFileTextField.setText(String.format("%s (%s)", newfile.getName(), Tools.formatlengthshort((int) duration)));
+                        AlertFile = newfile;
+                    }
+                } else {
+                    Tools.showinformationdialog("Information", newfile.getName() + " Isn't A Valid Audio File", "Supported Audio Formats: " + Tools.supportedaudiotext());
+                }
+            }
+        }
+
+        @Override
+        public void close() {
+            if (valuechanged) {
+                if (! Tools.getanswerdialog("Confirmation", "You Have Unsaved Changes", "Exit Without Saving?")) {return;}
+            }
+            super.close();
+        }
+    }
 }

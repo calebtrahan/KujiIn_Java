@@ -143,17 +143,17 @@ public class CreatorAndExporterWidget implements Widget {
     return good;
 }
     public void setuptextfields() {
-        Tools.numericTextField(PreTime);
-        Tools.numericTextField(RinTime);
-        Tools.numericTextField(KyoTime);
-        Tools.numericTextField(TohTime);
-        Tools.numericTextField(ShaTime);
-        Tools.numericTextField(KaiTime);
-        Tools.numericTextField(JinTime);
-        Tools.numericTextField(RetsuTime);
-        Tools.numericTextField(ZaiTime);
-        Tools.numericTextField(ZenTime);
-        Tools.numericTextField(PostTime);
+        Tools.integerTextField(PreTime);
+        Tools.integerTextField(RinTime);
+        Tools.integerTextField(KyoTime);
+        Tools.integerTextField(TohTime);
+        Tools.integerTextField(ShaTime);
+        Tools.integerTextField(KaiTime);
+        Tools.integerTextField(JinTime);
+        Tools.integerTextField(RetsuTime);
+        Tools.integerTextField(ZaiTime);
+        Tools.integerTextField(ZenTime);
+        Tools.integerTextField(PostTime);
         PreTime.textProperty().addListener((observable, oldValue, newValue) -> {
             try {PresessionValue.set(Integer.valueOf(newValue)); textfieldtimes.set(0, PresessionValue.get()); updatecreatorui();}
             catch (NumberFormatException ignored) {PreTime.setText("0"); PresessionValue.set(0); textfieldtimes.set(0, 0); updatecreatorui();}
@@ -397,7 +397,7 @@ public class CreatorAndExporterWidget implements Widget {
 
         @Override
         public void initialize(URL url, ResourceBundle resourceBundle) {
-            Tools.numericTextField(changeAllValuesMinutesTextField);
+            Tools.integerTextField(changeAllValuesMinutesTextField);
         }
     // Getters And Setters
         public Boolean getAccepted() {
@@ -584,7 +584,7 @@ public class CreatorAndExporterWidget implements Widget {
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
-            Tools.numericTextField(cutinvocationminutesTextField);
+            Tools.integerTextField(cutinvocationminutesTextField);
         }
 
         public int getCutinvocationduration() {

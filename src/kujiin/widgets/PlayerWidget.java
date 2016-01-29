@@ -359,5 +359,4 @@ public class PlayerWidget implements Widget {
     public enum PlayerState {
         PLAYING, PAUSED, STOPPED, TRANSITIONING, IDLE
     }
-
 }
