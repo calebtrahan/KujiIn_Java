@@ -1,7 +1,6 @@
 package kujiin.xml;
 
 import javafx.application.Platform;
-import javafx.stage.FileChooser;
 import kujiin.Tools;
 
 import javax.xml.bind.JAXBContext;
@@ -119,16 +118,6 @@ public class Options {
             Tools.showinformationdialog("Information", "Couldn't Save Options", "Check Write File Permissions Of " + optionsxmlfile.getAbsolutePath());
         }
     }
-    public void getnewAlertFile() {
-        File newalertfile = new FileChooser().showOpenDialog(null);
-        if (newalertfile == null) {return;}
-        boolean validaudiofile = Tools.validaudiofile(newalertfile);
-        if (validaudiofile) {
-//            setAlertfile(newalertfile);
-            marshall();
-        } else {Tools.showinformationdialog("Information", "Not A Valid Audio File", "Supported Audio Formats: " + Tools.supportedaudiotext());}
-    }
-    public void cleanup() {}
 
 // Subclasses
     @XmlAccessorType(XmlAccessType.PROPERTY)

@@ -28,6 +28,7 @@ public class Main extends Application {
     public void stop() throws Exception {
         if (Root.cleanup()) {
             super.stop();
+            System.exit(0);
         }
     }
 }

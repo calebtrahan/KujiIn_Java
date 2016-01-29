@@ -172,6 +172,9 @@ public class MainController implements Initializable {
     public void howtouseprogram(ActionEvent actionEvent) {Tools.howtouseprogram();}
     public void aboutthisprogram(ActionEvent actionEvent) {Tools.aboutthisprogram();}
     public void contactme(ActionEvent actionEvent) {Tools.contactme();}
+    public void close(ActionEvent actionEvent) {
+        if (cleanup()) {System.exit(0);}
+    }
 
 // Database And Total Progress Widget
     public void updatetotalprogresswidget(ActionEvent actionEvent) {
@@ -830,6 +833,9 @@ public class MainController implements Initializable {
         public Button ApplyButton;
         public Button AcceptButton;
         public Button CancelButton;
+        public Button DeleteAllGoalsButton;
+        public Button DeleteAllSessionsProgressButton;
+        public Button DefaultsButton;
         private kujiin.xml.Options Options;
         private File AlertFile;
         private boolean valuechanged;
@@ -918,6 +924,15 @@ public class MainController implements Initializable {
                 }
             }
         }
+        public void resettodefaults(ActionEvent actionEvent) {
+            // TODO Finish Building Options Here
+        }
+        public void deleteallsessions(ActionEvent actionEvent) {
+
+        }
+        public void deleteallgoals(ActionEvent actionEvent) {
+
+        }
 
         @Override
         public void close() {
@@ -926,5 +941,6 @@ public class MainController implements Initializable {
             }
             super.close();
         }
+
     }
 }
