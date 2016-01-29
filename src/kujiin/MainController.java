@@ -898,8 +898,7 @@ public class MainController implements Initializable {
             valuechanged = true;
         }
         public void openandtestnewfile(ActionEvent actionEvent) {
-            FileChooser a = new FileChooser();
-            File newfile = a.showOpenDialog(this);
+            File newfile = new FileChooser().showOpenDialog(this);
             if (newfile != null) {
                 if (Tools.validaudiofile(newfile)) {
                     double duration = Tools.getaudioduration(newfile);
