@@ -301,6 +301,10 @@ public class MainController implements Initializable {
         Goals.displaycurrentgoals();}
     public void viewcompletedgoals(Event event) {
         Goals.displaycompletedgoals();}
+    public void changesessionoptions(ActionEvent actionEvent) {
+        new ChangeProgramOptions(Options).showAndWait();
+        Options.marshall();
+    }
 
     // Menu Tools/Dialogs
     public static class ChangeAlertDialog extends Stage {
@@ -812,7 +816,7 @@ public class MainController implements Initializable {
         }
 
     }
-    public static class ChangeProgramOptions extends Stage implements Initializable {
+    public static class ChangeProgramOptions extends Stage {
         public CheckBox TooltipsCheckBox;
         public CheckBox HelpDialogsCheckBox;
         public TextField AlertFileTextField;
@@ -830,8 +834,12 @@ public class MainController implements Initializable {
         private File AlertFile;
         private boolean valuechanged;
 
-        @Override
-        public void initialize(URL location, ResourceBundle resources) {
+        public ChangeProgramOptions(Options sessionoptions) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Options");}
+            catch (IOException e) {e.printStackTrace();}
+            Options = sessionoptions;
             Tools.integerTextField(FadeInValue);
             Tools.integerTextField(FadeOutValue);
             Tools.integerTextField(EntrainmentVolumePercentage);
@@ -843,14 +851,6 @@ public class MainController implements Initializable {
             FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             AmbienceVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-        }
-
-        public ChangeProgramOptions(Options sessionoptions) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));
-            fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Error Occured");}
-            catch (IOException e) {e.printStackTrace();}
-            Options = sessionoptions;
             TooltipsCheckBox.setSelected(Options.getProgramOptions().getTooltips());
             HelpDialogsCheckBox.setSelected(Options.getProgramOptions().getHelpdialogs());
             String oldalertfilelocation = Options.getSessionOptions().getAlertfilelocation();
