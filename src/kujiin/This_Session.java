@@ -10,8 +10,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
-import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
@@ -61,6 +61,7 @@ public class This_Session {
     private Double entrainmentvolume;
     private Double ambiencevolume;
     private GoalsWidget goalsWidget;
+    private File exportfile;
     public MainController Root;
 
     public This_Session(MainController mainController) {
@@ -121,20 +122,14 @@ public class This_Session {
     public Double getSessionEntrainmentVolume() {return entrainmentvolume;}
     public GoalsWidget getGoalsWidget() {return goalsWidget;}
     public void setGoalsWidget(GoalsWidget goalsWidget) {this.goalsWidget = goalsWidget;}
+    public File getExportfile() {
+        return exportfile;
+    }
+    public void setExportfile(File exportfile) {
+        this.exportfile = exportfile;
+    }
 
 // Creation Methods
-    public static void deleteprevioussession() {
-        ArrayList<File> folders = new ArrayList<>();
-        folders.add(new File(Options.directorytemp, "Ambience"));
-        folders.add(new File(Options.directorytemp, "Entrainment"));
-        folders.add(new File(Options.directorytemp, "txt"));
-        folders.add(new File(Options.directorytemp, "Export"));
-        for (File i : folders) {
-            try {
-                for (File x : i.listFiles()) {x.delete();}
-            } catch (NullPointerException ignored) {}
-        }
-    }
     public boolean textfieldvaluesareOK(ArrayList<Integer> textfieldvalues) {
         for (int i = 0; i < textfieldvalues.size(); i++) {
             if (i != 0 && i != 10 && textfieldvalues.get(i) > 0) {
@@ -333,56 +328,88 @@ public class This_Session {
     }
 
 // Export
-    public boolean export() {
-        FileChooser fileChooser = new FileChooser();
-        File exportfile = fileChooser.showOpenDialog(null);
-        if (exportfile == null) {return false;}
-        CreatorAndExporterWidget.ExportingSessionDialog exportingSessionDialog = new CreatorAndExporterWidget.ExportingSessionDialog(this);
-        Service<Boolean> exporterservice = new Service<Boolean>() {
+    public Service<Boolean> getsessionexporter() {
+//        CreatorAndExporterWidget.ExportingSessionDialog exportingSessionDialog = new CreatorAndExporterWidget.ExportingSessionDialog(this);
+        return new Service<Boolean>() {
             @Override
             protected Task<Boolean> createTask() {
                 return new Task<Boolean>() {
                     @Override
                     protected Boolean call() throws Exception {
-                    // Combine Cut Entrainment + Ambience
+                        updateTitle("Finalizing Session");
+                        int taskcount = cutsinsession.size() + 2;
+                        // TODO Mix Entrainment And Ambience
                         for (Cut i : cutsinsession) {
+                            updateMessage("Combining Entrainment And Ambience For " + i.name);
+                            if (! i.mixentrainmentandambience()) {cancel();}
                             if (isCancelled()) {return false;}
-                            updateMessage("Currently Creating " + i.name);
-                            updateProgress((double) cutsinsession.indexOf(i), (double) cutsinsession.size() - 1);
-                            boolean cutcreatedsuccesfully = i.export();
-                            if (!cutcreatedsuccesfully) {return false;}
-                            updateMessage("Finished Creating " + i.name);
+                            updateProgress((double) (cutsinsession.indexOf(i) / taskcount), 1.0);
+                            updateMessage("Finished Combining " + i.name);
                         }
-                    // Combine Cut Files + Alert Files into Exportfile
-
-                    // Test Exportfile To Make Sure It's Not Zero And Doesn't Throw An Error When Opened In A Mediaplayer
-
-                        return exportfile.exists();
+                        updateMessage("Creating Final Session File (May Take A While)");
+                        export();
+                        if (isCancelled()) {return false;}
+                        updateProgress(taskcount - 1, 1.0);
+                        updateMessage("Double-Checking Final Session File");
+                        boolean success = testexportfile();
+                        if (isCancelled()) {return false;}
+                        updateProgress(1.0, 1.0);
+                        return success;
                     }
                 };
             }
         };
-        exportingSessionDialog.creatingsessionProgressBar.progressProperty().bind(exporterservice.progressProperty());
-        exportingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(exporterservice.messageProperty());
-        exportingSessionDialog.CancelButton.setOnAction(event -> exporterservice.cancel());
-        exporterservice.setOnSucceeded(event -> {
-            if (exporterservice.getValue()) {Tools.showinformationdialog("Information", "Export Succeeded", "File Saved To: ");}
-            else {Tools.showerrordialog("Error", "Errors Occured During Export", "Please Try Again Or Contact Me For Support");}
-            exportingSessionDialog.close();
-        });
-        exporterservice.setOnFailed(event -> {
-            String v = exporterservice.getException().getMessage();
-            Tools.showerrordialog("Error", "Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v,
-                    "Please Try Again Or Contact Me For Support");
-            This_Session.deleteprevioussession();
-            exportingSessionDialog.close();
-        });
-        exporterservice.setOnCancelled(event -> {
-            Tools.showinformationdialog("Cancelled", "Export Cancelled", "You Cancelled Export");
-            This_Session.deleteprevioussession();
-            exportingSessionDialog.close();
-        });
-        return false;
+//        exportingSessionDialog.creatingsessionProgressBar.progressProperty().bind(exporterservice.progressProperty());
+//        exportingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(exporterservice.messageProperty());
+//        exportingSessionDialog.CancelButton.setOnAction(event -> exporterservice.cancel());
+//        exporterservice.setOnSucceeded(event -> {
+//            if (exporterservice.getValue()) {Tools.showinformationdialog("Information", "Export Succeeded", "File Saved To: ");}
+//            else {Tools.showerrordialog("Error", "Errors Occured During Export", "Please Try Again Or Contact Me For Support");}
+//            exportingSessionDialog.close();
+//        });
+//        exporterservice.setOnFailed(event -> {
+//            String v = exporterservice.getException().getMessage();
+//            Tools.showerrordialog("Error", "Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v,
+//                    "Please Try Again Or Contact Me For Support");
+//            This_Session.deleteprevioussession();
+//            exportingSessionDialog.close();
+//        });
+//        exporterservice.setOnCancelled(event -> {
+//            Tools.showinformationdialog("Cancelled", "Export Cancelled", "You Cancelled Export");
+//            This_Session.deleteprevioussession();
+//            exportingSessionDialog.close();
+//        });
+//        return false;
+    }
+    public boolean export() {
+        ArrayList<File> filestoexport = new ArrayList<>();
+        for (int i=0; i < cutsinsession.size(); i++) {
+            filestoexport.add(cutsinsession.get(i).getFinalcutexportfile());
+            if (i != cutsinsession.size() - 1) {
+                filestoexport.add(new File(Root.getOptions().getSessionOptions().getAlertfilelocation()));
+            }
+        }
+        if (filestoexport.size() == 0) {return false;}
+        else {return Tools.concatenateaudiofiles(filestoexport, new File(Options.directorytemp, "Session.txt"), getExportfile());}
+    }
+    public boolean testexportfile() {
+        try {
+            MediaPlayer test = new MediaPlayer(new Media(getExportfile().toURI().toString()));
+            test.setOnReady(test::dispose);
+            return true;
+        } catch (MediaException ignored) {return false;}
+    }
+    public static void deleteprevioussession() {
+        ArrayList<File> folders = new ArrayList<>();
+        folders.add(new File(Options.directorytemp, "Ambience"));
+        folders.add(new File(Options.directorytemp, "Entrainment"));
+        folders.add(new File(Options.directorytemp, "txt"));
+        folders.add(new File(Options.directorytemp, "Export"));
+        for (File i : folders) {
+            try {
+                for (File x : i.listFiles()) {x.delete();}
+            } catch (NullPointerException ignored) {}
+        }
     }
 
 // Playback
@@ -540,7 +567,8 @@ public class This_Session {
         sessions.deletenonvalidsessions();
 //        try {sessions.addsession(TemporarySession);}
 //        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
-        if (Tools.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {export();}
+        if (Tools.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {
+            getsessionexporter();}
         Root.getGoals().update();
     }
     public void resetthissession() {
@@ -621,4 +649,5 @@ public class This_Session {
             displayReference = null;
         }
     }
+
 }

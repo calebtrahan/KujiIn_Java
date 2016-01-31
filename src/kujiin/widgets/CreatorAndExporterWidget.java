@@ -1,10 +1,10 @@
 package kujiin.widgets;
 
-import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class CreatorAndExporterWidget implements Widget {
     private Button changeallvaluesbutton;
@@ -70,6 +71,10 @@ public class CreatorAndExporterWidget implements Widget {
     private This_Session session;
     private Label StatusBar;
     private ArrayList<Integer> textfieldtimes = new ArrayList<>(11);
+    private ArrayList<Service<Boolean>> exportservices;
+    private Service<Boolean> currentexporterservice;
+    private Integer exportserviceindex;
+    private ExportingSessionDialog exportingSessionDialog;
 
     public CreatorAndExporterWidget(MainController mainController) {
         exportButton = mainController.ExportButton;
@@ -98,6 +103,7 @@ public class CreatorAndExporterWidget implements Widget {
         textfieldtimes.addAll(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0));
         TotalSessionTime.setOnKeyTyped(MainController.noneditabletextfield);
         ApproximateEndTime.setOnKeyTyped(MainController.noneditabletextfield);
+        exportservices = new ArrayList<>();
         updatecreatorui();
     }
 
@@ -109,7 +115,7 @@ public class CreatorAndExporterWidget implements Widget {
         this.exporterState = exporterState;
     }
 
-// Button Actions
+// Creation
     public boolean createsession() {
         if (gettextfieldtimes()) {
             if (session.sessioncreationwellformednesschecks(textfieldtimes)) {
@@ -120,13 +126,49 @@ public class CreatorAndExporterWidget implements Widget {
         }
         else {Tools.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid"); return false;}
     }
-    public void exportsession() {
-        if (checkforffmpeg()) {
-            createsession();
-        } else {
-            Tools.showerrordialog("Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
-        }
+
+// Export
+    public void startexport() {
+        if (createsession()) {
+            if (getExporterState() == ExporterState.IDLE) {
+                if (checkforffmpeg()) {
+                    exportserviceindex = 0;
+                    ArrayList<Cut> cutsinsession = session.getCutsinsession();
+                    exportservices.addAll(cutsinsession.stream().map(Cut::getcutexportservice).collect(Collectors.toList()));
+                    exportservices.add(session.getsessionexporter());
+                    exportingSessionDialog = new ExportingSessionDialog(session);
+                    exportingSessionDialog.show();
+                    setExporterState(ExporterState.EXPORT_IN_PROGRESS);
+                    exportnextservice();
+                } else {Tools.showerrordialog("Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");}
+            } else if (getExporterState() == ExporterState.EXPORT_IN_PROGRESS) {
+                Tools.showtimedmessage(StatusBar, "Session Currently Being Exported", 3000);
+            } else {
+                if (Tools.getanswerdialog("Confirmation", "Session Already Exported", "Export Again?")) {
+                    setExporterState(ExporterState.IDLE);
+                    startexport();
+                }
+            }
+        } else {Tools.showinformationdialog("Information", "Cannot Export", "No Cuts Selected");}
     }
+    private void exportnextservice() {
+        exportingSessionDialog.TotalProgress.setProgress((double) exportserviceindex / exportservices.size());
+        try {
+            currentexporterservice = exportservices.get(exportserviceindex);
+            currentexporterservice.setOnRunning(event -> {
+                exportingSessionDialog.CurrentProgress.progressProperty().bind(currentexporterservice.progressProperty());
+                exportingSessionDialog.StatusBar.textProperty().bind(currentexporterservice.messageProperty());
+                exportingSessionDialog.CurrentLabel.textProperty().bind(currentexporterservice.titleProperty());
+            });
+            currentexporterservice.setOnSucceeded(event -> {exportingSessionDialog.unbindproperties(); exportserviceindex++; exportnextservice();});
+            currentexporterservice.setOnCancelled(event -> exportcancelled());
+            currentexporterservice.setOnFailed(event -> exportfailed());
+            currentexporterservice.start();
+        } catch (ArrayIndexOutOfBoundsException ignored) {exportfinished();}
+    }
+    public void exportfailed() {setExporterState(ExporterState.IDLE);}
+    public void exportcancelled() {setExporterState(ExporterState.IDLE);}
+    public void exportfinished() {setExporterState(ExporterState.EXPORTED);}
 
 // Other Methods
     public boolean checkforffmpeg() {
@@ -419,61 +461,25 @@ public class CreatorAndExporterWidget implements Widget {
 
     }
     public static class ExportingSessionDialog extends Stage {
-        public ProgressBar creatingsessionProgressBar;
-        public Label creatingsessionTextStatusBar;
         public Button CancelButton;
-        private int sessionparts;
-        private int currentpartcount;
-        This_Session thisSession;
-        ArrayList<Cut> cutsinsesession;
+        public ProgressBar TotalProgress;
+        public Label StatusBar;
+        public ProgressBar CurrentProgress;
+        public Label TotalLabel;
+        public Label CurrentLabel;
 
         public ExportingSessionDialog(This_Session thisSession) {
-    //        this.cutsinsesession = cutsinsesession;
-    //        percent = sessionpartialpercent / 100;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ExportingSessionDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
             catch (IOException e) {e.printStackTrace();}
-    //        creatingsessionProgressBar.setProgress(0.0);
-            this.thisSession = thisSession;
-            currentpartcount = 0;
         }
 
-        public void setSessionparts(int sessionparts) {this.sessionparts = sessionparts;}
-
-        public void updateprogress() {
-            currentpartcount += 1;
-            Platform.runLater(() -> {
-    //            System.out.println("Current Part Count: " + currentpartcount);
-    //            System.out.println("Total This_Session Parts: " + sessionparts);
-                double percent = currentpartcount / sessionparts;
-    //            creatingsessionProgressBar.setProgress(percent);
-                testifdone();
-            });
-        }
-
-        public void testifdone() {
-    //        if (currentpartcount == sessionparts) {
-    //            if (thisSession.getCreated()) {
-    //                Alert completed = new Alert(Alert.AlertType.INFORMATION);
-    //                completed.setTitle("This_Session Created");
-    //                completed.setHeaderText("Completed!");
-    //                completed.setContentText("This_Session Creation Complete With No Errors");
-    //                completed.showAndWait();
-    //                this.close();
-    //            } else {
-    //                Alert completed = new Alert(Alert.AlertType.ERROR);
-    //                completed.setTitle("This_Session Creation Failed");
-    //                completed.setHeaderText("Failed!");
-    //                completed.setContentText("This_Session Creation Failed");
-    //                completed.showAndWait();
-    //                this.close();
-    //            }
-    //        }
-        }
-
-        public void displaymessage(String text) {
-    //        Platform.runLater(() -> creatingsessionTextStatusBar.setText(text));
+        public void unbindproperties() {
+            TotalProgress.progressProperty().unbind();
+            CurrentProgress.progressProperty().unbind();
+            StatusBar.textProperty().unbind();
+            CurrentLabel.textProperty().unbind();
         }
     }
     public static class SessionNotWellformedDialog extends Stage {

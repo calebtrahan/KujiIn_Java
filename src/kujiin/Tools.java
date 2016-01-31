@@ -33,6 +33,7 @@ public class Tools {
         txtfield.textProperty().addListener((observable, oldValue, newValue) -> {
             try {if (newValue.matches("\\d*")) {Integer.parseInt(newValue);}  else {txtfield.setText(oldValue);}}
             catch (Exception e) {txtfield.setText("");}});
+        txtfield.setText("0");
     }
     public static boolean getanswerdialog(String titletext, String headertext, String contenttext) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
@@ -312,6 +313,60 @@ public class Tools {
             }
         }
         return s.toString();
+    }
+    public static boolean concatenateaudiofiles(ArrayList<File> filestoconcatenate, File temptextfile, File finalfile) {
+        try {
+            PrintWriter writer = new PrintWriter(temptextfile);
+            for (File k : filestoconcatenate) {writer.println("file " + "\'" + k.getAbsolutePath() + "\'");}
+            writer.close();
+            ArrayList<String> cmdarraylist = new ArrayList<>();
+            cmdarraylist.add("ffmpeg");
+            cmdarraylist.add("-f");
+            cmdarraylist.add("concat");
+            cmdarraylist.add("-i");
+            cmdarraylist.add(temptextfile.getAbsolutePath());
+            cmdarraylist.add("-c");
+            cmdarraylist.add("copy");
+            cmdarraylist.add(finalfile.getAbsolutePath());
+            ProcessBuilder cmdlist = new ProcessBuilder(cmdarraylist);
+//            int count = 0;
+            final Process p;
+            p = cmdlist.start();
+            int exitcode = p.waitFor();
+//                if (Tools.checkaudioduration(finalentrainmentfile, getdurationinseconds())) {break;}
+//                else {
+//                    if (count > 3) {return false;}
+//                    else {count++;}
+//                }
+            temptextfile.delete();
+            return exitcode == 0;
+        } catch (IOException | InterruptedException e) {
+            new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());
+            return false;
+        }
+    }
+    public static boolean mixaudiofiles(ArrayList<File> filestomix, File outputfile) {
+        try {
+            // ffmpeg -i INPUT1 -i INPUT2 -i INPUT3 -filter_complex amix=inputs=3:duration=first:dropout_transition=3 OUTPUT
+            ArrayList<String> cmdarraylist = new ArrayList<>();
+            cmdarraylist.add("ffmpeg");
+            for (File i : filestomix) {
+                cmdarraylist.add("-i");
+                cmdarraylist.add(i.getAbsolutePath());
+            }
+            cmdarraylist.add("-filter_complex");
+            cmdarraylist.add("amix=inputs=" + filestomix.size() + ":");
+            cmdarraylist.add("duration=first");
+            cmdarraylist.add(outputfile.getAbsolutePath());
+            ProcessBuilder cmdlist = new ProcessBuilder(cmdarraylist);
+            final Process p;
+            p = cmdlist.start();
+            int exitcode = p.waitFor();
+            return exitcode == 0;
+        } catch (IOException | InterruptedException e) {
+            new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());
+            return false;
+        }
     }
 
 // List Utils

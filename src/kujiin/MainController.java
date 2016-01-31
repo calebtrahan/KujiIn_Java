@@ -259,7 +259,7 @@ public class MainController implements Initializable {
 //        }
     }
     public void exportsession(Event event) {
-        CreatorAndExporter.exportsession();
+        CreatorAndExporter.startexport();
     }
     public void settextfieldvalue(TextField textField, Integer value) {
         if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
