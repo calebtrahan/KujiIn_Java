@@ -477,15 +477,26 @@ public class Cut {
                     @Override
                     protected Boolean call() throws Exception {
                         updateTitle("Building " + name);
+                        System.out.println("Concatenating Entrainment For " + name);
                         updateMessage("Concatenating Entrainment Files");
                         Tools.concatenateaudiofiles(entrainmentlist, tempentrainmenttextfile, finalentrainmentfile);
                         if (isCancelled()) return false;
                         if (ambienceenabled) {
-                            updateProgress(0.33, 1.0);
+                            updateProgress(0.25, 1.0);
+                            System.out.println("Concatenating Ambience For " + name);
                             updateMessage("Concatenating Ambience Files");
                             Tools.concatenateaudiofiles(ambiencelist, tempambiencetextfile, finalambiencefile);
                             if (isCancelled()) return false;
-                            updateProgress(0.66, 1.0);
+                            updateProgress(0.50, 1.0);
+//                            System.out.println("Reducing Ambience Duration For " + name);
+//                            updateMessage("Cutting Ambience Audio To Selected Duration");
+//                            System.out.println("Final Ambience File" + finalambiencefile.getAbsolutePath());
+//                            if (Tools.getaudioduration(finalambiencefile) > getdurationinseconds()) {
+//                                Tools.trimaudiofile(finalambiencefile, getdurationinseconds());
+//                            }
+//                            if (isCancelled()) return false;
+                            updateProgress(0.75, 1.0);
+                            System.out.println("Mixing Final Audio For " + name);
                             updateMessage("Combining Entrainment And Ambience Files");
                             mixentrainmentandambience();
                             if (isCancelled()) return false;

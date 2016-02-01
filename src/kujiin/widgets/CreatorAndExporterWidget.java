@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 public class CreatorAndExporterWidget implements Widget {
     private Button changeallvaluesbutton;
@@ -132,15 +131,31 @@ public class CreatorAndExporterWidget implements Widget {
         if (createsession()) {
             if (getExporterState() == ExporterState.IDLE) {
                 if (checkforffmpeg()) {
+                    if (session.getExportfile() == null) {
+                        session.getnewexportsavefile();
+                    } else {
+                        // TODO Continue Fixing Logic Here
+                        if (session.getExportfile().exists()) {
+                            if (!Tools.getanswerdialog("Confirmation", "Overwrite Saved Exported Session?", "Saved Session: " + session.getExportfile().getAbsolutePath())) {
+                                session.getnewexportsavefile();
+                            }
+                        } else {session.getnewexportsavefile();}
+                    }
+                    if (session.getExportfile() == null) {Tools.showtimedmessage(StatusBar, "Export Session Cancelled", 3000); return;}
                     exportserviceindex = 0;
                     ArrayList<Cut> cutsinsession = session.getCutsinsession();
-                    exportservices.addAll(cutsinsession.stream().map(Cut::getcutexportservice).collect(Collectors.toList()));
+                    for (Cut i : cutsinsession) {
+                        exportservices.add(i.getcutexportservice());
+                    }
                     exportservices.add(session.getsessionexporter());
                     exportingSessionDialog = new ExportingSessionDialog(session);
                     exportingSessionDialog.show();
                     setExporterState(ExporterState.EXPORT_IN_PROGRESS);
                     exportnextservice();
-                } else {Tools.showerrordialog("Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");}
+                } else {
+                    Tools.showerrordialog("Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
+                    // TODO Open A Browser Showing How To Install FFMPEG
+                }
             } else if (getExporterState() == ExporterState.EXPORT_IN_PROGRESS) {
                 Tools.showtimedmessage(StatusBar, "Session Currently Being Exported", 3000);
             } else {
@@ -152,6 +167,7 @@ public class CreatorAndExporterWidget implements Widget {
         } else {Tools.showinformationdialog("Information", "Cannot Export", "No Cuts Selected");}
     }
     private void exportnextservice() {
+//        System.out.println("Starting Next Export Service");
         exportingSessionDialog.TotalProgress.setProgress((double) exportserviceindex / exportservices.size());
         try {
             currentexporterservice = exportservices.get(exportserviceindex);
@@ -166,9 +182,17 @@ public class CreatorAndExporterWidget implements Widget {
             currentexporterservice.start();
         } catch (ArrayIndexOutOfBoundsException ignored) {exportfinished();}
     }
-    public void exportfailed() {setExporterState(ExporterState.IDLE);}
-    public void exportcancelled() {setExporterState(ExporterState.IDLE);}
-    public void exportfinished() {setExporterState(ExporterState.EXPORTED);}
+    public void exportfailed() {
+        System.out.println(currentexporterservice.getException().getMessage());
+        System.out.println("Failed!");
+        setExporterState(ExporterState.IDLE);}
+    public void exportcancelled() {
+        System.out.println("Cancelled!");
+        setExporterState(ExporterState.IDLE);}
+    public void exportfinished() {
+        System.out.println("Export Finished!");
+        setExporterState(ExporterState.EXPORTED);
+    }
 
 // Other Methods
     public boolean checkforffmpeg() {
@@ -386,11 +410,11 @@ public class CreatorAndExporterWidget implements Widget {
         boolean currentlyexporting = getExporterState() == ExporterState.EXPORT_IN_PROGRESS;
         if (currentlyexporting) {
             Tools.showinformationdialog("Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
-        }
+        } else {This_Session.deleteprevioussession();}
         return ! currentlyexporting;
     }
 
-    // Presets
+// Presets
     public void loadpreset() {
         File xmlfile = new FileChooser().showOpenDialog(null);
         if (xmlfile != null && xmlfile.getName().endsWith(".xml")) {

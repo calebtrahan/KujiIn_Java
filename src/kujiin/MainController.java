@@ -258,9 +258,7 @@ public class MainController implements Initializable {
 //            PlayerStatusBar.setText("Session Creation In Progress");
 //        }
     }
-    public void exportsession(Event event) {
-        CreatorAndExporter.startexport();
-    }
+    public void exportsession(Event event) {CreatorAndExporter.startexport();}
     public void settextfieldvalue(TextField textField, Integer value) {
         if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
         else {textField.setText("-"); textField.setDisable(true);}
@@ -309,7 +307,7 @@ public class MainController implements Initializable {
         Options.marshall();
     }
 
-    // Menu Tools/Dialogs
+// Menu Tools/Dialogs
     public static class ChangeAlertDialog extends Stage {
         public TextField alertfileTextField;
         public Button openFileButton;
@@ -943,4 +941,5 @@ public class MainController implements Initializable {
         }
 
     }
+
 }

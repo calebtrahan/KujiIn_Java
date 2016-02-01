@@ -5,6 +5,7 @@ import javafx.animation.Timeline;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.xml.Options;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -329,6 +330,7 @@ public class Tools {
             cmdarraylist.add("copy");
             cmdarraylist.add(finalfile.getAbsolutePath());
             ProcessBuilder cmdlist = new ProcessBuilder(cmdarraylist);
+            cmdlist.redirectErrorStream(true);
 //            int count = 0;
             final Process p;
             p = cmdlist.start();
@@ -355,13 +357,42 @@ public class Tools {
                 cmdarraylist.add(i.getAbsolutePath());
             }
             cmdarraylist.add("-filter_complex");
-            cmdarraylist.add("amix=inputs=" + filestomix.size() + ":");
-            cmdarraylist.add("duration=first");
+            cmdarraylist.add("amix=inputs=" + filestomix.size() + ":duration=first");
             cmdarraylist.add(outputfile.getAbsolutePath());
+            ProcessBuilder cmdlist = new ProcessBuilder(cmdarraylist);
+            cmdlist.redirectErrorStream(true);
+            final Process p;
+            p = cmdlist.start();
+            cmdlist.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            cmdlist.redirectError(ProcessBuilder.Redirect.INHERIT);
+            cmdlist.redirectInput(ProcessBuilder.Redirect.INHERIT);
+            int exitcode = p.waitFor();
+            return exitcode == 0;
+        } catch (IOException | InterruptedException e) {
+            new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());
+            return false;
+        }
+    }
+    public static boolean trimaudiofile(File filetotrim, Integer lengthinseconds) {
+        try {
+            // ffmpeg -i input.mp3 -ss 00:02:54.583 -t 300 -acodec copy output.mp3
+            File tempfile = new File(Options.directorytemp, "Export/temptrim.mp3");
+            FileUtils.moveFile(filetotrim, tempfile);
+            ArrayList<String> cmdarraylist = new ArrayList<>();
+            cmdarraylist.add("ffmpeg");
+            cmdarraylist.add("-i");
+            cmdarraylist.add(tempfile.getAbsolutePath());
+            // Starting Time Here
+            cmdarraylist.add("-t");
+            cmdarraylist.add(lengthinseconds.toString());
+            cmdarraylist.add("-acodec");
+            cmdarraylist.add("copy");
+            cmdarraylist.add(filetotrim.getAbsolutePath());
             ProcessBuilder cmdlist = new ProcessBuilder(cmdarraylist);
             final Process p;
             p = cmdlist.start();
             int exitcode = p.waitFor();
+            tempfile.delete();
             return exitcode == 0;
         } catch (IOException | InterruptedException e) {
             new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());

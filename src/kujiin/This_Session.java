@@ -12,6 +12,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
@@ -380,6 +381,20 @@ public class This_Session {
 //            exportingSessionDialog.close();
 //        });
 //        return false;
+    }
+    public void getnewexportsavefile() {
+        File tempfile = new FileChooser().showSaveDialog(null);
+        if (tempfile != null && Tools.validaudiofile(tempfile)) {
+            setExportfile(tempfile);
+        } else {
+            if (tempfile == null) {return;}
+            if (Tools.getanswerdialog("Confirmation", "Invalid Audio File Extension", "Save As .mp3?")) {
+                String file = tempfile.getAbsolutePath();
+                int index = file.lastIndexOf(".");
+                String firstpart = file.substring(0, index - 1);
+                setExportfile(new File(firstpart.concat(".mp3")));
+            }
+        }
     }
     public boolean export() {
         ArrayList<File> filestoexport = new ArrayList<>();
