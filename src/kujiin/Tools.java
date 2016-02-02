@@ -317,6 +317,7 @@ public class Tools {
     }
     public static boolean concatenateaudiofiles(ArrayList<File> filestoconcatenate, File temptextfile, File finalfile) {
         try {
+            System.out.println("Started Concatenating Audio");
             PrintWriter writer = new PrintWriter(temptextfile);
             for (File k : filestoconcatenate) {writer.println("file " + "\'" + k.getAbsolutePath() + "\'");}
             writer.close();
@@ -335,6 +336,7 @@ public class Tools {
             final Process p;
             p = cmdlist.start();
             int exitcode = p.waitFor();
+            System.out.println("Finished Concatenating Audio");
 //                if (Tools.checkaudioduration(finalentrainmentfile, getdurationinseconds())) {break;}
 //                else {
 //                    if (count > 3) {return false;}
@@ -349,7 +351,9 @@ public class Tools {
     }
     public static boolean mixaudiofiles(ArrayList<File> filestomix, File outputfile) {
         try {
+            System.out.println("Started Mixing Audio");
             // ffmpeg -i INPUT1 -i INPUT2 -i INPUT3 -filter_complex amix=inputs=3:duration=first:dropout_transition=3 OUTPUT
+            System.out.println("Called Mix Audio Files");
             ArrayList<String> cmdarraylist = new ArrayList<>();
             cmdarraylist.add("ffmpeg");
             for (File i : filestomix) {
@@ -357,16 +361,18 @@ public class Tools {
                 cmdarraylist.add(i.getAbsolutePath());
             }
             cmdarraylist.add("-filter_complex");
-            cmdarraylist.add("amix=inputs=" + filestomix.size() + ":duration=first");
+            cmdarraylist.add(String.format("\"amix=inputs=%d:duration=first\"", filestomix.size()));
+//            cmdarraylist.add();
             cmdarraylist.add(outputfile.getAbsolutePath());
+            System.out.println(cmdarraylist.toString());
             ProcessBuilder cmdlist = new ProcessBuilder(cmdarraylist);
-            cmdlist.redirectErrorStream(true);
             final Process p;
             p = cmdlist.start();
             cmdlist.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             cmdlist.redirectError(ProcessBuilder.Redirect.INHERIT);
             cmdlist.redirectInput(ProcessBuilder.Redirect.INHERIT);
             int exitcode = p.waitFor();
+            System.out.println("Finished Mixing Audio. Exited With Code" + exitcode);
             return exitcode == 0;
         } catch (IOException | InterruptedException e) {
             new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());

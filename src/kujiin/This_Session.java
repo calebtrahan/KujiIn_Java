@@ -383,7 +383,9 @@ public class This_Session {
 //        return false;
     }
     public void getnewexportsavefile() {
-        File tempfile = new FileChooser().showSaveDialog(null);
+        FileChooser exportchooser = new FileChooser();
+        exportchooser.setTitle("Export Session");
+        File tempfile = exportchooser.showSaveDialog(null);
         if (tempfile != null && Tools.validaudiofile(tempfile)) {
             setExportfile(tempfile);
         } else {
@@ -425,6 +427,11 @@ public class This_Session {
                 for (File x : i.listFiles()) {x.delete();}
             } catch (NullPointerException ignored) {}
         }
+        try {
+            for (File x : Options.directorytemp.listFiles()) {
+                if (! x.isDirectory()) {x.delete();}
+            }
+        } catch (NullPointerException ignored) {}
     }
 
 // Playback

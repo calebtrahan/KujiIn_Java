@@ -35,6 +35,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.ResourceBundle;
 
+// TODO Get FFMPEG Working To Mix Audio Files Together
+    // Not Supported Stream?
 public class CreatorAndExporterWidget implements Widget {
     private Button changeallvaluesbutton;
     private Button exportButton;
