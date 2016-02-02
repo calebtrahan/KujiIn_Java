@@ -12,7 +12,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import kujiin.Cut;
 import kujiin.MainController;
@@ -20,13 +19,8 @@ import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.interfaces.Widget;
 import kujiin.xml.Options;
-import kujiin.xml.Session;
+import kujiin.xml.Preset;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -76,6 +70,7 @@ public class CreatorAndExporterWidget implements Widget {
     private Service<Boolean> currentexporterservice;
     private Integer exportserviceindex;
     private ExportingSessionDialog exportingSessionDialog;
+    private Preset Preset;
 
     public CreatorAndExporterWidget(MainController mainController) {
         exportButton = mainController.ExportButton;
@@ -86,6 +81,7 @@ public class CreatorAndExporterWidget implements Widget {
         AmbienceSwitch = mainController.AmbienceSwitch;
         TotalSessionTime = mainController.TotalSessionTime;
         ApproximateEndTime = mainController.ApproximateEndTime;
+        Preset = new Preset();
         PreTime = mainController.PreTime;
         RinTime = mainController.RinTime;
         KyoTime = mainController.KyoTime;
@@ -342,6 +338,31 @@ public class CreatorAndExporterWidget implements Widget {
             if (changevaluesdialog.getincludepostsession()) {PostTime.setText(minutes);}
         }
     }
+    public void changevaluestopreset(ArrayList<Integer> presetvalues) {
+        try {
+            PreTime.setText(presetvalues.get(0).toString());
+            RinTime.setText(presetvalues.get(1).toString());
+            KyoTime.setText(presetvalues.get(2).toString());
+            TohTime.setText(presetvalues.get(3).toString());
+            ShaTime.setText(presetvalues.get(4).toString());
+            KaiTime.setText(presetvalues.get(5).toString());
+            JinTime.setText(presetvalues.get(6).toString());
+            RetsuTime.setText(presetvalues.get(7).toString());
+            ZaiTime.setText(presetvalues.get(8).toString());
+            ZenTime.setText(presetvalues.get(9).toString());
+            PostTime.setText(presetvalues.get(10).toString());
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+            Tools.showerrordialog("Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
+        }
+    }
+    public ArrayList<Integer> getcreatorvalues() {
+        return new ArrayList<>(Arrays.asList(
+            Integer.parseInt(PreTime.getText()), Integer.parseInt(RinTime.getText()), Integer.parseInt(KyoTime.getText()),
+            Integer.parseInt(TohTime.getText()), Integer.parseInt(ShaTime.getText()), Integer.parseInt(KaiTime.getText()),
+            Integer.parseInt(JinTime.getText()), Integer.parseInt(RetsuTime.getText()), Integer.parseInt(ZaiTime.getText()),
+            Integer.parseInt(ZenTime.getText()), Integer.parseInt(PostTime.getText())
+        ));
+    }
 
 // Widget Implementation
     @Override
@@ -418,32 +439,15 @@ public class CreatorAndExporterWidget implements Widget {
 
 // Presets
     public void loadpreset() {
-        File xmlfile = new FileChooser().showOpenDialog(null);
-        if (xmlfile != null && xmlfile.getName().endsWith(".xml")) {
-            try {
-                JAXBContext context = JAXBContext.newInstance(Session.class);
-                Unmarshaller createMarshaller = context.createUnmarshaller();
-                Session loadedsession = (Session) createMarshaller.unmarshal(xmlfile);
-                if (loadedsession != null) {
-                    session.setupcutsinsession(loadedsession.getallcuttimes());
-                    Tools.showinformationdialog("Information", "Preset Loaded", "Your Preset Was Successfully Loaded");
-                } else {
-                    Tools.showinformationdialog("Invalid Preset File", "Invalid Preset File", "Cannot Load File");
-                }
-            } catch (JAXBException e) {Tools.showerrordialog("Error", "Not A Valid Preset File", "Please Select A Valid Preset File");}
-        }
+        if (Preset.openpreset() && Preset.validpreset()) {
+            changevaluestopreset(Preset.getpresettimes());
+        } else {Tools.showinformationdialog("Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
     }
-    public void saveaspreset(Session session) {
-        File xmlfile = new FileChooser().showSaveDialog(null);
-        if (xmlfile != null  && xmlfile.getName().endsWith(".xml")) {
-            try {
-                JAXBContext context = JAXBContext.newInstance(Session.class);
-                Marshaller createMarshaller = context.createMarshaller();
-                createMarshaller.marshal(session, xmlfile);
-                Tools.showinformationdialog("Information", "Preset Saved", "Your Preset Was Successfully Saved");
-            } catch (JAXBException e) {
-                Tools.showerrordialog("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
-        } else {Tools.showtimedmessage(StatusBar, "Canceled Saving Preset", 2000);}
+    public void savepreset() {
+        Preset.setpresettimes(getcreatorvalues());
+        if (! Preset.validpreset()) {Tools.showinformationdialog("Information", "Cannot Save Preset", "All Values Are 0"); return;}
+        if (Preset.savepreset()) {Tools.showtimedmessage(StatusBar, "Preset Successfully Saved", 4000);}
+        else {Tools.showerrordialog("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
     }
 
 // Subclasses/Dialogs

@@ -3,6 +3,7 @@ package kujiin;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import kujiin.xml.Options;
 import org.apache.commons.io.FileUtils;
@@ -230,6 +231,31 @@ public class Tools {
             org.apache.commons.io.FileUtils.writeStringToFile(file, contents);
             return true;
         } catch (IOException ignored) {return false;}
+    }
+    public static File getopenfile(String dialogtitle) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(dialogtitle);
+        return fileChooser.showOpenDialog(null);
+    }
+    public static File getsavefile(String dialogtitle) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(dialogtitle);
+        return fileChooser.showSaveDialog(null);
+    }
+    public static File fileextensioncorrect(String expectedextension, File filetocheck) {
+        if (! filetocheck.getName().contains(".")) {
+            if (Tools.getanswerdialog("Confirmation", "Invalid Extension", "Save As A ." + expectedextension + " File?")) {
+                return new File(filetocheck.getAbsolutePath().concat("." + expectedextension));
+            } else {return filetocheck;}
+        } else {
+            String extension = filetocheck.getName().substring(filetocheck.getName().lastIndexOf("."));
+            if (Tools.getanswerdialog("Confirmation", "Invalid Extension " + extension, "Rename As ." + expectedextension + "?")) {
+                String filewithoutextension = filetocheck.getAbsolutePath().substring(0, filetocheck.getName().lastIndexOf("."));
+                return new File(filewithoutextension.concat("." + expectedextension));
+            } else {
+                return filetocheck;
+            }
+        }
     }
 
 // Audio Utils

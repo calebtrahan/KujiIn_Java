@@ -180,7 +180,8 @@ public class MainController implements Initializable {
     public void updatetotalprogresswidget(ActionEvent actionEvent) {
         ProgressTracker.updateui();}
     public void displaylistofsessions(Event event) {
-        ProgressTracker.displaysessionlist();}
+        ProgressTracker.displaysessionlist();
+    }
     public void displayprematureendings(Event event) {
         ProgressTracker.displayprematureendings();}
     public void showcutprogress(Event event) {
@@ -234,7 +235,7 @@ public class MainController implements Initializable {
     public void loadpreset(ActionEvent actionEvent) {
         CreatorAndExporter.loadpreset();}
     public void savepreset(ActionEvent actionEvent) {
-        CreatorAndExporter.saveaspreset(ProgressTracker.getSessions().getsession(ProgressTracker.getSessions().sessionscount() - 1));}
+        CreatorAndExporter.savepreset();}
     public void createsession(Event event) {
 //        if (creatorState == CreatorState.NOT_CREATED || creatorState == CreatorState.CREATED) {
 //            if (creatorState == CreatorState.CREATED) {
@@ -258,7 +259,10 @@ public class MainController implements Initializable {
 //            PlayerStatusBar.setText("Session Creation In Progress");
 //        }
     }
-    public void exportsession(Event event) {CreatorAndExporter.startexport();}
+    public void exportsession(Event event) {
+        //        CreatorAndExporter.startexport();}
+        Tools.showtimedmessage(CreatorStatusBar, "Exporter Is Broken. FFMPEG Is Being A Pain In The Ass", 3000);
+    }
     public void settextfieldvalue(TextField textField, Integer value) {
         if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
         else {textField.setText("-"); textField.setDisable(true);}
