@@ -509,7 +509,7 @@ public class This_Session {
         int secondsleft = currentcut.getdurationinseconds() / currentcut.getSecondselapsed();
         int secondspracticed = currentcut.getdurationinseconds() - secondsleft;
         Double minutes = Math.floor(secondspracticed / 60);
-        sessions.getsession(sessions.sessionscount() - 1).updatecutduration(currentcut.number, minutes.intValue());
+        sessions.getsession(sessions.totalsessioncount() - 1).updatecutduration(currentcut.number, minutes.intValue());
         String prematureendingreason;
         if (Root.getOptions().getSessionOptions().getPrematureendings()) {
             ProgressAndGoalsWidget.PrematureEndingDialog ped = new ProgressAndGoalsWidget.PrematureEndingDialog(Root.getOptions());
@@ -518,7 +518,7 @@ public class This_Session {
             prematureendingreason = "";
         }
         if (prematureendingreason != null) {
-            sessions.getsession(sessions.sessionscount() - 1).writeprematureending(currentcut.name, prematureendingreason);
+            sessions.getsession(sessions.totalsessioncount() - 1).writeprematureending(currentcut.name, prematureendingreason);
         }
     }
     public void updateplayerui() {
@@ -600,7 +600,7 @@ public class This_Session {
 //    }
     public void transition() {
         closereferencefile();
-        sessions.getsession(sessions.sessionscount() - 1).updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+        sessions.getsession(sessions.totalsessioncount() - 1).updatecutduration(currentcut.number, currentcut.getdurationinminutes());
         Root.getProgressTracker().updategoalsui();
         currentcut.stop();
         if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}

@@ -89,47 +89,57 @@ public class Sessions {
     }
 
 // Session Information Getters
-    public int totalpracticetimeinminutes(boolean includepreandpost) {
+    public int getpracticedtimeinminutes(int index, Boolean includepreandpost) {
         try {
             int totalminutes = 0;
-            for (kujiin.xml.Session i : getSession()) {
-                if (includepreandpost) {for (int x=0; x<11;x++) {totalminutes += i.getcutduration(x);}}
-                else {for (int x=1; x<10;x++) {totalminutes += i.getcutduration(x);}}
+            if (index == 0) {
+            // Pre And Post
+                for (kujiin.xml.Session i : getSession()) {
+                    totalminutes += i.getcutduration(0);
+                    totalminutes += i.getcutduration(10);
+                }
+            } else if (index == 10) {
+            // TOTAL!
+                for (kujiin.xml.Session i : getSession()) {
+                    if (includepreandpost) {for (int x=0; x<11;x++) {totalminutes += i.getcutduration(x);}}
+                    else {for (int x=1; x<10;x++) {totalminutes += i.getcutduration(x);}}
+                }
+            } else {
+            // Indidivual Cut
+                for (kujiin.xml.Session i : getSession()) {totalminutes += i.getcutduration(index);}
             }
             return totalminutes;
         } catch (NullPointerException ignored) {return 0;}
     }
-    public double totalpracticetimeinhours(boolean includepreandpost) {
-        return Tools.convertminutestodecimalhours(totalpracticetimeinminutes(includepreandpost));
-    }
-    public int averagepracticetimeinminutes(boolean includepreandpost) {
-        try {return totalpracticetimeinminutes(includepreandpost) / getSession().size();}
+    public int averagepracticetimeinminutes(int index, Boolean includepreandpost) {
+        try {return getpracticedtimeinminutes(index, includepreandpost) / getSession().size();}
         catch (NullPointerException | ArithmeticException ignored) {return 0;}
     }
-    public ArrayList<Session> getsessionswithprematureendings() {
+    public ArrayList<Session> getsessionswithprematureendings(int index) {
         try {
             ArrayList<Session> sessionswithprematureendings = new ArrayList<>();
             for (kujiin.xml.Session i : getSession()) {
-                if (i.wasendedPremature()) {sessionswithprematureendings.add(i);}
+                if (i.wasendedPremature() && i.getcutduration(index) > 0) {sessionswithprematureendings.add(i);}
             }
             return sessionswithprematureendings;
         } catch (NullPointerException e) {return new ArrayList<>();}
     }
-    public int sessionscount() {
-        if (getSession() != null) {return getSession().size();}
-        else {return 0;}
+    public int cutsessionscount(int index) {
+        try {
+            int sessioncount = 0;
+            for (kujiin.xml.Session i : getSession()) {
+                if (i.getcutduration(index) != 0) {sessioncount++;}
+            }
+            return sessioncount;
+        } catch (NullPointerException ignored) {return 0;}
+    }
+    public int totalsessioncount() {
+        try {
+            deletenonvalidsessions();
+            return getSession().size();
+        } catch (NullPointerException ignored) {return 0;}
     }
     public Session getsession(int index) {
         return getSession().get(index);
-    }
-    public int gettotalcutpracticetimeinminutes(int cutindex) {
-        try {
-            int minutes;
-            if (cutindex != 10) {
-                minutes = 0;
-                for (Session i : getSession()) {minutes += i.getcutduration(cutindex);}
-            } else {minutes = totalpracticetimeinminutes(false);}
-            return minutes;
-        } catch (NullPointerException ignored) {return 0;}
     }
 }
