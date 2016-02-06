@@ -16,8 +16,8 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
-import kujiin.widgets.GoalsWidget;
 import kujiin.widgets.PlayerWidget;
+import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Options;
 import kujiin.xml.Sessions;
 
@@ -59,9 +59,6 @@ public class This_Session {
     private Boolean referencedisplayoption;
     private Boolean referencefullscreenoption;
     private PlayerWidget.ReferenceType referenceType;
-    private Double entrainmentvolume;
-    private Double ambiencevolume;
-    private GoalsWidget goalsWidget;
     private File exportfile;
     public MainController Root;
 
@@ -117,12 +114,6 @@ public class This_Session {
     public void setReferencefullscreenoption(Boolean referencefullscreenoption) {
         this.referencefullscreenoption = referencefullscreenoption;
     }
-    public void setSessionAmbienceVolume(Double volume) {entrainmentvolume = volume;}
-    public Double getSessionAmbienceVolume() {return ambiencevolume;}
-    public void setSessionEntrainmentVolume(Double volume) {ambiencevolume = volume;}
-    public Double getSessionEntrainmentVolume() {return entrainmentvolume;}
-    public GoalsWidget getGoalsWidget() {return goalsWidget;}
-    public void setGoalsWidget(GoalsWidget goalsWidget) {this.goalsWidget = goalsWidget;}
     public File getExportfile() {
         return exportfile;
     }
@@ -445,8 +436,6 @@ public class This_Session {
         currentcuttimeline.play();
         cutcount = 0;
         currentcut = cutsinsession.get(cutcount);
-        setSessionEntrainmentVolume(Root.getOptions().getSessionOptions().getEntrainmentvolume());
-        setSessionAmbienceVolume(Root.getOptions().getSessionOptions().getAmbiencevolume());
         playthiscut();
         sessions.createnewsession();
     }
@@ -523,7 +512,7 @@ public class This_Session {
         sessions.getsession(sessions.sessionscount() - 1).updatecutduration(currentcut.number, minutes.intValue());
         String prematureendingreason;
         if (Root.getOptions().getSessionOptions().getPrematureendings()) {
-            GoalsWidget.PrematureEndingDialog ped = new GoalsWidget.PrematureEndingDialog(Root.getOptions());
+            ProgressAndGoalsWidget.PrematureEndingDialog ped = new ProgressAndGoalsWidget.PrematureEndingDialog(Root.getOptions());
             prematureendingreason = ped.getReason();
         } else {
             prematureendingreason = "";
@@ -591,7 +580,7 @@ public class This_Session {
 //        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
         if (Tools.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {
             getsessionexporter();}
-        Root.getGoals().update();
+        Root.getProgressTracker().updategoalsui();
     }
     public void resetthissession() {
         currentcuttimeline = null;
@@ -600,19 +589,19 @@ public class This_Session {
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
     }
-    public void adjustvolume() {
-        if (getPlayerState() == PlayerWidget.PlayerState.PLAYING) {
-            PlayerWidget.AdjustVolume av = new PlayerWidget.AdjustVolume(currentcut, this);
-            av.show();
-            if (av.getAmbienceVolume() != null) {setSessionAmbienceVolume(av.getAmbienceVolume());}
-            if (av.getEntrainmentVolume() != null) {setSessionEntrainmentVolume(av.getEntrainmentVolume());}
-        } else {
-            Tools.showtimedmessage(StatusBar, "Cannot Adjust Volume. No Session Playing", 5000);}
-    }
+//    public void adjustvolume() {
+//        if (getPlayerState() == PlayerWidget.PlayerState.PLAYING) {
+//            PlayerWidget.AdjustVolume av = new PlayerWidget.AdjustVolume(currentcut, this);
+//            av.show();
+//            if (av.getAmbienceVolume() != null) {setSessionAmbienceVolume(av.getAmbienceVolume());}
+//            if (av.getEntrainmentVolume() != null) {setSessionEntrainmentVolume(av.getEntrainmentVolume());}
+//        } else {
+//            Tools.showtimedmessage(StatusBar, "Cannot Adjust Volume. No Session Playing", 5000);}
+//    }
     public void transition() {
         closereferencefile();
         sessions.getsession(sessions.sessionscount() - 1).updatecutduration(currentcut.number, currentcut.getdurationinminutes());
-        goalsWidget.update();
+        Root.getProgressTracker().updategoalsui();
         currentcut.stop();
         if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
         else {

@@ -382,7 +382,7 @@ public class CreatorAndExporterWidget implements Widget {
         ZaiTime.setDisable(true);
         ZenTime.setDisable(true);
         PostTime.setDisable(true);
-        Tools.showtimedmessage(StatusBar, "Creator Disabled While Session Player Enabled", 10000);
+        StatusBar.setText("Creator Disabled While Session Player Enabled");
     }
     public void disablebuttons() {
         ExportButton.setDisable(true);
@@ -406,6 +406,7 @@ public class CreatorAndExporterWidget implements Widget {
         ZaiTime.setDisable(false);
         ZenTime.setDisable(false);
         PostTime.setDisable(false);
+        StatusBar.setText("");
     }
     public void enablebuttons() {
         ExportButton.setDisable(false);

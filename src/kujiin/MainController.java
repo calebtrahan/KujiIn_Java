@@ -23,9 +23,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.widgets.CreatorAndExporterWidget;
-import kujiin.widgets.GoalsWidget;
 import kujiin.widgets.PlayerWidget;
-import kujiin.widgets.ProgressTrackerWidget;
+import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Options;
 import kujiin.xml.Session;
 import org.apache.commons.io.FileUtils;
@@ -71,7 +70,6 @@ public class MainController implements Initializable {
     public Label CutProgressLabelTotal;
     public Label TotalProgressLabelTotal;
     public Label CutProgressTopLabel;
-    public Button VolumeButton;
     public Label TotalSessionLabel;
     public Button ShowCutProgressButton;
     public TextField AverageSessionDuration;
@@ -87,24 +85,24 @@ public class MainController implements Initializable {
     public TextField TotalSessionTime;
     public ComboBox<String> GoalCutComboBox;
     public Label GoalTopLabel;
+    public Slider EntrainmentVolume;
+    public Slider AmbienceVolume;
     private This_Session Session;
-    private GoalsWidget Goals;
     private CreatorAndExporterWidget CreatorAndExporter;
     private PlayerWidget Player;
-    private ProgressTrackerWidget ProgressTracker;
+    private ProgressAndGoalsWidget ProgressTracker;
     private Options Options;
 
     // TODO Unify Goals + Total Session Progress Widget Into One Display (Drop Down Cut )
-        // TODO Maybe Unify Goals, And ProgressTrackerWidget Logic Into Cut Class?
+        // TODO Maybe Unify Goals, And ProgressAndGoalsWidget Logic Into Cut Class?
     
 // Event Handlers
     public static final EventHandler<KeyEvent> noneditabletextfield = event -> Tools.showinformationdialog("Information", "Can't Enter Text", "This Text Field Can't Be Edited");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setProgressTracker(new ProgressTrackerWidget(this));
+        setProgressTracker(new ProgressAndGoalsWidget(this));
         setSession(new This_Session(this));
-        setGoals(new GoalsWidget(this));
         setCreatorAndExporter(new CreatorAndExporterWidget(this));
         setPlayer(new PlayerWidget(this));
         setOptions(new Options());
@@ -113,16 +111,10 @@ public class MainController implements Initializable {
         CreatorStatusBar.setText("");
     }
     public Boolean cleanup() {
-        return getPlayer().cleanup() && getGoals().cleanup() && getCreatorAndExporter().cleanup() && getProgressTracker().cleanup();
+        return getPlayer().cleanup() && getCreatorAndExporter().cleanup() && getProgressTracker().cleanup();
     }
 
 // Getters And Setters
-    public GoalsWidget getGoals() {
-    return Goals;
-}
-    public void setGoals(GoalsWidget goals) {
-        this.Goals = goals;
-    }
     public This_Session getSession() {
         return Session;
     }
@@ -141,10 +133,10 @@ public class MainController implements Initializable {
     public void setPlayer(PlayerWidget player) {
         this.Player = player;
     }
-    public ProgressTrackerWidget getProgressTracker() {
+    public ProgressAndGoalsWidget getProgressTracker() {
         return ProgressTracker;
     }
-    public void setProgressTracker(ProgressTrackerWidget progressTracker) {
+    public void setProgressTracker(ProgressAndGoalsWidget progressTracker) {
         this.ProgressTracker = progressTracker;
     }
     public Options getOptions() {
@@ -179,9 +171,9 @@ public class MainController implements Initializable {
         if (cleanup()) {System.exit(0);}
     }
 
-// Database And Total Progress Widget
+// Total Progress And Goals Widget
     public void updatetotalprogresswidget(ActionEvent actionEvent) {
-        ProgressTracker.updateui();}
+        ProgressTracker.updateprogressui();}
     public void displaylistofsessions(Event event) {
         ProgressTracker.displaysessionlist();
     }
@@ -189,6 +181,14 @@ public class MainController implements Initializable {
         ProgressTracker.displayprematureendings();}
     public void showcutprogress(Event event) {
         ProgressTracker.displaydetailedcutprogress();}
+    public void setnewgoal(Event event) {
+        ProgressTracker.setnewgoal();}
+    public void getgoalpacing(Event event) {
+        ProgressTracker.goalpacing();}
+    public void viewcurrentgoals(Event event) {
+        ProgressTracker.displaycurrentgoals();}
+    public void viewcompletedgoals(Event event) {
+        ProgressTracker.displaycompletedgoals();}
 
 // Created Session Widget
     public boolean getsessioninformation() {
@@ -297,18 +297,6 @@ public class MainController implements Initializable {
         Player.stop(ProgressTracker.getSessions());}
     public void setReferenceOption(ActionEvent actionEvent) {
         Player.displayreferencefile();}
-    public void adjustvolume(ActionEvent actionEvent) {
-        Player.adjustvolume();}
-
-// Goals Widget
-    public void setnewgoal(Event event) {
-        Goals.setnewgoal();}
-    public void getgoalpacing(Event event) {
-        Goals.goalpacing();}
-    public void viewcurrentgoals(Event event) {
-        Goals.displaycurrentgoals();}
-    public void viewcompletedgoals(Event event) {
-        Goals.displaycompletedgoals();}
     public void changesessionoptions(ActionEvent actionEvent) {
         new ChangeProgramOptions(Options).showAndWait();
         Options.marshall();

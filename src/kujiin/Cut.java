@@ -329,16 +329,22 @@ public class Cut {
         double fadeoutduration = thisession.Root.getOptions().getSessionOptions().getFadeoutduration();
     // Set Entrainment Fadein
         if (fadeinduration > 0.0) {
+            fadeinentrainment = new Transition() {
+                {setCycleDuration(new Duration(fadeinduration * 1000));}
+                @Override
+                protected void interpolate(double frac) {
+                    double entrainmentvolume = frac * thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
+                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+                    thisession.Root.EntrainmentVolume.setValue(entrainmentvolume);
+                    thisession.Root.EntrainmentVolume.setDisable(true);
+                }
+            };
             entrainmentplayer.setOnPlaying(() -> {
-                fadeinentrainment = new Transition() {
-                    {setCycleDuration(new Duration(fadeinduration * 1000));}
-                    @Override
-                    protected void interpolate(double frac) {
-                        double entrainmentvolume = frac * thisession.getSessionEntrainmentVolume();
-                        getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
-                    }
-                };
                 fadeinentrainment.play();
+                fadeinentrainment.setOnFinished(event -> {
+                    thisession.Root.EntrainmentVolume.setDisable(false);
+                    thisession.Root.EntrainmentVolume.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
+                });
             });
         }
     // Set Entrainment Fade Out
@@ -349,7 +355,7 @@ public class Cut {
                     {setCycleDuration(new Duration(fadeoutduration * 1000));}
                     @Override
                     protected void interpolate(double frac) {
-                        double entrainmentvolume = frac * thisession.getSessionEntrainmentVolume();
+                        double entrainmentvolume = frac * thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
                         getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
                     }
                 }.play()));
@@ -362,14 +368,21 @@ public class Cut {
             ambienceplayer.play();
             ambienceplayer.setVolume(0.0);
     // Set Ambience Fade In
-            ambienceplayer.setOnPlaying(() -> new Transition() {
+            Animation ambiencefadein = new Transition() {
                 {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeinduration() * 1000));}
                 @Override
                 protected void interpolate(double frac) {
-                    double ambiencevolume = frac * thisession.getSessionAmbienceVolume();
+                    double ambiencevolume = frac * thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
                     getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                    thisession.Root.AmbienceVolume.setValue(ambiencevolume);
+                    thisession.Root.AmbienceVolume.setDisable(true);
                 }
-            }.play());
+            };
+            ambiencefadein.setOnFinished(event -> {
+                thisession.Root.AmbienceVolume.setDisable(false);
+                thisession.Root.AmbienceVolume.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
+            });
+            ambienceplayer.setOnPlaying(ambiencefadein::play);
     // Set Ambience Fade Out
             ambienceplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
                 double fadeoutstarttime = getdurationinseconds() - fadeoutduration;
@@ -419,7 +432,6 @@ public class Cut {
         entrainmentplayer.dispose();
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
         entrainmentplayer.play();
-//        entrainmentplayer.setVolume(Root.ENTRAINMENTVOLUME);
         entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
     }

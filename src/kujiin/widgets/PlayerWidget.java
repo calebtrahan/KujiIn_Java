@@ -23,7 +23,6 @@ import java.io.IOException;
 
 public class PlayerWidget implements Widget {
     private CheckBox onOffSwitch;
-    private Button AdjustVolumeButton;
     private Button PlayButton;
     private Button PauseButton;
     private Button StopButton;
@@ -36,7 +35,8 @@ public class PlayerWidget implements Widget {
     private ProgressBar CutProgress;
     private ProgressBar TotalProgress;
     private CheckBox ReferenceFileCheckbox;
-    private GoalsWidget GoalsWidget;
+    private Slider EntrainmentVolume;
+    private Slider AmbienceVolume;
     private Label StatusBar;
     private This_Session Session;
     private CreatorAndExporterWidget creatorAndExporterWidget;
@@ -44,7 +44,6 @@ public class PlayerWidget implements Widget {
 
     public PlayerWidget(MainController mainController) {
         onOffSwitch = mainController.SessionPlayerOnOffSwitch;
-        AdjustVolumeButton = mainController.VolumeButton;
         PlayButton = mainController.PlayButton;
         PauseButton = mainController.PauseButton;
         StopButton = mainController.StopButton;
@@ -57,10 +56,25 @@ public class PlayerWidget implements Widget {
         CutProgress = mainController.CutProgressBar;
         TotalProgress = mainController.TotalProgressBar;
         ReferenceFileCheckbox = mainController.ReferenceFilesOption;
-        GoalsWidget = mainController.getGoals();
+        EntrainmentVolume = mainController.EntrainmentVolume;
+        AmbienceVolume = mainController.AmbienceVolume;
         StatusBar = mainController.PlayerStatusBar;
         Session = mainController.getSession();
         creatorAndExporterWidget = mainController.getCreatorAndExporter();
+        EntrainmentVolume.setOnMouseClicked(event -> {
+            try {
+                Double value = EntrainmentVolume.getValue() * 100;
+                EntrainmentVolume.setTooltip(new Tooltip(value.intValue() + "%"));
+                Session.Root.getOptions().getSessionOptions().setEntrainmentvolume(EntrainmentVolume.getValue());
+            } catch (Exception ignored) {Tools.showtimedmessage(StatusBar, "No Session Playing", 2000);}
+        });
+        AmbienceVolume.setOnMouseClicked(event -> {
+            try {
+                Double value = AmbienceVolume.getValue() * 100;
+                AmbienceVolume.setTooltip(new Tooltip(value.intValue() + "%"));
+                Session.Root.getOptions().getSessionOptions().setAmbiencevolume(AmbienceVolume.getValue());
+            } catch(Exception ignored) {Tools.showtimedmessage(StatusBar, "No Session Playing", 2000);}
+        });
     }
 
 // Getters And Setters
@@ -74,7 +88,6 @@ public class PlayerWidget implements Widget {
 
 // Button Actions
     public void play(Sessions sessions) {
-        Session.setGoalsWidget(GoalsWidget);
         Tools.showtimedmessage(StatusBar, Session.play(), 3000);
     }
     public void pause() {
@@ -92,7 +105,6 @@ public class PlayerWidget implements Widget {
         else {
             Tools.showtimedmessage(StatusBar, "No Session Playing", 3000);}
     }
-    public void adjustvolume() {Session.adjustvolume();}
     public void displayreferencefile() {Session.togglereferencedisplay(ReferenceFileCheckbox);}
     public void statusSwitch() {
         if (onOffSwitch.isSelected()) {enable();
@@ -123,7 +135,6 @@ public class PlayerWidget implements Widget {
         }
         resetallvalues();
         Session.resetthissession();
-        AdjustVolumeButton.setDisable(true);
         PlayButton.setDisable(true);
         PauseButton.setDisable(true);
         StopButton.setDisable(true);
@@ -136,6 +147,8 @@ public class PlayerWidget implements Widget {
         CutProgress.setDisable(true);
         TotalProgress.setDisable(true);
         ReferenceFileCheckbox.setDisable(true);
+        EntrainmentVolume.setDisable(true);
+        AmbienceVolume.setDisable(true);
         onOffSwitch.setText("OFF");
     }
     @Override
@@ -147,7 +160,6 @@ public class PlayerWidget implements Widget {
             onOffSwitch.setText("OFF");
             return;
         }
-        AdjustVolumeButton.setDisable(false);
         PlayButton.setDisable(false);
         PauseButton.setDisable(false);
         StopButton.setDisable(false);
@@ -160,6 +172,8 @@ public class PlayerWidget implements Widget {
         CutProgress.setDisable(false);
         TotalProgress.setDisable(false);
         ReferenceFileCheckbox.setDisable(false);
+        AmbienceVolume.setDisable(false);
+        EntrainmentVolume.setDisable(false);
         onOffSwitch.setText("ON");
         readytoplay();
     }
@@ -201,34 +215,34 @@ public class PlayerWidget implements Widget {
                 fxmlLoader.setController(this);
                 try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Adjust Session Volume");}
                 catch (IOException e) {e.printStackTrace();}
-                if (currentcut.getCurrentAmbiencePlayer() != null) {
-                    currentcut.getCurrentAmbiencePlayer().volumeProperty().bind(AmbienceSlider.valueProperty());
-                    AmbienceSlider.setValue(session.getSessionAmbienceVolume());
-                    AmbiencePercentage.setText(new Double(session.getSessionAmbienceVolume() * 100).intValue() + "%");
-                    AmbienceSlider.setOnMouseClicked(event -> {
-                        Double value = AmbienceSlider.getValue() * 100;
-                        AmbiencePercentage.setText(value.intValue() + "%");
-                        session.setSessionAmbienceVolume(AmbienceSlider.getValue());
-                    });
-                }
-                else {
-                    AmbienceSlider.setDisable(true);
-                    AmbiencePercentage.setText("-");
-                }
-                if (currentcut.getCurrentEntrainmentPlayer() != null) {
-                    currentcut.getCurrentEntrainmentPlayer().volumeProperty().bind(EntrainmentSlider.valueProperty());
-                    EntrainmentSlider.setValue(session.getSessionEntrainmentVolume());
-                    EntrainmentPercentage.setText(new Double(session.getSessionEntrainmentVolume() * 100).intValue() + "%");
-                    EntrainmentSlider.setOnMouseClicked(event -> {
-                        Double value = EntrainmentSlider.getValue() * 100;
-                        EntrainmentPercentage.setText(value.intValue() + "%");
-                        session.setSessionEntrainmentVolume(EntrainmentSlider.getValue());
-                    });
-                }
-                else {
-                    EntrainmentSlider.setDisable(true);
-                    EntrainmentPercentage.setText("-");
-                }
+//                if (currentcut.getCurrentAmbiencePlayer() != null) {
+//                    currentcut.getCurrentAmbiencePlayer().volumeProperty().bind(AmbienceSlider.valueProperty());
+//                    AmbienceSlider.setValue(session.getSessionAmbienceVolume());
+//                    AmbiencePercentage.setText(new Double(session.getSessionAmbienceVolume() * 100).intValue() + "%");
+//                    AmbienceSlider.setOnMouseClicked(event -> {
+//                        Double value = AmbienceSlider.getValue() * 100;
+//                        AmbiencePercentage.setText(value.intValue() + "%");
+//                        session.setSessionAmbienceVolume(AmbienceSlider.getValue());
+//                    });
+//                }
+//                else {
+//                    AmbienceSlider.setDisable(true);
+//                    AmbiencePercentage.setText("-");
+//                }
+//                if (currentcut.getCurrentEntrainmentPlayer() != null) {
+//                    currentcut.getCurrentEntrainmentPlayer().volumeProperty().bind(EntrainmentSlider.valueProperty());
+//                    EntrainmentSlider.setValue(session.getSessionEntrainmentVolume());
+//                    EntrainmentPercentage.setText(new Double(session.getSessionEntrainmentVolume() * 100).intValue() + "%");
+//                    EntrainmentSlider.setOnMouseClicked(event -> {
+//                        Double value = EntrainmentSlider.getValue() * 100;
+//                        EntrainmentPercentage.setText(value.intValue() + "%");
+//                        session.setSessionEntrainmentVolume(EntrainmentSlider.getValue());
+//                    });
+//                }
+//                else {
+//                    EntrainmentSlider.setDisable(true);
+//                    EntrainmentPercentage.setText("-");
+//                }
             }
 
             public Double getEntrainmentVolume() {return EntrainmentSlider.getValue();}
