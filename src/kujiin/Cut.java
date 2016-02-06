@@ -27,6 +27,7 @@ public class Cut {
     public boolean ramp;
     public int rampduration;
     public int duration;
+    // Plackback Fields
     private File tempentrainmenttextfile;
     private File tempambiencetextfile;
     private File tempentrainmentfile;
@@ -536,4 +537,7 @@ public class Cut {
         if (tempentrainmenttextfile.exists()) {tempentrainmenttextfile.delete();}
         if (tempambiencetextfile.exists()) {tempambiencetextfile.delete();}
     }
+
+// Goals / Total Progress
+
 }

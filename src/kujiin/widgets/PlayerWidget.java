@@ -176,7 +176,7 @@ public class PlayerWidget implements Widget {
         ReferenceFileCheckbox.setText("Reference Display Disabled");
     }
     @Override
-    public Boolean cleanup() {
+    public boolean cleanup() {
         Session.stop();
         return Session.getPlayerState() != PlayerState.PLAYING;
     }

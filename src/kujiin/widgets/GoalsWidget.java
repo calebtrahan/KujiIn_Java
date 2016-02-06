@@ -42,10 +42,10 @@ public class GoalsWidget implements Widget{
     private Sessions allpracticedsessions;
     private CurrentGoals currentGoals;
     private CompletedGoals completedGoals;
+    private List<CurrentGoals.CurrentGoal> SelectedCutGoals;
     public static String[] GOALCUTNAMES = {"Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Total"};
 
-    // TODO Make Goals For Individual Cuts Rin-Zen And Integerate Into Goal Widget (And Keep Existing Total Hour Goal)
-
+// TODO Make Goals For Individual Cuts Rin-Zen And Integerate Into Goal Widget (And Keep Existing Total Hour Goal)
     public GoalsWidget(MainController mainController) {
         NewGoalButton = mainController.newgoalButton;
         CurrentGoalsButton = mainController.viewcurrrentgoalsButton;
@@ -147,10 +147,15 @@ public class GoalsWidget implements Widget{
             }
         } catch (NullPointerException ignored) {resetallvalues();}
     }
-    public Boolean cleanup() {
+    public boolean cleanup() {
         currentGoals.marshall();
         completedGoals.marshall();
         return true;
+    }
+    public boolean updategoal() {
+        SelectedCutGoals = currentGoals.getallcutgoals(CutSelectorComboBox.getSelectionModel().getSelectedIndex());
+        // TODO Find A Way To Pass Practiced Goal Time (For Each Cut) Into Here And Check Goals
+        return false;
     }
 
 // Widget Implementation

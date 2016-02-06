@@ -116,7 +116,7 @@ public class ProgressTrackerWidget implements Widget {
         AverageSessionDuration.setText("No Sessions Practiced");
     }
     @Override
-    public Boolean cleanup() {
+    public boolean cleanup() {
         return true;
     }
 

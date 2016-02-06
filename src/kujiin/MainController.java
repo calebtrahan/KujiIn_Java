@@ -94,6 +94,9 @@ public class MainController implements Initializable {
     private ProgressTrackerWidget ProgressTracker;
     private Options Options;
 
+    // TODO Unify Goals + Total Session Progress Widget Into One Display (Drop Down Cut )
+        // TODO Maybe Unify Goals, And ProgressTrackerWidget Logic Into Cut Class?
+    
 // Event Handlers
     public static final EventHandler<KeyEvent> noneditabletextfield = event -> Tools.showinformationdialog("Information", "Can't Enter Text", "This Text Field Can't Be Edited");
 

@@ -429,7 +429,7 @@ public class CreatorAndExporterWidget implements Widget {
         PostTime.setText("-");
     }
     @Override
-    public Boolean cleanup() {
+    public boolean cleanup() {
         boolean currentlyexporting = getExporterState() == ExporterState.EXPORT_IN_PROGRESS;
         if (currentlyexporting) {
             Tools.showinformationdialog("Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
