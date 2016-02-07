@@ -342,6 +342,7 @@ public class Cut {
             fadeinentrainment.setOnFinished(event -> {
                 thisession.Root.EntrainmentVolume.setDisable(false);
                 thisession.Root.EntrainmentVolume.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
+                thisession.Root.EntrainmentVolume.setOnMouseClicked(event1 -> thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.EntrainmentVolume.getValue()));
             });
             if (ambienceenabled) {
                 fadeinambience = new Transition() {
@@ -357,6 +358,7 @@ public class Cut {
                 fadeinambience.setOnFinished(event -> {
                     thisession.Root.AmbienceVolume.setDisable(false);
                     thisession.Root.AmbienceVolume.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
+                    thisession.Root.AmbienceVolume.setOnMouseClicked(event1 -> thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.AmbienceVolume.getValue()));
                 });
             }
         }
@@ -392,12 +394,14 @@ public class Cut {
             }
         }
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
+        entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnPlaying(() -> {entrainmentplayer.setVolume(0.0); fadeinentrainment.play();});
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
         if (ambienceenabled) {
             ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
+            ambienceplayer.setVolume(0.0);
             ambienceplayer.setOnPlaying(() -> {ambienceplayer.setVolume(0.0); fadeinambience.play();});
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
@@ -409,7 +413,7 @@ public class Cut {
         cuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updatecuttime()));
         cuttimeline.setCycleCount(Animation.INDEFINITE);
         cuttimeline.play();
-
+        thisession.Root.getProgressTracker().selectcut(number);
     }
     public void pause() {
         entrainmentplayer.pause();
@@ -482,10 +486,6 @@ public class Cut {
             ambienceplayer.play();
             ambienceplayer.setOnError(this::ambienceerror);
         } else {thisession.error_endplayback();}
-    }
-    public void playnextfilebecauseoferror() {
-        if (ambienceplayer.getStatus() != MediaPlayer.Status.PLAYING) {playnextambience();}
-        if (entrainmentplayer.getStatus() != MediaPlayer.Status.PLAYING) {playnextentrainment();}
     }
     public void startfadeout() {
         try {

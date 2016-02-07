@@ -188,7 +188,7 @@ public class PlayerWidget implements Widget {
         SessionTotalTime.setText("--:--");
         CutProgress.setProgress(0.0);
         TotalProgress.setProgress(0.0);
-        ReferenceFileCheckbox.setText("Reference Display Disabled");
+        ReferenceFileCheckbox.setText("Reference Display");
     }
     @Override
     public boolean cleanup() {
@@ -197,10 +197,9 @@ public class PlayerWidget implements Widget {
     }
 
     public void readytoplay() {
-
         CutPlayingText.setText("Ready To Play");
         SessionPlayingText.setText("Ready To Play");
-        ReferenceFileCheckbox.setText("Reference Display Disabled");
+        ReferenceFileCheckbox.setText("Reference Display");
         Tools.showtimedmessage(StatusBar, "Turn Session Player Off To Edit This Session", 6000);
     }
 

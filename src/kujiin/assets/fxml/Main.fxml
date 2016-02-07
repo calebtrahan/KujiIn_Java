@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane centerShape="false" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" pickOnBounds="false" prefHeight="332.0" prefWidth="867.0" scaleShape="false" snapToPixel="false" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.MainController">
+<AnchorPane centerShape="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" pickOnBounds="false" prefHeight="332.0" prefWidth="867.0" scaleShape="false" snapToPixel="false" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.MainController">
    <children>
       <MenuBar layoutX="3.0" prefHeight="29.0" prefWidth="867.0">
         <menus>
@@ -41,7 +41,7 @@
       </Label>
       <Label fx:id="CutProgressTopLabel" alignment="CENTER" layoutX="38.0" layoutY="210.0" prefHeight="17.0" prefWidth="166.0" text="No Session Playing" textAlignment="CENTER" />
       <Label fx:id="TotalSessionLabel" alignment="CENTER" layoutX="259.0" layoutY="210.0" prefHeight="17.0" prefWidth="189.0" text="No Session Playing" textAlignment="CENTER" />
-      <CheckBox fx:id="ReferenceFilesOption" layoutX="292.0" layoutY="255.0" mnemonicParsing="false" onAction="#setReferenceOption" prefHeight="22.0" prefWidth="160.0" text="Display Reference" textAlignment="RIGHT" wrapText="true" />
+      <CheckBox fx:id="ReferenceFilesOption" layoutX="293.0" layoutY="256.0" mnemonicParsing="false" onAction="#setReferenceOption" prefHeight="22.0" prefWidth="189.0" text="Display Reference" textAlignment="RIGHT" wrapText="true" />
       <Label fx:id="PlayerStatusBar" layoutX="13.0" layoutY="308.0" prefHeight="17.0" prefWidth="441.0" text="Player StatusBar Player StatusBar Player StatusBar Player StatusBar Player StatusBar Player">
          <font>
             <Font size="10.0" />
@@ -238,7 +238,7 @@
          <font>
             <Font size="10.0" />
          </font></Label>
-      <ComboBox fx:id="GoalCutComboBox" layoutX="645.0" layoutY="67.0" prefHeight="26.0" prefWidth="146.0" />
+      <ComboBox fx:id="GoalCutComboBox" layoutX="645.0" layoutY="67.0" prefHeight="26.0" prefWidth="146.0" promptText="Select..." />
       <HBox alignment="CENTER" layoutX="483.0" layoutY="279.0" prefHeight="29.0" prefWidth="380.0">
          <children>
             <Button fx:id="newgoalButton" mnemonicParsing="false" onMousePressed="#setnewgoal" prefHeight="7.0" prefWidth="97.0" text="New Goal">
@@ -293,19 +293,19 @@
             </Label>
          </children>
       </HBox>
-      <VBox alignment="CENTER" layoutX="13.0" layoutY="274.0" prefHeight="31.0" prefWidth="113.0">
+      <VBox alignment="CENTER" layoutX="13.0" layoutY="272.0" prefHeight="31.0" prefWidth="113.0">
          <children>
             <Label text="Entrainment" />
             <Slider fx:id="EntrainmentVolume" max="1.0" prefHeight="16.0" prefWidth="88.0" />
          </children>
       </VBox>
-      <VBox alignment="CENTER" layoutX="142.0" layoutY="274.0" prefHeight="31.0" prefWidth="113.0">
+      <VBox alignment="CENTER" layoutX="142.0" layoutY="272.0" prefHeight="31.0" prefWidth="113.0">
          <children>
             <Label text="Ambience" />
             <Slider fx:id="AmbienceVolume" max="1.0" prefHeight="16.0" prefWidth="88.0" />
          </children>
       </VBox>
-      <Label alignment="CENTER" layoutX="13.0" layoutY="259.0" prefHeight="16.0" prefWidth="234.0" text="Volume" />
+      <Label alignment="CENTER" layoutX="13.0" layoutY="258.0" prefHeight="16.0" prefWidth="234.0" text="Volume" />
       <Button fx:id="LoadPresetButton" layoutX="284.0" layoutY="33.0" mnemonicParsing="false" onAction="#loadpreset" prefHeight="23.0" prefWidth="82.0" text="Load Preset">
          <font>
             <Font size="12.0" />

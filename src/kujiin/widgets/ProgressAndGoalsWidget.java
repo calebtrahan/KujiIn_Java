@@ -140,6 +140,7 @@ public class ProgressAndGoalsWidget implements Widget {
     public void cutselectionchanged(ActionEvent actionEvent) {
         try {
             cutindex = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
+            PreAndPostOption.setDisable(cutindex != 10);
             if (cutindex == -1) {resetallvalues();}
             else {
                 updateprogressui();
@@ -239,7 +240,9 @@ public class ProgressAndGoalsWidget implements Widget {
         GoalHours.setText("  -");
         GoalProgress.setProgress(0.0);
         if (cutindex != null && cutindex != -1) {
-            TopLabel.setText("Set A Goal For");
+            if (cutindex == 10) {TopLabel.setText("Set A Total Goal");}
+            if (cutindex == 0) {TopLabel.setText("Set A Goal For " + GOALCUTNAMES[0]);}
+            else {TopLabel.setText("Set A Goal For " + GOALCUTNAMES[cutindex]);}
         } else {TopLabel.setText("Select A Cut");}
     }
     @Override
@@ -271,7 +274,6 @@ public class ProgressAndGoalsWidget implements Widget {
         else {CutSelectorComboBox.getSelectionModel().select(cutindex);}
     }
 
-// Goal Specific Methods
 // Goal Specific Methods
     public void updategoalsui() {
         try {
