@@ -43,8 +43,7 @@ public class ProgressAndGoalsWidget implements Widget {
     private Button DetailedCutProgressButton;
     private Button SessionListButton;
     private Button PrematureEndingsButton;
-
-    // Goals Fields
+// Goals Fields
     private CurrentGoals CurrentGoals;
     private CompletedGoals CompletedGoals;
     private Button NewGoalButton;
@@ -267,6 +266,10 @@ public class ProgressAndGoalsWidget implements Widget {
             else {NumberOfSessionsPracticed.setText(nonetext);}
         } catch (NullPointerException ignored) {}
     }
+    public void selectcut(int cutindex) {
+        if (cutindex == 0 || cutindex == 10) {CutSelectorComboBox.getSelectionModel().select(0);}
+        else {CutSelectorComboBox.getSelectionModel().select(cutindex);}
+    }
 
 // Goal Specific Methods
 // Goal Specific Methods
@@ -278,7 +281,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 return;
             }
             Double practiced = Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutes(cutindex, PreAndPostOption.isSelected()));
-            System.out.println("Goal: " + practiced);
+//            System.out.println("Goal: " + practiced);
             Double goal = CurrentGoals.getgoal(cutindex, 0).getGoal_Hours();
             PracticedHours.setText("Current: " + practiced.toString() + " hrs");
             GoalHours.setText("Goal: " + goal.toString() + " hrs");
