@@ -172,7 +172,8 @@ public class PlayerWidget implements Widget {
         CutProgress.setDisable(false);
         TotalProgress.setDisable(false);
         ReferenceFileCheckbox.setDisable(false);
-        AmbienceVolume.setDisable(false);
+        if (Session.getAmbienceenabled()) {AmbienceVolume.setDisable(false);}
+        else {AmbienceVolume.setDisable(true);}
         EntrainmentVolume.setDisable(false);
         onOffSwitch.setText("ON");
         readytoplay();

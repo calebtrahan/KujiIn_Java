@@ -533,6 +533,8 @@ public class This_Session {
                 StatusBar.setText("Session Playing. Currently Practicing " + currentcut.name + "...");
                 if (currentcut.getSecondselapsed() != 0) {CutProgress.setProgress((float) currentcut.getSecondselapsed() / (float) currentcut.getdurationinseconds());}
                 if (totalsecondselapsed != 0) {TotalProgress.setProgress((float) totalsecondselapsed / (float) totalsecondsinsession);}
+                Root.getProgressTracker().updategoalsui();
+                Root.getProgressTracker().updateprogressui();
             } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
                 CutProgress.setProgress(1.0);
                 if (currentcut.number != 10) {StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);}

@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class ProgressAndGoalsWidget implements Widget {
     public static String[] GOALCUTNAMES = {"Pre/Post", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Total"};
     private ComboBox<String> CutSelectorComboBox;
-    private int cutindex;
+    private Integer cutindex;
 // Progress Tracker Fields
     private Sessions Sessions;
     private TextField TotalTimePracticed;
@@ -54,10 +54,6 @@ public class ProgressAndGoalsWidget implements Widget {
     private Label GoalHours;
     private ProgressBar GoalProgress;
     private Label TopLabel;
-    private List<CurrentGoals.CurrentGoal> CutCurrentGoals;
-    private List<CompletedGoals.CompletedGoal> CutCompletedGoals;
-    private kujiin.xml.CurrentGoals.CurrentGoal CurrentGoal;
-    private kujiin.xml.CompletedGoals.CompletedGoal CompletedGoal;
 
     public ProgressAndGoalsWidget(MainController mainController) {
         NewGoalButton = mainController.newgoalButton;
@@ -243,53 +239,54 @@ public class ProgressAndGoalsWidget implements Widget {
         PracticedHours.setText("-   ");
         GoalHours.setText("  -");
         GoalProgress.setProgress(0.0);
-        TopLabel.setText("Select A Cut...");
+        if (cutindex != null && cutindex != -1) {
+            TopLabel.setText("Set A Goal For");
+        } else {TopLabel.setText("Select A Cut");}
     }
     @Override
     public boolean cleanup() {
         CurrentGoals.marshall();
         CompletedGoals.marshall();
+        Sessions.marshall();
         return true;
     }
 
 // Total Progress Specific Methods
     public void updateprogressui() {
     // Update Total Progress
-        Sessions.deletenonvalidsessions();
-        int averagesessionduration = Sessions.averagepracticetimeinminutes(cutindex, PreAndPostOption.isSelected());
-        int totalminutespracticed = Sessions.getpracticedtimeinminutes(cutindex, PreAndPostOption.isSelected());
-        int numberofsessionspracticed = Sessions.cutsessionscount(cutindex);
-        String nonetext = "No Sessions";
-        if (averagesessionduration != 0) {AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins(averagesessionduration));}
-        else {AverageSessionDuration.setText(nonetext);}
-        if (totalminutespracticed != 0) {TotalTimePracticed.setText(Tools.minutestoformattedhoursandmins(totalminutespracticed));}
-        else {TotalTimePracticed.setText(nonetext);}
-        if (numberofsessionspracticed != 0) {NumberOfSessionsPracticed.setText(Integer.toString(numberofsessionspracticed));}
-        else {NumberOfSessionsPracticed.setText(nonetext);}
+        try {
+            int averagesessionduration = Sessions.averagepracticetimeinminutes(cutindex, PreAndPostOption.isSelected());
+            int totalminutespracticed = Sessions.getpracticedtimeinminutes(cutindex, PreAndPostOption.isSelected());
+            int numberofsessionspracticed = Sessions.cutsessionscount(cutindex);
+            String nonetext = "No Sessions";
+            if (averagesessionduration != 0) {AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins(averagesessionduration));}
+            else {AverageSessionDuration.setText(nonetext);}
+            if (totalminutespracticed != 0) {TotalTimePracticed.setText(Tools.minutestoformattedhoursandmins(totalminutespracticed));}
+            else {TotalTimePracticed.setText(nonetext);}
+            if (numberofsessionspracticed != 0) {NumberOfSessionsPracticed.setText(Integer.toString(numberofsessionspracticed));}
+            else {NumberOfSessionsPracticed.setText(nonetext);}
+        } catch (NullPointerException ignored) {}
     }
 
 // Goal Specific Methods
+// Goal Specific Methods
     public void updategoalsui() {
-        CutCurrentGoals = CurrentGoals.getallcutgoals(cutindex);
-        CutCompletedGoals = CompletedGoals.getallcutgoals(cutindex);
-        String cutname = GOALCUTNAMES[cutindex];
-        if (! CurrentGoals.goalsexist(cutindex)) {
-            if (Tools.getanswerdialog("Information", "No Goals Exist For " + cutname, "Add A Goal For " + cutname + "?")) {setnewgoal(); return;}
-            else {resetallvalues(); return;}
-        }
-        Double practiced = Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutes(cutindex, PreAndPostOption.isSelected()));
-        Double goal = CurrentGoals.getgoal(cutindex, 0).getGoal_Hours();
-        PracticedHours.setText("Current: " + practiced.toString() + " hrs");
-        GoalHours.setText("Goal: " + goal.toString() + " hrs");
-        GoalProgress.setProgress(practiced / goal);
-        if (cutname.equals(GOALCUTNAMES[10])) { TopLabel.setText("Total Goal");}
-        else if (cutname.equals(GOALCUTNAMES[0])) {TopLabel.setText("Pre + Post Goal");}
-        else {TopLabel.setText(cutname + " 's Current Goal");}
-    }
-    public boolean updategoal() {
-        CutCurrentGoals = CurrentGoals.getallcutgoals(CutSelectorComboBox.getSelectionModel().getSelectedIndex());
-        // TODO Find A Way To Pass Practiced Goal Time (For Each Cut) Into Here And Check Goals
-        return false;
+        try {
+            String cutname = GOALCUTNAMES[cutindex];
+            if (! CurrentGoals.goalsexist(cutindex)) {
+                resetallvalues();
+                return;
+            }
+            Double practiced = Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutes(cutindex, PreAndPostOption.isSelected()));
+            System.out.println("Goal: " + practiced);
+            Double goal = CurrentGoals.getgoal(cutindex, 0).getGoal_Hours();
+            PracticedHours.setText("Current: " + practiced.toString() + " hrs");
+            GoalHours.setText("Goal: " + goal.toString() + " hrs");
+            GoalProgress.setProgress(practiced / goal);
+            if (cutname.equals(GOALCUTNAMES[10])) { TopLabel.setText("Total Goal");}
+            else if (cutname.equals(GOALCUTNAMES[0])) {TopLabel.setText("Pre + Post Goal");}
+            else {TopLabel.setText(cutname + "'s Current Goal");}
+        } catch (NullPointerException ignored) {}
     }
 
 // Subclasses/Dialogs

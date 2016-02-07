@@ -11,7 +11,6 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -93,7 +92,7 @@ public class MainController implements Initializable {
     private ProgressAndGoalsWidget ProgressTracker;
     private Options Options;
 
-    // TODO Unify Goals + Total Session Progress Widget Into One Display (Drop Down Cut )
+    // TODO Unify Goals + Total Session Progress Widget Into One Display (Drop Down Cut)
         // TODO Maybe Unify Goals, And ProgressAndGoalsWidget Logic Into Cut Class?
     
 // Event Handlers
@@ -281,9 +280,9 @@ public class MainController implements Initializable {
         if (Player.isEnabled()) {
             CreatorAndExporter.disable();
             CreatorAndExporter.disablebuttons();
-            Node node = (Node) actionEvent.getSource();
-            Stage stage = (Stage) node.getScene().getWindow();
-            stage.setOnCloseRequest(event -> ProgressTracker.getSessions().deletenonvalidsessions());
+//            Node node = (Node) actionEvent.getSource();
+//            Stage stage = (Stage) node.getScene().getWindow();
+//            stage.setOnCloseRequest(event -> ProgressTracker.getSessions().deletenonvalidsessions());
         } else {
             CreatorAndExporter.enable();
             CreatorAndExporter.enablebuttons();

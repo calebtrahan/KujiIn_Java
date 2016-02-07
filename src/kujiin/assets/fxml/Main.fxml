@@ -41,7 +41,7 @@
       </Label>
       <Label fx:id="CutProgressTopLabel" alignment="CENTER" layoutX="38.0" layoutY="210.0" prefHeight="17.0" prefWidth="166.0" text="No Session Playing" textAlignment="CENTER" />
       <Label fx:id="TotalSessionLabel" alignment="CENTER" layoutX="259.0" layoutY="210.0" prefHeight="17.0" prefWidth="189.0" text="No Session Playing" textAlignment="CENTER" />
-      <CheckBox fx:id="ReferenceFilesOption" layoutX="298.0" layoutY="255.0" mnemonicParsing="false" onAction="#setReferenceOption" prefHeight="22.0" prefWidth="132.0" text="Display Reference" textAlignment="RIGHT" wrapText="true" />
+      <CheckBox fx:id="ReferenceFilesOption" layoutX="292.0" layoutY="255.0" mnemonicParsing="false" onAction="#setReferenceOption" prefHeight="22.0" prefWidth="160.0" text="Display Reference" textAlignment="RIGHT" wrapText="true" />
       <Label fx:id="PlayerStatusBar" layoutX="13.0" layoutY="308.0" prefHeight="17.0" prefWidth="441.0" text="Player StatusBar Player StatusBar Player StatusBar Player StatusBar Player StatusBar Player">
          <font>
             <Font size="10.0" />

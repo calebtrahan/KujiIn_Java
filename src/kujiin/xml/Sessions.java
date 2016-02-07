@@ -18,7 +18,7 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Sessions {
     @XmlElement(name = "Session")
-    private List<Session> Session = null;
+    private List<Session> Session;
 
     public Sessions() {deletenonvalidsessions();}
 
@@ -45,9 +45,7 @@ public class Sessions {
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.sessionsxmlfile);
-        } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Save Sessions XML File", "Check Write File Permissions Of " + Options.sessionsxmlfile.getAbsolutePath());
-        }
+        } catch (JAXBException e) {}
     }
     public void createnewsession() {
         try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
@@ -135,11 +133,11 @@ public class Sessions {
     }
     public int totalsessioncount() {
         try {
-            deletenonvalidsessions();
             return getSession().size();
         } catch (NullPointerException ignored) {return 0;}
     }
     public Session getsession(int index) {
         return getSession().get(index);
     }
+
 }

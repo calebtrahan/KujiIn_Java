@@ -10,6 +10,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.widgets.PlayerWidget;
+import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Options;
 import org.apache.commons.io.FileUtils;
 
@@ -279,7 +280,7 @@ public class Cut {
     public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
     public void updatecuttime() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            System.out.println(getCurrentEntrainmentPlayer().getVolume());
+//            System.out.println(getCurrentEntrainmentPlayer().getVolume());
 //
 //  try {
             // TODO Use Javafx timeline to fade in fadeout audio (IF not 0.0)
@@ -315,6 +316,8 @@ public class Cut {
 //                }
 //            } catch (RuntimeException ignored) {}
             secondselapsed++;
+            ProgressAndGoalsWidget progressAndGoalsWidget = thisession.Root.getProgressTracker();
+            progressAndGoalsWidget.getSessions().getsession(progressAndGoalsWidget.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
 //        }
         }
     }
@@ -372,7 +375,7 @@ public class Cut {
                 {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeinduration() * 1000));}
                 @Override
                 protected void interpolate(double frac) {
-                    double ambiencevolume = frac * thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
+                    double ambiencevolume = frac * thisession.Root.getOptions().getSessionOptions().getAmbiencevolume();
                     getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                     thisession.Root.AmbienceVolume.setValue(ambiencevolume);
                     thisession.Root.AmbienceVolume.setDisable(true);

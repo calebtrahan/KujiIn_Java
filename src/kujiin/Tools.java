@@ -160,8 +160,8 @@ public class Tools {
     public static Double convertminutestodecimalhours(int mins) {
         int hours = mins / 60;
         int minutes = mins % 60;
-        double decimalhours = minutes / 60;
-        decimalhours += hours;
+        Double decimalhours = (double) (minutes / 60);
+        decimalhours += (double) hours;
         return decimalhours;
     }
     public static int convertdecimalhourstominutes(double decimalhours) {
