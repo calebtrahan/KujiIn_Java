@@ -17,7 +17,6 @@ import javafx.util.Duration;
 import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.PlayerWidget;
-import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Options;
 import kujiin.xml.Sessions;
 
@@ -479,24 +478,17 @@ public class This_Session {
     }
     public String stop() {
         if (playerState == PlayerWidget.PlayerState.PLAYING) {
-            pause();
-            if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
-                endsessionprematurely();
-                currentcut.stop();
-                currentcuttimeline.stop();
-                setPlayerState(PlayerWidget.PlayerState.STOPPED);
-                resetthissession();
-                return "Session Stopped";
-            } else {play(); return "";}
+            currentcut.stop();
+            currentcuttimeline.stop();
+            setPlayerState(PlayerWidget.PlayerState.STOPPED);
+            resetthissession();
+            return "Session Stopped";
         } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
-            if (Tools.getanswerdialog("End Prematurely", "End Session", "Really End This Session Prematurely?")) {
-                endsessionprematurely();
-                currentcut.stop();
-                currentcuttimeline.stop();
-                setPlayerState(PlayerWidget.PlayerState.STOPPED);
-                resetthissession();
-                return "Session Stopped";
-            } else {play(); return "";}
+            currentcut.stop();
+            currentcuttimeline.stop();
+            setPlayerState(PlayerWidget.PlayerState.STOPPED);
+            resetthissession();
+            return "Session Stopped";
         } else if (playerState == PlayerWidget.PlayerState.IDLE) {
             return "No Session Playing, Cannot Stop";
         } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
@@ -505,22 +497,22 @@ public class This_Session {
             return "";
         }
     }
-    public void endsessionprematurely() {
-        int secondsleft = currentcut.getdurationinseconds() / currentcut.getSecondselapsed();
-        int secondspracticed = currentcut.getdurationinseconds() - secondsleft;
-        Double minutes = Math.floor(secondspracticed / 60);
-        sessions.getsession(sessions.totalsessioncount() - 1).updatecutduration(currentcut.number, minutes.intValue());
-        String prematureendingreason;
-        if (Root.getOptions().getSessionOptions().getPrematureendings()) {
-            ProgressAndGoalsWidget.PrematureEndingDialog ped = new ProgressAndGoalsWidget.PrematureEndingDialog(Root.getOptions());
-            prematureendingreason = ped.getReason();
-        } else {
-            prematureendingreason = "";
-        }
-        if (prematureendingreason != null) {
-            sessions.getsession(sessions.totalsessioncount() - 1).writeprematureending(currentcut.name, prematureendingreason);
-        }
-    }
+//    public void endsessionprematurely() {
+//        int secondsleft = currentcut.getdurationinseconds() / currentcut.getSecondselapsed();
+//        int secondspracticed = currentcut.getdurationinseconds() - secondsleft;
+//        Double minutes = Math.floor(secondspracticed / 60);
+//        sessions.getsession(sessions.totalsessioncount() - 1).updatecutduration(currentcut.number, minutes.intValue());
+//        String prematureendingreason;
+//        if (Root.getOptions().getSessionOptions().getPrematureendings()) {
+//            ProgressAndGoalsWidget.PrematureEndingDialog ped = new ProgressAndGoalsWidget.PrematureEndingDialog(Root.getOptions());
+//            prematureendingreason = ped.getReason();
+//        } else {
+//            prematureendingreason = "";
+//        }
+//        if (prematureendingreason != null) {
+//            sessions.getsession(sessions.totalsessioncount() - 1).writeprematureending(currentcut.name, prematureendingreason);
+//        }
+//    }
     public void updateplayerui() {
         try {
             if (playerState == PlayerWidget.PlayerState.PLAYING) {
@@ -591,15 +583,6 @@ public class This_Session {
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
     }
-//    public void adjustvolume() {
-//        if (getPlayerState() == PlayerWidget.PlayerState.PLAYING) {
-//            PlayerWidget.AdjustVolume av = new PlayerWidget.AdjustVolume(currentcut, this);
-//            av.show();
-//            if (av.getAmbienceVolume() != null) {setSessionAmbienceVolume(av.getAmbienceVolume());}
-//            if (av.getEntrainmentVolume() != null) {setSessionEntrainmentVolume(av.getEntrainmentVolume());}
-//        } else {
-//            Tools.showtimedmessage(StatusBar, "Cannot Adjust Volume. No Session Playing", 5000);}
-//    }
     public void transition() {
         closereferencefile();
         sessions.getsession(sessions.totalsessioncount() - 1).updatecutduration(currentcut.number, currentcut.getdurationinminutes());

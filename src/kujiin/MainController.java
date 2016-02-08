@@ -40,7 +40,6 @@ public class MainController implements Initializable {
     public Button ExportButton;
     public Button PlayButton;
     public Button ListOfSessionsButton;
-    public Button PrematureEndingsButton;
     public CheckBox ReferenceFilesOption;
     public ProgressBar goalsprogressbar;
     public Label goalscurrrentvalueLabel;
@@ -86,6 +85,8 @@ public class MainController implements Initializable {
     public Label GoalTopLabel;
     public Slider EntrainmentVolume;
     public Slider AmbienceVolume;
+    public Label EntrainmentVolumePercentage;
+    public Label AmbienceVolumePercentage;
     private This_Session Session;
     private CreatorAndExporterWidget CreatorAndExporter;
     private PlayerWidget Player;
@@ -176,8 +177,6 @@ public class MainController implements Initializable {
     public void displaylistofsessions(Event event) {
         ProgressTracker.displaysessionlist();
     }
-    public void displayprematureendings(Event event) {
-        ProgressTracker.displayprematureendings();}
     public void showcutprogress(Event event) {
         ProgressTracker.displaydetailedcutprogress();}
     public void setnewgoal(Event event) {
@@ -816,7 +815,6 @@ public class MainController implements Initializable {
         public CheckBox HelpDialogsCheckBox;
         public TextField AlertFileTextField;
         public Button AlertFileSelectButton;
-        public CheckBox PrematureEndingCheckbox;
         public TextField FadeInValue;
         public TextField FadeOutValue;
         public TextField EntrainmentVolumePercentage;
@@ -828,9 +826,12 @@ public class MainController implements Initializable {
         public Button DeleteAllGoalsButton;
         public Button DeleteAllSessionsProgressButton;
         public Button DefaultsButton;
+        public CheckBox RampCheckbox;
+        public ChoiceBox<String> RampDurationChoiceBox;
         private kujiin.xml.Options Options;
         private File AlertFile;
         private boolean valuechanged;
+        private ObservableList<String> rampselections = FXCollections.observableArrayList(kujiin.xml.Options.RAMPDURATIONS);
 
         public ChangeProgramOptions(Options sessionoptions) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));
@@ -844,7 +845,6 @@ public class MainController implements Initializable {
             Tools.integerTextField(AmbienceVolumePercentage);
             TooltipsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             HelpDialogsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            PrematureEndingCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeInValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
@@ -864,7 +864,8 @@ public class MainController implements Initializable {
                     AlertFileTextField.setText("Select A New Alert File...");
                 }
             }
-            PrematureEndingCheckbox.setSelected(Options.getSessionOptions().getPrematureendings());
+            RampCheckbox.setSelected(Options.getSessionOptions().getRampenabled());
+            RampDurationChoiceBox.setItems(rampselections);
             FadeInValue.setText(Options.getSessionOptions().getFadeinduration().toString());
             FadeOutValue.setText(Options.getSessionOptions().getFadeoutduration().toString());
             EntrainmentVolumePercentage.setText(Options.getSessionOptions().getEntrainmentvolume().toString());
@@ -875,12 +876,17 @@ public class MainController implements Initializable {
         public void apply(ActionEvent actionEvent) {
             Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
             Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
-            Options.getSessionOptions().setPrematureendings(PrematureEndingCheckbox.isSelected());
+            Options.getSessionOptions().setRampenabled(RampCheckbox.isSelected());
+            int index = RampDurationChoiceBox.getSelectionModel().getSelectedIndex();
+            if (index == 0) {Options.getSessionOptions().setRampduration(2);}
+            else if (index == 1) {Options.getSessionOptions().setRampduration(3);}
+            else if (index == 2) {Options.getSessionOptions().setRampduration(5);}
             Options.getSessionOptions().setFadeoutduration(new Double(FadeInValue.getText()));
             Options.getSessionOptions().setFadeinduration(new Double(FadeOutValue.getText()));
             if (AlertFile != null) {
                 Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());
             }
+            Options.marshall();
             valuechanged = false;
             ApplyButton.setDisable(true);
         }

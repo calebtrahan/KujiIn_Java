@@ -113,15 +113,6 @@ public class Sessions {
         try {return getpracticedtimeinminutes(index, includepreandpost) / getSession().size();}
         catch (NullPointerException | ArithmeticException ignored) {return 0;}
     }
-    public ArrayList<Session> getsessionswithprematureendings(int index) {
-        try {
-            ArrayList<Session> sessionswithprematureendings = new ArrayList<>();
-            for (kujiin.xml.Session i : getSession()) {
-                if (i.wasendedPremature() && i.getcutduration(index) > 0) {sessionswithprematureendings.add(i);}
-            }
-            return sessionswithprematureendings;
-        } catch (NullPointerException e) {return new ArrayList<>();}
-    }
     public int cutsessionscount(int index) {
         try {
             int sessioncount = 0;

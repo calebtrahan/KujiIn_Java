@@ -293,13 +293,13 @@
             </Label>
          </children>
       </HBox>
-      <VBox alignment="CENTER" layoutX="13.0" layoutY="272.0" prefHeight="31.0" prefWidth="113.0">
+      <VBox alignment="CENTER" layoutX="13.0" layoutY="272.0" prefHeight="32.0" prefWidth="93.0">
          <children>
             <Label text="Entrainment" />
             <Slider fx:id="EntrainmentVolume" max="1.0" prefHeight="16.0" prefWidth="88.0" />
          </children>
       </VBox>
-      <VBox alignment="CENTER" layoutX="142.0" layoutY="272.0" prefHeight="31.0" prefWidth="113.0">
+      <VBox alignment="CENTER" layoutX="142.0" layoutY="272.0" prefHeight="32.0" prefWidth="93.0">
          <children>
             <Label text="Ambience" />
             <Slider fx:id="AmbienceVolume" max="1.0" prefHeight="16.0" prefWidth="88.0" />
@@ -323,11 +323,6 @@
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="PrematureEndingsButton" mnemonicParsing="false" onMousePressed="#displayprematureendings" prefHeight="23.0" prefWidth="126.0" text="Premature Endings">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Button>
             <Button fx:id="ShowCutProgressButton" mnemonicParsing="false" onMousePressed="#showcutprogress" prefHeight="20.0" prefWidth="144.0" text="Detailed Cut Progress">
                <font>
                   <Font size="12.0" />
@@ -346,5 +341,7 @@
             <Label fx:id="goalssettimeLabel" contentDisplay="CENTER" prefHeight="17.0" prefWidth="101.0" text="Goal: %d" textAlignment="CENTER" />
          </children>
       </HBox>
+      <Label fx:id="EntrainmentVolumePercentage" alignment="CENTER" layoutX="107.0" layoutY="287.0" text="100%" textAlignment="CENTER" />
+      <Label fx:id="AmbienceVolumePercentage" alignment="CENTER" layoutX="236.0" layoutY="287.0" text="100%" textAlignment="CENTER" />
    </children>
 </AnchorPane>

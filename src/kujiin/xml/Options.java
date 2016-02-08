@@ -38,6 +38,7 @@ public class Options {
     public static final File directorymaincuts = new File(directoryentrainment, "maincuts/");
     public static final ArrayList<String> allnames = new ArrayList<>(Arrays.asList(
             "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
+    public static final ArrayList<String> RAMPDURATIONS = new ArrayList<>(Arrays.asList("2 Minutes", "3 Minutes", "5 Minutes"));
 /// Default Option Values
     private static final Boolean TOOLTIPS = true;
     private static final Boolean HELPDIALOGS = true;
@@ -45,9 +46,10 @@ public class Options {
     private static final Double AMBIENCEVOLUME = 1.0; // Default Ambience Volume (Textfield -> In Percentage)
     private static final Double FADEINDURATION = 10.0; // Fade In Duration (Textfield -> In Decimal Seconds)
     private static final Double FADEOUTDURATION = 10.0; // Fade Out Duration (Textfield -> In Decimal Seconds)
-    private static final Boolean PREMATUREENDINGS = true; // Premature Endings Reason Dialog (Checkbox)
     private static final String ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
     private static final String THEMEFILELOCATION = null;
+    private static final Boolean RAMPENABLED = true;
+    private static final Integer RAMPDURATION = 3;
     private ProgramOptions ProgramOptions;
     private SessionOptions SessionOptions;
     private AppearanceOptions AppearanceOptions;
@@ -95,12 +97,13 @@ public class Options {
             programOptions.setHelpdialogs(HELPDIALOGS);
             setProgramOptions(programOptions);
             kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
-            sessionOptions.setPrematureendings(PREMATUREENDINGS);
             sessionOptions.setFadeoutduration(FADEOUTDURATION);
             sessionOptions.setAmbiencevolume(AMBIENCEVOLUME);
             sessionOptions.setAlertfilelocation(ALERTFILELOCATION);
             sessionOptions.setFadeinduration(FADEINDURATION);
             sessionOptions.setEntrainmentvolume(ENTRAINMENTVOLUME);
+            sessionOptions.setRampenabled(RAMPENABLED);
+            sessionOptions.setRampduration(RAMPDURATION);
             setSessionOptions(sessionOptions);
             kujiin.xml.Options.AppearanceOptions appearanceOptions = new AppearanceOptions();
             appearanceOptions.setThemefile(THEMEFILELOCATION);
@@ -147,8 +150,9 @@ public class Options {
         private Double ambiencevolume; // Default Ambience Volume (Textfield -> In Percentage)
         private Double fadeinduration; // Fade In Duration (Textfield -> In Decimal Seconds)
         private Double fadeoutduration; // Fade Out Duration (Textfield -> In Decimal Seconds)
-        private Boolean prematureendings; // Premature Endings Reason Dialog (Checkbox)
         private String alertfilelocation; // (Dialog Selecting A New Alert File)
+        private Boolean rampenabled;
+        private Integer rampduration;
 
         public SessionOptions() {}
 
@@ -177,18 +181,25 @@ public class Options {
         public void setFadeoutduration(Double fadeoutduration) {
             this.fadeoutduration = fadeoutduration;
         }
-        public Boolean getPrematureendings() {
-            return prematureendings;
-        }
-        public void setPrematureendings(Boolean prematureendings) {
-            this.prematureendings = prematureendings;
-        }
         public String getAlertfilelocation() {
             return alertfilelocation;
         }
         public void setAlertfilelocation(String alertfilelocation) {
             this.alertfilelocation = alertfilelocation;
         }
+        public Boolean getRampenabled() {
+            return rampenabled;
+        }
+        public void setRampenabled(Boolean rampenabled) {
+            this.rampenabled = rampenabled;
+        }
+        public Integer getRampduration() {
+            return rampduration;
+        }
+        public void setRampduration(Integer rampduration) {
+            this.rampduration = rampduration;
+        }
+
     }
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class AppearanceOptions {

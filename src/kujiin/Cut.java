@@ -134,7 +134,7 @@ public class Cut {
                     ambiencefiledurations.add(dur);
                 }
             }
-        } catch (NullPointerException ignored) {return false;}
+        } catch (NullPointerException ignored) {ignored.printStackTrace(); return false;}
         return ambiencefiles.size() > 0;
     }
     public boolean hasenoughAmbience(int secondstocheck) {
@@ -148,7 +148,6 @@ public class Cut {
         setCutstoplay(cutstoplay);
         if (isAmbienceenabled()) {return buildEntrainment() && buildAmbience();}
         else {return buildEntrainment();}
-
     }
     public boolean buildEntrainment() {
         File rampin1 = new File(Options.directorytohramp, "3in1.mp3");
@@ -210,58 +209,65 @@ public class Cut {
         for (File i : entrainmentlist) {
             entrainmentmedia.add(new Media(i.toURI().toString()));
         }
+        System.out.println(name + "'s Entrainment Builder Returning " + Boolean.toString(entrainmentmedia.size() > 0));
         return entrainmentmedia.size() > 0;
     }
+    // TODO If Presession Duration Is 0, Throwing An Exception
     public boolean buildAmbience() {
-        ambiencelist = new ArrayList<>();
-        ambiencemedia = new ArrayList<>();
-        Double currentduration = 0.0;
-        Double sessionduration = (double) getdurationinseconds();
-    // Ambience Is >= Session Duration
-        if (hasenoughAmbience(getdurationinseconds())) {
-            for (File i : ambiencefiles) {
-                if (currentduration < sessionduration) {
-                    ambiencelist.add(i);
-                    currentduration += ambiencefiledurations.get(ambiencefiles.indexOf(i));
-                } else {break;}
-            }
-    // Shuffle/Loop Ambience Randomly
-        } else {
-            Random randint = new Random();
-            while (currentduration < sessionduration) {
-                File tempfile = ambiencefiles.get(randint.nextInt(ambiencefiles.size() - 1));
-                double tempduration = ambiencefiledurations.get(ambiencefiles.indexOf(tempfile));
-                int size = ambiencelist.size();
-                if (size == 0) {
-                    ambiencelist.add(tempfile);
-                    currentduration += tempduration;
-                } else if (size == 1) {
-                    ambiencelist.add(tempfile);
-                    currentduration += tempduration;
-                } else if (size == 2) {
-                    if (!tempfile.equals(ambiencelist.get(size - 1))) {
+        try {
+            ambiencelist = new ArrayList<>();
+            ambiencemedia = new ArrayList<>();
+            Double currentduration = 0.0;
+            Double sessionduration = (double) getdurationinseconds();
+            // Ambience Is >= Session Duration
+            if (hasenoughAmbience(getdurationinseconds())) {
+                for (File i : ambiencefiles) {
+                    if (currentduration < sessionduration) {
+                        ambiencelist.add(i);
+                        currentduration += ambiencefiledurations.get(ambiencefiles.indexOf(i));
+                    } else {break;}
+                }
+        // Shuffle/Loop Ambience Randomly
+            } else {
+                Random randint = new Random();
+                while (currentduration < sessionduration) {
+                    File tempfile = ambiencefiles.get(randint.nextInt(ambiencefiles.size() - 1));
+                    double tempduration = ambiencefiledurations.get(ambiencefiles.indexOf(tempfile));
+                    int size = ambiencelist.size();
+                    if (size == 0) {
                         ambiencelist.add(tempfile);
                         currentduration += tempduration;
-                    }
-                } else if (size == 3) {
-                    if (!tempfile.equals(ambiencelist.get(size - 1)) && !tempfile.equals(ambiencelist.get(size - 2))) {
+                    } else if (size == 1) {
                         ambiencelist.add(tempfile);
                         currentduration += tempduration;
-                    }
-                } else if (size <= 5) {
-                    if (!tempfile.equals(ambiencelist.get(size - 1)) && !tempfile.equals(ambiencelist.get(size - 2)) && !tempfile.equals(ambiencelist.get(size - 3))) {
-                        ambiencelist.add(tempfile);
-                        currentduration += tempduration;
-                    }
-                } else if (size > 5) {
-                    if (!tempfile.equals(ambiencelist.get(size - 1)) && !tempfile.equals(ambiencelist.get(size - 2)) && !tempfile.equals(ambiencelist.get(size - 3)) && !tempfile.equals(ambiencelist.get(size - 4))) {
-                        ambiencelist.add(tempfile);
-                        currentduration += tempduration;
+                    } else if (size == 2) {
+                        if (!tempfile.equals(ambiencelist.get(size - 1))) {
+                            ambiencelist.add(tempfile);
+                            currentduration += tempduration;
+                        }
+                    } else if (size == 3) {
+                        if (!tempfile.equals(ambiencelist.get(size - 1)) && !tempfile.equals(ambiencelist.get(size - 2))) {
+                            ambiencelist.add(tempfile);
+                            currentduration += tempduration;
+                        }
+                    } else if (size <= 5) {
+                        if (!tempfile.equals(ambiencelist.get(size - 1)) && !tempfile.equals(ambiencelist.get(size - 2)) && !tempfile.equals(ambiencelist.get(size - 3))) {
+                            ambiencelist.add(tempfile);
+                            currentduration += tempduration;
+                        }
+                    } else if (size > 5) {
+                        if (!tempfile.equals(ambiencelist.get(size - 1)) && !tempfile.equals(ambiencelist.get(size - 2)) && !tempfile.equals(ambiencelist.get(size - 3)) && !tempfile.equals(ambiencelist.get(size - 4))) {
+                            ambiencelist.add(tempfile);
+                            currentduration += tempduration;
+                        }
                     }
                 }
             }
+            ambiencemedia.addAll(ambiencelist.stream().map(i -> new Media(i.toURI().toString())).collect(Collectors.toList()));
+            System.out.println(name + "'s Ambience Builder Returning " + Boolean.toString(ambiencemedia.size() > 0));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        ambiencemedia.addAll(ambiencelist.stream().map(i -> new Media(i.toURI().toString())).collect(Collectors.toList()));
         return ambiencemedia.size() > 0;
     }
     public void reset() {
@@ -336,13 +342,19 @@ public class Cut {
                     double entrainmentvolume = frac * thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
                     getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
                     thisession.Root.EntrainmentVolume.setValue(entrainmentvolume);
+                    Double value = thisession.Root.EntrainmentVolume.getValue() * 100;
+                    thisession.Root.EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     thisession.Root.EntrainmentVolume.setDisable(true);
                 }
             };
             fadeinentrainment.setOnFinished(event -> {
                 thisession.Root.EntrainmentVolume.setDisable(false);
                 thisession.Root.EntrainmentVolume.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
-                thisession.Root.EntrainmentVolume.setOnMouseClicked(event1 -> thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.EntrainmentVolume.getValue()));
+                thisession.Root.EntrainmentVolume.setOnMouseDragged(event1 -> {
+                    thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.EntrainmentVolume.getValue());
+                    Double value = thisession.Root.EntrainmentVolume.getValue() * 100;
+                    thisession.Root.EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                });
             });
             if (ambienceenabled) {
                 fadeinambience = new Transition() {
@@ -352,13 +364,19 @@ public class Cut {
                         double ambiencevolume = frac * thisession.Root.getOptions().getSessionOptions().getAmbiencevolume();
                         getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                         thisession.Root.AmbienceVolume.setValue(ambiencevolume);
+                        Double value = thisession.Root.AmbienceVolume.getValue() * 100;
+                        thisession.Root.AmbienceVolumePercentage.setText(value.intValue() + "%");
                         thisession.Root.AmbienceVolume.setDisable(true);
                     }
                 };
                 fadeinambience.setOnFinished(event -> {
                     thisession.Root.AmbienceVolume.setDisable(false);
                     thisession.Root.AmbienceVolume.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
-                    thisession.Root.AmbienceVolume.setOnMouseClicked(event1 -> thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.AmbienceVolume.getValue()));
+                    thisession.Root.AmbienceVolume.setOnMouseDragged(event1 -> {
+                        thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.AmbienceVolume.getValue());
+                        Double value = thisession.Root.AmbienceVolume.getValue() * 100;
+                        thisession.Root.AmbienceVolumePercentage.setText(value.intValue() + "%");
+                    });
                 });
             }
         }

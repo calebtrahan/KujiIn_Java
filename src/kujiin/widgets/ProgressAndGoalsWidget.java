@@ -42,7 +42,6 @@ public class ProgressAndGoalsWidget implements Widget {
     private CheckBox PreAndPostOption;
     private Button DetailedCutProgressButton;
     private Button SessionListButton;
-    private Button PrematureEndingsButton;
 // Goals Fields
     private CurrentGoals CurrentGoals;
     private CompletedGoals CompletedGoals;
@@ -69,7 +68,6 @@ public class ProgressAndGoalsWidget implements Widget {
         PreAndPostOption = mainController.PrePostSwitch;
         DetailedCutProgressButton = mainController.ShowCutProgressButton;
         SessionListButton = mainController.ListOfSessionsButton;
-        PrematureEndingsButton = mainController.PrematureEndingsButton;
         Sessions = new Sessions();
         CurrentGoals = new CurrentGoals();
         CompletedGoals = new CompletedGoals();
@@ -157,14 +155,6 @@ public class ProgressAndGoalsWidget implements Widget {
             Tools.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");
         } else {new DisplaySessionListDialog(null, Sessions.getSession()).showAndWait();}
     }
-    public void displayprematureendings() {
-        if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Select A Cut"); return;}
-        ArrayList<Session> prematuresessionlist = Sessions.getsessionswithprematureendings(cutindex);
-        if (prematuresessionlist.size() > 0) {
-            DisplayPrematureEndingsDialog a = new DisplayPrematureEndingsDialog(null, prematuresessionlist);
-            a.showAndWait();
-        } else {Tools.showinformationdialog("Cannot Display", "Nothing To Display", "No Sessions Ended Prematurely To Display");}
-    }
     public void setnewgoal() {
         if (cutindex == -1) {Tools.showinformationdialog("Information","No Cut Selected", "Select A Cut To Add A Goal To"); return;}
         SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(cutindex, this);
@@ -207,7 +197,6 @@ public class ProgressAndGoalsWidget implements Widget {
         PreAndPostOption.setDisable(true);
         DetailedCutProgressButton.setDisable(true);
         SessionListButton.setDisable(true);
-        PrematureEndingsButton.setDisable(true);
         NewGoalButton.setDisable(true);
         CurrentGoalsButton.setDisable(true);
         CompletedGoalsButton.setDisable(true);
@@ -223,7 +212,6 @@ public class ProgressAndGoalsWidget implements Widget {
         PreAndPostOption.setDisable(false);
         DetailedCutProgressButton.setDisable(false);
         SessionListButton.setDisable(false);
-        PrematureEndingsButton.setDisable(false);
         NewGoalButton.setDisable(false);
         CurrentGoalsButton.setDisable(false);
         CompletedGoalsButton.setDisable(false);
@@ -496,50 +484,6 @@ public class ProgressAndGoalsWidget implements Widget {
 
         public void closeDialog(Event event) {this.close();}
     }
-    public static class DisplayPrematureEndingsDialog extends Stage {
-
-        public TableView<PrematureEnding> prematureendingTable;
-        public TableColumn<PrematureEnding, String> DateColumn;
-        public TableColumn<PrematureEnding, String> LastCutPracticedColumn;
-        public TableColumn<PrematureEnding, String> ExpectedSessionColumn;
-        public Button CloseButton;
-        public TableColumn<PrematureEnding, String> ReasonColumn;
-        public ArrayList<Session> sessionwithprematureendings;
-
-        public DisplayPrematureEndingsDialog(Parent parent, ArrayList<Session> sessionwithprematureendings) {
-            this.sessionwithprematureendings = sessionwithprematureendings;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayPrematureEndings.fxml"));
-            fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Premature Endings");}
-            catch (IOException e) {e.printStackTrace();}
-            ObservableList<PrematureEnding> prematureEndings = FXCollections.observableArrayList();
-            for (Session i : sessionwithprematureendings) {
-                prematureEndings.add(new PrematureEnding(i.getDate_Practiced(), i.getLast_Cut_Practiced_Before_Premature_Ending(), i.getExpected_Session_List(), i.getPremature_Ending_Reason()));
-            }
-            DateColumn.setCellValueFactory(cellData -> cellData.getValue().date);
-            LastCutPracticedColumn.setCellValueFactory(cellData -> cellData.getValue().lastcutpracticed);
-            ExpectedSessionColumn.setCellValueFactory(cellData -> cellData.getValue().expectedsessionlist);
-            ReasonColumn.setCellValueFactory(cellData -> cellData.getValue().reason);
-            prematureendingTable.setItems(prematureEndings);
-        }
-
-        public void closeDialog(Event event) {this.close();}
-
-        public class PrematureEnding {
-            public StringProperty date;
-            public StringProperty lastcutpracticed;
-            public StringProperty expectedsessionlist;
-            public StringProperty reason;
-
-            public PrematureEnding(String date, String lastcutpracticed, String expectedsessionlist, String reason) {
-                this.date = new SimpleStringProperty(date);
-                this.lastcutpracticed = new SimpleStringProperty(lastcutpracticed);
-                this.expectedsessionlist = new SimpleStringProperty(expectedsessionlist);
-                this.reason = new SimpleStringProperty(reason);
-            }
-        }
-
-    }
     public static class GoalPacingDialog extends Stage implements Initializable {
         public Label SelectedGoalHours;
         public Button SelectADiffferentGoalButton;
@@ -595,33 +539,6 @@ public class ProgressAndGoalsWidget implements Widget {
         }
         public void closedialog(ActionEvent actionEvent) {close();}
 
-    }
-    public static class PrematureEndingDialog extends Stage {
-        public TextArea Reason;
-        public Button AcceptButton;
-        public Button CancelButton;
-        private kujiin.xml.Options Options;
-
-        public PrematureEndingDialog(Options options) {
-            Options = options;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/PrematureEndingDialog.fxml"));
-            fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Ending Session Prematurely");
-            } catch (IOException e) {e.printStackTrace();}
-        }
-
-        public String getReason() {
-            if (! Reason.getText().isEmpty()) {return Reason.getText();}
-            else {return null;}
-        }
-        public void accepted(ActionEvent actionEvent) {
-            this.close();
-        }
-        public void rejected(ActionEvent actionEvent) {
-            Options.getSessionOptions().setPrematureendings(! Tools.getanswerdialog("Disable Premature Endings", "Disable Premature Endings Dialog", "This Will Keep This Session From Displaying In The Future"));
-            Reason.setText("");
-            this.close();
-        }
     }
     public static class SelectGoalDialog extends Stage {
         public TableView<CurrentGoalBinding> currentgoaltable;

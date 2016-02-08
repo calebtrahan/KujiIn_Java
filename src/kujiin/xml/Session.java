@@ -34,10 +34,6 @@ public class Session {
     private ArrayList<File> Zai_Ambience;
     private ArrayList<File> Zen_Ambience;
     private ArrayList<File> Postsession_Ambience;
-    private Boolean Ended_Prematurely;
-    private String Last_Cut_Practiced_Before_Premature_Ending;
-    private String Premature_Ending_Reason;
-    private String Expected_Session_List;
 
     public Session(Integer presession_duration, Integer rin_duration, Integer kyo_duration, Integer toh_duration,
                    Integer sha_duration, Integer kai_duration, Integer jin_duration, Integer retsu_duration, Integer zai_duration, Integer zen_duration, Integer postsession_duration, Integer total_session_duration) {
@@ -192,14 +188,6 @@ public class Session {
     }
     public String getDate_Practiced() {return Date_Practiced;}
     public void setDate_Practiced(String date_Practiced) {Date_Practiced = date_Practiced;}
-    public String getPremature_Ending_Reason() {return Premature_Ending_Reason;}
-    public void setPremature_Ending_Reason(String premature_Ending_Reason) {Premature_Ending_Reason = premature_Ending_Reason;}
-    public String getLast_Cut_Practiced_Before_Premature_Ending() {return Last_Cut_Practiced_Before_Premature_Ending;}
-    public void setLast_Cut_Practiced_Before_Premature_Ending(String last_Cut_Practiced_Before_Premature_Ending) {Last_Cut_Practiced_Before_Premature_Ending = last_Cut_Practiced_Before_Premature_Ending;}
-    public String getExpected_Session_List() {return Expected_Session_List;}
-    public void setExpected_Session_List(String expected_Session_List) {Expected_Session_List = expected_Session_List;}
-    public Boolean getEnded_Prematurely() {return Ended_Prematurely;}
-    public void setEnded_Prematurely(Boolean ended_Prematurely) {Ended_Prematurely = ended_Prematurely;}
 
 // Other Methods
     public void updatecutduration(int cutindex, int duration) {
@@ -272,26 +260,5 @@ public class Session {
         for (Integer i: getallcuttimes()) {total += i;}
         setTotal_Session_Duration(total);
     }
-    public void writeprematureending(String lastcutpracticed, String reason) {
-        setLast_Cut_Practiced_Before_Premature_Ending(lastcutpracticed);
-        setPremature_Ending_Reason(reason);
-        ArrayList<Integer> expectedsessionlist = new ArrayList<>();
-        expectedsessionlist.add(getRin_Duration());
-        expectedsessionlist.add(getKyo_Duration());
-        expectedsessionlist.add(getToh_Duration());
-        expectedsessionlist.add(getSha_Duration());
-        expectedsessionlist.add(getKai_Duration());
-        expectedsessionlist.add(getJin_Duration());
-        expectedsessionlist.add(getRetsu_Duration());
-        expectedsessionlist.add(getZai_Duration());
-        expectedsessionlist.add(getZen_Duration());
-        StringBuilder text = new StringBuilder();
-        for (int i=0; i<expectedsessionlist.size(); i++) {
-            text.append(expectedsessionlist.get(i));
-            if (i < expectedsessionlist.size() - 1) {text.append(", ");}
-        }
-        setExpected_Session_List(text.toString());
-    }
-    public boolean wasendedPremature() {return getPremature_Ending_Reason() == null || getPremature_Ending_Reason().equals("");}
 
 }

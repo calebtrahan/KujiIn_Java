@@ -37,6 +37,8 @@ public class PlayerWidget implements Widget {
     private CheckBox ReferenceFileCheckbox;
     private Slider EntrainmentVolume;
     private Slider AmbienceVolume;
+    private Label EntrainmentPercentage;
+    private Label AmbiencePercentage;
     private Label StatusBar;
     private This_Session Session;
     private CreatorAndExporterWidget creatorAndExporterWidget;
@@ -58,6 +60,8 @@ public class PlayerWidget implements Widget {
         ReferenceFileCheckbox = mainController.ReferenceFilesOption;
         EntrainmentVolume = mainController.EntrainmentVolume;
         AmbienceVolume = mainController.AmbienceVolume;
+        EntrainmentPercentage = mainController.EntrainmentVolumePercentage;
+        AmbiencePercentage = mainController.AmbienceVolumePercentage;
         StatusBar = mainController.PlayerStatusBar;
         Session = mainController.getSession();
         creatorAndExporterWidget = mainController.getCreatorAndExporter();
@@ -149,6 +153,8 @@ public class PlayerWidget implements Widget {
         ReferenceFileCheckbox.setDisable(true);
         EntrainmentVolume.setDisable(true);
         AmbienceVolume.setDisable(true);
+        EntrainmentPercentage.setText("-");
+        AmbiencePercentage.setText("-");
         onOffSwitch.setText("OFF");
     }
     @Override
@@ -175,6 +181,8 @@ public class PlayerWidget implements Widget {
         if (Session.getAmbienceenabled()) {AmbienceVolume.setDisable(false);}
         else {AmbienceVolume.setDisable(true);}
         EntrainmentVolume.setDisable(false);
+        EntrainmentPercentage.setText("-");
+        AmbiencePercentage.setText("-");
         onOffSwitch.setText("ON");
         readytoplay();
     }
