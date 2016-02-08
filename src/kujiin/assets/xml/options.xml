@@ -10,6 +10,7 @@
         <entrainmentvolume>0.6</entrainmentvolume>
         <fadeinduration>10.0</fadeinduration>
         <fadeoutduration>10.0</fadeoutduration>
-        <prematureendings>true</prematureendings>
+        <rampduration>3</rampduration>
+        <rampenabled>true</rampenabled>
     </sessionOptions>
 </Options>

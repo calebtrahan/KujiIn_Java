@@ -866,6 +866,9 @@ public class MainController implements Initializable {
             }
             RampCheckbox.setSelected(Options.getSessionOptions().getRampenabled());
             RampDurationChoiceBox.setItems(rampselections);
+            if (Options.getSessionOptions().getRampduration() == 2) {RampDurationChoiceBox.getSelectionModel().select(0);}
+            else if (Options.getSessionOptions().getRampduration() == 3) {RampDurationChoiceBox.getSelectionModel().select(1);}
+            else if (Options.getSessionOptions().getRampduration() == 4) {RampDurationChoiceBox.getSelectionModel().select(2);}
             FadeInValue.setText(Options.getSessionOptions().getFadeinduration().toString());
             FadeOutValue.setText(Options.getSessionOptions().getFadeoutduration().toString());
             EntrainmentVolumePercentage.setText(Options.getSessionOptions().getEntrainmentvolume().toString());

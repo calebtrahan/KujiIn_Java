@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="462.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="462.0" prefWidth="499.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ScrollPane layoutX="7.0" layoutY="8.0" prefHeight="421.0" prefWidth="486.0">
          <content>
@@ -84,6 +84,20 @@
                         </Line>
                      </children>
                   </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="28.0" prefWidth="375.0">
+                     <children>
+                        <Label text="Fade In/Out" underline="true">
+                           <HBox.margin>
+                              <Insets left="70.0" right="20.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Label text="Volume Defaults" underline="true">
+                           <HBox.margin>
+                              <Insets left="80.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
                   <HBox prefHeight="34.0" prefWidth="406.0">
                      <children>
                         <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="200.0">
@@ -97,24 +111,9 @@
                               <Label text="seconds" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="200.0">
-                           <children>
-                              <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="80.0" text="Fade Out:" />
-                              <TextField fx:id="FadeOutValue" prefWidth="40.0">
-                                 <HBox.margin>
-                                    <Insets left="5.0" right="5.0" />
-                                 </HBox.margin>
-                              </TextField>
-                              <Label text="seconds" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="34.0" prefWidth="406.0">
-                     <children>
                         <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="162.0">
                            <children>
-                              <Label alignment="CENTER" prefHeight="42.0" prefWidth="80.0" text="Entrainment Volume:" textAlignment="RIGHT" wrapText="true">
+                              <Label alignment="CENTER_RIGHT" prefHeight="42.0" prefWidth="80.0" text="Entrainment" textAlignment="RIGHT" wrapText="true">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
@@ -127,9 +126,24 @@
                               <Label text="\%" />
                            </children>
                         </HBox>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="34.0" prefWidth="406.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="200.0">
+                           <children>
+                              <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="80.0" text="Fade Out:" />
+                              <TextField fx:id="FadeOutValue" prefWidth="40.0">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </TextField>
+                              <Label text="seconds" />
+                           </children>
+                        </HBox>
                         <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="152.0">
                            <children>
-                              <Label prefHeight="34.0" prefWidth="80.0" text="Ambience Volume" textAlignment="RIGHT" wrapText="true" />
+                              <Label alignment="CENTER_RIGHT" prefHeight="34.0" prefWidth="80.0" text="Ambience" textAlignment="RIGHT" wrapText="true" />
                               <TextField fx:id="AmbienceVolumePercentage" prefWidth="40.0">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" />
@@ -138,7 +152,7 @@
                               <Label text="\%" />
                            </children>
                            <HBox.margin>
-                              <Insets left="40.0" />
+                              <Insets />
                            </HBox.margin>
                         </HBox>
                      </children>

@@ -25,17 +25,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class This_Session {
-    private Cut presession = new Cut(0, "Presession", true, 0, this);
-    private Cut rin = new Cut(1, "RIN", false, 0, this);
-    private Cut kyo = new Cut(2, "KYO", false, 0, this);
-    private Cut toh = new Cut(3, "TOH", false, 0, this);
-    private Cut sha = new Cut(4, "SHA", false, 0, this);
-    private Cut jin = new Cut(6, "JIN", false, 0, this);
-    private Cut kai = new Cut(5, "KAI", false, 0, this);
-    private Cut retsu = new Cut(7, "RETSU", false, 0, this);
-    private Cut zai = new Cut(8, "ZAI", false, 0, this);
-    private Cut zen = new Cut(9, "ZEN", false, 0, this);
-    private Cut postsession = new Cut(10, "Postsession", true, 0, this);
+    private Cut presession = new Cut(0, "Presession", 0, this);
+    private Cut rin = new Cut(1, "RIN", 0, this);
+    private Cut kyo = new Cut(2, "KYO", 0, this);
+    private Cut toh = new Cut(3, "TOH", 0, this);
+    private Cut sha = new Cut(4, "SHA", 0, this);
+    private Cut jin = new Cut(6, "JIN", 0, this);
+    private Cut kai = new Cut(5, "KAI", 0, this);
+    private Cut retsu = new Cut(7, "RETSU", 0, this);
+    private Cut zai = new Cut(8, "ZAI", 0, this);
+    private Cut zen = new Cut(9, "ZEN", 0, this);
+    private Cut postsession = new Cut(10, "Postsession", 0, this);
     private ArrayList<Cut> cutsinsession;
     private Boolean ambienceenabled;
     private PlayerWidget.PlayerState playerState;
@@ -141,8 +141,8 @@ public class This_Session {
                         protected Void call() throws Exception {
                             int cutcount = 0;
                             for (Integer i : textfieldvalues) {
-                                if (i != 0) {
-                                    Cut thiscut = tempcuts[cutcount];
+                                Cut thiscut = tempcuts[cutcount];
+                                if (i != 0 || thiscut.number == 0 || thiscut.number == 10) {
                                     updateMessage(String.format("Currently Checking %s...", thiscut.name));
                                     if (thiscut.getambienceindirectory()) {
                                         if (!thiscut.hasenoughAmbience(i * 60)) {cutswithreducedambience.add(thiscut);}
