@@ -170,7 +170,7 @@ public class ProgressAndGoalsWidget implements Widget {
         if (! CurrentGoals.goalsexist(cutindex)) {Tools.showinformationdialog("Information", "No Goals Exist For " + GOALCUTNAMES[cutindex], "Please Add A Goal For " + GOALCUTNAMES[cutindex]); return;}
         List<CurrentGoals.CurrentGoal> goalslist = CurrentGoals.getallcutgoals(cutindex);
         if (goalslist == null) {Tools.showinformationdialog("Information", "No Goals To Display", "Set A New Goal First"); return;}
-        new DisplayCurrentGoalsDialog(goalslist, Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutes(cutindex, PreAndPostOption.isSelected()))).showAndWait();
+        new DisplayCurrentGoalsDialog(goalslist, Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected()), 2)).showAndWait();
     }
     public void displaycompletedgoals() {
         if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Display Completed Goals"); return;}
@@ -180,7 +180,7 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     public void goalpacing() {
         if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Calculate Goal Pacing"); return;}
-        new GoalPacingDialog(CurrentGoals.getgoal(cutindex, 0), CurrentGoals.getTotalGoals(), Sessions.getpracticedtimeinminutes(cutindex, PreAndPostOption.isSelected())).showAndWait();
+        new GoalPacingDialog(CurrentGoals.getgoal(cutindex, 0), CurrentGoals.getTotalGoals(), Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected())).showAndWait();
     }
 
 // Widget Implementation
@@ -246,7 +246,7 @@ public class ProgressAndGoalsWidget implements Widget {
     // Update Total Progress
         try {
             int averagesessionduration = Sessions.averagepracticetimeinminutes(cutindex, PreAndPostOption.isSelected());
-            int totalminutespracticed = Sessions.getpracticedtimeinminutes(cutindex, PreAndPostOption.isSelected());
+            int totalminutespracticed = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
             int numberofsessionspracticed = Sessions.cutsessionscount(cutindex);
             String nonetext = "No Sessions";
             if (averagesessionduration != 0) {AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins(averagesessionduration));}
@@ -266,17 +266,21 @@ public class ProgressAndGoalsWidget implements Widget {
     public void updategoalsui() {
         // TODO Goals Not Updating With Total Progress Widget
         try {
-            String cutname = GOALCUTNAMES[cutindex];
-            if (! CurrentGoals.goalsexist(cutindex)) {
-                resetallvalues();
-                return;
-            }
-            Double practiced = Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutes(cutindex, PreAndPostOption.isSelected()));
-//            System.out.println("Goal: " + practiced);
+            String cutname =  GOALCUTNAMES[cutindex];
+//            if (! CurrentGoals.goalsexist(cutindex)) {
+//                resetallvalues();
+//                return;
+//            }
+            Double practiced = Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected()), 2);
             Double goal = CurrentGoals.getgoal(cutindex, 0).getGoal_Hours();
-            PracticedHours.setText("Current: " + practiced.toString() + " hrs");
-            GoalHours.setText("Goal: " + goal.toString() + " hrs");
-            GoalProgress.setProgress(practiced / goal);
+            PracticedHours.setText(String.format("Current: %s hrs", practiced.toString()));
+            if (goal != null) {
+                GoalHours.setText(String.format("Goal: %s hrs", goal.toString()));
+                GoalProgress.setProgress(practiced / goal);
+            } else {
+                GoalHours.setText("?");
+                GoalProgress.setProgress(0.0);
+            }
             if (cutname.equals(GOALCUTNAMES[10])) { TopLabel.setText("Total Goal");}
             else if (cutname.equals(GOALCUTNAMES[0])) {TopLabel.setText("Pre + Post Goal");}
             else {TopLabel.setText(cutname + "'s Current Goal");}

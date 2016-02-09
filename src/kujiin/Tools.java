@@ -9,6 +9,8 @@ import kujiin.xml.Options;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -157,12 +159,14 @@ public class Tools {
     public static String convertfromlocaldatetostring(LocalDate localdate) {
         return localdate.format(dateFormat);
     }
-    public static Double convertminutestodecimalhours(int mins) {
-        int hours = mins / 60;
-        int minutes = mins % 60;
-        Double decimalhours = (double) (minutes / 60);
-        decimalhours += (double) hours;
-        return decimalhours;
+    public static Double convertminutestodecimalhours(int mins, int decimalplaces) {
+        double hours = mins / 60;
+        double minutes = mins % 60;
+        double decimalminutes = minutes / 60;
+        decimalminutes += hours;
+        BigDecimal bd = new BigDecimal(decimalminutes);
+        bd = bd.setScale(decimalplaces, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
     public static int convertdecimalhourstominutes(double decimalhours) {
         Double minutes = 60 * decimalhours;

@@ -212,7 +212,6 @@ public class Cut {
         }
         return entrainmentmedia.size() > 0;
     }
-    // TODO If Presession Duration Is 0, Throwing An Exception
     public boolean buildAmbience() {
         ambiencelist = new ArrayList<>();
         ambiencemedia = new ArrayList<>();
@@ -384,10 +383,11 @@ public class Cut {
                     double entvol = thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
                     double entrainmentvolume = frac * entvol;
                     double fadeoutvolume = entvol - entrainmentvolume;
-                    System.out.println("Fading Out Entrainment! Setting Volume To " + fadeoutvolume);
                     getCurrentEntrainmentPlayer().setVolume(fadeoutvolume);
                     thisession.Root.EntrainmentVolume.setValue(fadeoutvolume);
                     thisession.Root.EntrainmentVolume.setDisable(true);
+                    Double value = thisession.Root.EntrainmentVolume.getValue() * 100;
+                    thisession.Root.EntrainmentVolumePercentage.setText(value.intValue() + "%");
                 }
             };
             if (ambienceenabled) {
@@ -398,10 +398,11 @@ public class Cut {
                         double ambvol = thisession.Root.getOptions().getSessionOptions().getAmbiencevolume();
                         double ambiencevolume = frac * ambvol;
                         double fadeoutvolume = ambvol - ambiencevolume;
-                        System.out.println("Fading Out Ambience! Setting Volume To " + fadeoutvolume);
                         getCurrentAmbiencePlayer().setVolume(fadeoutvolume);
                         thisession.Root.AmbienceVolume.setValue(fadeoutvolume);
                         thisession.Root.AmbienceVolume.setDisable(true);
+                        Double value = thisession.Root.AmbienceVolume.getValue() * 100;
+                        thisession.Root.AmbienceVolumePercentage.setText(value.intValue() + "%");
                     }
                 };
             }

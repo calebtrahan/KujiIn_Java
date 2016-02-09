@@ -87,7 +87,26 @@ public class Sessions {
     }
 
 // Session Information Getters
-    public int getpracticedtimeinminutes(int index, Boolean includepreandpost) {
+    public int getpracticetimeinminutesforthissession(int index, Boolean includepreandpost) {
+        try {
+            int totalminutes = 0;
+            kujiin.xml.Session thissession = getsession(totalsessioncount() - 1);
+            if (index == 0) {
+                // Pre And Post
+                totalminutes += thissession.getcutduration(0);
+                totalminutes += thissession.getcutduration(10);
+            } else if (index == 10) {
+                // TOTAL!
+                if (includepreandpost) {for (int x=0; x<11;x++) {totalminutes += thissession.getcutduration(x);}}
+                else {for (int x=1; x<10;x++) {totalminutes += thissession.getcutduration(x);}}
+            } else {
+                // Indidivual Cut
+                totalminutes += thissession.getcutduration(index);
+            }
+            return totalminutes;
+        } catch (NullPointerException ignored) {return 0;}
+    }
+    public int getpracticedtimeinminutesforallsessions(int index, Boolean includepreandpost) {
         try {
             int totalminutes = 0;
             if (index == 0) {
@@ -110,7 +129,7 @@ public class Sessions {
         } catch (NullPointerException ignored) {return 0;}
     }
     public int averagepracticetimeinminutes(int index, Boolean includepreandpost) {
-        try {return getpracticedtimeinminutes(index, includepreandpost) / getSession().size();}
+        try {return getpracticedtimeinminutesforallsessions(index, includepreandpost) / getSession().size();}
         catch (NullPointerException | ArithmeticException ignored) {return 0;}
     }
     public int cutsessionscount(int index) {
