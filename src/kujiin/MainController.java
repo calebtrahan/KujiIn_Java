@@ -11,7 +11,6 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
@@ -25,7 +24,6 @@ import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.PlayerWidget;
 import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Options;
-import kujiin.xml.Session;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -110,7 +108,7 @@ public class MainController implements Initializable {
         sessionplayerswitch(null);
         CreatorStatusBar.setText("");
     }
-    public Boolean cleanup() {
+    public boolean cleanup() {
         return getPlayer().cleanup() && getCreatorAndExporter().cleanup() && getProgressTracker().cleanup();
     }
 
@@ -147,15 +145,6 @@ public class MainController implements Initializable {
     }
 
 // Top Menu Actions
-    public void changealertfile(ActionEvent actionEvent) {
-        ChangeAlertDialog a = new ChangeAlertDialog(null);
-        a.showAndWait();
-        if (a.getAlertfilechanged()) {
-            Tools.showtimedmessage(PlayerStatusBar, "Alert File Changed Successfully", 5000);
-        } else {
-            Tools.showtimedmessage(PlayerStatusBar, "Changing The Alert File Failed", 5000);
-        }
-    }
     public void editprogramsambience(ActionEvent actionEvent) {
         SessionAmbienceEditor sae = new SessionAmbienceEditor();
         sae.showAndWait();
@@ -188,85 +177,14 @@ public class MainController implements Initializable {
     public void viewcompletedgoals(Event event) {
         ProgressTracker.displaycompletedgoals();}
 
-// Created Session Widget
-    public boolean getsessioninformation() {
-        try {
-            boolean cutsinsession = Session.getCutsinsession().size() != 0;
-            if (cutsinsession) {
-                Session session = new Session();
-                ArrayList<Integer> cuttimes = new ArrayList<>(11);
-                for (String i : kujiin.xml.Options.allnames) {
-                    Integer duration = 0;
-                    for (Cut x : this.Session.getCutsinsession()) {if (x.name.equals(i)) {duration = x.getdurationinminutes();}}
-                    cuttimes.add(duration);
-                }
-                session.updatecutduration(0, cuttimes.get(0));
-                settextfieldvalue(PreTime, cuttimes.get(0));
-                session.updatecutduration(1, cuttimes.get(1));
-                settextfieldvalue(RinTime, cuttimes.get(1));
-                session.updatecutduration(2, cuttimes.get(2));
-                settextfieldvalue(KyoTime, cuttimes.get(2));
-                session.updatecutduration(3, cuttimes.get(3));
-                settextfieldvalue(TohTime, cuttimes.get(3));
-                session.updatecutduration(4, cuttimes.get(4));
-                settextfieldvalue(ShaTime, cuttimes.get(4));
-                session.updatecutduration(5, cuttimes.get(5));
-                settextfieldvalue(KaiTime, cuttimes.get(5));
-                session.updatecutduration(6, cuttimes.get(6));
-                settextfieldvalue(JinTime, cuttimes.get(6));
-                session.updatecutduration(7, cuttimes.get(7));
-                settextfieldvalue(RetsuTime, cuttimes.get(7));
-                session.updatecutduration(8, cuttimes.get(8));
-                settextfieldvalue(ZaiTime, cuttimes.get(8));
-                session.updatecutduration(9, cuttimes.get(9));
-                settextfieldvalue(ZenTime, cuttimes.get(9));
-                session.updatecutduration(10, cuttimes.get(10));
-                settextfieldvalue(PostTime, cuttimes.get(10));
-            }
-            // Set Ambience Enabled And This_Session Total Time
-//            if (Session.getAmbienceenabled()) {AmbienceEnabledTextField.setText("Yes"); AmbienceEnabledTextField.setDisable(false);}
-//            else {AmbienceEnabledTextField.setText("No"); AmbienceEnabledTextField.setDisable(true);}
-//            TotalSessionTimeTextField.setText(Session.gettotalsessionduration());
-//            TotalSessionTimeTextField.setDisable(! cutsinsession);
-            return true;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return false;
-        }
-    }
+// Creator And Exporter Widget
     public void loadpreset(ActionEvent actionEvent) {
         CreatorAndExporter.loadpreset();}
     public void savepreset(ActionEvent actionEvent) {
         CreatorAndExporter.savepreset();}
-    public void createsession(Event event) {
-//        if (creatorState == CreatorState.NOT_CREATED || creatorState == CreatorState.CREATED) {
-//            if (creatorState == CreatorState.CREATED) {
-//                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//                alert.setTitle("This_Session Validation");
-//                alert.setHeaderText("This_Session Is Already Created");
-//                alert.setContentText("Overwrite Previous This_Session?");
-//                Optional<ButtonType> result = alert.showAndWait();
-//                if ((result.isPresent()) && (result.get() != ButtonType.OK)) {
-//                    creatorState = CreatorState.NOT_CREATED; return;
-//                }
-//            }
-//            creatorState = CreatorState.CREATION_IN_PROGRESS;
-//            ChangeSessionValues createsession = new ChangeSessionValues(Session);
-//            createsession.showAndWait();
-//            if (getsessioninformation()) {creatorState = CreatorState.CREATED;}
-//            else {
-//                creatorState = CreatorState.NOT_CREATED;
-//            }
-//        } else {
-//            PlayerStatusBar.setText("Session Creation In Progress");
-//        }
-    }
     public void exportsession(Event event) {
         //        CreatorAndExporter.startexport();}
         Tools.showtimedmessage(CreatorStatusBar, "Exporter Is Broken. FFMPEG Is Being A Pain In The Ass", 3000);
-    }
-    public void settextfieldvalue(TextField textField, Integer value) {
-        if (value > 0) {textField.setDisable(false); textField.setText(Integer.toString(value));}
-        else {textField.setText("-"); textField.setDisable(true);}
     }
     public void ambienceswitch(ActionEvent actionEvent) {
         CreatorAndExporter.checkambience();}
@@ -298,63 +216,11 @@ public class MainController implements Initializable {
     public void changesessionoptions(ActionEvent actionEvent) {
         new ChangeProgramOptions(Options).showAndWait();
         Options.marshall();
+        getProgressTracker().updategoalsui();
+        getProgressTracker().updateprogressui();
     }
 
-// Menu Tools/Dialogs
-    public static class ChangeAlertDialog extends Stage {
-        public TextField alertfileTextField;
-        public Button openFileButton;
-        public Button AcceptButton;
-        public Button CancelButton;
-        private File newalertfile = null;
-        private File alertfileactual = kujiin.xml.Options.alertfile;
-        private Boolean alertfilechanged = null;
-
-        public ChangeAlertDialog(Parent parent) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeAlertDialog.fxml"));
-            fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select An Ambience Type Variation");}
-            catch (IOException e) {new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());}
-            if (alertfileactual.exists()) {this.setTitle("Change Alert File");}
-            else {this.setTitle("Add A New Alert File");}
-            alertfileTextField.setEditable(false);
-        }
-
-        public void commitchanges(Event event) {
-            if (newalertfile != null) {
-                if (alertfileactual.exists()) {                                                                             // Change Alert File
-                    File tempfile = new File(kujiin.xml.Options.sounddirectory, "AlertTemp.mp3");
-                    try {
-                        // Make A Temp File Copy In Case It Fails
-                        FileUtils.copyFile(alertfileactual, tempfile);
-                        alertfileactual.delete();
-                        FileUtils.copyFile(newalertfile, alertfileactual);
-                        if (Tools.testAlertFile()) {tempfile.delete();}
-                    } catch (IOException e) {setAlertfilechanged(false);}
-                } else {                                                                                                    // Set A New Alert File
-                    try {
-                        FileUtils.copyFile(newalertfile, alertfileactual);
-                    } catch (IOException e) {setAlertfilechanged(false);}
-                }
-                setAlertfilechanged(Tools.testAlertFile());
-                this.close();
-            } else {Tools.showerrordialog("Error", "No Alert File Opened", "Open An Alert File First");}
-        }
-
-        public void cancel(Event event) {
-            setAlertfilechanged(false);
-            this.close();
-        }
-
-        public Boolean getAlertfilechanged() {
-            if (alertfilechanged != null) {
-                return alertfilechanged;
-            } else {
-                return false;
-            }
-        }
-        public void setAlertfilechanged(Boolean alertfilechanged) {this.alertfilechanged = alertfilechanged;}
-    }
+// Dialogs
     public static class EditReferenceFiles extends Stage {
 
         public ChoiceBox<String> CutNamesChoiceBox;
@@ -849,8 +715,12 @@ public class MainController implements Initializable {
             FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             AmbienceVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            TooltipsCheckBox.setSelected(Options.getProgramOptions().getTooltips());
-            HelpDialogsCheckBox.setSelected(Options.getProgramOptions().getHelpdialogs());
+            loadoptionsfromxml();
+            checkalertfile();
+        }
+
+    // Button Actions
+        public boolean checkalertfile() {
             String oldalertfilelocation = Options.getSessionOptions().getAlertfilelocation();
             if (oldalertfilelocation != null) {
                 AlertFile = new File(oldalertfilelocation);
@@ -864,6 +734,11 @@ public class MainController implements Initializable {
                     AlertFileTextField.setText("Select A New Alert File...");
                 }
             }
+            return AlertFile != null;
+        }
+        public void loadoptionsfromxml() {
+            TooltipsCheckBox.setSelected(Options.getProgramOptions().getTooltips());
+            HelpDialogsCheckBox.setSelected(Options.getProgramOptions().getHelpdialogs());
             RampCheckbox.setSelected(Options.getSessionOptions().getRampenabled());
             RampDurationChoiceBox.setItems(rampselections);
             if (Options.getSessionOptions().getRampduration() == 2) {RampDurationChoiceBox.getSelectionModel().select(0);}
@@ -874,8 +749,6 @@ public class MainController implements Initializable {
             EntrainmentVolumePercentage.setText(Options.getSessionOptions().getEntrainmentvolume().toString());
             AmbienceVolumePercentage.setText(Options.getSessionOptions().getAmbiencevolume().toString());
         }
-
-    // Button Actions
         public void apply(ActionEvent actionEvent) {
             Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
             Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
@@ -910,12 +783,19 @@ public class MainController implements Initializable {
                 if (Tools.validaudiofile(newfile)) {
                     double duration = Tools.getaudioduration(newfile);
                     if (duration > 10000) {
-                        if (Tools.getanswerdialog("Validation", "Alert File Is longer Than 10 Seconds",
+                        if (! Tools.getanswerdialog("Validation", "Alert File Is longer Than 10 Seconds",
                                 String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
-                                        "Really Use It?", duration))) {
-                            AlertFileTextField.setText(String.format("%s (%s)", newfile.getName(), Tools.formatlengthshort((int) duration)));
-                            AlertFile = newfile;
+                                        "Really Use It?", duration))) {return;}
+                    }
+                    if (! newfile.getAbsolutePath().equals(kujiin.xml.Options.alertfile.getAbsolutePath()) &&
+                            Tools.getanswerdialog("Validation", "Alert File Isn't In Program Directory", "Copy To Program Directory?")) {
+                        if (kujiin.xml.Options.alertfile.exists()) {
+                            if (!Tools.getanswerdialog("Overwrite", "Old Alert File Already Exists", "Overwrite?")) {return;}
                         }
+                        try {
+                            kujiin.xml.Options.alertfile.delete();
+                            FileUtils.copyFile(newfile, kujiin.xml.Options.alertfile);
+                        } catch (IOException e) {Tools.showerrordialog("Error", "Couldn't Copy File", "Check Program Directory Permissions");}
                     } else {
                         AlertFileTextField.setText(String.format("%s (%s)", newfile.getName(), Tools.formatlengthshort((int) duration)));
                         AlertFile = newfile;
@@ -926,13 +806,23 @@ public class MainController implements Initializable {
             }
         }
         public void resettodefaults(ActionEvent actionEvent) {
-            // TODO Finish Building Options Here
+            Options.resettodefaults();
+            loadoptionsfromxml();
+            valuechanged = true;
         }
         public void deleteallsessions(ActionEvent actionEvent) {
-
+            if (Tools.getanswerdialog("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+                if (! kujiin.xml.Options.sessionsxmlfile.delete()) {
+                    Tools.showerrordialog("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                } else {Tools.showinformationdialog("Success", "Successfully Delete Sessions And Reset All Progress", "");}
+            }
         }
         public void deleteallgoals(ActionEvent actionEvent) {
-
+            if (Tools.getanswerdialog("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+                if (! kujiin.xml.Options.currentgoalsxmlfile.delete() && !kujiin.xml.Options.completedgoalsxmlfile.delete()) {
+                    Tools.showerrordialog("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                } else {Tools.showinformationdialog("Success", "Successfully Delete Sessions And Reset All Progress", "");}
+            }
         }
 
         @Override

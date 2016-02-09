@@ -264,6 +264,7 @@ public class ProgressAndGoalsWidget implements Widget {
 
 // Goal Specific Methods
     public void updategoalsui() {
+        // TODO Goals Not Updating With Total Progress Widget
         try {
             String cutname = GOALCUTNAMES[cutindex];
             if (! CurrentGoals.goalsexist(cutindex)) {

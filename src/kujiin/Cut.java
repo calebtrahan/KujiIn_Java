@@ -580,6 +580,4 @@ public class Cut {
         if (tempambiencetextfile.exists()) {tempambiencetextfile.delete();}
     }
 
-// Goals / Total Progress
-
 }

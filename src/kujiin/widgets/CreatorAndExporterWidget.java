@@ -115,7 +115,7 @@ public class CreatorAndExporterWidget implements Widget {
 // Creation
     public boolean createsession() {
         if (gettextfieldtimes()) {
-            if (session.sessioncreationwellformednesschecks(textfieldtimes)) {
+            if (session.checksessionwellformedness(textfieldtimes)) {
                 session.setAmbienceenabled(AmbienceSwitch.isSelected());
                 session.create(textfieldtimes);
                 return true;
@@ -309,7 +309,7 @@ public class CreatorAndExporterWidget implements Widget {
     public void checkambience() {
         if (AmbienceSwitch.isSelected()) {
             if (gettextfieldtimes()) {
-                session.checkifambienceisgood(textfieldtimes, AmbienceSwitch);
+                session.checkambience(textfieldtimes, AmbienceSwitch);
             } else {
                 Tools.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
                 AmbienceSwitch.setSelected(false);

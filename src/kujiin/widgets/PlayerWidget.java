@@ -211,52 +211,7 @@ public class PlayerWidget implements Widget {
         Tools.showtimedmessage(StatusBar, "Turn Session Player Off To Edit This Session", 6000);
     }
 
-// Subclasses/Dialogs
-    public static class AdjustVolume extends Stage {
-        public Slider EntrainmentSlider;
-        public Slider AmbienceSlider;
-        public Label EntrainmentPercentage;
-        public Label AmbiencePercentage;
-
-        public AdjustVolume(Cut currentcut, This_Session session) {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AdjustSessionVolume.fxml"));
-                fxmlLoader.setController(this);
-                try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Adjust Session Volume");}
-                catch (IOException e) {e.printStackTrace();}
-//                if (currentcut.getCurrentAmbiencePlayer() != null) {
-//                    currentcut.getCurrentAmbiencePlayer().volumeProperty().bind(AmbienceSlider.valueProperty());
-//                    AmbienceSlider.setValue(session.getSessionAmbienceVolume());
-//                    AmbiencePercentage.setText(new Double(session.getSessionAmbienceVolume() * 100).intValue() + "%");
-//                    AmbienceSlider.setOnMouseClicked(event -> {
-//                        Double value = AmbienceSlider.getValue() * 100;
-//                        AmbiencePercentage.setText(value.intValue() + "%");
-//                        session.setSessionAmbienceVolume(AmbienceSlider.getValue());
-//                    });
-//                }
-//                else {
-//                    AmbienceSlider.setDisable(true);
-//                    AmbiencePercentage.setText("-");
-//                }
-//                if (currentcut.getCurrentEntrainmentPlayer() != null) {
-//                    currentcut.getCurrentEntrainmentPlayer().volumeProperty().bind(EntrainmentSlider.valueProperty());
-//                    EntrainmentSlider.setValue(session.getSessionEntrainmentVolume());
-//                    EntrainmentPercentage.setText(new Double(session.getSessionEntrainmentVolume() * 100).intValue() + "%");
-//                    EntrainmentSlider.setOnMouseClicked(event -> {
-//                        Double value = EntrainmentSlider.getValue() * 100;
-//                        EntrainmentPercentage.setText(value.intValue() + "%");
-//                        session.setSessionEntrainmentVolume(EntrainmentSlider.getValue());
-//                    });
-//                }
-//                else {
-//                    EntrainmentSlider.setDisable(true);
-//                    EntrainmentPercentage.setText("-");
-//                }
-            }
-
-            public Double getEntrainmentVolume() {return EntrainmentSlider.getValue();}
-            public Double getAmbienceVolume() {return AmbienceSlider.getValue();}
-
-    }
+// Dialogs
     public static class DisplayReference extends Stage {
         public ScrollPane ContentPane;
         private Cut currentcut;

@@ -92,23 +92,7 @@ public class Options {
                         optionsxmlfile.getName()));
             }
         } else {
-            kujiin.xml.Options.ProgramOptions programOptions = new ProgramOptions();
-            programOptions.setTooltips(TOOLTIPS);
-            programOptions.setHelpdialogs(HELPDIALOGS);
-            setProgramOptions(programOptions);
-            kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
-            sessionOptions.setFadeoutduration(FADEOUTDURATION);
-            sessionOptions.setAmbiencevolume(AMBIENCEVOLUME);
-            sessionOptions.setAlertfilelocation(ALERTFILELOCATION);
-            sessionOptions.setFadeinduration(FADEINDURATION);
-            sessionOptions.setEntrainmentvolume(ENTRAINMENTVOLUME);
-            sessionOptions.setRampenabled(RAMPENABLED);
-            sessionOptions.setRampduration(RAMPDURATION);
-            setSessionOptions(sessionOptions);
-            kujiin.xml.Options.AppearanceOptions appearanceOptions = new AppearanceOptions();
-            appearanceOptions.setThemefile(THEMEFILELOCATION);
-            setAppearanceOptions(appearanceOptions);
-            marshall();
+            resettodefaults();
         }
     }
     public void marshall() {
@@ -120,6 +104,25 @@ public class Options {
         } catch (JAXBException e) {
             Tools.showinformationdialog("Information", "Couldn't Save Options", "Check Write File Permissions Of " + optionsxmlfile.getAbsolutePath());
         }
+    }
+    public void resettodefaults() {
+        kujiin.xml.Options.ProgramOptions programOptions = new ProgramOptions();
+        programOptions.setTooltips(TOOLTIPS);
+        programOptions.setHelpdialogs(HELPDIALOGS);
+        setProgramOptions(programOptions);
+        kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
+        sessionOptions.setFadeoutduration(FADEOUTDURATION);
+        sessionOptions.setAmbiencevolume(AMBIENCEVOLUME);
+        sessionOptions.setAlertfilelocation(ALERTFILELOCATION);
+        sessionOptions.setFadeinduration(FADEINDURATION);
+        sessionOptions.setEntrainmentvolume(ENTRAINMENTVOLUME);
+        sessionOptions.setRampenabled(RAMPENABLED);
+        sessionOptions.setRampduration(RAMPDURATION);
+        setSessionOptions(sessionOptions);
+        kujiin.xml.Options.AppearanceOptions appearanceOptions = new AppearanceOptions();
+        appearanceOptions.setThemefile(THEMEFILELOCATION);
+        setAppearanceOptions(appearanceOptions);
+        marshall();
     }
 
 // Subclasses

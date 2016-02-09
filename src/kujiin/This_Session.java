@@ -85,20 +85,13 @@ public class This_Session {
     public boolean getAmbienceenabled() {return ambienceenabled;}
     public void setCutsinsession(ArrayList<Cut> cutsinsession) {this.cutsinsession = cutsinsession;}
     public ArrayList<Cut> getCutsinsession() {return cutsinsession;}
-    public String gettotalsessionduration() {
-        Integer totaltime = 0;
-        for (Cut i : cutsinsession) {
-            totaltime += i.getdurationinminutes();
-        }
-        return Tools.minutestoformattedhoursandmins(totaltime);
-    }
-    public PlayerWidget.PlayerState getPlayerState() {return playerState;}
     public void setPlayerState(PlayerWidget.PlayerState playerState) {this.playerState = playerState;}
-    public PlayerWidget.ReferenceType getReferenceType() {
-        return referenceType;
-    }
+    public PlayerWidget.PlayerState getPlayerState() {return playerState;}
     public void setReferenceType(PlayerWidget.ReferenceType referenceType) {
         this.referenceType = referenceType;
+    }
+    public PlayerWidget.ReferenceType getReferenceType() {
+        return referenceType;
     }
     public ArrayList<Cut> getallCuts() {return new ArrayList<>(Arrays.asList(presession, rin, kyo, toh, sha, kai, jin, retsu, zai, zen, postsession));}
     public boolean isValid() {
@@ -121,15 +114,15 @@ public class This_Session {
     }
 
 // Creation Methods
-    public boolean textfieldvaluesareOK(ArrayList<Integer> textfieldvalues) {
+    public boolean checktextfieldvalues(ArrayList<Integer> textfieldvalues) {
         for (int i = 0; i < textfieldvalues.size(); i++) {
             if (i != 0 && i != 10 && textfieldvalues.get(i) > 0) {
                 return true;}
         }
         return false;
     }
-    public void checkifambienceisgood(ArrayList<Integer> textfieldvalues, CheckBox ambiencecheckbox) {
-        if (textfieldvaluesareOK(textfieldvalues)) {
+    public void checkambience(ArrayList<Integer> textfieldvalues, CheckBox ambiencecheckbox) {
+        if (checktextfieldvalues(textfieldvalues)) {
             ArrayList<Cut> cutswithnoambience = new ArrayList<>();
             ArrayList<Cut> cutswithreducedambience = new ArrayList<>();
             Cut[] tempcuts = {presession, rin, kyo, toh, sha, kai, jin, retsu, zai, zen, postsession};
@@ -219,7 +212,7 @@ public class This_Session {
             ambiencecheckerservice.start();
         } else {Tools.showinformationdialog("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
-    public boolean sessioncreationwellformednesschecks(ArrayList<Integer> textfieldtimes) {
+    public boolean checksessionwellformedness(ArrayList<Integer> textfieldtimes) {
         int lastcutindex = 0;
         for (int i = 0; i < textfieldtimes.size(); i++) {
             if (textfieldtimes.get(i) > 0) {lastcutindex = i;}
@@ -259,21 +252,23 @@ public class This_Session {
         zai.setDuration(textfieldtimes.get(8));
         zen.setDuration(textfieldtimes.get(9));
         postsession.setDuration(textfieldtimes.get(10));
-        cutsinsession.add(presession);
-        if (rin.duration != 0) {cutsinsession.add(rin);}
-        if (kyo.duration != 0) {cutsinsession.add(kyo);}
-        if (toh.duration != 0) {cutsinsession.add(toh);}
-        if (sha.duration != 0) {cutsinsession.add(sha);}
-        if (kai.duration != 0) {cutsinsession.add(kai);}
-        if (jin.duration != 0) {cutsinsession.add(jin);}
-        if (retsu.duration != 0) {cutsinsession.add(retsu);}
-        if (zai.duration != 0) {cutsinsession.add(zai);}
-        if (zen.duration != 0) {cutsinsession.add(zen);}
-        cutsinsession.add(postsession);
-        return cutsinsession.size() > 0;
+        ArrayList<Cut> cutlist = new ArrayList<>();
+        cutlist.add(presession);
+        if (rin.duration != 0) {cutlist.add(rin);}
+        if (kyo.duration != 0) {cutlist.add(kyo);}
+        if (toh.duration != 0) {cutlist.add(toh);}
+        if (sha.duration != 0) {cutlist.add(sha);}
+        if (kai.duration != 0) {cutlist.add(kai);}
+        if (jin.duration != 0) {cutlist.add(jin);}
+        if (retsu.duration != 0) {cutlist.add(retsu);}
+        if (zai.duration != 0) {cutlist.add(zai);}
+        if (zen.duration != 0) {cutlist.add(zen);}
+        cutlist.add(postsession);
+        setCutsinsession(cutlist);
+        return getCutsinsession().size() > 0;
     }
     public void create(ArrayList<Integer> textfieldtimes) {
-        if (sessioncreationwellformednesschecks(textfieldtimes)) {
+        if (checksessionwellformedness(textfieldtimes)) {
             setupcutsinsession(textfieldtimes);
             final SimpleTextDialogWithCancelButton[] sdcb = new SimpleTextDialogWithCancelButton[1];
             Service<Void> creationservice = new Service<Void>() {
@@ -497,22 +492,6 @@ public class This_Session {
             return "";
         }
     }
-//    public void endsessionprematurely() {
-//        int secondsleft = currentcut.getdurationinseconds() / currentcut.getSecondselapsed();
-//        int secondspracticed = currentcut.getdurationinseconds() - secondsleft;
-//        Double minutes = Math.floor(secondspracticed / 60);
-//        sessions.getsession(sessions.totalsessioncount() - 1).updatecutduration(currentcut.number, minutes.intValue());
-//        String prematureendingreason;
-//        if (Root.getOptions().getSessionOptions().getPrematureendings()) {
-//            ProgressAndGoalsWidget.PrematureEndingDialog ped = new ProgressAndGoalsWidget.PrematureEndingDialog(Root.getOptions());
-//            prematureendingreason = ped.getReason();
-//        } else {
-//            prematureendingreason = "";
-//        }
-//        if (prematureendingreason != null) {
-//            sessions.getsession(sessions.totalsessioncount() - 1).writeprematureending(currentcut.name, prematureendingreason);
-//        }
-//    }
     public void updateplayerui() {
         try {
             if (playerState == PlayerWidget.PlayerState.PLAYING) {
@@ -619,7 +598,7 @@ public class This_Session {
 
 // Reference Files
     public boolean choosereferencetype() {
-        PlayerWidget.ReferenceTypeDialog reftype = new PlayerWidget.ReferenceTypeDialog(referenceType, referencefullscreenoption);
+        PlayerWidget.ReferenceTypeDialog reftype = new PlayerWidget.ReferenceTypeDialog(getReferenceType(), referencefullscreenoption);
         reftype.showAndWait();
         setReferenceType(reftype.getReferenceType());
         setReferencefullscreenoption(reftype.getFullscreen());
@@ -636,7 +615,7 @@ public class This_Session {
         }
     }
     public void displayreferencefile() {
-        displayReference = new PlayerWidget.DisplayReference(currentcut, referenceType, referencefullscreenoption);
+        displayReference = new PlayerWidget.DisplayReference(currentcut, getReferenceType(), referencefullscreenoption);
         displayReference.show();
     }
     public void closereferencefile() {
