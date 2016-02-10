@@ -56,6 +56,7 @@ public class Cut {
     private Animation fadeinambience;
     private Animation fadeoutambience;
 
+
     public Cut(int number, String name, int duration, This_Session thisession) {
         this.number = number;
         this.name = name;
@@ -280,45 +281,9 @@ public class Cut {
     public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
     public void updatecuttime() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-//            System.out.println(getCurrentEntrainmentPlayer().getVolume());
-//
-//  try {
-            // TODO Use Javafx timeline to fade in fadeout audio (IF not 0.0)
-//                Double fadeinduration =
-//                Double fadeoutduration = thisession.Root.getOptions().getFadeoutduration();
-//                if (fadeinduration > 0.0 && secondselapsed <= fadeoutduration) {
-//                    if (! fadeinplayed) {
-//
-//                        fadeinplayed = true;
-//                    }
-////                    double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEINDURATION;
-////                    double entrainmentvolume = secondselapsed * entrainmentincrement;
-////                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
-////                    if (ambienceenabled) {
-////                        double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEINDURATION;
-////                        double ambiencevolume = secondselapsed * ambienceincrement;
-////                        getCurrentAmbiencePlayer().setVolume(ambiencevolume);
-////                    }
-//                }
-//                else if (secondselapsed >= getdurationinseconds() - PlayerWidget.FADEOUTDURATION) {
-//                    int secondsleft = getdurationinseconds() - secondselapsed;
-//                    double entrainmentincrement = thisession.getSessionEntrainmentVolume() / PlayerWidget.FADEOUTDURATION;
-//                    double entrainmentvolume = secondsleft * entrainmentincrement;
-//                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
-//                    if (ambienceenabled) {
-//                        double ambienceincrement = thisession.getSessionAmbienceVolume() / PlayerWidget.FADEOUTDURATION;
-//                        double ambiencevolume =  secondsleft * ambienceincrement;
-//                        getCurrentAmbiencePlayer().setVolume(ambiencevolume);
-//                    }
-//                } else {
-//                if (ambienceenabled) {getCurrentAmbiencePlayer().setVolume(thisession.getSessionAmbienceVolume());}
-//                getCurrentEntrainmentPlayer().setVolume(thisession.getSessionEntrainmentVolume());
-//                }
-//            } catch (RuntimeException ignored) {}
             secondselapsed++;
             ProgressAndGoalsWidget progressAndGoalsWidget = thisession.Root.getProgressTracker();
             progressAndGoalsWidget.getSessions().getsession(progressAndGoalsWidget.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
-//        }
         }
     }
     // --------- Controls ---------- //

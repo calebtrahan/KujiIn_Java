@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -107,11 +108,11 @@ public class Goals {
 
 // XML Processing
     public void unmarshall() {
-        if (Options.currentgoalsxmlfile.exists()) {
+        if (Options.goalsxmlfile.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Goals.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
-                Goals currentGoals = (Goals) createMarshaller.unmarshal(Options.currentgoalsxmlfile);
+                Goals currentGoals = (Goals) createMarshaller.unmarshal(Options.goalsxmlfile);
                 setPresessionGoals(currentGoals.getPresessionGoals());
                 setRinGoals(currentGoals.getRinGoals());
                 setKyoGoals(currentGoals.getKyoGoals());
@@ -125,7 +126,7 @@ public class Goals {
                 setPostsessionGoals(currentGoals.getPostsessionGoals());
                 setTotalGoals(currentGoals.getTotalGoals());
             } catch (JAXBException e) {
-                Tools.showinformationdialog("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.currentgoalsxmlfile.getAbsolutePath());
+                Tools.showinformationdialog("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.goalsxmlfile.getAbsolutePath());
             }
         }
     }
@@ -134,20 +135,20 @@ public class Goals {
             JAXBContext context = JAXBContext.newInstance(Goals.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, Options.currentgoalsxmlfile);
+            createMarshaller.marshal(this, Options.goalsxmlfile);
         } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.currentgoalsxmlfile.getAbsolutePath());
+            Tools.showinformationdialog("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.goalsxmlfile.getAbsolutePath());
         }
     }
     public void add(int cutindex, Goal newgoal) throws JAXBException {
-        List<Goal> newgoals = getallcutgoals(cutindex);
+        List<Goal> newgoals = getallcutgoals(cutindex, true);
         newgoals.add(newgoal);
         update(sort(newgoals), cutindex);
         marshall();
     }
     public boolean delete(int cutindex, Goal currentGoal) {
         try {
-            List<Goal> cutgoallist = getallcutgoals(cutindex);
+            List<Goal> cutgoallist = getallcutgoals(cutindex, true);
             cutgoallist.remove(currentGoal);
             update(sort(cutgoallist), cutindex);
             marshall();
@@ -163,39 +164,6 @@ public class Goals {
             return goallist;
         } catch (Exception ignored) {return null;}
     }
-    public boolean goaliscompleted(Goal currentGoal, double currentpracticedhours) {
-        return currentGoal.getGoal_Hours() >= currentpracticedhours;
-    }
-    public void checkifgoalscompleted(int cutindex, double currentpracticedhours, CompletedGoals completedGoals) {
-        List<Goal> cutgoals = getallcutgoals(cutindex);
-        int oldsize = cutgoals.size();
-        for (Goal i : cutgoals) {
-            if (goaliscompleted(i, currentpracticedhours)) {
-                if (! completedGoals.completegoal(cutindex, i)) {
-                    Tools.showerrordialog("Error", "Cannot Complete This Goals", "Check File Permissions");
-                } else {cutgoals.remove(i);}
-            }
-        }
-        if (cutgoals.size() != oldsize) {
-            update(sort(cutgoals), cutindex);
-            marshall();
-        }
-    }
-    public List<Goal> getallcutgoals(int cutindex) {
-        if (cutindex == 0) return PresessionGoals;
-        if (cutindex == 1) return RinGoals;
-        if (cutindex == 2) return KyoGoals;
-        if (cutindex == 3) return TohGoals;
-        if (cutindex == 4) return ShaGoals;
-        if (cutindex == 5) return KaiGoals;
-        if (cutindex == 6) return JinGoals;
-        if (cutindex == 7) return RetsuGoals;
-        if (cutindex == 8) return ZaiGoals;
-        if (cutindex == 9) return ZenGoals;
-        if (cutindex == 10) return PostsessionGoals;
-        if (cutindex == 11) return TotalGoals;
-        else return null;
-}
     public void update(List<Goal> cutgoallist, int cutindex) {
         if (cutindex == 0 || cutindex == 10) setPresessionGoals(cutgoallist);
         if (cutindex == 0) setRinGoals(cutgoallist);
@@ -209,12 +177,51 @@ public class Goals {
         if (cutindex == 8) setZenGoals(cutgoallist);
         if (cutindex == 9) setTotalGoals(cutgoallist);
     }
-    public Goal getgoal(int cutindex, Integer goalindex) {
-        try {return getallcutgoals(cutindex).get(goalindex);}
+
+
+// Goal Getters
+    public boolean goalsexist(int cutindex, boolean includecompleted) {
+        return getallcutgoals(cutindex, includecompleted) != null && ! getallcutgoals(cutindex, true).isEmpty();
+    }
+    public Goal getgoal(int cutindex, Integer goalindex, boolean includecompleted) {
+        try {return getallcutgoals(cutindex, includecompleted).get(goalindex);}
         catch (ArrayIndexOutOfBoundsException | NullPointerException ignored) {return null;}
     }
-    public boolean goalsexist(int cutindex) {
-        return getallcutgoals(cutindex) != null && getallcutgoals(cutindex).size() > 0;
+    public List<Goal> getallcutgoals(int cutindex, boolean includecompleted) {
+        if (cutindex == 0) return filtergoals(PresessionGoals, includecompleted);
+        if (cutindex == 1) return filtergoals(RinGoals, includecompleted);
+        if (cutindex == 2) return filtergoals(KyoGoals, includecompleted);
+        if (cutindex == 3) return filtergoals(TohGoals, includecompleted);
+        if (cutindex == 4) return filtergoals(ShaGoals, includecompleted);
+        if (cutindex == 5) return filtergoals(KaiGoals, includecompleted);
+        if (cutindex == 6) return filtergoals(JinGoals, includecompleted);
+        if (cutindex == 7) return filtergoals(RetsuGoals, includecompleted);
+        if (cutindex == 8) return filtergoals(ZaiGoals, includecompleted);
+        if (cutindex == 9) return filtergoals(ZenGoals, includecompleted);
+        if (cutindex == 10) return filtergoals(PostsessionGoals, includecompleted);
+        if (cutindex == 11) return filtergoals(TotalGoals, includecompleted);
+        else return null;
+    }
+    public List<Goal> filtergoals(List<Goal> cutgoals, boolean includecompleted) {
+        List<Goal> newgoallist = new ArrayList<>();
+        for (Goal i : cutgoals) {
+            if (includecompleted) {newgoallist.add(i);}
+            else {
+                if (!i.getCompleted()) {newgoallist.add(i);}
+            }
+        }
+        return newgoallist;
+    }
+
+// Goal Completion Methods
+    public void checkifgoalscompleted(int cutindex, double currentpracticedhours) {
+        for (Goal i : getallcutgoals(cutindex, true)) {
+            boolean completed = currentpracticedhours >= i.getGoal_Hours();
+            i.setCompleted(completed);
+            if (completed && i.getDate_Completed().isEmpty()) {
+                i.setDate_Completed(Tools.gettodaysdate());
+            }
+        }
     }
 
     @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -268,6 +275,7 @@ public class Goals {
             return String.format("%.2f", percent) + "%";
         }
     }
+
 }
 
 

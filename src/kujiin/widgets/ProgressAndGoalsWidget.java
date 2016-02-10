@@ -16,7 +16,10 @@ import javafx.stage.Stage;
 import kujiin.MainController;
 import kujiin.Tools;
 import kujiin.interfaces.Widget;
-import kujiin.xml.*;
+import kujiin.xml.Goals;
+import kujiin.xml.Options;
+import kujiin.xml.Session;
+import kujiin.xml.Sessions;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
@@ -42,7 +45,6 @@ public class ProgressAndGoalsWidget implements Widget {
     private Button SessionListButton;
 // Goals Fields
     private Goals Goals;
-    private CompletedGoals CompletedGoals;
     private Button NewGoalButton;
     private Button CurrentGoalsButton;
     private Button CompletedGoalsButton;
@@ -54,7 +56,6 @@ public class ProgressAndGoalsWidget implements Widget {
     public ProgressAndGoalsWidget(MainController mainController) {
         NewGoalButton = mainController.newgoalButton;
         CurrentGoalsButton = mainController.viewcurrrentgoalsButton;
-        CompletedGoalsButton = mainController.viewcompletedgoalsButton;
         PracticedHours = mainController.goalscurrrentvalueLabel;
         GoalHours = mainController.goalssettimeLabel;
         GoalProgress = mainController.goalsprogressbar;
@@ -68,7 +69,6 @@ public class ProgressAndGoalsWidget implements Widget {
         SessionListButton = mainController.ListOfSessionsButton;
         Sessions = new Sessions();
         Goals = new Goals();
-        CompletedGoals = new CompletedGoals();
         Service<Void> getsessions = new Service<Void>() {
             @Override
             protected Task<Void> createTask() {
@@ -91,7 +91,7 @@ public class ProgressAndGoalsWidget implements Widget {
         ObservableList<String> cutnames = FXCollections.observableArrayList(GOALCUTNAMES);
         CutSelectorComboBox.setItems(cutnames);
         CutSelectorComboBox.setOnAction(this::cutselectionchanged);
-        Service<Void> getcurrentgoals = new Service<Void>() {
+        Service<Void> getgoals = new Service<Void>() {
             @Override
             protected Task<Void> createTask() {
                 return new Task<Void>() {
@@ -103,33 +103,15 @@ public class ProgressAndGoalsWidget implements Widget {
                 };
             }
         };
-        Service<Void> getcompletedgoals = new Service<Void>() {
-            @Override
-            protected Task<Void> createTask() {
-                return new Task<Void>() {
-                    @Override
-                    protected Void call() throws Exception {
-                        CompletedGoals.unmarshall();
-                        return null;
-                    }
-                };
-            }
-        };
-        getcompletedgoals.setOnSucceeded(event -> updateprogressui());
-        getcompletedgoals.setOnFailed(event -> updateprogressui());
-        getcompletedgoals.start();
-        getcurrentgoals.setOnSucceeded(event -> updateprogressui());
-        getcurrentgoals.setOnFailed(event -> updateprogressui());
-        getcurrentgoals.start();
+        getgoals.setOnSucceeded(event -> updateprogressui());
+        getgoals.setOnFailed(event -> updateprogressui());
+        getgoals.start();
     }
 
 // Getters And Setters
     public Sessions getSessions() {return Sessions;}
     public Goals getGoal() {
         return Goals;
-    }
-    public kujiin.xml.CompletedGoals getCompletedGoals() {
-        return CompletedGoals;
     }
     public Integer getCutindex() {
         return cutindex;
@@ -169,15 +151,13 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     public void opengoaleditor() {
         if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Edit Its Goals"); return;}
-        if (! Goals.goalsexist(cutindex)) {Tools.showinformationdialog("Information", "No Goals Exist For " + GOALCUTNAMES[cutindex], "Please Add A Goal For " + GOALCUTNAMES[cutindex]); return;}
-        List<kujiin.xml.Goals.Goal> goalslist = Goals.getallcutgoals(cutindex);
-        if (goalslist == null) {Tools.showinformationdialog("Information", "No Goals To Edit For " + GOALCUTNAMES[cutindex], "Set A New Goal For " + GOALCUTNAMES[cutindex] + " First"); return;}
+        if (! Goals.goalsexist(cutindex, true)) {Tools.showinformationdialog("Information", "No Goals Exist For " + GOALCUTNAMES[cutindex], "Please Add A Goal For " + GOALCUTNAMES[cutindex]); return;}
         new EditGoalsDialog(this).showAndWait();
     }
-    public void goalpacing() {
-        if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Calculate Goal Pacing"); return;}
-        new GoalPacingDialog(Goals.getgoal(cutindex, 0), Goals.getTotalGoals(), Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected())).showAndWait();
-    }
+//    public void goalpacing() {
+//        if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Calculate Goal Pacing"); return;}
+//        new GoalPacingDialog(Goals.getgoal(cutindex, 0), Goals.getTotalGoals(), Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected())).showAndWait();
+//    }
 
 // Widget Implementation
     public void loading() {
@@ -232,7 +212,6 @@ public class ProgressAndGoalsWidget implements Widget {
     @Override
     public boolean cleanup() {
         Goals.marshall();
-        CompletedGoals.marshall();
         Sessions.marshall();
         return true;
     }
@@ -271,7 +250,7 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     public boolean checkifgoalsetandlongenough(int cut_index, int duration) {
         try {
-            List<kujiin.xml.Goals.Goal> currentGoals = Goals.sort(Goals.getallcutgoals(cut_index));
+            List<kujiin.xml.Goals.Goal> currentGoals = Goals.sort(Goals.getallcutgoals(cut_index, false));
             int currentpracticedminutes = Sessions.getpracticedtimeinminutesforallsessions(cut_index, PreAndPostOption.isSelected());
             currentpracticedminutes += duration;
             return currentpracticedminutes >= currentGoals.get(currentGoals.size() - 1).getGoal_Hours().intValue();
@@ -286,7 +265,7 @@ public class ProgressAndGoalsWidget implements Widget {
 //                return;
 //            }
             Double practiced = Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected()), 2);
-            Double goal = Goals.getgoal(cutindex, 0).getGoal_Hours();
+            Double goal = Goals.getgoal(cutindex, 0, false).getGoal_Hours();
             PracticedHours.setText(String.format("Current: %s hrs", practiced.toString()));
             if (goal != null) {
                 GoalHours.setText(String.format("Goal: %s hrs", goal.toString()));
@@ -301,7 +280,7 @@ public class ProgressAndGoalsWidget implements Widget {
         } catch (NullPointerException ignored) {}
     }
     public List<kujiin.xml.Goals.Goal> getcurrentgoallist(boolean includecompleted) {
-        if (cutindex != null) {return Goals.getallcutgoals(cutindex);}
+        if (cutindex != null) {return Goals.getallcutgoals(cutindex, includecompleted);}
         else {return null;}
     }
 
@@ -468,27 +447,18 @@ public class ProgressAndGoalsWidget implements Widget {
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Current Goals");}
             catch (IOException e) {e.printStackTrace();}
-            populatetable(ShowCompletedCheckBox.isSelected());
+            populatetable();
         }
-        public void populatetable(boolean includecompletedgoals) {
+        public void populatetable() {
             ObservableList<CurrentGoalBinding> currentGoals = FXCollections.observableArrayList();
             int count = 1;
             int cutindex = ProgressAndGoals.getCutindex();
             CurrentGoalList = new ArrayList<>();
-            for (kujiin.xml.Goals.Goal i : ProgressAndGoals.getGoal().getallcutgoals(cutindex)) {
-                if (includecompletedgoals) {
-                    if (i.getCompleted()) {
-                        currentGoals.add(new CurrentGoalBinding(count, Double.toString(i.getGoal_Hours()), i.getDate_Set(),
-                                i.getpercentagecompleted(ProgressAndGoals.getSessions().getpracticedtimeinminutesforallsessions(cutindex, false)),
-                                i.getCompleted(), i.getDate_Completed()));
-                        CurrentGoalList.add(i);
-                    }
-                } else {
-                    currentGoals.add(new CurrentGoalBinding(count, Double.toString(i.getGoal_Hours()), i.getDate_Set(),
-                            i.getpercentagecompleted(ProgressAndGoals.getSessions().getpracticedtimeinminutesforallsessions(cutindex, false)),
-                            i.getCompleted(), i.getDate_Completed()));
-                    CurrentGoalList.add(i);
-                }
+            for (kujiin.xml.Goals.Goal i : ProgressAndGoals.getGoal().getallcutgoals(cutindex, ShowCompletedCheckBox.isSelected())) {
+                currentGoals.add(new CurrentGoalBinding(count, Double.toString(i.getGoal_Hours()), i.getDate_Set(),
+                        i.getpercentagecompleted(ProgressAndGoals.getSessions().getpracticedtimeinminutesforallsessions(cutindex, false)),
+                        i.getCompleted(), i.getDate_Completed()));
+                CurrentGoalList.add(i);
                 count++;
             }
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().goalid.asObject());
@@ -515,7 +485,7 @@ public class ProgressAndGoalsWidget implements Widget {
             RemoveGoalButton.setDisable(index == -1);
         }
         public void showCompletedGoals(ActionEvent actionEvent) {
-            populatetable(ShowCompletedCheckBox.isSelected());
+            populatetable();
         }
         public void addgoal(ActionEvent actionEvent) {ProgressAndGoals.setnewgoal();}
         public void removegoal(ActionEvent actionEvent) {
@@ -652,7 +622,7 @@ public class ProgressAndGoalsWidget implements Widget {
             GoalMinutesSpinner.setEditable(true);
             GoalDatePicker.setValue(LocalDate.now());
             try {
-                int minutes = Tools.convertdecimalhourstominutes(progressAndGoalsWidget.getGoal().getgoal(cutindex, 0).getGoal_Hours());
+                int minutes = Tools.convertdecimalhourstominutes(progressAndGoalsWidget.getGoal().getgoal(cutindex, 0, false).getGoal_Hours());
                 GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(minutes / 60, Integer.MAX_VALUE, minutes / 60));
                 GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(minutes % 60, 59, minutes % 60));
             } catch (NullPointerException ignored) {

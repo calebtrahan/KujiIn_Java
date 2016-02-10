@@ -44,7 +44,6 @@ public class PlayerWidget implements Widget {
     private Label VolumeAmbienceLabel;
     private Label VolumeTopLabel;
     private This_Session Session;
-    private CreatorAndExporterWidget creatorAndExporterWidget;
     private ReferenceType referenceType;
 
     public PlayerWidget(MainController mainController) {
@@ -70,7 +69,6 @@ public class PlayerWidget implements Widget {
         VolumeEntrainmentLabel = mainController.VolumeEntrainmentLabel;
         VolumeTopLabel = mainController.VolumeTopLabel;
         Session = mainController.getSession();
-        creatorAndExporterWidget = mainController.getCreatorAndExporter();
         EntrainmentVolume.setOnMouseClicked(event -> {
             try {
                 Double value = EntrainmentVolume.getValue() * 100;

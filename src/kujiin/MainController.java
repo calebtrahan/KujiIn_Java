@@ -43,9 +43,7 @@ public class MainController implements Initializable {
     public Label goalscurrrentvalueLabel;
     public Label goalssettimeLabel;
     public Button newgoalButton;
-    public Button goalpacingButton;
     public Button viewcurrrentgoalsButton;
-    public Button viewcompletedgoalsButton;
     public Button PauseButton;
     public Button StopButton;
     public TextField PreTime;
@@ -188,8 +186,6 @@ public class MainController implements Initializable {
         ProgressTracker.displaydetailedcutprogress();}
     public void setnewgoal(Event event) {
         ProgressTracker.setnewgoal();}
-    public void getgoalpacing(Event event) {
-        ProgressTracker.goalpacing();}
     public void viewcurrentgoals(Event event) {
         ProgressTracker.opengoaleditor();}
 
@@ -216,16 +212,6 @@ public class MainController implements Initializable {
 // Session Player Widget
     public void sessionplayerswitch(ActionEvent actionEvent) {
         Player.statusSwitch();
-//        if (Player.isEnabled()) {
-//            CreatorAndExporter.disable();
-//            CreatorAndExporter.disablebuttons();
-////            Node node = (Node) actionEvent.getSource();
-////            Stage stage = (Stage) node.getScene().getWindow();
-////            stage.setOnCloseRequest(event -> ProgressTracker.getSessions().deletenonvalidsessions());
-//        } else {
-//            CreatorAndExporter.enable();
-//            CreatorAndExporter.enablebuttons();
-//        }
     }
     public void playsession(Event event) {
         Player.play(ProgressTracker.getSessions());}
@@ -841,7 +827,7 @@ public class MainController implements Initializable {
         }
         public void deleteallgoals(ActionEvent actionEvent) {
             if (Tools.getanswerdialog("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
-                if (! kujiin.xml.Options.currentgoalsxmlfile.delete() && !kujiin.xml.Options.completedgoalsxmlfile.delete()) {
+                if (! kujiin.xml.Options.sessionsxmlfile.delete()) {
                     Tools.showerrordialog("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
                 } else {Tools.showinformationdialog("Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }

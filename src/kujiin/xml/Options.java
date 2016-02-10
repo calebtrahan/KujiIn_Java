@@ -24,8 +24,7 @@ public class Options {
     public static final File logfile = new File(rootdirectory, "assets/sessionlog.txt");
     public static final File xmldirectory = new File(rootdirectory, "assets/xml/");
     public static final File optionsxmlfile = new File(xmldirectory, "options.xml");
-    public static final File completedgoalsxmlfile = new File(xmldirectory, "completed_goals.xml");
-    public static final File currentgoalsxmlfile = new File(xmldirectory, "current_goals.xml");
+    public static final File goalsxmlfile = new File(xmldirectory, "goals.xml");
     public static final File sessionsxmlfile = new File(xmldirectory, "sessions.xml");
     public static final File sounddirectory = new File(rootdirectory, "assets/sound/");
     public static final File alertfile = new File(sounddirectory, "Alert.mp3");

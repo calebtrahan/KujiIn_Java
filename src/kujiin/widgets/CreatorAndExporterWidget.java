@@ -31,7 +31,6 @@ import java.util.ResourceBundle;
 
 // TODO Get FFMPEG Working To Mix Audio Files Together
     // Not Supported Stream?
-// TODO Get Creator Button Working (Tie Into Enum, And Enable Player And Exporter, Disable Creator (And Change Button Text To 'Edit') When Session Is Created)
 public class CreatorAndExporterWidget implements Widget {
     private Button ChangeAllValuesButton;
     private Button ExportButton;
@@ -149,8 +148,14 @@ public class CreatorAndExporterWidget implements Widget {
 
 // Creation
     public void togglecreator() {
+        if (session.getPlayerState() == PlayerWidget.PlayerState.PLAYING ||
+            session.getPlayerState() == PlayerWidget.PlayerState.PAUSED ||
+            session.getPlayerState() == PlayerWidget.PlayerState.TRANSITIONING) {
+            if (Tools.getanswerdialog("Stop Session", "In Order To Edit Session Values The Session Player Must Be Stopped And Reset", "Stop And Reset Session Player?")) {
+                if (! session.stop().equals("Session Stopped")) {return;}
+            } else {return;}
+        }
         // TODO Check Exporter Here
-        // TODO Check Player Here
         if (creatorState == CreatorState.NOT_CREATED) {
             if (creationchecks()) {
                 session.setAmbienceenabled(AmbienceSwitch.isSelected());
