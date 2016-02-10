@@ -48,7 +48,7 @@
          </font></Label>
       <HBox alignment="BOTTOM_CENTER" layoutX="15.0" layoutY="60.0" prefHeight="20.0" prefWidth="441.0">
          <children>
-            <Label text="Pre" textAlignment="CENTER">
+            <Label fx:id="PreLabel" text="Pre" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>
@@ -56,18 +56,7 @@
                   <Insets left="5.0" right="5.0" />
                </HBox.margin>
             </Label>
-            <Label alignment="CENTER" text="RIN" textAlignment="CENTER">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <HBox.margin>
-                  <Insets left="5.0" right="5.0" />
-               </HBox.margin>
-               <padding>
-                  <Insets left="1.0" />
-               </padding>
-            </Label>
-            <Label alignment="CENTER" text="KYO" textAlignment="CENTER">
+            <Label fx:id="RinLabel" alignment="CENTER" text="RIN" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>
@@ -78,7 +67,7 @@
                   <Insets left="1.0" />
                </padding>
             </Label>
-            <Label alignment="CENTER" text="TOH" textAlignment="CENTER">
+            <Label fx:id="KyoLabel" alignment="CENTER" text="KYO" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>
@@ -89,7 +78,7 @@
                   <Insets left="1.0" />
                </padding>
             </Label>
-            <Label alignment="CENTER" text="SHA" textAlignment="CENTER">
+            <Label fx:id="TohLabel" alignment="CENTER" text="TOH" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>
@@ -100,7 +89,7 @@
                   <Insets left="1.0" />
                </padding>
             </Label>
-            <Label alignment="CENTER" text="KAI" textAlignment="CENTER">
+            <Label fx:id="ShaLabel" alignment="CENTER" text="SHA" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>
@@ -111,7 +100,7 @@
                   <Insets left="1.0" />
                </padding>
             </Label>
-            <Label alignment="CENTER" text="JIN" textAlignment="CENTER">
+            <Label fx:id="KaiLabel" alignment="CENTER" text="KAI" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>
@@ -122,7 +111,7 @@
                   <Insets left="1.0" />
                </padding>
             </Label>
-            <Label alignment="CENTER" text="RETSU" textAlignment="CENTER">
+            <Label fx:id="JinLabel" alignment="CENTER" text="JIN" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>
@@ -133,15 +122,7 @@
                   <Insets left="1.0" />
                </padding>
             </Label>
-            <Label alignment="CENTER" text="ZAI" textAlignment="CENTER">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <padding>
-                  <Insets left="1.0" />
-               </padding>
-            </Label>
-            <Label alignment="CENTER" text="ZEN" textAlignment="CENTER">
+            <Label fx:id="RetsuLabel" alignment="CENTER" text="RETSU" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>
@@ -152,7 +133,26 @@
                   <Insets left="1.0" />
                </padding>
             </Label>
-            <Label alignment="CENTER" text="Post" textAlignment="CENTER">
+            <Label fx:id="ZaiLabel" alignment="CENTER" text="ZAI" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <padding>
+                  <Insets left="1.0" />
+               </padding>
+            </Label>
+            <Label fx:id="ZenLabel" alignment="CENTER" text="ZEN" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </HBox.margin>
+               <padding>
+                  <Insets left="1.0" />
+               </padding>
+            </Label>
+            <Label fx:id="PostLabel" alignment="CENTER" text="Post" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>
@@ -185,7 +185,7 @@
             <TextField fx:id="PostTime" alignment="CENTER" prefHeight="25.0" prefWidth="40.0" />
          </children>
       </HBox>
-      <Label layoutX="337.0" layoutY="112.0" text="Session Length" />
+      <Label fx:id="LengthLabel" layoutX="337.0" layoutY="112.0" text="Session Length" />
       <TextField fx:id="TotalSessionTime" alignment="CENTER" editable="false" layoutX="309.0" layoutY="130.0" prefHeight="26.0" prefWidth="146.0" />
       <Label alignment="CENTER_RIGHT" layoutX="527.0" layoutY="66.0" prefHeight="28.0" prefWidth="113.0" text="Please Select:" textAlignment="RIGHT">
          <font>
@@ -221,7 +221,7 @@
       <CheckBox fx:id="PrePostSwitch" layoutX="614.0" layoutY="159.0" mnemonicParsing="false" onAction="#updatetotalprogresswidget" text="Include Presession And Postsession" />
       <CheckBox fx:id="SessionPlayerOnOffSwitch" layoutX="14.0" layoutY="190.0" mnemonicParsing="false" onAction="#sessionplayerswitch" text="OFF" />
       <CheckBox fx:id="AmbienceSwitch" layoutX="13.0" layoutY="110.0" mnemonicParsing="false" onAction="#ambienceswitch" prefHeight="18.0" prefWidth="132.0" text="Session Ambience" />
-      <Label layoutX="184.0" layoutY="113.0" text="~ Completion Time" />
+      <Label fx:id="CompletionLabel" layoutX="184.0" layoutY="113.0" text="~ Completion Time" />
       <TextField fx:id="ApproximateEndTime" alignment="CENTER" editable="false" layoutX="163.0" layoutY="130.0" prefHeight="23.0" prefWidth="146.0" />
       <HBox alignment="BOTTOM_RIGHT" layoutX="673.0" layoutY="331.0" prefHeight="28.0" prefWidth="105.0" />
       <Button fx:id="ChangeValuesButton" layoutX="13.0" layoutY="133.0" mnemonicParsing="false" onAction="#changeallcreatorvalues" prefHeight="23.0" prefWidth="132.0" text="Change All Values">
@@ -280,17 +280,17 @@
       </HBox>
       <VBox alignment="CENTER" layoutX="13.0" layoutY="272.0" prefHeight="32.0" prefWidth="93.0">
          <children>
-            <Label text="Entrainment" />
+            <Label fx:id="VolumeEntrainmentLabel" text="Entrainment" />
             <Slider fx:id="EntrainmentVolume" max="1.0" prefHeight="16.0" prefWidth="88.0" />
          </children>
       </VBox>
       <VBox alignment="CENTER" layoutX="142.0" layoutY="272.0" prefHeight="32.0" prefWidth="93.0">
          <children>
-            <Label text="Ambience" />
+            <Label fx:id="VolumeAmbienceLabel" text="Ambience" />
             <Slider fx:id="AmbienceVolume" max="1.0" prefHeight="16.0" prefWidth="88.0" />
          </children>
       </VBox>
-      <Label alignment="CENTER" layoutX="13.0" layoutY="258.0" prefHeight="16.0" prefWidth="234.0" text="Volume" />
+      <Label fx:id="VolumeTopLabel" alignment="CENTER" layoutX="13.0" layoutY="258.0" prefHeight="16.0" prefWidth="234.0" text="Volume" />
       <Button fx:id="LoadPresetButton" layoutX="279.0" layoutY="34.0" mnemonicParsing="false" onAction="#loadpreset" prefHeight="23.0" prefWidth="82.0" text="Load Preset">
          <font>
             <Font size="12.0" />
@@ -330,12 +330,12 @@
       <Label fx:id="AmbienceVolumePercentage" alignment="CENTER" layoutX="236.0" layoutY="287.0" text="100%" textAlignment="CENTER" />
       <HBox alignment="CENTER_RIGHT" layoutX="325.0" layoutY="158.0" prefHeight="31.0" prefWidth="132.0">
          <children>
-            <Button fx:id="CreateButton" mnemonicParsing="false" onMousePressed="#exportsession" prefHeight="23.0" prefWidth="63.0" text="Create">
+            <Button fx:id="CreateButton" mnemonicParsing="false" onAction="#togglecreator" onMousePressed="#exportsession" prefHeight="23.0" prefWidth="63.0" text="Create">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="ExportButton" mnemonicParsing="false" onMousePressed="#exportsession" prefHeight="23.0" prefWidth="63.0" text="Export">
+            <Button fx:id="ExportButton" mnemonicParsing="false" onAction="#toggleexporter" prefHeight="23.0" prefWidth="63.0" text="Export">
                <font>
                   <Font size="12.0" />
                </font>

@@ -37,9 +37,23 @@ public class CreatorAndExporterWidget implements Widget {
     private Button ExportButton;
     private Button LoadPresetButton;
     private Button SavePresetButton;
+    private Button CreateButton;
     private CheckBox AmbienceSwitch;
     private TextField TotalSessionTime;
     private TextField ApproximateEndTime;
+    private Label PreLabel;
+    private Label RinLabel;
+    private Label KyoLabel;
+    private Label TohLabel;
+    private Label ShaLabel;
+    private Label KaiLabel;
+    private Label JinLabel;
+    private Label RetsuLabel;
+    private Label ZaiLabel;
+    private Label ZenLabel;
+    private Label PostLabel;
+    private Label LengthLabel;
+    private Label CompletionLabel;
     private TextField PreTime;
     private TextField RinTime;
     private TextField KyoTime;
@@ -64,6 +78,7 @@ public class CreatorAndExporterWidget implements Widget {
     private IntegerProperty ZenValue = new SimpleIntegerProperty(0);
     private IntegerProperty PostsessionValue = new SimpleIntegerProperty(0);
     private ExporterState exporterState;
+    private CreatorState creatorState;
     private This_Session session;
     private ArrayList<Integer> textfieldtimes = new ArrayList<>(11);
     private ArrayList<Service<Boolean>> exportservices;
@@ -76,25 +91,40 @@ public class CreatorAndExporterWidget implements Widget {
         LoadPresetButton = mainController.LoadPresetButton;
         SavePresetButton = mainController.SavePresetButton;
         ChangeAllValuesButton = mainController.ChangeValuesButton;
+        CreateButton = mainController.CreateButton;
         ExportButton = mainController.ExportButton;
         AmbienceSwitch = mainController.AmbienceSwitch;
         TotalSessionTime = mainController.TotalSessionTime;
         ApproximateEndTime = mainController.ApproximateEndTime;
         Preset = new Preset();
+        PreLabel = mainController.PreLabel;
         PreTime = mainController.PreTime;
+        RinLabel = mainController.RinLabel;
         RinTime = mainController.RinTime;
+        KyoLabel = mainController.KyoLabel;
         KyoTime = mainController.KyoTime;
+        TohLabel = mainController.TohLabel;
         TohTime = mainController.TohTime;
+        ShaLabel = mainController.ShaLabel;
         ShaTime = mainController.ShaTime;
+        KaiLabel = mainController.KaiLabel;
         KaiTime = mainController.KaiTime;
+        JinLabel = mainController.JinLabel;
         JinTime = mainController.JinTime;
+        RetsuLabel = mainController.RetsuLabel;
         RetsuTime = mainController.RetsuTime;
+        ZaiLabel = mainController.ZaiLabel;
         ZaiTime = mainController.ZaiTime;
+        ZenLabel = mainController.ZenLabel;
         ZenTime = mainController.ZenTime;
+        PostLabel = mainController.PostLabel;
         PostTime = mainController.PostTime;
+        LengthLabel = mainController.LengthLabel;
+        CompletionLabel = mainController.CompletionLabel;
         session = mainController.getSession();
         StatusBar = mainController.CreatorStatusBar;
-        exporterState = ExporterState.IDLE;
+        exporterState = ExporterState.NOT_EXPORTED;
+        creatorState = CreatorState.NOT_CREATED;
         setuptextfields();
         textfieldtimes.addAll(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0));
         TotalSessionTime.setOnKeyTyped(MainController.noneditabletextfield);
@@ -110,15 +140,36 @@ public class CreatorAndExporterWidget implements Widget {
     public void setExporterState(ExporterState exporterState) {
         this.exporterState = exporterState;
     }
+    public CreatorState getCreatorState() {
+        return creatorState;
+    }
+    public void setCreatorState(CreatorState creatorState) {
+        this.creatorState = creatorState;
+    }
 
 // Creation
-    public boolean createsession() {
-        boolean created = creationchecks();
-        if (created) {
-            session.setAmbienceenabled(AmbienceSwitch.isSelected());
-            session.create(textfieldtimes);
+    public void togglecreator() {
+        // TODO Check Exporter Here
+        // TODO Check Player Here
+        if (creatorState == CreatorState.NOT_CREATED) {
+            if (creationchecks()) {
+                session.setAmbienceenabled(AmbienceSwitch.isSelected());
+                session.create(textfieldtimes);
+                disable();
+                ExportButton.setDisable(false);
+                CreateButton.setText("Edit");
+                session.Root.getPlayer().onOffSwitch.setDisable(false);
+                setCreatorState(CreatorState.CREATED);
+            }
+        } else {
+            enable();
+            ExportButton.setDisable(true);
+            CreateButton.setText("Create");
+            session.Root.getPlayer().onOffSwitch.setSelected(false);
+            session.Root.getPlayer().statusSwitch();
+            session.Root.getPlayer().onOffSwitch.setDisable(true);
+            setCreatorState(CreatorState.NOT_CREATED);
         }
-        return created;
     }
     public boolean creationchecks() {
         if (! gettextfieldtimes()) {Tools.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be > 0", "Cannot Continue"); return false;}
@@ -126,17 +177,31 @@ public class CreatorAndExporterWidget implements Widget {
         ArrayList<String> notgoodcuts = session.Root.getProgressTracker().precreationgoalchecks(textfieldtimes);
         if (! notgoodcuts.isEmpty()) {
             if (Tools.getanswerdialog("Confirmation", "Goals Aren't Long Enough For " + notgoodcuts.toArray().toString(), "Continue Creating Session Without Sufficient Goals?")) {
-
+                return true;
             }
         }
         return false;
     }
 
 // Export
+    public void toggleexport() {
+        if (exporterState == ExporterState.NOT_EXPORTED) {
+
+        } else if (exporterState == ExporterState.WORKING) {
+
+        } else if (exporterState == ExporterState.FAILED) {
+
+        } else if (exporterState == ExporterState.COMPLETED) {
+
+        } else if (exporterState == ExporterState.CANCELLED) {
+
+        } else {
+
+        }
+    }
     public void startexport() {
-        createsession();
-        if (createsession()) {
-            if (getExporterState() == ExporterState.IDLE) {
+        if (creationchecks()) {
+            if (getExporterState() == ExporterState.NOT_EXPORTED) {
                 if (checkforffmpeg()) {
                     if (session.getExportfile() == null) {
                         session.getnewexportsavefile();
@@ -157,17 +222,17 @@ public class CreatorAndExporterWidget implements Widget {
                     exportservices.add(session.getsessionexporter());
                     exportingSessionDialog = new ExportingSessionDialog(session);
                     exportingSessionDialog.show();
-                    setExporterState(ExporterState.EXPORT_IN_PROGRESS);
+                    setExporterState(ExporterState.WORKING);
                     exportnextservice();
                 } else {
                     Tools.showerrordialog("Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
                     // TODO Open A Browser Showing How To Install FFMPEG
                 }
-            } else if (getExporterState() == ExporterState.EXPORT_IN_PROGRESS) {
+            } else if (getExporterState() == ExporterState.WORKING) {
                 Tools.showtimedmessage(StatusBar, "Session Currently Being Exported", 3000);
             } else {
                 if (Tools.getanswerdialog("Confirmation", "Session Already Exported", "Export Again?")) {
-                    setExporterState(ExporterState.IDLE);
+                    setExporterState(ExporterState.NOT_EXPORTED);
                     startexport();
                 }
             }
@@ -192,13 +257,13 @@ public class CreatorAndExporterWidget implements Widget {
     public void exportfailed() {
         System.out.println(currentexporterservice.getException().getMessage());
         System.out.println("Failed!");
-        setExporterState(ExporterState.IDLE);}
+        setExporterState(ExporterState.FAILED);}
     public void exportcancelled() {
         System.out.println("Cancelled!");
-        setExporterState(ExporterState.IDLE);}
+        setExporterState(ExporterState.CANCELLED);}
     public void exportfinished() {
         System.out.println("Export Finished!");
-        setExporterState(ExporterState.EXPORTED);
+        setExporterState(ExporterState.COMPLETED);
     }
 
 // Other Methods
@@ -380,48 +445,78 @@ public class CreatorAndExporterWidget implements Widget {
         AmbienceSwitch.setDisable(true);
         ApproximateEndTime.setDisable(true);
         TotalSessionTime.setDisable(true);
+        PreLabel.setDisable(true);
         PreTime.setDisable(true);
+        RinLabel.setDisable(true);
         RinTime.setDisable(true);
+        KyoLabel.setDisable(true);
         KyoTime.setDisable(true);
+        TohLabel.setDisable(true);
         TohTime.setDisable(true);
+        ShaLabel.setDisable(true);
         ShaTime.setDisable(true);
+        KaiLabel.setDisable(true);
         KaiTime.setDisable(true);
+        JinLabel.setDisable(true);
         JinTime.setDisable(true);
+        RetsuLabel.setDisable(true);
         RetsuTime.setDisable(true);
+        ZaiLabel.setDisable(true);
         ZaiTime.setDisable(true);
+        ZenLabel.setDisable(true);
         ZenTime.setDisable(true);
+        PostLabel.setDisable(true);
         PostTime.setDisable(true);
-        StatusBar.setText("Creator Disabled While Session Player Enabled");
-    }
-    public void disablebuttons() {
-        ExportButton.setDisable(true);
+        LengthLabel.setDisable(true);
+        CompletionLabel.setDisable(true);
         LoadPresetButton.setDisable(true);
         SavePresetButton.setDisable(true);
+        StatusBar.setText("Creator Disabled While Session Player Enabled");
     }
+//    public void disablebuttons() {
+//        ExportButton.setDisable(true);
+//        LoadPresetButton.setDisable(true);
+//        SavePresetButton.setDisable(true);
+//    }
     @Override
     public void enable() {
         ChangeAllValuesButton.setDisable(false);
         AmbienceSwitch.setDisable(false);
         ApproximateEndTime.setDisable(false);
         TotalSessionTime.setDisable(false);
+        PreLabel.setDisable(false);
         PreTime.setDisable(false);
+        RinLabel.setDisable(false);
         RinTime.setDisable(false);
+        KyoLabel.setDisable(false);
         KyoTime.setDisable(false);
+        TohLabel.setDisable(false);
         TohTime.setDisable(false);
+        ShaLabel.setDisable(false);
         ShaTime.setDisable(false);
+        KaiLabel.setDisable(false);
         KaiTime.setDisable(false);
+        JinLabel.setDisable(false);
         JinTime.setDisable(false);
+        RetsuLabel.setDisable(false);
         RetsuTime.setDisable(false);
+        ZaiLabel.setDisable(false);
         ZaiTime.setDisable(false);
+        ZenLabel.setDisable(false);
         ZenTime.setDisable(false);
+        PostLabel.setDisable(false);
         PostTime.setDisable(false);
-        StatusBar.setText("");
-    }
-    public void enablebuttons() {
-        ExportButton.setDisable(false);
+        LengthLabel.setDisable(false);
+        CompletionLabel.setDisable(false);
         LoadPresetButton.setDisable(false);
         SavePresetButton.setDisable(false);
+        StatusBar.setText("");
     }
+//    public void enablebuttons() {
+//        ExportButton.setDisable(false);
+//        LoadPresetButton.setDisable(false);
+//        SavePresetButton.setDisable(false);
+//    }
     @Override
     public void resetallvalues() {
         AmbienceSwitch.setText("No Session Created");
@@ -440,7 +535,7 @@ public class CreatorAndExporterWidget implements Widget {
     }
     @Override
     public boolean cleanup() {
-        boolean currentlyexporting = getExporterState() == ExporterState.EXPORT_IN_PROGRESS;
+        boolean currentlyexporting = getExporterState() == ExporterState.WORKING;
         if (currentlyexporting) {
             Tools.showinformationdialog("Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
         } else {This_Session.deleteprevioussession();}
@@ -664,7 +759,9 @@ public class CreatorAndExporterWidget implements Widget {
 
 // Enums
     public enum ExporterState {
-        IDLE, EXPORT_IN_PROGRESS, EXPORTED
+        NOT_EXPORTED, WORKING, COMPLETED, FAILED, CANCELLED
     }
-
+    public enum CreatorState {
+        NOT_CREATED, CREATED
+    }
 }

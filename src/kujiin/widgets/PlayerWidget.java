@@ -22,7 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class PlayerWidget implements Widget {
-    private CheckBox onOffSwitch;
+    public CheckBox onOffSwitch;
     private Button PlayButton;
     private Button PauseButton;
     private Button StopButton;
@@ -40,6 +40,9 @@ public class PlayerWidget implements Widget {
     private Label EntrainmentPercentage;
     private Label AmbiencePercentage;
     private Label StatusBar;
+    private Label VolumeEntrainmentLabel;
+    private Label VolumeAmbienceLabel;
+    private Label VolumeTopLabel;
     private This_Session Session;
     private CreatorAndExporterWidget creatorAndExporterWidget;
     private ReferenceType referenceType;
@@ -63,6 +66,9 @@ public class PlayerWidget implements Widget {
         EntrainmentPercentage = mainController.EntrainmentVolumePercentage;
         AmbiencePercentage = mainController.AmbienceVolumePercentage;
         StatusBar = mainController.PlayerStatusBar;
+        VolumeAmbienceLabel = mainController.VolumeAmbienceLabel;
+        VolumeEntrainmentLabel = mainController.VolumeEntrainmentLabel;
+        VolumeTopLabel = mainController.VolumeTopLabel;
         Session = mainController.getSession();
         creatorAndExporterWidget = mainController.getCreatorAndExporter();
         EntrainmentVolume.setOnMouseClicked(event -> {
@@ -79,6 +85,8 @@ public class PlayerWidget implements Widget {
                 Session.Root.getOptions().getSessionOptions().setAmbiencevolume(AmbienceVolume.getValue());
             } catch(Exception ignored) {Tools.showtimedmessage(StatusBar, "No Session Playing", 2000);}
         });
+        onOffSwitch.setDisable(true);
+        Tools.showtimedmessage(StatusBar, "Player Disabled Till Session Is Created Or Loaded", 10000);
     }
 
 // Getters And Setters
@@ -153,19 +161,22 @@ public class PlayerWidget implements Widget {
         ReferenceFileCheckbox.setDisable(true);
         EntrainmentVolume.setDisable(true);
         AmbienceVolume.setDisable(true);
+        VolumeTopLabel.setDisable(true);
+        VolumeEntrainmentLabel.setDisable(true);
+        VolumeAmbienceLabel.setDisable(true);
         EntrainmentPercentage.setText("-");
         AmbiencePercentage.setText("-");
         onOffSwitch.setText("OFF");
     }
     @Override
     public void enable() {
-        if (! creatorAndExporterWidget.createsession()) {return;}
-        if (! Session.isValid()) {
-            Tools.showinformationdialog("Information", "Cannot Enable Session Player", "Session (Above) Isn't Valid, All Cut Values Are 0");
-            onOffSwitch.setSelected(false);
-            onOffSwitch.setText("OFF");
-            return;
-        }
+//        if (! creatorAndExporterWidget.createsession()) {return;}
+//        if (! Session.isValid()) {
+//            Tools.showinformationdialog("Information", "Cannot Enable Session Player", "Session (Above) Isn't Valid, All Cut Values Are 0");
+//            onOffSwitch.setSelected(false);
+//            onOffSwitch.setText("OFF");
+//            return;
+//        }
         PlayButton.setDisable(false);
         PauseButton.setDisable(false);
         StopButton.setDisable(false);
@@ -178,6 +189,9 @@ public class PlayerWidget implements Widget {
         CutProgress.setDisable(false);
         TotalProgress.setDisable(false);
         ReferenceFileCheckbox.setDisable(false);
+        VolumeTopLabel.setDisable(false);
+        VolumeEntrainmentLabel.setDisable(false);
+        VolumeAmbienceLabel.setDisable(false);
         if (Session.getAmbienceenabled()) {AmbienceVolume.setDisable(false);}
         else {AmbienceVolume.setDisable(true);}
         EntrainmentVolume.setDisable(false);

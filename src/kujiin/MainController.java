@@ -86,6 +86,22 @@ public class MainController implements Initializable {
     public Label EntrainmentVolumePercentage;
     public Label AmbienceVolumePercentage;
     public Button CreateButton;
+    public Label PreLabel;
+    public Label RinLabel;
+    public Label KyoLabel;
+    public Label TohLabel;
+    public Label ShaLabel;
+    public Label KaiLabel;
+    public Label JinLabel;
+    public Label RetsuLabel;
+    public Label ZaiLabel;
+    public Label ZenLabel;
+    public Label PostLabel;
+    public Label LengthLabel;
+    public Label CompletionLabel;
+    public Label VolumeEntrainmentLabel;
+    public Label VolumeAmbienceLabel;
+    public Label VolumeTopLabel;
     private This_Session Session;
     private CreatorAndExporterWidget CreatorAndExporter;
     private PlayerWidget Player;
@@ -182,6 +198,12 @@ public class MainController implements Initializable {
         CreatorAndExporter.loadpreset();}
     public void savepreset(ActionEvent actionEvent) {
         CreatorAndExporter.savepreset();}
+    public void togglecreator(ActionEvent actionEvent) {
+        getCreatorAndExporter().togglecreator();
+    }
+    public void toggleexporter(ActionEvent actionEvent) {
+        getCreatorAndExporter().toggleexport();
+    }
     public void exportsession(Event event) {
         //        CreatorAndExporter.startexport();}
         Tools.showtimedmessage(CreatorStatusBar, "Exporter Is Broken. FFMPEG Is Being A Pain In The Ass", 3000);
@@ -194,16 +216,16 @@ public class MainController implements Initializable {
 // Session Player Widget
     public void sessionplayerswitch(ActionEvent actionEvent) {
         Player.statusSwitch();
-        if (Player.isEnabled()) {
-            CreatorAndExporter.disable();
-            CreatorAndExporter.disablebuttons();
-//            Node node = (Node) actionEvent.getSource();
-//            Stage stage = (Stage) node.getScene().getWindow();
-//            stage.setOnCloseRequest(event -> ProgressTracker.getSessions().deletenonvalidsessions());
-        } else {
-            CreatorAndExporter.enable();
-            CreatorAndExporter.enablebuttons();
-        }
+//        if (Player.isEnabled()) {
+//            CreatorAndExporter.disable();
+//            CreatorAndExporter.disablebuttons();
+////            Node node = (Node) actionEvent.getSource();
+////            Stage stage = (Stage) node.getScene().getWindow();
+////            stage.setOnCloseRequest(event -> ProgressTracker.getSessions().deletenonvalidsessions());
+//        } else {
+//            CreatorAndExporter.enable();
+//            CreatorAndExporter.enablebuttons();
+//        }
     }
     public void playsession(Event event) {
         Player.play(ProgressTracker.getSessions());}
@@ -220,7 +242,7 @@ public class MainController implements Initializable {
         getProgressTracker().updateprogressui();
     }
 
-// Dialogs
+    // Dialogs
     public static class EditReferenceFiles extends Stage {
 
         public ChoiceBox<String> CutNamesChoiceBox;
