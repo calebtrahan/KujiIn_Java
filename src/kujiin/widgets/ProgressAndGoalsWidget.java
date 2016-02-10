@@ -1,9 +1,6 @@
 package kujiin.widgets;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -28,10 +25,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
+// TODO Finish Tying Current And Completed Goals Together
+// TODO Finish Making EditGoalsDialog (Also Add A Select A Different Cut Feature, And Make It So They Can Pass Cutindex Data Back And Forth)
 public class ProgressAndGoalsWidget implements Widget {
-    public static String[] GOALCUTNAMES = {"Pre/Post", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Total"};
+    public static String[] GOALCUTNAMES = {"Presession", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Postsession", "Total"};
     private ComboBox<String> CutSelectorComboBox;
     private Integer cutindex;
 // Progress Tracker Fields
@@ -43,7 +41,7 @@ public class ProgressAndGoalsWidget implements Widget {
     private Button DetailedCutProgressButton;
     private Button SessionListButton;
 // Goals Fields
-    private CurrentGoals CurrentGoals;
+    private Goals Goals;
     private CompletedGoals CompletedGoals;
     private Button NewGoalButton;
     private Button CurrentGoalsButton;
@@ -69,7 +67,7 @@ public class ProgressAndGoalsWidget implements Widget {
         DetailedCutProgressButton = mainController.ShowCutProgressButton;
         SessionListButton = mainController.ListOfSessionsButton;
         Sessions = new Sessions();
-        CurrentGoals = new CurrentGoals();
+        Goals = new Goals();
         CompletedGoals = new CompletedGoals();
         Service<Void> getsessions = new Service<Void>() {
             @Override
@@ -99,7 +97,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 return new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
-                        CurrentGoals.unmarshall();
+                        Goals.unmarshall();
                         return null;
                     }
                 };
@@ -127,11 +125,14 @@ public class ProgressAndGoalsWidget implements Widget {
 
 // Getters And Setters
     public Sessions getSessions() {return Sessions;}
-    public kujiin.xml.CurrentGoals getCurrentGoals() {
-        return CurrentGoals;
+    public Goals getGoal() {
+        return Goals;
     }
     public kujiin.xml.CompletedGoals getCompletedGoals() {
         return CompletedGoals;
+    }
+    public Integer getCutindex() {
+        return cutindex;
     }
 
 // Button Actions
@@ -160,27 +161,22 @@ public class ProgressAndGoalsWidget implements Widget {
         SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(cutindex, this);
         setANewGoalDialog.showAndWait();
         if (setANewGoalDialog.isAccepted()) {
-            try {CurrentGoals.add(cutindex, new CurrentGoals.CurrentGoal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
+            try {
+                Goals.add(cutindex, new Goals.Goal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
             catch (JAXBException ignored) {Tools.showerrordialog("Error", "Couldn't Add Goal", "Check File Permissions");}
         }
         updategoalsui();
     }
-    public void displaycurrentgoals() {
-        if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Display Current Goals"); return;}
-        if (! CurrentGoals.goalsexist(cutindex)) {Tools.showinformationdialog("Information", "No Goals Exist For " + GOALCUTNAMES[cutindex], "Please Add A Goal For " + GOALCUTNAMES[cutindex]); return;}
-        List<CurrentGoals.CurrentGoal> goalslist = CurrentGoals.getallcutgoals(cutindex);
-        if (goalslist == null) {Tools.showinformationdialog("Information", "No Goals To Display", "Set A New Goal First"); return;}
-        new DisplayCurrentGoalsDialog(goalslist, Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected()), 2)).showAndWait();
-    }
-    public void displaycompletedgoals() {
-        if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Display Completed Goals"); return;}
-        if (! CompletedGoals.goalsexist(cutindex)) {Tools.showinformationdialog("Information", "No Goals Completed For " + GOALCUTNAMES[cutindex], "Complete A Goal For " + GOALCUTNAMES[cutindex]); return;}
-        List<CompletedGoals.CompletedGoal> goalslist = CompletedGoals.getallcutgoals(cutindex);
-        new DisplayCompletedGoalsDialog(goalslist).showAndWait();
+    public void opengoaleditor() {
+        if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Edit Its Goals"); return;}
+        if (! Goals.goalsexist(cutindex)) {Tools.showinformationdialog("Information", "No Goals Exist For " + GOALCUTNAMES[cutindex], "Please Add A Goal For " + GOALCUTNAMES[cutindex]); return;}
+        List<kujiin.xml.Goals.Goal> goalslist = Goals.getallcutgoals(cutindex);
+        if (goalslist == null) {Tools.showinformationdialog("Information", "No Goals To Edit For " + GOALCUTNAMES[cutindex], "Set A New Goal For " + GOALCUTNAMES[cutindex] + " First"); return;}
+        new EditGoalsDialog(this).showAndWait();
     }
     public void goalpacing() {
         if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Calculate Goal Pacing"); return;}
-        new GoalPacingDialog(CurrentGoals.getgoal(cutindex, 0), CurrentGoals.getTotalGoals(), Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected())).showAndWait();
+        new GoalPacingDialog(Goals.getgoal(cutindex, 0), Goals.getTotalGoals(), Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected())).showAndWait();
     }
 
 // Widget Implementation
@@ -235,7 +231,7 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     @Override
     public boolean cleanup() {
-        CurrentGoals.marshall();
+        Goals.marshall();
         CompletedGoals.marshall();
         Sessions.marshall();
         return true;
@@ -263,16 +259,34 @@ public class ProgressAndGoalsWidget implements Widget {
     }
 
 // Goal Specific Methods
+    public ArrayList<String> precreationgoalchecks(ArrayList<Integer> textfieldtimes) {
+        ArrayList<String> notgoodcuts = new ArrayList<>();
+        for (int i = 0; i < textfieldtimes.size(); i++) {
+            Integer val = textfieldtimes.get(i);
+            if (! checkifgoalsetandlongenough(i, val)) {
+                notgoodcuts.add(GOALCUTNAMES[i]);
+            }
+        }
+        return notgoodcuts;
+    }
+    public boolean checkifgoalsetandlongenough(int cut_index, int duration) {
+        try {
+            List<kujiin.xml.Goals.Goal> currentGoals = Goals.sort(Goals.getallcutgoals(cut_index));
+            int currentpracticedminutes = Sessions.getpracticedtimeinminutesforallsessions(cut_index, PreAndPostOption.isSelected());
+            currentpracticedminutes += duration;
+            return currentpracticedminutes >= currentGoals.get(currentGoals.size() - 1).getGoal_Hours().intValue();
+        } catch (Exception e) {return false;}
+    }
     public void updategoalsui() {
         // TODO Goals Not Updating With Total Progress Widget
         try {
             String cutname =  GOALCUTNAMES[cutindex];
-//            if (! CurrentGoals.goalsexist(cutindex)) {
+//            if (! Goal.goalsexist(cutindex)) {
 //                resetallvalues();
 //                return;
 //            }
             Double practiced = Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected()), 2);
-            Double goal = CurrentGoals.getgoal(cutindex, 0).getGoal_Hours();
+            Double goal = Goals.getgoal(cutindex, 0).getGoal_Hours();
             PracticedHours.setText(String.format("Current: %s hrs", practiced.toString()));
             if (goal != null) {
                 GoalHours.setText(String.format("Goal: %s hrs", goal.toString()));
@@ -285,6 +299,10 @@ public class ProgressAndGoalsWidget implements Widget {
             else if (cutname.equals(GOALCUTNAMES[0])) {TopLabel.setText("Pre + Post Goal");}
             else {TopLabel.setText(cutname + "'s Current Goal");}
         } catch (NullPointerException ignored) {}
+    }
+    public List<kujiin.xml.Goals.Goal> getcurrentgoallist(boolean includecompleted) {
+        if (cutindex != null) {return Goals.getallcutgoals(cutindex);}
+        else {return null;}
     }
 
 // Subclasses/Dialogs
@@ -427,55 +445,52 @@ public class ProgressAndGoalsWidget implements Widget {
             }
         }
     }
-    public static class DisplayCompletedGoalsDialog extends Stage {
-        public TableView<CompletedGoal> currentgoaltable;
-        public TableColumn<CompletedGoal, Integer> NumberColumn;
-        public TableColumn<CompletedGoal, String> GoalTimeColumn;
-        public TableColumn<CompletedGoal, String> CompletedOnColumn;
-        public Button CloseButton;
-
-        public DisplayCompletedGoalsDialog(List<CompletedGoals.CompletedGoal> completedgoals) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCompletedGoals.fxml"));
-            fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Completed Goals");}
-            catch (IOException e) {e.printStackTrace();}
-            ObservableList<CompletedGoal> completedGoals = FXCollections.observableArrayList();
-            completedGoals.addAll(completedgoals.stream().map(i -> new CompletedGoal(completedgoals.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Completed())).collect(Collectors.toList()));
-            NumberColumn.setCellValueFactory(cellData -> cellData.getValue().goalid.asObject());
-            GoalTimeColumn.setCellValueFactory(cellData -> cellData.getValue().goalhours);
-            CompletedOnColumn.setCellValueFactory(cellData -> cellData.getValue().datecompleted);
-            currentgoaltable.setItems(completedGoals);
-        }
-
-        public void closeDialog(Event event) {this.close();}
-
-        public class CompletedGoal {
-            public IntegerProperty goalid;
-            public StringProperty goalhours;
-            public StringProperty datecompleted;
-
-            public CompletedGoal(int goalid, String goalhours, String datecompleted) {
-                this.goalid = new SimpleIntegerProperty(goalid);
-                this.goalhours = new SimpleStringProperty(goalhours);
-                this.datecompleted = new SimpleStringProperty(datecompleted);
-            }
-        }
-    }
-    public static class DisplayCurrentGoalsDialog extends Stage {
+    public static class EditGoalsDialog extends Stage {
         public TableView<CurrentGoalBinding> currentgoaltable;
         public TableColumn<CurrentGoalBinding, Integer> NumberColumn;
         public TableColumn<CurrentGoalBinding, String> GoalTimeColumn;
         public TableColumn<CurrentGoalBinding, String> DueDateColumn;
         public TableColumn<CurrentGoalBinding, String> PercentCompleteColumn;
         public Button CloseButton;
+        public TableColumn<CurrentGoalBinding, Boolean> IsCompletedColumn;
+        public TableColumn<CurrentGoalBinding, String> CompletionDateColumn;
+        public Label TopLabel;
+        public CheckBox ShowCompletedCheckBox;
+        public Button AddGoalButton;
+        public Button RemoveGoalButton;
+        private ProgressAndGoalsWidget ProgressAndGoals;
+        private List<kujiin.xml.Goals.Goal> CurrentGoalList;
+        private kujiin.xml.Goals.Goal SelectedGoal;
 
-        public DisplayCurrentGoalsDialog(List<CurrentGoals.CurrentGoal> currentGoalList, double currentpracticedhours) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCurrentGoals.fxml"));
+        public EditGoalsDialog(ProgressAndGoalsWidget progressandgoals) {
+            ProgressAndGoals = progressandgoals;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayGoals.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Current Goals");}
             catch (IOException e) {e.printStackTrace();}
+            populatetable(ShowCompletedCheckBox.isSelected());
+        }
+        public void populatetable(boolean includecompletedgoals) {
             ObservableList<CurrentGoalBinding> currentGoals = FXCollections.observableArrayList();
-            currentGoals.addAll(currentGoalList.stream().map(i -> new CurrentGoalBinding(currentGoalList.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Set(), i.getpercentagecompleted(currentpracticedhours))).collect(Collectors.toList()));
+            int count = 1;
+            int cutindex = ProgressAndGoals.getCutindex();
+            CurrentGoalList = new ArrayList<>();
+            for (kujiin.xml.Goals.Goal i : ProgressAndGoals.getGoal().getallcutgoals(cutindex)) {
+                if (includecompletedgoals) {
+                    if (i.getCompleted()) {
+                        currentGoals.add(new CurrentGoalBinding(count, Double.toString(i.getGoal_Hours()), i.getDate_Set(),
+                                i.getpercentagecompleted(ProgressAndGoals.getSessions().getpracticedtimeinminutesforallsessions(cutindex, false)),
+                                i.getCompleted(), i.getDate_Completed()));
+                        CurrentGoalList.add(i);
+                    }
+                } else {
+                    currentGoals.add(new CurrentGoalBinding(count, Double.toString(i.getGoal_Hours()), i.getDate_Set(),
+                            i.getpercentagecompleted(ProgressAndGoals.getSessions().getpracticedtimeinminutesforallsessions(cutindex, false)),
+                            i.getCompleted(), i.getDate_Completed()));
+                    CurrentGoalList.add(i);
+                }
+                count++;
+            }
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().goalid.asObject());
             NumberColumn.setStyle("-fx-alignment: CENTER;");
             GoalTimeColumn.setCellValueFactory(cellData -> cellData.getValue().goalhours);
@@ -484,10 +499,33 @@ public class ProgressAndGoalsWidget implements Widget {
             DueDateColumn.setStyle("-fx-alignment: CENTER;");
             PercentCompleteColumn.setCellValueFactory(cellData -> cellData.getValue().percentcomplete);
             PercentCompleteColumn.setStyle("-fx-alignment: CENTER;");
+            IsCompletedColumn.setCellValueFactory(cellData -> cellData.getValue().completed);
+            IsCompletedColumn.setStyle("-fx-alignment: CENTER;");
+            CompletionDateColumn.setCellValueFactory(cellData -> cellData.getValue().datecompleted);
+            CompletionDateColumn.setStyle("-fx-alignment: CENTER;");
             currentgoaltable.setItems(currentGoals);
         }
 
+    // Button Actions
+
         public void closeDialog(Event event) {this.close();}
+        public void selectionchanged(Event event) {
+            int index = currentgoaltable.getSelectionModel().getSelectedIndex();
+            if (index != -1) {SelectedGoal = CurrentGoalList.get(index);}
+            RemoveGoalButton.setDisable(index == -1);
+        }
+        public void showCompletedGoals(ActionEvent actionEvent) {
+            populatetable(ShowCompletedCheckBox.isSelected());
+        }
+        public void addgoal(ActionEvent actionEvent) {ProgressAndGoals.setnewgoal();}
+        public void removegoal(ActionEvent actionEvent) {
+            if (SelectedGoal == null) {return;}
+            if (! SelectedGoal.getCompleted() && Tools.getanswerdialog("Confirmation", "Remove This Goal?", "This Cannot Be Undone")) {
+                CurrentGoalList.remove(currentgoaltable.getSelectionModel().getSelectedIndex());
+                ProgressAndGoals.getGoal().update(CurrentGoalList, ProgressAndGoals.getCutindex());
+            }
+        }
+
     }
     public static class GoalPacingDialog extends Stage implements Initializable {
         public Label SelectedGoalHours;
@@ -495,11 +533,11 @@ public class ProgressAndGoalsWidget implements Widget {
         public Spinner<Integer> DaysSpinner;
         public Button CalculateButton;
         public Button CloseButton;
-        private CurrentGoals.CurrentGoal currentGoal;
-        private List<CurrentGoals.CurrentGoal> currentGoals;
+        private kujiin.xml.Goals.Goal currentGoal;
+        private List<kujiin.xml.Goals.Goal> currentGoals;
         private double alreadypracticedhours;
 
-        public GoalPacingDialog(CurrentGoals.CurrentGoal currentGoal, List<CurrentGoals.CurrentGoal> currentGoals, double alreadypracticedhours) {
+        public GoalPacingDialog(kujiin.xml.Goals.Goal currentGoal, List<kujiin.xml.Goals.Goal> currentGoals, double alreadypracticedhours) {
             this.currentGoal = currentGoal;
             this.currentGoals = currentGoals;
             this.alreadypracticedhours = alreadypracticedhours;
@@ -516,10 +554,10 @@ public class ProgressAndGoalsWidget implements Widget {
         }
 
         // Getters And Setters
-        public CurrentGoals.CurrentGoal getCurrentGoal() {
+        public kujiin.xml.Goals.Goal getCurrentGoal() {
             return currentGoal;
         }
-        public void setCurrentGoal(CurrentGoals.CurrentGoal currentGoal) {
+        public void setCurrentGoal(kujiin.xml.Goals.Goal currentGoal) {
             this.currentGoal = currentGoal;
         }
 
@@ -553,17 +591,17 @@ public class ProgressAndGoalsWidget implements Widget {
         public TableColumn<CurrentGoalBinding, String> PercentCompleteColumn;
         public Button SelectButton;
         public Button CancelButton;
-        public CurrentGoals.CurrentGoal selectedgoal;
-        private List<CurrentGoals.CurrentGoal> currentGoalList;
+        public kujiin.xml.Goals.Goal selectedgoal;
+        private List<kujiin.xml.Goals.Goal> currentGoalList;
 
-        public SelectGoalDialog(List<CurrentGoals.CurrentGoal> currentGoalList, double currentpracticedhours) {
+        public SelectGoalDialog(List<kujiin.xml.Goals.Goal> currentGoalList, double currentpracticedhours) {
             this.currentGoalList = currentGoalList;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SelectGoalDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select A Goal");}
             catch (IOException e) {e.printStackTrace();}
             ObservableList<CurrentGoalBinding> currentGoals = FXCollections.observableArrayList();
-            currentGoals.addAll(currentGoalList.stream().map(i -> new CurrentGoalBinding(currentGoalList.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Set(), i.getpercentagecompleted(currentpracticedhours))).collect(Collectors.toList()));
+//            currentGoals.addAll(currentGoalList.stream().map(i -> new CurrentGoalBinding(currentGoalList.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Set(), i.getpercentagecompleted(currentpracticedhours))).collect(Collectors.toList()));
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().goalid.asObject());
             NumberColumn.setStyle("-fx-alignment: CENTER;");
             GoalTimeColumn.setCellValueFactory(cellData -> cellData.getValue().goalhours);
@@ -576,10 +614,10 @@ public class ProgressAndGoalsWidget implements Widget {
         }
 
         // Getters And Setters
-        public CurrentGoals.CurrentGoal getSelectedgoal() {
+        public kujiin.xml.Goals.Goal getSelectedgoal() {
             return selectedgoal;
         }
-        public void setSelectedgoal(CurrentGoals.CurrentGoal selectedgoal) {
+        public void setSelectedgoal(kujiin.xml.Goals.Goal selectedgoal) {
             this.selectedgoal = selectedgoal;
         }
 
@@ -614,7 +652,7 @@ public class ProgressAndGoalsWidget implements Widget {
             GoalMinutesSpinner.setEditable(true);
             GoalDatePicker.setValue(LocalDate.now());
             try {
-                int minutes = Tools.convertdecimalhourstominutes(progressAndGoalsWidget.getCurrentGoals().getgoal(cutindex, 0).getGoal_Hours());
+                int minutes = Tools.convertdecimalhourstominutes(progressAndGoalsWidget.getGoal().getgoal(cutindex, 0).getGoal_Hours());
                 GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(minutes / 60, Integer.MAX_VALUE, minutes / 60));
                 GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(minutes % 60, 59, minutes % 60));
             } catch (NullPointerException ignored) {
@@ -658,14 +696,14 @@ public class ProgressAndGoalsWidget implements Widget {
                 setGoaldate(null);
             }
         }
-        public void viewcurrentgoals(Event event) {progressAndGoalsWidget.displaycurrentgoals();}
+        public void viewcurrentgoals(Event event) {progressAndGoalsWidget.opengoaleditor();}
     }
     public static class GoalCompleted extends Stage {
         public Label GoalHours;
         public Button CloseButton;
         public Label CurrentHoursLabel;
 
-        public GoalCompleted(CurrentGoals.CurrentGoal currentGoal, Double currentpracticedhours) {
+        public GoalCompleted(kujiin.xml.Goals.Goal currentGoal, Double currentpracticedhours) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalCompleted.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Goal Achieved");}
@@ -680,12 +718,16 @@ public class ProgressAndGoalsWidget implements Widget {
         private StringProperty goalhours;
         private StringProperty duedate;
         private StringProperty percentcomplete;
+        private BooleanProperty completed;
+        private StringProperty datecompleted;
 
-        public CurrentGoalBinding(int id, String goalhours, String duedate, String percentcomplete) {
+        public CurrentGoalBinding(int id, String goalhours, String duedate, String percentcomplete, Boolean completed, String datecompleted) {
             this.goalid = new SimpleIntegerProperty(id);
             this.goalhours = new SimpleStringProperty(goalhours);
             this.duedate = new SimpleStringProperty(duedate);
             this.percentcomplete = new SimpleStringProperty(percentcomplete);
+            this.completed = new SimpleBooleanProperty(completed);
+            this.datecompleted = new SimpleStringProperty(datecompleted);
         }
     }
 

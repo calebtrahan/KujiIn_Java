@@ -328,6 +328,16 @@ public class PlayerWidget implements Widget {
             this.close();
         }
     }
+    public static class SessionFinishedDialog extends Stage {
+
+        public SessionFinishedDialog() {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionFinishedDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Completed");}
+            catch (IOException e) {e.printStackTrace();}
+        }
+
+    }
 
 // Enumerators
     public enum ReferenceType {

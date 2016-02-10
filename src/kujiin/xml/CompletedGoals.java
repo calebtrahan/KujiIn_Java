@@ -142,7 +142,7 @@ public class CompletedGoals {
             return goallist;
         } catch (NullPointerException ignored) {return null;}
     }
-    public boolean completegoal(int cutindex, CurrentGoals.CurrentGoal currentGoal) {
+    public boolean completegoal(int cutindex, Goals.Goal currentGoal) {
         double hours = currentGoal.getGoal_Hours();
         CompletedGoal newcompletedgoal = new CompletedGoal();
         newcompletedgoal.setDate_Completed(Tools.gettodaysdate());

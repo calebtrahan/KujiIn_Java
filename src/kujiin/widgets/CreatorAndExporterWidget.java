@@ -31,12 +31,12 @@ import java.util.ResourceBundle;
 
 // TODO Get FFMPEG Working To Mix Audio Files Together
     // Not Supported Stream?
+// TODO Get Creator Button Working (Tie Into Enum, And Enable Player And Exporter, Disable Creator (And Change Button Text To 'Edit') When Session Is Created)
 public class CreatorAndExporterWidget implements Widget {
-    private Button changeallvaluesbutton;
-    private Button exportButton;
+    private Button ChangeAllValuesButton;
     private Button ExportButton;
-    private Button loadpresetbutton;
-    private Button savepresetbutton;
+    private Button LoadPresetButton;
+    private Button SavePresetButton;
     private CheckBox AmbienceSwitch;
     private TextField TotalSessionTime;
     private TextField ApproximateEndTime;
@@ -51,6 +51,7 @@ public class CreatorAndExporterWidget implements Widget {
     private TextField ZaiTime;
     private TextField ZenTime;
     private TextField PostTime;
+    private Label StatusBar;
     private IntegerProperty PresessionValue = new SimpleIntegerProperty(0);
     private IntegerProperty RinValue = new SimpleIntegerProperty(0);
     private IntegerProperty KyoValue = new SimpleIntegerProperty(0);
@@ -64,7 +65,6 @@ public class CreatorAndExporterWidget implements Widget {
     private IntegerProperty PostsessionValue = new SimpleIntegerProperty(0);
     private ExporterState exporterState;
     private This_Session session;
-    private Label StatusBar;
     private ArrayList<Integer> textfieldtimes = new ArrayList<>(11);
     private ArrayList<Service<Boolean>> exportservices;
     private Service<Boolean> currentexporterservice;
@@ -73,10 +73,9 @@ public class CreatorAndExporterWidget implements Widget {
     private Preset Preset;
 
     public CreatorAndExporterWidget(MainController mainController) {
-        exportButton = mainController.ExportButton;
-        loadpresetbutton = mainController.LoadPresetButton;
-        savepresetbutton = mainController.SavePresetButton;
-        changeallvaluesbutton = mainController.ChangeValuesButton;
+        LoadPresetButton = mainController.LoadPresetButton;
+        SavePresetButton = mainController.SavePresetButton;
+        ChangeAllValuesButton = mainController.ChangeValuesButton;
         ExportButton = mainController.ExportButton;
         AmbienceSwitch = mainController.AmbienceSwitch;
         TotalSessionTime = mainController.TotalSessionTime;
@@ -114,18 +113,28 @@ public class CreatorAndExporterWidget implements Widget {
 
 // Creation
     public boolean createsession() {
-        if (gettextfieldtimes()) {
-            if (session.checksessionwellformedness(textfieldtimes)) {
-                session.setAmbienceenabled(AmbienceSwitch.isSelected());
-                session.create(textfieldtimes);
-                return true;
-            } else {return false;}
+        boolean created = creationchecks();
+        if (created) {
+            session.setAmbienceenabled(AmbienceSwitch.isSelected());
+            session.create(textfieldtimes);
         }
-        else {Tools.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be Greater Than 0", "Session Not Valid"); return false;}
+        return created;
+    }
+    public boolean creationchecks() {
+        if (! gettextfieldtimes()) {Tools.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be > 0", "Cannot Continue"); return false;}
+        if (! session.checksessionwellformedness(textfieldtimes)) {return false;}
+        ArrayList<String> notgoodcuts = session.Root.getProgressTracker().precreationgoalchecks(textfieldtimes);
+        if (! notgoodcuts.isEmpty()) {
+            if (Tools.getanswerdialog("Confirmation", "Goals Aren't Long Enough For " + notgoodcuts.toArray().toString(), "Continue Creating Session Without Sufficient Goals?")) {
+
+            }
+        }
+        return false;
     }
 
 // Export
     public void startexport() {
+        createsession();
         if (createsession()) {
             if (getExporterState() == ExporterState.IDLE) {
                 if (checkforffmpeg()) {
@@ -276,10 +285,10 @@ public class CreatorAndExporterWidget implements Widget {
         TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
         ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
         AmbienceSwitch.setTooltip(new Tooltip("Check This After You Set All Values To Check For And Enable Ambience For This Session"));
-        changeallvaluesbutton.setTooltip(new Tooltip("Change All Cut Values Simultaneously"));
-        loadpresetbutton.setTooltip(new Tooltip("Load A Saved Preset"));
-        savepresetbutton.setTooltip(new Tooltip("Save This Session As A Preset"));
-        exportButton.setTooltip(new Tooltip("Export This Session To .mp3 For Use Without The Program"));
+        ChangeAllValuesButton.setTooltip(new Tooltip("Change All Cut Values Simultaneously"));
+        LoadPresetButton.setTooltip(new Tooltip("Load A Saved Preset"));
+        SavePresetButton.setTooltip(new Tooltip("Save This Session As A Preset"));
+        ExportButton.setTooltip(new Tooltip("Export This Session To .mp3 For Use Without The Program"));
     }
     public void updatecreatorui() {
         if (gettextfieldtimes()) {
@@ -367,7 +376,7 @@ public class CreatorAndExporterWidget implements Widget {
 // Widget Implementation
     @Override
     public void disable() {
-        changeallvaluesbutton.setDisable(true);
+        ChangeAllValuesButton.setDisable(true);
         AmbienceSwitch.setDisable(true);
         ApproximateEndTime.setDisable(true);
         TotalSessionTime.setDisable(true);
@@ -386,12 +395,12 @@ public class CreatorAndExporterWidget implements Widget {
     }
     public void disablebuttons() {
         ExportButton.setDisable(true);
-        loadpresetbutton.setDisable(true);
-        savepresetbutton.setDisable(true);
+        LoadPresetButton.setDisable(true);
+        SavePresetButton.setDisable(true);
     }
     @Override
     public void enable() {
-        changeallvaluesbutton.setDisable(false);
+        ChangeAllValuesButton.setDisable(false);
         AmbienceSwitch.setDisable(false);
         ApproximateEndTime.setDisable(false);
         TotalSessionTime.setDisable(false);
@@ -410,8 +419,8 @@ public class CreatorAndExporterWidget implements Widget {
     }
     public void enablebuttons() {
         ExportButton.setDisable(false);
-        loadpresetbutton.setDisable(false);
-        savepresetbutton.setDisable(false);
+        LoadPresetButton.setDisable(false);
+        SavePresetButton.setDisable(false);
     }
     @Override
     public void resetallvalues() {

@@ -85,6 +85,7 @@ public class MainController implements Initializable {
     public Slider AmbienceVolume;
     public Label EntrainmentVolumePercentage;
     public Label AmbienceVolumePercentage;
+    public Button CreateButton;
     private This_Session Session;
     private CreatorAndExporterWidget CreatorAndExporter;
     private PlayerWidget Player;
@@ -174,9 +175,7 @@ public class MainController implements Initializable {
     public void getgoalpacing(Event event) {
         ProgressTracker.goalpacing();}
     public void viewcurrentgoals(Event event) {
-        ProgressTracker.displaycurrentgoals();}
-    public void viewcompletedgoals(Event event) {
-        ProgressTracker.displaycompletedgoals();}
+        ProgressTracker.opengoaleditor();}
 
 // Creator And Exporter Widget
     public void loadpreset(ActionEvent actionEvent) {

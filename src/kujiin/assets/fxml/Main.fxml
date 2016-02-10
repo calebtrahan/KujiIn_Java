@@ -224,39 +224,24 @@
       <Label layoutX="184.0" layoutY="113.0" text="~ Completion Time" />
       <TextField fx:id="ApproximateEndTime" alignment="CENTER" editable="false" layoutX="163.0" layoutY="130.0" prefHeight="23.0" prefWidth="146.0" />
       <HBox alignment="BOTTOM_RIGHT" layoutX="673.0" layoutY="331.0" prefHeight="28.0" prefWidth="105.0" />
-      <Button fx:id="ExportButton" layoutX="355.0" layoutY="160.0" mnemonicParsing="false" onMousePressed="#exportsession" prefHeight="23.0" prefWidth="101.0" text="Export Session">
-         <font>
-            <Font size="12.0" />
-         </font>
-      </Button>
       <Button fx:id="ChangeValuesButton" layoutX="13.0" layoutY="133.0" mnemonicParsing="false" onAction="#changeallcreatorvalues" prefHeight="23.0" prefWidth="132.0" text="Change All Values">
          <font>
             <Font size="12.0" />
          </font>
       </Button>
-      <Label fx:id="CreatorStatusBar" layoutX="10.0" layoutY="165.0" prefHeight="16.0" prefWidth="338.0" text="Creator StatusBar Here Creator StatusBar Here Creator StatusBar Here">
+      <Label fx:id="CreatorStatusBar" layoutX="10.0" layoutY="165.0" prefHeight="16.0" prefWidth="316.0">
          <font>
             <Font size="10.0" />
          </font></Label>
       <ComboBox fx:id="GoalCutComboBox" layoutX="645.0" layoutY="67.0" prefHeight="26.0" prefWidth="146.0" promptText="Select..." />
-      <HBox alignment="CENTER" layoutX="483.0" layoutY="279.0" prefHeight="29.0" prefWidth="380.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="477.0" layoutY="281.0" prefHeight="29.0" prefWidth="377.0">
          <children>
             <Button fx:id="newgoalButton" mnemonicParsing="false" onMousePressed="#setnewgoal" prefHeight="7.0" prefWidth="97.0" text="New Goal">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="goalpacingButton" mnemonicParsing="false" onMousePressed="#getgoalpacing" text="Goal Pacing">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Button>
-            <Button fx:id="viewcurrrentgoalsButton" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" text="View Current">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Button>
-            <Button fx:id="viewcompletedgoalsButton" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onMousePressed="#viewcompletedgoals" prefHeight="13.0" prefWidth="113.0" text="View Completed">
+            <Button fx:id="viewcurrrentgoalsButton" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" text="Goal Editor">
                <font>
                   <Font size="12.0" />
                </font>
@@ -306,12 +291,12 @@
          </children>
       </VBox>
       <Label alignment="CENTER" layoutX="13.0" layoutY="258.0" prefHeight="16.0" prefWidth="234.0" text="Volume" />
-      <Button fx:id="LoadPresetButton" layoutX="284.0" layoutY="33.0" mnemonicParsing="false" onAction="#loadpreset" prefHeight="23.0" prefWidth="82.0" text="Load Preset">
+      <Button fx:id="LoadPresetButton" layoutX="279.0" layoutY="34.0" mnemonicParsing="false" onAction="#loadpreset" prefHeight="23.0" prefWidth="82.0" text="Load Preset">
          <font>
             <Font size="12.0" />
          </font>
       </Button>
-      <Button fx:id="SavePresetButton" layoutX="366.0" layoutY="33.0" mnemonicParsing="false" onAction="#savepreset" prefHeight="23.0" prefWidth="93.0" text="Save Preset">
+      <Button fx:id="SavePresetButton" layoutX="361.0" layoutY="34.0" mnemonicParsing="false" onAction="#savepreset" prefHeight="23.0" prefWidth="93.0" text="Save Preset">
          <font>
             <Font size="12.0" />
          </font>
@@ -343,5 +328,19 @@
       </HBox>
       <Label fx:id="EntrainmentVolumePercentage" alignment="CENTER" layoutX="107.0" layoutY="287.0" text="100%" textAlignment="CENTER" />
       <Label fx:id="AmbienceVolumePercentage" alignment="CENTER" layoutX="236.0" layoutY="287.0" text="100%" textAlignment="CENTER" />
+      <HBox alignment="CENTER_RIGHT" layoutX="325.0" layoutY="158.0" prefHeight="31.0" prefWidth="132.0">
+         <children>
+            <Button fx:id="CreateButton" mnemonicParsing="false" onMousePressed="#exportsession" prefHeight="23.0" prefWidth="63.0" text="Create">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Button>
+            <Button fx:id="ExportButton" mnemonicParsing="false" onMousePressed="#exportsession" prefHeight="23.0" prefWidth="63.0" text="Export">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
    </children>
 </AnchorPane>
