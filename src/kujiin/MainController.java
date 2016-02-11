@@ -228,7 +228,7 @@ public class MainController implements Initializable {
         getProgressTracker().updateprogressui();
     }
 
-    // Dialogs
+// Dialogs
     public static class EditReferenceFiles extends Stage {
 
         public ChoiceBox<String> CutNamesChoiceBox;

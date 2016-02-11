@@ -214,7 +214,7 @@
       <Label alignment="CENTER" layoutX="609.0" layoutY="105.0" prefHeight="16.0" prefWidth="113.0" text="# Of Sessions" />
       <TextField fx:id="AverageSessionDuration" alignment="CENTER" editable="false" layoutX="731.0" layoutY="125.0" prefHeight="26.0" prefWidth="113.0" text="99 Hrs 99 Mins" />
       <Label alignment="CENTER" layoutX="729.0" layoutY="105.0" prefHeight="16.0" prefWidth="113.0" text="Average Length" />
-      <Label fx:id="GoalTopLabel" alignment="CENTER" layoutX="484.0" layoutY="219.0" prefHeight="17.0" prefWidth="377.0" text="Current Presession Goal" textAlignment="CENTER">
+      <Label fx:id="GoalTopLabel" alignment="CENTER" layoutX="484.0" layoutY="219.0" prefHeight="17.0" prefWidth="377.0" text="No Cut Selected" textAlignment="CENTER">
          <font>
             <Font size="15.0" />
          </font></Label>
@@ -317,13 +317,13 @@
       </HBox>
       <HBox layoutX="476.0" layoutY="249.0" prefHeight="20.0" prefWidth="377.0">
          <children>
-            <Label fx:id="goalscurrrentvalueLabel" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="17.0" prefWidth="101.0" text="Current: %d" textAlignment="CENTER" />
+            <Label fx:id="goalscurrrentvalueLabel" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="17.0" prefWidth="101.0" text="No Cut Selected" textAlignment="CENTER" />
             <ProgressBar fx:id="goalsprogressbar" prefHeight="20.0" prefWidth="166.0" progress="0.0">
                <HBox.margin>
                   <Insets left="5.0" right="5.0" />
                </HBox.margin>
             </ProgressBar>
-            <Label fx:id="goalssettimeLabel" contentDisplay="CENTER" prefHeight="17.0" prefWidth="101.0" text="Goal: %d" textAlignment="CENTER" />
+            <Label fx:id="goalssettimeLabel" contentDisplay="CENTER" prefHeight="17.0" prefWidth="101.0" text="No Cut Selected" textAlignment="CENTER" />
          </children>
       </HBox>
       <Label fx:id="EntrainmentVolumePercentage" alignment="CENTER" layoutX="107.0" layoutY="287.0" text="100%" textAlignment="CENTER" />

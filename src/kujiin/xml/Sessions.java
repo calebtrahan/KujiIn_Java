@@ -109,13 +109,7 @@ public class Sessions {
     public int getpracticedtimeinminutesforallsessions(int index, Boolean includepreandpost) {
         try {
             int totalminutes = 0;
-            if (index == 0) {
-            // Pre And Post
-                for (kujiin.xml.Session i : getSession()) {
-                    totalminutes += i.getcutduration(0);
-                    totalminutes += i.getcutduration(10);
-                }
-            } else if (index == 10) {
+            if (index == 11) {
             // TOTAL!
                 for (kujiin.xml.Session i : getSession()) {
                     if (includepreandpost) {for (int x=0; x<11;x++) {totalminutes += i.getcutduration(x);}}

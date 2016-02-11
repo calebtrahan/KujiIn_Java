@@ -47,7 +47,6 @@ public class ProgressAndGoalsWidget implements Widget {
     private Goals Goals;
     private Button NewGoalButton;
     private Button CurrentGoalsButton;
-    private Button CompletedGoalsButton;
     private Label PracticedHours;
     private Label GoalHours;
     private ProgressBar GoalProgress;
@@ -106,6 +105,8 @@ public class ProgressAndGoalsWidget implements Widget {
         getgoals.setOnSucceeded(event -> updateprogressui());
         getgoals.setOnFailed(event -> updateprogressui());
         getgoals.start();
+        PreAndPostOption.setOnAction(this::cutselectionchanged);
+        cutindex = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
     }
 
 // Getters And Setters
@@ -121,7 +122,8 @@ public class ProgressAndGoalsWidget implements Widget {
     public void cutselectionchanged(ActionEvent actionEvent) {
         try {
             cutindex = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
-            PreAndPostOption.setDisable(cutindex != 10);
+            PreAndPostOption.setDisable(cutindex != 11);
+            if (cutindex != 11) {PreAndPostOption.setSelected(false);}
             if (cutindex == -1) {resetallvalues();}
             else {
                 updateprogressui();
@@ -161,9 +163,9 @@ public class ProgressAndGoalsWidget implements Widget {
 
 // Widget Implementation
     public void loading() {
-        AverageSessionDuration.setText("Loading...");
-        TotalTimePracticed.setText("Loading...");
-        NumberOfSessionsPracticed.setText("Loading...");
+        AverageSessionDuration.setText("-");
+        TotalTimePracticed.setText("-");
+        NumberOfSessionsPracticed.setText("-");
     }
     @Override
     public void disable() {
@@ -175,7 +177,6 @@ public class ProgressAndGoalsWidget implements Widget {
         SessionListButton.setDisable(true);
         NewGoalButton.setDisable(true);
         CurrentGoalsButton.setDisable(true);
-        CompletedGoalsButton.setDisable(true);
         PracticedHours.setDisable(true);
         GoalHours.setDisable(true);
         GoalProgress.setDisable(true);
@@ -190,7 +191,6 @@ public class ProgressAndGoalsWidget implements Widget {
         SessionListButton.setDisable(false);
         NewGoalButton.setDisable(false);
         CurrentGoalsButton.setDisable(false);
-        CompletedGoalsButton.setDisable(false);
         PracticedHours.setDisable(false);
         GoalHours.setDisable(false);
         GoalProgress.setDisable(false);
@@ -233,8 +233,7 @@ public class ProgressAndGoalsWidget implements Widget {
         } catch (NullPointerException ignored) {}
     }
     public void selectcut(int cutindex) {
-        if (cutindex == 0 || cutindex == 10) {CutSelectorComboBox.getSelectionModel().select(0);}
-        else {CutSelectorComboBox.getSelectionModel().select(cutindex);}
+        CutSelectorComboBox.getSelectionModel().select(cutindex);
     }
 
 // Goal Specific Methods
@@ -258,6 +257,7 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     public void updategoalsui() {
         // TODO Goals Not Updating With Total Progress Widget
+        System.out.println("Called Update Goals UI");
         try {
             String cutname =  GOALCUTNAMES[cutindex];
 //            if (! Goal.goalsexist(cutindex)) {
@@ -277,7 +277,19 @@ public class ProgressAndGoalsWidget implements Widget {
             if (cutname.equals(GOALCUTNAMES[10])) { TopLabel.setText("Total Goal");}
             else if (cutname.equals(GOALCUTNAMES[0])) {TopLabel.setText("Pre + Post Goal");}
             else {TopLabel.setText(cutname + "'s Current Goal");}
-        } catch (NullPointerException ignored) {}
+        } catch (NullPointerException ignored) {
+            if (cutindex != 11) {
+                TopLabel.setText(GOALCUTNAMES[cutindex] + "'s Current Goal");
+            } else {
+                TopLabel.setText(GOALCUTNAMES[cutindex] + " Session Time Current Goal");
+            }
+            Double practiced = Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected()), 2);
+            PracticedHours.setText(String.format("Current: %s hrs", practiced.toString()));
+            GoalHours.setText("No Current Goal");
+            GoalProgress.setProgress(0.0);
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+            resetallvalues();
+        }
     }
     public List<kujiin.xml.Goals.Goal> getcurrentgoallist(boolean includecompleted) {
         if (cutindex != null) {return Goals.getallcutgoals(cutindex, includecompleted);}
@@ -601,7 +613,7 @@ public class ProgressAndGoalsWidget implements Widget {
         }
     }
     public static class SetANewGoalDialog extends Stage {
-        private final ProgressAndGoalsWidget progressAndGoalsWidget;
+        private ProgressAndGoalsWidget progressAndGoalsWidget;
         public Spinner<Integer> GoalHoursSpinner;
         public Spinner<Integer> GoalMinutesSpinner;
         public DatePicker GoalDatePicker;
@@ -622,14 +634,17 @@ public class ProgressAndGoalsWidget implements Widget {
             GoalMinutesSpinner.setEditable(true);
             GoalDatePicker.setValue(LocalDate.now());
             try {
-                int minutes = Tools.convertdecimalhourstominutes(progressAndGoalsWidget.getGoal().getgoal(cutindex, 0, false).getGoal_Hours());
-                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(minutes / 60, Integer.MAX_VALUE, minutes / 60));
-                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(minutes % 60, 59, minutes % 60));
+                List<kujiin.xml.Goals.Goal> currentgoals = progressAndGoalsWidget.getGoal().getallcutgoals(cutindex, false);
+                System.out.println(currentgoals.size());
+                int highestgoalminutes = Tools.convertdecimalhourstominutes(progressAndGoalsWidget.getGoal().getgoal(cutindex, currentgoals.size() - 1, false).getGoal_Hours());
+                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(highestgoalminutes / 60, Integer.MAX_VALUE, highestgoalminutes / 60));
+                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(highestgoalminutes % 60, 59, highestgoalminutes % 60));
             } catch (NullPointerException ignored) {
                 GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
                 GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0));
             }
-            TopLabel.setText("Set A New Goal For " + GOALCUTNAMES[cutindex]);
+            if (cutindex != 11) TopLabel.setText("New Goal For " + GOALCUTNAMES[cutindex]);
+            else TopLabel.setText("New Total Goal");
         }
 
         // Getters And Setters

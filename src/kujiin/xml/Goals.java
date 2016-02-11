@@ -142,8 +142,16 @@ public class Goals {
     }
     public void add(int cutindex, Goal newgoal) throws JAXBException {
         List<Goal> newgoals = getallcutgoals(cutindex, true);
+        System.out.println("Old Goals:");
+        for (Goal i : newgoals) {
+            System.out.println(i.toString());
+        }
         newgoals.add(newgoal);
         update(sort(newgoals), cutindex);
+        System.out.println("New Goals:");
+        for (Goal i : getallcutgoals(cutindex, true)) {
+            System.out.println(i.toString());
+        }
         marshall();
     }
     public boolean delete(int cutindex, Goal currentGoal) {
@@ -165,27 +173,27 @@ public class Goals {
         } catch (Exception ignored) {return null;}
     }
     public void update(List<Goal> cutgoallist, int cutindex) {
-        if (cutindex == 0 || cutindex == 10) setPresessionGoals(cutgoallist);
-        if (cutindex == 0) setRinGoals(cutgoallist);
-        if (cutindex == 1) setKyoGoals(cutgoallist);
-        if (cutindex == 2) setTohGoals(cutgoallist);
-        if (cutindex == 3) setShaGoals(cutgoallist);
-        if (cutindex == 4) setKaiGoals(cutgoallist);
-        if (cutindex == 5) setJinGoals(cutgoallist);
-        if (cutindex == 6) setRetsuGoals(cutgoallist);
-        if (cutindex == 7) setZaiGoals(cutgoallist);
-        if (cutindex == 8) setZenGoals(cutgoallist);
-        if (cutindex == 9) setTotalGoals(cutgoallist);
+        if (cutindex == 0) setPresessionGoals(cutgoallist);
+        if (cutindex == 1) setRinGoals(cutgoallist);
+        if (cutindex == 2) setKyoGoals(cutgoallist);
+        if (cutindex == 3) setTohGoals(cutgoallist);
+        if (cutindex == 4) setShaGoals(cutgoallist);
+        if (cutindex == 5) setKaiGoals(cutgoallist);
+        if (cutindex == 6) setJinGoals(cutgoallist);
+        if (cutindex == 7) setRetsuGoals(cutgoallist);
+        if (cutindex == 8) setZaiGoals(cutgoallist);
+        if (cutindex == 9) setZenGoals(cutgoallist);
+        if (cutindex == 10) setPostsessionGoals(cutgoallist);
+        if (cutindex == 11) setTotalGoals(cutgoallist);
     }
 
-
-// Goal Getters
+    // Goal Getters
     public boolean goalsexist(int cutindex, boolean includecompleted) {
         return getallcutgoals(cutindex, includecompleted) != null && ! getallcutgoals(cutindex, true).isEmpty();
     }
     public Goal getgoal(int cutindex, Integer goalindex, boolean includecompleted) {
         try {return getallcutgoals(cutindex, includecompleted).get(goalindex);}
-        catch (ArrayIndexOutOfBoundsException | NullPointerException ignored) {return null;}
+        catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}
     }
     public List<Goal> getallcutgoals(int cutindex, boolean includecompleted) {
         if (cutindex == 0) return filtergoals(PresessionGoals, includecompleted);
@@ -203,14 +211,16 @@ public class Goals {
         else return null;
     }
     public List<Goal> filtergoals(List<Goal> cutgoals, boolean includecompleted) {
-        List<Goal> newgoallist = new ArrayList<>();
-        for (Goal i : cutgoals) {
-            if (includecompleted) {newgoallist.add(i);}
-            else {
-                if (!i.getCompleted()) {newgoallist.add(i);}
+        try {
+            List<Goal> newgoallist = new ArrayList<>();
+            for (Goal i : cutgoals) {
+                if (includecompleted) {newgoallist.add(i);}
+                else {
+                    if (i.getCompleted() == null || ! i.getCompleted()) {newgoallist.add(i);}
+                }
             }
-        }
-        return newgoallist;
+            return newgoallist;
+        } catch (NullPointerException e) {return new ArrayList<>();}
     }
 
 // Goal Completion Methods
@@ -239,6 +249,8 @@ public class Goals {
             setDate_Due(Tools.convertfromlocaldatetostring(duedate));
             setGoal_Hours(goalhours);
             setDate_Set(Tools.convertfromlocaldatetostring(LocalDate.now()));
+            setCompleted(false);
+            setDate_Completed("");
         }
 
         // Getters And Setters
@@ -273,6 +285,11 @@ public class Goals {
             percent *= 100;
 //        return (float) practicedhours / (float) goalhours;
             return String.format("%.2f", percent) + "%";
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Set Date: %s Goal Hours: %s Is Completed: %s Date Completed: %s", getDate_Set(), getGoal_Hours(), getCompleted(), getDate_Completed());
         }
     }
 
