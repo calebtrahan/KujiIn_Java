@@ -312,7 +312,7 @@ public class ProgressAndGoalsWidget implements Widget {
             GoalMinutes.setText("?");
             GoalHours.setText("?");
             GoalProgress.setProgress(0.0);
-            Tools.showtimedmessage(StatusBar, "No Current Goal Set For " + GOALCUTNAMES[cutindex], 2000);
+            Tools.showtimedmessage(StatusBar, "No Current Goal Set For " + GOALCUTNAMES[cutindex], 4000);
         } catch (ArrayIndexOutOfBoundsException ignored) {resetallvalues();}
     }
     public List<kujiin.xml.Goals.Goal> getcurrentgoallist(boolean includecompleted) {
