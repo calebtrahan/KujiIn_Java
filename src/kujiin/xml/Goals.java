@@ -228,7 +228,7 @@ public class Goals {
         for (Goal i : getallcutgoals(cutindex, true)) {
             boolean completed = currentpracticedhours >= i.getGoal_Hours();
             i.setCompleted(completed);
-            if (completed && i.getDate_Completed().isEmpty()) {
+            if (completed && i.getDate_Completed().equals("Not Completed")) {
                 i.setDate_Completed(Tools.gettodaysdate());
             }
         }
@@ -283,7 +283,7 @@ public class Goals {
         public String getpercentagecompleted(double currenthours) {
             float percent = (float) currenthours / getGoal_Hours().floatValue();
             percent *= 100;
-//        return (float) practicedhours / (float) goalhours;
+            if (percent >= 100) {percent = 100;}
             return String.format("%.2f", percent) + "%";
         }
 

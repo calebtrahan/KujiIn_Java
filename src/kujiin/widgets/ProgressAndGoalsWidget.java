@@ -261,7 +261,6 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     public void updategoalsui() {
         // TODO Goals Not Updating With Total Progress Widget
-        System.out.println("Called Update Goals UI");
         try {
             String cutname =  GOALCUTNAMES[cutindex];
 //            if (! Goal.goalsexist(cutindex)) {
@@ -273,6 +272,7 @@ public class ProgressAndGoalsWidget implements Widget {
             PracticedHours.setText(String.format("Current: %s hrs", practiced.toString()));
             if (goal != null) {
                 GoalHours.setText(String.format("Goal: %s hrs", goal.toString()));
+                System.out.println(practiced / goal);
                 GoalProgress.setProgress(practiced / goal);
             } else {
                 GoalHours.setText("?");
@@ -567,6 +567,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 if (Tools.getanswerdialog("Confirmation", "Unsaved Changes To " + GOALCUTNAMES[getCutindex()], "Save Changes Before Exiting?")) {
                     savechanges();
                 }
+                ProgressAndGoals.selectcut(getCutindex());
             }
             super.close();
         }
