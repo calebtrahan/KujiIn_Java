@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="454.0" prefWidth="648.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TableView fx:id="currentgoaltable" layoutX="15.0" layoutY="41.0" prefHeight="377.0" prefWidth="615.0" onMousePressed="#selectionchanged">
+      <TableView fx:id="CurrentGoalTable" layoutX="15.0" layoutY="41.0" onMousePressed="#tableselectionchanged" prefHeight="377.0" prefWidth="615.0">
         <columns>
           <TableColumn fx:id="NumberColumn" prefWidth="44.0" text="#" />
           <TableColumn fx:id="GoalTimeColumn" prefWidth="148.0" text="Goal Time (in Hours)" />
@@ -16,18 +16,20 @@
             <TableColumn fx:id="CompletionDateColumn" prefWidth="124.0" text="Completion Date" />
         </columns>
       </TableView>
-      <Label fx:id="TopLabel" alignment="CENTER" layoutX="15.0" layoutY="14.0" prefHeight="22.0" prefWidth="615.0" text="\%s Goals" textAlignment="CENTER">
+      <Label fx:id="TopLabel" alignment="CENTER" layoutX="15.0" layoutY="14.0" prefHeight="22.0" prefWidth="339.0" text="Goal List" textAlignment="CENTER">
          <font>
             <Font size="19.0" />
          </font>
       </Label>
-      <CheckBox fx:id="ShowCompletedCheckBox" layoutX="14.0" layoutY="422.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="171.0" text="Show Completed Goals" onAction="#showCompletedGoals"/>
+      <CheckBox fx:id="ShowCompletedCheckBox" layoutX="14.0" layoutY="422.0" mnemonicParsing="false" onAction="#completedgoalstoggle" prefHeight="18.0" prefWidth="171.0" text="Show Completed Goals" />
       <HBox alignment="CENTER_RIGHT" layoutX="393.0" layoutY="417.0" prefHeight="29.0" prefWidth="237.0">
          <children>
-            <Button fx:id="AddGoalButton" mnemonicParsing="false" text="Add Goal" onAction="#addgoal"/>
-            <Button fx:id="RemoveGoalButton" mnemonicParsing="false" text="Remove Goal" onAction="#removegoal"/>
+            <Button fx:id="AddGoalButton" mnemonicParsing="false" onAction="#addgoal" text="Set New" />
+            <Button fx:id="RemoveGoalButton" mnemonicParsing="false" onAction="#removegoal" text="Remove Goal" />
             <Button fx:id="CloseButton" mnemonicParsing="false" onMousePressed="#closeDialog" text="Close" />
          </children>
       </HBox>
+      <Label layoutX="380.0" layoutY="17.0" text="Select:" />
+      <ChoiceBox fx:id="CutSelectorComboBox" layoutX="437.0" layoutY="12.0" prefWidth="150.0" onAction="#changecutselection"/>
    </children>
 </AnchorPane>

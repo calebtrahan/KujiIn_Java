@@ -250,7 +250,7 @@ public class Goals {
             setGoal_Hours(goalhours);
             setDate_Set(Tools.convertfromlocaldatetostring(LocalDate.now()));
             setCompleted(false);
-            setDate_Completed("");
+            setDate_Completed("Not Completed");
         }
 
         // Getters And Setters
