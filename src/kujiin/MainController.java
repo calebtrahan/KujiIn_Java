@@ -40,8 +40,6 @@ public class MainController implements Initializable {
     public Button ListOfSessionsButton;
     public CheckBox ReferenceFilesOption;
     public ProgressBar goalsprogressbar;
-    public Label goalscurrrentvalueLabel;
-    public Label goalssettimeLabel;
     public Button newgoalButton;
     public Button viewcurrrentgoalsButton;
     public Button PauseButton;
@@ -65,7 +63,6 @@ public class MainController implements Initializable {
     public Label TotalProgressLabelTotal;
     public Label CutProgressTopLabel;
     public Label TotalSessionLabel;
-    public Button ShowCutProgressButton;
     public TextField AverageSessionDuration;
     public TextField TotalTimePracticed;
     public TextField NumberOfSessionsPracticed;
@@ -100,6 +97,11 @@ public class MainController implements Initializable {
     public Label VolumeEntrainmentLabel;
     public Label VolumeAmbienceLabel;
     public Label VolumeTopLabel;
+    public TextField GoalPracticedMinutes;
+    public TextField GoalSetHours;
+    public TextField GoalSetMinutes;
+    public Label GoalStatusBar;
+    public TextField GoalPracticedHours;
     private This_Session Session;
     private CreatorAndExporterWidget CreatorAndExporter;
     private PlayerWidget Player;
@@ -111,7 +113,7 @@ public class MainController implements Initializable {
         // Maybe Make A New Goal Setter To Set All Goals For All Cuts On One Dialog
 
 // Event Handlers
-    public static final EventHandler<KeyEvent> noneditabletextfield = event -> Tools.showinformationdialog("Information", "Can't Enter Text", "This Text Field Can't Be Edited");
+    public static final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Tools.showinformationdialog("Information", "Can't Enter Text", "This Text Field Can't Be Edited");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

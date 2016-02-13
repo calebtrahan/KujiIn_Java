@@ -126,8 +126,19 @@ public class CreatorAndExporterWidget implements Widget {
         creatorState = CreatorState.NOT_CREATED;
         setuptextfields();
         textfieldtimes.addAll(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0));
-        TotalSessionTime.setOnKeyTyped(MainController.noneditabletextfield);
-        ApproximateEndTime.setOnKeyTyped(MainController.noneditabletextfield);
+        PreLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        RinLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        KyoLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        TohLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        ShaLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        KaiLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        JinLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        RetsuLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        ZaiLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        ZenLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        PostLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        TotalSessionTime.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        ApproximateEndTime.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
         exportservices = new ArrayList<>();
         updatecreatorui();
     }

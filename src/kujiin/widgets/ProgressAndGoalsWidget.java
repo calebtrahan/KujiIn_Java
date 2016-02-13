@@ -41,30 +41,38 @@ public class ProgressAndGoalsWidget implements Widget {
     private TextField NumberOfSessionsPracticed;
     private TextField AverageSessionDuration;
     private CheckBox PreAndPostOption;
-    private Button DetailedCutProgressButton;
     private Button SessionListButton;
 // Goals Fields
     private Goals Goals;
     private Button NewGoalButton;
     private Button CurrentGoalsButton;
-    private Label PracticedHours;
-    private Label GoalHours;
+    private TextField PracticedHours;
+    private TextField PracticedMinutes;
+    private TextField GoalHours;
+    private TextField GoalMinutes;
     private ProgressBar GoalProgress;
     private Label TopLabel;
+    private Label StatusBar;
 
     public ProgressAndGoalsWidget(MainController mainController) {
         NewGoalButton = mainController.newgoalButton;
         CurrentGoalsButton = mainController.viewcurrrentgoalsButton;
-        PracticedHours = mainController.goalscurrrentvalueLabel;
-        GoalHours = mainController.goalssettimeLabel;
+        PracticedHours = mainController.GoalPracticedHours;
+        PracticedHours.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        PracticedMinutes = mainController.GoalPracticedMinutes;
+        PracticedMinutes.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        GoalHours = mainController.GoalSetHours;
+        GoalHours.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        GoalMinutes = mainController.GoalSetMinutes;
+        GoalMinutes.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
         GoalProgress = mainController.goalsprogressbar;
         CutSelectorComboBox = mainController.GoalCutComboBox;
         TopLabel = mainController.GoalTopLabel;
+        StatusBar = mainController.GoalStatusBar;
         TotalTimePracticed = mainController.TotalTimePracticed;
         NumberOfSessionsPracticed = mainController.NumberOfSessionsPracticed;
         AverageSessionDuration = mainController.AverageSessionDuration;
         PreAndPostOption = mainController.PrePostSwitch;
-        DetailedCutProgressButton = mainController.ShowCutProgressButton;
         SessionListButton = mainController.ListOfSessionsButton;
         Sessions = new Sessions();
         Goals = new Goals();
@@ -84,9 +92,9 @@ public class ProgressAndGoalsWidget implements Widget {
         getsessions.setOnFailed(event -> updateprogressui());
         getsessions.setOnSucceeded(event -> updateprogressui());
         getsessions.start();
-        TotalTimePracticed.setOnKeyTyped(MainController.noneditabletextfield);
-        NumberOfSessionsPracticed.setOnKeyTyped(MainController.noneditabletextfield);
-        AverageSessionDuration.setOnKeyTyped(MainController.noneditabletextfield);
+        TotalTimePracticed.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        NumberOfSessionsPracticed.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        AverageSessionDuration.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
         ObservableList<String> cutnames = FXCollections.observableArrayList(GOALCUTNAMES);
         CutSelectorComboBox.setItems(cutnames);
         CutSelectorComboBox.setOnAction(this::cutselectionchanged);
@@ -176,12 +184,13 @@ public class ProgressAndGoalsWidget implements Widget {
         NumberOfSessionsPracticed.setDisable(true);
         AverageSessionDuration.setDisable(true);
         PreAndPostOption.setDisable(true);
-        DetailedCutProgressButton.setDisable(true);
         SessionListButton.setDisable(true);
         NewGoalButton.setDisable(true);
         CurrentGoalsButton.setDisable(true);
         PracticedHours.setDisable(true);
-        GoalHours.setDisable(true);
+        PracticedMinutes.setDisable(false);
+        GoalHours.setDisable(false);
+        GoalMinutes.setDisable(false);
         GoalProgress.setDisable(true);
     }
     @Override
@@ -190,12 +199,13 @@ public class ProgressAndGoalsWidget implements Widget {
         NumberOfSessionsPracticed.setDisable(false);
         AverageSessionDuration.setDisable(false);
         PreAndPostOption.setDisable(false);
-        DetailedCutProgressButton.setDisable(false);
         SessionListButton.setDisable(false);
         NewGoalButton.setDisable(false);
         CurrentGoalsButton.setDisable(false);
         PracticedHours.setDisable(false);
+        PracticedMinutes.setDisable(false);
         GoalHours.setDisable(false);
+        GoalMinutes.setDisable(false);
         GoalProgress.setDisable(false);
     }
     @Override
@@ -203,13 +213,16 @@ public class ProgressAndGoalsWidget implements Widget {
         TotalTimePracticed.setText("No Sessions");
         NumberOfSessionsPracticed.setText("No Sessions");
         AverageSessionDuration.setText("No Sessions");
-        PracticedHours.setText("-   ");
-        GoalHours.setText("  -");
+        PracticedHours.setText("-");
+        PracticedMinutes.setText("-");
+        GoalHours.setText("-");
+        GoalMinutes.setText("-");
         GoalProgress.setProgress(0.0);
         if (cutindex != null && cutindex != -1) {
-            if (cutindex == 10) {TopLabel.setText("Set A Total Goal");}
-            if (cutindex == 0) {TopLabel.setText("Set A Goal For " + GOALCUTNAMES[0]);}
-            else {TopLabel.setText("Set A Goal For " + GOALCUTNAMES[cutindex]);}
+            TopLabel.setText(GOALCUTNAMES[cutindex]);
+//            if (cutindex == 10) {TopLabel.setText("Set A Total Goal");}
+//            if (cutindex == 0) {TopLabel.setText("Set A Goal For " + GOALCUTNAMES[0]);}
+//            else {TopLabel.setText("Set A Goal For " + GOALCUTNAMES[cutindex]);}
         } else {TopLabel.setText("Select A Cut");}
     }
     @Override
@@ -260,40 +273,47 @@ public class ProgressAndGoalsWidget implements Widget {
         } catch (Exception e) {return false;}
     }
     public void updategoalsui() {
-        // TODO Goals Not Updating With Total Progress Widget
         try {
-            String cutname =  GOALCUTNAMES[cutindex];
-//            if (! Goal.goalsexist(cutindex)) {
-//                resetallvalues();
-//                return;
-//            }
-            Double practiced = Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected()), 2);
+            int practicedminutes = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
             Double goal = Goals.getgoal(cutindex, 0, false).getGoal_Hours();
-            PracticedHours.setText(String.format("Current: %s hrs", practiced.toString()));
+            Integer hours = practicedminutes / 60;
+            Integer minutes = practicedminutes % 60;
+            PracticedHours.setText(hours.toString());
+            PracticedMinutes.setText(minutes.toString());
             if (goal != null) {
-                GoalHours.setText(String.format("Goal: %s hrs", goal.toString()));
-                System.out.println(practiced / goal);
-                GoalProgress.setProgress(practiced / goal);
+                Double progress = Tools.convertminutestodecimalhours(practicedminutes, 2) / goal;
+                goal *= 60;
+                Integer hrs = goal.intValue() / 60;
+                Integer mins = goal.intValue() % 60;
+                GoalHours.setText(hrs.toString());
+                GoalMinutes.setText(mins.toString());
+                GoalProgress.setProgress(progress);
             } else {
                 GoalHours.setText("?");
+                GoalMinutes.setText("?");
                 GoalProgress.setProgress(0.0);
             }
-            if (cutname.equals(GOALCUTNAMES[10])) { TopLabel.setText("Total Goal");}
-            else if (cutname.equals(GOALCUTNAMES[0])) {TopLabel.setText("Pre + Post Goal");}
-            else {TopLabel.setText(cutname + "'s Current Goal");}
+            TopLabel.setText(GOALCUTNAMES[cutindex]);
+//            if (cutname.equals(GOALCUTNAMES[10])) { TopLabel.setText("Total Goal");}
+//            else if (cutname.equals(GOALCUTNAMES[0])) {TopLabel.setText("Pre + Post Goal");}
+//            else {TopLabel.setText(cutname + "'s Current Goal");}
         } catch (NullPointerException ignored) {
-            if (cutindex != 11) {
-                TopLabel.setText(GOALCUTNAMES[cutindex] + "'s Current Goal");
-            } else {
-                TopLabel.setText(GOALCUTNAMES[cutindex] + " Session Time Current Goal");
-            }
-            Double practiced = Tools.convertminutestodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected()), 2);
-            PracticedHours.setText(String.format("Current: %s hrs", practiced.toString()));
-            GoalHours.setText("No Current Goal");
+            TopLabel.setText(GOALCUTNAMES[cutindex]);
+//            if (cutindex != 11) {
+//                TopLabel.setText(GOALCUTNAMES[cutindex] + "'s Current Goal");
+//            } else {
+//                TopLabel.setText(GOALCUTNAMES[cutindex] + " Session Time Current Goal");
+//            }
+            int practicedminutes = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
+            Integer hours = practicedminutes / 60;
+            Integer minutes = practicedminutes % 60;
+            PracticedHours.setText(hours.toString());
+            PracticedMinutes.setText(minutes.toString());
+            GoalMinutes.setText("?");
+            GoalHours.setText("?");
             GoalProgress.setProgress(0.0);
-        } catch (ArrayIndexOutOfBoundsException ignored) {
-            resetallvalues();
-        }
+            Tools.showtimedmessage(StatusBar, "No Current Goal Set For " + GOALCUTNAMES[cutindex], 2000);
+        } catch (ArrayIndexOutOfBoundsException ignored) {resetallvalues();}
     }
     public List<kujiin.xml.Goals.Goal> getcurrentgoallist(boolean includecompleted) {
         if (cutindex != null) {return Goals.getallcutgoals(cutindex, includecompleted);}

@@ -42,7 +42,7 @@
       <Label fx:id="CutProgressTopLabel" alignment="CENTER" layoutX="38.0" layoutY="210.0" prefHeight="17.0" prefWidth="166.0" text="No Session Playing" textAlignment="CENTER" />
       <Label fx:id="TotalSessionLabel" alignment="CENTER" layoutX="259.0" layoutY="210.0" prefHeight="17.0" prefWidth="189.0" text="No Session Playing" textAlignment="CENTER" />
       <CheckBox fx:id="ReferenceFilesOption" layoutX="293.0" layoutY="256.0" mnemonicParsing="false" onAction="#setReferenceOption" prefHeight="22.0" prefWidth="189.0" text="Display Reference" textAlignment="RIGHT" wrapText="true" />
-      <Label fx:id="PlayerStatusBar" layoutX="13.0" layoutY="308.0" prefHeight="17.0" prefWidth="441.0" text="Player StatusBar Player StatusBar Player StatusBar Player StatusBar Player StatusBar Player">
+      <Label fx:id="PlayerStatusBar" layoutX="13.0" layoutY="308.0" prefHeight="17.0" prefWidth="441.0">
          <font>
             <Font size="10.0" />
          </font></Label>
@@ -214,11 +214,11 @@
       <Label alignment="CENTER" layoutX="609.0" layoutY="105.0" prefHeight="16.0" prefWidth="113.0" text="# Of Sessions" />
       <TextField fx:id="AverageSessionDuration" alignment="CENTER" editable="false" layoutX="731.0" layoutY="125.0" prefHeight="26.0" prefWidth="113.0" text="99 Hrs 99 Mins" />
       <Label alignment="CENTER" layoutX="729.0" layoutY="105.0" prefHeight="16.0" prefWidth="113.0" text="Average Length" />
-      <Label fx:id="GoalTopLabel" alignment="CENTER" layoutX="484.0" layoutY="219.0" prefHeight="17.0" prefWidth="377.0" text="No Cut Selected" textAlignment="CENTER">
+      <Label fx:id="GoalTopLabel" alignment="CENTER" layoutX="590.0" layoutY="219.0" prefHeight="17.0" prefWidth="166.0" text="No Cut Selected" textAlignment="CENTER">
          <font>
             <Font size="15.0" />
          </font></Label>
-      <CheckBox fx:id="PrePostSwitch" layoutX="614.0" layoutY="159.0" mnemonicParsing="false" onAction="#updatetotalprogresswidget" text="Include Presession And Postsession" />
+      <CheckBox fx:id="PrePostSwitch" layoutX="484.0" layoutY="157.0" mnemonicParsing="false" onAction="#updatetotalprogresswidget" text="Include Presession And Postsession" />
       <CheckBox fx:id="SessionPlayerOnOffSwitch" layoutX="14.0" layoutY="190.0" mnemonicParsing="false" onAction="#sessionplayerswitch" text="OFF" />
       <CheckBox fx:id="AmbienceSwitch" layoutX="13.0" layoutY="110.0" mnemonicParsing="false" onAction="#ambienceswitch" prefHeight="18.0" prefWidth="132.0" text="Session Ambience" />
       <Label fx:id="CompletionLabel" layoutX="184.0" layoutY="113.0" text="~ Completion Time" />
@@ -234,7 +234,7 @@
             <Font size="10.0" />
          </font></Label>
       <ComboBox fx:id="GoalCutComboBox" layoutX="645.0" layoutY="67.0" prefHeight="26.0" prefWidth="146.0" promptText="Select..." />
-      <HBox alignment="CENTER_RIGHT" layoutX="477.0" layoutY="281.0" prefHeight="29.0" prefWidth="377.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="668.0" layoutY="295.0" prefHeight="29.0" prefWidth="179.0">
          <children>
             <Button fx:id="newgoalButton" mnemonicParsing="false" onMousePressed="#setnewgoal" prefHeight="7.0" prefWidth="97.0" text="New Goal">
                <font>
@@ -301,31 +301,7 @@
             <Font size="12.0" />
          </font>
       </Button>
-      <HBox alignment="TOP_RIGHT" layoutX="476.0" layoutY="186.0" prefHeight="28.0" prefWidth="377.0">
-         <children>
-            <Button fx:id="ListOfSessionsButton" mnemonicParsing="false" onMousePressed="#displaylistofsessions" prefHeight="23.0" prefWidth="126.0" text="View All Sessions">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Button>
-            <Button fx:id="ShowCutProgressButton" mnemonicParsing="false" onMousePressed="#showcutprogress" prefHeight="20.0" prefWidth="144.0" text="Detailed Cut Progress">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Button>
-         </children>
-      </HBox>
-      <HBox layoutX="476.0" layoutY="249.0" prefHeight="20.0" prefWidth="377.0">
-         <children>
-            <Label fx:id="goalscurrrentvalueLabel" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="17.0" prefWidth="101.0" text="No Cut Selected" textAlignment="CENTER" />
-            <ProgressBar fx:id="goalsprogressbar" prefHeight="20.0" prefWidth="166.0" progress="0.0">
-               <HBox.margin>
-                  <Insets left="5.0" right="5.0" />
-               </HBox.margin>
-            </ProgressBar>
-            <Label fx:id="goalssettimeLabel" contentDisplay="CENTER" prefHeight="17.0" prefWidth="101.0" text="No Cut Selected" textAlignment="CENTER" />
-         </children>
-      </HBox>
+      <HBox alignment="TOP_RIGHT" layoutX="476.0" layoutY="21.0" prefHeight="28.0" prefWidth="377.0" />
       <Label fx:id="EntrainmentVolumePercentage" alignment="CENTER" layoutX="107.0" layoutY="287.0" text="100%" textAlignment="CENTER" />
       <Label fx:id="AmbienceVolumePercentage" alignment="CENTER" layoutX="236.0" layoutY="287.0" text="100%" textAlignment="CENTER" />
       <HBox alignment="CENTER_RIGHT" layoutX="325.0" layoutY="158.0" prefHeight="31.0" prefWidth="132.0">
@@ -342,5 +318,86 @@
             </Button>
          </children>
       </HBox>
+      <ProgressBar fx:id="goalsprogressbar" layoutX="586.0" layoutY="263.0" prefHeight="23.0" prefWidth="166.0" progress="0.0" />
+      <VBox layoutX="464.0" layoutY="237.0" prefHeight="49.0" prefWidth="121.0">
+         <children>
+            <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="82.0">
+               <children>
+                  <Label text="Hours">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin></Label>
+                  <Label text="Minutes" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="113.0">
+               <children>
+                  <TextField fx:id="GoalPracticedHours" alignment="CENTER" editable="false" prefWidth="32.0" text="-">
+                     <HBox.margin>
+                        <Insets right="16.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <TextField fx:id="GoalPracticedMinutes" alignment="CENTER" editable="false" prefWidth="32.0" text="-">
+                     <HBox.margin>
+                        <Insets right="8.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox alignment="CENTER" layoutX="757.0" layoutY="237.0" prefHeight="49.0" prefWidth="97.0">
+         <children>
+            <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="82.0">
+               <children>
+                  <Label text="Hours">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Label text="Minutes" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="32.0" prefWidth="113.0">
+               <children>
+                  <TextField fx:id="GoalSetHours" alignment="CENTER" editable="false" prefWidth="32.0" text="-">
+                     <HBox.margin>
+                        <Insets left="8.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <TextField fx:id="GoalSetMinutes" alignment="CENTER" editable="false" prefWidth="32.0" text="-">
+                     <HBox.margin>
+                        <Insets left="15.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <Label layoutX="508.0" layoutY="222.0" text="Practiced">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="791.0" layoutY="222.0" text="Goal">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="GoalStatusBar" layoutX="480.0" layoutY="302.0" prefHeight="16.0" prefWidth="189.0">
+         <font>
+            <Font size="10.0" />
+         </font></Label>
+      <Button fx:id="ListOfSessionsButton" layoutX="723.0" layoutY="154.0" mnemonicParsing="false" onMousePressed="#displaylistofsessions" prefHeight="23.0" prefWidth="126.0" text="View All Sessions">
+         <font>
+            <Font size="12.0" />
+         </font>
+      </Button>
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="481.0" layoutY="185.0" prefHeight="29.0" prefWidth="377.0" text="Goals Tracker" textAlignment="CENTER">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </Label>
+      <Label layoutX="620.0" layoutY="245.0" text="Current Progress" />
    </children>
 </AnchorPane>
