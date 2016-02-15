@@ -134,7 +134,7 @@ public class Cut {
                     ambiencefiledurations.add(dur);
                 }
             }
-        } catch (NullPointerException ignored) {ignored.printStackTrace(); return false;}
+        } catch (NullPointerException e) {new MainController.ExceptionDialog(thisession.Root, e.getClass().getName(), e.getMessage()).showAndWait(); return false;}
         return ambiencefiles.size() > 0;
     }
     public boolean hasenoughAmbience(int secondstocheck) {

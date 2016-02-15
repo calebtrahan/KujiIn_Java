@@ -150,7 +150,7 @@ public class This_Session {
             };
             final SimpleTextDialogWithCancelButton[] cad = new SimpleTextDialogWithCancelButton[1];
             ambiencecheckerservice.setOnRunning(event -> {
-                cad[0] = new SimpleTextDialogWithCancelButton("Checking Ambience", "Checking Ambience", "");
+                cad[0] = new SimpleTextDialogWithCancelButton(Root, "Checking Ambience", "Checking Ambience", "");
                 cad[0].Message.textProperty().bind(ambiencecheckerservice.messageProperty());
                 cad[0].CancelButton.setOnAction(ev -> ambiencecheckerservice.cancel());
                 cad[0].showAndWait();
@@ -286,7 +286,7 @@ public class This_Session {
                 }
             };
             creationservice.setOnRunning(event -> {
-                sdcb[0] = new SimpleTextDialogWithCancelButton("Creating Session", "Creating Session", "");
+                sdcb[0] = new SimpleTextDialogWithCancelButton(Root, "Creating Session", "Creating Session", "");
                 sdcb[0].Message.textProperty().bind(creationservice.messageProperty());
                 sdcb[0].CancelButton.setOnAction(ev -> creationservice.cancel());
             });
@@ -513,7 +513,7 @@ public class This_Session {
             } else if (playerState == PlayerWidget.PlayerState.STOPPED) {
                 StatusBar.setText("Session Stopped");
             }
-        } catch (Exception e) {e.printStackTrace();}
+        } catch (Exception e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
     }
     public void playthiscut() {
         try {
@@ -523,9 +523,7 @@ public class This_Session {
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
             timeline.play();
             setPlayerState(PlayerWidget.PlayerState.PLAYING);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
     }
     public void progresstonextcut() {
         try {
@@ -535,11 +533,9 @@ public class This_Session {
                     cutcount++;
                     currentcut = cutsinsession.get(cutcount);
                     playthiscut();
-                } catch (ArrayIndexOutOfBoundsException e) {e.printStackTrace(); endofsession();}
+                } catch (ArrayIndexOutOfBoundsException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).show(); endofsession();}
             } else if (playerState == PlayerWidget.PlayerState.PLAYING) {transition();}
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
     }
     public void endofsession() {
         closereferencefile();

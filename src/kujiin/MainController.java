@@ -264,7 +264,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Reference Files Editor");
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
             cutnames = FXCollections.observableArrayList();
@@ -406,7 +406,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Session Ambience Editor");
             CutSelectionBox.setOnAction(event -> selectandloadcut());
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
@@ -419,7 +419,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Session Ambience Editor");
             CutSelectionBox.setOnAction(event -> selectandloadcut());
             CutSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
@@ -692,7 +692,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Program Error Occured");
             TopText.setText(exceptionname + " Occured");
             StackTraceTextField.setText(stacktrace);
@@ -746,7 +746,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Change Program Options");
             Tools.integerTextField(FadeInValue);
             Tools.integerTextField(FadeOutValue);

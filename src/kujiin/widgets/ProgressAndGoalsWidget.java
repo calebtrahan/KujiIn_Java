@@ -351,7 +351,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Session List");
             DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
             RinColumn.setCellValueFactory(cellData -> cellData.getValue().rin.asObject());
@@ -442,7 +442,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Cut Totals");
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
@@ -504,7 +504,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Edit Goals");
             CutSelectorComboBox.setItems(FXCollections.observableArrayList(GOALCUTNAMES));
             populatetable();
@@ -635,7 +635,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Goal Pacing");
             SelectedGoalHours.setText(currentGoal.getGoal_Hours() + " Hours");
         }
@@ -696,7 +696,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Select Goal");
             ObservableList<CurrentGoalBinding> currentGoals = FXCollections.observableArrayList();
 //            currentGoals.addAll(currentGoalList.stream().map(i -> new CurrentGoalBinding(currentGoalList.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Set(), i.getpercentagecompleted(currentpracticedhours))).collect(Collectors.toList()));
@@ -750,7 +750,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Set A New Goal");
             GoalHoursSpinner.setEditable(true);
             GoalMinutesSpinner.setEditable(true);
@@ -819,7 +819,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Goal Completed");
             GoalHours.setText(currentGoal.getGoal_Hours().toString());
             CurrentHoursLabel.setText(currentpracticedhours.toString());

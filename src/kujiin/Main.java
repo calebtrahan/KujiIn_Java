@@ -12,12 +12,12 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/Main.fxml"));
-        Scene defaultscene = new Scene(fxmlLoader.load());
+        Scene Scene = new Scene(fxmlLoader.load());
         Root = fxmlLoader.getController();
         primaryStage.setTitle("Kuji-In");
-        primaryStage.setScene(defaultscene);
+        primaryStage.setScene(Scene);
         primaryStage.setOnShowing(event -> {
-            Root.setScene(defaultscene);
+            Root.setScene(Scene);
             Root.getOptions().setStyle(Root.getScene());
         });
         primaryStage.show();

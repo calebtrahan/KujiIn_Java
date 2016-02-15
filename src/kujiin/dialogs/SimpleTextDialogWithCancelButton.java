@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import kujiin.MainController;
 
 import java.io.IOException;
 
@@ -12,12 +13,18 @@ public class SimpleTextDialogWithCancelButton extends Stage {
     public Button CancelButton;
     public Label Message;
     public Label TopTitle;
+    private MainController Root;
 
-    public SimpleTextDialogWithCancelButton(String titletext, String toptitletext, String message) {
+    public SimpleTextDialogWithCancelButton(MainController root, String titletext, String toptitletext, String message) {
+        Root = root;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SimpleTextDialogWithCancelButton.fxml"));
         fxmlLoader.setController(this);
-        try {setScene(new Scene(fxmlLoader.load())); this.setTitle(titletext);}
-        catch (IOException e) {e.printStackTrace();}
+        try {
+            Scene defaultscene = new Scene(fxmlLoader.load());
+            setScene(defaultscene);
+            Root.getOptions().setStyle(defaultscene);
+        } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+        setTitle(titletext);
         Message.setText(message);
         TopTitle.setText(toptitletext);
     }

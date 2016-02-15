@@ -96,7 +96,7 @@ public class CreatorAndExporterWidget implements Widget {
         AmbienceSwitch = root.AmbienceSwitch;
         TotalSessionTime = root.TotalSessionTime;
         ApproximateEndTime = root.ApproximateEndTime;
-        Preset = new Preset();
+        Preset = new Preset(root);
         PreLabel = root.PreLabel;
         PreTime = root.PreTime;
         RinLabel = root.RinLabel;
@@ -291,10 +291,7 @@ public class CreatorAndExporterWidget implements Widget {
         final Process checkforffmpeg = processBuilder.start();
         checkforffmpeg.waitFor();
         good = checkforffmpeg.exitValue() == 0;
-    } catch (IOException ignored) {} catch (InterruptedException e) {
-        e.printStackTrace();
-        good = false;
-    }
+    } catch (IOException | InterruptedException ignored) {good = false;}
     return good;
 }
     public void setuptextfields() {
@@ -590,7 +587,7 @@ public class CreatorAndExporterWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Change All Values To: ");
             setAccepted(false);
         }
@@ -635,7 +632,7 @@ public class CreatorAndExporterWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Exporting Session");
         }
 
@@ -667,7 +664,7 @@ public class CreatorAndExporterWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Session Not Well Formed");
             this.textfieldvalues = textfieldvalues;
             this.lastcutindex = lastcutindex;
@@ -760,7 +757,7 @@ public class CreatorAndExporterWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Cut Invocation");
         }
 

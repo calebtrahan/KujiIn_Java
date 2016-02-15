@@ -49,8 +49,7 @@ public class Sessions {
     }
     public void createnewsession() {
         try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
-        catch (JAXBException e) {
-            e.printStackTrace();
+        catch (JAXBException ignored) {
             Tools.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
     public void addsession(Session session) throws JAXBException {

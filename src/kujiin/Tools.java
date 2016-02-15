@@ -215,9 +215,7 @@ public class Tools {
             while ((line = br.readLine()) != null) {
                 System.out.println(line);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ignored) {}
     }
     public static void erasetextfile(File textfile) {
         PrintWriter writer = null;
@@ -297,8 +295,8 @@ public class Tools {
                 a.append(s);
             }
             return Double.parseDouble(a.toString());
-        } catch (IOException e) {e.printStackTrace();}
-        return 0.0;
+        } catch (IOException ignored) {return 0.0;}
+
     }
     public static boolean checkaudioduration(File audiofile, double expectedduration) {
         boolean durationOK;

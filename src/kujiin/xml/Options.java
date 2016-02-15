@@ -88,8 +88,7 @@ public class Options {
                 setProgramOptions(options.getProgramOptions());
                 setSessionOptions(options.getSessionOptions());
                 setAppearanceOptions(options.getAppearanceOptions());
-            } catch (JAXBException e) {
-                e.printStackTrace();
+            } catch (JAXBException ignored) {
                 Platform.runLater(() -> Tools.showinformationdialog("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
             }

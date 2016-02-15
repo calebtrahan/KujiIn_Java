@@ -240,7 +240,7 @@ public class PlayerWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle(currentcut.name + "'s Reference");
             setsizing();
             loadcontent();
@@ -250,7 +250,7 @@ public class PlayerWidget implements Widget {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Reference File Preview");}
-            catch (IOException e) {e.printStackTrace();}
+            catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             fullscreenoption = false;
             setsizing();
             WebView browser = new WebView();
@@ -278,7 +278,7 @@ public class PlayerWidget implements Widget {
                 try (FileInputStream fis = new FileInputStream(referencefile);
                      BufferedInputStream bis = new BufferedInputStream(fis)) {
                     while (bis.available() > 0) {sb.append((char) bis.read());}
-                } catch (Exception e) {e.printStackTrace();}
+                } catch (Exception e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
                 TextArea ta = new TextArea();
                 ta.setText(sb.toString());
                 ta.setWrapText(true);
@@ -310,7 +310,7 @@ public class PlayerWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Reference Type Select");
             if (referenceType != null) {
                 if (referenceType == ReferenceType.txt) {TextOption.setSelected(true);}
@@ -364,7 +364,7 @@ public class PlayerWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {e.printStackTrace();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Session Completed");
         }
 
