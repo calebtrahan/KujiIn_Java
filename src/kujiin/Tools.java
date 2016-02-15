@@ -2,6 +2,7 @@ package kujiin;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
@@ -24,7 +25,7 @@ public class Tools {
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     public static final String[] SUPPORTEDAUDIOFORMATS = {"mp3", "aac", "wav", "aif", "aiff", "m4a"};
 
-// Menu Actions
+// Menu Methods
     public static void howtouseprogram() {
 
     }
@@ -33,41 +34,73 @@ public class Tools {
 
     }
 
-// Gui Utils
-    public static void integerTextField(TextField txtfield) {
+// Gui Methods
+    public static void integerTextField(TextField txtfield, boolean setvalueatzero) {
         txtfield.textProperty().addListener((observable, oldValue, newValue) -> {
             try {if (newValue.matches("\\d*")) {Integer.parseInt(newValue);}  else {txtfield.setText(oldValue);}}
             catch (Exception e) {txtfield.setText("");}});
-        txtfield.setText("0");
+        if (setvalueatzero) {txtfield.setText("0");}
     }
-    public static boolean getanswerdialog(String titletext, String headertext, String contenttext) {
+    public static void doubleTextField(TextField txtfield, boolean setvalueatzero) {
+        txtfield.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {if (newValue.matches("\\d+\\.\\d+")) {Double.parseDouble(newValue);}  else {txtfield.setText(oldValue);}}
+            catch (Exception e) {txtfield.setText("");}});
+        if (setvalueatzero) {txtfield.setText("0.00");}
+    }
+    public static boolean getanswerdialog(MainController root, String titletext, String headertext, String contenttext) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setTitle(titletext);
         a.setHeaderText(headertext);
         a.setContentText(contenttext);
+        DialogPane dialogPane = a.getDialogPane();
+        dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
         Optional<ButtonType> answer = a.showAndWait();
         return answer.isPresent() && answer.get() == ButtonType.OK;
     }
-    public static void showinformationdialog(String titletext, String headertext, String contexttext) {
+    public static void showinformationdialog(MainController root, String titletext, String headertext, String contexttext) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setTitle(titletext);
         a.setHeaderText(headertext);
         a.setContentText(contexttext);
+        DialogPane dialogPane = a.getDialogPane();
+        dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
         a.showAndWait();
     }
-    public static void showerrordialog(String titletext, String headertext, String contenttext) {
+    public static void showerrordialog(MainController root, String titletext, String headertext, String contenttext) {
         Alert a = new Alert(Alert.AlertType.ERROR);
         a.setTitle(titletext);
         a.setHeaderText(headertext);
         a.setContentText(contenttext);
+        DialogPane dialogPane = a.getDialogPane();
+        dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
         a.showAndWait();
     }
     public static void showtimedmessage(Label label, String text, double millis) {
         label.setText(text);
         new Timeline(new KeyFrame(Duration.millis(millis), ae -> label.setText(""))).play();
     }
+    public static void validate(TextField txtfield, int highvalue, int valtotest) {
+        ObservableList<String> styleclass = txtfield.getStyleClass();
+        if (valtotest > highvalue) {if (!styleclass.contains("error")) {styleclass.add("error");}}
+        else {styleclass.removeAll(Collections.singleton("error"));}
+    }
+    public static void validate(ChoiceBox<String> choicebox, Boolean val) {
+        ObservableList<String> styleclass = choicebox.getStyleClass();
+        if (! val ) {if (!styleclass.contains("error")) {styleclass.add("error");}}
+        else {styleclass.removeAll(Collections.singleton("error"));}
+    }
+    public static void validate(TextField txtfield, Boolean val) {
+        ObservableList<String> styleclass = txtfield.getStyleClass();
+        if (! val ) {if (!styleclass.contains("error")) {styleclass.add("error");}}
+        else {styleclass.removeAll(Collections.singleton("error"));}
+    }
+    public static void validate(Label lbl, Boolean val) {
+        ObservableList<String> styleclass = lbl.getStyleClass();
+        if (! val ) {if (!styleclass.contains("error")) {styleclass.add("error");}
+        } else {styleclass.removeAll(Collections.singleton("error"));}
+    }
 
-// Time Utils
+// Time Methods
     public static double hoursandminutestoformatteddecimalhours(int hours, int minutes) {
         System.out.println("Minutes Is " + minutes);
         double newval;
@@ -165,16 +198,19 @@ public class Tools {
         double minutes = mins % 60;
         double decimalminutes = minutes / 60;
         decimalminutes += hours;
-        BigDecimal bd = new BigDecimal(decimalminutes);
-        bd = bd.setScale(decimalplaces, RoundingMode.HALF_UP);
-        return bd.doubleValue();
+        return rounddouble(decimalminutes, 2);
     }
     public static int convertdecimalhourstominutes(double decimalhours) {
         Double minutes = 60 * decimalhours;
         return minutes.intValue();
     }
+    public static Double rounddouble(double number, int decimalplaces) {
+        BigDecimal bd = new BigDecimal(number);
+        bd = bd.setScale(decimalplaces, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
 
-// Session Utils
+// Session Methods
     public static void formatcurrentcutprogress(Cut currentcut, int currenttimeinseconds, Label currentlabel, ProgressBar currentprogress, Label totallabel) {
         int totalduration = currentcut.getdurationinminutes();
         String formattedtotalduration =  String.format("%02d:00", totalduration);
@@ -208,7 +244,7 @@ public class Tools {
         totallabel.setText(formattedtotalduration);
     }
 
-// File Utils
+// File Methods
     public static void printfile(File textfile) {
         try (BufferedReader br = new BufferedReader(new FileReader(textfile))) {
             String line = null;
@@ -259,14 +295,14 @@ public class Tools {
         } else {fileChooser.setInitialDirectory(initialdirectory);}
         return fileChooser.showSaveDialog(scene.getWindow());
     }
-    public static File fileextensioncorrect(String expectedextension, File filetocheck) {
+    public static File fileextensioncorrect(MainController root, String expectedextension, File filetocheck) {
         if (! filetocheck.getName().contains(".")) {
-            if (Tools.getanswerdialog("Confirmation", "Invalid Extension", "Save As A ." + expectedextension + " File?")) {
+            if (Tools.getanswerdialog(root, "Confirmation", "Invalid Extension", "Save As A ." + expectedextension + " File?")) {
                 return new File(filetocheck.getAbsolutePath().concat("." + expectedextension));
             } else {return filetocheck;}
         } else {
             String extension = filetocheck.getName().substring(filetocheck.getName().lastIndexOf("."));
-            if (Tools.getanswerdialog("Confirmation", "Invalid Extension " + extension, "Rename As ." + expectedextension + "?")) {
+            if (Tools.getanswerdialog(root, "Confirmation", "Invalid Extension " + extension, "Rename As ." + expectedextension + "?")) {
                 String filewithoutextension = filetocheck.getAbsolutePath().substring(0, filetocheck.getName().lastIndexOf("."));
                 return new File(filewithoutextension.concat("." + expectedextension));
             } else {
@@ -275,10 +311,7 @@ public class Tools {
         }
     }
 
-// Audio Utils
-    public static boolean testAlertFile() {
-        return Options.ALERTFILE.exists() && Tools.getaudioduration(Options.ALERTFILE) != 0.0;
-    }
+// Audio Methods
     public static double getaudioduration(File audiofile) {
         try {
             Runtime rt = Runtime.getRuntime();
@@ -295,7 +328,7 @@ public class Tools {
                 a.append(s);
             }
             return Double.parseDouble(a.toString());
-        } catch (IOException ignored) {return 0.0;}
+        } catch (IOException | NumberFormatException ignored) {return 0.0;}
 
     }
     public static boolean checkaudioduration(File audiofile, double expectedduration) {
@@ -449,7 +482,24 @@ public class Tools {
         }
     }
 
-// List Utils
+// String Methods
+    public static String reformatcapatalized(String text) {
+        StringBuilder newname = new StringBuilder();
+        char[] tempname = text.toCharArray();
+        for (int x = 0; x < tempname.length; x++) {
+            if (x == 0) {
+                newname.append(Character.toUpperCase(tempname[0]));
+            } else if (Character.isUpperCase(tempname[x])) {
+                newname.append(" ");
+                newname.append(tempname[x]);
+            } else {
+                newname.append(tempname[x]);
+            }
+        }
+        return newname.toString();
+    }
+
+// List Methods
     public static List<?> shufflelist(List<?> list, int times) {
         for (int i = 0; i < times; i++) {
             Collections.shuffle(list);
@@ -457,7 +507,7 @@ public class Tools {
         return list;
     }
 
-// Log Utils
+// Log Methods
     public static boolean sendstacktracetodeveloper(String stacktrace) {
         // TODO Email Stacktrace To Me
         return false;

@@ -113,7 +113,7 @@ public class MainController implements Initializable {
         // Maybe Make A New Goal Setter To Set All Goals For All Cuts On One Dialog
 
 // Event Handlers
-    public static final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Tools.showinformationdialog("Information", "Can't Enter Text", "This Text Field Can't Be Edited");
+    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Tools.showinformationdialog(this, "Information", "Can't Enter Text", "This Text Field Can't Be Edited");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -121,7 +121,7 @@ public class MainController implements Initializable {
         setSession(new This_Session(this));
         setCreatorAndExporter(new CreatorAndExporterWidget(this));
         setPlayer(new PlayerWidget(this));
-        setOptions(new Options());
+        setOptions(new Options(this));
         getOptions().unmarshall();
         sessionplayerswitch(null);
         CreatorStatusBar.setText("");
@@ -314,12 +314,12 @@ public class MainController implements Initializable {
                 String text = selectedcut + "'s Reference File (" + selectedvariation + " Variation) Has Been Saved";
                 Tools.showtimedmessage(StatusBar, text, 5000);
             } else {
-                Tools.showerrordialog("Error", "Couldn't Save", "Does The File Exist/Do You Have Access To It?");}
+                Tools.showerrordialog(Root, "Error", "Couldn't Save", "Does The File Exist/Do You Have Access To It?");}
         }
         public void loadnewfile(ActionEvent actionEvent) {
             if (! CutNamesChoiceBox.getValue().equals("") && ! CutVariationsChoiceBox.getValue().equals("")) {
                 if (unsavedchanges()) {
-                    if (Tools.getanswerdialog("Confirmation", "Document Has Unsaved Changes", "Save These Changes Before Loading A Different File?")) {savefile(null);}
+                    if (Tools.getanswerdialog(Root, "Confirmation", "Document Has Unsaved Changes", "Save These Changes Before Loading A Different File?")) {savefile(null);}
                     else {return;}
                 }
                 selectedcut = CutNamesChoiceBox.getValue();
@@ -330,9 +330,9 @@ public class MainController implements Initializable {
                 MainTextArea.setText(Tools.getFileContents(selectedfile));
             } else {
                 if (CutNamesChoiceBox.getValue().equals("")) {
-                    Tools.showinformationdialog("Information", "No Cut Selected", "Select A Cut To Load");}
+                    Tools.showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
                 else {
-                    Tools.showinformationdialog("Information", "No Variation Selected", "Select A Variation To Load");}
+                    Tools.showinformationdialog(Root, "Information", "No Variation Selected", "Select A Variation To Load");}
                 SelectReferenceFileLabel.setText("Select A Cut Name And Variation And Press 'Load'");
             }
         }
@@ -343,7 +343,7 @@ public class MainController implements Initializable {
                     PlayerWidget.DisplayReference dr = new PlayerWidget.DisplayReference(Root, MainTextArea.getText());
                     dr.showAndWait();
                 } else {
-                    Tools.showinformationdialog("Information", "Preview Is For Html Content Not Available For Text Only", "Cannot Open Preview");
+                    Tools.showinformationdialog(Root, "Information", "Preview Is For Html Content Not Available For Text Only", "Cannot Open Preview");
                 }
             }
         }
@@ -445,13 +445,13 @@ public class MainController implements Initializable {
                     }
                 };
                 copyfile.setOnSucceeded(event -> selectandloadcut());
-                copyfile.setOnFailed(event -> Tools.showerrordialog("Error", "Couldn't Copy File To " + selectedcutname + "'s Ambience Directory", "Check File Permissions"));
+                copyfile.setOnFailed(event -> Tools.showerrordialog(Root, "Error", "Couldn't Copy File To " + selectedcutname + "'s Ambience Directory", "Check File Permissions"));
                 copyfile.start();
             } else {
                 if (selected_new_ambiencesong == null) {
-                    Tools.showinformationdialog("Information", "Cannot Transfer", "Nothing Selected");
+                    Tools.showinformationdialog(Root, "Information", "Cannot Transfer", "Nothing Selected");
                 } else {
-                    Tools.showinformationdialog("Information", "Cannot Transfer", "No Cut Selected");
+                    Tools.showinformationdialog(Root, "Information", "Cannot Transfer", "No Cut Selected");
                 }
             }
         }
@@ -459,7 +459,7 @@ public class MainController implements Initializable {
             if (selected_current_ambiencesong != null && selectedcutname != null) {
                 for (AmbienceSong i : NewAmbienceTable.getItems()) {
                     if (selected_current_ambiencesong.name.getValue().equals(i.name.getValue())) {
-                        Tools.showinformationdialog("Information", "File Already Exists", "Select A Different File To Transfer");
+                        Tools.showinformationdialog(Root, "Information", "File Already Exists", "Select A Different File To Transfer");
                         return;
                     }
                 }
@@ -483,7 +483,7 @@ public class MainController implements Initializable {
                     System.out.println(new_songlist.size());
                     NewAmbienceTable.setItems(new_songlist);
                 });
-                copyfile.setOnFailed(event -> Tools.showerrordialog("Error", "Couldn't Copy File To Temp Directory", "Check File Permissions"));
+                copyfile.setOnFailed(event -> Tools.showerrordialog(Root, "Error", "Couldn't Copy File To Temp Directory", "Check File Permissions"));
                 copyfile.start();
             }
         }
@@ -505,7 +505,7 @@ public class MainController implements Initializable {
                     c.append(i.getName());
                     if (i != notvalidfilenames.get(notvalidfilenames.size() - 1)) {c.append("\n");}
                 }
-                Tools.showinformationdialog("Information", "The Files Weren't Added Because They Are Unsupported", c.toString());
+                Tools.showinformationdialog(Root, "Information", "The Files Weren't Added Because They Are Unsupported", c.toString());
             }
         }
         public void removefromnewambience(ActionEvent actionEvent) {
@@ -513,7 +513,7 @@ public class MainController implements Initializable {
             if (index != -1) {
                 NewAmbienceTable.getItems().remove(index);
             } else {
-                Tools.showinformationdialog("Information", "Nothing Selected", "Select A Table Item To Remove");
+                Tools.showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");
             }
         }
         public void previewnewambience(ActionEvent actionEvent) {
@@ -553,16 +553,16 @@ public class MainController implements Initializable {
             int index = CurrentAmbienceTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 String filename = current_songlist.get(index).getName();
-                if (Tools.getanswerdialog("Confirmation", String.format("Remove '%s' From %s's Ambience?", filename, selectedcutname), "This Cannot Be Undone")) {
+                if (Tools.getanswerdialog(Root, "Confirmation", String.format("Remove '%s' From %s's Ambience?", filename, selectedcutname), "This Cannot Be Undone")) {
                     if (current_songlist.get(index).getFile().delete()) {
                         CurrentAmbienceTable.getItems().remove(index);
                         current_songlist.remove(index);
                         selectandloadcut();
                     } else {
-                        Tools.showerrordialog("Error", "Couldn't Delete '" + filename + "'", "Check File Permissions");}
+                        Tools.showerrordialog(Root, "Error", "Couldn't Delete '" + filename + "'", "Check File Permissions");}
                 }
             } else {
-                Tools.showinformationdialog("Information", "Nothing To Remove", "Select An Item To Remove");}
+                Tools.showinformationdialog(Root, "Information", "Nothing To Remove", "Select An Item To Remove");}
         }
         public void previewcurrentambience(ActionEvent actionEvent) {
             if (selected_current_ambiencesong != null && CurrentAmbienceTable.getItems().size() > 0) {
@@ -587,11 +587,11 @@ public class MainController implements Initializable {
                     }
                     return true;
                 } catch (NullPointerException e) {
-                    Tools.showinformationdialog("Information", selectedcutname + " Has No Ambience", "Please Add Ambience To " + selectedcutname);
+                    Tools.showinformationdialog(Root, "Information", selectedcutname + " Has No Ambience", "Please Add Ambience To " + selectedcutname);
                     return false;
                 }
             } else {
-                Tools.showinformationdialog("Information", "No Cut Loaded", "Load A Cut's Ambience First");
+                Tools.showinformationdialog(Root, "Information", "No Cut Loaded", "Load A Cut's Ambience First");
                 return false;
             }
         }
@@ -618,7 +618,7 @@ public class MainController implements Initializable {
                     PreviewStartButton.setText("Stop");
                 }
             } else {
-                Tools.showinformationdialog("Information", "Nothing To Preview", "Select A Table Item And Press Preview");}
+                Tools.showinformationdialog(Root, "Information", "Nothing To Preview", "Select A Table Item And Press Preview");}
         }
         public void updatePositionSlider(Duration currenttime) {
             if (PreviewSlider.isValueChanging()) {return;}
@@ -696,6 +696,7 @@ public class MainController implements Initializable {
             setTitle("Program Error Occured");
             TopText.setText(exceptionname + " Occured");
             StackTraceTextField.setText(stacktrace);
+            StackTraceTextField.setWrapText(true);
         }
 
         public void exit(ActionEvent actionEvent) {
@@ -731,6 +732,7 @@ public class MainController implements Initializable {
         public Button DefaultsButton;
         public CheckBox RampCheckbox;
         public ChoiceBox<String> RampDurationChoiceBox;
+        public CheckBox AlertFileCheckbox;
         private kujiin.xml.Options Options;
         private File AlertFile;
         private boolean valuechanged;
@@ -748,10 +750,10 @@ public class MainController implements Initializable {
                 Root.getOptions().setStyle(defaultscene);
             } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Change Program Options");
-            Tools.integerTextField(FadeInValue);
-            Tools.integerTextField(FadeOutValue);
-            Tools.integerTextField(EntrainmentVolumePercentage);
-            Tools.integerTextField(AmbienceVolumePercentage);
+            Tools.doubleTextField(FadeInValue, false);
+            Tools.doubleTextField(FadeOutValue, false);
+            Tools.doubleTextField(EntrainmentVolumePercentage, false);
+            Tools.doubleTextField(AmbienceVolumePercentage, false);
             kujiin.xml.Options.STYLETHEMES.clear();
             try {
                 for (File i : kujiin.xml.Options.DIRECTORYSTYLES.listFiles()) {
@@ -767,26 +769,27 @@ public class MainController implements Initializable {
             FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             AmbienceVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+            ProgramThemeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+                selectnewtheme();
+                changedvalue();
+            });
+            AlertFileCheckbox.setOnAction(event -> alertfiletoggle());
+            AlertFileTextField.setEditable(false);
+            AlertFileTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
             loadoptionsfromxml();
             checkalertfile();
         }
 
     // Button Actions
-        public boolean checkalertfile() {
-            String oldalertfilelocation = Options.getSessionOptions().getAlertfilelocation();
-            if (oldalertfilelocation != null) {
-                AlertFile = new File(oldalertfilelocation);
-                if (AlertFile.exists()) {
-                    if (Tools.validaudiofile(AlertFile)) {
-                        String audioduration = Tools.formatlengthshort((int) Tools.getaudioduration(AlertFile));
-                        AlertFileTextField.setText(String.format("%s (%s)", AlertFile.getName(), audioduration));
-                    } else {Tools.showinformationdialog("Information", "Old Alert File Is Unsupported", "Please Select A New One");}
-                } else {
-                    AlertFile = null;
-                    AlertFileTextField.setText("Select A New Alert File...");
+        public void selectnewtheme() {
+            if (ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {
+                File cssfile = new File(kujiin.xml.Options.DIRECTORYSTYLES, ProgramThemeChoiceBox.getValue() + ".css");
+                if (cssfile.exists()) {
+                    Options.getAppearanceOptions().setThemefile(cssfile.toURI().toString());
+                    getScene().getStylesheets().clear();
+                    getScene().getStylesheets().add(Options.getAppearanceOptions().getThemefile());
                 }
             }
-            return AlertFile != null;
         }
         public void loadoptionsfromxml() {
             TooltipsCheckBox.setSelected(Options.getProgramOptions().getTooltips());
@@ -796,10 +799,14 @@ public class MainController implements Initializable {
             if (Options.getSessionOptions().getRampduration() == 2) {RampDurationChoiceBox.getSelectionModel().select(0);}
             else if (Options.getSessionOptions().getRampduration() == 3) {RampDurationChoiceBox.getSelectionModel().select(1);}
             else if (Options.getSessionOptions().getRampduration() == 4) {RampDurationChoiceBox.getSelectionModel().select(2);}
-            FadeInValue.setText(Options.getSessionOptions().getFadeinduration().toString());
-            FadeOutValue.setText(Options.getSessionOptions().getFadeoutduration().toString());
-            EntrainmentVolumePercentage.setText(Options.getSessionOptions().getEntrainmentvolume().toString());
-            AmbienceVolumePercentage.setText(Options.getSessionOptions().getAmbiencevolume().toString());
+            FadeInValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeinduration()));
+            FadeOutValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeoutduration()));
+            EntrainmentVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getEntrainmentvolume() * 100));
+            AmbienceVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getAmbiencevolume() * 100));
+            AlertFileCheckbox.setSelected(Options.getSessionOptions().getAlertfunction());
+            try {AlertFile = new File(Options.getSessionOptions().getAlertfilelocation());}
+            catch (NullPointerException ignored) {AlertFile = null;}
+            checkalertfile();
         }
         public void apply(ActionEvent actionEvent) {
             Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
@@ -829,33 +836,18 @@ public class MainController implements Initializable {
             ApplyButton.setDisable(false);
             valuechanged = true;
         }
-        public void openandtestnewfile(ActionEvent actionEvent) {
-            File newfile = Tools.singleopenfilechooser(getScene(), "Select A New Alert File", null);
-            if (newfile != null) {
-                if (Tools.validaudiofile(newfile)) {
-                    double duration = Tools.getaudioduration(newfile);
-                    if (duration > 10000) {
-                        if (! Tools.getanswerdialog("Validation", "Alert File Is longer Than 10 Seconds",
-                                String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
-                                        "Really Use It?", duration))) {return;}
-                    }
-                    if (! newfile.getAbsolutePath().equals(kujiin.xml.Options.ALERTFILE.getAbsolutePath()) &&
-                            Tools.getanswerdialog("Validation", "Alert File Isn't In Program Directory", "Copy To Program Directory?")) {
-                        if (kujiin.xml.Options.ALERTFILE.exists()) {
-                            if (!Tools.getanswerdialog("Overwrite", "Old Alert File Already Exists", "Overwrite?")) {return;}
-                        }
-                        try {
-                            kujiin.xml.Options.ALERTFILE.delete();
-                            FileUtils.copyFile(newfile, kujiin.xml.Options.ALERTFILE);
-                        } catch (IOException e) {Tools.showerrordialog("Error", "Couldn't Copy File", "Check Program Directory Permissions");}
-                    } else {
-                        AlertFileTextField.setText(String.format("%s (%s)", newfile.getName(), Tools.formatlengthshort((int) duration)));
-                        AlertFile = newfile;
-                    }
-                } else {
-                    Tools.showinformationdialog("Information", newfile.getName() + " Isn't A Valid Audio File", "Supported Audio Formats: " + Tools.supportedaudiotext());
-                }
+        public boolean checkvalues() {
+            Double entrainmentvolume = new Double(EntrainmentVolumePercentage.getText()) / 100;
+            Double ambiencevolume = new Double(AmbienceVolumePercentage.getText()) / 100;
+            boolean entrainmentgood = entrainmentvolume <= 100.0 && entrainmentvolume > 0.0;
+            boolean ambiencegood = ambiencevolume <= 100.0 && ambiencevolume > 0.0;
+            Tools.validate(EntrainmentVolumePercentage, entrainmentgood);
+            Tools.validate(AmbienceVolumePercentage, ambiencegood);
+            boolean alertfilegood = checkalertfile();
+            if (AlertFileCheckbox.isSelected()) {
+                Tools.validate(AlertFileTextField, alertfilegood);
             }
+            return entrainmentgood && ambiencegood && alertfilegood;
         }
         public void resettodefaults(ActionEvent actionEvent) {
             Options.resettodefaults();
@@ -863,28 +855,88 @@ public class MainController implements Initializable {
             valuechanged = true;
         }
         public void deleteallsessions(ActionEvent actionEvent) {
-            if (Tools.getanswerdialog("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+            if (Tools.getanswerdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
                 if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
-                    Tools.showerrordialog("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
-                } else {Tools.showinformationdialog("Success", "Successfully Delete Sessions And Reset All Progress", "");}
+                    Tools.showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                } else {Tools.showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }
         }
         public void deleteallgoals(ActionEvent actionEvent) {
-            if (Tools.getanswerdialog("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+            if (Tools.getanswerdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
                 if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
-                    Tools.showerrordialog("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
-                } else {Tools.showinformationdialog("Success", "Successfully Delete Sessions And Reset All Progress", "");}
+                    Tools.showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                } else {Tools.showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }
         }
 
+    // Alert File Methods
+        public void alertfiletoggle() {
+            if (AlertFileCheckbox.isSelected()) {
+                AlertFileCheckbox.setText("Enabled");
+                if (Options.getSessionOptions().getAlertfilelocation() == null) {
+                    AlertFile = getnewalertfile();
+                    checkalertfile();
+                }
+            } else {
+                AlertFileCheckbox.setText("Disabled");
+                if (Tools.getanswerdialog(Root, "Confirmation", "This Will Disable The Audible Alert File Played In Between Cuts", "Really Disable This Feature?")) {
+                    AlertFile = null;
+                    checkalertfile();
+                } else {
+                    AlertFileCheckbox.setSelected(true);
+                    alertfiletoggle();
+                }
+            }
+        }
+        public File getnewalertfile() {
+            File newfile = Tools.singleopenfilechooser(getScene(), "Select A New Alert File", null);
+            if (newfile != null) {
+                if (Tools.validaudiofile(newfile)) {
+                    double duration = Tools.getaudioduration(newfile);
+                    if (duration > 10000) {
+                        if (!Tools.getanswerdialog(Root, "Validation", "Alert File Is longer Than 10 Seconds",
+                                String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
+                                        "Really Use It?", duration))) {newfile = null;}
+                    }
+                } else {
+                    Tools.showinformationdialog(Root, "Information", newfile.getName() + " Isn't A Valid Audio File", "Supported Audio Formats: " + Tools.supportedaudiotext());
+                    newfile = null;
+                }
+            }
+            return newfile;
+        }
+        public boolean checkalertfile() {
+            boolean good;
+            if (AlertFile != null && Tools.validaudiofile(AlertFile)) {
+                good = true;
+                Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());
+                String audioduration = Tools.formatlengthshort((int) Tools.getaudioduration(AlertFile));
+                AlertFileTextField.setText(String.format("%s (%s)", AlertFile.getName(), audioduration));
+            } else {
+                good = false;
+                AlertFileCheckbox.setText("Disabled");
+                AlertFileTextField.setText("Alert Feature Disabled");
+                Options.getSessionOptions().setAlertfilelocation(null);
+            }
+            Options.getSessionOptions().setAlertfunction(good);
+            AlertFileSelectButton.setDisable(! good);
+            AlertFileTextField.setDisable(! good);
+            AlertFileCheckbox.setSelected(good);
+            return good;
+        }
+        public void openandtestnewfile(ActionEvent actionEvent) {
+            AlertFile = getnewalertfile();
+            checkalertfile();
+        }
+
+    // Dialog Methods
         @Override
         public void close() {
             if (valuechanged) {
-                if (! Tools.getanswerdialog("Confirmation", "You Have Unsaved Changes", "Exit Without Saving?")) {return;}
+                if (! Tools.getanswerdialog(Root, "Confirmation", "You Have Unsaved Changes", "Exit Without Saving?")) {return;}
             }
             super.close();
         }
-
     }
 
 }

@@ -164,14 +164,14 @@ public class This_Session {
                         if (i != cutswithnoambience.size() - 1) {a.append(", ");}
                     }
                     if (cutswithnoambience.size() > 1) {
-                        Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
-                        if (Tools.getanswerdialog("Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
+                        Tools.showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
+                        if (Tools.getanswerdialog(Root, "Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
                             MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(Root);
                             ambienceEditor.showAndWait();
                         }
                     } else {
-                        Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
-                        if (Tools.getanswerdialog("Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
+                        Tools.showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
+                        if (Tools.getanswerdialog(Root, "Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
                             MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(Root, cutswithnoambience.get(0).name);
                             ambienceEditor.showAndWait();
                         }
@@ -190,9 +190,9 @@ public class This_Session {
                             count++;
                         }
                         if (cutswithreducedambience.size() == 1) {
-                            ambiencecheckbox.setSelected(Tools.getanswerdialog("Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
+                            ambiencecheckbox.setSelected(Tools.getanswerdialog(Root, "Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
                         } else {
-                            ambiencecheckbox.setSelected(Tools.getanswerdialog("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
+                            ambiencecheckbox.setSelected(Tools.getanswerdialog(Root, "Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
                         }
                     } else {
                         ambiencecheckbox.setSelected(true);
@@ -205,11 +205,11 @@ public class This_Session {
             });
             ambiencecheckerservice.setOnFailed(event -> {
                 cad[0].close();
-                Tools.showerrordialog("Error", "Couldn't Check Ambience", "Check Ambience Folder Read Permissions");
+                Tools.showerrordialog(Root, "Error", "Couldn't Check Ambience", "Check Ambience Folder Read Permissions");
                 ambiencecheckbox.setSelected(false);
             });
             ambiencecheckerservice.start();
-        } else {Tools.showinformationdialog("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
+        } else {Tools.showinformationdialog(Root, "Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
     public boolean checksessionwellformedness(ArrayList<Integer> textfieldtimes) {
         int lastcutindex = 0;
@@ -298,7 +298,7 @@ public class This_Session {
                 sdcb[0].close();
             });
             creationservice.setOnFailed(event -> {
-                Platform.runLater(() -> Tools.showerrordialog("Error", "Session Creation Failed", "Check Sound File Read Permissions"));
+                Platform.runLater(() -> Tools.showerrordialog(Root, "Error", "Session Creation Failed", "Check Sound File Read Permissions"));
                 resetallcuts();
                 sdcb[0].close();
             });
@@ -372,7 +372,7 @@ public class This_Session {
             setExportfile(tempfile);
         } else {
             if (tempfile == null) {return;}
-            if (Tools.getanswerdialog("Confirmation", "Invalid Audio File Extension", "Save As .mp3?")) {
+            if (Tools.getanswerdialog(Root, "Confirmation", "Invalid Audio File Extension", "Save As .mp3?")) {
                 String file = tempfile.getAbsolutePath();
                 int index = file.lastIndexOf(".");
                 String firstpart = file.substring(0, index - 1);
@@ -544,7 +544,7 @@ public class This_Session {
         sessions.deletenonvalidsessions();
 //        try {sessions.addsession(TemporarySession);}
 //        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
-        if (Tools.getanswerdialog("Confirmation", "Session Completed", "Export This Session For Later Use?")) {
+        if (Tools.getanswerdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
             getsessionexporter();}
         Root.getProgressTracker().updategoalsui();
     }
@@ -562,27 +562,29 @@ public class This_Session {
         currentcut.stop();
         if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
         else {
-            Media alertmedia = new Media(Options.ALERTFILE.toURI().toString());
-            MediaPlayer alertplayer = new MediaPlayer(alertmedia);
-            alertplayer.play();
-            setPlayerState(PlayerWidget.PlayerState.TRANSITIONING);
-            alertplayer.setOnEndOfMedia(() -> {
-                alertplayer.stop();
-                alertplayer.dispose();
-                progresstonextcut();
-            });
-            alertplayer.setOnError(() -> {
-                if (Tools.getanswerdialog("Confirmation", "An Error Occured While Playing Alert File" +
-                        alertplayer.getMedia().getSource() + "'", "Retry Playing Alert File? (Pressing Cancel " +
-                        "Will Progress To The Next Cut)")) {
-                    alertplayer.stop();
-                    alertplayer.play();
-                } else {
+            if (Root.getOptions().getSessionOptions().getAlertfunction()) {
+                Media alertmedia = new Media(Root.getOptions().getSessionOptions().getAlertfilelocation());
+                MediaPlayer alertplayer = new MediaPlayer(alertmedia);
+                alertplayer.play();
+                setPlayerState(PlayerWidget.PlayerState.TRANSITIONING);
+                alertplayer.setOnEndOfMedia(() -> {
                     alertplayer.stop();
                     alertplayer.dispose();
                     progresstonextcut();
-                }
-            });
+                });
+                alertplayer.setOnError(() -> {
+                    if (Tools.getanswerdialog(Root, "Confirmation", "An Error Occured While Playing Alert File" +
+                            alertplayer.getMedia().getSource() + "'", "Retry Playing Alert File? (Pressing Cancel " +
+                            "Will Progress To The Next Cut)")) {
+                        alertplayer.stop();
+                        alertplayer.play();
+                    } else {
+                        alertplayer.stop();
+                        alertplayer.dispose();
+                        progresstonextcut();
+                    }
+                });
+            } else {progresstonextcut();}
         }
     }
     public void error_endplayback() {

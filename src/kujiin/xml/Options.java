@@ -2,6 +2,7 @@ package kujiin.xml;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import kujiin.MainController;
 import kujiin.Tools;
 
 import javax.xml.bind.JAXBContext;
@@ -29,7 +30,6 @@ public class Options {
     public static final File DIRECTORYSTYLES = new File(ROOTDIRECTORY, "assets/styles/");
     public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");
     public static final File SOUNDDIRECTORY = new File(ROOTDIRECTORY, "assets/sound/");
-    public static final File ALERTFILE = new File(SOUNDDIRECTORY, "Alert.mp3");
     public static final File DIRECTORYTEMP = new File(SOUNDDIRECTORY, "temp/");
     public static final File DIRECTORYAMBIENCE = new File(SOUNDDIRECTORY, "ambience/");
     public static final File DIRECTORYENTRAINMENT = new File(SOUNDDIRECTORY, "entrainment/");
@@ -48,6 +48,7 @@ public class Options {
     private static final Double AMBIENCEVOLUME = 1.0; // Default Ambience Volume (Textfield -> In Percentage)
     private static final Double FADEINDURATION = 10.0; // Fade In Duration (Textfield -> In Decimal Seconds)
     private static final Double FADEOUTDURATION = 10.0; // Fade Out Duration (Textfield -> In Decimal Seconds)
+    private static final Boolean ALERTFUNCTION = true;
     private static final String ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
     private static final String THEMEFILELOCATION = new File(DIRECTORYSTYLES, "dark.css").toURI().toString();
     private static final Boolean RAMPENABLED = true;
@@ -55,8 +56,12 @@ public class Options {
     private ProgramOptions ProgramOptions;
     private SessionOptions SessionOptions;
     private AppearanceOptions AppearanceOptions;
+    private MainController Root;
 
     public Options() {}
+    public Options(MainController root) {
+        Root = root;
+    }
 
 // Getters And Setters
     public Options.ProgramOptions getProgramOptions() {
@@ -89,7 +94,7 @@ public class Options {
                 setSessionOptions(options.getSessionOptions());
                 setAppearanceOptions(options.getAppearanceOptions());
             } catch (JAXBException ignored) {
-                Platform.runLater(() -> Tools.showinformationdialog("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
+                Platform.runLater(() -> Tools.showinformationdialog(Root, "Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
             }
         } else {
@@ -103,7 +108,7 @@ public class Options {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, OPTIONSXMLFILE);
         } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
+            Tools.showinformationdialog(Root, "Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
         }
     }
     public void resettodefaults() {
@@ -114,6 +119,7 @@ public class Options {
         kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
         sessionOptions.setFadeoutduration(FADEOUTDURATION);
         sessionOptions.setAmbiencevolume(AMBIENCEVOLUME);
+        sessionOptions.setAlertfunction(ALERTFUNCTION);
         sessionOptions.setAlertfilelocation(ALERTFILELOCATION);
         sessionOptions.setFadeinduration(FADEINDURATION);
         sessionOptions.setEntrainmentvolume(ENTRAINMENTVOLUME);
@@ -155,12 +161,13 @@ public class Options {
 }
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class SessionOptions {
-        private Double entrainmentvolume; // Default Entrainment Volume (Textfield -> In Percentage)
-        private Double ambiencevolume; // Default Ambience Volume (Textfield -> In Percentage)
-        private Double fadeinduration; // Fade In Duration (Textfield -> In Decimal Seconds)
-        private Double fadeoutduration; // Fade Out Duration (Textfield -> In Decimal Seconds)
-        private String alertfilelocation; // (Dialog Selecting A New Alert File)
+        private Double entrainmentvolume;
+        private Double ambiencevolume;
+        private Double fadeinduration;
+        private Double fadeoutduration;
+        private String alertfilelocation;
         private Boolean rampenabled;
+        private Boolean alertfunction;
         private Integer rampduration;
 
         public SessionOptions() {}
@@ -208,7 +215,12 @@ public class Options {
         public void setRampduration(Integer rampduration) {
             this.rampduration = rampduration;
         }
-
+        public Boolean getAlertfunction() {
+            return alertfunction;
+        }
+        public void setAlertfunction(Boolean alertfunction) {
+            this.alertfunction = alertfunction;
+        }
     }
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class AppearanceOptions {

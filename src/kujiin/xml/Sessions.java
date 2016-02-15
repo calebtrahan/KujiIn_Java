@@ -1,5 +1,6 @@
 package kujiin.xml;
 
+import kujiin.MainController;
 import kujiin.Tools;
 
 import javax.xml.bind.JAXBContext;
@@ -19,8 +20,12 @@ import java.util.List;
 public class Sessions {
     @XmlElement(name = "Session")
     private List<Session> Session;
+    private MainController Root;
 
-    public Sessions() {deletenonvalidsessions();}
+    public Sessions() {}
+    public Sessions(MainController root) {
+        Root = root;
+    }
 
 // Getters And Setters
     public List<kujiin.xml.Session> getSession() {return Session;}
@@ -35,7 +40,7 @@ public class Sessions {
                 Sessions noises1 = (Sessions) createMarshaller.unmarshal(Options.SESSIONSXMLFILE);
                 setSession(noises1.getSession());
             } catch (JAXBException e) {
-                Tools.showinformationdialog("Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
+                Tools.showinformationdialog(Root, "Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -50,7 +55,7 @@ public class Sessions {
     public void createnewsession() {
         try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
         catch (JAXBException ignored) {
-            Tools.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
+            Tools.showerrordialog(Root, "Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
     public void addsession(Session session) throws JAXBException {
         if (Options.SESSIONSXMLFILE.exists()) {unmarshall();}

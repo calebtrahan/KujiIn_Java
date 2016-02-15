@@ -44,30 +44,32 @@ public class PlayerWidget implements Widget {
     private Label VolumeTopLabel;
     private This_Session Session;
     private ReferenceType referenceType;
+    private MainController Root;
 
-    public PlayerWidget(MainController mainController) {
-        onOffSwitch = mainController.SessionPlayerOnOffSwitch;
-        PlayButton = mainController.PlayButton;
-        PauseButton = mainController.PauseButton;
-        StopButton = mainController.StopButton;
-        CutPlayingText = mainController.CutProgressTopLabel;
-        SessionPlayingText = mainController.TotalSessionLabel;
-        CutCurrentTime = mainController.CutProgressLabelCurrent;
-        CutTotalTime = mainController.CutProgressLabelTotal;
-        SessionCurrentTime = mainController.TotalProgressLabelCurrent;
-        SessionTotalTime = mainController.TotalProgressLabelTotal;
-        CutProgress = mainController.CutProgressBar;
-        TotalProgress = mainController.TotalProgressBar;
-        ReferenceFileCheckbox = mainController.ReferenceFilesOption;
-        EntrainmentVolume = mainController.EntrainmentVolume;
-        AmbienceVolume = mainController.AmbienceVolume;
-        EntrainmentPercentage = mainController.EntrainmentVolumePercentage;
-        AmbiencePercentage = mainController.AmbienceVolumePercentage;
-        StatusBar = mainController.PlayerStatusBar;
-        VolumeAmbienceLabel = mainController.VolumeAmbienceLabel;
-        VolumeEntrainmentLabel = mainController.VolumeEntrainmentLabel;
-        VolumeTopLabel = mainController.VolumeTopLabel;
-        Session = mainController.getSession();
+    public PlayerWidget(MainController root) {
+        Root = root;
+        onOffSwitch = root.SessionPlayerOnOffSwitch;
+        PlayButton = root.PlayButton;
+        PauseButton = root.PauseButton;
+        StopButton = root.StopButton;
+        CutPlayingText = root.CutProgressTopLabel;
+        SessionPlayingText = root.TotalSessionLabel;
+        CutCurrentTime = root.CutProgressLabelCurrent;
+        CutTotalTime = root.CutProgressLabelTotal;
+        SessionCurrentTime = root.TotalProgressLabelCurrent;
+        SessionTotalTime = root.TotalProgressLabelTotal;
+        CutProgress = root.CutProgressBar;
+        TotalProgress = root.TotalProgressBar;
+        ReferenceFileCheckbox = root.ReferenceFilesOption;
+        EntrainmentVolume = root.EntrainmentVolume;
+        AmbienceVolume = root.AmbienceVolume;
+        EntrainmentPercentage = root.EntrainmentVolumePercentage;
+        AmbiencePercentage = root.AmbienceVolumePercentage;
+        StatusBar = root.PlayerStatusBar;
+        VolumeAmbienceLabel = root.VolumeAmbienceLabel;
+        VolumeEntrainmentLabel = root.VolumeEntrainmentLabel;
+        VolumeTopLabel = root.VolumeTopLabel;
+        Session = root.getSession();
         EntrainmentVolume.setOnMouseClicked(event -> {
             try {
                 Double value = EntrainmentVolume.getValue() * 100;
@@ -125,13 +127,13 @@ public class PlayerWidget implements Widget {
     public void disable() {
         PlayerState playerState = Session.getPlayerState();
         if (playerState == PlayerState.PLAYING) {
-            if (! Tools.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
+            if (! Tools.getanswerdialog(Root, "Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
                 onOffSwitch.setSelected(true);
                 onOffSwitch.setText("ON");
                 return;
             }
         } else if (playerState == PlayerState.PAUSED) {
-            if (! Tools.getanswerdialog("Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
+            if (! Tools.getanswerdialog(Root, "Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
                 onOffSwitch.setSelected(true);
                 onOffSwitch.setText("ON");
                 return;

@@ -59,6 +59,11 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefHeight="41.0" prefWidth="537.0">
                      <children>
+                        <CheckBox fx:id="AlertFileCheckbox" mnemonicParsing="false" text="Disabled">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </CheckBox>
                         <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="73.0" text="Alert File:" />
                         <TextField fx:id="AlertFileTextField" prefHeight="26.0" prefWidth="212.0" text="Please Select...">
                            <HBox.margin>
@@ -103,7 +108,7 @@
                         <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="200.0">
                            <children>
                               <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="80.0" text="Fade In:" />
-                              <TextField fx:id="FadeInValue" prefWidth="40.0">
+                              <TextField fx:id="FadeInValue" prefWidth="50.0">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" />
                                  </HBox.margin>
@@ -118,7 +123,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="EntrainmentVolumePercentage" prefHeight="26.0" prefWidth="39.0">
+                              <TextField fx:id="EntrainmentVolumePercentage" prefHeight="26.0" prefWidth="50.0">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" />
                                  </HBox.margin>
@@ -133,7 +138,7 @@
                         <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="200.0">
                            <children>
                               <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="80.0" text="Fade Out:" />
-                              <TextField fx:id="FadeOutValue" prefWidth="40.0">
+                              <TextField fx:id="FadeOutValue" prefWidth="50.0">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" />
                                  </HBox.margin>
@@ -144,7 +149,7 @@
                         <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="152.0">
                            <children>
                               <Label alignment="CENTER_RIGHT" prefHeight="34.0" prefWidth="80.0" text="Ambience" textAlignment="RIGHT" wrapText="true" />
-                              <TextField fx:id="AmbienceVolumePercentage" prefWidth="40.0">
+                              <TextField fx:id="AmbienceVolumePercentage" prefWidth="50.0">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" />
                                  </HBox.margin>

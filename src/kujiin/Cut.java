@@ -447,7 +447,7 @@ public class Cut {
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists
-        if (Tools.getanswerdialog("Confirmation", "An Error Occured While Playing " + name +
+        if (Tools.getanswerdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
                 "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
                 entrainmentplayer.stop();
@@ -458,7 +458,7 @@ public class Cut {
     public void ambienceerror() {
         System.out.println("Ambience Error!");
         // Pause Entrainment
-        if (Tools.getanswerdialog("Confirmation", "An Error Occured While Playing " + name +
+        if (Tools.getanswerdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
                         "'s Ambience. Problem File Is: '" + getCurrentAmbiencePlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             ambienceplayer.stop();

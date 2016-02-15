@@ -59,13 +59,13 @@ public class ProgressAndGoalsWidget implements Widget {
         NewGoalButton = root.newgoalButton;
         CurrentGoalsButton = root.viewcurrrentgoalsButton;
         PracticedHours = root.GoalPracticedHours;
-        PracticedHours.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        PracticedHours.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         PracticedMinutes = root.GoalPracticedMinutes;
-        PracticedMinutes.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        PracticedMinutes.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         GoalHours = root.GoalSetHours;
-        GoalHours.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        GoalHours.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         GoalMinutes = root.GoalSetMinutes;
-        GoalMinutes.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        GoalMinutes.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         GoalProgress = root.goalsprogressbar;
         CutSelectorComboBox = root.GoalCutComboBox;
         TopLabel = root.GoalTopLabel;
@@ -75,7 +75,7 @@ public class ProgressAndGoalsWidget implements Widget {
         AverageSessionDuration = root.AverageSessionDuration;
         PreAndPostOption = root.PrePostSwitch;
         SessionListButton = root.ListOfSessionsButton;
-        Sessions = new Sessions();
+        Sessions = new Sessions(Root);
         Goals = new Goals();
         Service<Void> getsessions = new Service<Void>() {
             @Override
@@ -93,9 +93,9 @@ public class ProgressAndGoalsWidget implements Widget {
         getsessions.setOnFailed(event -> updateprogressui());
         getsessions.setOnSucceeded(event -> updateprogressui());
         getsessions.start();
-        TotalTimePracticed.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        NumberOfSessionsPracticed.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        AverageSessionDuration.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        TotalTimePracticed.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        NumberOfSessionsPracticed.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        AverageSessionDuration.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         ObservableList<String> cutnames = FXCollections.observableArrayList(GOALCUTNAMES);
         CutSelectorComboBox.setItems(cutnames);
         CutSelectorComboBox.setOnAction(this::cutselectionchanged);
@@ -145,27 +145,27 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     public void displaydetailedcutprogress() {
         if (Sessions.getSession() != null) {new DisplayCutTotalsDialog(Root, Sessions.getSession());}
-        else {Tools.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");}
+        else {Tools.showinformationdialog(Root, "Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");}
     }
     public void displaysessionlist() {
         if (Sessions.getSession() == null || Sessions.getSession().size() == 0) {
-            Tools.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");
+            Tools.showinformationdialog(Root, "Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");
         } else {new DisplaySessionListDialog(null, Sessions.getSession()).showAndWait();}
     }
     public void setnewgoal() {
-        if (cutindex == -1) {Tools.showinformationdialog("Information","No Cut Selected", "Select A Cut To Add A Goal To"); return;}
+        if (cutindex == -1) {Tools.showinformationdialog(Root, "Information","No Cut Selected", "Select A Cut To Add A Goal To"); return;}
         SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(cutindex, Root);
         setANewGoalDialog.showAndWait();
         if (setANewGoalDialog.isAccepted()) {
             try {
                 Goals.add(cutindex, new Goals.Goal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
-            catch (JAXBException ignored) {Tools.showerrordialog("Error", "Couldn't Add Goal", "Check File Permissions");}
+            catch (JAXBException ignored) {Tools.showerrordialog(Root, "Error", "Couldn't Add Goal", "Check File Permissions");}
         }
         updategoalsui();
     }
     public void opengoaleditor() {
-        if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Edit Its Goals"); return;}
-        if (! Goals.goalsexist(cutindex, true)) {Tools.showinformationdialog("Information", "No Goals Exist For " + GOALCUTNAMES[cutindex], "Please Add A Goal For " + GOALCUTNAMES[cutindex]); return;}
+        if (cutindex == -1) {Tools.showinformationdialog(Root, "Information", "No Cut Selected", "Please Select A Cut To Edit Its Goals"); return;}
+        if (! Goals.goalsexist(cutindex, true)) {Tools.showinformationdialog(Root, "Information", "No Goals Exist For " + GOALCUTNAMES[cutindex], "Please Add A Goal For " + GOALCUTNAMES[cutindex]); return;}
         new EditGoalsDialog(Root).showAndWait();
     }
 //    public void goalpacing() {
@@ -528,7 +528,7 @@ public class ProgressAndGoalsWidget implements Widget {
         public void changecutselection(ActionEvent actionEvent) {
             if (getCutindex() != null) {
                 if (goalschanged()) {
-                    if (Tools.getanswerdialog("Confirmation", "You Have Made Unsaved Changes To " + GOALCUTNAMES[getCutindex()], "Save These Changes Before Changing Cuts?")) {
+                    if (Tools.getanswerdialog(Root, "Confirmation", "You Have Made Unsaved Changes To " + GOALCUTNAMES[getCutindex()], "Save These Changes Before Changing Cuts?")) {
                         savechanges();
                     }
                 }
@@ -586,7 +586,7 @@ public class ProgressAndGoalsWidget implements Widget {
             populatetable();}
         public void removegoal(ActionEvent actionEvent) {
             if (SelectedGoal == null) {return;}
-            if (! SelectedGoal.getCompleted() && Tools.getanswerdialog("Confirmation", "Remove This Goal?", "This Cannot Be Undone")) {
+            if (! SelectedGoal.getCompleted() && Tools.getanswerdialog(Root, "Confirmation", "Remove This Goal?", "This Cannot Be Undone")) {
                 CurrentGoalList.remove(CurrentGoalTable.getSelectionModel().getSelectedIndex());
                 ProgressAndGoals.getGoal().update(CurrentGoalList, ProgressAndGoals.getCutindex());
             }
@@ -605,7 +605,7 @@ public class ProgressAndGoalsWidget implements Widget {
         @Override
         public void close() {
             if (getCutindex() != null && getCutindex() != -1) {
-                if (Tools.getanswerdialog("Confirmation", "Unsaved Changes To " + GOALCUTNAMES[getCutindex()], "Save Changes Before Exiting?")) {
+                if (Tools.getanswerdialog(Root, "Confirmation", "Unsaved Changes To " + GOALCUTNAMES[getCutindex()], "Save Changes Before Exiting?")) {
                     savechanges();
                 }
                 ProgressAndGoals.selectcut(getCutindex());
@@ -662,14 +662,14 @@ public class ProgressAndGoalsWidget implements Widget {
             SelectedGoalHours.setText(getCurrentGoal().getGoal_Hours() + " Hours");
         }
         public void calculate(ActionEvent actionEvent) {
-            if (getCurrentGoal() == null) {Tools.showerrordialog("Error", "No Goal Selected", "Please Select A Goal"); return;}
-            if (DaysSpinner.getValue() == 0) {Tools.showerrordialog("Error", "Cannot Calculate", "Days Cannot Be 0"); return;}
+            if (getCurrentGoal() == null) {Tools.showerrordialog(Root, "Error", "No Goal Selected", "Please Select A Goal"); return;}
+            if (DaysSpinner.getValue() == 0) {Tools.showerrordialog(Root, "Error", "Cannot Calculate", "Days Cannot Be 0"); return;}
             Double goalhours = getCurrentGoal().getGoal_Hours();
             Double days = (double) DaysSpinner.getValue();
             Float hourstopractice = goalhours.floatValue() / days.floatValue();
             int minsaday = Tools.convertdecimalhourstominutes(hourstopractice.doubleValue());
             String formattedgoalhours = Tools.minstoformattedlonghoursandminutes(Tools.convertdecimalhourstominutes(goalhours));
-            Tools.showinformationdialog("Calculation", "To Reach " + formattedgoalhours + " In " + days.intValue() + " Days:",
+            Tools.showinformationdialog(Root, "Calculation", "To Reach " + formattedgoalhours + " In " + days.intValue() + " Days:",
                     "Practice For " + Tools.minstoformattedlonghoursandminutes(minsaday) + " A Day");
         }
         public void closedialog(ActionEvent actionEvent) {close();}
@@ -723,7 +723,7 @@ public class ProgressAndGoalsWidget implements Widget {
         public void closeDialog(ActionEvent actionEvent) {close();}
         public void selectgoal(ActionEvent actionEvent) {
             int index = currentgoaltable.getSelectionModel().getSelectedIndex();
-            if (index == -1) {Tools.showinformationdialog("Information", "No Goal Selected", "Select A Goal"); return;}
+            if (index == -1) {Tools.showinformationdialog(Root, "Information", "No Goal Selected", "Select A Goal"); return;}
             setSelectedgoal(currentGoalList.get(index));
             close();
         }
@@ -788,7 +788,7 @@ public class ProgressAndGoalsWidget implements Widget {
         public void cancelgoalsetting(Event event) {this.close();}
         public void Accept(Event event) {
             if (GoalMinutesSpinner.getValue() > 59) {
-                Tools.showinformationdialog("Information", "Minutes Cannot Be Greater Than 59", "Select A Value Less Than 59"); return;}
+                Tools.showinformationdialog(Root, "Information", "Minutes Cannot Be Greater Than 59", "Select A Value Less Than 59"); return;}
             boolean dategood = GoalDatePicker.getValue().isAfter(LocalDate.now());
             if (dategood) {
                 int hours = GoalHoursSpinner.getValue();
@@ -798,7 +798,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 setGoaldate(GoalDatePicker.getValue());
                 super.close();
             } else {
-                Tools.showinformationdialog("Cannot Set Goal", "Cannot Set Goal", "Due Date Must Be After Today");
+                Tools.showinformationdialog(Root, "Cannot Set Goal", "Cannot Set Goal", "Due Date Must Be After Today");
                 setGoalhours(null);
                 setGoaldate(null);
             }

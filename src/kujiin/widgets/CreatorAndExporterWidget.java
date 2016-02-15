@@ -127,19 +127,19 @@ public class CreatorAndExporterWidget implements Widget {
         creatorState = CreatorState.NOT_CREATED;
         setuptextfields();
         textfieldtimes.addAll(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0));
-        PreLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        RinLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        KyoLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        TohLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        ShaLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        KaiLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        JinLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        RetsuLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        ZaiLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        ZenLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        PostLabel.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        TotalSessionTime.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        ApproximateEndTime.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
+        PreLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        RinLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        KyoLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        TohLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        ShaLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        KaiLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        JinLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        RetsuLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        ZaiLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        ZenLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        PostLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        TotalSessionTime.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        ApproximateEndTime.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         exportservices = new ArrayList<>();
         updatecreatorui();
     }
@@ -163,7 +163,7 @@ public class CreatorAndExporterWidget implements Widget {
         if (session.getPlayerState() == PlayerWidget.PlayerState.PLAYING ||
             session.getPlayerState() == PlayerWidget.PlayerState.PAUSED ||
             session.getPlayerState() == PlayerWidget.PlayerState.TRANSITIONING) {
-            if (Tools.getanswerdialog("Stop Session", "In Order To Edit Session Values The Session Player Must Be Stopped And Reset", "Stop And Reset Session Player?")) {
+            if (Tools.getanswerdialog(Root, "Stop Session", "In Order To Edit Session Values The Session Player Must Be Stopped And Reset", "Stop And Reset Session Player?")) {
                 if (! session.stop().equals("Session Stopped")) {return;}
             } else {return;}
         }
@@ -189,11 +189,11 @@ public class CreatorAndExporterWidget implements Widget {
         }
     }
     public boolean creationchecks() {
-        if (! gettextfieldtimes()) {Tools.showerrordialog("Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be > 0", "Cannot Continue"); return false;}
+        if (! gettextfieldtimes()) {Tools.showerrordialog(Root, "Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be > 0", "Cannot Continue"); return false;}
         if (! session.checksessionwellformedness(textfieldtimes)) {return false;}
         ArrayList<String> notgoodcuts = session.Root.getProgressTracker().precreationgoalchecks(textfieldtimes);
         if (! notgoodcuts.isEmpty()) {
-            if (Tools.getanswerdialog("Confirmation", "Goals Aren't Long Enough For " + notgoodcuts.toArray().toString(), "Continue Creating Session Without Sufficient Goals?")) {
+            if (Tools.getanswerdialog(Root, "Confirmation", "Goals Aren't Long Enough For " + notgoodcuts.toArray().toString(), "Continue Creating Session Without Sufficient Goals?")) {
                 return true;
             }
         }
@@ -225,7 +225,7 @@ public class CreatorAndExporterWidget implements Widget {
                     } else {
                         // TODO Continue Fixing Logic Here
                         if (session.getExportfile().exists()) {
-                            if (!Tools.getanswerdialog("Confirmation", "Overwrite Saved Exported Session?", "Saved Session: " + session.getExportfile().getAbsolutePath())) {
+                            if (!Tools.getanswerdialog(Root, "Confirmation", "Overwrite Saved Exported Session?", "Saved Session: " + session.getExportfile().getAbsolutePath())) {
                                 session.getnewexportsavefile();
                             }
                         } else {session.getnewexportsavefile();}
@@ -242,18 +242,18 @@ public class CreatorAndExporterWidget implements Widget {
                     setExporterState(ExporterState.WORKING);
                     exportnextservice();
                 } else {
-                    Tools.showerrordialog("Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
+                    Tools.showerrordialog(Root, "Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
                     // TODO Open A Browser Showing How To Install FFMPEG
                 }
             } else if (getExporterState() == ExporterState.WORKING) {
                 Tools.showtimedmessage(StatusBar, "Session Currently Being Exported", 3000);
             } else {
-                if (Tools.getanswerdialog("Confirmation", "Session Already Exported", "Export Again?")) {
+                if (Tools.getanswerdialog(Root, "Confirmation", "Session Already Exported", "Export Again?")) {
                     setExporterState(ExporterState.NOT_EXPORTED);
                     startexport();
                 }
             }
-        } else {Tools.showinformationdialog("Information", "Cannot Export", "No Cuts Selected");}
+        } else {Tools.showinformationdialog(Root, "Information", "Cannot Export", "No Cuts Selected");}
     }
     private void exportnextservice() {
 //        System.out.println("Starting Next Export Service");
@@ -295,17 +295,17 @@ public class CreatorAndExporterWidget implements Widget {
     return good;
 }
     public void setuptextfields() {
-        Tools.integerTextField(PreTime);
-        Tools.integerTextField(RinTime);
-        Tools.integerTextField(KyoTime);
-        Tools.integerTextField(TohTime);
-        Tools.integerTextField(ShaTime);
-        Tools.integerTextField(KaiTime);
-        Tools.integerTextField(JinTime);
-        Tools.integerTextField(RetsuTime);
-        Tools.integerTextField(ZaiTime);
-        Tools.integerTextField(ZenTime);
-        Tools.integerTextField(PostTime);
+        Tools.integerTextField(PreTime, true);
+        Tools.integerTextField(RinTime, true);
+        Tools.integerTextField(KyoTime, true);
+        Tools.integerTextField(TohTime, true);
+        Tools.integerTextField(ShaTime, true);
+        Tools.integerTextField(KaiTime, true);
+        Tools.integerTextField(JinTime, true);
+        Tools.integerTextField(RetsuTime, true);
+        Tools.integerTextField(ZaiTime, true);
+        Tools.integerTextField(ZenTime, true);
+        Tools.integerTextField(PostTime, true);
         PreTime.textProperty().addListener((observable, oldValue, newValue) -> {
             try {PresessionValue.set(Integer.valueOf(newValue)); textfieldtimes.set(0, PresessionValue.get()); updatecreatorui();}
             catch (NumberFormatException ignored) {PreTime.setText("0"); PresessionValue.set(0); textfieldtimes.set(0, 0); updatecreatorui();}
@@ -399,7 +399,7 @@ public class CreatorAndExporterWidget implements Widget {
             if (gettextfieldtimes()) {
                 session.checkambience(textfieldtimes, AmbienceSwitch);
             } else {
-                Tools.showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
+                Tools.showinformationdialog(Root, "Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
                 AmbienceSwitch.setSelected(false);
             }
         } else {
@@ -440,7 +440,7 @@ public class CreatorAndExporterWidget implements Widget {
             ZenTime.setText(presetvalues.get(9).toString());
             PostTime.setText(presetvalues.get(10).toString());
         } catch (ArrayIndexOutOfBoundsException ignored) {
-            Tools.showerrordialog("Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
+            Tools.showerrordialog(Root, "Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
         }
     }
     public ArrayList<Integer> getcreatorvalues() {
@@ -551,7 +551,7 @@ public class CreatorAndExporterWidget implements Widget {
     public boolean cleanup() {
         boolean currentlyexporting = getExporterState() == ExporterState.WORKING;
         if (currentlyexporting) {
-            Tools.showinformationdialog("Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
+            Tools.showinformationdialog(Root, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
         } else {This_Session.deleteprevioussession();}
         return ! currentlyexporting;
     }
@@ -560,13 +560,13 @@ public class CreatorAndExporterWidget implements Widget {
     public void loadpreset() {
         if (Preset.openpreset() && Preset.validpreset()) {
             changevaluestopreset(Preset.getpresettimes());
-        } else {Tools.showinformationdialog("Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
+        } else {Tools.showinformationdialog(Root, "Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
     }
     public void savepreset() {
         Preset.setpresettimes(getcreatorvalues());
-        if (! Preset.validpreset()) {Tools.showinformationdialog("Information", "Cannot Save Preset", "All Values Are 0"); return;}
+        if (! Preset.validpreset()) {Tools.showinformationdialog(Root, "Information", "Cannot Save Preset", "All Values Are 0"); return;}
         if (Preset.savepreset()) {Tools.showtimedmessage(StatusBar, "Preset Successfully Saved", 4000);}
-        else {Tools.showerrordialog("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
+        else {Tools.showerrordialog(Root, "Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
     }
 
 // Subclasses/Dialogs
@@ -594,7 +594,7 @@ public class CreatorAndExporterWidget implements Widget {
 
         @Override
         public void initialize(URL url, ResourceBundle resourceBundle) {
-            Tools.integerTextField(changeAllValuesMinutesTextField);
+            Tools.integerTextField(changeAllValuesMinutesTextField, true);
         }
     // Getters And Setters
         public Boolean getAccepted() {
@@ -722,7 +722,7 @@ public class CreatorAndExporterWidget implements Widget {
         }
 
         public void createSessionwithoutmissingcuts(Event event) {
-            if (Tools.getanswerdialog("Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
+            if (Tools.getanswerdialog(Root, "Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
                 setCreatesession(true);
                 this.close();
             }
@@ -763,7 +763,7 @@ public class CreatorAndExporterWidget implements Widget {
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
-            Tools.integerTextField(cutinvocationminutesTextField);
+            Tools.integerTextField(cutinvocationminutesTextField, true);
         }
 
         public int getCutinvocationduration() {
@@ -786,12 +786,12 @@ public class CreatorAndExporterWidget implements Widget {
                     setCutinvocationduration(value);
                     this.close();
                 } else {
-                    if (Tools.getanswerdialog("Confirmation", "Cut Invocation Value Is 0", "Continue With Zero Value (These Cuts Won't Be Included)" )) {
+                    if (Tools.getanswerdialog(Root, "Confirmation", "Cut Invocation Value Is 0", "Continue With Zero Value (These Cuts Won't Be Included)" )) {
                         setCutinvocationduration(0);
                         this.close();
                     }
                 }
-            } catch (NumberFormatException e) {Tools.showerrordialog("Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
+            } catch (NumberFormatException e) {Tools.showerrordialog(Root, "Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
         }
     }
 

@@ -1,5 +1,6 @@
 package kujiin.xml;
 
+import kujiin.MainController;
 import kujiin.Tools;
 import kujiin.lib.BeanComparator;
 
@@ -30,10 +31,14 @@ public class Goals {
     private List<Goal> ZenGoals;
     private List<Goal> PostsessionGoals;
     private List<Goal> TotalGoals;
+    private MainController Root;
 
     // TODO Unify Completed And Current Goals With The IsCompleted() Boolean
 
     public Goals() {}
+    public Goals(MainController root) {
+        Root = root;
+    }
 
 // Getters And Setters
     public List<Goal> getPresessionGoals() {
@@ -126,7 +131,7 @@ public class Goals {
                 setPostsessionGoals(currentGoals.getPostsessionGoals());
                 setTotalGoals(currentGoals.getTotalGoals());
             } catch (JAXBException e) {
-                Tools.showinformationdialog("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+                Tools.showinformationdialog(Root, "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -137,7 +142,7 @@ public class Goals {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.GOALSXMLFILE);
         } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+            Tools.showinformationdialog(Root, "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
         }
     }
     public void add(int cutindex, Goal newgoal) throws JAXBException {

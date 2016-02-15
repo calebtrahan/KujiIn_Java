@@ -125,7 +125,7 @@ public class Preset {
     }
     public boolean savepreset() {
         File presetfile = Tools.savefilechooser(Root.getScene(), "Save Preset As", null);
-        if (presetfile != null && Tools.fileextensioncorrect("xml", presetfile).getName().endsWith(".xml")) {
+        if (presetfile != null && Tools.fileextensioncorrect(Root, "xml", presetfile).getName().endsWith(".xml")) {
             try {
                 marshall(null);
                 return true;

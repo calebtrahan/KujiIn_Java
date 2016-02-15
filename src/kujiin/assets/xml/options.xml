@@ -8,6 +8,7 @@
         <tooltips>true</tooltips>
     </programOptions>
     <sessionOptions>
+        <alertfunction>false</alertfunction>
         <ambiencevolume>1.0</ambiencevolume>
         <entrainmentvolume>0.6</entrainmentvolume>
         <fadeinduration>10.0</fadeinduration>
