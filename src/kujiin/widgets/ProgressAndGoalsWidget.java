@@ -347,8 +347,12 @@ public class ProgressAndGoalsWidget implements Widget {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplaySessionList.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("New Goal");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Session List");
             DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
             RinColumn.setCellValueFactory(cellData -> cellData.getValue().rin.asObject());
             KyoColumn.setCellValueFactory(cellData -> cellData.getValue().kyo.asObject());
@@ -434,8 +438,12 @@ public class ProgressAndGoalsWidget implements Widget {
             this.allsessions = allsessions;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCutTotalsDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Current Goals");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Cut Totals");
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
             ProgressColumn.setCellValueFactory(cellData -> cellData.getValue().formattedduration);
@@ -492,8 +500,12 @@ public class ProgressAndGoalsWidget implements Widget {
             ProgressAndGoals = Root.getProgressTracker();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayGoals.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Current Goals");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Edit Goals");
             CutSelectorComboBox.setItems(FXCollections.observableArrayList(GOALCUTNAMES));
             populatetable();
         }
@@ -619,8 +631,12 @@ public class ProgressAndGoalsWidget implements Widget {
             this.alreadypracticedhours = alreadypracticedhours;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalPacingDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Goal Pacing");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Goal Pacing");
             SelectedGoalHours.setText(currentGoal.getGoal_Hours() + " Hours");
         }
 
@@ -676,8 +692,12 @@ public class ProgressAndGoalsWidget implements Widget {
             this.currentGoalList = currentGoalList;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SelectGoalDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select A Goal");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Select Goal");
             ObservableList<CurrentGoalBinding> currentGoals = FXCollections.observableArrayList();
 //            currentGoals.addAll(currentGoalList.stream().map(i -> new CurrentGoalBinding(currentGoalList.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Set(), i.getpercentagecompleted(currentpracticedhours))).collect(Collectors.toList()));
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().goalid.asObject());
@@ -726,8 +746,12 @@ public class ProgressAndGoalsWidget implements Widget {
             progressAndGoalsWidget = Root.getProgressTracker();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetNewGoalDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("New Goal");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Set A New Goal");
             GoalHoursSpinner.setEditable(true);
             GoalMinutesSpinner.setEditable(true);
             GoalDatePicker.setValue(LocalDate.now());
@@ -791,8 +815,12 @@ public class ProgressAndGoalsWidget implements Widget {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalCompleted.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Goal Achieved");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Goal Completed");
             GoalHours.setText(currentGoal.getGoal_Hours().toString());
             CurrentHoursLabel.setText(currentpracticedhours.toString());
             CloseButton.setOnAction(event -> close());

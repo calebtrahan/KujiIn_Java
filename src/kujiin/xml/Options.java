@@ -1,6 +1,7 @@
 package kujiin.xml;
 
 import javafx.application.Platform;
+import javafx.scene.Scene;
 import kujiin.Tools;
 
 import javax.xml.bind.JAXBContext;
@@ -48,7 +49,7 @@ public class Options {
     private static final Double FADEINDURATION = 10.0; // Fade In Duration (Textfield -> In Decimal Seconds)
     private static final Double FADEOUTDURATION = 10.0; // Fade Out Duration (Textfield -> In Decimal Seconds)
     private static final String ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
-    private static final String THEMEFILELOCATION = new File(DIRECTORYSTYLES, "dark.css").getAbsolutePath();
+    private static final String THEMEFILELOCATION = new File(DIRECTORYSTYLES, "dark.css").toURI().toString();
     private static final Boolean RAMPENABLED = true;
     private static final Integer RAMPDURATION = 3;
     private ProgramOptions ProgramOptions;
@@ -124,6 +125,11 @@ public class Options {
         appearanceOptions.setThemefile(THEMEFILELOCATION);
         setAppearanceOptions(appearanceOptions);
         marshall();
+    }
+    public void setStyle(Scene scene) {
+        scene.getStylesheets().clear();
+        String themefile = getAppearanceOptions().getThemefile();
+        if (themefile != null) {scene.getStylesheets().add(themefile);}
     }
 
 // Subclasses

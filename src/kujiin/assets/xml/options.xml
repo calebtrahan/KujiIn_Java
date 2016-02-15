@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Options>
     <appearanceOptions>
-        <themefile>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/styles/dark.css</themefile>
+        <themefile>file:/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/styles/dark.css</themefile>
     </appearanceOptions>
     <programOptions>
         <helpdialogs>true</helpdialogs>

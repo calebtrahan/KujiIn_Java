@@ -102,6 +102,7 @@ public class MainController implements Initializable {
     public TextField GoalSetMinutes;
     public Label GoalStatusBar;
     public TextField GoalPracticedHours;
+    public Scene Scene;
     private This_Session Session;
     private CreatorAndExporterWidget CreatorAndExporter;
     private PlayerWidget Player;
@@ -160,6 +161,12 @@ public class MainController implements Initializable {
     }
     public void setOptions(Options options) {
         Options = options;
+    }
+    public javafx.scene.Scene getScene() {
+        return Scene;
+    }
+    public void setScene(javafx.scene.Scene scene) {
+        Scene = scene;
     }
 
 // Top Menu Actions
@@ -250,12 +257,16 @@ public class MainController implements Initializable {
         private String selectedvariation;
         private MainController Root;
 
-    public EditReferenceFiles(MainController root) {
-        Root = root;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/EditReferenceFiles.fxml"));
+        public EditReferenceFiles(MainController root) {
+            Root = root;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/EditReferenceFiles.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select An Ambience Type Variation");}
-            catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage());}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Reference Files Editor");
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
             cutnames = FXCollections.observableArrayList();
             variations = FXCollections.observableArrayList();
@@ -392,8 +403,12 @@ public class MainController implements Initializable {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Ambience Editor");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Session Ambience Editor");
             CutSelectionBox.setOnAction(event -> selectandloadcut());
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
@@ -401,8 +416,12 @@ public class MainController implements Initializable {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Ambience Editor");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Session Ambience Editor");
             CutSelectionBox.setOnAction(event -> selectandloadcut());
             CutSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
@@ -671,8 +690,12 @@ public class MainController implements Initializable {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ExceptionDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Error Occured");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Program Error Occured");
             TopText.setText(exceptionname + " Occured");
             StackTraceTextField.setText(stacktrace);
         }
@@ -722,14 +745,11 @@ public class MainController implements Initializable {
             fxmlLoader.setController(this);
             Options = Root.getOptions();
             try {
-                Scene scene = new Scene(fxmlLoader.load());
-                setScene(scene);
-                this.setTitle("Options");
-                if (Options.getAppearanceOptions().getThemefile() != null) {
-                    scene.getRoot().setStyle(Options.getAppearanceOptions().getThemefile());
-                }
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
             } catch (IOException e) {e.printStackTrace();}
-
+            setTitle("Change Program Options");
             Tools.integerTextField(FadeInValue);
             Tools.integerTextField(FadeOutValue);
             Tools.integerTextField(EntrainmentVolumePercentage);

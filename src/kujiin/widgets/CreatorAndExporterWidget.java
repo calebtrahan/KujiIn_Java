@@ -585,11 +585,15 @@ public class CreatorAndExporterWidget implements Widget {
         public ChangeAllValuesDialog(MainController root) {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ChangeAllValuesDialog.fxml"));
-                fxmlLoader.setController(this);
-                try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Change All Values To:");}
-                catch (IOException e) {e.printStackTrace();}
-                setAccepted(false);
-            }
+            fxmlLoader.setController(this);
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Change All Values To: ");
+            setAccepted(false);
+        }
 
         @Override
         public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -627,8 +631,12 @@ public class CreatorAndExporterWidget implements Widget {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ExportingSessionDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Exporting Session");
         }
 
         public void unbindproperties() {
@@ -655,8 +663,12 @@ public class CreatorAndExporterWidget implements Widget {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionNotWellformedDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Session Not Well Formed");
             this.textfieldvalues = textfieldvalues;
             this.lastcutindex = lastcutindex;
             sessionmissingcutsLabel.setText(cutsmissingtext);
@@ -744,8 +756,12 @@ public class CreatorAndExporterWidget implements Widget {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CutInvocationDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Cut Invocation");
         }
 
         @Override

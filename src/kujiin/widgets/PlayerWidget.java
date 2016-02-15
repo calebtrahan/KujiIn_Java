@@ -236,8 +236,12 @@ public class PlayerWidget implements Widget {
             this.fullscreenoption = fullscreenoption;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle(currentcut.name + "'s Reference");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle(currentcut.name + "'s Reference");
             setsizing();
             loadcontent();
         }
@@ -302,8 +306,12 @@ public class PlayerWidget implements Widget {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceTypeDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Reference Type Variation");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Reference Type Select");
             if (referenceType != null) {
                 if (referenceType == ReferenceType.txt) {TextOption.setSelected(true);}
                 else if (referenceType == ReferenceType.html) {HTMLOption.setSelected(true);}
@@ -352,8 +360,12 @@ public class PlayerWidget implements Widget {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionFinishedDialog.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Completed");}
-            catch (IOException e) {e.printStackTrace();}
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {e.printStackTrace();}
+            setTitle("Session Completed");
         }
 
     }

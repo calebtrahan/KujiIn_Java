@@ -2,7 +2,6 @@ package kujiin;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -13,10 +12,14 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/Main.fxml"));
-        Parent root = fxmlLoader.load();
+        Scene defaultscene = new Scene(fxmlLoader.load());
         Root = fxmlLoader.getController();
         primaryStage.setTitle("Kuji-In");
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setScene(defaultscene);
+        primaryStage.setOnShowing(event -> {
+            Root.setScene(defaultscene);
+            Root.getOptions().setStyle(Root.getScene());
+        });
         primaryStage.show();
     }
 
@@ -31,4 +34,5 @@ public class Main extends Application {
             System.exit(0);
         }
     }
+
 }
