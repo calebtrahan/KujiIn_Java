@@ -17,7 +17,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.widgets.CreatorAndExporterWidget;
@@ -491,8 +490,7 @@ public class MainController implements Initializable {
 
     // New Ambience Methods
         public void addfilestonewambience(ActionEvent actionEvent) {
-            FileChooser a = new FileChooser();
-            List<File> files = a.showOpenMultipleDialog(this);
+            List<File> files = Tools.multipleopenfilechooser(getScene(), "Add Files", null);
             ArrayList<File> notvalidfilenames = new ArrayList<>();
             if (files != null) {
                 for (File i : files) {
@@ -832,7 +830,7 @@ public class MainController implements Initializable {
             valuechanged = true;
         }
         public void openandtestnewfile(ActionEvent actionEvent) {
-            File newfile = new FileChooser().showOpenDialog(this);
+            File newfile = Tools.singleopenfilechooser(getScene(), "Select A New Alert File", null);
             if (newfile != null) {
                 if (Tools.validaudiofile(newfile)) {
                     double duration = Tools.getaudioduration(newfile);

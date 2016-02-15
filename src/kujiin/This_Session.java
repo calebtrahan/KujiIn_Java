@@ -12,7 +12,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
-import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
@@ -368,9 +367,7 @@ public class This_Session {
 //        return false;
     }
     public void getnewexportsavefile() {
-        FileChooser exportchooser = new FileChooser();
-        exportchooser.setTitle("Export Session");
-        File tempfile = exportchooser.showSaveDialog(null);
+        File tempfile = Tools.savefilechooser(Root.getScene(), "Save Export File As", null);
         if (tempfile != null && Tools.validaudiofile(tempfile)) {
             setExportfile(tempfile);
         } else {

@@ -2,6 +2,7 @@ package kujiin;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -236,15 +237,29 @@ public class Tools {
             return true;
         } catch (IOException ignored) {return false;}
     }
-    public static File getopenfile(String dialogtitle) {
+    public static File singleopenfilechooser(Scene scene, String dialogtitle, File initialdirectory) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(dialogtitle);
-        return fileChooser.showOpenDialog(null);
+        if (initialdirectory == null) {
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        } else {fileChooser.setInitialDirectory(initialdirectory);}
+        return fileChooser.showOpenDialog(scene.getWindow());
     }
-    public static File getsavefile(String dialogtitle) {
+    public static List<File> multipleopenfilechooser(Scene scene, String dialogtitle, File initialdirectory) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(dialogtitle);
-        return fileChooser.showSaveDialog(null);
+        if (initialdirectory == null) {
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        } else {fileChooser.setInitialDirectory(initialdirectory);}
+        return fileChooser.showOpenMultipleDialog(scene.getWindow());
+    }
+    public static File savefilechooser(Scene scene, String dialogtitle, File initialdirectory) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(dialogtitle);
+        if (initialdirectory == null) {
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        } else {fileChooser.setInitialDirectory(initialdirectory);}
+        return fileChooser.showSaveDialog(scene.getWindow());
     }
     public static File fileextensioncorrect(String expectedextension, File filetocheck) {
         if (! filetocheck.getName().contains(".")) {
