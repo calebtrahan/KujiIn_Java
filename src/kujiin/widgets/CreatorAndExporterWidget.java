@@ -8,7 +8,6 @@ import javafx.concurrent.Service;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
@@ -85,43 +84,45 @@ public class CreatorAndExporterWidget implements Widget {
     private Integer exportserviceindex;
     private ExportingSessionDialog exportingSessionDialog;
     private Preset Preset;
+    private MainController Root;
 
-    public CreatorAndExporterWidget(MainController mainController) {
-        LoadPresetButton = mainController.LoadPresetButton;
-        SavePresetButton = mainController.SavePresetButton;
-        ChangeAllValuesButton = mainController.ChangeValuesButton;
-        CreateButton = mainController.CreateButton;
-        ExportButton = mainController.ExportButton;
-        AmbienceSwitch = mainController.AmbienceSwitch;
-        TotalSessionTime = mainController.TotalSessionTime;
-        ApproximateEndTime = mainController.ApproximateEndTime;
+    public CreatorAndExporterWidget(MainController root) {
+        Root = root;
+        LoadPresetButton = root.LoadPresetButton;
+        SavePresetButton = root.SavePresetButton;
+        ChangeAllValuesButton = root.ChangeValuesButton;
+        CreateButton = root.CreateButton;
+        ExportButton = root.ExportButton;
+        AmbienceSwitch = root.AmbienceSwitch;
+        TotalSessionTime = root.TotalSessionTime;
+        ApproximateEndTime = root.ApproximateEndTime;
         Preset = new Preset();
-        PreLabel = mainController.PreLabel;
-        PreTime = mainController.PreTime;
-        RinLabel = mainController.RinLabel;
-        RinTime = mainController.RinTime;
-        KyoLabel = mainController.KyoLabel;
-        KyoTime = mainController.KyoTime;
-        TohLabel = mainController.TohLabel;
-        TohTime = mainController.TohTime;
-        ShaLabel = mainController.ShaLabel;
-        ShaTime = mainController.ShaTime;
-        KaiLabel = mainController.KaiLabel;
-        KaiTime = mainController.KaiTime;
-        JinLabel = mainController.JinLabel;
-        JinTime = mainController.JinTime;
-        RetsuLabel = mainController.RetsuLabel;
-        RetsuTime = mainController.RetsuTime;
-        ZaiLabel = mainController.ZaiLabel;
-        ZaiTime = mainController.ZaiTime;
-        ZenLabel = mainController.ZenLabel;
-        ZenTime = mainController.ZenTime;
-        PostLabel = mainController.PostLabel;
-        PostTime = mainController.PostTime;
-        LengthLabel = mainController.LengthLabel;
-        CompletionLabel = mainController.CompletionLabel;
-        session = mainController.getSession();
-        StatusBar = mainController.CreatorStatusBar;
+        PreLabel = root.PreLabel;
+        PreTime = root.PreTime;
+        RinLabel = root.RinLabel;
+        RinTime = root.RinTime;
+        KyoLabel = root.KyoLabel;
+        KyoTime = root.KyoTime;
+        TohLabel = root.TohLabel;
+        TohTime = root.TohTime;
+        ShaLabel = root.ShaLabel;
+        ShaTime = root.ShaTime;
+        KaiLabel = root.KaiLabel;
+        KaiTime = root.KaiTime;
+        JinLabel = root.JinLabel;
+        JinTime = root.JinTime;
+        RetsuLabel = root.RetsuLabel;
+        RetsuTime = root.RetsuTime;
+        ZaiLabel = root.ZaiLabel;
+        ZaiTime = root.ZaiTime;
+        ZenLabel = root.ZenLabel;
+        ZenTime = root.ZenTime;
+        PostLabel = root.PostLabel;
+        PostTime = root.PostTime;
+        LengthLabel = root.LengthLabel;
+        CompletionLabel = root.CompletionLabel;
+        session = root.getSession();
+        StatusBar = root.CreatorStatusBar;
         exporterState = ExporterState.NOT_EXPORTED;
         creatorState = CreatorState.NOT_CREATED;
         setuptextfields();
@@ -236,7 +237,7 @@ public class CreatorAndExporterWidget implements Widget {
                         exportservices.add(i.getcutexportservice());
                     }
                     exportservices.add(session.getsessionexporter());
-                    exportingSessionDialog = new ExportingSessionDialog(session);
+                    exportingSessionDialog = new ExportingSessionDialog(Root);
                     exportingSessionDialog.show();
                     setExporterState(ExporterState.WORKING);
                     exportnextservice();
@@ -410,7 +411,7 @@ public class CreatorAndExporterWidget implements Widget {
         }
     }
     public void changeallvalues() {
-        ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog();
+        ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(Root);
         changevaluesdialog.showAndWait();
         if (changevaluesdialog.getAccepted()) {
             Integer min = changevaluesdialog.getminutes();
@@ -579,14 +580,16 @@ public class CreatorAndExporterWidget implements Widget {
         public CheckBox PresessionCheckbox;
         public CheckBox PostsessionCheckBox;
         private Boolean accepted;
+        private MainController Root;
 
-        public ChangeAllValuesDialog() {
+        public ChangeAllValuesDialog(MainController root) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ChangeAllValuesDialog.fxml"));
-            fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Change All Values To:");}
-            catch (IOException e) {e.printStackTrace();}
-            setAccepted(false);
-        }
+                fxmlLoader.setController(this);
+                try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Change All Values To:");}
+                catch (IOException e) {e.printStackTrace();}
+                setAccepted(false);
+            }
 
         @Override
         public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -618,8 +621,10 @@ public class CreatorAndExporterWidget implements Widget {
         public ProgressBar CurrentProgress;
         public Label TotalLabel;
         public Label CurrentLabel;
+        private MainController Root;
 
-        public ExportingSessionDialog(This_Session thisSession) {
+        public ExportingSessionDialog(MainController root) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ExportingSessionDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
@@ -644,8 +649,10 @@ public class CreatorAndExporterWidget implements Widget {
         private int lastcutindex;
         private int invocationduration;
         private boolean createsession;
+        private MainController Root;
 
-        public SessionNotWellformedDialog(Parent parent, ArrayList<Integer> textfieldvalues, String cutsmissingtext, int lastcutindex) {
+        public SessionNotWellformedDialog(MainController root, ArrayList<Integer> textfieldvalues, String cutsmissingtext, int lastcutindex) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionNotWellformedDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}
@@ -655,7 +662,7 @@ public class CreatorAndExporterWidget implements Widget {
             sessionmissingcutsLabel.setText(cutsmissingtext);
             populatelistview();
             explanationLabel.setText(("Your Practiced Cuts Do Not Connect! Due To The Nature Of The Kuji-In I Recommend " +
-                    "Connecting All Cuts From RIN All The Way To Your Last Cut (") + Options.allnames.get(lastcutindex) +
+                    "Connecting All Cuts From RIN All The Way To Your Last Cut (") + Options.ALLNAMES.get(lastcutindex) +
                     ") Or Your This_Session Might Not Have The Energy It Needs");
             setCreatesession(false);
         }
@@ -666,7 +673,7 @@ public class CreatorAndExporterWidget implements Widget {
             int count = 0;
             boolean thisitemmissing;
             for (int i = 0; i < textfieldvalues.size(); i++) {
-                String name = Options.allnames.get(i);
+                String name = Options.ALLNAMES.get(i);
                 String minutes;
                 if (i <= lastcutindex || i == textfieldvalues.size() - 1) {
                     thisitemmissing = false;
@@ -698,7 +705,7 @@ public class CreatorAndExporterWidget implements Widget {
         public void returntoCreator(Event event) {this.close();}
 
         public void addmissingcutstoSession(Event event) {
-            CutInvocationDialog cutdurationdialog = new CutInvocationDialog(null);
+            CutInvocationDialog cutdurationdialog = new CutInvocationDialog(Root);
             cutdurationdialog.showAndWait();
             setInvocationduration(cutdurationdialog.getCutinvocationduration());
             setCreatesession(true);
@@ -731,8 +738,10 @@ public class CreatorAndExporterWidget implements Widget {
         public Button OKButton;
         public TextField cutinvocationminutesTextField;
         private int cutinvocationduration;
+        private MainController Root;
 
-        CutInvocationDialog(Parent parent) {
+        public CutInvocationDialog(MainController root) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CutInvocationDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Creating This_Session");}

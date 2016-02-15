@@ -9,7 +9,6 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -53,27 +52,29 @@ public class ProgressAndGoalsWidget implements Widget {
     private ProgressBar GoalProgress;
     private Label TopLabel;
     private Label StatusBar;
+    private MainController Root;
 
-    public ProgressAndGoalsWidget(MainController mainController) {
-        NewGoalButton = mainController.newgoalButton;
-        CurrentGoalsButton = mainController.viewcurrrentgoalsButton;
-        PracticedHours = mainController.GoalPracticedHours;
+    public ProgressAndGoalsWidget(MainController root) {
+        Root = root;
+        NewGoalButton = root.newgoalButton;
+        CurrentGoalsButton = root.viewcurrrentgoalsButton;
+        PracticedHours = root.GoalPracticedHours;
         PracticedHours.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        PracticedMinutes = mainController.GoalPracticedMinutes;
+        PracticedMinutes = root.GoalPracticedMinutes;
         PracticedMinutes.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        GoalHours = mainController.GoalSetHours;
+        GoalHours = root.GoalSetHours;
         GoalHours.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        GoalMinutes = mainController.GoalSetMinutes;
+        GoalMinutes = root.GoalSetMinutes;
         GoalMinutes.setOnKeyTyped(MainController.NONEDITABLETEXTFIELD);
-        GoalProgress = mainController.goalsprogressbar;
-        CutSelectorComboBox = mainController.GoalCutComboBox;
-        TopLabel = mainController.GoalTopLabel;
-        StatusBar = mainController.GoalStatusBar;
-        TotalTimePracticed = mainController.TotalTimePracticed;
-        NumberOfSessionsPracticed = mainController.NumberOfSessionsPracticed;
-        AverageSessionDuration = mainController.AverageSessionDuration;
-        PreAndPostOption = mainController.PrePostSwitch;
-        SessionListButton = mainController.ListOfSessionsButton;
+        GoalProgress = root.goalsprogressbar;
+        CutSelectorComboBox = root.GoalCutComboBox;
+        TopLabel = root.GoalTopLabel;
+        StatusBar = root.GoalStatusBar;
+        TotalTimePracticed = root.TotalTimePracticed;
+        NumberOfSessionsPracticed = root.NumberOfSessionsPracticed;
+        AverageSessionDuration = root.AverageSessionDuration;
+        PreAndPostOption = root.PrePostSwitch;
+        SessionListButton = root.ListOfSessionsButton;
         Sessions = new Sessions();
         Goals = new Goals();
         Service<Void> getsessions = new Service<Void>() {
@@ -143,7 +144,7 @@ public class ProgressAndGoalsWidget implements Widget {
         } catch (NullPointerException ignored) {resetallvalues();}
     }
     public void displaydetailedcutprogress() {
-        if (Sessions.getSession() != null) {new DisplayCutTotalsDialog(Sessions.getSession());}
+        if (Sessions.getSession() != null) {new DisplayCutTotalsDialog(Root, Sessions.getSession());}
         else {Tools.showinformationdialog("Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");}
     }
     public void displaysessionlist() {
@@ -153,7 +154,7 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     public void setnewgoal() {
         if (cutindex == -1) {Tools.showinformationdialog("Information","No Cut Selected", "Select A Cut To Add A Goal To"); return;}
-        SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(cutindex, this);
+        SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(cutindex, Root);
         setANewGoalDialog.showAndWait();
         if (setANewGoalDialog.isAccepted()) {
             try {
@@ -165,7 +166,7 @@ public class ProgressAndGoalsWidget implements Widget {
     public void opengoaleditor() {
         if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Edit Its Goals"); return;}
         if (! Goals.goalsexist(cutindex, true)) {Tools.showinformationdialog("Information", "No Goals Exist For " + GOALCUTNAMES[cutindex], "Please Add A Goal For " + GOALCUTNAMES[cutindex]); return;}
-        new EditGoalsDialog(this).showAndWait();
+        new EditGoalsDialog(Root).showAndWait();
     }
 //    public void goalpacing() {
 //        if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Calculate Goal Pacing"); return;}
@@ -298,7 +299,10 @@ public class ProgressAndGoalsWidget implements Widget {
 //            else if (cutname.equals(GOALCUTNAMES[0])) {TopLabel.setText("Pre + Post Goal");}
 //            else {TopLabel.setText(cutname + "'s Current Goal");}
         } catch (NullPointerException ignored) {
-            TopLabel.setText(GOALCUTNAMES[cutindex]);
+            if (cutindex != -1) {
+                TopLabel.setText(GOALCUTNAMES[cutindex]);
+                Tools.showtimedmessage(StatusBar, "No Current Goal Set For " + GOALCUTNAMES[cutindex], 4000);
+            }
 //            if (cutindex != 11) {
 //                TopLabel.setText(GOALCUTNAMES[cutindex] + "'s Current Goal");
 //            } else {
@@ -312,7 +316,6 @@ public class ProgressAndGoalsWidget implements Widget {
             GoalMinutes.setText("?");
             GoalHours.setText("?");
             GoalProgress.setProgress(0.0);
-            Tools.showtimedmessage(StatusBar, "No Current Goal Set For " + GOALCUTNAMES[cutindex], 4000);
         } catch (ArrayIndexOutOfBoundsException ignored) {resetallvalues();}
     }
     public List<kujiin.xml.Goals.Goal> getcurrentgoallist(boolean includecompleted) {
@@ -337,9 +340,11 @@ public class ProgressAndGoalsWidget implements Widget {
         public TableColumn<SessionRow, Integer> TotalColumn;
         public Button CloseButton;
         private ObservableList<SessionRow> sessionlist = FXCollections.observableArrayList();
+        private MainController Root;
 
 
-        public DisplaySessionListDialog(Parent parent, List<Session> sessionlist) {
+        public DisplaySessionListDialog(MainController root, List<Session> sessionlist) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplaySessionList.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("New Goal");}
@@ -421,9 +426,11 @@ public class ProgressAndGoalsWidget implements Widget {
         public TableColumn<TotalProgressRow, String> NameColumn;
         public TableColumn<TotalProgressRow, String> ProgressColumn;
         public TableColumn<TotalProgressRow, Integer> NumberColumn;
+        private MainController Root;
         private List<Session> allsessions;
 
-        public DisplayCutTotalsDialog(List<Session> allsessions) {
+        public DisplayCutTotalsDialog(MainController root, List<Session> allsessions) {
+            Root = root;
             this.allsessions = allsessions;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayCutTotalsDialog.fxml"));
             fxmlLoader.setController(this);
@@ -443,7 +450,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 String duration;
                 if (durationinmins > 0) {duration = Tools.minutestoformattedhoursandmins(durationinmins);}
                 else {duration = "-";}
-                allrows.add(new TotalProgressRow(i, Options.allnames.get(i), duration));
+                allrows.add(new TotalProgressRow(i, Options.ALLNAMES.get(i), duration));
             }
             progresstable.getItems().addAll(allrows);
         }
@@ -474,13 +481,15 @@ public class ProgressAndGoalsWidget implements Widget {
         public Button AddGoalButton;
         public Button RemoveGoalButton;
         public ChoiceBox<String> CutSelectorComboBox;
+        private MainController Root;
         private ProgressAndGoalsWidget ProgressAndGoals;
         private List<kujiin.xml.Goals.Goal> CurrentGoalList;
         private kujiin.xml.Goals.Goal SelectedGoal;
         private Integer cutindex;
 
-        public EditGoalsDialog(ProgressAndGoalsWidget progressandgoals) {
-            ProgressAndGoals = progressandgoals;
+        public EditGoalsDialog(MainController root) {
+            Root = root;
+            ProgressAndGoals = Root.getProgressTracker();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayGoals.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Current Goals");}
@@ -598,11 +607,13 @@ public class ProgressAndGoalsWidget implements Widget {
         public Spinner<Integer> DaysSpinner;
         public Button CalculateButton;
         public Button CloseButton;
+        private MainController Root;
         private kujiin.xml.Goals.Goal currentGoal;
         private List<kujiin.xml.Goals.Goal> currentGoals;
         private double alreadypracticedhours;
 
-        public GoalPacingDialog(kujiin.xml.Goals.Goal currentGoal, List<kujiin.xml.Goals.Goal> currentGoals, double alreadypracticedhours) {
+        public GoalPacingDialog(MainController root, kujiin.xml.Goals.Goal currentGoal, List<kujiin.xml.Goals.Goal> currentGoals, double alreadypracticedhours) {
+            Root = root;
             this.currentGoal = currentGoal;
             this.currentGoals = currentGoals;
             this.alreadypracticedhours = alreadypracticedhours;
@@ -628,7 +639,7 @@ public class ProgressAndGoalsWidget implements Widget {
 
         // Button Actions
         public void selectanewgoal(ActionEvent actionEvent) {
-            SelectGoalDialog selectGoalDialog = new SelectGoalDialog(currentGoals, alreadypracticedhours);
+            SelectGoalDialog selectGoalDialog = new SelectGoalDialog(Root, currentGoals, alreadypracticedhours);
             selectGoalDialog.showAndWait();
             setCurrentGoal(selectGoalDialog.getSelectedgoal());
             if (getCurrentGoal() == null) {return;}
@@ -657,9 +668,11 @@ public class ProgressAndGoalsWidget implements Widget {
         public Button SelectButton;
         public Button CancelButton;
         public kujiin.xml.Goals.Goal selectedgoal;
+        private MainController Root;
         private List<kujiin.xml.Goals.Goal> currentGoalList;
 
-        public SelectGoalDialog(List<kujiin.xml.Goals.Goal> currentGoalList, double currentpracticedhours) {
+        public SelectGoalDialog(MainController root, List<kujiin.xml.Goals.Goal> currentGoalList, double currentpracticedhours) {
+            Root = root;
             this.currentGoalList = currentGoalList;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SelectGoalDialog.fxml"));
             fxmlLoader.setController(this);
@@ -706,9 +719,11 @@ public class ProgressAndGoalsWidget implements Widget {
         public Label TopLabel;
         private LocalDate goaldate;
         private Double goalhours;
+        private MainController Root;
 
-        public SetANewGoalDialog(int cutindex, ProgressAndGoalsWidget progressAndGoalsWidget) {
-            this.progressAndGoalsWidget = progressAndGoalsWidget;
+        public SetANewGoalDialog(int cutindex, MainController root) {
+            Root = root;
+            progressAndGoalsWidget = Root.getProgressTracker();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetNewGoalDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("New Goal");}
@@ -770,8 +785,10 @@ public class ProgressAndGoalsWidget implements Widget {
         public Label GoalHours;
         public Button CloseButton;
         public Label CurrentHoursLabel;
+        private MainController Root;
 
-        public GoalCompleted(kujiin.xml.Goals.Goal currentGoal, Double currentpracticedhours) {
+        public GoalCompleted(MainController root, kujiin.xml.Goals.Goal currentGoal, Double currentpracticedhours) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalCompleted.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Goal Achieved");}

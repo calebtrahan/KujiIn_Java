@@ -264,7 +264,7 @@ public class Tools {
 
 // Audio Utils
     public static boolean testAlertFile() {
-        return Options.alertfile.exists() && Tools.getaudioduration(Options.alertfile) != 0.0;
+        return Options.ALERTFILE.exists() && Tools.getaudioduration(Options.ALERTFILE) != 0.0;
     }
     public static double getaudioduration(File audiofile) {
         try {
@@ -375,7 +375,7 @@ public class Tools {
             temptextfile.delete();
             return exitcode == 0;
         } catch (IOException | InterruptedException e) {
-            new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());
+            new MainController.ExceptionDialog(null, e.getClass().getName(), e.getMessage());
             return false;
         }
     }
@@ -405,14 +405,14 @@ public class Tools {
             System.out.println("Finished Mixing Audio. Exited With Code" + exitcode);
             return exitcode == 0;
         } catch (IOException | InterruptedException e) {
-            new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());
+            new MainController.ExceptionDialog(null, e.getClass().getName(), e.getMessage());
             return false;
         }
     }
     public static boolean trimaudiofile(File filetotrim, Integer lengthinseconds) {
         try {
             // ffmpeg -i input.mp3 -ss 00:02:54.583 -t 300 -acodec copy output.mp3
-            File tempfile = new File(Options.directorytemp, "Export/temptrim.mp3");
+            File tempfile = new File(Options.DIRECTORYTEMP, "Export/temptrim.mp3");
             FileUtils.moveFile(filetotrim, tempfile);
             ArrayList<String> cmdarraylist = new ArrayList<>();
             cmdarraylist.add("ffmpeg");
@@ -431,7 +431,7 @@ public class Tools {
             tempfile.delete();
             return exitcode == 0;
         } catch (IOException | InterruptedException e) {
-            new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());
+            new MainController.ExceptionDialog(null, e.getClass().getName(), e.getMessage());
             return false;
         }
     }

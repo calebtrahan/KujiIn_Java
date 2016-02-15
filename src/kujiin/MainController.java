@@ -164,11 +164,11 @@ public class MainController implements Initializable {
 
 // Top Menu Actions
     public void editprogramsambience(ActionEvent actionEvent) {
-        SessionAmbienceEditor sae = new SessionAmbienceEditor();
+        SessionAmbienceEditor sae = new SessionAmbienceEditor(this);
         sae.showAndWait();
     }
     public void editreferencefiles(ActionEvent actionEvent) {
-        EditReferenceFiles a = new EditReferenceFiles();
+        EditReferenceFiles a = new EditReferenceFiles(this);
         a.showAndWait();
     }
     public void howtouseprogram(ActionEvent actionEvent) {Tools.howtouseprogram();}
@@ -216,15 +216,15 @@ public class MainController implements Initializable {
         Player.statusSwitch();
     }
     public void playsession(Event event) {
-        Player.play(ProgressTracker.getSessions());}
+        Player.play();}
     public void pausesession(Event event) {
         Player.pause();}
     public void stopsession(Event event) {
-        Player.stop(ProgressTracker.getSessions());}
+        Player.stop();}
     public void setReferenceOption(ActionEvent actionEvent) {
         Player.displayreferencefile();}
     public void changesessionoptions(ActionEvent actionEvent) {
-        new ChangeProgramOptions(Options).showAndWait();
+        new ChangeProgramOptions(this).showAndWait();
         Options.marshall();
         getProgressTracker().updategoalsui();
         getProgressTracker().updateprogressui();
@@ -232,7 +232,6 @@ public class MainController implements Initializable {
 
 // Dialogs
     public static class EditReferenceFiles extends Stage {
-
         public ChoiceBox<String> CutNamesChoiceBox;
         public ChoiceBox<String> CutVariationsChoiceBox;
         public TextArea MainTextArea;
@@ -244,21 +243,23 @@ public class MainController implements Initializable {
         public Button PreviewButton;
         private ObservableList<String> cutnames;
         private ObservableList<String> variations;
-        private File htmldirectory = new File(kujiin.xml.Options.directoryreference, "html");
-        private File txtdirectory = new File(kujiin.xml.Options.directoryreference, "txt");
+        private File htmldirectory = new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html");
+        private File txtdirectory = new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt");
         private File selectedfile;
         private String selectedcut;
         private String selectedvariation;
+        private MainController Root;
 
-        public EditReferenceFiles() {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/EditReferenceFiles.fxml"));
+    public EditReferenceFiles(MainController root) {
+        Root = root;
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/EditReferenceFiles.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Select An Ambience Type Variation");}
-            catch (IOException e) {new MainController.ExceptionDialog(e.getClass().getName(), e.getMessage());}
+            catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage());}
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
             cutnames = FXCollections.observableArrayList();
             variations = FXCollections.observableArrayList();
-            cutnames.addAll(kujiin.xml.Options.allnames);
+            cutnames.addAll(kujiin.xml.Options.ALLNAMES);
             variations.addAll(Arrays.asList("html", "txt"));
             CutNamesChoiceBox.setItems(cutnames);
             CutVariationsChoiceBox.setItems(variations);
@@ -329,7 +330,7 @@ public class MainController implements Initializable {
         public void preview(ActionEvent actionEvent) {
             if (MainTextArea.getText().length() > 0 && selectedvariation != null) {
                 if (selectedvariation.equals("html")) {
-                    PlayerWidget.DisplayReference dr = new PlayerWidget.DisplayReference(MainTextArea.getText());
+                    PlayerWidget.DisplayReference dr = new PlayerWidget.DisplayReference(Root, MainTextArea.getText());
                     dr.showAndWait();
                 } else {
                     Tools.showinformationdialog("Information", "Preview Is For Html Content Not Available For Text Only", "Cannot Open Preview");
@@ -369,6 +370,7 @@ public class MainController implements Initializable {
         private AmbienceSong selected_new_ambiencesong;
         private AmbienceSong selected_current_ambiencesong;
         private File tempdirectory;
+        private MainController Root;
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
@@ -381,27 +383,29 @@ public class MainController implements Initializable {
             CurrentAmbienceTable.getSelectionModel().selectedItemProperty().addListener(
                     (observable, oldValue, newValue) -> currentselectionchanged(newValue));
             ObservableList<String> allnames = FXCollections.observableArrayList();
-            allnames.addAll(kujiin.xml.Options.allnames);
+            allnames.addAll(kujiin.xml.Options.ALLNAMES);
             CutSelectionBox.setItems(allnames);
             this.setOnCloseRequest(event -> close());
         }
 
-        public SessionAmbienceEditor() {
+        public SessionAmbienceEditor(MainController root) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Ambience Editor");}
             catch (IOException e) {e.printStackTrace();}
             CutSelectionBox.setOnAction(event -> selectandloadcut());
-            tempdirectory = new File(kujiin.xml.Options.directorytemp, "AmbienceEditor");
+            tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
-        public SessionAmbienceEditor(String cutname) {
+        public SessionAmbienceEditor(MainController root, String cutname) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Ambience Editor");}
             catch (IOException e) {e.printStackTrace();}
             CutSelectionBox.setOnAction(event -> selectandloadcut());
-            CutSelectionBox.getSelectionModel().select(kujiin.xml.Options.allnames.indexOf(cutname));
-            tempdirectory = new File(kujiin.xml.Options.directorytemp, "AmbienceEditor");
+            CutSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
+            tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
 
     // Transfer Methods
@@ -414,7 +418,7 @@ public class MainController implements Initializable {
                         return new Task<Void>() {
                             @Override
                             protected Void call() throws Exception {
-                                File cutdirectory = new File(kujiin.xml.Options.directoryambience, selectedcutname);
+                                File cutdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutname);
                                 File newfile = new File(cutdirectory, selected_new_ambiencesong.name.getValue());
                                 FileUtils.copyFile(selected_new_ambiencesong.getFile(), newfile);
                                 return null;
@@ -521,8 +525,8 @@ public class MainController implements Initializable {
             }
             current_songlist.clear();
             CurrentAmbienceTable.getItems().clear();
-            int index = kujiin.xml.Options.allnames.indexOf(CutSelectionBox.getValue());
-            selectedcutname = kujiin.xml.Options.allnames.get(index);
+            int index = kujiin.xml.Options.ALLNAMES.indexOf(CutSelectionBox.getValue());
+            selectedcutname = kujiin.xml.Options.ALLNAMES.get(index);
             if (getcurrentambiencefiles()) {
                 CurrentAmbienceTable.getItems().addAll(current_songlist);
                 CutSelectionLabel.setText(selectedcutname + "'s Ambience");
@@ -559,7 +563,7 @@ public class MainController implements Initializable {
         public void currentselectionchanged(AmbienceSong ambiencesong) {selected_current_ambiencesong = ambiencesong;}
         public boolean getcurrentambiencefiles() {
             if (selectedcutname != null) {
-                File thisdirectory = new File(kujiin.xml.Options.directoryambience, selectedcutname);
+                File thisdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutname);
                 try {
                     for (File i : thisdirectory.listFiles()) {
                         if (Tools.validaudiofile(i)) {current_songlist.add(new AmbienceSong(i.getName(), i));}
@@ -661,8 +665,10 @@ public class MainController implements Initializable {
         public Button ContinueButton;
         public CheckBox NotifyMeCheckbox;
         public Label TopText;
+        private MainController Root;
 
-        public ExceptionDialog(String exceptionname, String stacktrace) {
+        public ExceptionDialog(MainController root, String exceptionname, String stacktrace) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ExceptionDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Error Occured");}
@@ -695,7 +701,7 @@ public class MainController implements Initializable {
         public TextField FadeOutValue;
         public TextField EntrainmentVolumePercentage;
         public TextField AmbienceVolumePercentage;
-        public ChoiceBox ProgramThemeChoiceBox;
+        public ChoiceBox<String> ProgramThemeChoiceBox;
         public Button ApplyButton;
         public Button AcceptButton;
         public Button CancelButton;
@@ -708,17 +714,35 @@ public class MainController implements Initializable {
         private File AlertFile;
         private boolean valuechanged;
         private ObservableList<String> rampselections = FXCollections.observableArrayList(kujiin.xml.Options.RAMPDURATIONS);
+        private MainController Root;
 
-        public ChangeProgramOptions(Options sessionoptions) {
+        public ChangeProgramOptions(MainController root) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Options");}
-            catch (IOException e) {e.printStackTrace();}
-            Options = sessionoptions;
+            Options = Root.getOptions();
+            try {
+                Scene scene = new Scene(fxmlLoader.load());
+                setScene(scene);
+                this.setTitle("Options");
+                if (Options.getAppearanceOptions().getThemefile() != null) {
+                    scene.getRoot().setStyle(Options.getAppearanceOptions().getThemefile());
+                }
+            } catch (IOException e) {e.printStackTrace();}
+
             Tools.integerTextField(FadeInValue);
             Tools.integerTextField(FadeOutValue);
             Tools.integerTextField(EntrainmentVolumePercentage);
             Tools.integerTextField(AmbienceVolumePercentage);
+            kujiin.xml.Options.STYLETHEMES.clear();
+            try {
+                for (File i : kujiin.xml.Options.DIRECTORYSTYLES.listFiles()) {
+                    if (i.getName().endsWith(".css")) {kujiin.xml.Options.STYLETHEMES.add(i.getName().substring(0, i.getName().length() - 4));}
+                }
+                if (kujiin.xml.Options.STYLETHEMES.size() != 0) {
+                    ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(kujiin.xml.Options.STYLETHEMES));
+                }
+            } catch (NullPointerException e) {ProgramThemeChoiceBox.getItems().clear(); ProgramThemeChoiceBox.setDisable(true);}
             TooltipsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             HelpDialogsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeInValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
@@ -797,14 +821,14 @@ public class MainController implements Initializable {
                                 String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
                                         "Really Use It?", duration))) {return;}
                     }
-                    if (! newfile.getAbsolutePath().equals(kujiin.xml.Options.alertfile.getAbsolutePath()) &&
+                    if (! newfile.getAbsolutePath().equals(kujiin.xml.Options.ALERTFILE.getAbsolutePath()) &&
                             Tools.getanswerdialog("Validation", "Alert File Isn't In Program Directory", "Copy To Program Directory?")) {
-                        if (kujiin.xml.Options.alertfile.exists()) {
+                        if (kujiin.xml.Options.ALERTFILE.exists()) {
                             if (!Tools.getanswerdialog("Overwrite", "Old Alert File Already Exists", "Overwrite?")) {return;}
                         }
                         try {
-                            kujiin.xml.Options.alertfile.delete();
-                            FileUtils.copyFile(newfile, kujiin.xml.Options.alertfile);
+                            kujiin.xml.Options.ALERTFILE.delete();
+                            FileUtils.copyFile(newfile, kujiin.xml.Options.ALERTFILE);
                         } catch (IOException e) {Tools.showerrordialog("Error", "Couldn't Copy File", "Check Program Directory Permissions");}
                     } else {
                         AlertFileTextField.setText(String.format("%s (%s)", newfile.getName(), Tools.formatlengthshort((int) duration)));
@@ -822,14 +846,14 @@ public class MainController implements Initializable {
         }
         public void deleteallsessions(ActionEvent actionEvent) {
             if (Tools.getanswerdialog("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
-                if (! kujiin.xml.Options.sessionsxmlfile.delete()) {
+                if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
                     Tools.showerrordialog("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
                 } else {Tools.showinformationdialog("Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }
         }
         public void deleteallgoals(ActionEvent actionEvent) {
             if (Tools.getanswerdialog("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
-                if (! kujiin.xml.Options.sessionsxmlfile.delete()) {
+                if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
                     Tools.showerrordialog("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
                 } else {Tools.showinformationdialog("Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }

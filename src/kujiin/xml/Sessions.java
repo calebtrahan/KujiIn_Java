@@ -28,14 +28,14 @@ public class Sessions {
 
 // XML Processing
     public void unmarshall() {
-        if (Options.sessionsxmlfile.exists()) {
+        if (Options.SESSIONSXMLFILE.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Sessions.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
-                Sessions noises1 = (Sessions) createMarshaller.unmarshal(Options.sessionsxmlfile);
+                Sessions noises1 = (Sessions) createMarshaller.unmarshal(Options.SESSIONSXMLFILE);
                 setSession(noises1.getSession());
             } catch (JAXBException e) {
-                Tools.showinformationdialog("Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.sessionsxmlfile.getAbsolutePath());
+                Tools.showinformationdialog("Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -44,7 +44,7 @@ public class Sessions {
             JAXBContext context = JAXBContext.newInstance(Sessions.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, Options.sessionsxmlfile);
+            createMarshaller.marshal(this, Options.SESSIONSXMLFILE);
         } catch (JAXBException e) {}
     }
     public void createnewsession() {
@@ -54,7 +54,7 @@ public class Sessions {
             Tools.showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
     public void addsession(Session session) throws JAXBException {
-        if (Options.sessionsxmlfile.exists()) {unmarshall();}
+        if (Options.SESSIONSXMLFILE.exists()) {unmarshall();}
         List<Session> sessionsList = getSession();
         if (sessionsList != null && sessionsList.size() > 0) {
             sortsessions();
@@ -70,7 +70,7 @@ public class Sessions {
         JAXBContext context = JAXBContext.newInstance(Sessions.class);
         Marshaller createMarshaller = context.createMarshaller();
         createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        createMarshaller.marshal(this, Options.sessionsxmlfile);
+        createMarshaller.marshal(this, Options.SESSIONSXMLFILE);
     }
     public void deletenonvalidsessions() {
         try {

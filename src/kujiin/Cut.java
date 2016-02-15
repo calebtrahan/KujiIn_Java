@@ -62,14 +62,14 @@ public class Cut {
         this.name = name;
         this.duration = duration;
         this.thisession = thisession;
-        ambiencedirectory = new File(Options.directoryambience, name);
-        tempentrainmenttextfile = new File(Options.directorytemp, "txt/" + name + "Ent.txt");
-        tempentrainmentfile = new File(Options.directorytemp, "Entrainment/" + name + "Temp.mp3");
-        finalentrainmentfile = new File(Options.directorytemp, "Entrainment/" + name + ".mp3");
-        tempambiencetextfile = new File(Options.directorytemp, "txt/" + name + "Amb.txt");
-        tempambiencefile = new File(Options.directorytemp, "Ambience/" + name + "Temp.mp3");
-        finalambiencefile = new File(Options.directorytemp, "Ambience/" + name + ".mp3");
-        setFinalcutexportfile(new File(Options.directorytemp, name + ".mp3"));
+        ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
+        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
+        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
+        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
+        tempambiencetextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Amb.txt");
+        tempambiencefile = new File(Options.DIRECTORYTEMP, "Ambience/" + name + "Temp.mp3");
+        finalambiencefile = new File(Options.DIRECTORYTEMP, "Ambience/" + name + ".mp3");
+        setFinalcutexportfile(new File(Options.DIRECTORYTEMP, name + ".mp3"));
     }
 
 // Getters And Setters
@@ -87,10 +87,10 @@ public class Cut {
     public File getReferenceFile(PlayerWidget.ReferenceType referenceType) {
         if (referenceType == PlayerWidget.ReferenceType.html) {
             String name = this.name + ".html";
-            return new File(Options.directoryreference, "html/" + name);
+            return new File(Options.DIRECTORYREFERENCE, "html/" + name);
         } else if (referenceType == PlayerWidget.ReferenceType.txt) {
             String name = this.name + ".txt";
-            return new File(Options.directoryreference, "txt/" + name);
+            return new File(Options.DIRECTORYREFERENCE, "txt/" + name);
         } else {
             return null;
         }
@@ -150,12 +150,12 @@ public class Cut {
         else {return buildEntrainment();}
     }
     public boolean buildEntrainment() {
-        File rampin1 = new File(Options.directorytohramp, "3in1.mp3");
-        File rampin2 = new File(Options.directorytohramp, "3in2.mp3");
-        File rampout1 = new File(Options.directorytohramp, "3out1.mp3");
-        File rampout2 = new File(Options.directorytohramp, "3out2.mp3");
-        File rampoutspecial1 = new File(Options.directorytohramp, "3outpostsession1.mp3");
-        File rampoutspecial2 = new File(Options.directorytohramp, "3outpostsession2.mp3");
+        File rampin1 = new File(Options.DIRECTORYTOHRAMP, "3in1.mp3");
+        File rampin2 = new File(Options.DIRECTORYTOHRAMP, "3in2.mp3");
+        File rampout1 = new File(Options.DIRECTORYTOHRAMP, "3out1.mp3");
+        File rampout2 = new File(Options.DIRECTORYTOHRAMP, "3out2.mp3");
+        File rampoutspecial1 = new File(Options.DIRECTORYTOHRAMP, "3outpostsession1.mp3");
+        File rampoutspecial2 = new File(Options.DIRECTORYTOHRAMP, "3outpostsession2.mp3");
         entrainmentlist = new ArrayList<>();
         entrainmentmedia = new ArrayList<>();
         int fivetimes = 0;
@@ -173,12 +173,12 @@ public class Cut {
         }
         for (int i = 0; i < fivetimes; i++) {
             String filename = name + "5.mp3";
-            File thisfile = new File(Options.directorymaincuts, filename);
+            File thisfile = new File(Options.DIRECTORYMAINCUTS, filename);
             entrainmentlist.add(thisfile);
         }
         for (int i = 0; i < singletimes; i++) {
             String filename = name + "1.mp3";
-            File thisfile = new File(Options.directorymaincuts, filename);
+            File thisfile = new File(Options.DIRECTORYMAINCUTS, filename);
             entrainmentlist.add(thisfile);
         }
         Tools.shufflelist(entrainmentlist, 5);
@@ -198,14 +198,14 @@ public class Cut {
         if (number == 0 && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
             int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
             String rampupfirstname = "ar" + cutstoplay.get(1).number + rampdur + ".mp3";
-            File ramptofirstcut = new File(Options.directoryrampup, rampupfirstname);
+            File ramptofirstcut = new File(Options.DIRECTORYRAMPUP, rampupfirstname);
             entrainmentlist.add(ramptofirstcut);
         }
         if (number == 10 && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
             int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
             String rampdowntopost =  "zr" +
                     cutstoplay.get(cutstoplay.size()-2).number + rampdur + ".mp3";
-            File thisfile = new File(Options.directoryrampdown, rampdowntopost);
+            File thisfile = new File(Options.DIRECTORYRAMPDOWN, rampdowntopost);
             entrainmentlist.add(0, thisfile);
         }
         for (File i : entrainmentlist) {
@@ -531,10 +531,10 @@ public class Cut {
     }
     public Boolean sessionreadyforFinalExport(boolean ambienceenabled) {
         boolean cutisgood;
-        File entrainmentfile = new File(Options.directorytemp, "Entrainment/" + name + ".mp3");
+        File entrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
         cutisgood = entrainmentfile.exists();
         if (ambienceenabled) {
-            File ambiencefile = new File(Options.directorytemp, "Ambience/" + name + ".mp3");
+            File ambiencefile = new File(Options.DIRECTORYTEMP, "Ambience/" + name + ".mp3");
             cutisgood = ambiencefile.exists();
         }
         return cutisgood;

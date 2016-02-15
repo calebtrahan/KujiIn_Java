@@ -167,13 +167,13 @@ public class This_Session {
                     if (cutswithnoambience.size() > 1) {
                         Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
                         if (Tools.getanswerdialog("Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
-                            MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor();
+                            MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(Root);
                             ambienceEditor.showAndWait();
                         }
                     } else {
                         Tools.showerrordialog("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
                         if (Tools.getanswerdialog("Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
-                            MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(cutswithnoambience.get(0).name);
+                            MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(Root, cutswithnoambience.get(0).name);
                             ambienceEditor.showAndWait();
                         }
                     }
@@ -186,7 +186,7 @@ public class This_Session {
                             a.append("\n");
                             Cut thiscut = cutswithreducedambience.get(i);
                             String formattedcurrentduration = Tools.minutestoformattedhoursandmins((int) thiscut.getTotalambienceduration() / 60);
-                            String formattedexpectedduration = Tools.minutestoformattedhoursandmins(textfieldvalues.get(Options.allnames.indexOf(cutswithreducedambience.get(i).name)));
+                            String formattedexpectedduration = Tools.minutestoformattedhoursandmins(textfieldvalues.get(Options.ALLNAMES.indexOf(cutswithreducedambience.get(i).name)));
                             a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }
@@ -224,13 +224,13 @@ public class This_Session {
         }
         if (indexestochange.size() > 0) {
             ArrayList<String> cutsmissinglist = new ArrayList<>();
-            for (Integer x : indexestochange) {cutsmissinglist.add(Options.allnames.get(x));}
+            for (Integer x : indexestochange) {cutsmissinglist.add(Options.ALLNAMES.get(x));}
             StringBuilder cutsmissingtext = new StringBuilder();
             for (int i = 0; i < cutsmissinglist.size(); i++) {
                 cutsmissingtext.append(cutsmissinglist.get(i));
                 if (i != cutsmissinglist.size() - 1) {cutsmissingtext.append(", ");}
             }
-            CreatorAndExporterWidget.SessionNotWellformedDialog notWellformedDialog = new CreatorAndExporterWidget.SessionNotWellformedDialog(null, textfieldtimes, cutsmissingtext.toString(), lastcutindex);
+            CreatorAndExporterWidget.SessionNotWellformedDialog notWellformedDialog = new CreatorAndExporterWidget.SessionNotWellformedDialog(Root, textfieldtimes, cutsmissingtext.toString(), lastcutindex);
             notWellformedDialog.showAndWait();
             if (notWellformedDialog.isCreatesession()) {
                 int invocationduration = notWellformedDialog.getInvocationduration();
@@ -392,7 +392,7 @@ public class This_Session {
             }
         }
         if (filestoexport.size() == 0) {return false;}
-        else {return Tools.concatenateaudiofiles(filestoexport, new File(Options.directorytemp, "Session.txt"), getExportfile());}
+        else {return Tools.concatenateaudiofiles(filestoexport, new File(Options.DIRECTORYTEMP, "Session.txt"), getExportfile());}
     }
     public boolean testexportfile() {
         try {
@@ -403,17 +403,17 @@ public class This_Session {
     }
     public static void deleteprevioussession() {
         ArrayList<File> folders = new ArrayList<>();
-        folders.add(new File(Options.directorytemp, "Ambience"));
-        folders.add(new File(Options.directorytemp, "Entrainment"));
-        folders.add(new File(Options.directorytemp, "txt"));
-        folders.add(new File(Options.directorytemp, "Export"));
+        folders.add(new File(Options.DIRECTORYTEMP, "Ambience"));
+        folders.add(new File(Options.DIRECTORYTEMP, "Entrainment"));
+        folders.add(new File(Options.DIRECTORYTEMP, "txt"));
+        folders.add(new File(Options.DIRECTORYTEMP, "Export"));
         for (File i : folders) {
             try {
                 for (File x : i.listFiles()) {x.delete();}
             } catch (NullPointerException ignored) {}
         }
         try {
-            for (File x : Options.directorytemp.listFiles()) {
+            for (File x : Options.DIRECTORYTEMP.listFiles()) {
                 if (! x.isDirectory()) {x.delete();}
             }
         } catch (NullPointerException ignored) {}
@@ -569,7 +569,7 @@ public class This_Session {
         currentcut.stop();
         if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
         else {
-            Media alertmedia = new Media(Options.alertfile.toURI().toString());
+            Media alertmedia = new Media(Options.ALERTFILE.toURI().toString());
             MediaPlayer alertplayer = new MediaPlayer(alertmedia);
             alertplayer.play();
             setPlayerState(PlayerWidget.PlayerState.TRANSITIONING);
@@ -598,7 +598,7 @@ public class This_Session {
 
 // Reference Files
     public boolean choosereferencetype() {
-        PlayerWidget.ReferenceTypeDialog reftype = new PlayerWidget.ReferenceTypeDialog(getReferenceType(), referencefullscreenoption);
+        PlayerWidget.ReferenceTypeDialog reftype = new PlayerWidget.ReferenceTypeDialog(Root, getReferenceType(), referencefullscreenoption);
         reftype.showAndWait();
         setReferenceType(reftype.getReferenceType());
         setReferencefullscreenoption(reftype.getFullscreen());
@@ -615,7 +615,7 @@ public class This_Session {
         }
     }
     public void displayreferencefile() {
-        displayReference = new PlayerWidget.DisplayReference(currentcut, getReferenceType(), referencefullscreenoption);
+        displayReference = new PlayerWidget.DisplayReference(Root, currentcut, getReferenceType(), referencefullscreenoption);
         displayReference.show();
     }
     public void closereferencefile() {

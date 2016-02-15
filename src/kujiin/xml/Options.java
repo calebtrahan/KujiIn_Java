@@ -18,26 +18,28 @@ import java.util.Arrays;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Options {
 // Directory Constants
-    public static final File projectroot = new File(System.getProperty("user.dir"));
-    public static final File rootdirectory = new File(projectroot, "src/kujiin/");
-    public static final File directoryreference = new File(rootdirectory, "assets/reference/");
-    public static final File logfile = new File(rootdirectory, "assets/sessionlog.txt");
-    public static final File xmldirectory = new File(rootdirectory, "assets/xml/");
-    public static final File optionsxmlfile = new File(xmldirectory, "options.xml");
-    public static final File goalsxmlfile = new File(xmldirectory, "goals.xml");
-    public static final File sessionsxmlfile = new File(xmldirectory, "sessions.xml");
-    public static final File sounddirectory = new File(rootdirectory, "assets/sound/");
-    public static final File alertfile = new File(sounddirectory, "Alert.mp3");
-    public static final File directorytemp = new File(sounddirectory, "temp/");
-    public static final File directoryambience = new File(sounddirectory, "ambience/");
-    public static final File directoryentrainment = new File(sounddirectory, "entrainment/");
-    public static final File directoryrampup = new File(directoryentrainment, "ramp/up/");
-    public static final File directoryrampdown = new File(directoryentrainment, "ramp/down/");
-    public static final File directorytohramp = new File(directoryentrainment, "tohramp/");
-    public static final File directorymaincuts = new File(directoryentrainment, "maincuts/");
-    public static final ArrayList<String> allnames = new ArrayList<>(Arrays.asList(
+    public static final File PROJECTROOT = new File(System.getProperty("user.dir"));
+    public static final File ROOTDIRECTORY = new File(PROJECTROOT, "src/kujiin/");
+    public static final File DIRECTORYREFERENCE = new File(ROOTDIRECTORY, "assets/reference/");
+    public static final File LOGFILE = new File(ROOTDIRECTORY, "assets/sessionlog.txt");
+    public static final File XMLDIRECTORY = new File(ROOTDIRECTORY, "assets/xml/");
+    public static final File OPTIONSXMLFILE = new File(XMLDIRECTORY, "options.xml");
+    public static final File GOALSXMLFILE = new File(XMLDIRECTORY, "goals.xml");
+    public static final File DIRECTORYSTYLES = new File(ROOTDIRECTORY, "assets/styles/");
+    public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");
+    public static final File SOUNDDIRECTORY = new File(ROOTDIRECTORY, "assets/sound/");
+    public static final File ALERTFILE = new File(SOUNDDIRECTORY, "Alert.mp3");
+    public static final File DIRECTORYTEMP = new File(SOUNDDIRECTORY, "temp/");
+    public static final File DIRECTORYAMBIENCE = new File(SOUNDDIRECTORY, "ambience/");
+    public static final File DIRECTORYENTRAINMENT = new File(SOUNDDIRECTORY, "entrainment/");
+    public static final File DIRECTORYRAMPUP = new File(DIRECTORYENTRAINMENT, "ramp/up/");
+    public static final File DIRECTORYRAMPDOWN = new File(DIRECTORYENTRAINMENT, "ramp/down/");
+    public static final File DIRECTORYTOHRAMP = new File(DIRECTORYENTRAINMENT, "tohramp/");
+    public static final File DIRECTORYMAINCUTS = new File(DIRECTORYENTRAINMENT, "maincuts/");
+    public static final ArrayList<String> ALLNAMES = new ArrayList<>(Arrays.asList(
             "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
     public static final ArrayList<String> RAMPDURATIONS = new ArrayList<>(Arrays.asList("2 Minutes", "3 Minutes", "5 Minutes"));
+    public static ArrayList<String> STYLETHEMES = new ArrayList<>();
 /// Default Option Values
     private static final Boolean TOOLTIPS = true;
     private static final Boolean HELPDIALOGS = true;
@@ -46,7 +48,7 @@ public class Options {
     private static final Double FADEINDURATION = 10.0; // Fade In Duration (Textfield -> In Decimal Seconds)
     private static final Double FADEOUTDURATION = 10.0; // Fade Out Duration (Textfield -> In Decimal Seconds)
     private static final String ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
-    private static final String THEMEFILELOCATION = null;
+    private static final String THEMEFILELOCATION = new File(DIRECTORYSTYLES, "dark.css").getAbsolutePath();
     private static final Boolean RAMPENABLED = true;
     private static final Integer RAMPDURATION = 3;
     private ProgramOptions ProgramOptions;
@@ -77,18 +79,18 @@ public class Options {
 
 // XML Processing
     public void unmarshall() {
-        if (optionsxmlfile.exists()) {
+        if (OPTIONSXMLFILE.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(kujiin.xml.Options.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
-                kujiin.xml.Options options = (kujiin.xml.Options) unmarshaller.unmarshal(optionsxmlfile);
+                kujiin.xml.Options options = (kujiin.xml.Options) unmarshaller.unmarshal(OPTIONSXMLFILE);
                 setProgramOptions(options.getProgramOptions());
                 setSessionOptions(options.getSessionOptions());
                 setAppearanceOptions(options.getAppearanceOptions());
             } catch (JAXBException e) {
                 e.printStackTrace();
                 Platform.runLater(() -> Tools.showinformationdialog("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
-                        optionsxmlfile.getName()));
+                        OPTIONSXMLFILE.getName()));
             }
         } else {
             resettodefaults();
@@ -99,9 +101,9 @@ public class Options {
             JAXBContext context = JAXBContext.newInstance(Options.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, optionsxmlfile);
+            createMarshaller.marshal(this, OPTIONSXMLFILE);
         } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Save Options", "Check Write File Permissions Of " + optionsxmlfile.getAbsolutePath());
+            Tools.showinformationdialog("Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
         }
     }
     public void resettodefaults() {

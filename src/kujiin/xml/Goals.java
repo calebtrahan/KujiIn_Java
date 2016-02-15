@@ -108,11 +108,11 @@ public class Goals {
 
 // XML Processing
     public void unmarshall() {
-        if (Options.goalsxmlfile.exists()) {
+        if (Options.GOALSXMLFILE.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Goals.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
-                Goals currentGoals = (Goals) createMarshaller.unmarshal(Options.goalsxmlfile);
+                Goals currentGoals = (Goals) createMarshaller.unmarshal(Options.GOALSXMLFILE);
                 setPresessionGoals(currentGoals.getPresessionGoals());
                 setRinGoals(currentGoals.getRinGoals());
                 setKyoGoals(currentGoals.getKyoGoals());
@@ -126,7 +126,7 @@ public class Goals {
                 setPostsessionGoals(currentGoals.getPostsessionGoals());
                 setTotalGoals(currentGoals.getTotalGoals());
             } catch (JAXBException e) {
-                Tools.showinformationdialog("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.goalsxmlfile.getAbsolutePath());
+                Tools.showinformationdialog("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -135,9 +135,9 @@ public class Goals {
             JAXBContext context = JAXBContext.newInstance(Goals.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, Options.goalsxmlfile);
+            createMarshaller.marshal(this, Options.GOALSXMLFILE);
         } catch (JAXBException e) {
-            Tools.showinformationdialog("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.goalsxmlfile.getAbsolutePath());
+            Tools.showinformationdialog("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
         }
     }
     public void add(int cutindex, Goal newgoal) throws JAXBException {

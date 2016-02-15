@@ -14,7 +14,6 @@ import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.interfaces.Widget;
-import kujiin.xml.Sessions;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -97,7 +96,7 @@ public class PlayerWidget implements Widget {
     public boolean isEnabled() {return onOffSwitch.isSelected();}
 
 // Button Actions
-    public void play(Sessions sessions) {
+    public void play() {
         Tools.showtimedmessage(StatusBar, Session.play(), 3000);
     }
     public void pause() {
@@ -106,7 +105,7 @@ public class PlayerWidget implements Widget {
         else {
             Tools.showtimedmessage(StatusBar, "No Session Playing", 3000);}
     }
-    public void stop(Sessions Sessions) {
+    public void stop() {
         if (Session != null) {
             String message = Session.stop();
             Tools.showtimedmessage(StatusBar, message, 3000);
@@ -225,38 +224,43 @@ public class PlayerWidget implements Widget {
 // Dialogs
     public static class DisplayReference extends Stage {
         public ScrollPane ContentPane;
+        private MainController Root;
         private Cut currentcut;
         private ReferenceType referenceType;
+        private Boolean fullscreenoption;
 
-        public DisplayReference(Cut currentcut, ReferenceType referenceType, Boolean fullscreenoption) {
+        public DisplayReference(MainController root, Cut currentcut, ReferenceType referenceType, Boolean fullscreenoption) {
+            Root = root;
             this.currentcut = currentcut;
             this.referenceType = referenceType;
+            this.fullscreenoption = fullscreenoption;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle(currentcut.name + "'s Reference");}
             catch (IOException e) {e.printStackTrace();}
-            setsizing(fullscreenoption);
+            setsizing();
             loadcontent();
         }
-
-        public DisplayReference(String htmlcontent) {
+        public DisplayReference(MainController root, String htmlcontent) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Reference File Preview");}
             catch (IOException e) {e.printStackTrace();}
-            setsizing(false);
+            fullscreenoption = false;
+            setsizing();
             WebView browser = new WebView();
             WebEngine webEngine = browser.getEngine();
             ContentPane.setContent(browser);
             webEngine.loadContent(htmlcontent);
         }
 
-        public void setsizing(boolean fullscreen) {
+        public void setsizing() {
             Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
             double height = primaryScreenBounds.getHeight();
             double width = primaryScreenBounds.getWidth();
-            if (! fullscreen) {height -= 200; width -= 200;}
-            this.setFullScreen(fullscreen);
+            if (! fullscreenoption) {height -= 200; width -= 200;}
+            this.setFullScreen(fullscreenoption);
             this.setHeight(height);
             this.setWidth(width);
             ContentPane.setFitToWidth(true);
@@ -284,6 +288,7 @@ public class PlayerWidget implements Widget {
         }
     }
     public static class ReferenceTypeDialog extends Stage {
+        private MainController Root;
         public Button AcceptButton;
         public RadioButton HTMLOption;
         public RadioButton TextOption;
@@ -293,7 +298,8 @@ public class PlayerWidget implements Widget {
         private Boolean fullscreen;
         private Boolean enabled;
 
-        public ReferenceTypeDialog (ReferenceType referenceType, Boolean fullscreenoption) {
+        public ReferenceTypeDialog (MainController root, ReferenceType referenceType, Boolean fullscreenoption) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceTypeDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Reference Type Variation");}
@@ -340,8 +346,10 @@ public class PlayerWidget implements Widget {
         }
     }
     public static class SessionFinishedDialog extends Stage {
+        private MainController Root;
 
-        public SessionFinishedDialog() {
+        public SessionFinishedDialog(MainController root) {
+            Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionFinishedDialog.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Session Completed");}
