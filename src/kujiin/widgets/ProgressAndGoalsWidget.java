@@ -154,11 +154,11 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     public void setnewgoal() {
         if (cutindex == -1) {Tools.showinformationdialog(Root, "Information","No Cut Selected", "Select A Cut To Add A Goal To"); return;}
-        SetANewGoalDialog setANewGoalDialog = new SetANewGoalDialog(cutindex, Root);
-        setANewGoalDialog.showAndWait();
-        if (setANewGoalDialog.isAccepted()) {
+        SetANewGoalForSingleCut setANewGoalForSingleCutDialog = new SetANewGoalForSingleCut(cutindex, Root);
+        setANewGoalForSingleCutDialog.showAndWait();
+        if (setANewGoalForSingleCutDialog.isAccepted()) {
             try {
-                Goals.add(cutindex, new Goals.Goal(setANewGoalDialog.getGoaldate(), setANewGoalDialog.getGoalhours()));}
+                Goals.add(cutindex, new Goals.Goal(setANewGoalForSingleCutDialog.getGoaldate(), setANewGoalForSingleCutDialog.getGoalhours()));}
             catch (JAXBException ignored) {Tools.showerrordialog(Root, "Error", "Couldn't Add Goal", "Check File Permissions");}
         }
         updategoalsui();
@@ -255,12 +255,12 @@ public class ProgressAndGoalsWidget implements Widget {
     }
 
 // Goal Specific Methods
-    public ArrayList<String> precreationgoalchecks(ArrayList<Integer> textfieldtimes) {
-        ArrayList<String> notgoodcuts = new ArrayList<>();
+    public ArrayList<Integer> precreationgoalchecks(ArrayList<Integer> textfieldtimes) {
+        ArrayList<Integer> notgoodcuts = new ArrayList<>();
         for (int i = 0; i < textfieldtimes.size(); i++) {
             Integer val = textfieldtimes.get(i);
             if (! checkifgoalsetandlongenough(i, val)) {
-                notgoodcuts.add(GOALCUTNAMES[i]);
+                notgoodcuts.add(i);
             }
         }
         return notgoodcuts;
@@ -728,7 +728,7 @@ public class ProgressAndGoalsWidget implements Widget {
             close();
         }
     }
-    public static class SetANewGoalDialog extends Stage {
+    public static class SetANewGoalForSingleCut extends Stage {
         private ProgressAndGoalsWidget progressAndGoalsWidget;
         public Spinner<Integer> GoalHoursSpinner;
         public Spinner<Integer> GoalMinutesSpinner;
@@ -741,7 +741,7 @@ public class ProgressAndGoalsWidget implements Widget {
         private Double goalhours;
         private MainController Root;
 
-        public SetANewGoalDialog(int cutindex, MainController root) {
+        public SetANewGoalForSingleCut(int cutindex, MainController root) {
             Root = root;
             progressAndGoalsWidget = Root.getProgressTracker();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetNewGoalDialog.fxml"));
@@ -804,6 +804,123 @@ public class ProgressAndGoalsWidget implements Widget {
             }
         }
         public void viewcurrentgoals(Event event) {progressAndGoalsWidget.opengoaleditor();}
+    }
+    public static class SetANewGoalForMultipleCuts extends Stage {
+        public ToggleButton Presession;
+        public ToggleButton RIN;
+        public ToggleButton KYO;
+        public ToggleButton TOH;
+        public ToggleButton SHA;
+        public ToggleButton KAI;
+        public ToggleButton JIN;
+        public ToggleButton RETSU;
+        public ToggleButton ZAI;
+        public ToggleButton ZEN;
+        public ToggleButton Postsession;
+        private ProgressAndGoalsWidget progressAndGoalsWidget;
+        private MainController Root;
+        public Spinner<Integer> GoalHoursSpinner;
+        public Spinner<Integer> GoalMinutesSpinner;
+        public DatePicker GoalDatePicker;
+        public Button CancelButton;
+        public Button OKButton;
+        public Button CurrentGoalsButton;
+        public Label TopLabel;
+        private LocalDate goaldate;
+        private Double goalhours;
+
+        public SetANewGoalForMultipleCuts(MainController root, ArrayList<Integer> cutindexes, int expectedminutes) {
+            Root = root;
+            progressAndGoalsWidget = Root.getProgressTracker();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetMultipleGoalsDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            setTitle("Set A Goal For Multiple Cuts");
+            GoalHoursSpinner.setEditable(true);
+            GoalMinutesSpinner.setEditable(true);
+            GoalDatePicker.setValue(LocalDate.now());
+            GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(expectedminutes / 60, Integer.MAX_VALUE, expectedminutes / 60));
+            GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(expectedminutes % 60, 59, expectedminutes % 60));
+            for (Integer i : cutindexes) {select(i, true);}
+        }
+
+    // Getters And Setters
+        public LocalDate getGoaldate() {
+            return goaldate;
+        }
+        public void setGoaldate(LocalDate goaldate) {
+            this.goaldate = goaldate;
+        }
+        public Double getGoalhours() {
+            return goalhours;
+        }
+        public void setGoalhours(Double goalhours) {
+            this.goalhours = goalhours;
+        }
+        public boolean isAccepted() {return getGoalhours() != null && getGoaldate() != null && ! getSelectedCutIndexes().isEmpty();}
+        public List<Integer> getSelectedCutIndexes() {
+            List<Integer> selectedcuts = new ArrayList<>();
+            for (int i = 0; i<=10; i++) {if (getselected(i)) {selectedcuts.add(i);}}
+            return selectedcuts;
+        }
+        public void select(int index, boolean value) {
+            if (index == 0) {Presession.setSelected(value);}
+            if (index == 1) {RIN.setSelected(value);}
+            if (index == 2) {KYO.setSelected(value);}
+            if (index == 3) {TOH.setSelected(value);}
+            if (index == 4) {SHA.setSelected(value);}
+            if (index == 5) {KAI.setSelected(value);}
+            if (index == 6) {JIN.setSelected(value);}
+            if (index == 7) {RETSU.setSelected(value);}
+            if (index == 8) {ZAI.setSelected(value);}
+            if (index == 9) {ZEN.setSelected(value);}
+            if (index == 10) {Postsession.setSelected(value);}
+        }
+        public boolean getselected(int index) {
+            if (index == 0) {return Presession.isSelected();}
+            if (index == 1) {return RIN.isSelected();}
+            if (index == 2) {return KYO.isSelected();}
+            if (index == 3) {return TOH.isSelected();}
+            if (index == 4) {return SHA.isSelected();}
+            if (index == 5) {return KAI.isSelected();}
+            if (index == 6) {return JIN.isSelected();}
+            if (index == 7) {return RETSU.isSelected();}
+            if (index == 8) {return ZAI.isSelected();}
+            if (index == 9) {return ZEN.isSelected();}
+            if (index == 10) {return Postsession.isSelected();}
+            return false;
+        }
+
+    // Button Actions
+        public void viewcurrentgoals(Event event) {
+            progressAndGoalsWidget.opengoaleditor();
+        }
+        public void Accept(Event event) {
+            if (getSelectedCutIndexes().isEmpty()) {Tools.showinformationdialog(Root, "Information", "Cannot Add Goal", "No Cuts Selected"); return;}
+            if (GoalMinutesSpinner.getValue() > 59) {
+                Tools.showinformationdialog(Root, "Information", "Minutes Cannot Be Greater Than 59", "Select A Value Less Than 59"); return;}
+            boolean dategood = GoalDatePicker.getValue().isAfter(LocalDate.now());
+            if (dategood) {
+                int hours = GoalHoursSpinner.getValue();
+                int minutes = GoalMinutesSpinner.getValue();
+                double newhours = Tools.hoursandminutestoformatteddecimalhours(hours, minutes);
+                setGoalhours(newhours);
+                setGoaldate(GoalDatePicker.getValue());
+                super.close();
+            } else {
+                Tools.showinformationdialog(Root, "Cannot Set Goal", "Cannot Set Goal", "Due Date Must Be After Today");
+                setGoalhours(null);
+                setGoaldate(null);
+            }
+        }
+        public void cancelgoalsetting(Event event) {
+            this.close();
+        }
+
     }
     public static class GoalCompleted extends Stage {
         public Label GoalHours;

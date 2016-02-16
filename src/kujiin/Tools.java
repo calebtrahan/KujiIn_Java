@@ -506,6 +506,11 @@ public class Tools {
         }
         return list;
     }
+    public static int getmaxvalue(List<Integer> list) {
+        List<Integer> listcopy = list;
+        Collections.sort(listcopy);
+        return listcopy.get(listcopy.size() - 1);
+    }
 
 // Log Methods
     public static boolean sendstacktracetodeveloper(String stacktrace) {

@@ -17,16 +17,16 @@ import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.interfaces.Widget;
+import kujiin.xml.Goals;
 import kujiin.xml.Options;
 import kujiin.xml.Preset;
 
+import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.ResourceBundle;
+import java.time.LocalDate;
+import java.util.*;
 
 // TODO Get FFMPEG Working To Mix Audio Files Together
     // Not Supported Stream?
@@ -177,6 +177,7 @@ public class CreatorAndExporterWidget implements Widget {
                 CreateButton.setText("Edit");
                 session.Root.getPlayer().onOffSwitch.setDisable(false);
                 setCreatorState(CreatorState.CREATED);
+                Tools.showinformationdialog(Root, "Success", "Session Successfully Created", "You Can Now Play Or Export This Session");
             }
         } else {
             enable();
@@ -191,12 +192,32 @@ public class CreatorAndExporterWidget implements Widget {
     public boolean creationchecks() {
         if (! gettextfieldtimes()) {Tools.showerrordialog(Root, "Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be > 0", "Cannot Continue"); return false;}
         if (! session.checksessionwellformedness(textfieldtimes)) {return false;}
-        ArrayList<String> notgoodcuts = session.Root.getProgressTracker().precreationgoalchecks(textfieldtimes);
-        if (! notgoodcuts.isEmpty()) {
-            if (Tools.getanswerdialog(Root, "Confirmation", "Goals Aren't Long Enough For " + notgoodcuts.toArray().toString(), "Continue Creating Session Without Sufficient Goals?")) {
+        ArrayList<Integer> notgoodongoals = session.Root.getProgressTracker().precreationgoalchecks(textfieldtimes);
+        if (! notgoodongoals.isEmpty()) {
+            StringBuilder notgoodtext = new StringBuilder();
+            for (int i = 0; i < notgoodongoals.size(); i++) {
+                notgoodtext.append(ProgressAndGoalsWidget.GOALCUTNAMES[i]);
+                if (i != notgoodtext.length() - 1) {notgoodtext.append(", ");}
+                if (i == notgoodongoals.size() / 2) {notgoodtext.append("\n");}
+            }
+            if (Tools.getanswerdialog(Root, "Confirmation", "Goals Aren't Long Enough For \n" + notgoodtext.toString(), "Set Goals For These Cuts Before Creating This Session?")) {
+                ProgressAndGoalsWidget.SetANewGoalForMultipleCuts s = new ProgressAndGoalsWidget.SetANewGoalForMultipleCuts(Root, notgoodongoals, Tools.getmaxvalue(notgoodongoals));
+                s.showAndWait();
+                if (s.isAccepted()) {
+                    List<Integer> cutindexes = s.getSelectedCutIndexes();
+                    Double goalhours = s.getGoalhours();
+                    LocalDate goaldate = s.getGoaldate();
+                    boolean goalssetsuccessfully = true;
+                    for (Integer i : cutindexes) {
+                        try {
+                            Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours));}
+                        catch (JAXBException ignored) {goalssetsuccessfully = false; Tools.showerrordialog(Root, "Error", "Couldn't Add Goal For " + ProgressAndGoalsWidget.GOALCUTNAMES[i], "Check File Permissions");}
+                    }
+                    if (goalssetsuccessfully) {Tools.showinformationdialog(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");}
+                }
                 return true;
             }
-        }
+        } else {return true;}
         return false;
     }
 
