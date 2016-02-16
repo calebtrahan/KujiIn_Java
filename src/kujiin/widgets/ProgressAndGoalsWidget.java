@@ -26,7 +26,6 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO Finish Tying Current And Completed Goals Together
 // TODO Finish Making EditGoalsDialog (Also Add A Select A Different Cut Feature, And Make It So They Can Pass Cutindex Data Back And Forth)
 public class ProgressAndGoalsWidget implements Widget {
     public static String[] GOALCUTNAMES = {"Presession", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Postsession", "Total"};
@@ -164,7 +163,7 @@ public class ProgressAndGoalsWidget implements Widget {
     public void opengoaleditor() {
         if (cutindex == -1) {Tools.showinformationdialog(Root, "Information", "No Cut Selected", "Please Select A Cut To Edit Its Goals"); return;}
         if (! Goals.goalsexist(cutindex, true)) {Tools.showinformationdialog(Root, "Information", "No Goals Exist For " + GOALCUTNAMES[cutindex], "Please Add A Goal For " + GOALCUTNAMES[cutindex]); return;}
-        new EditGoalsDialog(Root).showAndWait();
+        new EditGoalsDialog(Root, cutindex).showAndWait();
     }
 //    public void goalpacing() {
 //        if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Calculate Goal Pacing"); return;}
@@ -494,7 +493,7 @@ public class ProgressAndGoalsWidget implements Widget {
         private kujiin.xml.Goals.Goal SelectedGoal;
         private Integer cutindex;
 
-        public EditGoalsDialog(MainController root) {
+        public EditGoalsDialog(MainController root, int cutindex) {
             Root = root;
             ProgressAndGoals = Root.getProgressTracker();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayGoals.fxml"));
@@ -507,9 +506,9 @@ public class ProgressAndGoalsWidget implements Widget {
             setTitle("Edit Goals");
             CutSelectorComboBox.setItems(FXCollections.observableArrayList(GOALCUTNAMES));
             populatetable();
+            if (cutindex == -1) {TopLabel.setText("Select A Cut");}
+            else {CutSelectorComboBox.getSelectionModel().select(cutindex);}
         }
-
-    // Button Actions
 
     // Getters And Setters
         public Integer getCutindex() {
@@ -579,7 +578,7 @@ public class ProgressAndGoalsWidget implements Widget {
             int index = CurrentGoalTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {SelectedGoal = CurrentGoalList.get(index);}
             RemoveGoalButton.setDisable(index == -1);
-            GoalPacingButton.setDisable(index == -1);
+            GoalPacingButton.setDisable(SelectedGoal != null && ! SelectedGoal.getCompleted());
         }
         public void completedgoalstoggle(ActionEvent actionEvent) {
             populatetable();
@@ -616,6 +615,7 @@ public class ProgressAndGoalsWidget implements Widget {
             super.close();
         }
 
+    // Goal pacing
         public void goalpacing(ActionEvent actionEvent) {
             if (getselectedgoal() != null && CurrentGoalList != null && getCutindex() != null) {
                 new GoalPacingDialog(Root, getselectedgoal(), CurrentGoalList, Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false)).showAndWait();
@@ -630,12 +630,14 @@ public class ProgressAndGoalsWidget implements Widget {
         public TextField GoalDaysTillDue;
         public Button ExtendDueDateButton;
         public Button CloseButton;
+        public TextField GoalTimeLeft;
+        public TextField PracticeTimeDaysAWeek;
+        public TextField TotalPracticedTime;
         private MainController Root;
         private Goals.Goal CurrentGoal;
         private List<Goals.Goal> CurrentGoals;
 
-        // TODO Add To GUI -> 1) Your Current Practiced Time 2)Time Left To Goal Completion
-        public GoalPacingDialog(MainController root, kujiin.xml.Goals.Goal currentGoal, List<kujiin.xml.Goals.Goal> currentGoals, double alreadypracticedhours) {
+        public GoalPacingDialog(MainController root, kujiin.xml.Goals.Goal currentGoal, List<kujiin.xml.Goals.Goal> currentGoals, int cutindex) {
             Root = root;
             CurrentGoal = currentGoal;
             CurrentGoals = currentGoals;
@@ -647,8 +649,13 @@ public class ProgressAndGoalsWidget implements Widget {
                 Root.getOptions().setStyle(defaultscene);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Goal Pacing");
-            GoalDuration.setText(Tools.minstoformattedabbreviatedhoursandminutes(Tools.convertdecimalhourstominutes(currentGoal.getGoal_Hours())));
+            int practicedminutes = Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false);
+            int goalminutes = Tools.convertdecimalhourstominutes(currentGoal.getGoal_Hours());
+            GoalDuration.setText(Tools.minstoformattedabbreviatedhoursandminutes(goalminutes));
             GoalDueDate.setText(CurrentGoal.getDate_Due());
+            TotalPracticedTime.setText(Tools.minstoformattedabbreviatedhoursandminutes(practicedminutes));
+            int minutesleft = goalminutes - practicedminutes;
+            GoalTimeLeft.setText(Tools.minstoformattedabbreviatedhoursandminutes(minutesleft));
             LocalDate datedue = Tools.converttolocaldate(CurrentGoal.getDate_Due());
             int daystilldue = Period.between(LocalDate.now(), datedue).getDays();
             // TODO If daystilldue is negative -> extendduedate()
@@ -657,9 +664,6 @@ public class ProgressAndGoalsWidget implements Widget {
             PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> {calculate();});
             calculate();
         }
-
-    // Getters And Setters
-
 
     // Button Actions
         public void closedialog(ActionEvent actionEvent) {close();}
@@ -686,10 +690,8 @@ public class ProgressAndGoalsWidget implements Widget {
             Double days = (double) PracticeDays.getValue();
             Float hourstopractice = goalhours.floatValue() / days.floatValue();
             int minsaday = Tools.convertdecimalhourstominutes(hourstopractice.doubleValue());
-            String formattedgoalhours = Tools.minstoformattedabbreviatedhoursandminutes(Tools.convertdecimalhourstominutes(goalhours));
+            String formattedgoalhours = Tools.minstoformattedabbreviatedhoursandminutes(minsaday);
             PracticeTimeADay.setText(formattedgoalhours);
-//            Tools.showinformationdialog(Root, "Calculation", "To Reach " + formattedgoalhours + " In " + days.intValue() + " Days:",
-//                    "Practice For " + Tools.minstoformattedlonghoursandminutes(minsaday) + " A Day");
         }
     }
     public static class SelectGoalDialog extends Stage {
@@ -1013,4 +1015,5 @@ public class ProgressAndGoalsWidget implements Widget {
             close();
         }
     }
+
 }

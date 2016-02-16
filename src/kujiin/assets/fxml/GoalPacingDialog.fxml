@@ -4,11 +4,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="191.0" prefWidth="437.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="236.0" prefWidth="437.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox alignment="BOTTOM_RIGHT" layoutX="373.0" layoutY="287.0" prefHeight="26.0" prefWidth="71.0" />
-      <VBox alignment="CENTER" layoutX="215.0" layoutY="236.0" prefHeight="26.0" prefWidth="183.0" />
-      <VBox alignment="TOP_CENTER" layoutX="234.0" layoutY="37.0" prefHeight="120.0" prefWidth="196.0">
+      <VBox alignment="TOP_CENTER" layoutX="234.0" layoutY="37.0" prefHeight="149.0" prefWidth="196.0">
          <children>
             <HBox alignment="CENTER" prefHeight="35.0" prefWidth="246.0">
                <children>
@@ -23,7 +22,20 @@
                   </Spinner>
                </children>
             </HBox>
-            <Label alignment="CENTER" prefHeight="50.0" prefWidth="196.0" text="Time You Need To Practice Every Day To Complete This Goal On Time" textAlignment="CENTER" wrapText="true" />
+            <Label text="Days A Week">
+               <VBox.margin>
+                  <Insets bottom="2.0" top="2.0" />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="PracticeTimeDaysAWeek" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="39.0" text="7">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+            </TextField>
+            <Label alignment="CENTER" prefHeight="20.0" prefWidth="196.0" text="Practice Time Per Day" textAlignment="CENTER" wrapText="true">
+               <VBox.margin>
+                  <Insets bottom="2.0" top="2.0" />
+               </VBox.margin></Label>
             <TextField fx:id="PracticeTimeADay" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="39.0" text="99 Hrs. 59 Mins.">
                <font>
                   <Font name="System Bold" size="15.0" />
@@ -39,7 +51,7 @@
             <Font size="20.0" />
          </font>
       </Label>
-      <VBox layoutX="5.0" layoutY="37.0" prefHeight="108.0" prefWidth="216.0">
+      <VBox layoutX="5.0" layoutY="37.0" prefHeight="143.0" prefWidth="216.0">
          <children>
             <HBox alignment="CENTER" prefHeight="36.0" prefWidth="246.0">
                <children>
@@ -73,6 +85,16 @@
                   <TextField fx:id="GoalDaysTillDue" alignment="CENTER" editable="false" prefWidth="123.0" text="23 Days" />
                </children>
             </HBox>
+            <HBox alignment="CENTER" prefHeight="36.0" prefWidth="216.0">
+               <children>
+                  <Label alignment="CENTER_RIGHT" prefWidth="80.0" text="Time Left">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="GoalTimeLeft" alignment="CENTER" editable="false" prefWidth="123.0" text="1 Hrs. 1 Mins." />
+               </children>
+            </HBox>
          </children>
       </VBox>
       <Label layoutX="278.0" layoutY="14.0" text="Goal Pacing">
@@ -80,10 +102,20 @@
             <Font size="20.0" />
          </font>
       </Label>
-      <HBox alignment="CENTER_RIGHT" layoutX="172.0" layoutY="160.0" prefHeight="26.0" prefWidth="258.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="234.0" layoutY="200.0" prefHeight="26.0" prefWidth="196.0">
          <children>
-            <Button fx:id="ExtendDueDateButton" mnemonicParsing="false" onAction="#extendduedate" text="Extend Due Date" />
+            <Button fx:id="ExtendDueDateButton" mnemonicParsing="false" onAction="#extendduedate" prefHeight="26.0" prefWidth="118.0" text="Extend Due Date" />
             <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#closedialog" text="Close" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="14.0" layoutY="195.0" prefHeight="36.0" prefWidth="216.0">
+         <children>
+            <Label alignment="CENTER" prefHeight="43.0" prefWidth="121.0" text="Total Presession Practice Time" textAlignment="CENTER" wrapText="true">
+               <padding>
+                  <Insets right="5.0" />
+               </padding>
+            </Label>
+            <TextField fx:id="TotalPracticedTime" alignment="CENTER" editable="false" prefWidth="123.0" text="99 Hrs. 99 Mins" />
          </children>
       </HBox>
    </children>
