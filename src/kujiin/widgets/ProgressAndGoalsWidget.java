@@ -666,23 +666,41 @@ public class ProgressAndGoalsWidget implements Widget {
             GoalTimeLeft.setText(Tools.minstoformattedabbreviatedhoursandminutes(minutesleft));
             LocalDate datedue = Tools.converttolocaldate(CurrentGoal.getDate_Due());
             int daystilldue = Period.between(LocalDate.now(), datedue).getDays();
-            // TODO If daystilldue is negative -> extendduedate()
-            GoalDaysTillDue.setText(String.format("%s Days", daystilldue));
-            PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, daystilldue, daystilldue));
-            PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> {calculate();});
-            calculate();
+            System.out.println("Days Till Due " + daystilldue);
+            if (daystilldue >= 0) {
+                GoalDaysTillDue.setText(String.format("%s Days", daystilldue));
+                PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, daystilldue, daystilldue));
+                calculate();
+                PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> {
+                    calculate();
+                });
+            } else {
+                Tools.showinformationdialog(Root, "Goal Is Overdue", "Cannot Calculate Goal Pacing For A Goal That Is Past Due", "Set A New Due Date To Use This Feature");
+                if (! extendduedate(null)) {close();}
+                else {
+                    datedue = Tools.converttolocaldate(CurrentGoal.getDate_Due());
+                    daystilldue = Period.between(LocalDate.now(), datedue).getDays();
+                    GoalDaysTillDue.setText(String.format("%s Days", daystilldue));
+                    PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, daystilldue, daystilldue));
+                    calculate();
+                    PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> {
+                        calculate();
+                    });
+                }
+            }
         }
 
     // Button Actions
         public void closedialog(ActionEvent actionEvent) {close();}
-        public void extendduedate(ActionEvent actionEvent) {
+        public boolean extendduedate(ActionEvent actionEvent) {
             DatePickerDialog dpd = new DatePickerDialog(Root, "Select A New Due Date", "Select A New Due Date", LocalDate.now());
             dpd.showAndWait();
             if (dpd.getDate() != null) {
                 if (Tools.getanswerdialog(Root, "Confirmation", "This Will Postpone This Goal's Due Date To " + dpd.getDate().toString(), "Really Postpone?")) {
                     CurrentGoal.setDate_Due(Tools.convertfromlocaldatetostring(dpd.getDate()));
-                } else {Tools.showinformationdialog(Root, "Information", "Extend Due Date Cancelled", "This Goal's Due Date Was Not Extended");}
-            }
+                    return true;
+                } else {Tools.showinformationdialog(Root, "Information", "Extend Due Date Cancelled", "This Goal's Due Date Was Not Extended"); return false;}
+            } else {return false;}
         }
 
     // Other Methods
@@ -694,6 +712,7 @@ public class ProgressAndGoalsWidget implements Widget {
 //            SelectedGoalHours.setText(getCurrentGoal().getGoal_Hours() + " Hours");
         }
         public void calculate() {
+            System.out.println("Calculating");
             Double goalhours = CurrentGoal.getGoal_Hours();
             Double days = (double) PracticeDays.getValue();
             Float hourstopractice = goalhours.floatValue() / days.floatValue();
@@ -981,7 +1000,7 @@ public class ProgressAndGoalsWidget implements Widget {
         public CurrentGoalBinding(int id, String goalhours, String duedate, String percentcomplete, Boolean completed, String datecompleted) {
             this.goalid = new SimpleIntegerProperty(id);
             this.goalhours = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(Tools.convertdecimalhourstominutes(new Double(goalhours))));
-            this.duedate = new SimpleStringProperty(duedate);
+            this.duedate = new SimpleStringProperty(Tools.checkifdateoverdue(duedate));
             this.percentcomplete = new SimpleStringProperty(percentcomplete);
             this.completed = new SimpleBooleanProperty(completed);
             this.datecompleted = new SimpleStringProperty(datecompleted);
@@ -994,9 +1013,11 @@ public class ProgressAndGoalsWidget implements Widget {
         public Button CloseButton;
         private LocalDate date;
         private MainController Root;
+        private LocalDate MustBeAfterDate;
 
-        public DatePickerDialog(MainController root, String titletext, String TopLabelText, LocalDate setDate) {
+        public DatePickerDialog(MainController root, String titletext, String TopLabelText, LocalDate minimumdate) {
             Root = root;
+            MustBeAfterDate = minimumdate;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DatePickerDialog.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -1006,7 +1027,7 @@ public class ProgressAndGoalsWidget implements Widget {
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle(titletext);
             TopLabel.setText(TopLabelText);
-            Date.setValue(setDate);
+            Date.setValue(LocalDate.now());
         }
 
         public LocalDate getDate() {
@@ -1016,8 +1037,10 @@ public class ProgressAndGoalsWidget implements Widget {
             this.date = date;
         }
         public void accept(ActionEvent actionEvent) {
-            setDate(Date.getValue());
-            close();
+            if (Date.getValue().isAfter(MustBeAfterDate) || Date.getValue().isEqual(MustBeAfterDate)) {
+                setDate(Date.getValue());
+                close();
+            } else {Tools.showinformationdialog(Root, "Information", "Goal Date Must Be After " + Tools.convertfromlocaldatetostring(MustBeAfterDate), "Select A Later Date");}
         }
         public void cancel(ActionEvent actionEvent) {
             close();

@@ -60,7 +60,7 @@
                         <Insets right="5.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField fx:id="GoalDuration" editable="false" prefHeight="26.0" prefWidth="123.0" text="9999 Hrs. 59 Mins." />
+                  <TextField fx:id="GoalDuration" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="123.0" text="9999 Hrs. 59 Mins." />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="35.0" prefWidth="221.0">

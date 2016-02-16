@@ -17,6 +17,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -144,7 +145,6 @@ public class Tools {
         }
         return stringbuilder.toString();
     }
-
     public static String minutestoformattedhoursandmins(int min) {
         if (min > 0) {
             int hours = min / 60;
@@ -226,6 +226,15 @@ public class Tools {
         BigDecimal bd = new BigDecimal(number);
         bd = bd.setScale(decimalplaces, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+    public static String checkifdateoverdue(String DateFormatted) {
+        LocalDate datedue = Tools.converttolocaldate(DateFormatted);
+        int daystilldue = Period.between(LocalDate.now(), datedue).getDays();
+        if (daystilldue > 1) {return DateFormatted;}
+        if (daystilldue == 1) {return "Tomorrow";}
+        if (daystilldue == 0) {return "Today";}
+        if (daystilldue < 0) {return "Past Due";}
+        else {return "";}
     }
 
 // Session Methods
