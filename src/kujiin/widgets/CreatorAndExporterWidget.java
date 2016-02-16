@@ -399,7 +399,6 @@ public class CreatorAndExporterWidget implements Widget {
             cal.add(Calendar.MINUTE, totalsessiontime);
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
             ApproximateEndTime.setText(sdf.format(cal.getTime()));
-            Tools.showtimedmessage(StatusBar, "Turn Session Player On To Play This Session, Or Export By Pressing 'Export' Button", 5000);
         } else {
             TotalSessionTime.setText("-");
             ApproximateEndTime.setText("-");

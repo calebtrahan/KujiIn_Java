@@ -9,7 +9,7 @@
       <TableView fx:id="CurrentGoalTable" layoutX="15.0" layoutY="41.0" onMousePressed="#tableselectionchanged" prefHeight="377.0" prefWidth="615.0">
         <columns>
           <TableColumn fx:id="NumberColumn" prefWidth="44.0" text="#" />
-          <TableColumn fx:id="GoalTimeColumn" prefWidth="148.0" text="Goal Time (in Hours)" />
+          <TableColumn fx:id="GoalTimeColumn" prefWidth="148.0" text="Goal Duration" />
             <TableColumn fx:id="DueDateColumn" prefWidth="113.0" text="Due Date" />
             <TableColumn fx:id="PercentCompleteColumn" prefWidth="97.0" text="\% Complete" />
             <TableColumn fx:id="IsCompletedColumn" prefWidth="87.0" text="Completed" />
@@ -26,7 +26,7 @@
          <children>
             <Button fx:id="AddGoalButton" mnemonicParsing="false" onAction="#addgoal" text="Set New" />
             <Button fx:id="RemoveGoalButton" mnemonicParsing="false" onAction="#removegoal" text="Remove Goal" />
-            <Button fx:id="GoalPacingButton" mnemonicParsing="false" text="Pacing" onAction="#goalpacing"/>
+            <Button fx:id="GoalPacingButton" mnemonicParsing="false" onAction="#goalpacing" text="Pacing" />
             <Button fx:id="CloseButton" mnemonicParsing="false" onMousePressed="#closeDialog" text="Close" />
          </children>
       </HBox>

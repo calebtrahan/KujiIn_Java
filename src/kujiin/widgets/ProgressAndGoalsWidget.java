@@ -108,8 +108,8 @@ public class ProgressAndGoalsWidget implements Widget {
                 };
             }
         };
-        getgoals.setOnSucceeded(event -> updateprogressui());
-        getgoals.setOnFailed(event -> updateprogressui());
+        getgoals.setOnSucceeded(event -> updategoalsui());
+        getgoals.setOnFailed(event -> updategoalsui());
         getgoals.start();
         PreAndPostOption.setOnAction(this::cutselectionchanged);
         cutindex = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
@@ -234,16 +234,22 @@ public class ProgressAndGoalsWidget implements Widget {
     public void updateprogressui() {
     // Update Total Progress
         try {
-            int averagesessionduration = Sessions.averagepracticetimeinminutes(cutindex, PreAndPostOption.isSelected());
-            int totalminutespracticed = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
-            int numberofsessionspracticed = Sessions.cutsessionscount(cutindex);
-            String nonetext = "No Sessions";
-            if (averagesessionduration != 0) {AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins(averagesessionduration));}
-            else {AverageSessionDuration.setText(nonetext);}
-            if (totalminutespracticed != 0) {TotalTimePracticed.setText(Tools.minutestoformattedhoursandmins(totalminutespracticed));}
-            else {TotalTimePracticed.setText(nonetext);}
-            if (numberofsessionspracticed != 0) {NumberOfSessionsPracticed.setText(Integer.toString(numberofsessionspracticed));}
-            else {NumberOfSessionsPracticed.setText(nonetext);}
+            if (cutindex == -1) {
+                PreAndPostOption.setDisable(true);
+                SessionListButton.setDisable(true);
+            } else {
+                int averagesessionduration = Sessions.averagepracticetimeinminutes(cutindex, PreAndPostOption.isSelected());
+                int totalminutespracticed = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
+                int numberofsessionspracticed = Sessions.cutsessionscount(cutindex);
+                boolean sessionsgood = averagesessionduration != 0 || totalminutespracticed != 0 || numberofsessionspracticed != 0;
+                String nonetext = "No Sessions";
+                if (sessionsgood) {AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins(averagesessionduration));}
+                else {AverageSessionDuration.setText(nonetext);}
+                if (sessionsgood) {TotalTimePracticed.setText(Tools.minutestoformattedhoursandmins(totalminutespracticed));}
+                else {TotalTimePracticed.setText(nonetext);}
+                if (sessionsgood) {NumberOfSessionsPracticed.setText(Integer.toString(numberofsessionspracticed));}
+                else {NumberOfSessionsPracticed.setText(nonetext);}
+            }
         } catch (NullPointerException ignored) {}
     }
     public void selectcut(int cutindex) {
@@ -272,6 +278,8 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     public void updategoalsui() {
         try {
+            NewGoalButton.setDisable(cutindex == -1);
+            CurrentGoalsButton.setDisable(cutindex == -1);
             int practicedminutes = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
             Double goal = Goals.getgoal(cutindex, 0, false).getGoal_Hours();
             Integer hours = practicedminutes / 60;
@@ -292,26 +300,25 @@ public class ProgressAndGoalsWidget implements Widget {
                 GoalProgress.setProgress(0.0);
             }
             TopLabel.setText(GOALCUTNAMES[cutindex]);
-//            if (cutname.equals(GOALCUTNAMES[10])) { TopLabel.setText("Total Goal");}
-//            else if (cutname.equals(GOALCUTNAMES[0])) {TopLabel.setText("Pre + Post Goal");}
-//            else {TopLabel.setText(cutname + "'s Current Goal");}
         } catch (NullPointerException ignored) {
             if (cutindex != -1) {
                 TopLabel.setText(GOALCUTNAMES[cutindex]);
                 Tools.showtimedmessage(StatusBar, "No Current Goal Set For " + GOALCUTNAMES[cutindex], 4000);
+                int practicedminutes = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
+                Integer hours = practicedminutes / 60;
+                Integer minutes = practicedminutes % 60;
+                PracticedHours.setText(hours.toString());
+                PracticedMinutes.setText(minutes.toString());
+                GoalMinutes.setText("?");
+                GoalHours.setText("?");
+            } else {
+                PracticedHours.setText("-");
+                PracticedMinutes.setText("-");
+                GoalMinutes.setText("-");
+                GoalHours.setText("-");
             }
-//            if (cutindex != 11) {
-//                TopLabel.setText(GOALCUTNAMES[cutindex] + "'s Current Goal");
-//            } else {
-//                TopLabel.setText(GOALCUTNAMES[cutindex] + " Session Time Current Goal");
-//            }
-            int practicedminutes = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
-            Integer hours = practicedminutes / 60;
-            Integer minutes = practicedminutes % 60;
-            PracticedHours.setText(hours.toString());
-            PracticedMinutes.setText(minutes.toString());
-            GoalMinutes.setText("?");
-            GoalHours.setText("?");
+            NewGoalButton.setDisable(cutindex == -1);
+            CurrentGoalsButton.setDisable(cutindex == -1);
             GoalProgress.setProgress(0.0);
         } catch (ArrayIndexOutOfBoundsException ignored) {resetallvalues();}
     }
@@ -322,7 +329,6 @@ public class ProgressAndGoalsWidget implements Widget {
 
 // Subclasses/Dialogs
     public static class DisplaySessionListDialog extends Stage {
-
         public TableView<SessionRow> sessionsTableView;
         public TableColumn<SessionRow, String> DateColumn;
         public TableColumn<SessionRow, Integer> RinColumn;
@@ -522,6 +528,8 @@ public class ProgressAndGoalsWidget implements Widget {
     // Cut Selection Methods
         public boolean goalschanged() {
             List<kujiin.xml.Goals.Goal> goalsfromxml = ProgressAndGoals.getGoal().getallcutgoals(ProgressAndGoals.getCutindex(), true);
+            System.out.println(CurrentGoalList.containsAll(goalsfromxml));
+            System.out.println(goalsfromxml.size() + " Compared To: " + CurrentGoalList.size());
             return ! CurrentGoalList.containsAll(goalsfromxml) ||  goalsfromxml.size() != CurrentGoalList.size();
         }
         public void changecutselection(ActionEvent actionEvent) {
@@ -578,7 +586,7 @@ public class ProgressAndGoalsWidget implements Widget {
             int index = CurrentGoalTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {SelectedGoal = CurrentGoalList.get(index);}
             RemoveGoalButton.setDisable(index == -1);
-            GoalPacingButton.setDisable(SelectedGoal != null && ! SelectedGoal.getCompleted());
+            GoalPacingButton.setDisable(index == -1 || SelectedGoal == null || SelectedGoal.getCompleted());
         }
         public void completedgoalstoggle(ActionEvent actionEvent) {
             populatetable();
@@ -972,7 +980,7 @@ public class ProgressAndGoalsWidget implements Widget {
 
         public CurrentGoalBinding(int id, String goalhours, String duedate, String percentcomplete, Boolean completed, String datecompleted) {
             this.goalid = new SimpleIntegerProperty(id);
-            this.goalhours = new SimpleStringProperty(goalhours);
+            this.goalhours = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(Tools.convertdecimalhourstominutes(new Double(goalhours))));
             this.duedate = new SimpleStringProperty(duedate);
             this.percentcomplete = new SimpleStringProperty(percentcomplete);
             this.completed = new SimpleBooleanProperty(completed);
