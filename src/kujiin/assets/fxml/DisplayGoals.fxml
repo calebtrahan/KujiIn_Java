@@ -22,14 +22,15 @@
          </font>
       </Label>
       <CheckBox fx:id="ShowCompletedCheckBox" layoutX="14.0" layoutY="422.0" mnemonicParsing="false" onAction="#completedgoalstoggle" prefHeight="18.0" prefWidth="171.0" text="Show Completed Goals" />
-      <HBox alignment="CENTER_RIGHT" layoutX="393.0" layoutY="417.0" prefHeight="29.0" prefWidth="237.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="315.0" layoutY="417.0" prefHeight="29.0" prefWidth="315.0">
          <children>
             <Button fx:id="AddGoalButton" mnemonicParsing="false" onAction="#addgoal" text="Set New" />
             <Button fx:id="RemoveGoalButton" mnemonicParsing="false" onAction="#removegoal" text="Remove Goal" />
+            <Button fx:id="GoalPacingButton" mnemonicParsing="false" text="Pacing" onAction="#goalpacing"/>
             <Button fx:id="CloseButton" mnemonicParsing="false" onMousePressed="#closeDialog" text="Close" />
          </children>
       </HBox>
       <Label layoutX="380.0" layoutY="17.0" text="Select:" />
-      <ChoiceBox fx:id="CutSelectorComboBox" layoutX="437.0" layoutY="12.0" prefWidth="150.0" onAction="#changecutselection"/>
+      <ChoiceBox fx:id="CutSelectorComboBox" layoutX="437.0" layoutY="12.0" onAction="#changecutselection" prefWidth="150.0" />
    </children>
 </AnchorPane>

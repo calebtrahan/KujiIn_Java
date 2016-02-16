@@ -584,7 +584,10 @@ public class This_Session {
                         progresstonextcut();
                     }
                 });
-            } else {progresstonextcut();}
+            } else {
+                setPlayerState(PlayerWidget.PlayerState.TRANSITIONING);
+                progresstonextcut();
+            }
         }
     }
     public void error_endplayback() {

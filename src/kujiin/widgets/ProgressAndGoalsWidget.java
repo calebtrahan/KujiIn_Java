@@ -8,7 +8,6 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -22,11 +21,10 @@ import kujiin.xml.Sessions;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 // TODO Finish Tying Current And Completed Goals Together
 // TODO Finish Making EditGoalsDialog (Also Add A Select A Different Cut Feature, And Make It So They Can Pass Cutindex Data Back And Forth)
@@ -489,6 +487,7 @@ public class ProgressAndGoalsWidget implements Widget {
         public Button AddGoalButton;
         public Button RemoveGoalButton;
         public ChoiceBox<String> CutSelectorComboBox;
+        public Button GoalPacingButton;
         private MainController Root;
         private ProgressAndGoalsWidget ProgressAndGoals;
         private List<kujiin.xml.Goals.Goal> CurrentGoalList;
@@ -519,6 +518,7 @@ public class ProgressAndGoalsWidget implements Widget {
         public void setCutindex(Integer cutindex) {
             this.cutindex = cutindex;
         }
+        public kujiin.xml.Goals.Goal getselectedgoal() {return SelectedGoal;}
 
     // Cut Selection Methods
         public boolean goalschanged() {
@@ -538,6 +538,8 @@ public class ProgressAndGoalsWidget implements Widget {
             setCutindex(index);
             ProgressAndGoals.selectcut(getCutindex());
             CurrentGoalTable.getItems().clear();
+            RemoveGoalButton.setDisable(true);
+            GoalPacingButton.setDisable(true);
             populatetable();
         }
 
@@ -577,6 +579,7 @@ public class ProgressAndGoalsWidget implements Widget {
             int index = CurrentGoalTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {SelectedGoal = CurrentGoalList.get(index);}
             RemoveGoalButton.setDisable(index == -1);
+            GoalPacingButton.setDisable(index == -1);
         }
         public void completedgoalstoggle(ActionEvent actionEvent) {
             populatetable();
@@ -612,23 +615,30 @@ public class ProgressAndGoalsWidget implements Widget {
             }
             super.close();
         }
+
+        public void goalpacing(ActionEvent actionEvent) {
+            if (getselectedgoal() != null && CurrentGoalList != null && getCutindex() != null) {
+                new GoalPacingDialog(Root, getselectedgoal(), CurrentGoalList, Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false)).showAndWait();
+            }
+        }
     }
-    public static class GoalPacingDialog extends Stage implements Initializable {
-        public Label SelectedGoalHours;
-        public Button SelectADiffferentGoalButton;
-        public Spinner<Integer> DaysSpinner;
-        public Button CalculateButton;
+    public static class GoalPacingDialog extends Stage {
+        public Spinner<Integer> PracticeDays;
+        public TextField PracticeTimeADay;
+        public TextField GoalDuration;
+        public TextField GoalDueDate;
+        public TextField GoalDaysTillDue;
+        public Button ExtendDueDateButton;
         public Button CloseButton;
         private MainController Root;
-        private kujiin.xml.Goals.Goal currentGoal;
-        private List<kujiin.xml.Goals.Goal> currentGoals;
-        private double alreadypracticedhours;
+        private Goals.Goal CurrentGoal;
+        private List<Goals.Goal> CurrentGoals;
 
+        // TODO Add To GUI -> 1) Your Current Practiced Time 2)Time Left To Goal Completion
         public GoalPacingDialog(MainController root, kujiin.xml.Goals.Goal currentGoal, List<kujiin.xml.Goals.Goal> currentGoals, double alreadypracticedhours) {
             Root = root;
-            this.currentGoal = currentGoal;
-            this.currentGoals = currentGoals;
-            this.alreadypracticedhours = alreadypracticedhours;
+            CurrentGoal = currentGoal;
+            CurrentGoals = currentGoals;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalPacingDialog.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -637,43 +647,50 @@ public class ProgressAndGoalsWidget implements Widget {
                 Root.getOptions().setStyle(defaultscene);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Goal Pacing");
-            SelectedGoalHours.setText(currentGoal.getGoal_Hours() + " Hours");
+            GoalDuration.setText(Tools.minstoformattedabbreviatedhoursandminutes(Tools.convertdecimalhourstominutes(currentGoal.getGoal_Hours())));
+            GoalDueDate.setText(CurrentGoal.getDate_Due());
+            LocalDate datedue = Tools.converttolocaldate(CurrentGoal.getDate_Due());
+            int daystilldue = Period.between(LocalDate.now(), datedue).getDays();
+            // TODO If daystilldue is negative -> extendduedate()
+            GoalDaysTillDue.setText(String.format("%s Days", daystilldue));
+            PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, daystilldue, daystilldue));
+            PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> {calculate();});
+            calculate();
         }
 
-        @Override
-        public void initialize(URL location, ResourceBundle resources) {
-            DaysSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
+    // Getters And Setters
+
+
+    // Button Actions
+        public void closedialog(ActionEvent actionEvent) {close();}
+        public void extendduedate(ActionEvent actionEvent) {
+            DatePickerDialog dpd = new DatePickerDialog(Root, "Select A New Due Date", "Select A New Due Date", LocalDate.now());
+            dpd.showAndWait();
+            if (dpd.getDate() != null) {
+                if (Tools.getanswerdialog(Root, "Confirmation", "This Will Postpone This Goal's Due Date To " + dpd.getDate().toString(), "Really Postpone?")) {
+                    CurrentGoal.setDate_Due(Tools.convertfromlocaldatetostring(dpd.getDate()));
+                } else {Tools.showinformationdialog(Root, "Information", "Extend Due Date Cancelled", "This Goal's Due Date Was Not Extended");}
+            }
         }
 
-        // Getters And Setters
-        public kujiin.xml.Goals.Goal getCurrentGoal() {
-            return currentGoal;
-        }
-        public void setCurrentGoal(kujiin.xml.Goals.Goal currentGoal) {
-            this.currentGoal = currentGoal;
-        }
-
-        // Button Actions
+    // Other Methods
         public void selectanewgoal(ActionEvent actionEvent) {
-            SelectGoalDialog selectGoalDialog = new SelectGoalDialog(Root, currentGoals, alreadypracticedhours);
-            selectGoalDialog.showAndWait();
-            setCurrentGoal(selectGoalDialog.getSelectedgoal());
-            if (getCurrentGoal() == null) {return;}
-            SelectedGoalHours.setText(getCurrentGoal().getGoal_Hours() + " Hours");
+//            SelectGoalDialog selectGoalDialog = new SelectGoalDialog(Root, currentGoals, alreadypracticedhours);
+//            selectGoalDialog.showAndWait();
+//            setCurrentGoal(selectGoalDialog.getSelectedgoal());
+//            if (getCurrentGoal() == null) {return;}
+//            SelectedGoalHours.setText(getCurrentGoal().getGoal_Hours() + " Hours");
         }
-        public void calculate(ActionEvent actionEvent) {
-            if (getCurrentGoal() == null) {Tools.showerrordialog(Root, "Error", "No Goal Selected", "Please Select A Goal"); return;}
-            if (DaysSpinner.getValue() == 0) {Tools.showerrordialog(Root, "Error", "Cannot Calculate", "Days Cannot Be 0"); return;}
-            Double goalhours = getCurrentGoal().getGoal_Hours();
-            Double days = (double) DaysSpinner.getValue();
+        public void calculate() {
+            Double goalhours = CurrentGoal.getGoal_Hours();
+            Double days = (double) PracticeDays.getValue();
             Float hourstopractice = goalhours.floatValue() / days.floatValue();
             int minsaday = Tools.convertdecimalhourstominutes(hourstopractice.doubleValue());
-            String formattedgoalhours = Tools.minstoformattedlonghoursandminutes(Tools.convertdecimalhourstominutes(goalhours));
-            Tools.showinformationdialog(Root, "Calculation", "To Reach " + formattedgoalhours + " In " + days.intValue() + " Days:",
-                    "Practice For " + Tools.minstoformattedlonghoursandminutes(minsaday) + " A Day");
+            String formattedgoalhours = Tools.minstoformattedabbreviatedhoursandminutes(Tools.convertdecimalhourstominutes(goalhours));
+            PracticeTimeADay.setText(formattedgoalhours);
+//            Tools.showinformationdialog(Root, "Calculation", "To Reach " + formattedgoalhours + " In " + days.intValue() + " Days:",
+//                    "Practice For " + Tools.minstoformattedlonghoursandminutes(minsaday) + " A Day");
         }
-        public void closedialog(ActionEvent actionEvent) {close();}
-
     }
     public static class SelectGoalDialog extends Stage {
         public TableView<CurrentGoalBinding> currentgoaltable;
@@ -960,5 +977,40 @@ public class ProgressAndGoalsWidget implements Widget {
             this.datecompleted = new SimpleStringProperty(datecompleted);
         }
     }
+    public static class DatePickerDialog extends Stage {
+        public Label TopLabel;
+        public DatePicker Date;
+        public Button AcceptButton;
+        public Button CloseButton;
+        private LocalDate date;
+        private MainController Root;
 
+        public DatePickerDialog(MainController root, String titletext, String TopLabelText, LocalDate setDate) {
+            Root = root;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DatePickerDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(defaultscene);
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            setTitle(titletext);
+            TopLabel.setText(TopLabelText);
+            Date.setValue(setDate);
+        }
+
+        public LocalDate getDate() {
+            return date;
+        }
+        public void setDate(LocalDate date) {
+            this.date = date;
+        }
+        public void accept(ActionEvent actionEvent) {
+            setDate(Date.getValue());
+            close();
+        }
+        public void cancel(ActionEvent actionEvent) {
+            close();
+        }
+    }
 }
