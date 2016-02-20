@@ -935,7 +935,9 @@ public class MainController implements Initializable {
             Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
             Options.getSessionOptions().setReferencetype(tempreferencetype);
             Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
+            Options.getSessionOptions().setAlertfunction(AlertSwitch.isSelected());
             if (AlertFile != null) {Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());}
+            else {Options.getSessionOptions().setAlertfilelocation(null);}
             Options.marshall();
             valuechanged = false;
             ApplyButton.setDisable(true);
