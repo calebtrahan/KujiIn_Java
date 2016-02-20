@@ -374,7 +374,10 @@ public class Cut {
         }
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
         entrainmentplayer.setVolume(0.0);
-        entrainmentplayer.setOnPlaying(() -> {entrainmentplayer.setVolume(0.0); fadeinentrainment.play();});
+        entrainmentplayer.setOnPlaying(() -> {
+            entrainmentplayer.setVolume(0.0);
+            if (entrainmentplaycount == 0) {fadeinentrainment.play();}
+        });
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
@@ -421,20 +424,24 @@ public class Cut {
         fadeouttimeline.stop();
     }
     public void playnextentrainment() {
-        entrainmentplaycount++;
-        entrainmentplayer.dispose();
-        entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
-        entrainmentplayer.setOnPlaying(() -> {entrainmentplayer.setVolume(0.0); fadeinentrainment.playFromStart();});
-        entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
-        entrainmentplayer.setOnError(this::entrainmenterror);
-        entrainmentplayer.play();
+        try {
+            entrainmentplaycount++;
+            entrainmentplayer.dispose();
+            entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
+            entrainmentplayer.setVolume(0.0);
+            entrainmentplayer.setOnPlaying(() -> entrainmentplayer.setVolume(0.0));
+            entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
+            entrainmentplayer.setOnError(this::entrainmenterror);
+            entrainmentplayer.play();
+        } catch (IndexOutOfBoundsException ignored) {}
     }
     public void playnextambience() {
         try {
             ambienceplaycount++;
             ambienceplayer.dispose();
             ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
-            ambienceplayer.setOnPlaying(() -> {ambienceplayer.setVolume(0.0); fadeinambience.playFromStart();});
+            ambienceplayer.setVolume(0.0);
+            ambienceplayer.setOnPlaying(() -> ambienceplayer.setVolume(0.0));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.play();

@@ -50,7 +50,7 @@ public class Sessions {
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.SESSIONSXMLFILE);
-        } catch (JAXBException e) {}
+        } catch (JAXBException e) {Tools.showinformationdialog(Root, "Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
     }
     public void createnewsession() {
         try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
@@ -91,6 +91,7 @@ public class Sessions {
     }
 
 // Session Information Getters
+    // TODO Refactor These Methods So They Make More Sense
     public int getpracticetimeinminutesforthissession(int index, Boolean includepreandpost) {
         try {
             int totalminutes = 0;
@@ -99,7 +100,7 @@ public class Sessions {
                 // Pre And Post
                 totalminutes += thissession.getcutduration(0);
                 totalminutes += thissession.getcutduration(10);
-            } else if (index == 10) {
+            } else if (index == 11) {
                 // TOTAL!
                 if (includepreandpost) {for (int x=0; x<11;x++) {totalminutes += thissession.getcutduration(x);}}
                 else {for (int x=1; x<10;x++) {totalminutes += thissession.getcutduration(x);}}

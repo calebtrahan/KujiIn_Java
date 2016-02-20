@@ -14,6 +14,8 @@ import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.interfaces.Widget;
+import kujiin.xml.Session;
+import kujiin.xml.Sessions;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -356,6 +358,9 @@ public class PlayerWidget implements Widget {
         }
     }
     public static class SessionFinishedDialog extends Stage {
+        public TextField TotalPracticeDuration;
+        public TextField SessionDuration;
+        public Button CloseButton;
         private MainController Root;
 
         public SessionFinishedDialog(MainController root) {
@@ -366,10 +371,19 @@ public class PlayerWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
+                Sessions currentsessions = Root.getProgressTracker().getSessions();
+                Session thissession = currentsessions.getsession(currentsessions.totalsessioncount() - 1);
+                int thisessionminutes = thissession.getTotal_Session_Duration();
+                SessionDuration.setText(Tools.minstoformattedabbreviatedhoursandminutes(thisessionminutes));
+                SessionDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
+                int totalsessionminutes = currentsessions.getpracticedtimeinminutesforallsessions(11, true);
+                TotalPracticeDuration.setText(Tools.minstoformattedabbreviatedhoursandminutes(totalsessionminutes));
+                TotalPracticeDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Session Completed");
         }
 
+        public void closedialog(ActionEvent actionEvent) {close();}
     }
 
 // Enumerators

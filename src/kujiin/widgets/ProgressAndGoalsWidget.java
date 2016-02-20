@@ -147,7 +147,7 @@ public class ProgressAndGoalsWidget implements Widget {
     public void displaysessionlist() {
         if (Sessions.getSession() == null || Sessions.getSession().size() == 0) {
             Tools.showinformationdialog(Root, "Cannot Display", "Nothing To Display", "Need To Practice At Least One Session To Use This Feature");
-        } else {new DisplaySessionListDialog(null, Sessions.getSession()).showAndWait();}
+        } else {new DisplaySessionListDialog(Root, Sessions.getSession()).showAndWait();}
     }
     public void setnewgoal() {
         if (cutindex == -1) {Tools.showinformationdialog(Root, "Information","No Cut Selected", "Select A Cut To Add A Goal To"); return;}
@@ -234,10 +234,8 @@ public class ProgressAndGoalsWidget implements Widget {
     public void updateprogressui() {
     // Update Total Progress
         try {
-            if (cutindex == -1) {
-                PreAndPostOption.setDisable(true);
-                SessionListButton.setDisable(true);
-            } else {
+            if (cutindex == -1) {PreAndPostOption.setDisable(true);}
+            else {
                 int averagesessionduration = Sessions.averagepracticetimeinminutes(cutindex, PreAndPostOption.isSelected());
                 int totalminutespracticed = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
                 int numberofsessionspracticed = Sessions.cutsessionscount(cutindex);
@@ -331,16 +329,16 @@ public class ProgressAndGoalsWidget implements Widget {
     public static class DisplaySessionListDialog extends Stage {
         public TableView<SessionRow> sessionsTableView;
         public TableColumn<SessionRow, String> DateColumn;
-        public TableColumn<SessionRow, Integer> RinColumn;
-        public TableColumn<SessionRow, Integer> KyoColumn;
-        public TableColumn<SessionRow, Integer> TohColumn;
-        public TableColumn<SessionRow, Integer> ShaColumn;
-        public TableColumn<SessionRow, Integer> KaiColumn;
-        public TableColumn<SessionRow, Integer> JinColumn;
-        public TableColumn<SessionRow, Integer> RetsuColumn;
-        public TableColumn<SessionRow, Integer> ZaiColumn;
-        public TableColumn<SessionRow, Integer> ZenColumn;
-        public TableColumn<SessionRow, Integer> TotalColumn;
+        public TableColumn<SessionRow, String> RinColumn;
+        public TableColumn<SessionRow, String> KyoColumn;
+        public TableColumn<SessionRow, String> TohColumn;
+        public TableColumn<SessionRow, String> ShaColumn;
+        public TableColumn<SessionRow, String> KaiColumn;
+        public TableColumn<SessionRow, String> JinColumn;
+        public TableColumn<SessionRow, String> RetsuColumn;
+        public TableColumn<SessionRow, String> ZaiColumn;
+        public TableColumn<SessionRow, String> ZenColumn;
+        public TableColumn<SessionRow, String> TotalColumn;
         public Button CloseButton;
         private ObservableList<SessionRow> sessionlist = FXCollections.observableArrayList();
         private MainController Root;
@@ -357,16 +355,16 @@ public class ProgressAndGoalsWidget implements Widget {
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
             setTitle("Session List");
             DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
-            RinColumn.setCellValueFactory(cellData -> cellData.getValue().rin.asObject());
-            KyoColumn.setCellValueFactory(cellData -> cellData.getValue().kyo.asObject());
-            TohColumn.setCellValueFactory(cellData -> cellData.getValue().toh.asObject());
-            ShaColumn.setCellValueFactory(cellData -> cellData.getValue().sha.asObject());
-            KaiColumn.setCellValueFactory(cellData -> cellData.getValue().kai.asObject());
-            JinColumn.setCellValueFactory(cellData -> cellData.getValue().jin.asObject());
-            RetsuColumn.setCellValueFactory(cellData -> cellData.getValue().retsu.asObject());
-            ZaiColumn.setCellValueFactory(cellData -> cellData.getValue().zai.asObject());
-            ZenColumn.setCellValueFactory(cellData -> cellData.getValue().zen.asObject());
-            TotalColumn.setCellValueFactory(cellData -> cellData.getValue().total.asObject());
+            RinColumn.setCellValueFactory(cellData -> cellData.getValue().rin);
+            KyoColumn.setCellValueFactory(cellData -> cellData.getValue().kyo);
+            TohColumn.setCellValueFactory(cellData -> cellData.getValue().toh);
+            ShaColumn.setCellValueFactory(cellData -> cellData.getValue().sha);
+            KaiColumn.setCellValueFactory(cellData -> cellData.getValue().kai);
+            JinColumn.setCellValueFactory(cellData -> cellData.getValue().jin);
+            RetsuColumn.setCellValueFactory(cellData -> cellData.getValue().retsu);
+            ZaiColumn.setCellValueFactory(cellData -> cellData.getValue().zai);
+            ZenColumn.setCellValueFactory(cellData -> cellData.getValue().zen);
+            TotalColumn.setCellValueFactory(cellData -> cellData.getValue().total);
             ArrayList<SessionRow> sessionRows = new ArrayList<>();
             int count = 1;
             for (Session i : sessionlist) {
@@ -386,34 +384,34 @@ public class ProgressAndGoalsWidget implements Widget {
         public class SessionRow {
             public IntegerProperty id;
             public StringProperty datepracticed;
-            public IntegerProperty presession;
-            public IntegerProperty rin;
-            public IntegerProperty kyo;
-            public IntegerProperty toh;
-            public IntegerProperty sha;
-            public IntegerProperty kai;
-            public IntegerProperty jin;
-            public IntegerProperty retsu;
-            public IntegerProperty zai;
-            public IntegerProperty zen;
-            public IntegerProperty postsession;
-            public IntegerProperty total;
+            public StringProperty presession;
+            public StringProperty rin;
+            public StringProperty kyo;
+            public StringProperty toh;
+            public StringProperty sha;
+            public StringProperty kai;
+            public StringProperty jin;
+            public StringProperty retsu;
+            public StringProperty zai;
+            public StringProperty zen;
+            public StringProperty postsession;
+            public StringProperty total;
 
             public SessionRow(int id, String datepracticed, int presession, int rin, int kyo, int toh, int sha, int kai, int jin, int retsu, int zai, int zen, int postsession, int total) {
                 this.id = new SimpleIntegerProperty(id);
                 this.datepracticed = new SimpleStringProperty(datepracticed);
-                this.presession = new SimpleIntegerProperty(presession);
-                this.rin = new SimpleIntegerProperty(rin);
-                this.kyo = new SimpleIntegerProperty(kyo);
-                this.toh = new SimpleIntegerProperty(toh);
-                this.sha = new SimpleIntegerProperty(sha);
-                this.kai = new SimpleIntegerProperty(kai);
-                this.jin = new SimpleIntegerProperty(jin);
-                this.retsu = new SimpleIntegerProperty(retsu);
-                this.zai = new SimpleIntegerProperty(zai);
-                this.zen = new SimpleIntegerProperty(zen);
-                this.postsession = new SimpleIntegerProperty(postsession);
-                this.total = new SimpleIntegerProperty(total);
+                this.presession = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(presession));
+                this.rin = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(rin));
+                this.kyo = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(kyo));
+                this.toh = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(toh));
+                this.sha = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(sha));
+                this.kai = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(kai));
+                this.jin = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(jin));
+                this.retsu = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(retsu));
+                this.zai = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(zai));
+                this.zen = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(zen));
+                this.postsession = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(postsession));
+                this.total = new SimpleStringProperty(Tools.minstoformattedabbreviatedhoursandminutes(total));
             }
 
             public String toString() {

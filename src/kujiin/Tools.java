@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import kujiin.widgets.PlayerWidget;
 import kujiin.xml.Options;
 import org.apache.commons.io.FileUtils;
 
@@ -21,14 +22,16 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-
+// TODO Reference Display Isn't Switching Off If On When Checbox Unselected
+// TODO Style Reference Display
+// TODO End Of Session Produces ArrayIndexOutOfBounds On Exception Dialog Instead
 public class Tools {
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     public static final String[] SUPPORTEDAUDIOFORMATS = {"mp3", "aac", "wav", "aif", "aiff", "m4a"};
 
 // Menu Methods
-    public static void howtouseprogram() {
-
+    public static void howtouseprogram(MainController root) {
+        new PlayerWidget.DisplayReference(root, Tools.getFileContents(new File(Options.DIRECTORYREFERENCE, "html/JIN.html"))).showAndWait();
     }
     public static void aboutthisprogram() {}
     public static void contactme() {
@@ -102,6 +105,7 @@ public class Tools {
     }
 
 // Time Methods
+    // TODO Refactor These Methods So They Make More Sense
     public static double hoursandminutestoformatteddecimalhours(int hours, int minutes) {
         System.out.println("Minutes Is " + minutes);
         double newval;
@@ -138,11 +142,9 @@ public class Tools {
             if (hours > 1) {stringbuilder.append("s");}
             if (minutes > 0) {stringbuilder.append(" ");}
         }
-        if (minutes > 0) {
-            stringbuilder.append(minutes);
-            stringbuilder.append(" Min");
-            if (minutes > 1) {stringbuilder.append("s");}
-        }
+        stringbuilder.append(minutes);
+        stringbuilder.append(" Min");
+        if (minutes > 1) {stringbuilder.append("s");}
         return stringbuilder.toString();
     }
     public static String minutestoformattedhoursandmins(int min) {

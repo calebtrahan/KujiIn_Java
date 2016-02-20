@@ -108,12 +108,8 @@ public class MainController implements Initializable {
     private ProgressAndGoalsWidget ProgressTracker;
     private Options Options;
 
-    // TODO Check if Goals For Each Cut Are >= Set Practice Time (+ Already Practiced Time)
-        // If Not, Ask To Set New Goals
-        // Maybe Make A New Goal Setter To Set All Goals For All Cuts On One Dialog
-
 // Event Handlers
-    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Tools.showinformationdialog(this, "Information", "Can't Enter Text", "This Text Field Can't Be Edited");
+    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Tools.showinformationdialog(this, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -177,7 +173,7 @@ public class MainController implements Initializable {
         EditReferenceFiles a = new EditReferenceFiles(this);
         a.showAndWait();
     }
-    public void howtouseprogram(ActionEvent actionEvent) {Tools.howtouseprogram();}
+    public void howtouseprogram(ActionEvent actionEvent) {Tools.howtouseprogram(this);}
     public void aboutthisprogram(ActionEvent actionEvent) {Tools.aboutthisprogram();}
     public void contactme(ActionEvent actionEvent) {Tools.contactme();}
     public void close(ActionEvent actionEvent) {

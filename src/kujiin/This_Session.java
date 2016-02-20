@@ -17,6 +17,7 @@ import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.PlayerWidget;
 import kujiin.xml.Options;
+import kujiin.xml.Session;
 import kujiin.xml.Sessions;
 
 import java.io.File;
@@ -533,19 +534,18 @@ public class This_Session {
                     cutcount++;
                     currentcut = cutsinsession.get(cutcount);
                     playthiscut();
-                } catch (ArrayIndexOutOfBoundsException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).show(); endofsession();}
+                } catch (ArrayIndexOutOfBoundsException ignored) {endofsession();}
             } else if (playerState == PlayerWidget.PlayerState.PLAYING) {transition();}
-        } catch (Exception e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+        } catch (Exception e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).show();}
     }
     public void endofsession() {
         closereferencefile();
         currentcuttimeline.stop();
         setPlayerState(PlayerWidget.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
-//        try {sessions.addsession(TemporarySession);}
-//        catch (JAXBException ignored) {GuiUtils.showerrordialog("Error", "Cannot Save Session", "XML Error. Please Check File Permissions");}
-        if (Tools.getanswerdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
-            getsessionexporter();}
+        new PlayerWidget.SessionFinishedDialog(Root).showAndWait();
+//        if (Tools.getanswerdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
+//            getsessionexporter();}
         Root.getProgressTracker().updategoalsui();
     }
     public void resetthissession() {
@@ -557,7 +557,10 @@ public class This_Session {
     }
     public void transition() {
         closereferencefile();
-        sessions.getsession(sessions.totalsessioncount() - 1).updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+        Session currentsession = sessions.getsession(sessions.totalsessioncount() - 1);
+        currentsession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+        sessions.marshall();
+        // TODO Right Here Sessions Isn't Marshalling Properly. Not Saving Sessions
         Root.getProgressTracker().updategoalsui();
         currentcut.stop();
         if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}

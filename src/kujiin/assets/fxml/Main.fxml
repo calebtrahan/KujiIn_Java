@@ -248,30 +248,30 @@
             </Button>
          </children>
       </HBox>
-      <HBox alignment="CENTER" layoutX="5.0" layoutY="230.0" prefHeight="26.0" prefWidth="234.0">
+      <HBox alignment="CENTER" layoutX="5.0" layoutY="230.0" prefHeight="26.0" prefWidth="244.0">
          <children>
-            <Label fx:id="CutProgressLabelCurrent" alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="50.0" text="--:--">
+            <Label fx:id="CutProgressLabelCurrent" alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="60.0" text="--:--">
                <HBox.margin>
                   <Insets right="5.0" />
                </HBox.margin>
             </Label>
             <ProgressBar fx:id="CutProgressBar" prefHeight="21.0" prefWidth="135.0" progress="0.0" />
-            <Label fx:id="CutProgressLabelTotal" prefHeight="16.0" prefWidth="50.0" text="--:--">
+            <Label fx:id="CutProgressLabelTotal" prefHeight="16.0" prefWidth="60.0" text="--:--">
                <HBox.margin>
                   <Insets left="5.0" />
                </HBox.margin>
             </Label>
          </children>
       </HBox>
-      <HBox alignment="CENTER" layoutX="242.0" layoutY="230.0" prefHeight="23.0" prefWidth="222.0">
+      <HBox alignment="CENTER" layoutX="233.0" layoutY="232.0" prefHeight="23.0" prefWidth="232.0">
          <children>
-            <Label fx:id="TotalProgressLabelCurrent" alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="50.0" text="--:--">
+            <Label fx:id="TotalProgressLabelCurrent" alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="60.0" text="--:--">
                <HBox.margin>
                   <Insets right="5.0" />
                </HBox.margin>
             </Label>
             <ProgressBar fx:id="TotalProgressBar" prefHeight="22.0" prefWidth="135.0" progress="0.0" />
-            <Label fx:id="TotalProgressLabelTotal" prefHeight="16.0" prefWidth="50.0" text="--:--">
+            <Label fx:id="TotalProgressLabelTotal" prefHeight="16.0" prefWidth="60.0" text="--:--">
                <HBox.margin>
                   <Insets left="5.0" />
                </HBox.margin>
@@ -398,6 +398,6 @@
             <Font size="19.0" />
          </font>
       </Label>
-      <Label layoutX="620.0" layoutY="245.0" text="Current Progress" />
+      <Label alignment="CENTER" layoutX="590.0" layoutY="247.0" prefHeight="16.0" prefWidth="166.0" text="Progress" />
    </children>
 </AnchorPane>
