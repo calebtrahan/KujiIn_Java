@@ -23,7 +23,7 @@ public class SimpleTextDialogWithCancelButton extends Stage {
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             Root.getOptions().setStyle(defaultscene);
-        } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+        } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         setTitle(titletext);
         Message.setText(message);
         TopTitle.setText(toptitletext);

@@ -352,7 +352,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session List");
             DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
             RinColumn.setCellValueFactory(cellData -> cellData.getValue().rin);
@@ -443,7 +443,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Cut Totals");
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
@@ -506,7 +506,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Edit Goals");
             CutSelectorComboBox.setItems(FXCollections.observableArrayList(GOALCUTNAMES));
             populatetable();
@@ -653,7 +653,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Goal Pacing");
             int practicedminutes = Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false);
             int goalminutes = Tools.convertdecimalhourstominutes(currentGoal.getGoal_Hours());
@@ -740,7 +740,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Select Goal");
             ObservableList<CurrentGoalBinding> currentGoals = FXCollections.observableArrayList();
 //            currentGoals.addAll(currentGoalList.stream().map(i -> new CurrentGoalBinding(currentGoalList.indexOf(i) + 1, Double.toString(i.getGoal_Hours()), i.getDate_Set(), i.getpercentagecompleted(currentpracticedhours))).collect(Collectors.toList()));
@@ -794,7 +794,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Set A New Goal");
             GoalHoursSpinner.setEditable(true);
             GoalMinutesSpinner.setEditable(true);
@@ -882,7 +882,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Set A Goal For Multiple Cuts");
             GoalHoursSpinner.setEditable(true);
             GoalMinutesSpinner.setEditable(true);
@@ -980,7 +980,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Goal Completed");
             GoalHours.setText(currentGoal.getGoal_Hours().toString());
             CurrentHoursLabel.setText(currentpracticedhours.toString());
@@ -1022,7 +1022,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle(titletext);
             TopLabel.setText(TopLabelText);
             Date.setValue(LocalDate.now());

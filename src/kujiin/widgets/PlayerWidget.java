@@ -244,7 +244,7 @@ public class PlayerWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle(currentcut.name + "'s Reference");
             setsizing();
             loadcontent();
@@ -254,7 +254,7 @@ public class PlayerWidget implements Widget {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
             fxmlLoader.setController(this);
             try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Reference File Preview");}
-            catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             fullscreenoption = false;
             setsizing();
             WebView browser = new WebView();
@@ -282,7 +282,7 @@ public class PlayerWidget implements Widget {
                 try (FileInputStream fis = new FileInputStream(referencefile);
                      BufferedInputStream bis = new BufferedInputStream(fis)) {
                     while (bis.available() > 0) {sb.append((char) bis.read());}
-                } catch (Exception e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+                } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
                 TextArea ta = new TextArea();
                 ta.setText(sb.toString());
                 ta.setWrapText(true);
@@ -314,7 +314,7 @@ public class PlayerWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Type Select");
             if (referenceType != null) {
                 if (referenceType == ReferenceType.txt) {TextOption.setSelected(true);}
@@ -379,7 +379,7 @@ public class PlayerWidget implements Widget {
                 int totalsessionminutes = currentsessions.getpracticedtimeinminutesforallsessions(11, true);
                 TotalPracticeDuration.setText(Tools.minstoformattedabbreviatedhoursandminutes(totalsessionminutes));
                 TotalPracticeDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Completed");
         }
 

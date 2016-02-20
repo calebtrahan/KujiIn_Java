@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import kujiin.MainController;
 import kujiin.Tools;
+import kujiin.widgets.PlayerWidget;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -39,7 +40,7 @@ public class Options {
     public static final File DIRECTORYMAINCUTS = new File(DIRECTORYENTRAINMENT, "maincuts/");
     public static final ArrayList<String> ALLNAMES = new ArrayList<>(Arrays.asList(
             "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
-    public static final ArrayList<String> RAMPDURATIONS = new ArrayList<>(Arrays.asList("2 Minutes", "3 Minutes", "5 Minutes"));
+    public static final ArrayList<String> RAMPDURATIONS = new ArrayList<>(Arrays.asList("None", "2 Minutes", "3 Minutes", "5 Minutes"));
     public static ArrayList<String> STYLETHEMES = new ArrayList<>();
 /// Default Option Values
     private static final Boolean TOOLTIPS = true;
@@ -53,6 +54,9 @@ public class Options {
     private static final String THEMEFILELOCATION = new File(DIRECTORYSTYLES, "dark.css").toURI().toString();
     private static final Boolean RAMPENABLED = true;
     private static final Integer RAMPDURATION = 3;
+    private static final PlayerWidget.ReferenceType REFERENCE_TYPE = null;
+    private static final Boolean REFERENCEDISPLAY = false;
+    private static final Boolean REFERENCEFULLSCREEN = true;
     private ProgramOptions ProgramOptions;
     private SessionOptions SessionOptions;
     private AppearanceOptions AppearanceOptions;
@@ -103,6 +107,7 @@ public class Options {
     }
     public void marshall() {
         try {
+            getSessionOptions().setRampenabled(getSessionOptions().getRampduration() > 0);
             JAXBContext context = JAXBContext.newInstance(Options.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -125,6 +130,9 @@ public class Options {
         sessionOptions.setEntrainmentvolume(ENTRAINMENTVOLUME);
         sessionOptions.setRampenabled(RAMPENABLED);
         sessionOptions.setRampduration(RAMPDURATION);
+        sessionOptions.setReferenceoption(REFERENCEDISPLAY);
+        sessionOptions.setReferencetype(REFERENCE_TYPE);
+        sessionOptions.setReferencefullscreen(REFERENCEFULLSCREEN);
         setSessionOptions(sessionOptions);
         kujiin.xml.Options.AppearanceOptions appearanceOptions = new AppearanceOptions();
         appearanceOptions.setThemefile(THEMEFILELOCATION);
@@ -169,6 +177,9 @@ public class Options {
         private Boolean rampenabled;
         private Boolean alertfunction;
         private Integer rampduration;
+        private Boolean referenceoption;
+        private PlayerWidget.ReferenceType referencetype;
+        private Boolean referencefullscreen;
 
         public SessionOptions() {}
 
@@ -220,6 +231,24 @@ public class Options {
         }
         public void setAlertfunction(Boolean alertfunction) {
             this.alertfunction = alertfunction;
+        }
+        public Boolean getReferenceoption() {
+            return referenceoption;
+        }
+        public void setReferenceoption(Boolean referenceoption) {
+            this.referenceoption = referenceoption;
+        }
+        public PlayerWidget.ReferenceType getReferencetype() {
+            return referencetype;
+        }
+        public void setReferencetype(PlayerWidget.ReferenceType referencetype) {
+            this.referencetype = referencetype;
+        }
+        public Boolean getReferencefullscreen() {
+            return referencefullscreen;
+        }
+        public void setReferencefullscreen(Boolean referencefullscreen) {
+            this.referencefullscreen = referencefullscreen;
         }
     }
     @XmlAccessorType(XmlAccessType.PROPERTY)

@@ -450,7 +450,7 @@ public class Tools {
             temptextfile.delete();
             return exitcode == 0;
         } catch (IOException | InterruptedException e) {
-            new MainController.ExceptionDialog(null, e.getClass().getName(), e.getMessage());
+            new MainController.ExceptionDialog(null, e);
             return false;
         }
     }
@@ -480,7 +480,7 @@ public class Tools {
             System.out.println("Finished Mixing Audio. Exited With Code" + exitcode);
             return exitcode == 0;
         } catch (IOException | InterruptedException e) {
-            new MainController.ExceptionDialog(null, e.getClass().getName(), e.getMessage());
+            new MainController.ExceptionDialog(null, e);
             return false;
         }
     }
@@ -506,7 +506,7 @@ public class Tools {
             tempfile.delete();
             return exitcode == 0;
         } catch (IOException | InterruptedException e) {
-            new MainController.ExceptionDialog(null, e.getClass().getName(), e.getMessage());
+            new MainController.ExceptionDialog(null, e);
             return false;
         }
     }

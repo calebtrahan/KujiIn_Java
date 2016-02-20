@@ -190,7 +190,7 @@ public class CreatorAndExporterWidget implements Widget {
         }
     }
     public boolean creationchecks() {
-        if (! gettextfieldtimes()) {Tools.showerrordialog(Root, "Error", "At Least One Cut's Value (Pre + Post Excluded) Must Be > 0", "Cannot Continue"); return false;}
+        if (! gettextfieldtimes()) {Tools.showerrordialog(Root, "Error Creating Session", "At Least One Cut's Value Must Not Be 0", "Cannot Create Session"); return false;}
         if (! session.checksessionwellformedness(textfieldtimes)) {return false;}
         ArrayList<Integer> notgoodongoals = session.Root.getProgressTracker().precreationgoalchecks(textfieldtimes);
         if (! notgoodongoals.isEmpty()) {
@@ -394,7 +394,12 @@ public class CreatorAndExporterWidget implements Widget {
         if (gettextfieldtimes()) {
             Integer totalsessiontime = 0;
             for (Integer i : textfieldtimes) {totalsessiontime += i;}
+            int rampduration = Root.getOptions().getSessionOptions().getRampduration();
+            totalsessiontime += rampduration * 2;
+            if (rampduration > 0) {TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + rampduration + "Mins. On Both Presession And Postsession"));}
+            else {TotalSessionTime.setTooltip(null);}
             TotalSessionTime.setText(Tools.minutestoformattedhoursandmins(totalsessiontime));
+            ApproximateEndTime.setTooltip(new Tooltip("Time You Finish Will Vary Depending On When You Start Playback"));
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, totalsessiontime);
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
@@ -507,11 +512,6 @@ public class CreatorAndExporterWidget implements Widget {
         SavePresetButton.setDisable(true);
         StatusBar.setText("Creator Disabled While Session Player Enabled");
     }
-//    public void disablebuttons() {
-//        ExportButton.setDisable(true);
-//        LoadPresetButton.setDisable(true);
-//        SavePresetButton.setDisable(true);
-//    }
     @Override
     public void enable() {
         ChangeAllValuesButton.setDisable(false);
@@ -546,11 +546,6 @@ public class CreatorAndExporterWidget implements Widget {
         SavePresetButton.setDisable(false);
         StatusBar.setText("");
     }
-//    public void enablebuttons() {
-//        ExportButton.setDisable(false);
-//        LoadPresetButton.setDisable(false);
-//        SavePresetButton.setDisable(false);
-//    }
     @Override
     public void resetallvalues() {
         AmbienceSwitch.setText("No Session Created");
@@ -607,7 +602,7 @@ public class CreatorAndExporterWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Change All Values To: ");
             setAccepted(false);
         }
@@ -652,7 +647,7 @@ public class CreatorAndExporterWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Exporting Session");
         }
 
@@ -684,7 +679,7 @@ public class CreatorAndExporterWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Not Well Formed");
             this.textfieldvalues = textfieldvalues;
             this.lastcutindex = lastcutindex;
@@ -777,7 +772,7 @@ public class CreatorAndExporterWidget implements Widget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Cut Invocation");
         }
 

@@ -134,7 +134,7 @@ public class Cut {
                     ambiencefiledurations.add(dur);
                 }
             }
-        } catch (NullPointerException e) {new MainController.ExceptionDialog(thisession.Root, e.getClass().getName(), e.getMessage()).showAndWait(); return false;}
+        } catch (NullPointerException e) {new MainController.ExceptionDialog(thisession.Root, e).showAndWait(); return false;}
         return ambiencefiles.size() > 0;
     }
     public boolean hasenoughAmbience(int secondstocheck) {
@@ -375,7 +375,6 @@ public class Cut {
         entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
         entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnPlaying(() -> {
-            entrainmentplayer.setVolume(0.0);
             if (entrainmentplaycount == 0) {fadeinentrainment.play();}
         });
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
@@ -384,7 +383,7 @@ public class Cut {
         if (ambienceenabled) {
             ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
             ambienceplayer.setVolume(0.0);
-            ambienceplayer.setOnPlaying(() -> {ambienceplayer.setVolume(0.0); fadeinambience.play();});
+            ambienceplayer.setOnPlaying(() -> fadeinambience.play());
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.play();

@@ -110,6 +110,8 @@ public class MainController implements Initializable {
 
 // Event Handlers
     public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Tools.showinformationdialog(this, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
+    public final EventHandler<ActionEvent> CHECKBOXONOFFLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("ON");} else {a.setText("OFF");}};
+    public final EventHandler<ActionEvent> CHECKBOXYESNOLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("YES");} else {a.setText("NO");}};
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -260,7 +262,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Files Editor");
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
             cutnames = FXCollections.observableArrayList();
@@ -402,7 +404,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Ambience Editor");
             CutSelectionBox.setOnAction(event -> selectandloadcut());
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
@@ -415,7 +417,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Ambience Editor");
             CutSelectionBox.setOnAction(event -> selectandloadcut());
             CutSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
@@ -680,7 +682,7 @@ public class MainController implements Initializable {
         public Label TopText;
         private MainController Root;
 
-        public ExceptionDialog(MainController root, String exceptionname, String stacktrace) {
+        public ExceptionDialog(MainController root, Exception exception) {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ExceptionDialog.fxml"));
             fxmlLoader.setController(this);
@@ -688,10 +690,11 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException ignored) {}
+            exception.printStackTrace();
             setTitle("Program Error Occured");
-            TopText.setText(exceptionname + " Occured");
-            StackTraceTextField.setText(stacktrace);
+            TopText.setText(exception.getClass().getName() + " Occured");
+            StackTraceTextField.setText(exception.getMessage());
             StackTraceTextField.setWrapText(true);
         }
 
@@ -726,14 +729,22 @@ public class MainController implements Initializable {
         public Button DeleteAllGoalsButton;
         public Button DeleteAllSessionsProgressButton;
         public Button DefaultsButton;
-        public CheckBox RampCheckbox;
         public ChoiceBox<String> RampDurationChoiceBox;
-        public CheckBox AlertFileCheckbox;
+        public CheckBox AlertSwitch;
+        public CheckBox ReferenceSwitch;
+        public RadioButton ReferenceHTMLRadioButton;
+        public RadioButton ReferenceTXTRadioButton;
+        public CheckBox FullscreenCheckbox;
+        public CheckBox RampSwitch;
+        public Label ReferenceTopLabelDisplayType;
+        public Label ReferenceTopLabelFullScreen;
+        public Label RampTopLabel;
         private kujiin.xml.Options Options;
         private File AlertFile;
         private boolean valuechanged;
         private ObservableList<String> rampselections = FXCollections.observableArrayList(kujiin.xml.Options.RAMPDURATIONS);
         private MainController Root;
+        private PlayerWidget.ReferenceType tempreferencetype;
 
         public ChangeProgramOptions(MainController root) {
             Root = root;
@@ -744,7 +755,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
-            } catch (IOException e) {new ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Change Program Options");
             Tools.doubleTextField(FadeInValue, false);
             Tools.doubleTextField(FadeOutValue, false);
@@ -769,117 +780,37 @@ public class MainController implements Initializable {
                 selectnewtheme();
                 changedvalue();
             });
-            AlertFileCheckbox.setOnAction(event -> alertfiletoggle());
+            AlertSwitch.setOnMouseClicked(event -> alertfiletoggle());
+            AlertSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
+            ReferenceSwitch.setOnMouseClicked(event -> referencetoggle());
+            ReferenceSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
+            RampSwitch.setOnMouseClicked(event -> ramptoggle());
+            RampSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
+            ReferenceHTMLRadioButton.setOnAction(event1 -> HTMLTypeSelected());
+            ReferenceTXTRadioButton.setOnAction(event1 -> TXTTypeSelected());
+            FullscreenCheckbox.setOnAction(Root.CHECKBOXYESNOLISTENER);
+            FullscreenCheckbox.setOnMouseClicked(event -> setFullscreenOption());
             AlertFileTextField.setEditable(false);
             AlertFileTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
             loadoptionsfromxml();
             checkalertfile();
-        }
-
-    // Button Actions
-        public void selectnewtheme() {
-            if (ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {
-                File cssfile = new File(kujiin.xml.Options.DIRECTORYSTYLES, ProgramThemeChoiceBox.getValue() + ".css");
-                if (cssfile.exists()) {
-                    Options.getAppearanceOptions().setThemefile(cssfile.toURI().toString());
-                    getScene().getStylesheets().clear();
-                    getScene().getStylesheets().add(Options.getAppearanceOptions().getThemefile());
-                }
-            }
-        }
-        public void loadoptionsfromxml() {
-            TooltipsCheckBox.setSelected(Options.getProgramOptions().getTooltips());
-            HelpDialogsCheckBox.setSelected(Options.getProgramOptions().getHelpdialogs());
-            RampCheckbox.setSelected(Options.getSessionOptions().getRampenabled());
-            RampDurationChoiceBox.setItems(rampselections);
-            if (Options.getSessionOptions().getRampduration() == 2) {RampDurationChoiceBox.getSelectionModel().select(0);}
-            else if (Options.getSessionOptions().getRampduration() == 3) {RampDurationChoiceBox.getSelectionModel().select(1);}
-            else if (Options.getSessionOptions().getRampduration() == 4) {RampDurationChoiceBox.getSelectionModel().select(2);}
-            FadeInValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeinduration()));
-            FadeOutValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeoutduration()));
-            EntrainmentVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getEntrainmentvolume() * 100));
-            AmbienceVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getAmbiencevolume() * 100));
-            AlertFileCheckbox.setSelected(Options.getSessionOptions().getAlertfunction());
-            try {AlertFile = new File(Options.getSessionOptions().getAlertfilelocation());}
-            catch (NullPointerException ignored) {AlertFile = null;}
-            checkalertfile();
-        }
-        public void apply(ActionEvent actionEvent) {
-            Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
-            Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
-            Options.getSessionOptions().setRampenabled(RampCheckbox.isSelected());
-            int index = RampDurationChoiceBox.getSelectionModel().getSelectedIndex();
-            if (index == 0) {Options.getSessionOptions().setRampduration(2);}
-            else if (index == 1) {Options.getSessionOptions().setRampduration(3);}
-            else if (index == 2) {Options.getSessionOptions().setRampduration(5);}
-            Options.getSessionOptions().setFadeoutduration(new Double(FadeInValue.getText()));
-            Options.getSessionOptions().setFadeinduration(new Double(FadeOutValue.getText()));
-            if (AlertFile != null) {
-                Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());
-            }
-            Options.marshall();
-            valuechanged = false;
-            ApplyButton.setDisable(true);
-        }
-        public void accept(ActionEvent actionEvent) {
-            apply(null);
-            close();
-        }
-        public void cancel(ActionEvent actionEvent) {
-            close();
-        }
-        public void changedvalue() {
-            ApplyButton.setDisable(false);
-            valuechanged = true;
-        }
-        public boolean checkvalues() {
-            Double entrainmentvolume = new Double(EntrainmentVolumePercentage.getText()) / 100;
-            Double ambiencevolume = new Double(AmbienceVolumePercentage.getText()) / 100;
-            boolean entrainmentgood = entrainmentvolume <= 100.0 && entrainmentvolume > 0.0;
-            boolean ambiencegood = ambiencevolume <= 100.0 && ambiencevolume > 0.0;
-            Tools.validate(EntrainmentVolumePercentage, entrainmentgood);
-            Tools.validate(AmbienceVolumePercentage, ambiencegood);
-            boolean alertfilegood = checkalertfile();
-            if (AlertFileCheckbox.isSelected()) {
-                Tools.validate(AlertFileTextField, alertfilegood);
-            }
-            return entrainmentgood && ambiencegood && alertfilegood;
-        }
-        public void resettodefaults(ActionEvent actionEvent) {
-            Options.resettodefaults();
-            loadoptionsfromxml();
-            valuechanged = true;
-        }
-        public void deleteallsessions(ActionEvent actionEvent) {
-            if (Tools.getanswerdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
-                if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
-                    Tools.showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
-                } else {Tools.showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
-            }
-        }
-        public void deleteallgoals(ActionEvent actionEvent) {
-            if (Tools.getanswerdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
-                if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
-                    Tools.showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
-                } else {Tools.showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
-            }
+            referencetoggle();
+            ramptoggle();
         }
 
     // Alert File Methods
         public void alertfiletoggle() {
-            if (AlertFileCheckbox.isSelected()) {
-                AlertFileCheckbox.setText("Enabled");
+            if (AlertSwitch.isSelected()) {
                 if (Options.getSessionOptions().getAlertfilelocation() == null) {
                     AlertFile = getnewalertfile();
                     checkalertfile();
                 }
             } else {
-                AlertFileCheckbox.setText("Disabled");
                 if (Tools.getanswerdialog(Root, "Confirmation", "This Will Disable The Audible Alert File Played In Between Cuts", "Really Disable This Feature?")) {
                     AlertFile = null;
                     checkalertfile();
                 } else {
-                    AlertFileCheckbox.setSelected(true);
+                    AlertSwitch.setSelected(true);
                     alertfiletoggle();
                 }
             }
@@ -910,19 +841,145 @@ public class MainController implements Initializable {
                 AlertFileTextField.setText(String.format("%s (%s)", AlertFile.getName(), audioduration));
             } else {
                 good = false;
-                AlertFileCheckbox.setText("Disabled");
                 AlertFileTextField.setText("Alert Feature Disabled");
                 Options.getSessionOptions().setAlertfilelocation(null);
             }
             Options.getSessionOptions().setAlertfunction(good);
             AlertFileSelectButton.setDisable(! good);
             AlertFileTextField.setDisable(! good);
-            AlertFileCheckbox.setSelected(good);
+            AlertSwitch.setSelected(good);
             return good;
         }
         public void openandtestnewfile(ActionEvent actionEvent) {
             AlertFile = getnewalertfile();
             checkalertfile();
+        }
+
+    // Reference Methods
+        public void referencetoggle() {
+            boolean enabled = ReferenceSwitch.isSelected();
+            ReferenceHTMLRadioButton.setDisable(! enabled);
+            ReferenceTXTRadioButton.setDisable(! enabled);
+            FullscreenCheckbox.setDisable(! enabled);
+            ReferenceTopLabelDisplayType.setDisable(! enabled);
+            ReferenceTopLabelFullScreen.setDisable(! enabled);
+            if (! enabled) {
+                tempreferencetype = null;
+                ReferenceHTMLRadioButton.setSelected(false);
+                ReferenceTXTRadioButton.setSelected(false);
+            }
+        }
+        public void setFullscreenOption() {
+            if (! FullscreenCheckbox.isDisabled()) {
+                Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
+            }
+        }
+        public void HTMLTypeSelected() {
+            ReferenceHTMLRadioButton.setSelected(true);
+            ReferenceTXTRadioButton.setSelected(false);
+            tempreferencetype = PlayerWidget.ReferenceType.html;
+        }
+        public void TXTTypeSelected() {
+            ReferenceHTMLRadioButton.setSelected(true);
+            ReferenceTXTRadioButton.setSelected(false);
+            tempreferencetype = PlayerWidget.ReferenceType.txt;
+        }
+
+    // Ramp Methods
+        public void ramptoggle() {
+            boolean enabled = RampSwitch.isSelected();
+            RampDurationChoiceBox.setDisable(! enabled);
+            RampTopLabel.setDisable(! enabled);
+        }
+
+    // Button Actions
+        public void selectnewtheme() {
+            if (ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {
+                File cssfile = new File(kujiin.xml.Options.DIRECTORYSTYLES, ProgramThemeChoiceBox.getValue() + ".css");
+                if (cssfile.exists()) {
+                    Options.getAppearanceOptions().setThemefile(cssfile.toURI().toString());
+                    getScene().getStylesheets().clear();
+                    getScene().getStylesheets().add(Options.getAppearanceOptions().getThemefile());
+                }
+            }
+        }
+        public void loadoptionsfromxml() {
+            TooltipsCheckBox.setSelected(Options.getProgramOptions().getTooltips());
+            HelpDialogsCheckBox.setSelected(Options.getProgramOptions().getHelpdialogs());
+            RampSwitch.setSelected(Options.getSessionOptions().getRampenabled());
+            RampDurationChoiceBox.setItems(rampselections);
+            if (Options.getSessionOptions().getRampduration() == 2) {RampDurationChoiceBox.getSelectionModel().select(0);}
+            else if (Options.getSessionOptions().getRampduration() == 3) {RampDurationChoiceBox.getSelectionModel().select(1);}
+            else if (Options.getSessionOptions().getRampduration() == 4) {RampDurationChoiceBox.getSelectionModel().select(2);}
+            FadeInValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeinduration()));
+            FadeOutValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeoutduration()));
+            EntrainmentVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getEntrainmentvolume() * 100));
+            AmbienceVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getAmbiencevolume() * 100));
+            AlertSwitch.setSelected(Options.getSessionOptions().getAlertfunction());
+            try {AlertFile = new File(Options.getSessionOptions().getAlertfilelocation());}
+            catch (NullPointerException ignored) {AlertFile = null;}
+            checkalertfile();
+        }
+        public void apply(ActionEvent actionEvent) {
+            Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
+            Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
+            Options.getSessionOptions().setRampenabled(RampSwitch.isSelected());
+            if (RampSwitch.isSelected()) {
+                int index = RampDurationChoiceBox.getSelectionModel().getSelectedIndex();
+                if (index == 0) {Options.getSessionOptions().setRampduration(2);}
+                else if (index == 1) {Options.getSessionOptions().setRampduration(3);}
+                else if (index == 2) {Options.getSessionOptions().setRampduration(5);}
+            } else {Options.getSessionOptions().setRampduration(null);}
+            Options.getSessionOptions().setFadeoutduration(new Double(FadeInValue.getText()));
+            Options.getSessionOptions().setFadeinduration(new Double(FadeOutValue.getText()));
+            Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
+            Options.getSessionOptions().setReferencetype(tempreferencetype);
+            Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
+            if (AlertFile != null) {Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());}
+            Options.marshall();
+            valuechanged = false;
+            ApplyButton.setDisable(true);
+        }
+        public void accept(ActionEvent actionEvent) {
+            apply(null);
+            close();
+        }
+        public void cancel(ActionEvent actionEvent) {
+            close();
+        }
+        public void changedvalue() {
+            ApplyButton.setDisable(false);
+            valuechanged = true;
+        }
+        public boolean checkvalues() {
+            Double entrainmentvolume = new Double(EntrainmentVolumePercentage.getText()) / 100;
+            Double ambiencevolume = new Double(AmbienceVolumePercentage.getText()) / 100;
+            boolean entrainmentgood = entrainmentvolume <= 100.0 && entrainmentvolume > 0.0;
+            boolean ambiencegood = ambiencevolume <= 100.0 && ambiencevolume > 0.0;
+            Tools.validate(EntrainmentVolumePercentage, entrainmentgood);
+            Tools.validate(AmbienceVolumePercentage, ambiencegood);
+            boolean alertfilegood = checkalertfile();
+            if (AlertSwitch.isSelected()) {Tools.validate(AlertFileTextField, alertfilegood);}
+            return entrainmentgood && ambiencegood && alertfilegood;
+        }
+        public void resettodefaults(ActionEvent actionEvent) {
+            Options.resettodefaults();
+            loadoptionsfromxml();
+            valuechanged = true;
+        }
+        public void deleteallsessions(ActionEvent actionEvent) {
+            if (Tools.getanswerdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+                if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
+                    Tools.showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                } else {Tools.showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
+            }
+        }
+        public void deleteallgoals(ActionEvent actionEvent) {
+            if (Tools.getanswerdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+                if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
+                    Tools.showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                } else {Tools.showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
+            }
         }
 
     // Dialog Methods

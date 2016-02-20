@@ -514,7 +514,7 @@ public class This_Session {
             } else if (playerState == PlayerWidget.PlayerState.STOPPED) {
                 StatusBar.setText("Session Stopped");
             }
-        } catch (Exception e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+        } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
     public void playthiscut() {
         try {
@@ -524,7 +524,7 @@ public class This_Session {
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
             timeline.play();
             setPlayerState(PlayerWidget.PlayerState.PLAYING);
-        } catch (Exception e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+        } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
     public void progresstonextcut() {
         try {
@@ -536,7 +536,7 @@ public class This_Session {
                     playthiscut();
                 } catch (ArrayIndexOutOfBoundsException ignored) {endofsession();}
             } else if (playerState == PlayerWidget.PlayerState.PLAYING) {transition();}
-        } catch (Exception e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).show();}
+        } catch (Exception e) {new MainController.ExceptionDialog(Root, e).show();}
     }
     public void endofsession() {
         closereferencefile();
@@ -613,6 +613,9 @@ public class This_Session {
             if (value && playerState == PlayerWidget.PlayerState.PLAYING) {displayreferencefile();}
             if (value) {ReferenceFileCheckbox.setText("Display Reference");}
             else {ReferenceFileCheckbox.setText("Display Reference");}
+        } else {
+
+            // TODO Unset Reference Files Here
         }
     }
     public void displayreferencefile() {

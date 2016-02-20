@@ -20,7 +20,7 @@ public class SimpleTextDialog extends Stage {
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             Root.getOptions().setStyle(defaultscene);
-        } catch (IOException e) {new MainController.ExceptionDialog(Root, e.getClass().getName(), e.getMessage()).showAndWait();}
+        } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         setTitle(toptitle);
         Message.setText(message);
         Message.setWrapText(true);
