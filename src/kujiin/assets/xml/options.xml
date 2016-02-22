@@ -15,5 +15,6 @@
         <fadeoutduration>10.0</fadeoutduration>
         <rampduration>3</rampduration>
         <rampenabled>true</rampenabled>
+        <referencefullscreen>true</referencefullscreen>
     </sessionOptions>
 </Options>

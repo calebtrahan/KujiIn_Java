@@ -858,6 +858,7 @@ public class MainController implements Initializable {
     // Reference Methods
         public void referencetoggle() {
             boolean enabled = ReferenceSwitch.isSelected();
+            if (enabled) {ReferenceSwitch.setText("ON");}
             ReferenceHTMLRadioButton.setDisable(! enabled);
             ReferenceTXTRadioButton.setDisable(! enabled);
             FullscreenCheckbox.setDisable(! enabled);
@@ -880,14 +881,15 @@ public class MainController implements Initializable {
             tempreferencetype = PlayerWidget.ReferenceType.html;
         }
         public void TXTTypeSelected() {
-            ReferenceHTMLRadioButton.setSelected(true);
-            ReferenceTXTRadioButton.setSelected(false);
+            ReferenceHTMLRadioButton.setSelected(false);
+            ReferenceTXTRadioButton.setSelected(true);
             tempreferencetype = PlayerWidget.ReferenceType.txt;
         }
 
     // Ramp Methods
         public void ramptoggle() {
             boolean enabled = RampSwitch.isSelected();
+            if (enabled) {RampSwitch.setText("ON");}
             RampDurationChoiceBox.setDisable(! enabled);
             RampTopLabel.setDisable(! enabled);
         }

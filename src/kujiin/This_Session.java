@@ -55,9 +55,6 @@ public class This_Session {
     private Label SessionPlayingText;
     private Label StatusBar;
     private PlayerWidget.DisplayReference displayReference;
-    private Boolean referencedisplayoption;
-    private Boolean referencefullscreenoption;
-    private PlayerWidget.ReferenceType referenceType;
     private File exportfile;
     public MainController Root;
 
@@ -87,12 +84,6 @@ public class This_Session {
     public ArrayList<Cut> getCutsinsession() {return cutsinsession;}
     public void setPlayerState(PlayerWidget.PlayerState playerState) {this.playerState = playerState;}
     public PlayerWidget.PlayerState getPlayerState() {return playerState;}
-    public void setReferenceType(PlayerWidget.ReferenceType referenceType) {
-        this.referenceType = referenceType;
-    }
-    public PlayerWidget.ReferenceType getReferenceType() {
-        return referenceType;
-    }
     public ArrayList<Cut> getallCuts() {return new ArrayList<>(Arrays.asList(presession, rin, kyo, toh, sha, kai, jin, retsu, zai, zen, postsession));}
     public boolean isValid() {
         int totaltime = 0;
@@ -100,11 +91,6 @@ public class This_Session {
             if (i.number != 0 && i.number != 10) {totaltime += i.duration;}
         }
         return totaltime > 0;
-    }
-    public Boolean isReferencedisplayoption() {return referencedisplayoption;}
-    public void setReferencedisplayoption(boolean referencedisplayoption) {this.referencedisplayoption = referencedisplayoption;}
-    public void setReferencefullscreenoption(Boolean referencefullscreenoption) {
-        this.referencefullscreenoption = referencefullscreenoption;
     }
     public File getExportfile() {
         return exportfile;
@@ -518,7 +504,7 @@ public class This_Session {
     }
     public void playthiscut() {
         try {
-            if (isReferencedisplayoption() != null) {displayreferencefile();}
+            if (Root.getOptions().getSessionOptions().getReferenceoption()) {displayreferencefile();}
             Duration cutduration = currentcut.getDuration();
             currentcut.start();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
@@ -599,12 +585,14 @@ public class This_Session {
 
 // Reference Files
     public boolean choosereferencetype() {
-        PlayerWidget.ReferenceTypeDialog reftype = new PlayerWidget.ReferenceTypeDialog(Root, getReferenceType(), referencefullscreenoption);
-        reftype.showAndWait();
-        setReferenceType(reftype.getReferenceType());
-        setReferencefullscreenoption(reftype.getFullscreen());
-        setReferencedisplayoption(reftype.getEnabled());
-        return reftype.getEnabled();
+        if (! Root.getOptions().getSessionOptions().getReferenceoption()) {
+            PlayerWidget.ReferenceTypeDialog reftype = new PlayerWidget.ReferenceTypeDialog(Root);
+            reftype.showAndWait();
+            Root.getOptions().getSessionOptions().setReferencetype(reftype.getReferenceType());
+            Root.getOptions().getSessionOptions().setReferencefullscreen(reftype.getFullscreen());
+            Root.getOptions().getSessionOptions().setReferenceoption(reftype.getEnabled());
+            return reftype.getEnabled();
+        } else {return true;}
     }
     public void togglereferencedisplay(CheckBox ReferenceFileCheckbox) {
         if (ReferenceFileCheckbox.isSelected()) {
@@ -614,12 +602,13 @@ public class This_Session {
             if (value) {ReferenceFileCheckbox.setText("Display Reference");}
             else {ReferenceFileCheckbox.setText("Display Reference");}
         } else {
-
-            // TODO Unset Reference Files Here
+            Root.getOptions().getSessionOptions().setReferenceoption(false);
+            Root.getOptions().getSessionOptions().setReferencetype(null);
+            closereferencefile();
         }
     }
     public void displayreferencefile() {
-        displayReference = new PlayerWidget.DisplayReference(Root, currentcut, getReferenceType(), referencefullscreenoption);
+        displayReference = new PlayerWidget.DisplayReference(Root, currentcut);
         displayReference.show();
     }
     public void closereferencefile() {

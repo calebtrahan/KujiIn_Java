@@ -84,16 +84,18 @@ public class Cut {
     }
     public void setAmbienceenabled(boolean ambienceenabled) {this.ambienceenabled = ambienceenabled;}
     public boolean isAmbienceenabled() {return ambienceenabled;}
-    public File getReferenceFile(PlayerWidget.ReferenceType referenceType) {
-        if (referenceType == PlayerWidget.ReferenceType.html) {
-            String name = this.name + ".html";
-            return new File(Options.DIRECTORYREFERENCE, "html/" + name);
-        } else if (referenceType == PlayerWidget.ReferenceType.txt) {
-            String name = this.name + ".txt";
-            return new File(Options.DIRECTORYREFERENCE, "txt/" + name);
-        } else {
+    public File getReferenceFile() {
+        PlayerWidget.ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
+        if (referenceType != null) {
+            if (referenceType == PlayerWidget.ReferenceType.html) {
+                String name = this.name + ".html";
+                return new File(Options.DIRECTORYREFERENCE, "html/" + name);
+            } else if (referenceType == PlayerWidget.ReferenceType.txt) {
+                String name = this.name + ".txt";
+                return new File(Options.DIRECTORYREFERENCE, "txt/" + name);
+            }
             return null;
-        }
+        } else {return null;}
     }
     public void setCutstoplay(ArrayList<Cut> cutstoplay) {this.cutstoplay = cutstoplay;}
     public File getFinalcutexportfile() {

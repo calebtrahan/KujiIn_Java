@@ -233,11 +233,11 @@ public class PlayerWidget implements Widget {
         private ReferenceType referenceType;
         private Boolean fullscreenoption;
 
-        public DisplayReference(MainController root, Cut currentcut, ReferenceType referenceType, Boolean fullscreenoption) {
+        public DisplayReference(MainController root, Cut currentcut) {
             Root = root;
             this.currentcut = currentcut;
-            this.referenceType = referenceType;
-            this.fullscreenoption = fullscreenoption;
+            referenceType = Root.getOptions().getSessionOptions().getReferencetype();
+            fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -276,24 +276,27 @@ public class PlayerWidget implements Widget {
             ContentPane.setStyle("-fx-background-color: #212526");
         }
         public void loadcontent() {
-            File referencefile = currentcut.getReferenceFile(referenceType);
-            if (referenceType == ReferenceType.txt) {
-                StringBuilder sb = new StringBuilder();
-                try (FileInputStream fis = new FileInputStream(referencefile);
-                     BufferedInputStream bis = new BufferedInputStream(fis)) {
-                    while (bis.available() > 0) {sb.append((char) bis.read());}
-                } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-                TextArea ta = new TextArea();
-                ta.setText(sb.toString());
-                ta.setWrapText(true);
-                ContentPane.setContent(ta);
-            } else if (referenceType == ReferenceType.html) {
-                WebView browser = new WebView();
-                WebEngine webEngine = browser.getEngine();
-                ContentPane.setContent(browser);
-                webEngine.load(referencefile.toURI().toString());
+            File referencefile = currentcut.getReferenceFile();
+            if (referencefile != null) {
+                if (referenceType == ReferenceType.txt) {
+                    StringBuilder sb = new StringBuilder();
+                    try (FileInputStream fis = new FileInputStream(referencefile);
+                         BufferedInputStream bis = new BufferedInputStream(fis)) {
+                        while (bis.available() > 0) {sb.append((char) bis.read());}
+                    } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+                    TextArea ta = new TextArea();
+                    ta.setText(sb.toString());
+                    ta.setWrapText(true);
+                    ContentPane.setContent(ta);
+                } else if (referenceType == ReferenceType.html) {
+                    WebView browser = new WebView();
+                    WebEngine webEngine = browser.getEngine();
+                    ContentPane.setContent(browser);
+                    webEngine.load(referencefile.toURI().toString());
+                }
             }
         }
+
     }
     public static class ReferenceTypeDialog extends Stage {
         private MainController Root;
@@ -302,12 +305,14 @@ public class PlayerWidget implements Widget {
         public RadioButton TextOption;
         public Button CancelButton;
         public CheckBox FullScreenOption;
-        private ReferenceType referenceType = null;
+        private ReferenceType referenceType;
         private Boolean fullscreen;
         private Boolean enabled;
 
-        public ReferenceTypeDialog (MainController root, ReferenceType referenceType, Boolean fullscreenoption) {
+        public ReferenceTypeDialog (MainController root) {
             Root = root;
+            referenceType = Root.getOptions().getSessionOptions().getReferencetype();
+            fullscreen = Root.getOptions().getSessionOptions().getReferencefullscreen();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceTypeDialog.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -320,7 +325,7 @@ public class PlayerWidget implements Widget {
                 if (referenceType == ReferenceType.txt) {TextOption.setSelected(true);}
                 else if (referenceType == ReferenceType.html) {HTMLOption.setSelected(true);}
             }
-            if (fullscreenoption != null) {FullScreenOption.setSelected(fullscreenoption);}
+            FullScreenOption.setSelected(fullscreen);
         }
 
     // Getters And Setters
