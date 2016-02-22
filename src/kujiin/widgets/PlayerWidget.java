@@ -40,12 +40,11 @@ public class PlayerWidget implements Widget {
     private Slider AmbienceVolume;
     private Label EntrainmentPercentage;
     private Label AmbiencePercentage;
-    private Label StatusBar;
+    public Label StatusBar;
     private Label VolumeEntrainmentLabel;
     private Label VolumeAmbienceLabel;
     private Label VolumeTopLabel;
     private This_Session Session;
-    private ReferenceType referenceType;
     private MainController Root;
 
     public PlayerWidget(MainController root) {
@@ -87,17 +86,8 @@ public class PlayerWidget implements Widget {
             } catch(Exception ignored) {Tools.showtimedmessage(StatusBar, "No Session Playing", 2000);}
         });
         onOffSwitch.setDisable(true);
-        Tools.showtimedmessage(StatusBar, "Player Disabled Till Session Is Created Or Loaded", 10000);
+        Tools.showtimedmessage(StatusBar, "Player Disabled Until Session Is Created Or Loaded", 10000);
     }
-
-// Getters And Setters
-    public ReferenceType getReferenceType() {
-        return referenceType;
-    }
-    public void setReferenceType(ReferenceType referenceType) {
-        this.referenceType = referenceType;
-    }
-    public boolean isEnabled() {return onOffSwitch.isSelected();}
 
 // Button Actions
     public void play() {
@@ -218,7 +208,6 @@ public class PlayerWidget implements Widget {
         Session.stop();
         return Session.getPlayerState() != PlayerState.PLAYING;
     }
-
     public void readytoplay() {
         CutPlayingText.setText("Ready To Play");
         SessionPlayingText.setText("Ready To Play");
@@ -398,4 +387,5 @@ public class PlayerWidget implements Widget {
     public enum PlayerState {
         PLAYING, PAUSED, STOPPED, TRANSITIONING, IDLE
     }
+
 }

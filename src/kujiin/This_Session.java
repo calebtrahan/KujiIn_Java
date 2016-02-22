@@ -24,6 +24,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// TODO Double Check That Reference Files Switch On And Off And Work With The Options Being In XML
+// TODO Work On Completed Goals
+
 public class This_Session {
     private Cut presession = new Cut(0, "Presession", 0, this);
     private Cut rin = new Cut(1, "RIN", 0, this);

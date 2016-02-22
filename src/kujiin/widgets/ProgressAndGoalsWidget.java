@@ -165,10 +165,6 @@ public class ProgressAndGoalsWidget implements Widget {
         if (! Goals.goalsexist(cutindex, true)) {Tools.showinformationdialog(Root, "Information", "No Goals Exist For " + GOALCUTNAMES[cutindex], "Please Add A Goal For " + GOALCUTNAMES[cutindex]); return;}
         new EditGoalsDialog(Root, cutindex).showAndWait();
     }
-//    public void goalpacing() {
-//        if (cutindex == -1) {Tools.showinformationdialog("Information", "No Cut Selected", "Please Select A Cut To Calculate Goal Pacing"); return;}
-//        new GoalPacingDialog(Goals.getgoal(cutindex, 0), Goals.getTotalGoals(), Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected())).showAndWait();
-//    }
 
 // Widget Implementation
     public void loading() {
@@ -241,9 +237,17 @@ public class ProgressAndGoalsWidget implements Widget {
                 int numberofsessionspracticed = Sessions.cutsessionscount(cutindex);
                 boolean sessionsgood = averagesessionduration != 0 || totalminutespracticed != 0 || numberofsessionspracticed != 0;
                 String nonetext = "No Sessions";
-                if (sessionsgood) {AverageSessionDuration.setText(Tools.minutestoformattedhoursandmins(averagesessionduration));}
+                if (sessionsgood) {
+                    String longtext = Tools.minutestoformattedhoursandmins(averagesessionduration);
+                    if (longtext.toCharArray().length <= 14) {AverageSessionDuration.setText(longtext);}
+                    else {AverageSessionDuration.setText(Tools.minstoformattedabbreviatedhoursandminutes(averagesessionduration));}
+                }
                 else {AverageSessionDuration.setText(nonetext);}
-                if (sessionsgood) {TotalTimePracticed.setText(Tools.minutestoformattedhoursandmins(totalminutespracticed));}
+                if (sessionsgood) {
+                    String longtext = Tools.minutestoformattedhoursandmins(totalminutespracticed);
+                    if (longtext.toCharArray().length <= 14) {TotalTimePracticed.setText(longtext);}
+                    else {TotalTimePracticed.setText(Tools.minstoformattedabbreviatedhoursandminutes(totalminutespracticed));}
+                }
                 else {TotalTimePracticed.setText(nonetext);}
                 if (sessionsgood) {NumberOfSessionsPracticed.setText(Integer.toString(numberofsessionspracticed));}
                 else {NumberOfSessionsPracticed.setText(nonetext);}

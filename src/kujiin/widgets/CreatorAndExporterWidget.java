@@ -176,6 +176,7 @@ public class CreatorAndExporterWidget implements Widget {
                 ExportButton.setDisable(false);
                 CreateButton.setText("Edit");
                 session.Root.getPlayer().onOffSwitch.setDisable(false);
+                session.Root.getPlayer().StatusBar.setText("Player Disabled Until Session Is Created Or Loaded");
                 setCreatorState(CreatorState.CREATED);
                 Tools.showinformationdialog(Root, "Success", "Session Successfully Created", "You Can Now Play Or Export This Session");
             }
@@ -186,6 +187,7 @@ public class CreatorAndExporterWidget implements Widget {
             session.Root.getPlayer().onOffSwitch.setSelected(false);
             session.Root.getPlayer().statusSwitch();
             session.Root.getPlayer().onOffSwitch.setDisable(true);
+            session.Root.getPlayer().onOffSwitch.setTooltip(new Tooltip("Create A Session To Enable The Session Player"));
             setCreatorState(CreatorState.NOT_CREATED);
         }
     }

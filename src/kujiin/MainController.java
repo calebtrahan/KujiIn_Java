@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.*;
 
 public class MainController implements Initializable {
@@ -691,6 +692,7 @@ public class MainController implements Initializable {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(defaultscene);
             } catch (IOException ignored) {}
+            System.out.println(String.format("Time %s Encountered: %s", exception.getClass().getName(), LocalDate.now()));
             exception.printStackTrace();
             setTitle("Program Error Occured");
             TopText.setText(exception.getClass().getName() + " Occured");
