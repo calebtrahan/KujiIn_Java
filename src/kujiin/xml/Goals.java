@@ -192,7 +192,7 @@ public class Goals {
         if (cutindex == 11) setTotalGoals(cutgoallist);
     }
 
-    // Goal Getters
+// Goal Getters
     public boolean goalsexist(int cutindex, boolean includecompleted) {
         return getallcutgoals(cutindex, includecompleted) != null && ! getallcutgoals(cutindex, true).isEmpty();
     }
@@ -227,21 +227,39 @@ public class Goals {
             return newgoallist;
         } catch (NullPointerException e) {return new ArrayList<>();}
     }
+//    public List<Goal> getgoalscompletedondate(int cutindex, LocalDate localDate) {
+//       List<Goal> goalscompletedondate = new ArrayList<>();
+//        for (Goal i : getallcutgoals(cutindex, false)) {
+//            LocalDate date = Tools.converttolocaldate(i.getDate_Completed())
+//        }
+//    }
 
 // Goal Completion Methods
-    public void checkifgoalscompleted(int cutindex, double currentpracticedhours) {
+    public void sortcompletedgoals(int cutindex, double currentpracticedhours) {
         for (Goal i : getallcutgoals(cutindex, true)) {
             boolean completed = currentpracticedhours >= i.getGoal_Hours();
             i.setCompleted(completed);
-            if (completed && i.getDate_Completed().equals("Not Completed")) {
+            if (completed && ! i.getCompleted()) {i.setDate_Completed(Tools.gettodaysdate());}
+        }
+    }
+    public List<Goal> completecutgoals(int cutindex, double currentpracticedhours) {
+        List<Goal> completedthisession = new ArrayList<>();
+        for (Goal i : getallcutgoals(cutindex, true)) {
+            boolean completed = currentpracticedhours >= i.getGoal_Hours();
+            boolean notcompletedbefore = ! i.getCompleted();
+            if (completed && notcompletedbefore) {
+                i.setCompleted(true);
                 i.setDate_Completed(Tools.gettodaysdate());
+                completedthisession.add(i);
             }
         }
+        return completedthisession;
     }
 
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class Goal {
         private Integer ID;
+        private String CutName;
         private String Date_Set;
         private String Date_Due;
         private String Date_Completed;
@@ -250,10 +268,11 @@ public class Goals {
 
         public Goal() {}
 
-        public Goal(LocalDate duedate, Double goalhours) {
+        public Goal(LocalDate duedate, Double goalhours, String cutname) {
             setDate_Due(Tools.convertfromlocaldatetostring(duedate));
             setGoal_Hours(goalhours);
             setDate_Set(Tools.convertfromlocaldatetostring(LocalDate.now()));
+            setCutName(cutname);
             setCompleted(false);
             setDate_Completed("Not Completed");
         }
@@ -278,6 +297,12 @@ public class Goals {
         }
         public void setCompleted(Boolean completed) {
             Completed = completed;
+        }
+        public String getCutName() {
+            return CutName;
+        }
+        public void setCutName(String cutName) {
+            CutName = cutName;
         }
 
         // Other Methods

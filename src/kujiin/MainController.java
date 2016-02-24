@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
+// TODO Saving Preset Is Broke!
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;
@@ -96,7 +97,6 @@ public class MainController implements Initializable {
     public Label CompletionLabel;
     public Label VolumeEntrainmentLabel;
     public Label VolumeAmbienceLabel;
-    public Label VolumeTopLabel;
     public TextField GoalPracticedMinutes;
     public TextField GoalSetHours;
     public TextField GoalSetMinutes;

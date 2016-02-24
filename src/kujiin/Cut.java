@@ -9,6 +9,7 @@ import javafx.concurrent.Task;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import kujiin.interfaces.Playable;
 import kujiin.widgets.PlayerWidget;
 import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Options;
@@ -21,12 +22,11 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class Cut {
+public class Cut implements Playable {
     private This_Session thisession;
     public String name;
     public int number;
     public int duration;
-    // Plackback Fields
     private File tempentrainmenttextfile;
     private File tempambiencetextfile;
     private File tempentrainmentfile;
@@ -40,6 +40,7 @@ public class Cut {
     private ArrayList<Double> ambiencefiledurations;
     private File ambiencedirectory;
     private double totalambienceduration;
+    // Playable Fields
     private int entrainmentplaycount;
     private int ambienceplaycount;
     private ArrayList<Media> entrainmentmedia;
@@ -104,6 +105,7 @@ public class Cut {
     public void setFinalcutexportfile(File finalcutexportfile) {
         this.finalcutexportfile = finalcutexportfile;
     }
+    public int getSecondselapsed() {return secondselapsed;}
 
 // Getters For Cut Information
     public Duration getDuration() {return new Duration((double) getdurationinseconds() * 1000);}
@@ -274,21 +276,16 @@ public class Cut {
         if (ambiencemedia != null) ambiencemedia.clear();
     }
 
-// Playback
-    // ------- Playback Info -------- //
+// Playable Implementation
     public MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
     public MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
-    public int getSecondselapsed() {return secondselapsed;}
-    public String getcurrenttimeformatted() {return Tools.formatlengthshort(secondselapsed + 1);}
-    public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
-    public void updatecuttime() {
+    public void tick() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             secondselapsed++;
             ProgressAndGoalsWidget progressAndGoalsWidget = thisession.Root.getProgressTracker();
             progressAndGoalsWidget.getSessions().getsession(progressAndGoalsWidget.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
         }
     }
-    // --------- Controls ---------- //
     public void start() {
         entrainmentplaycount = 0;
         ambienceplaycount = 0;
@@ -393,7 +390,7 @@ public class Cut {
         Double millistillfadeout = (getdurationinseconds() * 1000) - (fadeoutduration * 1000);
         fadeouttimeline = new Timeline(new KeyFrame(Duration.millis(millistillfadeout), ae -> startfadeout()));
         fadeouttimeline.play();
-        cuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updatecuttime()));
+        cuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> tick()));
         cuttimeline.setCycleCount(Animation.INDEFINITE);
         cuttimeline.play();
         thisession.Root.getProgressTracker().selectcut(number);
@@ -429,8 +426,6 @@ public class Cut {
             entrainmentplaycount++;
             entrainmentplayer.dispose();
             entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
-            entrainmentplayer.setVolume(0.0);
-            entrainmentplayer.setOnPlaying(() -> entrainmentplayer.setVolume(0.0));
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
             entrainmentplayer.play();
@@ -441,8 +436,6 @@ public class Cut {
             ambienceplaycount++;
             ambienceplayer.dispose();
             ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
-            ambienceplayer.setVolume(0.0);
-            ambienceplayer.setOnPlaying(() -> ambienceplayer.setVolume(0.0));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.play();
@@ -451,7 +444,6 @@ public class Cut {
             for (Media i : ambiencemedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
         }
     }
-    // ------ Error Handling ------- //
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists
@@ -484,6 +476,9 @@ public class Cut {
             }
         } catch (NullPointerException ignored) {}
     }
+    // Playback Information Getters
+    public String getcurrenttimeformatted() {return Tools.formatlengthshort(secondselapsed + 1);}
+    public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
 
 // Export
     public Service<Boolean> getcutexportservice() {

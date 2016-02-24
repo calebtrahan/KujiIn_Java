@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="335.0" prefWidth="531.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="TopLabel" alignment="CENTER" layoutX="13.0" layoutY="14.0" prefHeight="20.0" prefWidth="506.0" text="You Completed xx Goals This Session" textAlignment="CENTER">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+      <TableView fx:id="GoalsCompletedTable" layoutX="14.0" layoutY="36.0" prefHeight="268.0" prefWidth="506.0">
+        <columns>
+          <TableColumn fx:id="CutNameColumn" prefWidth="75.0" text="Cut Name" />
+            <TableColumn fx:id="CurrentHoursColumn" prefWidth="91.0" text="Current Hrs" />
+            <TableColumn fx:id="GoalHoursColumn" prefWidth="69.0" text="Goal Hrs" />
+          <TableColumn fx:id="DateSetColumn" text="Date Set" />
+            <TableColumn fx:id="DaysTakenColumn" prefWidth="83.0" text="Days Taken" />
+            <TableColumn fx:id="DateCompletedColumn" prefWidth="107.0" text="Date Completed" />
+        </columns>
+      </TableView>
+      <Button fx:id="CloseButton" layoutX="468.0" layoutY="304.0" mnemonicParsing="false" text="Close" />
+   </children>
+</AnchorPane>

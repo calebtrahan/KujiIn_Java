@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="123.0" prefWidth="206.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="119.0" prefWidth="227.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label layoutX="35.0" layoutY="14.0" text="Goal Completed">
+      <Label fx:id="TopLabel" alignment="CENTER" layoutX="1.0" layoutY="14.0" prefHeight="20.0" prefWidth="226.0" text="Postsession Goal Achieved">
          <font>
-            <Font size="19.0" />
+            <Font size="17.0" />
          </font>
       </Label>
-      <Label fx:id="GoalHours" alignment="CENTER_RIGHT" layoutX="57.0" layoutY="46.0" prefHeight="36.0" prefWidth="62.0" text="999" textAlignment="CENTER">
+      <Label fx:id="GoalHours" alignment="CENTER_RIGHT" layoutX="62.0" layoutY="44.0" prefHeight="36.0" prefWidth="62.0" text="999" textAlignment="CENTER">
          <font>
             <Font size="31.0" />
          </font>
       </Label>
-      <Label layoutX="126.0" layoutY="56.0" text="hours" />
-      <Button fx:id="CloseButton" layoutX="147.0" layoutY="89.0" mnemonicParsing="false" text="Close" />
-      <Label fx:id="CurrentHoursLabel" layoutX="14.0" layoutY="94.0" prefHeight="16.0" prefWidth="129.0" text="Current Hours: 999.9" />
+      <Label layoutX="131.0" layoutY="54.0" text="hours" />
+      <Button fx:id="CloseButton" layoutX="164.0" layoutY="89.0" mnemonicParsing="false" text="Close" />
+      <Label fx:id="CurrentHoursLabel" layoutX="3.0" layoutY="94.0" prefHeight="16.0" prefWidth="146.0" text="Practiced Hours: 999.9" />
    </children>
 </AnchorPane>

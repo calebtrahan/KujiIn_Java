@@ -1,5 +1,8 @@
 package kujiin.widgets;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
@@ -12,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import kujiin.Cut;
 import kujiin.MainController;
 import kujiin.This_Session;
@@ -84,6 +88,7 @@ public class CreatorAndExporterWidget implements Widget {
     private Integer exportserviceindex;
     private ExportingSessionDialog exportingSessionDialog;
     private Preset Preset;
+    private Timeline updateuitimeline;
     private MainController Root;
 
     public CreatorAndExporterWidget(MainController root) {
@@ -141,6 +146,8 @@ public class CreatorAndExporterWidget implements Widget {
         TotalSessionTime.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         ApproximateEndTime.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         exportservices = new ArrayList<>();
+        updateuitimeline = new Timeline(new KeyFrame(Duration.millis(60000), ae -> updatecreatorui()));
+        updateuitimeline.setCycleCount(Animation.INDEFINITE);
         updatecreatorui();
     }
 
@@ -212,7 +219,7 @@ public class CreatorAndExporterWidget implements Widget {
                     boolean goalssetsuccessfully = true;
                     for (Integer i : cutindexes) {
                         try {
-                            Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours));}
+                            Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours, ProgressAndGoalsWidget.GOALCUTNAMES[i]));}
                         catch (JAXBException ignored) {goalssetsuccessfully = false; Tools.showerrordialog(Root, "Error", "Couldn't Add Goal For " + ProgressAndGoalsWidget.GOALCUTNAMES[i], "Check File Permissions");}
                     }
                     if (goalssetsuccessfully) {Tools.showinformationdialog(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");}
@@ -482,6 +489,7 @@ public class CreatorAndExporterWidget implements Widget {
 // Widget Implementation
     @Override
     public void disable() {
+        updateuitimeline.stop();
         ChangeAllValuesButton.setDisable(true);
         AmbienceSwitch.setDisable(true);
         ApproximateEndTime.setDisable(true);
@@ -516,6 +524,7 @@ public class CreatorAndExporterWidget implements Widget {
     }
     @Override
     public void enable() {
+        updateuitimeline.play();
         ChangeAllValuesButton.setDisable(false);
         AmbienceSwitch.setDisable(false);
         ApproximateEndTime.setDisable(false);

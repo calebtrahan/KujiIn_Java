@@ -43,7 +43,6 @@ public class PlayerWidget implements Widget {
     public Label StatusBar;
     private Label VolumeEntrainmentLabel;
     private Label VolumeAmbienceLabel;
-    private Label VolumeTopLabel;
     private This_Session Session;
     private MainController Root;
 
@@ -69,7 +68,6 @@ public class PlayerWidget implements Widget {
         StatusBar = root.PlayerStatusBar;
         VolumeAmbienceLabel = root.VolumeAmbienceLabel;
         VolumeEntrainmentLabel = root.VolumeEntrainmentLabel;
-        VolumeTopLabel = root.VolumeTopLabel;
         Session = root.getSession();
         EntrainmentVolume.setOnMouseClicked(event -> {
             try {
@@ -152,7 +150,6 @@ public class PlayerWidget implements Widget {
         ReferenceFileCheckbox.setDisable(true);
         EntrainmentVolume.setDisable(true);
         AmbienceVolume.setDisable(true);
-        VolumeTopLabel.setDisable(true);
         VolumeEntrainmentLabel.setDisable(true);
         VolumeAmbienceLabel.setDisable(true);
         EntrainmentPercentage.setText("-");
@@ -180,7 +177,6 @@ public class PlayerWidget implements Widget {
         CutProgress.setDisable(false);
         TotalProgress.setDisable(false);
         ReferenceFileCheckbox.setDisable(false);
-        VolumeTopLabel.setDisable(false);
         VolumeEntrainmentLabel.setDisable(false);
         VolumeAmbienceLabel.setDisable(false);
         if (Session.getAmbienceenabled()) {AmbienceVolume.setDisable(false);}

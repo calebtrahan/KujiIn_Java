@@ -16,6 +16,8 @@ import javafx.util.Duration;
 import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.PlayerWidget;
+import kujiin.widgets.ProgressAndGoalsWidget;
+import kujiin.xml.Goals;
 import kujiin.xml.Options;
 import kujiin.xml.Session;
 import kujiin.xml.Sessions;
@@ -23,9 +25,14 @@ import kujiin.xml.Sessions;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 // TODO Double Check That Reference Files Switch On And Off And Work With The Options Being In XML
 // TODO Work On Completed Goals
+// TODO If Ramp Disabled (And No Pre/PostSession Set) Ask User If They Want TO Add A Ramp Into 1st Practiced Cut (2/3/5) Min, Then Update UI And Create Session
+
+// TODO Problems During Session
+    // Create A Field (GoalsCompleted) For ThisSession, Check If Completed When Transitioning Cuts, And Add A Method To Add Completed Goals To Be Displayed At endofsession()
 
 public class This_Session {
     private Cut presession = new Cut(0, "Presession", 0, this);
@@ -60,6 +67,7 @@ public class This_Session {
     private PlayerWidget.DisplayReference displayReference;
     private File exportfile;
     public MainController Root;
+    public List<Goals.Goal> GoalsCompletedThisSession;
 
     public This_Session(MainController mainController) {
         Root = mainController;
@@ -507,7 +515,7 @@ public class This_Session {
     }
     public void playthiscut() {
         try {
-            if (Root.getOptions().getSessionOptions().getReferenceoption()) {displayreferencefile();}
+            if (Root.getOptions().getSessionOptions().getReferenceoption() != null) {displayreferencefile();}
             Duration cutduration = currentcut.getDuration();
             currentcut.start();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
@@ -520,6 +528,9 @@ public class This_Session {
             if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
 //                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
                 try {
+                    List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcut.number,
+                            Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(currentcut.number, false), 2));
+                    GoalsCompletedThisSession.addAll(completedgoals);
                     cutcount++;
                     currentcut = cutsinsession.get(cutcount);
                     playthiscut();
@@ -532,7 +543,18 @@ public class This_Session {
         currentcuttimeline.stop();
         setPlayerState(PlayerWidget.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
+        // TODO Display Session Complete! Dialog
         new PlayerWidget.SessionFinishedDialog(Root).showAndWait();
+        // TODO Display Goal(s) Complete!
+        if (GoalsCompletedThisSession.size() == 1) {
+            Goals.Goal i = GoalsCompletedThisSession.get(0);
+            int cutindex = new ArrayList<String>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(i.getCutName());
+            double currentpracticedhours = Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2);
+            new ProgressAndGoalsWidget.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
+        } else if (GoalsCompletedThisSession.size() > 1) {
+            new ProgressAndGoalsWidget.MultipleGoalsCompletedDialog(Root, GoalsCompletedThisSession).showAndWait();
+        }
+        // TODO Prompt For Export
 //        if (Tools.getanswerdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            getsessionexporter();}
         Root.getProgressTracker().updategoalsui();
