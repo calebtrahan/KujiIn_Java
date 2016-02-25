@@ -548,7 +548,7 @@ public class This_Session {
         // TODO Display Goal(s) Complete!
         if (GoalsCompletedThisSession.size() == 1) {
             Goals.Goal i = GoalsCompletedThisSession.get(0);
-            int cutindex = new ArrayList<String>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(i.getCutName());
+            int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(i.getCutName());
             double currentpracticedhours = Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2);
             new ProgressAndGoalsWidget.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
         } else if (GoalsCompletedThisSession.size() > 1) {

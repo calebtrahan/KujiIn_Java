@@ -137,6 +137,7 @@ public class Goals {
     }
     public void marshall() {
         try {
+            sortallcompletedgoals();
             JAXBContext context = JAXBContext.newInstance(Goals.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -227,6 +228,13 @@ public class Goals {
             return newgoallist;
         } catch (NullPointerException e) {return new ArrayList<>();}
     }
+    public int getcompletedgoalcount(int cutindex) {
+        int completedgoalcount = 0;
+        for (Goal i : getallcutgoals(cutindex, true)) {
+            if (i.getCompleted()) completedgoalcount++;
+        }
+        return completedgoalcount;
+    }
 //    public List<Goal> getgoalscompletedondate(int cutindex, LocalDate localDate) {
 //       List<Goal> goalscompletedondate = new ArrayList<>();
 //        for (Goal i : getallcutgoals(cutindex, false)) {
@@ -235,6 +243,12 @@ public class Goals {
 //    }
 
 // Goal Completion Methods
+    public void sortallcompletedgoals() {
+        for (int i = 0; i <= 10; i++) {
+            double currentpracticedhours = Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(i, false);
+            sortcompletedgoals(i, currentpracticedhours);
+        }
+    }
     public void sortcompletedgoals(int cutindex, double currentpracticedhours) {
         for (Goal i : getallcutgoals(cutindex, true)) {
             boolean completed = currentpracticedhours >= i.getGoal_Hours();

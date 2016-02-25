@@ -78,7 +78,7 @@ public class ProgressAndGoalsWidget implements Widget {
         PreAndPostOption = root.PrePostSwitch;
         SessionListButton = root.ListOfSessionsButton;
         Sessions = new Sessions(Root);
-        Goals = new Goals();
+        Goals = new Goals(Root);
         Service<Void> getsessions = new Service<Void>() {
             @Override
             protected Task<Void> createTask() {
@@ -285,6 +285,7 @@ public class ProgressAndGoalsWidget implements Widget {
     }
     public void updategoalsui() {
         try {
+//            Goals.sortallcompletedgoals();
             NewGoalButton.setDisable(cutindex == -1);
             CurrentGoalsButton.setDisable(cutindex == -1);
             int practicedminutes = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
@@ -310,7 +311,7 @@ public class ProgressAndGoalsWidget implements Widget {
         } catch (NullPointerException ignored) {
             if (cutindex != -1) {
                 TopLabel.setText(GOALCUTNAMES[cutindex]);
-                Tools.showtimedmessage(StatusBar, "No Current Goal Set For " + GOALCUTNAMES[cutindex], 4000);
+                Tools.showtimedmessage(StatusBar, "No Current Goal Set (" + Goals.getcompletedgoalcount(cutindex) + " Completed)", 4000);
                 int practicedminutes = Sessions.getpracticedtimeinminutesforallsessions(cutindex, PreAndPostOption.isSelected());
                 Integer hours = practicedminutes / 60;
                 Integer minutes = practicedminutes % 60;
@@ -793,6 +794,8 @@ public class ProgressAndGoalsWidget implements Widget {
         private LocalDate goaldate;
         private Double goalhours;
         private MainController Root;
+        private int practicedminutes;
+        private int goalminutes;
 
         public SetANewGoalForSingleCut(int cutindex, MainController root) {
             Root = root;
@@ -808,15 +811,19 @@ public class ProgressAndGoalsWidget implements Widget {
             GoalHoursSpinner.setEditable(true);
             GoalMinutesSpinner.setEditable(true);
             GoalDatePicker.setValue(LocalDate.now());
+            practicedminutes = Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false);
             try {
                 List<kujiin.xml.Goals.Goal> currentgoals = progressAndGoalsWidget.getGoal().getallcutgoals(cutindex, false);
                 System.out.println(currentgoals.size());
-                int highestgoalminutes = Tools.convertdecimalhourstominutes(progressAndGoalsWidget.getGoal().getgoal(cutindex, currentgoals.size() - 1, false).getGoal_Hours());
-                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(highestgoalminutes / 60, Integer.MAX_VALUE, highestgoalminutes / 60));
-                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(highestgoalminutes % 60, 59, highestgoalminutes % 60));
+                goalminutes = Tools.convertdecimalhourstominutes(progressAndGoalsWidget.getGoal().getgoal(cutindex, currentgoals.size() - 1, false).getGoal_Hours());
+                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(goalminutes / 60, Integer.MAX_VALUE, goalminutes / 60));
+                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, goalminutes % 60));
             } catch (NullPointerException ignored) {
-                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
-                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0));
+                goalminutes = 0;
+                int hr = practicedminutes / 60;
+                int min = practicedminutes % 60;
+                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(hr, Integer.MAX_VALUE, hr));
+                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, min));
             }
             if (cutindex != 11) TopLabel.setText("New Goal For " + GOALCUTNAMES[cutindex]);
             else TopLabel.setText("New Total Goal");
@@ -840,21 +847,31 @@ public class ProgressAndGoalsWidget implements Widget {
         // Button Actions
         public void cancelgoalsetting(Event event) {this.close();}
         public void Accept(Event event) {
-            if (GoalMinutesSpinner.getValue() > 59) {
-                Tools.showinformationdialog(Root, "Information", "Minutes Cannot Be Greater Than 59", "Select A Value Less Than 59"); return;}
-            boolean dategood = GoalDatePicker.getValue().isAfter(LocalDate.now());
-            if (dategood) {
-                int hours = GoalHoursSpinner.getValue();
-                int minutes = GoalMinutesSpinner.getValue();
-                double newhours = Tools.hoursandminutestoformatteddecimalhours(hours, minutes);
-                setGoalhours(newhours);
-                setGoaldate(GoalDatePicker.getValue());
-                super.close();
-            } else {
-                Tools.showinformationdialog(Root, "Cannot Set Goal", "Cannot Set Goal", "Due Date Must Be After Today");
+            int thisminutes = (GoalHoursSpinner.getValue() * 60) + GoalMinutesSpinner.getValue();
+            if (thisminutes <= practicedminutes) {
+                Tools.showinformationdialog(Root, "Cannot Set Goal", "Goal Time Must Be Higher Than Practiced Time " + Tools.minstoformattedlonghoursandminutes(practicedminutes), "Cannot Set Goal");
                 setGoalhours(null);
                 setGoaldate(null);
+                return;
             }
+            if (thisminutes > goalminutes) {
+                Tools.showinformationdialog(Root, "Cannot Set Goal", "Goal Time Must Be Higher Than Practiced Time " + Tools.minstoformattedlonghoursandminutes(practicedminutes), "Cannot Set Goal");
+                setGoalhours(null);
+                setGoaldate(null);
+                return;
+            }
+            if (! GoalDatePicker.getValue().isAfter(LocalDate.now())) {
+                Tools.showinformationdialog(Root, "Cannot Set Goal",  "Due Date Must Be After Today", "Cannot Set Goal");
+                setGoalhours(null);
+                setGoaldate(null);
+                return;
+            }
+            int hours = GoalHoursSpinner.getValue();
+            int minutes = GoalMinutesSpinner.getValue();
+            double newhours = Tools.hoursandminutestoformatteddecimalhours(hours, minutes);
+            setGoalhours(newhours);
+            setGoaldate(GoalDatePicker.getValue());
+            super.close();
         }
         public void viewcurrentgoals(Event event) {progressAndGoalsWidget.opengoaleditor();}
     }
@@ -1034,7 +1051,7 @@ public class ProgressAndGoalsWidget implements Widget {
             ObservableList<CompletedGoalsAtEndOfSessionBinding> newcompletedgoals = FXCollections.observableArrayList();
             for (kujiin.xml.Goals.Goal i : completedgoals) {
                 String cutname = i.getCutName();
-                int cutindex = new ArrayList<String>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(cutname);
+                int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(cutname);
                 String practicedhours = Double.toString(Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2));
                 String goalhours = i.getGoal_Hours().toString();
                 String dateset = i.getDate_Set();
