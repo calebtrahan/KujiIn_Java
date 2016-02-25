@@ -39,8 +39,8 @@
             <Font size="19.0" />
          </font>
       </Label>
-      <Label fx:id="CutProgressTopLabel" alignment="CENTER_RIGHT" layoutX="249.0" layoutY="210.0" prefHeight="17.0" prefWidth="121.0" text="No Session Playing" textAlignment="CENTER" />
-      <Label fx:id="TotalSessionLabel" alignment="CENTER_RIGHT" layoutX="253.0" layoutY="250.0" prefHeight="17.0" prefWidth="113.0" text="No Session Playing" textAlignment="CENTER" />
+      <Label fx:id="CutProgressTopLabel" alignment="CENTER" layoutX="211.0" layoutY="209.0" prefHeight="17.0" prefWidth="200.0" text="No Session Playing" textAlignment="CENTER" />
+      <Label fx:id="TotalSessionLabel" alignment="CENTER" layoutX="211.0" layoutY="249.0" prefHeight="17.0" prefWidth="200.0" text="No Session Playing" textAlignment="CENTER" />
       <CheckBox fx:id="ReferenceFilesOption" layoutX="204.0" layoutY="297.0" mnemonicParsing="false" onAction="#setReferenceOption" prefHeight="26.0" prefWidth="90.0" text="Reference" textAlignment="CENTER" wrapText="true" />
       <Label fx:id="PlayerStatusBar" alignment="BOTTOM_LEFT" layoutX="18.0" layoutY="296.0" prefHeight="29.0" prefWidth="158.0" wrapText="true">
          <font>
@@ -270,7 +270,7 @@
                   <Insets right="5.0" />
                </HBox.margin>
             </Label>
-            <ProgressBar fx:id="TotalProgressBar" prefHeight="22.0" prefWidth="200.0" progress="0.0" />
+            <ProgressBar fx:id="TotalProgressBar" prefHeight="21.0" prefWidth="200.0" progress="0.0" />
             <Label fx:id="TotalProgressLabelTotal" prefHeight="16.0" prefWidth="60.0" text="--:--">
                <HBox.margin>
                   <Insets left="5.0" />

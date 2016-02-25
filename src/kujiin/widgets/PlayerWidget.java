@@ -197,7 +197,7 @@ public class PlayerWidget implements Widget {
         SessionTotalTime.setText("--:--");
         CutProgress.setProgress(0.0);
         TotalProgress.setProgress(0.0);
-        ReferenceFileCheckbox.setText("Reference Display");
+        ReferenceFileCheckbox.setText("Reference");
     }
     @Override
     public boolean cleanup() {
@@ -207,7 +207,7 @@ public class PlayerWidget implements Widget {
     public void readytoplay() {
         CutPlayingText.setText("Ready To Play");
         SessionPlayingText.setText("Ready To Play");
-        ReferenceFileCheckbox.setText("Reference Display");
+        ReferenceFileCheckbox.setText("Reference");
     }
 
 // Dialogs

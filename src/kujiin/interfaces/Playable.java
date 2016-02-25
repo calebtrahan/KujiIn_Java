@@ -15,4 +15,5 @@ public interface Playable {
     void startfadeout();
     void entrainmenterror();
     void ambienceerror();
+    void cleanup();
 }

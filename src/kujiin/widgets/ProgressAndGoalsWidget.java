@@ -269,7 +269,7 @@ public class ProgressAndGoalsWidget implements Widget {
         ArrayList<Integer> notgoodcuts = new ArrayList<>();
         for (int i = 0; i < textfieldtimes.size(); i++) {
             Integer val = textfieldtimes.get(i);
-            if (! checkifgoalsetandlongenough(i, val)) {
+            if (val != 0 && ! checkifgoalsetandlongenough(i, val)) {
                 notgoodcuts.add(i);
             }
         }

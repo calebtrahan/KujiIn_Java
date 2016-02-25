@@ -27,12 +27,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+// TODO Theme The Reference Files With A Dark Theme
 // TODO Double Check That Reference Files Switch On And Off And Work With The Options Being In XML
 // TODO Work On Completed Goals
 // TODO If Ramp Disabled (And No Pre/PostSession Set) Ask User If They Want TO Add A Ramp Into 1st Practiced Cut (2/3/5) Min, Then Update UI And Create Session
-
-// TODO Problems During Session
-    // Create A Field (GoalsCompleted) For ThisSession, Check If Completed When Transitioning Cuts, And Add A Method To Add Completed Goals To Be Displayed At endofsession()
 
 public class This_Session {
     private Cut presession = new Cut(0, "Presession", 0, this);
@@ -491,18 +489,27 @@ public class This_Session {
         try {
             if (playerState == PlayerWidget.PlayerState.PLAYING) {
                 totalsecondselapsed++;
-                CutPlayingText.setText(String.format("%s Progress", currentcut.name));
-                SessionPlayingText.setText("Total Progress");
+                Float currentprogress;
+                Float totalprogress;
+                if (currentcut.getSecondselapsed() != 0) {currentprogress = (float) currentcut.getSecondselapsed() / (float) currentcut.getdurationinseconds();}
+                else {currentprogress = (float) 0.0;}
+                if (totalsecondselapsed != 0) {totalprogress = (float) totalsecondselapsed / (float) totalsecondsinsession;}
+                else {totalprogress = (float) 0.0;}
+                CutProgress.setProgress(currentprogress);
+                TotalProgress.setProgress(totalprogress);
+                currentprogress *= 100;
+                totalprogress *= 100;
+                CutPlayingText.setText(String.format("%s Progress (%d", currentcut.name, currentprogress.intValue()) + "%)");
+                SessionPlayingText.setText(String.format("Total Progress (%d", totalprogress.intValue()) + "%)");
                 CutCurrentTime.setText(currentcut.getcurrenttimeformatted());
                 CutTotalTime.setText(currentcut.gettotaltimeformatted());
                 SessionCurrentTime.setText(Tools.formatlengthshort(totalsecondselapsed));
                 StatusBar.setText("Session Playing. Currently Practicing " + currentcut.name + "...");
-                if (currentcut.getSecondselapsed() != 0) {CutProgress.setProgress((float) currentcut.getSecondselapsed() / (float) currentcut.getdurationinseconds());}
-                if (totalsecondselapsed != 0) {TotalProgress.setProgress((float) totalsecondselapsed / (float) totalsecondsinsession);}
                 Root.getProgressTracker().updategoalsui();
                 Root.getProgressTracker().updateprogressui();
             } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
                 CutProgress.setProgress(1.0);
+                CutPlayingText.setText(currentcut.name + " Completed");
                 if (currentcut.number != 10) {StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);}
                 CutCurrentTime.setText(currentcut.gettotaltimeformatted());
                 CutTotalTime.setText(currentcut.gettotaltimeformatted());
@@ -519,6 +526,7 @@ public class This_Session {
             Duration cutduration = currentcut.getDuration();
             currentcut.start();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
+            timeline.setOnFinished(event -> timeline.stop());
             timeline.play();
             setPlayerState(PlayerWidget.PlayerState.PLAYING);
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
@@ -530,22 +538,24 @@ public class This_Session {
                 try {
                     List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcut.number,
                             Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(currentcut.number, false), 2));
-                    GoalsCompletedThisSession.addAll(completedgoals);
+                    if (completedgoals.size() > 0) {GoalsCompletedThisSession.addAll(completedgoals);}
+                    currentcut.cleanup();
                     cutcount++;
                     currentcut = cutsinsession.get(cutcount);
                     playthiscut();
-                } catch (ArrayIndexOutOfBoundsException ignored) {endofsession();}
+                } catch (IndexOutOfBoundsException ignored) {currentcut.cleanup(); endofsession();}
             } else if (playerState == PlayerWidget.PlayerState.PLAYING) {transition();}
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).show();}
     }
     public void endofsession() {
+        CutPlayingText.setText(currentcut.name + " Completed");
+        SessionPlayingText.setText("Session Completed");
         closereferencefile();
         currentcuttimeline.stop();
         setPlayerState(PlayerWidget.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
-        // TODO Display Session Complete! Dialog
+        // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It
         new PlayerWidget.SessionFinishedDialog(Root).showAndWait();
-        // TODO Display Goal(s) Complete!
         if (GoalsCompletedThisSession.size() == 1) {
             Goals.Goal i = GoalsCompletedThisSession.get(0);
             int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(i.getCutName());
@@ -624,8 +634,8 @@ public class This_Session {
             boolean value = choosereferencetype();
             ReferenceFileCheckbox.setSelected(value);
             if (value && playerState == PlayerWidget.PlayerState.PLAYING) {displayreferencefile();}
-            if (value) {ReferenceFileCheckbox.setText("Display Reference");}
-            else {ReferenceFileCheckbox.setText("Display Reference");}
+            if (value) {ReferenceFileCheckbox.setText("Reference");}
+            else {ReferenceFileCheckbox.setText("Reference");}
         } else {
             Root.getOptions().getSessionOptions().setReferenceoption(false);
             Root.getOptions().getSessionOptions().setReferencetype(null);

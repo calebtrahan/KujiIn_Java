@@ -205,11 +205,14 @@ public class CreatorAndExporterWidget implements Widget {
         if (! notgoodongoals.isEmpty()) {
             StringBuilder notgoodtext = new StringBuilder();
             for (int i = 0; i < notgoodongoals.size(); i++) {
-                notgoodtext.append(ProgressAndGoalsWidget.GOALCUTNAMES[i]);
-                if (i != notgoodtext.length() - 1) {notgoodtext.append(", ");}
-                if (i == notgoodongoals.size() / 2) {notgoodtext.append("\n");}
+                if (i == 0 && notgoodongoals.size() > 1) {notgoodtext.append("\n");}
+                notgoodtext.append(ProgressAndGoalsWidget.GOALCUTNAMES[notgoodongoals.get(i)]);
+                if (notgoodongoals.size() > 1) {
+                    if (i != notgoodtext.length() - 1) {notgoodtext.append(", ");}
+                    if (i == notgoodongoals.size() / 2) {notgoodtext.append("\n");}
+                }
             }
-            if (Tools.getanswerdialog(Root, "Confirmation", "Goals Aren't Long Enough For \n" + notgoodtext.toString(), "Set Goals For These Cuts Before Creating This Session?")) {
+            if (Tools.getanswerdialog(Root, "Confirmation", "Goals Aren't Long Enough For " + notgoodtext.toString(), "Set Goals For These Cuts Before Creating This Session?")) {
                 ProgressAndGoalsWidget.SetANewGoalForMultipleCuts s = new ProgressAndGoalsWidget.SetANewGoalForMultipleCuts(Root, notgoodongoals, Tools.getmaxvalue(notgoodongoals));
                 s.showAndWait();
                 if (s.isAccepted()) {
@@ -225,9 +228,8 @@ public class CreatorAndExporterWidget implements Widget {
                     if (goalssetsuccessfully) {Tools.showinformationdialog(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");}
                 }
                 return true;
-            }
+            } else {return true;}
         } else {return true;}
-        return false;
     }
 
 // Export

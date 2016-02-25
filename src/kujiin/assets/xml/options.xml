@@ -16,5 +16,7 @@
         <rampduration>3</rampduration>
         <rampenabled>true</rampenabled>
         <referencefullscreen>true</referencefullscreen>
+        <referenceoption>true</referenceoption>
+        <referencetype>html</referencetype>
     </sessionOptions>
 </Options>

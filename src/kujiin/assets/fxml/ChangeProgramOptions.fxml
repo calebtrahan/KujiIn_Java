@@ -86,7 +86,7 @@
                         <Button fx:id="AlertFileSelectButton" mnemonicParsing="false" onAction="#openandtestnewfile" text="Open File" />
                      </children>
                   </HBox>
-                  <Label alignment="CENTER" contentDisplay="TOP" prefHeight="16.0" prefWidth="476.0" text="Reference Display" textAlignment="CENTER">
+                  <Label alignment="CENTER" contentDisplay="TOP" prefHeight="16.0" prefWidth="476.0" text="Reference" textAlignment="CENTER">
                      <font>
                         <Font size="15.0" />
                      </font>

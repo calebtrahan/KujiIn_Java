@@ -476,6 +476,18 @@ public class Cut implements Playable {
             }
         } catch (NullPointerException ignored) {}
     }
+    public void cleanup() {
+        try {
+            if (ambienceenabled) {getCurrentAmbiencePlayer().dispose();}
+            getCurrentEntrainmentPlayer().dispose();
+            fadeinentrainment.stop();
+            fadeinambience.stop();
+            fadeoutambience.stop();
+            fadeinentrainment.stop();
+            fadeouttimeline.stop();
+            cuttimeline.stop();
+        } catch (Exception ignored) {}
+    }
     // Playback Information Getters
     public String getcurrenttimeformatted() {return Tools.formatlengthshort(secondselapsed + 1);}
     public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
