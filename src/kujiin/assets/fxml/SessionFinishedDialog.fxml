@@ -18,7 +18,7 @@
                   <Insets top="5.0" />
                </VBox.margin>
             </Label>
-            <TextField fx:id="TotalPracticeDuration" alignment="CENTER" prefHeight="26.0" prefWidth="131.0" text="999 Hrs. 59 Mins.">
+            <TextField fx:id="TotalPracticeDuration" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="131.0" text="999 Hrs. 59 Mins.">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
@@ -32,7 +32,7 @@
                   <Insets top="5.0" />
                </VBox.margin>
             </Label>
-            <TextField fx:id="SessionDuration" alignment="CENTER" prefHeight="26.0" prefWidth="131.0" text="999 Hrs. 59 Mins.">
+            <TextField fx:id="SessionDuration" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="131.0" text="999 Hrs. 59 Mins.">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>

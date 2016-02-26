@@ -924,27 +924,35 @@ public class MainController implements Initializable {
             catch (NullPointerException ignored) {AlertFile = null;}
             checkalertfile();
         }
-        public void apply(ActionEvent actionEvent) {
-            Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
-            Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
-            Options.getSessionOptions().setRampenabled(RampSwitch.isSelected());
-            if (RampSwitch.isSelected()) {
-                int index = RampDurationChoiceBox.getSelectionModel().getSelectedIndex();
-                if (index == 0) {Options.getSessionOptions().setRampduration(2);}
-                else if (index == 1) {Options.getSessionOptions().setRampduration(3);}
-                else if (index == 2) {Options.getSessionOptions().setRampduration(5);}
-            } else {Options.getSessionOptions().setRampduration(null);}
-            Options.getSessionOptions().setFadeoutduration(new Double(FadeInValue.getText()));
-            Options.getSessionOptions().setFadeinduration(new Double(FadeOutValue.getText()));
-            Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
-            Options.getSessionOptions().setReferencetype(tempreferencetype);
-            Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
-            Options.getSessionOptions().setAlertfunction(AlertSwitch.isSelected());
-            if (AlertFile != null) {Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());}
-            else {Options.getSessionOptions().setAlertfilelocation(null);}
-            Options.marshall();
-            valuechanged = false;
-            ApplyButton.setDisable(true);
+        public boolean apply(ActionEvent actionEvent) {
+            try {
+                if (checkvalues()) {
+                    Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
+                    Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
+                    Options.getSessionOptions().setRampenabled(RampSwitch.isSelected());
+                    if (RampSwitch.isSelected()) {
+                        int index = RampDurationChoiceBox.getSelectionModel().getSelectedIndex();
+                        if (index == 0) {Options.getSessionOptions().setRampduration(2);}
+                        else if (index == 1) {Options.getSessionOptions().setRampduration(3);}
+                        else if (index == 2) {Options.getSessionOptions().setRampduration(5);}
+                    } else {Options.getSessionOptions().setRampduration(null);}
+                    Options.getSessionOptions().setFadeoutduration(new Double(FadeInValue.getText()));
+                    Options.getSessionOptions().setFadeinduration(new Double(FadeOutValue.getText()));
+                    Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
+                    Options.getSessionOptions().setReferencetype(tempreferencetype);
+                    Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
+                    Options.getSessionOptions().setAlertfunction(AlertSwitch.isSelected());
+                    if (AlertFile != null) {Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());}
+                    else {Options.getSessionOptions().setAlertfilelocation(null);}
+                    Options.marshall();
+                    valuechanged = false;
+                    ApplyButton.setDisable(true);
+                    return true;
+                } else {return false;}
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
         }
         public void accept(ActionEvent actionEvent) {
             apply(null);

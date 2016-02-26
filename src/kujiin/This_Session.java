@@ -555,15 +555,19 @@ public class This_Session {
         setPlayerState(PlayerWidget.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
         // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It
-        new PlayerWidget.SessionFinishedDialog(Root).showAndWait();
-        if (GoalsCompletedThisSession.size() == 1) {
-            Goals.Goal i = GoalsCompletedThisSession.get(0);
-            int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(i.getCutName());
-            double currentpracticedhours = Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2);
-            new ProgressAndGoalsWidget.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
-        } else if (GoalsCompletedThisSession.size() > 1) {
-            new ProgressAndGoalsWidget.MultipleGoalsCompletedDialog(Root, GoalsCompletedThisSession).showAndWait();
-        }
+        PlayerWidget.SessionFinishedDialog sess = new PlayerWidget.SessionFinishedDialog(Root);
+        sess.show();
+        sess.setOnHidden(event -> {
+            System.out.println("Session Finished Dialog Is Closed/Hidden");
+            if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
+                Goals.Goal i = GoalsCompletedThisSession.get(0);
+                int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(i.getCutName());
+                double currentpracticedhours = Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2);
+                new ProgressAndGoalsWidget.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
+            } else if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() > 1) {
+                new ProgressAndGoalsWidget.MultipleGoalsCompletedDialog(Root, GoalsCompletedThisSession).showAndWait();
+            }
+        });
         // TODO Prompt For Export
 //        if (Tools.getanswerdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            getsessionexporter();}
