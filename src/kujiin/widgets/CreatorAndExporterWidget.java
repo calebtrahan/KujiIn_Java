@@ -146,7 +146,7 @@ public class CreatorAndExporterWidget implements Widget {
         TotalSessionTime.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         ApproximateEndTime.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         exportservices = new ArrayList<>();
-        updateuitimeline = new Timeline(new KeyFrame(Duration.millis(60000), ae -> updatecreatorui()));
+        updateuitimeline = new Timeline(new KeyFrame(Duration.millis(10000), ae -> updatecreatorui()));
         updateuitimeline.setCycleCount(Animation.INDEFINITE);
         updatecreatorui();
     }

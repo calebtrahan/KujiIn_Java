@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+// TODO Reference Display Isn't Switching Off If On When Checbox Unselected
 public class PlayerWidget implements Widget {
     public CheckBox onOffSwitch;
     private Button PlayButton;
@@ -147,6 +148,7 @@ public class PlayerWidget implements Widget {
         SessionTotalTime.setDisable(true);
         CutProgress.setDisable(true);
         TotalProgress.setDisable(true);
+        ReferenceFileCheckbox.setSelected(false);
         ReferenceFileCheckbox.setDisable(true);
         EntrainmentVolume.setDisable(true);
         AmbienceVolume.setDisable(true);
@@ -176,6 +178,7 @@ public class PlayerWidget implements Widget {
         SessionTotalTime.setDisable(false);
         CutProgress.setDisable(false);
         TotalProgress.setDisable(false);
+        ReferenceFileCheckbox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
         ReferenceFileCheckbox.setDisable(false);
         VolumeEntrainmentLabel.setDisable(false);
         VolumeAmbienceLabel.setDisable(false);
@@ -211,12 +214,14 @@ public class PlayerWidget implements Widget {
     }
 
 // Dialogs
+    // TODO Style Reference Display
     public static class DisplayReference extends Stage {
         public ScrollPane ContentPane;
         private MainController Root;
         private Cut currentcut;
         private ReferenceType referenceType;
         private Boolean fullscreenoption;
+        private Scene scene;
 
         public DisplayReference(MainController root, Cut currentcut) {
             Root = root;
@@ -226,9 +231,9 @@ public class PlayerWidget implements Widget {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
             fxmlLoader.setController(this);
             try {
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                scene = new Scene(fxmlLoader.load());
+                setScene(scene);
+                Root.getOptions().setStyle(scene);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle(currentcut.name + "'s Reference");
             setsizing();
@@ -238,8 +243,12 @@ public class PlayerWidget implements Widget {
             Root = root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
             fxmlLoader.setController(this);
-            try {setScene(new Scene(fxmlLoader.load())); this.setTitle("Reference File Preview");}
-            catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+            try {
+                scene = new Scene(fxmlLoader.load());
+                setScene(scene);
+                Root.getOptions().setStyle(scene);
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+            setTitle("Reference File Preview");
             fullscreenoption = false;
             setsizing();
             WebView browser = new WebView();
@@ -273,15 +282,18 @@ public class PlayerWidget implements Widget {
                     ta.setText(sb.toString());
                     ta.setWrapText(true);
                     ContentPane.setContent(ta);
+                    Root.getOptions().setStyle(scene);
                 } else if (referenceType == ReferenceType.html) {
+                    // TODO Get Dark Theme For Webview Here For Reference Files
                     WebView browser = new WebView();
                     WebEngine webEngine = browser.getEngine();
-                    ContentPane.setContent(browser);
+//                    Root.getOptions().setStyle(scene);
+//                    webEngine.setUserStyleSheetLocation(new File(Options.DIRECTORYSTYLES, "dark.css").toURI().toString());
                     webEngine.load(referencefile.toURI().toString());
+                    ContentPane.setContent(browser);
                 }
             }
         }
-
     }
     public static class ReferenceTypeDialog extends Stage {
         private MainController Root;

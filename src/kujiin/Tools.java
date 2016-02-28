@@ -22,9 +22,6 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-// TODO Reference Display Isn't Switching Off If On When Checbox Unselected
-// TODO Style Reference Display
-// TODO End Of Session Produces ArrayIndexOutOfBounds On Exception Dialog Instead
 public class Tools {
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     public static final String[] SUPPORTEDAUDIOFORMATS = {"mp3", "aac", "wav", "aif", "aiff", "m4a"};
@@ -105,7 +102,7 @@ public class Tools {
     }
 
 // Time Methods
-    // TODO Refactor These Methods So They Make More Sense
+    // TODO Refactor These Method Names So They Aren't So Confusing
     public static double hoursandminutestoformatteddecimalhours(int hours, int minutes) {
         System.out.println("Minutes Is " + minutes);
         double newval;

@@ -31,6 +31,7 @@ import java.util.List;
 // TODO Double Check That Reference Files Switch On And Off And Work With The Options Being In XML
 // TODO Work On Completed Goals
 // TODO If Ramp Disabled (And No Pre/PostSession Set) Ask User If They Want TO Add A Ramp Into 1st Practiced Cut (2/3/5) Min, Then Update UI And Create Session
+// TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
 
 public class This_Session {
     private Cut presession = new Cut(0, "Presession", 0, this);
@@ -554,7 +555,7 @@ public class This_Session {
         currentcuttimeline.stop();
         setPlayerState(PlayerWidget.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
-        // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It
+        // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It Then Change Session Finsished Dialog To Showandwait
         PlayerWidget.SessionFinishedDialog sess = new PlayerWidget.SessionFinishedDialog(Root);
         sess.show();
         sess.setOnHidden(event -> {
@@ -585,7 +586,6 @@ public class This_Session {
         Session currentsession = sessions.getsession(sessions.totalsessioncount() - 1);
         currentsession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
         sessions.marshall();
-        // TODO Right Here Sessions Isn't Marshalling Properly. Not Saving Sessions
         Root.getProgressTracker().updategoalsui();
         currentcut.stop();
         if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
@@ -623,24 +623,20 @@ public class This_Session {
     }
 
 // Reference Files
-    public boolean choosereferencetype() {
-        if (! Root.getOptions().getSessionOptions().getReferenceoption()) {
+    public void choosereferencetype() {
+        if (! Root.getOptions().getSessionOptions().getReferenceoption() && Root.getOptions().getSessionOptions().getReferencetype() == null) {
             PlayerWidget.ReferenceTypeDialog reftype = new PlayerWidget.ReferenceTypeDialog(Root);
             reftype.showAndWait();
             Root.getOptions().getSessionOptions().setReferencetype(reftype.getReferenceType());
             Root.getOptions().getSessionOptions().setReferencefullscreen(reftype.getFullscreen());
             Root.getOptions().getSessionOptions().setReferenceoption(reftype.getEnabled());
-            return reftype.getEnabled();
-        } else {return true;}
+        }
     }
     public void togglereferencedisplay(CheckBox ReferenceFileCheckbox) {
-        if (ReferenceFileCheckbox.isSelected()) {
-            boolean value = choosereferencetype();
-            ReferenceFileCheckbox.setSelected(value);
-            if (value && playerState == PlayerWidget.PlayerState.PLAYING) {displayreferencefile();}
-            if (value) {ReferenceFileCheckbox.setText("Reference");}
-            else {ReferenceFileCheckbox.setText("Reference");}
-        } else {
+        if (ReferenceFileCheckbox.isSelected()) {choosereferencetype();}
+        ReferenceFileCheckbox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
+        if (ReferenceFileCheckbox.isSelected()  && playerState == PlayerWidget.PlayerState.PLAYING) {displayreferencefile();}
+        else {
             Root.getOptions().getSessionOptions().setReferenceoption(false);
             Root.getOptions().getSessionOptions().setReferencetype(null);
             closereferencefile();

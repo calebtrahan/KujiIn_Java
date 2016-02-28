@@ -126,4 +126,5 @@ linear-gradient(to bottom, derive(-fx-base,+50%), derive(-fx-base,-40%), derive(
     -fx-base: rgb(50, 50, 50);
     -fx-background: rgb(50, 50, 50);
     -fx-control-inner-background:  rgb(50, 50, 50);
+    -fx-text-fill: white;
 }
