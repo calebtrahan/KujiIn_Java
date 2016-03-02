@@ -13,7 +13,6 @@ import kujiin.Cut;
 import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
-import kujiin.interfaces.Widget;
 import kujiin.xml.Session;
 import kujiin.xml.Sessions;
 
@@ -21,54 +20,48 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+// TODO Refactor Into Meditation Program -> And Add 5 Elements To Be Practiced With or Without Cuts
 
 // TODO Reference Display Isn't Switching Off If On When Checbox Unselected
-public class PlayerWidget implements Widget {
-    public CheckBox onOffSwitch;
-    private Button PlayButton;
-    private Button PauseButton;
-    private Button StopButton;
-    private Label CutPlayingText;
-    private Label SessionPlayingText;
-    private Label CutCurrentTime;
-    private Label CutTotalTime;
-    private Label SessionCurrentTime;
-    private Label SessionTotalTime;
-    private ProgressBar CutProgress;
-    private ProgressBar TotalProgress;
-    private CheckBox ReferenceFileCheckbox;
-    private Slider EntrainmentVolume;
-    private Slider AmbienceVolume;
-    private Label EntrainmentPercentage;
-    private Label AmbiencePercentage;
+// TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
+// TODO Playback Problems
+    // TOH Freq Is Way Too Loud!
+// TODO Reference Display Isn't Displaying Text But Is Styled -> FIX!
+// TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
+
+public class PlayerWidget extends Stage {
+    public Button PlayButton;
+    public Button PauseButton;
+    public Button StopButton;
     public Label StatusBar;
-    private Label VolumeEntrainmentLabel;
-    private Label VolumeAmbienceLabel;
+    public CheckBox ReferenceSwitch;
+    public RadioButton ReferenceHTMLButton;
+    public RadioButton ReferenceTXTButton;
+    public Slider EntrainmentVolume;
+    public Label EntrainmentVolumePercentage;
+    public Slider AmbienceVolume;
+    public Label AmbienceVolumePercentage;
+    public Label CurrentCutTopLabel;
+    public Label CutCurrentLabel;
+    public ProgressBar CurrentCutProgress;
+    public Label CutTotalLabel;
+    public Label TotalCurrentLabel;
+    public ProgressBar TotalProgress;
+    public Label TotalTotalLabel;
+    public Label TotalSessionLabel;
     private This_Session Session;
     private MainController Root;
 
     public PlayerWidget(MainController root) {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
+        fxmlLoader.setController(this);
+        try {
+            Scene defaultscene = new Scene(fxmlLoader.load());
+            setScene(defaultscene);
+            Root.getOptions().setStyle(defaultscene);
+        } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+        setTitle("Session List");
         Root = root;
-        onOffSwitch = root.SessionPlayerOnOffSwitch;
-        PlayButton = root.PlayButton;
-        PauseButton = root.PauseButton;
-        StopButton = root.StopButton;
-        CutPlayingText = root.CutProgressTopLabel;
-        SessionPlayingText = root.TotalSessionLabel;
-        CutCurrentTime = root.CutProgressLabelCurrent;
-        CutTotalTime = root.CutProgressLabelTotal;
-        SessionCurrentTime = root.TotalProgressLabelCurrent;
-        SessionTotalTime = root.TotalProgressLabelTotal;
-        CutProgress = root.CutProgressBar;
-        TotalProgress = root.TotalProgressBar;
-        ReferenceFileCheckbox = root.ReferenceFilesOption;
-        EntrainmentVolume = root.EntrainmentVolume;
-        AmbienceVolume = root.AmbienceVolume;
-        EntrainmentPercentage = root.EntrainmentVolumePercentage;
-        AmbiencePercentage = root.AmbienceVolumePercentage;
-        StatusBar = root.PlayerStatusBar;
-        VolumeAmbienceLabel = root.VolumeAmbienceLabel;
-        VolumeEntrainmentLabel = root.VolumeEntrainmentLabel;
         Session = root.getSession();
         EntrainmentVolume.setOnMouseClicked(event -> {
             try {
@@ -84,7 +77,6 @@ public class PlayerWidget implements Widget {
                 Session.Root.getOptions().getSessionOptions().setAmbiencevolume(AmbienceVolume.getValue());
             } catch(Exception ignored) {Tools.showtimedmessage(StatusBar, "No Session Playing", 2000);}
         });
-        onOffSwitch.setDisable(true);
         Tools.showtimedmessage(StatusBar, "Player Disabled Until Session Is Created Or Loaded", 10000);
     }
 
@@ -102,115 +94,28 @@ public class PlayerWidget implements Widget {
         if (Session != null) {
             String message = Session.stop();
             Tools.showtimedmessage(StatusBar, message, 3000);
-            if (message.equals("Session Stopped")) {resetallvalues();}
+//            if (message.equals("Session Stopped")) {resetallvalues();}
         }
         else {
             Tools.showtimedmessage(StatusBar, "No Session Playing", 3000);}
     }
-    public void displayreferencefile() {Session.togglereferencedisplay(ReferenceFileCheckbox);}
+    public void displayreferencefile() {
+//        Session.togglereferencedisplay(ReferenceFileCheckbox);
+    }
     public void statusSwitch() {
-        if (onOffSwitch.isSelected()) {enable();
-        } else {disable();}
+//        if (onOffSwitch.isSelected()) {enable();
+//        } else {disable();}
     }
 
 // Widget Implementation
-    @Override
-    public void disable() {
-        PlayerState playerState = Session.getPlayerState();
-        if (playerState == PlayerState.PLAYING) {
-            if (! Tools.getanswerdialog(Root, "Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
-                onOffSwitch.setSelected(true);
-                onOffSwitch.setText("ON");
-                return;
-            }
-        } else if (playerState == PlayerState.PAUSED) {
-            if (! Tools.getanswerdialog(Root, "Confirmation", "Disable Session Player", "This Will Stop And Reset The Playing Session")) {
-                onOffSwitch.setSelected(true);
-                onOffSwitch.setText("ON");
-                return;
-            }
-        } else if (playerState == PlayerState.TRANSITIONING) {
-            StatusBar.setText("Transitioning, Please Wait Till The Next Cut To Turn Off The Player");
-            onOffSwitch.setSelected(true);
-            onOffSwitch.setText("ON");
-            return;
-        }
-        resetallvalues();
-        Session.resetthissession();
-        PlayButton.setDisable(true);
-        PauseButton.setDisable(true);
-        StopButton.setDisable(true);
-        CutPlayingText.setDisable(true);
-        SessionPlayingText.setDisable(true);
-        CutCurrentTime.setDisable(true);
-        CutTotalTime.setDisable(true);
-        SessionCurrentTime.setDisable(true);
-        SessionTotalTime.setDisable(true);
-        CutProgress.setDisable(true);
-        TotalProgress.setDisable(true);
-        ReferenceFileCheckbox.setSelected(false);
-        ReferenceFileCheckbox.setDisable(true);
-        EntrainmentVolume.setDisable(true);
-        AmbienceVolume.setDisable(true);
-        VolumeEntrainmentLabel.setDisable(true);
-        VolumeAmbienceLabel.setDisable(true);
-        EntrainmentPercentage.setText("-");
-        AmbiencePercentage.setText("-");
-        onOffSwitch.setText("OFF");
-    }
-    @Override
-    public void enable() {
-//        if (! creatorAndExporterWidget.createsession()) {return;}
-//        if (! Session.isValid()) {
-//            Tools.showinformationdialog("Information", "Cannot Enable Session Player", "Session (Above) Isn't Valid, All Cut Values Are 0");
-//            onOffSwitch.setSelected(false);
-//            onOffSwitch.setText("OFF");
-//            return;
-//        }
-        PlayButton.setDisable(false);
-        PauseButton.setDisable(false);
-        StopButton.setDisable(false);
-        CutPlayingText.setDisable(false);
-        SessionPlayingText.setDisable(false);
-        CutCurrentTime.setDisable(false);
-        CutTotalTime.setDisable(false);
-        SessionCurrentTime.setDisable(false);
-        SessionTotalTime.setDisable(false);
-        CutProgress.setDisable(false);
-        TotalProgress.setDisable(false);
-        ReferenceFileCheckbox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
-        ReferenceFileCheckbox.setDisable(false);
-        VolumeEntrainmentLabel.setDisable(false);
-        VolumeAmbienceLabel.setDisable(false);
-        if (Session.getAmbienceenabled()) {AmbienceVolume.setDisable(false);}
-        else {AmbienceVolume.setDisable(true);}
-        EntrainmentVolume.setDisable(false);
-        EntrainmentPercentage.setText("-");
-        AmbiencePercentage.setText("-");
-        onOffSwitch.setText("ON");
-        readytoplay();
-    }
-    @Override
-    public void resetallvalues() {
-        CutPlayingText.setText("Player Disabled");
-        SessionPlayingText.setText("Player Disabled");
-        CutCurrentTime.setText("--:--");
-        CutTotalTime.setText("--:--");
-        SessionCurrentTime.setText("--:--");
-        SessionTotalTime.setText("--:--");
-        CutProgress.setProgress(0.0);
-        TotalProgress.setProgress(0.0);
-        ReferenceFileCheckbox.setText("Reference");
-    }
-    @Override
     public boolean cleanup() {
         Session.stop();
         return Session.getPlayerState() != PlayerState.PLAYING;
     }
     public void readytoplay() {
-        CutPlayingText.setText("Ready To Play");
-        SessionPlayingText.setText("Ready To Play");
-        ReferenceFileCheckbox.setText("Reference");
+//        CutPlayingText.setText("Ready To Play");
+//        SessionPlayingText.setText("Ready To Play");
+//        ReferenceFileCheckbox.setText("Reference");
     }
 
 // Dialogs

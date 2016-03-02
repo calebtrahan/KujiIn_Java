@@ -100,9 +100,17 @@ public class Tools {
         if (! val ) {if (!styleclass.contains("error")) {styleclass.add("error");}
         } else {styleclass.removeAll(Collections.singleton("error"));}
     }
+    public static void valueboxandlabelpairswitch(ToggleButton toggleButton, TextField textField) {
+        if (toggleButton.isSelected()) {
+            Tools.integerTextField(textField, true);
+        } else {
+            textField.setText("-");
+            textField.setDisable(true);
+        }
+    }
 
 // Time Methods
-    // TODO Refactor These Method Names So They Aren't So Confusing
+    // TODO Refactor These Method Names So They Aren't So Confusing Maybe With TimeFormatting... DateFormattting...
     public static double hoursandminutestoformatteddecimalhours(int hours, int minutes) {
         System.out.println("Minutes Is " + minutes);
         double newval;
@@ -189,14 +197,12 @@ public class Tools {
     public static String formatlengthshort(int sec) {
         int hours = 0;
         int minutes = 0;
-        int seconds = 0;
         if (sec >= 3600) {hours = sec / 3600; sec -= hours * 3600;}
         if (sec >= 60) {minutes = sec / 60; sec -= minutes * 60;}
-        seconds = sec;
         if (hours > 0) {
-            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+            return String.format("%02d:%02d:%02d", hours, minutes, sec);
         } else {
-            return String.format("%02d:%02d", minutes, seconds);
+            return String.format("%02d:%02d", minutes, sec);
         }
     }
     public static String gettodaysdate() {

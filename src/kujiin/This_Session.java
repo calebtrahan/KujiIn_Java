@@ -7,8 +7,6 @@ import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
@@ -54,32 +52,15 @@ public class This_Session {
     private int totalsecondselapsed;
     private int totalsecondsinsession;
     private int cutcount;
-    private Label CutCurrentTime;
-    private Label CutTotalTime;
-    private Label SessionCurrentTime;
-    private Label SessionTotalTime;
-    private ProgressBar CutProgress;
-    private ProgressBar TotalProgress;
-    private Label CutPlayingText;
-    private Label SessionPlayingText;
-    private Label StatusBar;
     private PlayerWidget.DisplayReference displayReference;
     private File exportfile;
     public MainController Root;
     public List<Goals.Goal> GoalsCompletedThisSession;
+    private PlayerWidget playerWidget;
 
     public This_Session(MainController mainController) {
         Root = mainController;
         this.sessions = Root.getProgressTracker().getSessions();
-        CutCurrentTime = Root.CutProgressLabelCurrent;
-        CutTotalTime = Root.CutProgressLabelTotal;
-        SessionCurrentTime = Root.TotalProgressLabelCurrent;
-        SessionTotalTime = Root.TotalProgressLabelTotal;
-        CutProgress = Root.CutProgressBar;
-        TotalProgress = Root.TotalProgressBar;
-        CutPlayingText = Root.CutProgressTopLabel;
-        SessionPlayingText = Root.TotalSessionLabel;
-        StatusBar = Root.PlayerStatusBar;
         cutsinsession = new ArrayList<>();
         ambienceenabled = false;
         setPlayerState(PlayerWidget.PlayerState.IDLE);
@@ -107,6 +88,12 @@ public class This_Session {
     }
     public void setExportfile(File exportfile) {
         this.exportfile = exportfile;
+    }
+    public PlayerWidget getPlayerWidget() {
+        return playerWidget;
+    }
+    public void setPlayerWidget(PlayerWidget playerWidget) {
+        this.playerWidget = playerWidget;
     }
 
 // Creation Methods
@@ -182,7 +169,7 @@ public class This_Session {
                             a.append("\n");
                             Cut thiscut = cutswithreducedambience.get(i);
                             String formattedcurrentduration = Tools.minutestoformattedhoursandmins((int) thiscut.getTotalambienceduration() / 60);
-                            String formattedexpectedduration = Tools.minutestoformattedhoursandmins(textfieldvalues.get(Options.ALLNAMES.indexOf(cutswithreducedambience.get(i).name)));
+                            String formattedexpectedduration = Tools.minutestoformattedhoursandmins(textfieldvalues.get(Options.CUTNAMES.indexOf(cutswithreducedambience.get(i).name)));
                             a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }
@@ -220,7 +207,7 @@ public class This_Session {
         }
         if (indexestochange.size() > 0) {
             ArrayList<String> cutsmissinglist = new ArrayList<>();
-            for (Integer x : indexestochange) {cutsmissinglist.add(Options.ALLNAMES.get(x));}
+            for (Integer x : indexestochange) {cutsmissinglist.add(Options.CUTNAMES.get(x));}
             StringBuilder cutsmissingtext = new StringBuilder();
             for (int i = 0; i < cutsmissinglist.size(); i++) {
                 cutsmissingtext.append(cutsmissinglist.get(i));
@@ -380,7 +367,7 @@ public class This_Session {
     public boolean export() {
         ArrayList<File> filestoexport = new ArrayList<>();
         for (int i=0; i < cutsinsession.size(); i++) {
-            filestoexport.add(cutsinsession.get(i).getFinalcutexportfile());
+            filestoexport.add(cutsinsession.get(i).getFinalexportfile());
             if (i != cutsinsession.size() - 1) {
                 filestoexport.add(new File(Root.getOptions().getSessionOptions().getAlertfilelocation()));
             }
@@ -418,7 +405,7 @@ public class This_Session {
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
         for (Cut i : cutsinsession) {totalsecondsinsession += i.getdurationinseconds();}
-        SessionTotalTime.setText(Tools.formatlengthshort(totalsecondsinsession));
+        getPlayerWidget().TotalTotalLabel.setText(Tools.formatlengthshort(totalsecondsinsession));
         currentcuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
         currentcuttimeline.setCycleCount(Animation.INDEFINITE);
         currentcuttimeline.play();
@@ -496,35 +483,35 @@ public class This_Session {
                 else {currentprogress = (float) 0.0;}
                 if (totalsecondselapsed != 0) {totalprogress = (float) totalsecondselapsed / (float) totalsecondsinsession;}
                 else {totalprogress = (float) 0.0;}
-                CutProgress.setProgress(currentprogress);
-                TotalProgress.setProgress(totalprogress);
+                getPlayerWidget().CurrentCutProgress.setProgress(currentprogress);
+                getPlayerWidget().TotalProgress.setProgress(totalprogress);
                 currentprogress *= 100;
                 totalprogress *= 100;
-                CutPlayingText.setText(String.format("%s Progress (%d", currentcut.name, currentprogress.intValue()) + "%)");
-                SessionPlayingText.setText(String.format("Total Progress (%d", totalprogress.intValue()) + "%)");
-                CutCurrentTime.setText(currentcut.getcurrenttimeformatted());
-                CutTotalTime.setText(currentcut.gettotaltimeformatted());
-                SessionCurrentTime.setText(Tools.formatlengthshort(totalsecondselapsed));
-                StatusBar.setText("Session Playing. Currently Practicing " + currentcut.name + "...");
+                getPlayerWidget().CurrentCutTopLabel.setText(String.format("%s Progress (%d", currentcut.name, currentprogress.intValue()) + "%)");
+                getPlayerWidget().TotalSessionLabel.setText(String.format("Total Progress (%d", totalprogress.intValue()) + "%)");
+                getPlayerWidget().CutCurrentLabel.setText(currentcut.getcurrenttimeformatted());
+                getPlayerWidget().CutTotalLabel.setText(currentcut.gettotaltimeformatted());
+                getPlayerWidget().TotalCurrentLabel.setText(Tools.formatlengthshort(totalsecondselapsed));
+                getPlayerWidget().StatusBar.setText("Session Playing. Currently Practicing " + currentcut.name + "...");
                 Root.getProgressTracker().updategoalsui();
                 Root.getProgressTracker().updateprogressui();
             } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
-                CutProgress.setProgress(1.0);
-                CutPlayingText.setText(currentcut.name + " Completed");
-                if (currentcut.number != 10) {StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);}
-                CutCurrentTime.setText(currentcut.gettotaltimeformatted());
-                CutTotalTime.setText(currentcut.gettotaltimeformatted());
+                getPlayerWidget().CurrentCutProgress.setProgress(1.0);
+                getPlayerWidget().CurrentCutTopLabel.setText(currentcut.name + " Completed");
+                if (currentcut.number != 10) {getPlayerWidget().StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);}
+                getPlayerWidget().CutCurrentLabel.setText(currentcut.gettotaltimeformatted());
+                getPlayerWidget().CutTotalLabel.setText(currentcut.gettotaltimeformatted());
             } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
-                StatusBar.setText("Session Paused");
+                getPlayerWidget().StatusBar.setText("Session Paused");
             } else if (playerState == PlayerWidget.PlayerState.STOPPED) {
-                StatusBar.setText("Session Stopped");
+                getPlayerWidget().StatusBar.setText("Session Stopped");
             }
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
     public void playthiscut() {
         try {
             if (Root.getOptions().getSessionOptions().getReferenceoption() != null) {displayreferencefile();}
-            Duration cutduration = currentcut.getDuration();
+            Duration cutduration = currentcut.getdurationasobject();
             currentcut.start();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
             timeline.setOnFinished(event -> timeline.stop());
@@ -549,8 +536,8 @@ public class This_Session {
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).show();}
     }
     public void endofsession() {
-        CutPlayingText.setText(currentcut.name + " Completed");
-        SessionPlayingText.setText("Session Completed");
+        getPlayerWidget().CurrentCutTopLabel.setText(currentcut.name + " Completed");
+        getPlayerWidget().TotalSessionLabel.setText("Session Completed");
         closereferencefile();
         currentcuttimeline.stop();
         setPlayerState(PlayerWidget.PlayerState.STOPPED);
@@ -652,5 +639,4 @@ public class This_Session {
             displayReference = null;
         }
     }
-
 }

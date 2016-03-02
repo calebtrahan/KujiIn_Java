@@ -39,12 +39,9 @@ public class MainController implements Initializable {
     public Button ExportButton;
     public Button PlayButton;
     public Button ListOfSessionsButton;
-    public CheckBox ReferenceFilesOption;
     public ProgressBar goalsprogressbar;
     public Button newgoalButton;
     public Button viewcurrrentgoalsButton;
-    public Button PauseButton;
-    public Button StopButton;
     public TextField PreTime;
     public TextField RinTime;
     public TextField KyoTime;
@@ -56,53 +53,49 @@ public class MainController implements Initializable {
     public TextField ZaiTime;
     public TextField ZenTime;
     public TextField PostTime;
-    public ProgressBar CutProgressBar;
-    public ProgressBar TotalProgressBar;
-    public Label CutProgressLabelCurrent;
-    public Label TotalProgressLabelCurrent;
-    public Label CutProgressLabelTotal;
-    public Label TotalProgressLabelTotal;
-    public Label CutProgressTopLabel;
-    public Label TotalSessionLabel;
     public TextField AverageSessionDuration;
     public TextField TotalTimePracticed;
     public TextField NumberOfSessionsPracticed;
     public CheckBox PrePostSwitch;
     public Button LoadPresetButton;
     public Button SavePresetButton;
-    public CheckBox SessionPlayerOnOffSwitch;
     public CheckBox AmbienceSwitch;
     public TextField ApproximateEndTime;
-    public Button ChangeValuesButton;
+    public Button ChangeAllCutsButton;
     public TextField TotalSessionTime;
     public ComboBox<String> GoalCutComboBox;
     public Label GoalTopLabel;
-    public Slider EntrainmentVolume;
-    public Slider AmbienceVolume;
-    public Label EntrainmentVolumePercentage;
-    public Label AmbienceVolumePercentage;
     public Button CreateButton;
-    public Label PreLabel;
-    public Label RinLabel;
-    public Label KyoLabel;
-    public Label TohLabel;
-    public Label ShaLabel;
-    public Label KaiLabel;
-    public Label JinLabel;
-    public Label RetsuLabel;
-    public Label ZaiLabel;
-    public Label ZenLabel;
-    public Label PostLabel;
     public Label LengthLabel;
     public Label CompletionLabel;
-    public Label VolumeEntrainmentLabel;
-    public Label VolumeAmbienceLabel;
     public TextField GoalPracticedMinutes;
     public TextField GoalSetHours;
     public TextField GoalSetMinutes;
     public Label GoalStatusBar;
     public TextField GoalPracticedHours;
     public Scene Scene;
+    public ToggleButton RinSwitch;
+    public ToggleButton KyoSwitch;
+    public ToggleButton TohSwitch;
+    public ToggleButton ShaSwitch;
+    public ToggleButton KaiSwitch;
+    public ToggleButton JinSwitch;
+    public ToggleButton RetsuSwitch;
+    public ToggleButton ZaiSwitch;
+    public ToggleButton ZenSwitch;
+    public ToggleButton EarthSwitch;
+    public ToggleButton AirSwitch;
+    public ToggleButton FireSwitch;
+    public ToggleButton WaterSwitch;
+    public ToggleButton VoidSwitch;
+    public TextField EarthTime;
+    public TextField AirTime;
+    public TextField FireTime;
+    public TextField WaterTime;
+    public TextField VoidTime;
+    public ToggleButton PreSwitch;
+    public ToggleButton PostSwitch;
+    public Button ChangeAllElementsButton;
     private This_Session Session;
     private CreatorAndExporterWidget CreatorAndExporter;
     private PlayerWidget Player;
@@ -119,14 +112,12 @@ public class MainController implements Initializable {
         setProgressTracker(new ProgressAndGoalsWidget(this));
         setSession(new This_Session(this));
         setCreatorAndExporter(new CreatorAndExporterWidget(this));
-        setPlayer(new PlayerWidget(this));
         setOptions(new Options(this));
         getOptions().unmarshall();
-        sessionplayerswitch(null);
         CreatorStatusBar.setText("");
     }
     public boolean cleanup() {
-        return getPlayer().cleanup() && getCreatorAndExporter().cleanup() && getProgressTracker().cleanup();
+        return getCreatorAndExporter().cleanup() && getProgressTracker().cleanup();
     }
 
 // Getters And Setters
@@ -168,6 +159,12 @@ public class MainController implements Initializable {
     }
 
 // Top Menu Actions
+    public void changesessionoptions(ActionEvent actionEvent) {
+    new ChangeProgramOptions(this).showAndWait();
+    Options.marshall();
+    getProgressTracker().updategoalsui();
+    getProgressTracker().updateprogressui();
+}
     public void editprogramsambience(ActionEvent actionEvent) {
         SessionAmbienceEditor sae = new SessionAmbienceEditor(this);
         sae.showAndWait();
@@ -213,26 +210,18 @@ public class MainController implements Initializable {
     }
     public void ambienceswitch(ActionEvent actionEvent) {
         CreatorAndExporter.checkambience();}
-    public void changeallcreatorvalues(ActionEvent actionEvent) {
-        CreatorAndExporter.changeallvalues();}
+    public void changeallcutsvalues(ActionEvent actionEvent) {
+        CreatorAndExporter.changeallcutvalues();}
+    public void changeallelementsvalues(ActionEvent actionEvent) {
+        CreatorAndExporter.changeallelementvalues();
+    }
 
 // Session Player Widget
-    public void sessionplayerswitch(ActionEvent actionEvent) {
-        Player.statusSwitch();
-    }
-    public void playsession(Event event) {
-        Player.play();}
-    public void pausesession(Event event) {
-        Player.pause();}
-    public void stopsession(Event event) {
-        Player.stop();}
-    public void setReferenceOption(ActionEvent actionEvent) {
-        Player.displayreferencefile();}
-    public void changesessionoptions(ActionEvent actionEvent) {
-        new ChangeProgramOptions(this).showAndWait();
-        Options.marshall();
-        getProgressTracker().updategoalsui();
-        getProgressTracker().updateprogressui();
+    // TODO Check Here If Playthissession Is Open
+    public void playthisession(ActionEvent actionEvent) {
+        if (getPlayer() != null && getPlayer().isShowing()) {return;}
+        setPlayer(new PlayerWidget(this));
+        getPlayer().showAndWait();
     }
 
 // Dialogs
@@ -268,7 +257,7 @@ public class MainController implements Initializable {
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
             cutnames = FXCollections.observableArrayList();
             variations = FXCollections.observableArrayList();
-            cutnames.addAll(kujiin.xml.Options.ALLNAMES);
+            cutnames.addAll(kujiin.xml.Options.CUTNAMES);
             variations.addAll(Arrays.asList("html", "txt"));
             CutNamesChoiceBox.setItems(cutnames);
             CutVariationsChoiceBox.setItems(variations);
@@ -392,7 +381,7 @@ public class MainController implements Initializable {
             CurrentAmbienceTable.getSelectionModel().selectedItemProperty().addListener(
                     (observable, oldValue, newValue) -> currentselectionchanged(newValue));
             ObservableList<String> allnames = FXCollections.observableArrayList();
-            allnames.addAll(kujiin.xml.Options.ALLNAMES);
+            allnames.addAll(kujiin.xml.Options.CUTNAMES);
             CutSelectionBox.setItems(allnames);
             this.setOnCloseRequest(event -> close());
         }
@@ -421,7 +410,7 @@ public class MainController implements Initializable {
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Ambience Editor");
             CutSelectionBox.setOnAction(event -> selectandloadcut());
-            CutSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
+            CutSelectionBox.getSelectionModel().select(kujiin.xml.Options.CUTNAMES.indexOf(cutname));
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
 
@@ -541,8 +530,8 @@ public class MainController implements Initializable {
             }
             current_songlist.clear();
             CurrentAmbienceTable.getItems().clear();
-            int index = kujiin.xml.Options.ALLNAMES.indexOf(CutSelectionBox.getValue());
-            selectedcutname = kujiin.xml.Options.ALLNAMES.get(index);
+            int index = kujiin.xml.Options.CUTNAMES.indexOf(CutSelectionBox.getValue());
+            selectedcutname = kujiin.xml.Options.CUTNAMES.get(index);
             if (getcurrentambiencefiles()) {
                 CurrentAmbienceTable.getItems().addAll(current_songlist);
                 CutSelectionLabel.setText(selectedcutname + "'s Ambience");

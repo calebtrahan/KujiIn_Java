@@ -38,8 +38,9 @@ public class Options {
     public static final File DIRECTORYRAMPDOWN = new File(DIRECTORYENTRAINMENT, "ramp/down/");
     public static final File DIRECTORYTOHRAMP = new File(DIRECTORYENTRAINMENT, "tohramp/");
     public static final File DIRECTORYMAINCUTS = new File(DIRECTORYENTRAINMENT, "maincuts/");
-    public static final ArrayList<String> ALLNAMES = new ArrayList<>(Arrays.asList(
+    public static final ArrayList<String> CUTNAMES = new ArrayList<>(Arrays.asList(
             "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
+    public static final ArrayList<String> ELEMENTNAMES = new ArrayList<>(Arrays.asList("Earth", "Air", "Fire", "Water", "Void"));
     public static final ArrayList<String> RAMPDURATIONS = new ArrayList<>(Arrays.asList("None", "2 Minutes", "3 Minutes", "5 Minutes"));
     public static ArrayList<String> STYLETHEMES = new ArrayList<>();
 /// Default Option Values

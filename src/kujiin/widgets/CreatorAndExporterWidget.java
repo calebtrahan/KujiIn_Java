@@ -20,7 +20,6 @@ import kujiin.Cut;
 import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
-import kujiin.interfaces.Widget;
 import kujiin.xml.Goals;
 import kujiin.xml.Options;
 import kujiin.xml.Preset;
@@ -34,7 +33,7 @@ import java.util.*;
 
 // TODO Get FFMPEG Working To Mix Audio Files Together
     // Not Supported Stream?
-public class CreatorAndExporterWidget implements Widget {
+public class CreatorAndExporterWidget {
     private Button ChangeAllValuesButton;
     private Button ExportButton;
     private Button LoadPresetButton;
@@ -43,18 +42,6 @@ public class CreatorAndExporterWidget implements Widget {
     private CheckBox AmbienceSwitch;
     private TextField TotalSessionTime;
     private TextField ApproximateEndTime;
-    private Label PreLabel;
-    private Label RinLabel;
-    private Label KyoLabel;
-    private Label TohLabel;
-    private Label ShaLabel;
-    private Label KaiLabel;
-    private Label JinLabel;
-    private Label RetsuLabel;
-    private Label ZaiLabel;
-    private Label ZenLabel;
-    private Label PostLabel;
-    private Label LengthLabel;
     private Label CompletionLabel;
     private TextField PreTime;
     private TextField RinTime;
@@ -95,36 +82,24 @@ public class CreatorAndExporterWidget implements Widget {
         Root = root;
         LoadPresetButton = root.LoadPresetButton;
         SavePresetButton = root.SavePresetButton;
-        ChangeAllValuesButton = root.ChangeValuesButton;
+        ChangeAllValuesButton = root.ChangeAllCutsButton;
         CreateButton = root.CreateButton;
         ExportButton = root.ExportButton;
         AmbienceSwitch = root.AmbienceSwitch;
         TotalSessionTime = root.TotalSessionTime;
         ApproximateEndTime = root.ApproximateEndTime;
         Preset = new Preset(root);
-        PreLabel = root.PreLabel;
         PreTime = root.PreTime;
-        RinLabel = root.RinLabel;
         RinTime = root.RinTime;
-        KyoLabel = root.KyoLabel;
         KyoTime = root.KyoTime;
-        TohLabel = root.TohLabel;
         TohTime = root.TohTime;
-        ShaLabel = root.ShaLabel;
         ShaTime = root.ShaTime;
-        KaiLabel = root.KaiLabel;
         KaiTime = root.KaiTime;
-        JinLabel = root.JinLabel;
         JinTime = root.JinTime;
-        RetsuLabel = root.RetsuLabel;
         RetsuTime = root.RetsuTime;
-        ZaiLabel = root.ZaiLabel;
         ZaiTime = root.ZaiTime;
-        ZenLabel = root.ZenLabel;
         ZenTime = root.ZenTime;
-        PostLabel = root.PostLabel;
         PostTime = root.PostTime;
-        LengthLabel = root.LengthLabel;
         CompletionLabel = root.CompletionLabel;
         session = root.getSession();
         StatusBar = root.CreatorStatusBar;
@@ -132,17 +107,6 @@ public class CreatorAndExporterWidget implements Widget {
         creatorState = CreatorState.NOT_CREATED;
         setuptextfields();
         textfieldtimes.addAll(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0));
-        PreLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        RinLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        KyoLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        TohLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        ShaLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        KaiLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        JinLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        RetsuLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        ZaiLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        ZenLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        PostLabel.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         TotalSessionTime.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         ApproximateEndTime.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         exportservices = new ArrayList<>();
@@ -179,22 +143,20 @@ public class CreatorAndExporterWidget implements Widget {
             if (creationchecks()) {
                 session.setAmbienceenabled(AmbienceSwitch.isSelected());
                 session.create(textfieldtimes);
-                disable();
+//                disable();
                 ExportButton.setDisable(false);
                 CreateButton.setText("Edit");
-                session.Root.getPlayer().onOffSwitch.setDisable(false);
+                session.Root.PlayButton.setDisable(false);
                 session.Root.getPlayer().StatusBar.setText("Player Disabled Until Session Is Created Or Loaded");
                 setCreatorState(CreatorState.CREATED);
                 Tools.showinformationdialog(Root, "Success", "Session Successfully Created", "You Can Now Play Or Export This Session");
             }
         } else {
-            enable();
+//            enable();
             ExportButton.setDisable(true);
             CreateButton.setText("Create");
-            session.Root.getPlayer().onOffSwitch.setSelected(false);
+            session.Root.PlayButton.setDisable(true);
             session.Root.getPlayer().statusSwitch();
-            session.Root.getPlayer().onOffSwitch.setDisable(true);
-            session.Root.getPlayer().onOffSwitch.setTooltip(new Tooltip("Create A Session To Enable The Session Player"));
             setCreatorState(CreatorState.NOT_CREATED);
         }
     }
@@ -266,7 +228,7 @@ public class CreatorAndExporterWidget implements Widget {
                     exportserviceindex = 0;
                     ArrayList<Cut> cutsinsession = session.getCutsinsession();
                     for (Cut i : cutsinsession) {
-                        exportservices.add(i.getcutexportservice());
+                        exportservices.add(i.getexportservice());
                     }
                     exportservices.add(session.getsessionexporter());
                     exportingSessionDialog = new ExportingSessionDialog(Root);
@@ -443,7 +405,7 @@ public class CreatorAndExporterWidget implements Widget {
             session.setAmbienceenabled(false);
         }
     }
-    public void changeallvalues() {
+    public void changeallcutvalues() {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(Root);
         changevaluesdialog.showAndWait();
         if (changevaluesdialog.getAccepted()) {
@@ -462,6 +424,7 @@ public class CreatorAndExporterWidget implements Widget {
             if (changevaluesdialog.getincludepostsession()) {PostTime.setText(minutes);}
         }
     }
+    public void changeallelementvalues() {}
     public void changevaluestopreset(ArrayList<Integer> presetvalues) {
         try {
             PreTime.setText(presetvalues.get(0).toString());
@@ -489,93 +452,91 @@ public class CreatorAndExporterWidget implements Widget {
     }
 
 // Widget Implementation
-    @Override
-    public void disable() {
-        updateuitimeline.stop();
-        ChangeAllValuesButton.setDisable(true);
-        AmbienceSwitch.setDisable(true);
-        ApproximateEndTime.setDisable(true);
-        TotalSessionTime.setDisable(true);
-        PreLabel.setDisable(true);
-        PreTime.setDisable(true);
-        RinLabel.setDisable(true);
-        RinTime.setDisable(true);
-        KyoLabel.setDisable(true);
-        KyoTime.setDisable(true);
-        TohLabel.setDisable(true);
-        TohTime.setDisable(true);
-        ShaLabel.setDisable(true);
-        ShaTime.setDisable(true);
-        KaiLabel.setDisable(true);
-        KaiTime.setDisable(true);
-        JinLabel.setDisable(true);
-        JinTime.setDisable(true);
-        RetsuLabel.setDisable(true);
-        RetsuTime.setDisable(true);
-        ZaiLabel.setDisable(true);
-        ZaiTime.setDisable(true);
-        ZenLabel.setDisable(true);
-        ZenTime.setDisable(true);
-        PostLabel.setDisable(true);
-        PostTime.setDisable(true);
-        LengthLabel.setDisable(true);
-        CompletionLabel.setDisable(true);
-        LoadPresetButton.setDisable(true);
-        SavePresetButton.setDisable(true);
-        StatusBar.setText("Creator Disabled While Session Player Enabled");
-    }
-    @Override
-    public void enable() {
-        updateuitimeline.play();
-        ChangeAllValuesButton.setDisable(false);
-        AmbienceSwitch.setDisable(false);
-        ApproximateEndTime.setDisable(false);
-        TotalSessionTime.setDisable(false);
-        PreLabel.setDisable(false);
-        PreTime.setDisable(false);
-        RinLabel.setDisable(false);
-        RinTime.setDisable(false);
-        KyoLabel.setDisable(false);
-        KyoTime.setDisable(false);
-        TohLabel.setDisable(false);
-        TohTime.setDisable(false);
-        ShaLabel.setDisable(false);
-        ShaTime.setDisable(false);
-        KaiLabel.setDisable(false);
-        KaiTime.setDisable(false);
-        JinLabel.setDisable(false);
-        JinTime.setDisable(false);
-        RetsuLabel.setDisable(false);
-        RetsuTime.setDisable(false);
-        ZaiLabel.setDisable(false);
-        ZaiTime.setDisable(false);
-        ZenLabel.setDisable(false);
-        ZenTime.setDisable(false);
-        PostLabel.setDisable(false);
-        PostTime.setDisable(false);
-        LengthLabel.setDisable(false);
-        CompletionLabel.setDisable(false);
-        LoadPresetButton.setDisable(false);
-        SavePresetButton.setDisable(false);
-        StatusBar.setText("");
-    }
-    @Override
-    public void resetallvalues() {
-        AmbienceSwitch.setText("No Session Created");
-        TotalSessionTime.setText("No Session Created");
-        PreTime.setText("-");
-        RinTime.setText("-");
-        KyoTime.setText("-");
-        TohTime.setText("-");
-        ShaTime.setText("-");
-        KaiTime.setText("-");
-        JinTime.setText("-");
-        RetsuTime.setText("-");
-        ZaiTime.setText("-");
-        ZenTime.setText("-");
-        PostTime.setText("-");
-    }
-    @Override
+//    @Override
+//    public void disable() {
+//        updateuitimeline.stop();
+//        ChangeAllValuesButton.setDisable(true);
+//        AmbienceSwitch.setDisable(true);
+//        ApproximateEndTime.setDisable(true);
+//        TotalSessionTime.setDisable(true);
+//        PreTime.setDisable(true);
+//        RinTime.setDisable(true);
+//        KyoLabel.setDisable(true);
+//        KyoTime.setDisable(true);
+//        TohLabel.setDisable(true);
+//        TohTime.setDisable(true);
+//        ShaLabel.setDisable(true);
+//        ShaTime.setDisable(true);
+//        KaiLabel.setDisable(true);
+//        KaiTime.setDisable(true);
+//        JinLabel.setDisable(true);
+//        JinTime.setDisable(true);
+//        RetsuLabel.setDisable(true);
+//        RetsuTime.setDisable(true);
+//        ZaiLabel.setDisable(true);
+//        ZaiTime.setDisable(true);
+//        ZenLabel.setDisable(true);
+//        ZenTime.setDisable(true);
+//        PostLabel.setDisable(true);
+//        PostTime.setDisable(true);
+//        LengthLabel.setDisable(true);
+//        CompletionLabel.setDisable(true);
+//        LoadPresetButton.setDisable(true);
+//        SavePresetButton.setDisable(true);
+//        StatusBar.setText("Creator Disabled While Session Player Enabled");
+//    }
+//    @Override
+//    public void enable() {
+//        updateuitimeline.play();
+//        ChangeAllValuesButton.setDisable(false);
+//        AmbienceSwitch.setDisable(false);
+//        ApproximateEndTime.setDisable(false);
+//        TotalSessionTime.setDisable(false);
+//        PreLabel.setDisable(false);
+//        PreTime.setDisable(false);
+//        RinLabel.setDisable(false);
+//        RinTime.setDisable(false);
+//        KyoLabel.setDisable(false);
+//        KyoTime.setDisable(false);
+//        TohLabel.setDisable(false);
+//        TohTime.setDisable(false);
+//        ShaLabel.setDisable(false);
+//        ShaTime.setDisable(false);
+//        KaiLabel.setDisable(false);
+//        KaiTime.setDisable(false);
+//        JinLabel.setDisable(false);
+//        JinTime.setDisable(false);
+//        RetsuLabel.setDisable(false);
+//        RetsuTime.setDisable(false);
+//        ZaiLabel.setDisable(false);
+//        ZaiTime.setDisable(false);
+//        ZenLabel.setDisable(false);
+//        ZenTime.setDisable(false);
+//        PostLabel.setDisable(false);
+//        PostTime.setDisable(false);
+//        LengthLabel.setDisable(false);
+//        CompletionLabel.setDisable(false);
+//        LoadPresetButton.setDisable(false);
+//        SavePresetButton.setDisable(false);
+//        StatusBar.setText("");
+//    }
+//    @Override
+//    public void resetallvalues() {
+//        AmbienceSwitch.setText("No Session Created");
+//        TotalSessionTime.setText("No Session Created");
+//        PreTime.setText("-");
+//        RinTime.setText("-");
+//        KyoTime.setText("-");
+//        TohTime.setText("-");
+//        ShaTime.setText("-");
+//        KaiTime.setText("-");
+//        JinTime.setText("-");
+//        RetsuTime.setText("-");
+//        ZaiTime.setText("-");
+//        ZenTime.setText("-");
+//        PostTime.setText("-");
+//    }
+//    @Override
     public boolean cleanup() {
         boolean currentlyexporting = getExporterState() == ExporterState.WORKING;
         if (currentlyexporting) {
@@ -699,7 +660,7 @@ public class CreatorAndExporterWidget implements Widget {
             sessionmissingcutsLabel.setText(cutsmissingtext);
             populatelistview();
             explanationLabel.setText(("Your Practiced Cuts Do Not Connect! Due To The Nature Of The Kuji-In I Recommend " +
-                    "Connecting All Cuts From RIN All The Way To Your Last Cut (") + Options.ALLNAMES.get(lastcutindex) +
+                    "Connecting All Cuts From RIN All The Way To Your Last Cut (") + Options.CUTNAMES.get(lastcutindex) +
                     ") Or Your This_Session Might Not Have The Energy It Needs");
             setCreatesession(false);
         }
@@ -710,7 +671,7 @@ public class CreatorAndExporterWidget implements Widget {
             int count = 0;
             boolean thisitemmissing;
             for (int i = 0; i < textfieldvalues.size(); i++) {
-                String name = Options.ALLNAMES.get(i);
+                String name = Options.CUTNAMES.get(i);
                 String minutes;
                 if (i <= lastcutindex || i == textfieldvalues.size() - 1) {
                     thisitemmissing = false;

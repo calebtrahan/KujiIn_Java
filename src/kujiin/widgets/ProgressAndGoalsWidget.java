@@ -469,7 +469,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 String duration;
                 if (durationinmins > 0) {duration = Tools.minutestoformattedhoursandmins(durationinmins);}
                 else {duration = "-";}
-                allrows.add(new TotalProgressRow(i, Options.ALLNAMES.get(i), duration));
+                allrows.add(new TotalProgressRow(i, Options.CUTNAMES.get(i), duration));
             }
             progresstable.getItems().addAll(allrows);
         }
