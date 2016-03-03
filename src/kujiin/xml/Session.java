@@ -12,6 +12,11 @@ import java.util.ArrayList;
 public class Session {
     private String Date_Practiced;
     private Integer Presession_Duration;
+    private Integer Earth_Duration;
+    private Integer Air_Duration;
+    private Integer Fire_Duration;
+    private Integer Water_Duration;
+    private Integer Void_Duration;
     private Integer Rin_Duration;
     private Integer Kyo_Duration;
     private Integer Toh_Duration;
@@ -24,6 +29,11 @@ public class Session {
     private Integer Postsession_Duration;
     private Integer Total_Session_Duration;
     private ArrayList<File> Presession_Ambience;
+    private ArrayList<File> Earth_Ambience;
+    private ArrayList<File> Air_Ambience;
+    private ArrayList<File> Fire_Ambience;
+    private ArrayList<File> Water_Ambience;
+    private ArrayList<File> Void_Ambience;
     private ArrayList<File> Rin_Ambience;
     private ArrayList<File> Kyo_Ambience;
     private ArrayList<File> Toh_Ambience;
@@ -59,6 +69,36 @@ public class Session {
     }
     public void setPresession_Duration(Integer presession_Duration) {
         Presession_Duration = presession_Duration;
+    }
+    public Integer getEarth_Duration() {
+        return Earth_Duration;
+    }
+    public void setEarth_Duration(Integer earth_Duration) {
+        Earth_Duration = earth_Duration;
+    }
+    public Integer getAir_Duration() {
+        return Air_Duration;
+    }
+    public void setAir_Duration(Integer air_Duration) {
+        Air_Duration = air_Duration;
+    }
+    public Integer getFire_Duration() {
+        return Fire_Duration;
+    }
+    public void setFire_Duration(Integer fire_Duration) {
+        Fire_Duration = fire_Duration;
+    }
+    public Integer getWater_Duration() {
+        return Water_Duration;
+    }
+    public void setWater_Duration(Integer water_Duration) {
+        Water_Duration = water_Duration;
+    }
+    public Integer getVoid_Duration() {
+        return Void_Duration;
+    }
+    public void setVoid_Duration(Integer void_Duration) {
+        Void_Duration = void_Duration;
     }
     public Integer getRin_Duration() {
         return Rin_Duration;
@@ -128,6 +168,36 @@ public class Session {
         return Presession_Ambience;
     }
     public void setPresession_Ambience(ArrayList<File> presession_Ambience) {Presession_Ambience = presession_Ambience;}
+    public ArrayList<File> getEarth_Ambience() {
+        return Earth_Ambience;
+    }
+    public void setEarth_Ambience(ArrayList<File> earth_Ambience) {
+        Earth_Ambience = earth_Ambience;
+    }
+    public ArrayList<File> getAir_Ambience() {
+        return Air_Ambience;
+    }
+    public void setAir_Ambience(ArrayList<File> air_Ambience) {
+        Air_Ambience = air_Ambience;
+    }
+    public ArrayList<File> getFire_Ambience() {
+        return Fire_Ambience;
+    }
+    public void setFire_Ambience(ArrayList<File> fire_Ambience) {
+        Fire_Ambience = fire_Ambience;
+    }
+    public ArrayList<File> getWater_Ambience() {
+        return Water_Ambience;
+    }
+    public void setWater_Ambience(ArrayList<File> water_Ambience) {
+        Water_Ambience = water_Ambience;
+    }
+    public ArrayList<File> getVoid_Ambience() {
+        return Void_Ambience;
+    }
+    public void setVoid_Ambience(ArrayList<File> void_Ambience) {
+        Void_Ambience = void_Ambience;
+    }
     public ArrayList<File> getRin_Ambience() {
         return Rin_Ambience;
     }

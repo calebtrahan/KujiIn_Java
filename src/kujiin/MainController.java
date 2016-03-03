@@ -198,9 +198,6 @@ public class MainController implements Initializable {
         CreatorAndExporter.loadpreset();}
     public void savepreset(ActionEvent actionEvent) {
         CreatorAndExporter.savepreset();}
-    public void togglecreator(ActionEvent actionEvent) {
-        getCreatorAndExporter().togglecreator();
-    }
     public void toggleexporter(ActionEvent actionEvent) {
         getCreatorAndExporter().toggleexport();
     }
@@ -219,9 +216,12 @@ public class MainController implements Initializable {
 // Session Player Widget
     // TODO Check Here If Playthissession Is Open
     public void playthisession(ActionEvent actionEvent) {
-        if (getPlayer() != null && getPlayer().isShowing()) {return;}
-        setPlayer(new PlayerWidget(this));
-        getPlayer().showAndWait();
+        getCreatorAndExporter().togglecreator();
+        if (getCreatorAndExporter().getCreatorState() == CreatorAndExporterWidget.CreatorState.CREATED) {
+            if (getPlayer() != null && getPlayer().isShowing()) {return;}
+            setPlayer(new PlayerWidget(this));
+            getPlayer().showAndWait();
+        } else {}
     }
 
 // Dialogs

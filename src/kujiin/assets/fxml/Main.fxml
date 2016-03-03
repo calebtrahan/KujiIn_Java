@@ -43,7 +43,6 @@
             <Font size="16.0" />
          </font>
       </Label>
-      <CheckBox fx:id="AmbienceSwitch" layoutX="292.0" layoutY="244.0" mnemonicParsing="false" onAction="#ambienceswitch" text="Add Ambience" />
       <Label fx:id="CreatorStatusBar" layoutX="10.0" layoutY="265.0" prefHeight="26.0" prefWidth="582.0">
          <font>
             <Font size="10.0" />
@@ -60,13 +59,13 @@
          </font>
       </Button>
       <HBox alignment="TOP_RIGHT" layoutX="54.0" layoutY="565.0" prefHeight="28.0" prefWidth="377.0" />
-      <HBox alignment="TOP_RIGHT" layoutX="401.0" layoutY="240.0" prefHeight="26.0" prefWidth="189.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="351.0" layoutY="240.0" prefHeight="23.0" prefWidth="239.0">
          <children>
-            <Button fx:id="CreateButton" mnemonicParsing="false" onAction="#togglecreator" onMousePressed="#exportsession" prefHeight="23.0" prefWidth="63.0" text="Create">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Button>
+            <CheckBox fx:id="AmbienceSwitch" mnemonicParsing="false" onAction="#ambienceswitch" text="Add Ambience">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </CheckBox>
             <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#playthisession" prefHeight="17.0" prefWidth="62.0" text="Play">
                <font>
                   <Font size="12.0" />
@@ -268,14 +267,14 @@
             <Font name="System Bold" size="19.0" />
          </font>
       </Label>
-      <HBox layoutX="10.0" layoutY="240.0" prefHeight="26.0" prefWidth="239.0">
+      <HBox layoutX="10.0" layoutY="240.0" prefHeight="26.0" prefWidth="309.0">
          <children>
-            <Button fx:id="ChangeAllCutsButton" mnemonicParsing="false" onAction="#changeallcutsvalues" prefHeight="23.0" prefWidth="118.0" text="Edit All Cuts">
+            <Button fx:id="ChangeAllCutsButton" mnemonicParsing="false" onAction="#changeallcutsvalues" prefHeight="23.0" prefWidth="140.0" text="Change All Cut Values">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="ChangeAllElementsButton" mnemonicParsing="false" onAction="#changeallelementsvalues" prefHeight="23.0" prefWidth="118.0" text="Edit All Elements">
+            <Button fx:id="ChangeAllElementsButton" mnemonicParsing="false" onAction="#changeallelementsvalues" prefHeight="23.0" prefWidth="167.0" text="Change All Element Values">
                <font>
                   <Font size="12.0" />
                </font>

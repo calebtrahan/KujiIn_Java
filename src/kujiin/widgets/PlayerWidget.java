@@ -53,11 +53,13 @@ public class PlayerWidget extends Stage {
     private MainController Root;
 
     public PlayerWidget(MainController root) {
+        Root = root;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
         fxmlLoader.setController(this);
         try {
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
+            Root.getOptions();
             Root.getOptions().setStyle(defaultscene);
         } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         setTitle("Session List");
@@ -82,7 +84,7 @@ public class PlayerWidget extends Stage {
 
 // Button Actions
     public void play() {
-        Tools.showtimedmessage(StatusBar, Session.play(), 3000);
+        Tools.showtimedmessage(StatusBar, Session.play(this), 3000);
     }
     public void pause() {
         if (Session != null) {

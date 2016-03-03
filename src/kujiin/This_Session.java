@@ -414,8 +414,9 @@ public class This_Session {
         playthiscut();
         sessions.createnewsession();
     }
-    public String play() {
+    public String play(PlayerWidget playerWidget) {
         if (playerState == PlayerWidget.PlayerState.IDLE) {
+            setPlayerWidget(playerWidget);
             startplayback();
             return "Playing Session...";
         }
@@ -426,6 +427,7 @@ public class This_Session {
             return "Resuming Session...";
         }
         else if(playerState == PlayerWidget.PlayerState.STOPPED) {
+            setPlayerWidget(playerWidget);
             startplayback();
             return "Playing Session...";
         }

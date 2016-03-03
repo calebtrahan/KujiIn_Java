@@ -4,38 +4,38 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="217.0" prefWidth="514.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="224.0" prefWidth="514.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label alignment="CENTER" layoutX="7.0" layoutY="3.0" prefHeight="22.0" prefWidth="498.0" text="Session Player" textAlignment="CENTER">
          <font>
             <Font name="System Bold" size="19.0" />
          </font>
       </Label>
-      <HBox alignment="TOP_RIGHT" layoutX="341.0" layoutY="188.0" prefHeight="22.0" prefWidth="165.0">
+      <HBox alignment="TOP_RIGHT" layoutX="340.0" layoutY="199.0" prefHeight="22.0" prefWidth="165.0">
          <children>
-            <Button fx:id="PlayButton" mnemonicParsing="false" prefHeight="0.0" prefWidth="60.0" text="Play">
+            <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#play" prefHeight="0.0" prefWidth="60.0" text="Play">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="PauseButton" mnemonicParsing="false" text="Pause">
+            <Button fx:id="PauseButton" mnemonicParsing="false" onAction="#pause" text="Pause">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="StopButton" mnemonicParsing="false" text="Stop">
+            <Button fx:id="StopButton" mnemonicParsing="false" onAction="#stop" text="Stop">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
          </children>
       </HBox>
-      <Label fx:id="StatusBar" layoutX="14.0" layoutY="191.0" prefHeight="16.0" prefWidth="338.0" text="StatusBar">
+      <Label fx:id="StatusBar" layoutX="14.0" layoutY="202.0" prefHeight="16.0" prefWidth="338.0" text="StatusBar">
          <font>
             <Font size="12.0" />
          </font>
       </Label>
-      <VBox alignment="CENTER" layoutX="278.0" layoutY="124.0" prefHeight="53.0" prefWidth="218.0">
+      <VBox alignment="CENTER" layoutX="282.0" layoutY="132.0" prefHeight="53.0" prefWidth="218.0">
          <children>
             <Label text="Reference Display" />
             <HBox alignment="CENTER" prefHeight="30.0" prefWidth="195.0">
@@ -55,7 +55,7 @@
             </HBox>
          </children>
       </VBox>
-      <VBox alignment="CENTER" layoutX="13.0" layoutY="115.0" prefHeight="70.0" prefWidth="218.0">
+      <VBox alignment="CENTER" layoutX="14.0" layoutY="124.0" prefHeight="70.0" prefWidth="218.0">
          <children>
             <Label text="Entrainment Volume" />
             <HBox alignment="CENTER" prefHeight="22.0" prefWidth="172.0">
@@ -81,39 +81,54 @@
             </HBox>
          </children>
       </VBox>
-      <VBox alignment="CENTER" layoutY="37.0" prefHeight="72.0" prefWidth="510.0">
+      <VBox alignment="CENTER" layoutY="30.0" prefHeight="72.0" prefWidth="510.0">
          <children>
-            <Label fx:id="CurrentCutTopLabel" alignment="CENTER" prefHeight="16.0" prefWidth="340.0" text="\%s Progress" textAlignment="CENTER" />
+            <Label fx:id="CurrentCutTopLabel" alignment="CENTER" prefHeight="16.0" prefWidth="340.0" text="No Session Playing" textAlignment="CENTER" />
             <HBox alignment="CENTER" prefHeight="30.0" prefWidth="494.0">
                <children>
-                  <Label fx:id="CutCurrentLabel" alignment="CENTER_RIGHT" prefWidth="52.0" text="99:99:99">
+                  <Label fx:id="CutCurrentLabel" alignment="CENTER_RIGHT" prefWidth="52.0" text="--:--">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>
                   </Label>
-                  <ProgressBar fx:id="CurrentCutProgress" prefWidth="360.0" progress="0.0" />
-                  <Label fx:id="CutTotalLabel" prefWidth="52.0" text="99:99:99">
+                  <ProgressBar fx:id="CurrentCutProgress" prefWidth="360.0" progress="0.0">
+                     <HBox.margin>
+                        <Insets bottom="5.0" top="5.0" />
+                     </HBox.margin></ProgressBar>
+                  <Label fx:id="CutTotalLabel" prefWidth="52.0" text="--:--">
                      <HBox.margin>
                         <Insets left="5.0" />
                      </HBox.margin>
                   </Label>
                </children>
+               <VBox.margin>
+                  <Insets top="2.0" />
+               </VBox.margin>
             </HBox>
-            <Label fx:id="TotalSessionLabel" alignment="CENTER" prefHeight="16.0" prefWidth="338.0" text="Total Progress" />
+            <Label fx:id="TotalSessionLabel" alignment="CENTER" prefHeight="16.0" prefWidth="338.0" text="No Session Playing">
+               <VBox.margin>
+                  <Insets bottom="2.0" />
+               </VBox.margin></Label>
             <HBox alignment="CENTER" prefHeight="30.0" prefWidth="494.0">
                <children>
-                  <Label fx:id="TotalCurrentLabel" alignment="CENTER_RIGHT" prefWidth="52.0" text="99:99:99">
+                  <Label fx:id="TotalCurrentLabel" alignment="CENTER_RIGHT" prefWidth="52.0" text="--:--">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>
                   </Label>
-                  <ProgressBar fx:id="TotalProgress" prefWidth="360.0" progress="0.0" />
-                  <Label fx:id="TotalTotalLabel" prefWidth="52.0" text="99:99:99">
+                  <ProgressBar fx:id="TotalProgress" prefWidth="360.0" progress="0.0">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin></ProgressBar>
+                  <Label fx:id="TotalTotalLabel" prefWidth="52.0" text="--:--">
                      <HBox.margin>
                         <Insets left="5.0" />
                      </HBox.margin>
                   </Label>
                </children>
+               <VBox.margin>
+                  <Insets top="2.0" />
+               </VBox.margin>
             </HBox>
          </children>
       </VBox>

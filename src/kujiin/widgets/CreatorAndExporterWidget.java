@@ -147,18 +147,10 @@ public class CreatorAndExporterWidget {
                 ExportButton.setDisable(false);
                 CreateButton.setText("Edit");
                 session.Root.PlayButton.setDisable(false);
-                session.Root.getPlayer().StatusBar.setText("Player Disabled Until Session Is Created Or Loaded");
                 setCreatorState(CreatorState.CREATED);
                 Tools.showinformationdialog(Root, "Success", "Session Successfully Created", "You Can Now Play Or Export This Session");
             }
-        } else {
-//            enable();
-            ExportButton.setDisable(true);
-            CreateButton.setText("Create");
-            session.Root.PlayButton.setDisable(true);
-            session.Root.getPlayer().statusSwitch();
-            setCreatorState(CreatorState.NOT_CREATED);
-        }
+        } else {setCreatorState(CreatorState.NOT_CREATED);}
     }
     public boolean creationchecks() {
         if (! gettextfieldtimes()) {Tools.showerrordialog(Root, "Error Creating Session", "At Least One Cut's Value Must Not Be 0", "Cannot Create Session"); return false;}
