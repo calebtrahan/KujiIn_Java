@@ -29,6 +29,11 @@ public class Goals {
     private List<Goal> RetsuGoals;
     private List<Goal> ZaiGoals;
     private List<Goal> ZenGoals;
+    private List<Goal> EarthGoals;
+    private List<Goal> AirGoals;
+    private List<Goal> FireGoals;
+    private List<Goal> WaterGoals;
+    private List<Goal> VoidGoals;
     private List<Goal> PostsessionGoals;
     private List<Goal> TotalGoals;
     private MainController Root;
@@ -101,6 +106,36 @@ public class Goals {
     public void setZenGoals(List<Goal> zenGoals) {
         ZenGoals = zenGoals;
     }
+    public List<Goal> getEarthGoals() {
+        return EarthGoals;
+    }
+    public void setEarthGoals(List<Goal> earthGoals) {
+        EarthGoals = earthGoals;
+    }
+    public List<Goal> getAirGoals() {
+        return AirGoals;
+    }
+    public void setAirGoals(List<Goal> airGoals) {
+        AirGoals = airGoals;
+    }
+    public List<Goal> getFireGoals() {
+        return FireGoals;
+    }
+    public void setFireGoals(List<Goal> fireGoals) {
+        FireGoals = fireGoals;
+    }
+    public List<Goal> getWaterGoals() {
+        return WaterGoals;
+    }
+    public void setWaterGoals(List<Goal> waterGoals) {
+        WaterGoals = waterGoals;
+    }
+    public List<Goal> getVoidGoals() {
+        return VoidGoals;
+    }
+    public void setVoidGoals(List<Goal> voidGoals) {
+        VoidGoals = voidGoals;
+    }
     public List<Goal> getPostsessionGoals() {
         return PostsessionGoals;
     }
@@ -128,6 +163,11 @@ public class Goals {
                 setRetsuGoals(currentGoals.getRetsuGoals());
                 setZaiGoals(currentGoals.getZaiGoals());
                 setZenGoals(currentGoals.getZenGoals());
+                setEarthGoals(currentGoals.getEarthGoals());
+                setAirGoals(currentGoals.getAirGoals());
+                setFireGoals(currentGoals.getFireGoals());
+                setWaterGoals(currentGoals.getWaterGoals());
+                setVoidGoals(currentGoals.getVoidGoals());
                 setPostsessionGoals(currentGoals.getPostsessionGoals());
                 setTotalGoals(currentGoals.getTotalGoals());
             } catch (JAXBException e) {
@@ -146,25 +186,25 @@ public class Goals {
             Tools.showinformationdialog(Root, "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
         }
     }
-    public void add(int cutindex, Goal newgoal) throws JAXBException {
-        List<Goal> newgoals = getallcutgoals(cutindex, true);
+    public void add(int cutorelementindex, Goal newgoal) throws JAXBException {
+        List<Goal> newgoals = getallcutgoals(cutorelementindex, true);
         System.out.println("Old Goals:");
         for (Goal i : newgoals) {
             System.out.println(i.toString());
         }
         newgoals.add(newgoal);
-        update(sort(newgoals), cutindex);
+        update(sort(newgoals), cutorelementindex);
         System.out.println("New Goals:");
-        for (Goal i : getallcutgoals(cutindex, true)) {
+        for (Goal i : getallcutgoals(cutorelementindex, true)) {
             System.out.println(i.toString());
         }
         marshall();
     }
-    public boolean delete(int cutindex, Goal currentGoal) {
+    public boolean delete(int cutorelementindex, Goal currentGoal) {
         try {
-            List<Goal> cutgoallist = getallcutgoals(cutindex, true);
+            List<Goal> cutgoallist = getallcutgoals(cutorelementindex, true);
             cutgoallist.remove(currentGoal);
-            update(sort(cutgoallist), cutindex);
+            update(sort(cutgoallist), cutorelementindex);
             marshall();
             return true;
         } catch (Exception e) {return false;}
@@ -178,42 +218,47 @@ public class Goals {
             return goallist;
         } catch (Exception ignored) {return null;}
     }
-    public void update(List<Goal> cutgoallist, int cutindex) {
-        if (cutindex == 0) setPresessionGoals(cutgoallist);
-        if (cutindex == 1) setRinGoals(cutgoallist);
-        if (cutindex == 2) setKyoGoals(cutgoallist);
-        if (cutindex == 3) setTohGoals(cutgoallist);
-        if (cutindex == 4) setShaGoals(cutgoallist);
-        if (cutindex == 5) setKaiGoals(cutgoallist);
-        if (cutindex == 6) setJinGoals(cutgoallist);
-        if (cutindex == 7) setRetsuGoals(cutgoallist);
-        if (cutindex == 8) setZaiGoals(cutgoallist);
-        if (cutindex == 9) setZenGoals(cutgoallist);
-        if (cutindex == 10) setPostsessionGoals(cutgoallist);
-        if (cutindex == 11) setTotalGoals(cutgoallist);
+    public void update(List<Goal> cutgoallist, int cutorelementindex) {
+        if (cutorelementindex == 0) setPresessionGoals(cutgoallist);
+        if (cutorelementindex == 1) setRinGoals(cutgoallist);
+        if (cutorelementindex == 2) setKyoGoals(cutgoallist);
+        if (cutorelementindex == 3) setTohGoals(cutgoallist);
+        if (cutorelementindex == 4) setShaGoals(cutgoallist);
+        if (cutorelementindex == 5) setKaiGoals(cutgoallist);
+        if (cutorelementindex == 6) setJinGoals(cutgoallist);
+        if (cutorelementindex == 7) setRetsuGoals(cutgoallist);
+        if (cutorelementindex == 8) setZaiGoals(cutgoallist);
+        if (cutorelementindex == 9) setZenGoals(cutgoallist);
+        if (cutorelementindex == 10) setPostsessionGoals(cutgoallist);
+        if (cutorelementindex == 11) setTotalGoals(cutgoallist);
     }
 
 // Goal Getters
-    public boolean goalsexist(int cutindex, boolean includecompleted) {
-        return getallcutgoals(cutindex, includecompleted) != null && ! getallcutgoals(cutindex, true).isEmpty();
+    public boolean goalsexist(int cutorelementindex, boolean includecompleted) {
+        return getallcutgoals(cutorelementindex, includecompleted) != null && ! getallcutgoals(cutorelementindex, true).isEmpty();
     }
-    public Goal getgoal(int cutindex, Integer goalindex, boolean includecompleted) {
-        try {return getallcutgoals(cutindex, includecompleted).get(goalindex);}
+    public Goal getgoal(int cutorelementindex, Integer goalindex, boolean includecompleted) {
+        try {return getallcutgoals(cutorelementindex, includecompleted).get(goalindex);}
         catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}
     }
-    public List<Goal> getallcutgoals(int cutindex, boolean includecompleted) {
-        if (cutindex == 0) return filtergoals(PresessionGoals, includecompleted);
-        if (cutindex == 1) return filtergoals(RinGoals, includecompleted);
-        if (cutindex == 2) return filtergoals(KyoGoals, includecompleted);
-        if (cutindex == 3) return filtergoals(TohGoals, includecompleted);
-        if (cutindex == 4) return filtergoals(ShaGoals, includecompleted);
-        if (cutindex == 5) return filtergoals(KaiGoals, includecompleted);
-        if (cutindex == 6) return filtergoals(JinGoals, includecompleted);
-        if (cutindex == 7) return filtergoals(RetsuGoals, includecompleted);
-        if (cutindex == 8) return filtergoals(ZaiGoals, includecompleted);
-        if (cutindex == 9) return filtergoals(ZenGoals, includecompleted);
-        if (cutindex == 10) return filtergoals(PostsessionGoals, includecompleted);
-        if (cutindex == 11) return filtergoals(TotalGoals, includecompleted);
+    public List<Goal> getallcutgoals(int cutorelementindex, boolean includecompleted) {
+        if (cutorelementindex == 0) return filtergoals(PresessionGoals, includecompleted);
+        if (cutorelementindex == 1) return filtergoals(RinGoals, includecompleted);
+        if (cutorelementindex == 2) return filtergoals(KyoGoals, includecompleted);
+        if (cutorelementindex == 3) return filtergoals(TohGoals, includecompleted);
+        if (cutorelementindex == 4) return filtergoals(ShaGoals, includecompleted);
+        if (cutorelementindex == 5) return filtergoals(KaiGoals, includecompleted);
+        if (cutorelementindex == 6) return filtergoals(JinGoals, includecompleted);
+        if (cutorelementindex == 7) return filtergoals(RetsuGoals, includecompleted);
+        if (cutorelementindex == 8) return filtergoals(ZaiGoals, includecompleted);
+        if (cutorelementindex == 9) return filtergoals(ZenGoals, includecompleted);
+        if (cutorelementindex == 10) return filtergoals(EarthGoals, includecompleted);
+        if (cutorelementindex == 11) return filtergoals(AirGoals, includecompleted);
+        if (cutorelementindex == 12) return filtergoals(FireGoals, includecompleted);
+        if (cutorelementindex == 13) return filtergoals(WaterGoals, includecompleted);
+        if (cutorelementindex == 14) return filtergoals(VoidGoals, includecompleted);
+        if (cutorelementindex == 15) return filtergoals(PostsessionGoals, includecompleted);
+        if (cutorelementindex == 16) return filtergoals(TotalGoals, includecompleted);
         else return null;
     }
     public List<Goal> filtergoals(List<Goal> cutgoals, boolean includecompleted) {
@@ -228,9 +273,9 @@ public class Goals {
             return newgoallist;
         } catch (NullPointerException e) {return new ArrayList<>();}
     }
-    public int getcompletedgoalcount(int cutindex) {
+    public int getcompletedgoalcount(int cutorelementindex) {
         int completedgoalcount = 0;
-        for (Goal i : getallcutgoals(cutindex, true)) {
+        for (Goal i : getallcutgoals(cutorelementindex, true)) {
             if (i.getCompleted()) completedgoalcount++;
         }
         return completedgoalcount;
@@ -249,16 +294,16 @@ public class Goals {
             sortcompletedgoals(i, currentpracticedhours);
         }
     }
-    public void sortcompletedgoals(int cutindex, double currentpracticedhours) {
-        for (Goal i : getallcutgoals(cutindex, true)) {
+    public void sortcompletedgoals(int cutorelementindex, double currentpracticedhours) {
+        for (Goal i : getallcutgoals(cutorelementindex, true)) {
             boolean completed = currentpracticedhours >= i.getGoal_Hours();
             i.setCompleted(completed);
             if (completed && ! i.getCompleted()) {i.setDate_Completed(Tools.gettodaysdate());}
         }
     }
-    public List<Goal> completecutgoals(int cutindex, double currentpracticedhours) {
+    public List<Goal> completecutgoals(int cutorelementindex, double currentpracticedhours) {
         List<Goal> completedthisession = new ArrayList<>();
-        for (Goal i : getallcutgoals(cutindex, true)) {
+        for (Goal i : getallcutgoals(cutorelementindex, true)) {
             boolean completed = currentpracticedhours >= i.getGoal_Hours();
             boolean notcompletedbefore = ! i.getCompleted();
             if (completed && notcompletedbefore) {

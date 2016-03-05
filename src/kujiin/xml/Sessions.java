@@ -2,6 +2,7 @@ package kujiin.xml;
 
 import kujiin.MainController;
 import kujiin.Tools;
+import kujiin.widgets.ProgressAndGoalsWidget;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -100,10 +101,10 @@ public class Sessions {
                 // Pre And Post
                 totalminutes += thissession.getcutduration(0);
                 totalminutes += thissession.getcutduration(10);
-            } else if (index == 11) {
+            } else if (index == ProgressAndGoalsWidget.GOALCUTNAMES.length - 1) {
                 // TOTAL!
-                if (includepreandpost) {for (int x=0; x<11;x++) {totalminutes += thissession.getcutduration(x);}}
-                else {for (int x=1; x<10;x++) {totalminutes += thissession.getcutduration(x);}}
+                if (includepreandpost) {for (int x=0; x<ProgressAndGoalsWidget.GOALCUTNAMES.length - 1;x++) {totalminutes += thissession.getcutduration(x);}}
+                else {for (int x=1; x<ProgressAndGoalsWidget.GOALCUTNAMES.length - 2;x++) {totalminutes += thissession.getcutduration(x);}}
             } else {
                 // Indidivual Cut
                 totalminutes += thissession.getcutduration(index);
@@ -114,7 +115,7 @@ public class Sessions {
     public int getpracticedtimeinminutesforallsessions(int index, Boolean includepreandpost) {
         try {
             int totalminutes = 0;
-            if (index == 11) {
+            if (index == ProgressAndGoalsWidget.GOALCUTNAMES.length - 1) {
             // TOTAL!
                 for (kujiin.xml.Session i : getSession()) {
                     if (includepreandpost) {for (int x=0; x<11;x++) {totalminutes += i.getcutduration(x);}}

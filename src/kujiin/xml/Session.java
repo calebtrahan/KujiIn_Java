@@ -1,6 +1,7 @@
 package kujiin.xml;
 
 import kujiin.Tools;
+import kujiin.widgets.ProgressAndGoalsWidget;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -271,7 +272,12 @@ public class Session {
         if (cutindex == 7) {setRetsu_Duration(duration);}
         if (cutindex == 8) {setZai_Duration(duration);}
         if (cutindex == 9) {setZen_Duration(duration);}
-        if (cutindex == 10) {setPostsession_Duration(duration);}
+        if (cutindex == 10) {setEarth_Duration(duration);}
+        if (cutindex == 11) {setAir_Duration(duration);}
+        if (cutindex == 12) {setFire_Duration(duration);}
+        if (cutindex == 13) {setWater_Duration(duration);}
+        if (cutindex == 14) {setVoid_Duration(duration);}
+        if (cutindex == 15) {setPostsession_Duration(duration);}
         updatetotalsessionduration();
     }
     public int getcutduration(int cutindex) {
@@ -285,7 +291,12 @@ public class Session {
         if (cutindex == 7) {return getRetsu_Duration();}
         if (cutindex == 8) {return getZai_Duration();}
         if (cutindex == 9) {return getZen_Duration();}
-        if (cutindex == 10) {return getPostsession_Duration();}
+        if (cutindex == 10) {return getEarth_Duration();}
+        if (cutindex == 11) {return getAir_Duration();}
+        if (cutindex == 12) {return getFire_Duration();}
+        if (cutindex == 13) {return getWater_Duration();}
+        if (cutindex == 14) {return getVoid_Duration();}
+        if (cutindex == 15) {return getPostsession_Duration();}
         else {return 0;}
     }
     public void setcutambience(int cutindex, ArrayList<File> ambiencelist) {
@@ -297,9 +308,15 @@ public class Session {
         if (cutindex == 5) setKai_Ambience(ambiencelist);
         if (cutindex == 6) setJin_Ambience(ambiencelist);
         if (cutindex == 7) setRetsu_Ambience(ambiencelist);
-        if (cutindex == 8) setZen_Ambience(ambiencelist);
-        if (cutindex == 9) setPostsession_Ambience(ambiencelist);
-        if (cutindex == 10) System.out.println("Can't Set Cut Ambience Not A Valid Index: " + cutindex);
+        if (cutindex == 8) setZai_Ambience(ambiencelist);
+        if (cutindex == 9) setZen_Ambience(ambiencelist);
+        if (cutindex == 10) setEarth_Ambience(ambiencelist);
+        if (cutindex == 11) setAir_Ambience(ambiencelist);
+        if (cutindex == 12) setFire_Ambience(ambiencelist);
+        if (cutindex == 13) setWater_Ambience(ambiencelist);
+        if (cutindex == 14) setVoid_Ambience(ambiencelist);
+        if (cutindex == 15) setPostsession_Ambience(ambiencelist);
+        else System.out.println("Can't Set Cut Ambience Not A Valid Index: " + cutindex);
     }
     public ArrayList<Integer> getallcuttimes() {
         ArrayList<Integer> allcuttimes = new ArrayList<>();
@@ -314,13 +331,18 @@ public class Session {
         allcuttimes.add(getZai_Duration());
         allcuttimes.add(getZen_Duration());
         allcuttimes.add(getZen_Duration());
+        allcuttimes.add(getEarth_Duration());
+        allcuttimes.add(getAir_Duration());
+        allcuttimes.add(getFire_Duration());
+        allcuttimes.add(getWater_Duration());
+        allcuttimes.add(getVoid_Duration());
         allcuttimes.add(getPostsession_Duration());
         return allcuttimes;
     }
     public boolean sessionnotEmpty() {
         int count = 0;
         for (Integer i : getallcuttimes()) {
-            if (count > 0 && count < 10) {if (i > 0) {return true;}}
+            if (count > 0 && count < ProgressAndGoalsWidget.CUTORELEMENTCOUNT - 1) {if (i > 0) {return true;}}
             count++;
         }
         return false;
