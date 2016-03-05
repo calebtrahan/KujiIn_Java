@@ -220,7 +220,6 @@ public class MainController implements Initializable {
     }
 
 // Session Player Widget
-    // TODO Check Here If Playthissession Is Open
     public void playthisession(ActionEvent actionEvent) {
         getCreatorAndExporter().togglecreator();
         if (getCreatorAndExporter().getCreatorState() == CreatorAndExporterWidget.CreatorState.CREATED) {
@@ -228,7 +227,8 @@ public class MainController implements Initializable {
             getStage().setIconified(true);
             setPlayer(new PlayerWidget(this));
             getPlayer().showAndWait();
-        } else {}
+            getStage().setIconified(false);
+        }
     }
 
 // Dialogs
