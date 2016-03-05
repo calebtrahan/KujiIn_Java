@@ -95,6 +95,7 @@ public class MainController implements Initializable {
     public ToggleButton PostSwitch;
     public Button ChangeAllElementsButton;
     public Scene Scene;
+    public Stage Stage;
     private This_Session Session;
     private CreatorAndExporterWidget CreatorAndExporter;
     private PlayerWidget Player;
@@ -156,8 +157,14 @@ public class MainController implements Initializable {
     public void setScene(javafx.scene.Scene scene) {
         Scene = scene;
     }
+    public javafx.stage.Stage getStage() {
+        return Stage;
+    }
+    public void setStage(javafx.stage.Stage stage) {
+        Stage = stage;
+    }
 
-// Top Menu Actions
+    // Top Menu Actions
     public void changesessionoptions(ActionEvent actionEvent) {
     new ChangeProgramOptions(this).showAndWait();
     Options.marshall();
@@ -218,6 +225,7 @@ public class MainController implements Initializable {
         getCreatorAndExporter().togglecreator();
         if (getCreatorAndExporter().getCreatorState() == CreatorAndExporterWidget.CreatorState.CREATED) {
             if (getPlayer() != null && getPlayer().isShowing()) {return;}
+            getStage().setIconified(true);
             setPlayer(new PlayerWidget(this));
             getPlayer().showAndWait();
         } else {}

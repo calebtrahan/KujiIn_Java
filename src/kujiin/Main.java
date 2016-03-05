@@ -18,6 +18,7 @@ public class Main extends Application {
         primaryStage.setScene(Scene);
         primaryStage.setOnShowing(event -> {
             Root.setScene(Scene);
+            Root.setStage(primaryStage);
             Root.getOptions().setStyle(Root.getScene());
         });
         primaryStage.show();

@@ -200,7 +200,7 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
                 }
             }
         }
-        ambiencemedia.addAll(ambiencelist.stream().map(i -> new Media(i.toURI().toString())).collect(Collectors.toList()));
+        super.ambiencemedia.addAll(ambiencelist.stream().map(i -> new Media(i.toURI().toString())).collect(Collectors.toList()));
         return ambiencemedia.size() > 0;
     }
     @Override

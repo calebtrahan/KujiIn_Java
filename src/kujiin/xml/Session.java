@@ -47,7 +47,10 @@ public class Session {
     private ArrayList<File> Postsession_Ambience;
 
     public Session(Integer presession_duration, Integer rin_duration, Integer kyo_duration, Integer toh_duration,
-                   Integer sha_duration, Integer kai_duration, Integer jin_duration, Integer retsu_duration, Integer zai_duration, Integer zen_duration, Integer postsession_duration, Integer total_session_duration) {
+                   Integer sha_duration, Integer kai_duration, Integer jin_duration, Integer retsu_duration,
+                   Integer zai_duration, Integer zen_duration, Integer earth_duration, Integer air_duration,
+                   Integer fire_duration, Integer water_duration, Integer void_duration,
+                   Integer postsession_duration, Integer total_session_duration) {
         Presession_Duration = presession_duration;
         Rin_Duration = rin_duration;
         Kyo_Duration = kyo_duration;
@@ -58,6 +61,11 @@ public class Session {
         Retsu_Duration = retsu_duration;
         Zai_Duration = zai_duration;
         Zen_Duration = zen_duration;
+        Earth_Duration = earth_duration;
+        Air_Duration = air_duration;
+        Fire_Duration = fire_duration;
+        Water_Duration = water_duration;
+        Void_Duration = void_duration;
         Postsession_Duration = postsession_duration;
         Total_Session_Duration = total_session_duration;
         setDate_Practiced(Tools.gettodaysdate());

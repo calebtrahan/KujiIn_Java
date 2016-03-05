@@ -658,7 +658,8 @@ public class CreatorAndExporterWidget {
             ObservableList<Text> sessionitems = FXCollections.observableArrayList();
             int count = 0;
             boolean thisitemmissing;
-            for (int i = 0; i < textfieldvalues.size(); i++) {
+            for (int i = 0; i < textfieldvalues.size() - 1; i++) {
+                // TODO IMPORTANT Index Out Of Bounds Here
                 String name = Options.CUTNAMES.get(i);
                 String minutes;
                 if (i <= lastcutindex || i == textfieldvalues.size() - 1) {

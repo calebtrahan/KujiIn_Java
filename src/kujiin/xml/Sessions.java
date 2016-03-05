@@ -54,7 +54,7 @@ public class Sessions {
         } catch (JAXBException e) {Tools.showinformationdialog(Root, "Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
     }
     public void createnewsession() {
-        try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
+        try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
         catch (JAXBException ignored) {
             Tools.showerrordialog(Root, "Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }

@@ -244,7 +244,6 @@ public class This_Session {
                     return new Task<Void>() {
                         @Override
                         protected Void call() throws Exception {
-                            int cutcount = 0;
                             for (Object i : tempcuts) {
                                 if (i instanceof Cut) {
                                     Cut thiscut = (Cut) i;
@@ -262,8 +261,15 @@ public class This_Session {
                                             if (!thiselement.hasenoughAmbience(thiselement.getdurationinseconds())) {cutsorelementswithreducedambience.add(thiselement);}
                                         } else {cutsorelementswithnoambience.add(thiselement);}
                                     }
+                                } else if (i instanceof Qi_Gong) {
+                                    Qi_Gong thisqigong = (Qi_Gong) i;
+                                    updateMessage(String.format("Currently Checking %s...", thisqigong.name));
+                                    if (thisqigong.getdurationinminutes() != 0) {
+                                        if (thisqigong.getambienceindirectory()) {
+                                            if (!thisqigong.hasenoughAmbience(thisqigong.getdurationinseconds())) {cutsorelementswithreducedambience.add(thisqigong);}
+                                        } else {cutsorelementswithnoambience.add(thisqigong);}
+                                    }
                                 }
-                                cutcount++;
                             }
                             updateMessage("Done Checking Ambience");
                             return null;
@@ -390,7 +396,7 @@ public class This_Session {
             for (Object i : getallitemsinSession()) {
                 if (i instanceof Cut) {if (! ((Cut) i).build(getCutsinSession(), ambienceenabled)) {return false;}}
                 if (i instanceof Element) {if (! ((Element) i).build(getElementsinSession(), ambienceenabled)) {return false;}}
-                if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(getallitemsinSession().get(1), getallitemsinSession().get(getallitemsinSession().size() - 2))) {return false;}}
+                if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(getallitemsinSession().get(1), getallitemsinSession().get(getallitemsinSession().size() - 2), ambienceenabled)) {return false;}}
             }
             return true;
         } else {return false;}

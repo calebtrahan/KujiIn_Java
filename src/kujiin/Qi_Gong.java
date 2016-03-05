@@ -61,7 +61,8 @@ public class Qi_Gong extends Playable implements Creatable, Exportable {
     }
 
 // Creation
-    public boolean build(Object firstcutorelement, Object lastcutorelement) {
+    public boolean build(Object firstcutorelement, Object lastcutorelement, boolean ambienceenabled) {
+        setAmbienceenabled(ambienceenabled);
         entrainmentlist = new ArrayList<>();
         entrainmentmedia = new ArrayList<>();
         if (name.equals("Presession")) {
@@ -82,7 +83,9 @@ public class Qi_Gong extends Playable implements Creatable, Exportable {
                 entrainmentlist.add(0, thisfile);
             }
         }
-        return entrainmentlist.size() > 0 && entrainmentmedia.size() > 0;
+        boolean entrainmentgood = entrainmentlist.size() > 0 && entrainmentmedia.size() > 0;
+        if (ambienceenabled) {return entrainmentgood && buildAmbience();}
+        else {return entrainmentgood;}
     }
     @Override
     public boolean isValid() {
