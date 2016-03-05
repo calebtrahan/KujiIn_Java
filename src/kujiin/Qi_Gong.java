@@ -18,15 +18,11 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-// TODO Extend Functionality Of Cut Here, Or Put Basic Functionality here And Have Cut Extend This
-// TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
-// TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
-// TODO Player On Separate Screen
-public class Element extends Playable implements Creatable, Exportable {
+public class Qi_Gong extends Playable implements Creatable, Exportable {
     private ToggleButton Switch;
     private TextField Value;
 
-    public Element(int number, String name, int duration, This_Session thissession, ToggleButton aSwitch, TextField value) {
+    public Qi_Gong (int number, String name, int duration, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
         super.duration = duration;
@@ -65,11 +61,28 @@ public class Element extends Playable implements Creatable, Exportable {
     }
 
 // Creation
-    public boolean build(ArrayList<Element> elementstoplay, boolean ambienceenabled) {
-        setAmbienceenabled(ambienceenabled);
-        setElementstoplay(elementstoplay);
-        if (ambienceenabled) {return buildAmbience() && buildEntrainment();}
-        else {return buildEntrainment();}
+    public boolean build(Object firstcutorelement, Object lastcutorelement) {
+        entrainmentlist = new ArrayList<>();
+        entrainmentmedia = new ArrayList<>();
+        if (name.equals("Presession")) {
+            buildEntrainment();
+            if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+                int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
+                String rampupfirstname = "ar" + ((Playable) firstcutorelement).number + rampdur + ".mp3";
+                File ramptofirstcut = new File(Options.DIRECTORYRAMPUP, rampupfirstname);
+                entrainmentlist.add(ramptofirstcut);
+            }
+        }
+        if (name.equals("Postsession")) {
+            buildEntrainment();
+            if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+                int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
+                String rampdowntopost = "zr" + ((Playable) lastcutorelement).number + rampdur + ".mp3";
+                File thisfile = new File(Options.DIRECTORYRAMPDOWN, rampdowntopost);
+                entrainmentlist.add(0, thisfile);
+            }
+        }
+        return entrainmentlist.size() > 0 && entrainmentmedia.size() > 0;
     }
     @Override
     public boolean isValid() {
@@ -99,7 +112,27 @@ public class Element extends Playable implements Creatable, Exportable {
     }
     @Override
     public boolean buildEntrainment() {
-        return false;
+        int fivetimes = 0;
+        int singletimes = 0;
+        if (duration != 0) {
+            fivetimes = duration / 5;
+            singletimes = duration % 5;
+        }
+        for (int i = 0; i < fivetimes; i++) {
+            String filename = name + "5.mp3";
+            File thisfile = new File(Options.DIRECTORYMAINCUTS, filename);
+            entrainmentlist.add(thisfile);
+        }
+        for (int i = 0; i < singletimes; i++) {
+            String filename = name + "1.mp3";
+            File thisfile = new File(Options.DIRECTORYMAINCUTS, filename);
+            entrainmentlist.add(thisfile);
+        }
+        Tools.shufflelist(entrainmentlist, 5);
+        for (File i : entrainmentlist) {
+            entrainmentmedia.add(new Media(i.toURI().toString()));
+        }
+        return entrainmentmedia.size() > 0;
     }
     @Override
     public boolean buildAmbience() {
@@ -164,6 +197,11 @@ public class Element extends Playable implements Creatable, Exportable {
 
 // Playback
     @Override
+    public void start() {
+        super.start();
+        thisession.Root.getProgressTracker().selectcut(number);
+    }
+    @Override
     public void tick() {
         super.tick();
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
@@ -172,17 +210,12 @@ public class Element extends Playable implements Creatable, Exportable {
         }
     }
     @Override
-    public void start() {
-        super.start();
-        thisession.Root.getProgressTracker().selectcut(number);
-    }
-    @Override
     public void playnextentrainment() {
         try {
             super.playnextentrainment();
         } catch (IndexOutOfBoundsException ignored) {
-            System.out.println("Out Of Bounds In " + name + "'s Ambience List: ");
-            for (Media i : ambiencemedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
+            System.out.println("Out Of Bounds In " + this.name + "'s Entrainment List: ");
+            for (Media i : entrainmentmedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
         }
     }
     @Override
@@ -190,45 +223,79 @@ public class Element extends Playable implements Creatable, Exportable {
         try {
             super.playnextambience();
         } catch (IndexOutOfBoundsException ignored) {
-            System.out.println("Out Of Bounds In " + name + "'s Ambience List: ");
-            for (Media i : entrainmentmedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
+            System.out.println("Out Of Bounds In " + this.name + "'s Ambience List: ");
+            for (Media i : ambiencemedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
         }
     }
     // Playback Getters
     @Override
     public Duration getdurationasobject() {
-        return super.getdurationasobject();
+        double dur = super.getdurationasobject().toSeconds();
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+            dur += thisession.Root.getOptions().getSessionOptions().getRampduration() * 60;
+        }
+        return new Duration(dur * 1000);
     }
     @Override
     public int getdurationinseconds() {
-        return super.getdurationinseconds();
+        int seconds = super.getdurationinseconds();
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+            seconds += thisession.Root.getOptions().getSessionOptions().getRampduration() * 60;
+        }
+        return seconds;
     }
     @Override
     public int getdurationinminutes() {
-        return super.getdurationinminutes();
+        int minutes = super.getdurationinminutes();
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+            minutes += thisession.Root.getOptions().getSessionOptions().getRampduration();
+        }
+        return minutes;
     }
     @Override
     public Double getdurationindecimalhours() {
-        return super.getdurationindecimalhours();
-    }
-    @Override
-    public String getcurrenttimeformatted() {
-        return super.getcurrenttimeformatted();
+        return Tools.convertminutestodecimalhours(this.getdurationinminutes(), 2);
     }
     @Override
     public String gettotaltimeformatted() {
-        return super.gettotaltimeformatted();
+        return Tools.formatlengthshort(this.getdurationinseconds());
+    }
+
+
+    @Override
+    public void startfadeout() {
+        super.startfadeout();
+    }
+    @Override
+    public void cleanup() {
+        super.cleanup();
     }
     @Override
     public void entrainmenterror() {
-        super.entrainmenterror();
+        System.out.println("Entrainment Error");
+        // Pause Ambience If Exists
+        if (Tools.getanswerdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
+                        "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
+                "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
+            entrainmentplayer.stop();
+            entrainmentplayer.play();
+            entrainmentplayer.setOnError(this::entrainmenterror);
+        } else {thisession.error_endplayback();}
     }
     @Override
     public void ambienceerror() {
-        super.ambienceerror();
+        System.out.println("Ambience Error!");
+        // Pause Entrainment
+        if (Tools.getanswerdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
+                        "'s Ambience. Problem File Is: '" + getCurrentAmbiencePlayer().getMedia().getSource() + "'",
+                "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
+            ambienceplayer.stop();
+            ambienceplayer.play();
+            ambienceplayer.setOnError(this::ambienceerror);
+        } else {thisession.error_endplayback();}
     }
 
-// Export
+    // Export
     @Override
     public Service<Boolean> getexportservice() {
         return null;
@@ -253,4 +320,5 @@ public class Element extends Playable implements Creatable, Exportable {
     public Boolean sessionreadyforFinalExport() {
         return null;
     }
+
 }

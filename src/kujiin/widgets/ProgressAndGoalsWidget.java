@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 
 // TODO Finish Making EditGoalsDialog (Also Add A Select A Different Cut Feature, And Make It So They Can Pass Cutindex Data Back And Forth)
 public class ProgressAndGoalsWidget implements Widget {
-    public static String[] GOALCUTNAMES = {"Presession", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Postsession", "Total"};
+    public static String[] GOALCUTNAMES = {"Presession", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Earth", "Air", "Fire", "Water", "Void", "Postsession", "Total"};
     private ComboBox<String> CutSelectorComboBox;
     private Integer cutindex;
 // Progress Tracker Fields
@@ -136,8 +136,8 @@ public class ProgressAndGoalsWidget implements Widget {
     public void cutselectionchanged(ActionEvent actionEvent) {
         try {
             cutindex = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
-            PreAndPostOption.setDisable(cutindex != 11);
-            if (cutindex != 11) {PreAndPostOption.setSelected(false);}
+            PreAndPostOption.setDisable(cutindex != GOALCUTNAMES.length - 1);
+            if (cutindex != GOALCUTNAMES.length - 1) {PreAndPostOption.setSelected(false);}
             if (cutindex == -1) {resetallvalues();}
             else {
                 updateprogressui();

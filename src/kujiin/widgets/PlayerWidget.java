@@ -9,7 +9,6 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import kujiin.Cut;
 import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
@@ -62,7 +61,7 @@ public class PlayerWidget extends Stage {
             Root.getOptions();
             Root.getOptions().setStyle(defaultscene);
         } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-        setTitle("Session List");
+        setTitle("Session Player");
         Root = root;
         Session = root.getSession();
         EntrainmentVolume.setOnMouseClicked(event -> {
@@ -125,14 +124,14 @@ public class PlayerWidget extends Stage {
     public static class DisplayReference extends Stage {
         public ScrollPane ContentPane;
         private MainController Root;
-        private Cut currentcut;
+        private Playable currentcutorelement;
         private ReferenceType referenceType;
         private Boolean fullscreenoption;
         private Scene scene;
 
-        public DisplayReference(MainController root, Cut currentcut) {
+        public DisplayReference(MainController root, Object currentcutorelement) {
             Root = root;
-            this.currentcut = currentcut;
+            this.currentcutorelement = (Playable) currentcutorelement;
             referenceType = Root.getOptions().getSessionOptions().getReferencetype();
             fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
@@ -142,7 +141,7 @@ public class PlayerWidget extends Stage {
                 setScene(scene);
                 Root.getOptions().setStyle(scene);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-            setTitle(currentcut.name + "'s Reference");
+            setTitle(this.currentcutorelement.name + "'s Reference");
             setsizing();
             loadcontent();
         }
@@ -177,7 +176,7 @@ public class PlayerWidget extends Stage {
             ContentPane.setStyle("-fx-background-color: #212526");
         }
         public void loadcontent() {
-            File referencefile = currentcut.getReferenceFile();
+            File referencefile = currentcutorelement.getReferenceFile();
             if (referencefile != null) {
                 if (referenceType == ReferenceType.txt) {
                     StringBuilder sb = new StringBuilder();

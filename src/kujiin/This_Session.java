@@ -3,16 +3,15 @@ package kujiin;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.control.CheckBox;
 import javafx.scene.media.Media;
-import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
+import kujiin.widgets.Playable;
 import kujiin.widgets.PlayerWidget;
 import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Goals;
@@ -32,62 +31,69 @@ import java.util.List;
 // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
 
 public class This_Session {
-    private Cut presession = new Cut(0, "Presession", 0, this);
-    private Cut rin = new Cut(1, "RIN", 0, this);
-    private Cut kyo = new Cut(2, "KYO", 0, this);
-    private Cut toh = new Cut(3, "TOH", 0, this);
-    private Cut sha = new Cut(4, "SHA", 0, this);
-    private Cut jin = new Cut(6, "JIN", 0, this);
-    private Cut kai = new Cut(5, "KAI", 0, this);
-    private Cut retsu = new Cut(7, "RETSU", 0, this);
-    private Cut zai = new Cut(8, "ZAI", 0, this);
-    private Cut zen = new Cut(9, "ZEN", 0, this);
-    private Cut postsession = new Cut(10, "Postsession", 0, this);
-    private ArrayList<Cut> cutsinsession;
+    private Qi_Gong Presession;
+    private Cut Rin;
+    private Cut Kyo;
+    private Cut Toh;
+    private Cut Sha;
+    private Cut Jin;
+    private Cut Kai;
+    private Cut Retsu;
+    private Cut Zai;
+    private Cut Zen;
+    private Qi_Gong Postsession;
+    private Element Earth;
+    private Element Air;
+    private Element Fire;
+    private Element Water;
+    private Element Void;
     private Boolean ambienceenabled;
     private PlayerWidget.PlayerState playerState;
-    private Cut currentcut;
-    private Timeline currentcuttimeline;
+    private Object currentcutorelement;
+    private Timeline updateuitimeline;
     private Sessions sessions;
     private int totalsecondselapsed;
     private int totalsecondsinsession;
-    private int cutcount;
+    private int cutorelementcount;
     private PlayerWidget.DisplayReference displayReference;
-    private File exportfile;
     public MainController Root;
     public List<Goals.Goal> GoalsCompletedThisSession;
     private PlayerWidget playerWidget;
+    private List<Object> itemsinsession;
 
     public This_Session(MainController mainController) {
         Root = mainController;
         this.sessions = Root.getProgressTracker().getSessions();
-        cutsinsession = new ArrayList<>();
         ambienceenabled = false;
         setPlayerState(PlayerWidget.PlayerState.IDLE);
-   }
+        Presession =  new Qi_Gong(0, "Presession", 0, this, Root.PreSwitch, Root.PreTime);
+        Rin = new Cut(1, "RIN", 0, this, Root.RinSwitch, Root.RinTime);
+        Kyo = new Cut(2, "KYO", 0, this, Root.KyoSwitch, Root.KyoTime);
+        Toh = new Cut(3, "TOH", 0, this, Root.TohSwitch, Root.TohTime);
+        Sha = new Cut(4, "SHA", 0, this, Root.ShaSwitch, Root.ShaTime);
+        Kai = new Cut(5, "KAI", 0, this, Root.KaiSwitch, Root.KaiTime);
+        Jin = new Cut(6, "JIN", 0, this, Root.JinSwitch, Root.JinTime);
+        Retsu = new Cut(7, "RETSU", 0, this, Root.RetsuSwitch, Root.RetsuTime);
+        Zai = new Cut(8, "ZAI", 0, this, Root.ZaiSwitch, Root.ZaiTime);
+        Zen = new Cut(9, "ZEN", 0, this, Root.ZenSwitch, Root.ZenTime);
+        Earth = new Element(10, "Earth", 0, this, Root.EarthSwitch, Root.EarthTime);
+        Air = new Element(11, "Air", 0, this, Root.AirSwitch, Root.AirTime);
+        Fire = new Element(12, "Fire", 0, this, Root.FireSwitch, Root.FireTime);
+        Water = new Element(13, "Water", 0, this, Root.WaterSwitch, Root.WaterTime);
+        Void = new Element(14, "Void", 0, this, Root.VoidSwitch, Root.VoidTime);
+        Postsession = new Qi_Gong(15, "Postsession", 0, this, Root.PostSwitch, Root.PostTime);
+    }
 
 // Getters And Setters
     public void setAmbienceenabled(Boolean ambienceenabled) {
         this.ambienceenabled = ambienceenabled;
     }
-    public boolean getAmbienceenabled() {return ambienceenabled;}
-    public void setCutsinsession(ArrayList<Cut> cutsinsession) {this.cutsinsession = cutsinsession;}
-    public ArrayList<Cut> getCutsinsession() {return cutsinsession;}
     public void setPlayerState(PlayerWidget.PlayerState playerState) {this.playerState = playerState;}
     public PlayerWidget.PlayerState getPlayerState() {return playerState;}
-    public ArrayList<Cut> getallCuts() {return new ArrayList<>(Arrays.asList(presession, rin, kyo, toh, sha, kai, jin, retsu, zai, zen, postsession));}
     public boolean isValid() {
         int totaltime = 0;
-        for (Cut i : getallCuts()) {
-            if (i.number != 0 && i.number != 10) {totaltime += i.duration;}
-        }
+        for (Object i : getallCutsAndElements()) {totaltime += ((Playable) i).getdurationinminutes();}
         return totaltime > 0;
-    }
-    public File getExportfile() {
-        return exportfile;
-    }
-    public void setExportfile(File exportfile) {
-        this.exportfile = exportfile;
     }
     public PlayerWidget getPlayerWidget() {
         return playerWidget;
@@ -95,20 +101,143 @@ public class This_Session {
     public void setPlayerWidget(PlayerWidget playerWidget) {
         this.playerWidget = playerWidget;
     }
+    public ArrayList<Object> getallCutsAndElements() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
+    public ArrayList<Cut> getallCuts()  {return new ArrayList<>(Arrays.asList(Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen));}
+    public ArrayList<Element> getallElements() {return new ArrayList<>(Arrays.asList(Earth, Air, Fire, Water, Void));}
+    public List<Object> getallitemsinSession() {
+        return itemsinsession;
+    }
+    public void setItemsinsession(List<Object> itemsinsession) {
+        this.itemsinsession = itemsinsession;
+    }
+    public ArrayList<Cut> getCutsinSession() {
+        ArrayList<Cut> cutinsession = new ArrayList<>();
+        for (Object i : itemsinsession) {
+            if (i instanceof Cut) {cutinsession.add((Cut) i);}
+        }
+        return cutinsession;
+    }
+    public ArrayList<Element> getElementsinSession() {
+        ArrayList<Element> elementsinsession = new ArrayList<>();
+        for (Object i : itemsinsession) {
+            if (i instanceof Element) {elementsinsession.add((Element) i);}
+        }
+        return elementsinsession;
+    }
+    // Cut And Element Getters
+    public Qi_Gong getPresession() {
+        return Presession;
+    }
+    public Cut getRin() {
+        return Rin;
+    }
+    public Cut getKyo() {
+        return Kyo;
+    }
+    public Cut getToh() {
+        return Toh;
+    }
+    public Cut getSha() {
+        return Sha;
+    }
+    public Cut getJin() {
+        return Jin;
+    }
+    public Cut getKai() {
+        return Kai;
+    }
+    public Cut getRetsu() {
+        return Retsu;
+    }
+    public Cut getZai() {
+        return Zai;
+    }
+    public Cut getZen() {
+        return Zen;
+    }
+    public Qi_Gong getPostsession() {
+        return Postsession;
+    }
+    public Element getEarth() {
+        return Earth;
+    }
+    public Element getAir() {
+        return Air;
+    }
+    public Element getFire() {
+        return Fire;
+    }
+    public Element getWater() {
+        return Water;
+    }
+    public Element getVoid() {
+        return Void;
+    }
+
+    // GUI
+    public void setDuration(int elementorcutindex, int duration) {
+        if (elementorcutindex == 0) {Presession.setDuration(duration);}
+        if (elementorcutindex == 1) {Rin.setDuration(duration);}
+        if (elementorcutindex == 2) {Kyo.setDuration(duration);}
+        if (elementorcutindex == 3) {Toh.setDuration(duration);}
+        if (elementorcutindex == 4) {Sha.setDuration(duration);}
+        if (elementorcutindex == 5) {Kai.setDuration(duration);}
+        if (elementorcutindex == 6) {Jin.setDuration(duration);}
+        if (elementorcutindex == 7) {Retsu.setDuration(duration);}
+        if (elementorcutindex == 8) {Zai.setDuration(duration);}
+        if (elementorcutindex == 9) {Zen.setDuration(duration);}
+        if (elementorcutindex == 10) {Postsession.setDuration(duration);}
+        if (elementorcutindex == 11) {Earth.setDuration(duration);}
+        if (elementorcutindex == 12) {Air.setDuration(duration);}
+        if (elementorcutindex == 13) {Fire.setDuration(duration);}
+        if (elementorcutindex == 14) {Water.setDuration(duration);}
+        if (elementorcutindex == 15) {Void.setDuration(duration);}
+    }
+    public int getDuration(int elementorcutindex) {
+        if (elementorcutindex == 0) {return Presession.getdurationinminutes();}
+        if (elementorcutindex == 1) {return Rin.getdurationinminutes();}
+        if (elementorcutindex == 2) {return Kyo.getdurationinminutes();}
+        if (elementorcutindex == 3) {return Toh.getdurationinminutes();}
+        if (elementorcutindex == 4) {return Sha.getdurationinminutes();}
+        if (elementorcutindex == 5) {return Kai.getdurationinminutes();}
+        if (elementorcutindex == 6) {return Jin.getdurationinminutes();}
+        if (elementorcutindex == 7) {return Retsu.getdurationinminutes();}
+        if (elementorcutindex == 8) {return Zai.getdurationinminutes();}
+        if (elementorcutindex == 9) {return Zen.getdurationinminutes();}
+        if (elementorcutindex == 10) {return Postsession.getdurationinminutes();}
+        if (elementorcutindex == 11) {return Earth.getdurationinminutes();}
+        if (elementorcutindex == 12) {return Air.getdurationinminutes();}
+        if (elementorcutindex == 13) {return Fire.getdurationinminutes();}
+        if (elementorcutindex == 14) {return Water.getdurationinminutes();}
+        if (elementorcutindex == 15) {return Void.getdurationinminutes();}
+        return 0;
+    }
+    public ArrayList<Integer> getallsessionvalues() {
+        ArrayList<Integer> values = new ArrayList<>();
+        for (int i=0; i<=15; i++) {values.add(getDuration(i));}
+        return values;
+    }
+    public ArrayList<Integer> getcutsessionvalues(boolean includepreandpost) {
+        if (includepreandpost) {return new ArrayList<>(getallsessionvalues().subList(0, 11));}
+        else {return new ArrayList<>(getallsessionvalues().subList(1, 10));}
+    }
+    public ArrayList<Integer> getelementvalues() {
+        return new ArrayList<>(getallsessionvalues().subList(11, 15));
+    }
 
 // Creation Methods
-    public boolean checktextfieldvalues(ArrayList<Integer> textfieldvalues) {
-        for (int i = 0; i < textfieldvalues.size(); i++) {
-            if (i != 0 && i != 10 && textfieldvalues.get(i) > 0) {
-                return true;}
+    public boolean sessionvaluesok() {
+        for (Object i : getallCutsAndElements()) {
+            Playable cutorelement = (Playable) i;
+            if (cutorelement.getdurationinminutes() > 0) {return true;}
         }
         return false;
     }
-    public void checkambience(ArrayList<Integer> textfieldvalues, CheckBox ambiencecheckbox) {
-        if (checktextfieldvalues(textfieldvalues)) {
-            ArrayList<Cut> cutswithnoambience = new ArrayList<>();
-            ArrayList<Cut> cutswithreducedambience = new ArrayList<>();
-            Cut[] tempcuts = {presession, rin, kyo, toh, sha, kai, jin, retsu, zai, zen, postsession};
+    public void checkambience(CheckBox ambiencecheckbox) {
+        if (sessionvaluesok()) {
+            ArrayList<Object> cutsorelementswithnoambience = new ArrayList<>();
+            ArrayList<Object> cutsorelementswithreducedambience = new ArrayList<>();
+            Object[] tempcuts = getallCutsAndElements().toArray();
             Service<Void> ambiencecheckerservice = new Service<Void>() {
                 @Override
                 protected Task<Void> createTask() {
@@ -116,13 +245,23 @@ public class This_Session {
                         @Override
                         protected Void call() throws Exception {
                             int cutcount = 0;
-                            for (Integer i : textfieldvalues) {
-                                Cut thiscut = tempcuts[cutcount];
-                                if (i != 0 || thiscut.number == 0 || thiscut.number == 10) {
+                            for (Object i : tempcuts) {
+                                if (i instanceof Cut) {
+                                    Cut thiscut = (Cut) i;
                                     updateMessage(String.format("Currently Checking %s...", thiscut.name));
-                                    if (thiscut.getambienceindirectory()) {
-                                        if (!thiscut.hasenoughAmbience(i * 60)) {cutswithreducedambience.add(thiscut);}
-                                    } else {cutswithnoambience.add(thiscut);}
+                                    if (thiscut.getdurationinminutes() != 0) {
+                                        if (thiscut.getambienceindirectory()) {
+                                            if (!thiscut.hasenoughAmbience(thiscut.getdurationinseconds())) {cutsorelementswithreducedambience.add(thiscut);}
+                                        } else {cutsorelementswithnoambience.add(thiscut);}
+                                    }
+                                } else if (i instanceof Element) {
+                                    Element thiselement = (Element) i;
+                                    updateMessage(String.format("Currently Checking %s...", thiselement.name));
+                                    if (thiselement.getdurationinminutes() != 0) {
+                                        if (thiselement.getambienceindirectory()) {
+                                            if (!thiselement.hasenoughAmbience(thiselement.getdurationinseconds())) {cutsorelementswithreducedambience.add(thiselement);}
+                                        } else {cutsorelementswithnoambience.add(thiselement);}
+                                    }
                                 }
                                 cutcount++;
                             }
@@ -141,13 +280,13 @@ public class This_Session {
             });
             ambiencecheckerservice.setOnSucceeded(event -> {
                 cad[0].close();
-                if (cutswithnoambience.size() > 0) {
+                if (cutsorelementswithnoambience.size() > 0) {
                     StringBuilder a = new StringBuilder();
-                    for (int i = 0; i < cutswithnoambience.size(); i++) {
-                        a.append(cutswithnoambience.get(i).name);
-                        if (i != cutswithnoambience.size() - 1) {a.append(", ");}
+                    for (int i = 0; i < cutsorelementswithnoambience.size(); i++) {
+                        a.append(((Playable) cutsorelementswithnoambience.get(i)).name);
+                        if (i != cutsorelementswithnoambience.size() - 1) {a.append(", ");}
                     }
-                    if (cutswithnoambience.size() > 1) {
+                    if (cutsorelementswithnoambience.size() > 1) {
                         Tools.showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
                         if (Tools.getanswerdialog(Root, "Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
                             MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(Root);
@@ -156,24 +295,24 @@ public class This_Session {
                     } else {
                         Tools.showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
                         if (Tools.getanswerdialog(Root, "Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
-                            MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(Root, cutswithnoambience.get(0).name);
+                            MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(Root, ((Playable) cutsorelementswithnoambience.get(0)).name);
                             ambienceEditor.showAndWait();
                         }
                     }
                     ambiencecheckbox.setSelected(false);
                 } else {
-                    if (cutswithreducedambience.size() > 0) {
+                    if (cutsorelementswithreducedambience.size() > 0) {
                         StringBuilder a = new StringBuilder();
                         int count = 1;
-                        for (int i = 0; i < cutswithreducedambience.size(); i++) {
+                        for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
                             a.append("\n");
-                            Cut thiscut = cutswithreducedambience.get(i);
+                            Playable thiscut = (Playable) cutsorelementswithreducedambience.get(i);
                             String formattedcurrentduration = Tools.minutestoformattedhoursandmins((int) thiscut.getTotalambienceduration() / 60);
-                            String formattedexpectedduration = Tools.minutestoformattedhoursandmins(textfieldvalues.get(Options.CUTNAMES.indexOf(cutswithreducedambience.get(i).name)));
+                            String formattedexpectedduration = Tools.minutestoformattedhoursandmins(((Playable) cutsorelementswithreducedambience.get(i)).getdurationinminutes());
                             a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }
-                        if (cutswithreducedambience.size() == 1) {
+                        if (cutsorelementswithreducedambience.size() == 1) {
                             ambiencecheckbox.setSelected(Tools.getanswerdialog(Root, "Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
                         } else {
                             ambiencecheckbox.setSelected(Tools.getanswerdialog(Root, "Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
@@ -223,76 +362,43 @@ public class This_Session {
         }
         return true;
     }
-    public boolean setupcutsinsession(ArrayList<Integer> textfieldtimes) {
-        presession.setDuration(textfieldtimes.get(0));
-        rin.setDuration(textfieldtimes.get(1));
-        kyo.setDuration(textfieldtimes.get(2));
-        toh.setDuration(textfieldtimes.get(3));
-        sha.setDuration(textfieldtimes.get(4));
-        kai.setDuration(textfieldtimes.get(5));
-        jin.setDuration(textfieldtimes.get(6));
-        retsu.setDuration(textfieldtimes.get(7));
-        zai.setDuration(textfieldtimes.get(8));
-        zen.setDuration(textfieldtimes.get(9));
-        postsession.setDuration(textfieldtimes.get(10));
-        ArrayList<Cut> cutlist = new ArrayList<>();
-        cutlist.add(presession);
-        if (rin.duration != 0) {cutlist.add(rin);}
-        if (kyo.duration != 0) {cutlist.add(kyo);}
-        if (toh.duration != 0) {cutlist.add(toh);}
-        if (sha.duration != 0) {cutlist.add(sha);}
-        if (kai.duration != 0) {cutlist.add(kai);}
-        if (jin.duration != 0) {cutlist.add(jin);}
-        if (retsu.duration != 0) {cutlist.add(retsu);}
-        if (zai.duration != 0) {cutlist.add(zai);}
-        if (zen.duration != 0) {cutlist.add(zen);}
-        cutlist.add(postsession);
-        setCutsinsession(cutlist);
-        return getCutsinsession().size() > 0;
+    public boolean setupcutsinsession() {
+        itemsinsession = new ArrayList<>();
+        if (Presession.getdurationinminutes() != 0) {itemsinsession.add(Presession);}
+        if (Rin.getdurationinminutes() != 0) {itemsinsession.add(Rin);}
+        if (Kyo.getdurationinminutes() != 0) {itemsinsession.add(Kyo);}
+        if (Toh.getdurationinminutes() != 0) {itemsinsession.add(Toh);}
+        if (Sha.getdurationinminutes() != 0) {itemsinsession.add(Sha);}
+        if (Kai.getdurationinminutes() != 0) {itemsinsession.add(Kai);}
+        if (Jin.getdurationinminutes() != 0) {itemsinsession.add(Jin);}
+        if (Retsu.getdurationinminutes() != 0) {itemsinsession.add(Retsu);}
+        if (Zai.getdurationinminutes() != 0) {itemsinsession.add(Zai);}
+        if (Zen.getdurationinminutes() != 0) {itemsinsession.add(Zen);}
+        if (Earth.getdurationinminutes() != 0) {itemsinsession.add(Earth);}
+        if (Air.getdurationinminutes() != 0) {itemsinsession.add(Air);}
+        if (Fire.getdurationinminutes() != 0) {itemsinsession.add(Fire);}
+        if (Water.getdurationinminutes() != 0) {itemsinsession.add(Water);}
+        if (Void.getdurationinminutes() != 0) {itemsinsession.add(Void);}
+        if (Postsession.getdurationinminutes() != 0) {itemsinsession.add(Postsession);}
+        setItemsinsession(itemsinsession);
+        return getallitemsinSession().size() > 0;
     }
-    public void create(ArrayList<Integer> textfieldtimes) {
+    public boolean create(ArrayList<Integer> textfieldtimes) {
         if (checksessionwellformedness(textfieldtimes)) {
-            setupcutsinsession(textfieldtimes);
-            final SimpleTextDialogWithCancelButton[] sdcb = new SimpleTextDialogWithCancelButton[1];
-            Service<Void> creationservice = new Service<Void>() {
-                @Override
-                protected Task<Void> createTask() {
-                    return new Task<Void>() {
-                        @Override
-                        protected Void call() throws Exception {
-                            for (Cut i : cutsinsession) {
-                                updateMessage("Creating " + i.name);
-                                if (! i.build(cutsinsession, ambienceenabled)) {cancel();}
-                                updateMessage("Finished Creating " + i.name);
-                            }
-                            return null;
-                    }};
-                }
-            };
-            creationservice.setOnRunning(event -> {
-                sdcb[0] = new SimpleTextDialogWithCancelButton(Root, "Creating Session", "Creating Session", "");
-                sdcb[0].Message.textProperty().bind(creationservice.messageProperty());
-                sdcb[0].CancelButton.setOnAction(ev -> creationservice.cancel());
-            });
-            creationservice.setOnCancelled(event -> {
-                resetallcuts();
-                sdcb[0].close();
-            });
-            creationservice.setOnSucceeded(event -> {
-                sdcb[0].close();
-            });
-            creationservice.setOnFailed(event -> {
-                Platform.runLater(() -> Tools.showerrordialog(Root, "Error", "Session Creation Failed", "Check Sound File Read Permissions"));
-                resetallcuts();
-                sdcb[0].close();
-            });
-            creationservice.start();
-        }
+            setupcutsinsession();
+            // TODO Filter And Sort Session Parts Here
+            for (Object i : getallitemsinSession()) {
+                if (i instanceof Cut) {if (! ((Cut) i).build(getCutsinSession(), ambienceenabled)) {return false;}}
+                if (i instanceof Element) {if (! ((Element) i).build(getElementsinSession(), ambienceenabled)) {return false;}}
+                if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(getallitemsinSession().get(1), getallitemsinSession().get(getallitemsinSession().size() - 2))) {return false;}}
+            }
+            return true;
+        } else {return false;}
     }
-    public void resetallcuts() {
-        for (Cut i : getallCuts()) {
-            i.reset();
-            i.setAmbienceenabled(false);
+    public void resetcreateditems() {
+        for (Object i : getallCutsAndElements()) {
+            if (i instanceof Element) {((Element) i).reset();}
+            if (i instanceof Cut) {((Cut) i).reset();}
         }
     }
 
@@ -306,19 +412,19 @@ public class This_Session {
                     @Override
                     protected Boolean call() throws Exception {
                         updateTitle("Finalizing Session");
-                        int taskcount = cutsinsession.size() + 2;
-                        // TODO Mix Entrainment And Ambience
-                        for (Cut i : cutsinsession) {
-                            updateMessage("Combining Entrainment And Ambience For " + i.name);
-                            if (! i.mixentrainmentandambience()) {cancel();}
-                            if (isCancelled()) {return false;}
-                            updateProgress((double) (cutsinsession.indexOf(i) / taskcount), 1.0);
-                            updateMessage("Finished Combining " + i.name);
-                        }
+//                        int taskcount = cutsinsession.size() + 2;
+//                        // TODO Mix Entrainment And Ambience
+//                        for (Cut i : cutsinsession) {
+//                            updateMessage("Combining Entrainment And Ambience For " + i.name);
+//                            if (! i.mixentrainmentandambience()) {cancel();}
+//                            if (isCancelled()) {return false;}
+//                            updateProgress((double) (cutsinsession.indexOf(i) / taskcount), 1.0);
+//                            updateMessage("Finished Combining " + i.name);
+//                        }
                         updateMessage("Creating Final Session File (May Take A While)");
                         export();
                         if (isCancelled()) {return false;}
-                        updateProgress(taskcount - 1, 1.0);
+//                        updateProgress(taskcount - 1, 1.0);
                         updateMessage("Double-Checking Final Session File");
                         boolean success = testexportfile();
                         if (isCancelled()) {return false;}
@@ -351,36 +457,36 @@ public class This_Session {
 //        return false;
     }
     public void getnewexportsavefile() {
-        File tempfile = Tools.savefilechooser(Root.getScene(), "Save Export File As", null);
-        if (tempfile != null && Tools.validaudiofile(tempfile)) {
-            setExportfile(tempfile);
-        } else {
-            if (tempfile == null) {return;}
-            if (Tools.getanswerdialog(Root, "Confirmation", "Invalid Audio File Extension", "Save As .mp3?")) {
-                String file = tempfile.getAbsolutePath();
-                int index = file.lastIndexOf(".");
-                String firstpart = file.substring(0, index - 1);
-                setExportfile(new File(firstpart.concat(".mp3")));
-            }
-        }
+//        File tempfile = Tools.savefilechooser(Root.getScene(), "Save Export File As", null);
+//        if (tempfile != null && Tools.validaudiofile(tempfile)) {
+//            setExportfile(tempfile);
+//        } else {
+//            if (tempfile == null) {return;}
+//            if (Tools.getanswerdialog(Root, "Confirmation", "Invalid Audio File Extension", "Save As .mp3?")) {
+//                String file = tempfile.getAbsolutePath();
+//                int index = file.lastIndexOf(".");
+//                String firstpart = file.substring(0, index - 1);
+//                setExportfile(new File(firstpart.concat(".mp3")));
+//            }
+//        }
     }
     public boolean export() {
         ArrayList<File> filestoexport = new ArrayList<>();
-        for (int i=0; i < cutsinsession.size(); i++) {
-            filestoexport.add(cutsinsession.get(i).getFinalexportfile());
-            if (i != cutsinsession.size() - 1) {
-                filestoexport.add(new File(Root.getOptions().getSessionOptions().getAlertfilelocation()));
-            }
-        }
-        if (filestoexport.size() == 0) {return false;}
-        else {return Tools.concatenateaudiofiles(filestoexport, new File(Options.DIRECTORYTEMP, "Session.txt"), getExportfile());}
+//        for (int i=0; i < cutsinsession.size(); i++) {
+//            filestoexport.add(cutsinsession.get(i).getFinalexportfile());
+//            if (i != cutsinsession.size() - 1) {
+//                filestoexport.add(new File(Root.getOptions().getSessionOptions().getAlertfilelocation()));
+//            }
+//        }
+        return filestoexport.size() != 0;
     }
     public boolean testexportfile() {
-        try {
-            MediaPlayer test = new MediaPlayer(new Media(getExportfile().toURI().toString()));
-            test.setOnReady(test::dispose);
-            return true;
-        } catch (MediaException ignored) {return false;}
+//        try {
+//            MediaPlayer test = new MediaPlayer(new Media(getExportfile().toURI().toString()));
+//            test.setOnReady(test::dispose);
+//            return true;
+//        } catch (MediaException ignored) {return false;}
+        return false;
     }
     public static void deleteprevioussession() {
         ArrayList<File> folders = new ArrayList<>();
@@ -404,13 +510,13 @@ public class This_Session {
     public void startplayback() {
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
-        for (Cut i : cutsinsession) {totalsecondsinsession += i.getdurationinseconds();}
+        for (Object i : itemsinsession) {totalsecondsinsession += ((Playable) i).getdurationinseconds();}
         getPlayerWidget().TotalTotalLabel.setText(Tools.formatlengthshort(totalsecondsinsession));
-        currentcuttimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
-        currentcuttimeline.setCycleCount(Animation.INDEFINITE);
-        currentcuttimeline.play();
-        cutcount = 0;
-        currentcut = cutsinsession.get(cutcount);
+        updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
+        updateuitimeline.setCycleCount(Animation.INDEFINITE);
+        updateuitimeline.play();
+        cutorelementcount = 0;
+        currentcutorelement = itemsinsession.get(cutorelementcount);
         playthiscut();
         sessions.createnewsession();
     }
@@ -421,8 +527,8 @@ public class This_Session {
             return "Playing Session...";
         }
         else if(playerState == PlayerWidget.PlayerState.PAUSED) {
-            currentcuttimeline.play();
-            currentcut.resume();
+            updateuitimeline.play();
+            ((Playable) currentcutorelement).resume();
             setPlayerState(PlayerWidget.PlayerState.PLAYING);
             return "Resuming Session...";
         }
@@ -442,8 +548,8 @@ public class This_Session {
     }
     public String pause() {
         if (playerState == PlayerWidget.PlayerState.PLAYING) {
-            currentcut.pause();
-            currentcuttimeline.pause();
+            ((Playable) currentcutorelement).pause();
+            updateuitimeline.pause();
             setPlayerState(PlayerWidget.PlayerState.PAUSED);
             return "Session Paused";
         } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
@@ -456,14 +562,14 @@ public class This_Session {
     }
     public String stop() {
         if (playerState == PlayerWidget.PlayerState.PLAYING) {
-            currentcut.stop();
-            currentcuttimeline.stop();
+            ((Playable) currentcutorelement).stop();
+            updateuitimeline.stop();
             setPlayerState(PlayerWidget.PlayerState.STOPPED);
             resetthissession();
             return "Session Stopped";
         } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
-            currentcut.stop();
-            currentcuttimeline.stop();
+            ((Playable) currentcutorelement).stop();
+            updateuitimeline.stop();
             setPlayerState(PlayerWidget.PlayerState.STOPPED);
             resetthissession();
             return "Session Stopped";
@@ -481,7 +587,7 @@ public class This_Session {
                 totalsecondselapsed++;
                 Float currentprogress;
                 Float totalprogress;
-                if (currentcut.getSecondselapsed() != 0) {currentprogress = (float) currentcut.getSecondselapsed() / (float) currentcut.getdurationinseconds();}
+                if (((Playable) currentcutorelement).getSecondselapsed() != 0) {currentprogress = (float) ((Playable) currentcutorelement).getSecondselapsed() / (float) ((Playable) currentcutorelement).getdurationinseconds();}
                 else {currentprogress = (float) 0.0;}
                 if (totalsecondselapsed != 0) {totalprogress = (float) totalsecondselapsed / (float) totalsecondsinsession;}
                 else {totalprogress = (float) 0.0;}
@@ -489,20 +595,20 @@ public class This_Session {
                 getPlayerWidget().TotalProgress.setProgress(totalprogress);
                 currentprogress *= 100;
                 totalprogress *= 100;
-                getPlayerWidget().CurrentCutTopLabel.setText(String.format("%s Progress (%d", currentcut.name, currentprogress.intValue()) + "%)");
+                getPlayerWidget().CurrentCutTopLabel.setText(String.format("%s Progress (%d", ((Playable) currentcutorelement).name, currentprogress.intValue()) + "%)");
                 getPlayerWidget().TotalSessionLabel.setText(String.format("Total Progress (%d", totalprogress.intValue()) + "%)");
-                getPlayerWidget().CutCurrentLabel.setText(currentcut.getcurrenttimeformatted());
-                getPlayerWidget().CutTotalLabel.setText(currentcut.gettotaltimeformatted());
+                getPlayerWidget().CutCurrentLabel.setText(((Playable) currentcutorelement).getcurrenttimeformatted());
+                getPlayerWidget().CutTotalLabel.setText(((Playable) currentcutorelement).gettotaltimeformatted());
                 getPlayerWidget().TotalCurrentLabel.setText(Tools.formatlengthshort(totalsecondselapsed));
-                getPlayerWidget().StatusBar.setText("Session Playing. Currently Practicing " + currentcut.name + "...");
+                getPlayerWidget().StatusBar.setText("Session Playing. Currently Practicing " + ((Playable) currentcutorelement).name + "...");
                 Root.getProgressTracker().updategoalsui();
                 Root.getProgressTracker().updateprogressui();
             } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
                 getPlayerWidget().CurrentCutProgress.setProgress(1.0);
-                getPlayerWidget().CurrentCutTopLabel.setText(currentcut.name + " Completed");
-                if (currentcut.number != 10) {getPlayerWidget().StatusBar.setText("Prepare For " + cutsinsession.get(currentcut.number + 1).name);}
-                getPlayerWidget().CutCurrentLabel.setText(currentcut.gettotaltimeformatted());
-                getPlayerWidget().CutTotalLabel.setText(currentcut.gettotaltimeformatted());
+                getPlayerWidget().CurrentCutTopLabel.setText(((Playable) currentcutorelement).name + " Completed");
+                if (! ((Playable) currentcutorelement).name.equals("Postsession")) {getPlayerWidget().StatusBar.setText("Prepare For " + ((Playable) getallitemsinSession().get(((Playable) currentcutorelement).number + 1)).name);}
+                getPlayerWidget().CutCurrentLabel.setText(((Playable) currentcutorelement).gettotaltimeformatted());
+                getPlayerWidget().CutTotalLabel.setText(((Playable) currentcutorelement).gettotaltimeformatted());
             } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
                 getPlayerWidget().StatusBar.setText("Session Paused");
             } else if (playerState == PlayerWidget.PlayerState.STOPPED) {
@@ -513,8 +619,8 @@ public class This_Session {
     public void playthiscut() {
         try {
             if (Root.getOptions().getSessionOptions().getReferenceoption() != null) {displayreferencefile();}
-            Duration cutduration = currentcut.getdurationasobject();
-            currentcut.start();
+            Duration cutduration = ((Playable) currentcutorelement).getdurationasobject();
+            ((Playable) currentcutorelement).start();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
             timeline.setOnFinished(event -> timeline.stop());
             timeline.play();
@@ -526,22 +632,23 @@ public class This_Session {
             if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
 //                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
                 try {
-                    List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcut.number,
-                            Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(currentcut.number, false), 2));
+                    List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(((Playable) currentcutorelement).number,
+                            Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(((Playable) currentcutorelement).number, false), 2));
                     if (completedgoals.size() > 0) {GoalsCompletedThisSession.addAll(completedgoals);}
-                    currentcut.cleanup();
-                    cutcount++;
-                    currentcut = cutsinsession.get(cutcount);
+                    ((Playable) currentcutorelement).cleanup();
+                    cutorelementcount++;
+                    currentcutorelement = getallitemsinSession().get(cutorelementcount);
                     playthiscut();
-                } catch (IndexOutOfBoundsException ignored) {currentcut.cleanup(); endofsession();}
+                } catch (IndexOutOfBoundsException ignored) {
+                    ((Playable) currentcutorelement).cleanup(); endofsession();}
             } else if (playerState == PlayerWidget.PlayerState.PLAYING) {transition();}
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).show();}
     }
     public void endofsession() {
-        getPlayerWidget().CurrentCutTopLabel.setText(currentcut.name + " Completed");
+        getPlayerWidget().CurrentCutTopLabel.setText(((Playable) currentcutorelement).name + " Completed");
         getPlayerWidget().TotalSessionLabel.setText("Session Completed");
         closereferencefile();
-        currentcuttimeline.stop();
+        updateuitimeline.stop();
         setPlayerState(PlayerWidget.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
         // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It Then Change Session Finsished Dialog To Showandwait
@@ -564,20 +671,20 @@ public class This_Session {
         Root.getProgressTracker().updategoalsui();
     }
     public void resetthissession() {
-        currentcuttimeline = null;
+        updateuitimeline = null;
         sessions.deletenonvalidsessions();
-        cutcount = 0;
+        cutorelementcount = 0;
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
     }
     public void transition() {
         closereferencefile();
         Session currentsession = sessions.getsession(sessions.totalsessioncount() - 1);
-        currentsession.updatecutduration(currentcut.number, currentcut.getdurationinminutes());
+        currentsession.updatecutduration(((Playable) currentcutorelement).number, ((Playable) currentcutorelement).getdurationinminutes());
         sessions.marshall();
         Root.getProgressTracker().updategoalsui();
-        currentcut.stop();
-        if (currentcut.number == 10) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
+        ((Playable) currentcutorelement).stop();
+        if (((Playable) currentcutorelement).name.equals("Postsession")) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
         else {
             if (Root.getOptions().getSessionOptions().getAlertfunction()) {
                 Media alertmedia = new Media(Root.getOptions().getSessionOptions().getAlertfilelocation());
@@ -632,7 +739,7 @@ public class This_Session {
         }
     }
     public void displayreferencefile() {
-        displayReference = new PlayerWidget.DisplayReference(Root, currentcut);
+        displayReference = new PlayerWidget.DisplayReference(Root, currentcutorelement);
         displayReference.show();
     }
     public void closereferencefile() {
@@ -641,4 +748,5 @@ public class This_Session {
             displayReference = null;
         }
     }
+
 }

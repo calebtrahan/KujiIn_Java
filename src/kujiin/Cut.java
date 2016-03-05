@@ -1,12 +1,13 @@
 package kujiin;
 
+import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Service;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
 import kujiin.interfaces.Creatable;
 import kujiin.interfaces.Exportable;
-import kujiin.widgets.PlayerWidget;
 import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Options;
 
@@ -16,15 +17,19 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Cut extends kujiin.widgets.Playable implements Exportable, Creatable {
-    public String name;
-    public int number;
+    private ToggleButton Switch;
+    private TextField Value;
 
-    public Cut(int number, String name, int duration, This_Session thisession) {
+    public Cut(int number, String name, int duration, This_Session thisession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
         super.duration = duration;
         super.thisession = thisession;
         ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
+        Switch = aSwitch;
+        Value = value;
+        Switch.setOnAction(event -> toggleswitch());
+        toggleswitch();
 //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
 //        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
@@ -34,12 +39,42 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
 //        setFinalexportfile(new File(Options.DIRECTORYTEMP, name + ".mp3"));
     }
 
+// GUI
+    public void toggleswitch() {
+        ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
+            try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
+            catch (Exception e) {Value.setText("");}
+        };
+        if (Switch.isSelected()) {
+            Value.textProperty().addListener(integertextfield);
+            Value.setText("0");
+            Value.setDisable(false);
+        } else {
+            Value.textProperty().removeListener(integertextfield);
+            Value.setText("-");
+            Value.setDisable(true);
+        }
+    }
+    public void changevalue(int newvalue) {
+        if (newvalue == 0) {Switch.setSelected(false); toggleswitch();}
+        else {
+            Switch.setSelected(true);
+            Value.setDisable(false);
+            Value.setText(Integer.toString(newvalue));
+            setDuration(newvalue);
+        }
+    }
+
 // Creation
     public boolean build(ArrayList<Cut> cutstoplay, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
         setCutstoplay(cutstoplay);
         if (ambienceenabled) {return buildEntrainment() && buildAmbience();}
         else {return buildEntrainment();}
+    }
+    @Override
+    public boolean isValid() {
+        return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
     }
     @Override
     public boolean getambienceindirectory() {
@@ -109,19 +144,6 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
                 entrainmentlist.add(0, rampinfile);
                 entrainmentlist.add(rampoutfile);
             }
-        }
-        if (number == 0 && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
-            String rampupfirstname = "ar" + cutstoplay.get(1).number + rampdur + ".mp3";
-            File ramptofirstcut = new File(Options.DIRECTORYRAMPUP, rampupfirstname);
-            entrainmentlist.add(ramptofirstcut);
-        }
-        if (number == 10 && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
-            String rampdowntopost =  "zr" +
-                    cutstoplay.get(cutstoplay.size()-2).number + rampdur + ".mp3";
-            File thisfile = new File(Options.DIRECTORYRAMPDOWN, rampdowntopost);
-            entrainmentlist.add(0, thisfile);
         }
         for (File i : entrainmentlist) {
             entrainmentmedia.add(new Media(i.toURI().toString()));
@@ -204,18 +226,6 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
         thisession.Root.getProgressTracker().selectcut(number);
     }
     @Override
-    public void pause() {
-        super.pause();
-    }
-    @Override
-    public void resume() {
-        super.resume();
-    }
-    @Override
-    public void stop() {
-        super.stop();
-    }
-    @Override
     public void playnextentrainment() {
         try {
             super.playnextentrainment();
@@ -256,63 +266,6 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
             ambienceplayer.play();
             ambienceplayer.setOnError(this::ambienceerror);
         } else {thisession.error_endplayback();}
-    }
-    @Override
-    public void startfadeout() {
-        try {
-            super.startfadeout();
-        } catch (NullPointerException ignored) {}
-    }
-    @Override
-    public void cleanup() {
-        super.cleanup();
-    }
-    // Playback Getters
-    @Override
-    public Duration getdurationasobject() {
-        double dur = super.getdurationasobject().toSeconds();
-        if ((number == 0 || number == 10) && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            dur += thisession.Root.getOptions().getSessionOptions().getRampduration() * 60;
-        }
-        return new Duration(dur * 1000);
-    }
-    @Override
-    public int getdurationinseconds() {
-        int seconds = super.getdurationinseconds();
-        if ((number == 0 || number == 10) && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            seconds += thisession.Root.getOptions().getSessionOptions().getRampduration() * 60;
-        }
-        return seconds;
-    }
-    @Override
-    public int getdurationinminutes() {
-        int minutes = super.getdurationinminutes();
-        if ((number == 0 || number == 10) && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            minutes += thisession.Root.getOptions().getSessionOptions().getRampduration();
-        }
-        return minutes;
-    }
-    @Override
-    public Double getdurationindecimalhours() {
-        return Tools.convertminutestodecimalhours(getdurationinminutes(), 2) + super.getdurationindecimalhours();
-    }
-    @Override
-    public String getcurrenttimeformatted() {return super.getcurrenttimeformatted();}
-    @Override
-    public String gettotaltimeformatted() {return super.gettotaltimeformatted();}
-    // Reference Files
-    public File getReferenceFile() {
-        PlayerWidget.ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
-        if (referenceType != null) {
-            if (referenceType == PlayerWidget.ReferenceType.html) {
-                String name = this.name + ".html";
-                return new File(Options.DIRECTORYREFERENCE, "html/" + name);
-            } else if (referenceType == PlayerWidget.ReferenceType.txt) {
-                String name = this.name + ".txt";
-                return new File(Options.DIRECTORYREFERENCE, "txt/" + name);
-            }
-            return null;
-        } else {return null;}
     }
 
 // Export
@@ -397,4 +350,5 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     public File getFinalexportfile() {
         return null;
     }
+
 }

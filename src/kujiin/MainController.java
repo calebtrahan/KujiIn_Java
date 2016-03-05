@@ -65,7 +65,6 @@ public class MainController implements Initializable {
     public TextField TotalSessionTime;
     public ComboBox<String> GoalCutComboBox;
     public Label GoalTopLabel;
-    public Button CreateButton;
     public Label LengthLabel;
     public Label CompletionLabel;
     public TextField GoalPracticedMinutes;
@@ -73,7 +72,6 @@ public class MainController implements Initializable {
     public TextField GoalSetMinutes;
     public Label GoalStatusBar;
     public TextField GoalPracticedHours;
-    public Scene Scene;
     public ToggleButton RinSwitch;
     public ToggleButton KyoSwitch;
     public ToggleButton TohSwitch;
@@ -96,6 +94,7 @@ public class MainController implements Initializable {
     public ToggleButton PreSwitch;
     public ToggleButton PostSwitch;
     public Button ChangeAllElementsButton;
+    public Scene Scene;
     private This_Session Session;
     private CreatorAndExporterWidget CreatorAndExporter;
     private PlayerWidget Player;
@@ -109,11 +108,11 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        setOptions(new Options(this));
+        getOptions().unmarshall();
         setProgressTracker(new ProgressAndGoalsWidget(this));
         setSession(new This_Session(this));
         setCreatorAndExporter(new CreatorAndExporterWidget(this));
-        setOptions(new Options(this));
-        getOptions().unmarshall();
         CreatorStatusBar.setText("");
     }
     public boolean cleanup() {

@@ -11,12 +11,15 @@ import kujiin.Cut;
 import kujiin.Element;
 import kujiin.This_Session;
 import kujiin.Tools;
+import kujiin.xml.Options;
 
 import java.io.File;
 import java.util.ArrayList;
 
 public class Playable {
-    public int duration;
+    public int number;
+    public String name;
+    protected int duration;
     protected This_Session thisession;
     protected File ambiencedirectory;
     protected double totalambienceduration;
@@ -55,7 +58,7 @@ public class Playable {
     public int getSecondselapsed() {return secondselapsed;}
 
 // Playback Controls
-    protected void start() {
+    public void start() {
         entrainmentplaycount = 0;
         ambienceplaycount = 0;
         double fadeinduration = thisession.Root.getOptions().getSessionOptions().getFadeinduration();
@@ -163,7 +166,7 @@ public class Playable {
         cutorelementtimeline.setCycleCount(Animation.INDEFINITE);
         cutorelementtimeline.play();
     }
-    protected void resume() {
+    public void resume() {
         entrainmentplayer.play();
         if (ambienceenabled) {ambienceplayer.play();}
         cutorelementtimeline.play();
@@ -171,7 +174,7 @@ public class Playable {
         if (secondselapsed >= getdurationinseconds() - thisession.Root.getOptions().getSessionOptions().getFadeoutduration()) {fadeoutentrainment.play();}
         fadeouttimeline.play();
     }
-    protected void pause() {
+    public void pause() {
         entrainmentplayer.pause();
         if (ambienceenabled) {ambienceplayer.pause();}
         cutorelementtimeline.pause();
@@ -179,7 +182,7 @@ public class Playable {
         if (secondselapsed >= getdurationinseconds() - thisession.Root.getOptions().getSessionOptions().getFadeoutduration()) {fadeoutentrainment.pause();}
         fadeouttimeline.pause();
     }
-    protected void stop() {
+    public void stop() {
         entrainmentplayer.stop();
         entrainmentplayer.dispose();
         if (ambienceenabled) {
@@ -189,10 +192,10 @@ public class Playable {
         cutorelementtimeline.stop();
         fadeouttimeline.stop();
     }
-    protected void tick() {
+    public void tick() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {secondselapsed++;}
     }
-    protected void playnextentrainment() throws IndexOutOfBoundsException {
+    public void playnextentrainment() throws IndexOutOfBoundsException {
         try {
             entrainmentplaycount++;
             entrainmentplayer.dispose();
@@ -202,7 +205,7 @@ public class Playable {
             entrainmentplayer.play();
         } catch (IndexOutOfBoundsException ignored) {}
     }
-    protected void playnextambience() throws IndexOutOfBoundsException {
+    public void playnextambience() throws IndexOutOfBoundsException {
         ambienceplaycount++;
         ambienceplayer.dispose();
         ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
@@ -210,7 +213,7 @@ public class Playable {
         ambienceplayer.setOnError(this::ambienceerror);
         ambienceplayer.play();
     }
-    protected void startfadeout() {
+    public void startfadeout() {
         thisession.Root.getPlayer().EntrainmentVolume.valueProperty().unbindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
         fadeoutentrainment.play();
         if (ambienceenabled) {
@@ -218,7 +221,7 @@ public class Playable {
             fadeoutambience.play();
         }
     }
-    protected void cleanup() {
+    public void cleanup() {
         try {
             if (ambienceenabled) {getCurrentAmbiencePlayer().dispose();}
             getCurrentEntrainmentPlayer().dispose();
@@ -232,21 +235,34 @@ public class Playable {
     }
 
 // Session Information Getters
-    protected Duration getdurationasobject() {return new Duration((double) getdurationinseconds() * 1000);}
-    protected int getdurationinseconds() {
+    public Duration getdurationasobject() {return new Duration((double) getdurationinseconds() * 1000);}
+    public int getdurationinseconds() {
         return duration * 60;
     }
-    protected int getdurationinminutes() {
+    public int getdurationinminutes() {
         return duration;
     }
-    protected Double getdurationindecimalhours() {return Tools.convertminutestodecimalhours(getdurationinminutes(), 2);}
-    protected String getcurrenttimeformatted() {
-        return Tools.formatlengthshort(getdurationinseconds());
+    public Double getdurationindecimalhours() {return Tools.convertminutestodecimalhours(getdurationinminutes(), 2);}
+    public String getcurrenttimeformatted() {
+        return Tools.formatlengthshort(getSecondselapsed());
     }
-    protected String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
+    public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
 
 // Error Handling
     protected void entrainmenterror() {}
     protected void ambienceerror() {}
+
+// Reference Files
+    protected File getReferenceFile() {
+        PlayerWidget.ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
+        if (referenceType == null) {return null;}
+        if (referenceType == PlayerWidget.ReferenceType.html) {
+            String name = this.name + ".html";
+            return new File(Options.DIRECTORYREFERENCE, "html/" + name);
+        } else if (referenceType == PlayerWidget.ReferenceType.txt) {
+            String name = this.name + ".txt";
+            return new File(Options.DIRECTORYREFERENCE, "txt/" + name);
+        } else {return null;}
+    }
 
 }
