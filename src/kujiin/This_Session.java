@@ -393,10 +393,11 @@ public class This_Session {
         if (checksessionwellformedness(textfieldtimes)) {
             setupcutsinsession();
             // TODO Filter And Sort Session Parts Here
-            for (Object i : getallitemsinSession()) {
-                if (i instanceof Cut) {if (! ((Cut) i).build(getCutsinSession(), ambienceenabled)) {return false;}}
-                if (i instanceof Element) {if (! ((Element) i).build(getElementsinSession(), ambienceenabled)) {return false;}}
-                if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(getallitemsinSession().get(1), getallitemsinSession().get(getallitemsinSession().size() - 2), ambienceenabled)) {return false;}}
+            ArrayList<Object> alliteminsession = new ArrayList<>(getallitemsinSession());
+            for (Object i : alliteminsession) {
+                if (i instanceof Cut) {if (! ((Cut) i).build(alliteminsession, ambienceenabled)) {return false;}}
+                if (i instanceof Element) {if (! ((Element) i).build(alliteminsession, ambienceenabled)) {return false;}}
+                if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(alliteminsession, ambienceenabled)) {return false;}}
             }
             return true;
         } else {return false;}

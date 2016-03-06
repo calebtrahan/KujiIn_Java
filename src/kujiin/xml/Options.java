@@ -37,6 +37,7 @@ public class Options {
     public static final File DIRECTORYRAMPUP = new File(DIRECTORYENTRAINMENT, "ramp/up/");
     public static final File DIRECTORYRAMPDOWN = new File(DIRECTORYENTRAINMENT, "ramp/down/");
     public static final File DIRECTORYTOHRAMP = new File(DIRECTORYENTRAINMENT, "tohramp/");
+    public static final File DIRECTORYELEMENTRAMP = new File(DIRECTORYENTRAINMENT, "elementramp/");
     public static final File DIRECTORYMAINCUTS = new File(DIRECTORYENTRAINMENT, "maincuts/");
     public static final ArrayList<String> CUTNAMES = new ArrayList<>(Arrays.asList(
             "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));

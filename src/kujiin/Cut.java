@@ -66,9 +66,9 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     }
 
 // Creation
-    public boolean build(ArrayList<Cut> cutstoplay, boolean ambienceenabled) {
+    public boolean build(ArrayList<Object> elementorcutstoplay, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
-        setCutstoplay(cutstoplay);
+        setAllcutsorelementstoplay(elementorcutstoplay);
         if (ambienceenabled) {return buildEntrainment() && buildAmbience();}
         else {return buildEntrainment();}
     }

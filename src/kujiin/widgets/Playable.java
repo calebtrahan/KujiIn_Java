@@ -42,6 +42,7 @@ public class Playable {
     protected int secondselapsed;
     protected ArrayList<Cut> cutstoplay;
     protected ArrayList<Element> elementstoplay;
+    protected ArrayList<Object> allcutsorelementstoplay;
     protected Timeline cutorelementtimeline;
 
 // Getters And Setters
@@ -53,9 +54,26 @@ public class Playable {
     }
     public void setCutstoplay(ArrayList<Cut> cutstoplay) {this.cutstoplay = cutstoplay;}
     public void setElementstoplay(ArrayList<Element> elementstoplay) {this.elementstoplay = elementstoplay;}
+    public void setAllcutsorelementstoplay(ArrayList<Object> allcutsorelementstoplay) {
+        this.allcutsorelementstoplay = allcutsorelementstoplay;
+        sortElementsAndCuts();
+    }
+    public ArrayList<Object> getAllcutsorelementstoplay() {
+        return allcutsorelementstoplay;
+    }
     public void setTotalambienceduration(double totalambienceduration) {this.totalambienceduration = totalambienceduration;}
     public double getTotalambienceduration() {return totalambienceduration;}
     public int getSecondselapsed() {return secondselapsed;}
+    public void sortElementsAndCuts() {
+        ArrayList<Cut> cutlist = new ArrayList<>();
+        ArrayList<Element> elementlist = new ArrayList<>();
+        for (Object i : allcutsorelementstoplay) {
+            if (i instanceof Cut) {cutlist.add((Cut) i);}
+            if (i instanceof Element) {elementlist.add((Element) i);}
+        }
+        setCutstoplay(cutlist);
+        setElementstoplay(elementlist);
+    }
 
 // Playback Controls
     public void start() {

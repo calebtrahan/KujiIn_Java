@@ -61,15 +61,20 @@ public class Qi_Gong extends Playable implements Creatable, Exportable {
     }
 
 // Creation
-    public boolean build(Object firstcutorelement, Object lastcutorelement, boolean ambienceenabled) {
+    public boolean build(ArrayList<Object> elementsorcutstoplay, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
+        setAllcutsorelementstoplay(elementsorcutstoplay);
         entrainmentlist = new ArrayList<>();
         entrainmentmedia = new ArrayList<>();
         if (name.equals("Presession")) {
             buildEntrainment();
             if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
                 int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
-                String rampupfirstname = "ar" + ((Playable) firstcutorelement).number + rampdur + ".mp3";
+                int number;
+                int actualnumber = ((Playable) elementsorcutstoplay.get(1)).number;
+                if (actualnumber > 9) {number = 10;}
+                else {number = actualnumber;}
+                String rampupfirstname = "ar" + number + rampdur + ".mp3";
                 File ramptofirstcut = new File(Options.DIRECTORYRAMPUP, rampupfirstname);
                 entrainmentlist.add(ramptofirstcut);
             }
@@ -78,7 +83,11 @@ public class Qi_Gong extends Playable implements Creatable, Exportable {
             buildEntrainment();
             if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
                 int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
-                String rampdowntopost = "zr" + ((Playable) lastcutorelement).number + rampdur + ".mp3";
+                int number;
+                int actualnumber = ((Playable) elementsorcutstoplay.get(elementsorcutstoplay.size() - 2)).number;
+                if (actualnumber > 9) {number = 10;}
+                else {number = actualnumber;}
+                String rampdowntopost = "zr" + number + rampdur + ".mp3";
                 File thisfile = new File(Options.DIRECTORYRAMPDOWN, rampdowntopost);
                 entrainmentlist.add(0, thisfile);
             }
@@ -121,20 +130,10 @@ public class Qi_Gong extends Playable implements Creatable, Exportable {
             fivetimes = duration / 5;
             singletimes = duration % 5;
         }
-        for (int i = 0; i < fivetimes; i++) {
-            String filename = name + "5.mp3";
-            File thisfile = new File(Options.DIRECTORYMAINCUTS, filename);
-            entrainmentlist.add(thisfile);
-        }
-        for (int i = 0; i < singletimes; i++) {
-            String filename = name + "1.mp3";
-            File thisfile = new File(Options.DIRECTORYMAINCUTS, filename);
-            entrainmentlist.add(thisfile);
-        }
+        for (int i = 0; i < fivetimes; i++) {entrainmentlist.add(new File(Options.DIRECTORYMAINCUTS, "Qi-Gong5.mp3"));}
+        for (int i = 0; i < singletimes; i++) {entrainmentlist.add(new File(Options.DIRECTORYMAINCUTS, "Qi-Gong1.mp3"));}
         Tools.shufflelist(entrainmentlist, 5);
-        for (File i : entrainmentlist) {
-            entrainmentmedia.add(new Media(i.toURI().toString()));
-        }
+        for (File i : entrainmentlist) {entrainmentmedia.add(new Media(i.toURI().toString()));}
         return entrainmentmedia.size() > 0;
     }
     @Override

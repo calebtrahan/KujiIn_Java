@@ -65,9 +65,9 @@ public class Element extends Playable implements Creatable, Exportable {
     }
 
 // Creation
-    public boolean build(ArrayList<Element> elementstoplay, boolean ambienceenabled) {
+    public boolean build(ArrayList<Object> elementstoplay, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
-        setElementstoplay(elementstoplay);
+        setAllcutsorelementstoplay(elementstoplay);
         if (ambienceenabled) {return buildAmbience() && buildEntrainment();}
         else {return buildEntrainment();}
     }
@@ -99,7 +99,52 @@ public class Element extends Playable implements Creatable, Exportable {
     }
     @Override
     public boolean buildEntrainment() {
-        return false;
+        try {
+            entrainmentlist = new ArrayList<>();
+            entrainmentmedia = new ArrayList<>();
+            int index = getAllcutsorelementstoplay().indexOf(this);
+            Playable cutorelementbefore = (Playable) getAllcutsorelementstoplay().get(index - 1);
+            Playable cutorelementafter = (Playable) getAllcutsorelementstoplay().get(index + 1);
+            int adjustedduration = getdurationinminutes();
+            File rampindirectory = new File(Options.DIRECTORYELEMENTRAMP, "in/");
+            File rampoutdirectory = new File(Options.DIRECTORYELEMENTRAMP, "out/");
+            boolean elementbefore = cutorelementbefore.number > 9;
+            boolean elementafter = cutorelementafter.number > 9;
+        // Calculate Ramp Duration
+            int duration;
+            if (getdurationinminutes() > 13) {duration = 3;}
+            else if (getdurationinminutes() > 8) {duration = 2;}
+            else {duration = 1;}
+        // Adjust Duration For Ramp(s)
+            if (! elementbefore) {adjustedduration -= duration;}
+            if (! elementafter) {adjustedduration -= duration;}
+        // Add Main Entrainment Files
+            int fivetimes = adjustedduration / 5;
+            int singletimes = adjustedduration % 5;
+            for (int i = 0; i < fivetimes; i++) {
+                File thisfile = new File(Options.DIRECTORYMAINCUTS, "ELEMENT5.mp3");
+                entrainmentlist.add(thisfile);
+            }
+            for (int i = 0; i < singletimes; i++) {
+                File thisfile = new File(Options.DIRECTORYMAINCUTS, "ELEMENT1.mp3");
+                entrainmentlist.add(thisfile);
+            }
+        // Add IN RAMP
+            if (! elementbefore) {
+                File rampin = new File(rampindirectory, cutorelementbefore.name.toLowerCase() + duration + ".mp3");
+                entrainmentlist.add(0, rampin);
+            }
+        // Add OUT RAMP
+            if (! elementafter) {
+                File rampout = new File(rampoutdirectory, cutorelementafter.name.toLowerCase() + duration + ".mp3");
+                entrainmentlist.add(rampout);
+            }
+            Tools.shufflelist(entrainmentlist, 5);
+            for (File i : entrainmentlist) {
+                entrainmentmedia.add(new Media(i.toURI().toString()));
+            }
+            return entrainmentmedia.size() > 0;
+        } catch (ArrayIndexOutOfBoundsException ignored) {return false;}
     }
     @Override
     public boolean buildAmbience() {
