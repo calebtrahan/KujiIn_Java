@@ -10,6 +10,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -781,10 +782,13 @@ public class CreatorAndExporterWidget {
         public Button DownButton;
         public Button AcceptButton;
         public Button CancelButton;
-        private List<? extends Playable> sessionitems;
-        private List<SessionItem> tableitems;
+        private List<Object> sessionitems;
+        private ObservableList<SessionItem> tableitems;
+        private MainController Root;
 
-        public SortSessionItems(MainController Root, This_Session session) {
+        public SortSessionItems(MainController Root, List<Object> sessionitems) {
+            this.sessionitems = sessionitems;
+            this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SortSessionParts.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -795,8 +799,86 @@ public class CreatorAndExporterWidget {
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
             DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
+            SessionItemsTable.setOnMouseClicked(event -> itemselected());
+            tableitems = FXCollections.observableArrayList();
+            populatetable();
         }
 
+        public void itemselected() {
+            boolean validitemselected = SessionItemsTable.getSelectionModel().getSelectedIndex() != -1;
+            UpButton.setDisable(! validitemselected);
+            DownButton.setDisable(! validitemselected);
+        }
+        public void populatetable() {
+            SessionItemsTable.getItems().clear();
+            tableitems.clear();
+            int count = 1;
+            for (Object i : sessionitems) {
+                Playable item = (Playable) i;
+                tableitems.add(new SessionItem(count, item.name, Tools.minstoformattedabbreviatedhoursandminutes(item.getdurationinminutes())));
+                count++;
+            }
+            SessionItemsTable.setItems(tableitems);
+        }
+        public void moveitemup(ActionEvent actionEvent) {
+            int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
+            if (selectedindex == -1) {return;}
+            if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
+                Tools.showinformationdialog(Root, "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
+                return;
+            }
+            if (selectedindex == 0) {return;}
+            Playable selecteditem = (Playable) sessionitems.get(selectedindex);
+            Playable oneitemup = (Playable) sessionitems.get(selectedindex - 1);
+            if (selecteditem instanceof Cut && oneitemup instanceof Cut) {
+                if (selecteditem.number > oneitemup.number) {
+                    Tools.showinformationdialog(Root, "Cannot Move", selecteditem.name + " Cannot Be Moved Before " + oneitemup.name + ". Cuts Would Be Out Of Order", "Cannot Move");
+                    return;
+                }
+            }
+            if (oneitemup instanceof Qi_Gong) {
+                Tools.showinformationdialog(Root, "Cannot Move", "Cannot Replace Presession", "Cannot Move");
+                return;
+            }
+            Collections.swap(sessionitems, selectedindex, selectedindex - 1);
+            populatetable();
+        }
+        public void moveitemdown(ActionEvent actionEvent) {
+            int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
+            if (selectedindex == -1) {return;}
+            if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
+                Tools.showinformationdialog(Root, "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
+                return;
+            }
+            if (selectedindex == tableitems.size() - 1) {return;}
+            Playable selecteditem = (Playable) sessionitems.get(selectedindex);
+            Playable oneitemdown = (Playable) sessionitems.get(selectedindex + 1);
+            if (selecteditem instanceof Cut && oneitemdown instanceof Cut) {
+                if (selecteditem.number < oneitemdown.number) {
+                    Tools.showinformationdialog(Root, "Cannot Move", selecteditem.name + " Cannot Be Moved After " + oneitemdown.name + ". Cuts Would Be Out Of Order", "Cannot Move");
+                    return;
+                }
+            }
+            if (oneitemdown instanceof Qi_Gong) {
+                Tools.showinformationdialog(Root, "Cannot Move", "Cannot Replace Postsession", "Cannot Move");
+                return;
+            }
+            Collections.swap(sessionitems, selectedindex, selectedindex + 1);
+            populatetable();
+        }
+        public void cutcheck() {
+
+        }
+        public List<Object> getorderedsessionitems() {
+            return sessionitems;
+        }
+        public void accept(ActionEvent actionEvent) {
+            close();
+        }
+        public void cancel(ActionEvent actionEvent) {
+            sessionitems = null;
+            close();
+        }
 
         class SessionItem {
             private IntegerProperty number;

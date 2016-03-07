@@ -392,7 +392,16 @@ public class This_Session {
     public boolean create(ArrayList<Integer> textfieldtimes) {
         if (checksessionwellformedness(textfieldtimes)) {
             setupcutsinsession();
-            // TODO Filter And Sort Session Parts Here
+            boolean haselements = false;
+            boolean hascuts = false;
+            for (Object i : getallitemsinSession()) {if (i instanceof Element) haselements = true;}
+            for (Object i : getallitemsinSession()) {if (i instanceof Cut) hascuts = true;}
+            if (haselements && hascuts || haselements && ! hascuts) {
+                CreatorAndExporterWidget.SortSessionItems sortSessionItems = new CreatorAndExporterWidget.SortSessionItems(Root, getallitemsinSession());
+                sortSessionItems.showAndWait();
+                if (sortSessionItems.getorderedsessionitems() == null) {return false;}
+                else {setItemsinsession(sortSessionItems.getorderedsessionitems());}
+            }
             ArrayList<Object> alliteminsession = new ArrayList<>(getallitemsinSession());
             for (Object i : alliteminsession) {
                 if (i instanceof Cut) {if (! ((Cut) i).build(alliteminsession, ambienceenabled)) {return false;}}

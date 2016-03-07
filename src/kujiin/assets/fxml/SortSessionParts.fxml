@@ -16,8 +16,8 @@
       </TableView>
       <HBox layoutX="14.0" layoutY="351.0" prefHeight="29.0" prefWidth="167.0">
          <children>
-            <Button fx:id="UpButton" mnemonicParsing="false" text="Move Up" />
-            <Button fx:id="DownButton" mnemonicParsing="false" text="Move Down" />
+            <Button fx:id="UpButton" mnemonicParsing="false" text="Move Up" onAction="#moveitemup"/>
+            <Button fx:id="DownButton" mnemonicParsing="false" text="Move Down" onAction="#moveitemdown"/>
          </children>
       </HBox>
       <Label layoutX="104.0" layoutY="4.0" text="Arrange Session Items">
@@ -27,8 +27,8 @@
       </Label>
       <HBox alignment="TOP_RIGHT" layoutX="225.0" layoutY="351.0" prefHeight="29.0" prefWidth="141.0">
          <children>
-            <Button fx:id="AcceptButton" mnemonicParsing="false" text="Accept" />
-            <Button fx:id="CancelButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Cancel" />
+            <Button fx:id="AcceptButton" mnemonicParsing="false" text="Accept" onAction="#accept"/>
+            <Button fx:id="CancelButton" alignment="CENTER_RIGHT" mnemonicParsing="false" text="Cancel" onAction="#cancel"/>
          </children>
       </HBox>
    </children>
