@@ -9,22 +9,24 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.interfaces.Creatable;
 import kujiin.interfaces.Exportable;
+import kujiin.interfaces.Trackable;
 import kujiin.widgets.Playable;
 import kujiin.widgets.ProgressAndGoalsWidget;
+import kujiin.xml.Goals;
 import kujiin.xml.Options;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-// TODO Extend Functionality Of Cut Here, Or Put Basic Functionality here And Have Cut Extend This
 // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
 // TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
-// TODO Player On Separate Screen
-public class Element extends Playable implements Creatable, Exportable {
+public class Element extends Playable implements Creatable, Exportable, Trackable {
     private ToggleButton Switch;
     private TextField Value;
+    private Goals GoalsController;
 
     public Element(int number, String name, int duration, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
@@ -41,8 +43,15 @@ public class Element extends Playable implements Creatable, Exportable {
 // GUI
     public void toggleswitch() {
         ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
-            try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
-            catch (Exception e) {Value.setText("");}
+            try {
+                if (newValue.matches("\\d*")) {
+                    Value.setText(Integer.toString(Integer.parseInt(newValue)));
+                } else {
+                    Value.setText(oldValue);
+                }
+            } catch (Exception e) {
+                Value.setText("");
+            }
         };
         if (Switch.isSelected()) {
             Value.textProperty().addListener(integertextfield);
@@ -55,8 +64,10 @@ public class Element extends Playable implements Creatable, Exportable {
         }
     }
     public void changevalue(int newvalue) {
-        if (newvalue == 0) {Switch.setSelected(false); toggleswitch();}
-        else {
+        if (newvalue == 0) {
+            Switch.setSelected(false);
+            toggleswitch();
+        } else {
             Switch.setSelected(true);
             Value.setDisable(false);
             Value.setText(Integer.toString(newvalue));
@@ -65,11 +76,15 @@ public class Element extends Playable implements Creatable, Exportable {
     }
 
 // Creation
+    @Override
     public boolean build(ArrayList<Object> elementstoplay, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
         setAllcutsorelementstoplay(elementstoplay);
-        if (ambienceenabled) {return buildAmbience() && buildEntrainment();}
-        else {return buildEntrainment();}
+        if (ambienceenabled) {
+            return buildAmbience() && buildEntrainment();
+        } else {
+            return buildEntrainment();
+        }
     }
     @Override
     public boolean isValid() {
@@ -87,13 +102,18 @@ public class Element extends Playable implements Creatable, Exportable {
                     ambiencefiledurations.add(dur);
                 }
             }
-        } catch (NullPointerException e) {new MainController.ExceptionDialog(thisession.Root, e).showAndWait(); return false;}
+        } catch (NullPointerException e) {
+            new MainController.ExceptionDialog(thisession.Root, e).showAndWait();
+            return false;
+        }
         return ambiencefiles.size() > 0;
     }
     @Override
     public boolean hasenoughAmbience(int secondstocheck) {
         double a = 0;
-        for (Double i : ambiencefiledurations) {a += i;}
+        for (Double i : ambiencefiledurations) {
+            a += i;
+        }
         setTotalambienceduration(a);
         return a > (double) secondstocheck;
     }
@@ -110,15 +130,23 @@ public class Element extends Playable implements Creatable, Exportable {
             File rampoutdirectory = new File(Options.DIRECTORYELEMENTRAMP, "out/");
             boolean elementbefore = cutorelementbefore.number > 9;
             boolean elementafter = cutorelementafter.number > 9;
-        // Calculate Ramp Duration
+            // Calculate Ramp Duration
             int duration;
-            if (getdurationinminutes() > 13) {duration = 3;}
-            else if (getdurationinminutes() > 8) {duration = 2;}
-            else {duration = 1;}
-        // Adjust Duration For Ramp(s)
-            if (! elementbefore) {adjustedduration -= duration;}
-            if (! elementafter) {adjustedduration -= duration;}
-        // Add Main Entrainment Files
+            if (getdurationinminutes() > 13) {
+                duration = 3;
+            } else if (getdurationinminutes() > 8) {
+                duration = 2;
+            } else {
+                duration = 1;
+            }
+            // Adjust Duration For Ramp(s)
+            if (!elementbefore) {
+                adjustedduration -= duration;
+            }
+            if (!elementafter) {
+                adjustedduration -= duration;
+            }
+            // Add Main Entrainment Files
             int fivetimes = adjustedduration / 5;
             int singletimes = adjustedduration % 5;
             for (int i = 0; i < fivetimes; i++) {
@@ -129,13 +157,13 @@ public class Element extends Playable implements Creatable, Exportable {
                 File thisfile = new File(Options.DIRECTORYMAINCUTS, "ELEMENT1.mp3");
                 entrainmentlist.add(thisfile);
             }
-        // Add IN RAMP
-            if (! elementbefore) {
+            // Add IN RAMP
+            if (!elementbefore) {
                 File rampin = new File(rampindirectory, cutorelementbefore.name.toLowerCase() + duration + ".mp3");
                 entrainmentlist.add(0, rampin);
             }
-        // Add OUT RAMP
-            if (! elementafter) {
+            // Add OUT RAMP
+            if (!elementafter) {
                 File rampout = new File(rampoutdirectory, cutorelementafter.name.toLowerCase() + duration + ".mp3");
                 entrainmentlist.add(rampout);
             }
@@ -144,7 +172,9 @@ public class Element extends Playable implements Creatable, Exportable {
                 entrainmentmedia.add(new Media(i.toURI().toString()));
             }
             return entrainmentmedia.size() > 0;
-        } catch (ArrayIndexOutOfBoundsException ignored) {return false;}
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+            return false;
+        }
     }
     @Override
     public boolean buildAmbience() {
@@ -158,7 +188,9 @@ public class Element extends Playable implements Creatable, Exportable {
                 if (currentduration < sessionduration) {
                     ambiencelist.add(i);
                     currentduration += ambiencefiledurations.get(ambiencefiles.indexOf(i));
-                } else {break;}
+                } else {
+                    break;
+                }
             }
             // Shuffle/Loop Ambience Randomly
         } else {
@@ -227,7 +259,9 @@ public class Element extends Playable implements Creatable, Exportable {
             super.playnextentrainment();
         } catch (IndexOutOfBoundsException ignored) {
             System.out.println("Out Of Bounds In " + name + "'s Ambience List: ");
-            for (Media i : ambiencemedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
+            for (Media i : ambiencemedia) {
+                System.out.println(i.getSource() + i.getDuration().toSeconds());
+            }
         }
     }
     @Override
@@ -236,7 +270,9 @@ public class Element extends Playable implements Creatable, Exportable {
             super.playnextambience();
         } catch (IndexOutOfBoundsException ignored) {
             System.out.println("Out Of Bounds In " + name + "'s Ambience List: ");
-            for (Media i : entrainmentmedia) {System.out.println(i.getSource() + i.getDuration().toSeconds());}
+            for (Media i : entrainmentmedia) {
+                System.out.println(i.getSource() + i.getDuration().toSeconds());
+            }
         }
     }
     // Playback Getters
@@ -273,6 +309,36 @@ public class Element extends Playable implements Creatable, Exportable {
         super.ambienceerror();
     }
 
+// Goals
+    @Override
+    public void setGoalsController(Goals goals) {
+        GoalsController = goals;
+    }
+    @Override
+    public Goals getGoalsController() {
+        return GoalsController;
+    }
+    @Override
+    public void setCurrentGoal() {
+
+    }
+    @Override
+    public Goals.Goal getCurrentGoal() {
+        return GoalsController.getcurrentgoal(number);
+    }
+    @Override
+    public void setGoals(List<Goals.Goal> goalslist) {
+        GoalsController.update(goalslist, number);
+    }
+    @Override
+    public List<Goals.Goal> getGoals(boolean includecompleted) {
+        return GoalsController.getallcutgoals(number, includecompleted);
+    }
+    @Override
+    public void checkCurrentGoal(double currrentpracticedhours) {
+
+    }
+
 // Export
     @Override
     public Service<Boolean> getexportservice() {
@@ -298,4 +364,5 @@ public class Element extends Playable implements Creatable, Exportable {
     public Boolean sessionreadyforFinalExport() {
         return null;
     }
+
 }

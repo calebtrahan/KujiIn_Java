@@ -48,6 +48,11 @@ public class PlayerWidget extends Stage {
     public ProgressBar TotalProgress;
     public Label TotalTotalLabel;
     public Label TotalSessionLabel;
+    public TextField GoalPracticedHours;
+    public TextField GoalPracticedMinutes;
+    public ProgressBar GoalProgressBar;
+    public TextField GoalSetHours;
+    public TextField GoalSetMinutes;
     private This_Session Session;
     private MainController Root;
 
@@ -79,6 +84,10 @@ public class PlayerWidget extends Stage {
             } catch(Exception ignored) {Tools.showtimedmessage(StatusBar, "No Session Playing", 2000);}
         });
         Tools.showtimedmessage(StatusBar, "Player Disabled Until Session Is Created Or Loaded", 10000);
+        GoalPracticedHours.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        GoalPracticedMinutes.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        GoalSetHours.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        GoalSetMinutes.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
     }
 
 // Button Actions

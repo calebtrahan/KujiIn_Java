@@ -9,18 +9,22 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.interfaces.Creatable;
 import kujiin.interfaces.Exportable;
+import kujiin.interfaces.Trackable;
 import kujiin.widgets.Playable;
 import kujiin.widgets.ProgressAndGoalsWidget;
+import kujiin.xml.Goals;
 import kujiin.xml.Options;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class Qi_Gong extends Playable implements Creatable, Exportable {
+public class Qi_Gong extends Playable implements Creatable, Exportable, Trackable {
     private ToggleButton Switch;
     private TextField Value;
+    private Goals GoalsController;
 
     public Qi_Gong (int number, String name, int duration, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
@@ -262,16 +266,6 @@ public class Qi_Gong extends Playable implements Creatable, Exportable {
     public String gettotaltimeformatted() {
         return Tools.formatlengthshort(this.getdurationinseconds());
     }
-
-
-    @Override
-    public void startfadeout() {
-        super.startfadeout();
-    }
-    @Override
-    public void cleanup() {
-        super.cleanup();
-    }
     @Override
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
@@ -297,7 +291,37 @@ public class Qi_Gong extends Playable implements Creatable, Exportable {
         } else {thisession.error_endplayback();}
     }
 
-    // Export
+// Goals
+    @Override
+    public void setGoalsController(Goals goals) {
+        GoalsController = goals;
+    }
+    @Override
+    public Goals getGoalsController() {
+        return GoalsController;
+    }
+    @Override
+    public void setCurrentGoal() {
+
+    }
+    @Override
+    public Goals.Goal getCurrentGoal() {
+        return null;
+    }
+    @Override
+    public void setGoals(List<Goals.Goal> goalslist) {
+
+    }
+    @Override
+    public List<Goals.Goal> getGoals(boolean includecompleted) {
+        return null;
+    }
+    @Override
+    public void checkCurrentGoal(double currrentpracticedhours) {
+
+    }
+
+// Export
     @Override
     public Service<Boolean> getexportservice() {
         return null;

@@ -8,17 +8,21 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import kujiin.interfaces.Creatable;
 import kujiin.interfaces.Exportable;
+import kujiin.interfaces.Trackable;
 import kujiin.widgets.ProgressAndGoalsWidget;
+import kujiin.xml.Goals;
 import kujiin.xml.Options;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class Cut extends kujiin.widgets.Playable implements Exportable, Creatable {
+public class Cut extends kujiin.widgets.Playable implements Exportable, Creatable, Trackable {
     private ToggleButton Switch;
     private TextField Value;
+    private Goals GoalsController;
 
     public Cut(int number, String name, int duration, This_Session thisession, ToggleButton aSwitch, TextField value) {
         this.number = number;
@@ -266,6 +270,36 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
             ambienceplayer.play();
             ambienceplayer.setOnError(this::ambienceerror);
         } else {thisession.error_endplayback();}
+    }
+
+// Goals
+    @Override
+    public void setGoalsController(Goals goals) {
+        GoalsController = goals;
+    }
+    @Override
+    public Goals getGoalsController() {
+        return GoalsController;
+    }
+    @Override
+    public void setCurrentGoal() {
+
+    }
+    @Override
+    public Goals.Goal getCurrentGoal() {
+        return null;
+    }
+    @Override
+    public void setGoals(List<Goals.Goal> goalslist) {
+
+    }
+    @Override
+    public List<Goals.Goal> getGoals(boolean includecompleted) {
+        return getGoalsController().getallcutgoals(number, includecompleted);
+    }
+    @Override
+    public void checkCurrentGoal(double currrentpracticedhours) {
+
     }
 
 // Export

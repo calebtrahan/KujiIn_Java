@@ -237,6 +237,10 @@ public class Goals {
     public boolean goalsexist(int cutorelementindex, boolean includecompleted) {
         return getallcutgoals(cutorelementindex, includecompleted) != null && ! getallcutgoals(cutorelementindex, true).isEmpty();
     }
+    public Goal getcurrentgoal(int cutorelementindex) {
+        try {return getallcutgoals(cutorelementindex, false).get(0);}
+        catch (NullPointerException | IndexOutOfBoundsException ignored) {return null;}
+    }
     public Goal getgoal(int cutorelementindex, Integer goalindex, boolean includecompleted) {
         try {return getallcutgoals(cutorelementindex, includecompleted).get(goalindex);}
         catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}

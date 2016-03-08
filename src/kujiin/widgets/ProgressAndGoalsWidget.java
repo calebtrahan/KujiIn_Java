@@ -282,6 +282,7 @@ public class ProgressAndGoalsWidget implements Widget {
         } catch (Exception e) {return false;}
     }
     public void updategoalsui() {
+        // TODO Update Session Player Goals UI As Well Along With The One On ROOT
         try {
 //            Goals.sortallcompletedgoals();
             NewGoalButton.setDisable(cutorelementindex == -1);
