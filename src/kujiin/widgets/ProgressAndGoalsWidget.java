@@ -293,6 +293,7 @@ public class ProgressAndGoalsWidget implements Widget {
             Integer minutes = practicedminutes % 60;
             PracticedHours.setText(hours.toString());
             PracticedMinutes.setText(minutes.toString());
+            PlayerWidget playerWidget = Root.getPlayer();
             if (goal != null) {
                 Double progress = Tools.convertminutestodecimalhours(practicedminutes, 2) / goal;
                 goal *= 60;
@@ -301,10 +302,20 @@ public class ProgressAndGoalsWidget implements Widget {
                 GoalHours.setText(hrs.toString());
                 GoalMinutes.setText(mins.toString());
                 GoalProgress.setProgress(progress);
+                if (Root.getPlayer() != null && Root.getPlayer().isShowing()) {
+                    playerWidget.GoalSetHours.setText(hrs.toString());
+                    playerWidget.GoalSetMinutes.setText(mins.toString());
+                    playerWidget.GoalProgressBar.setProgress(progress);
+                }
             } else {
                 GoalHours.setText("?");
                 GoalMinutes.setText("?");
                 GoalProgress.setProgress(0.0);
+                if (playerWidget != null && playerWidget.isShowing()) {
+                    playerWidget.GoalSetHours.setText("?");
+                    playerWidget.GoalSetMinutes.setText("?");
+                    playerWidget.GoalProgressBar.setProgress(0.0);
+                }
             }
             TopLabel.setText(GOALCUTNAMES[cutorelementindex]);
         } catch (NullPointerException ignored) {
@@ -318,6 +329,7 @@ public class ProgressAndGoalsWidget implements Widget {
                 PracticedMinutes.setText(minutes.toString());
                 GoalMinutes.setText("?");
                 GoalHours.setText("?");
+
             } else {
                 PracticedHours.setText("-");
                 PracticedMinutes.setText("-");
@@ -328,6 +340,7 @@ public class ProgressAndGoalsWidget implements Widget {
             CurrentGoalsButton.setDisable(cutorelementindex == -1);
             GoalProgress.setProgress(0.0);
         } catch (ArrayIndexOutOfBoundsException ignored) {resetallvalues();}
+
     }
     public List<kujiin.xml.Goals.Goal> getcurrentgoallist(boolean includecompleted) {
         if (cutorelementindex != null) {return Goals.getallcutgoals(cutorelementindex, includecompleted);}
