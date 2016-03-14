@@ -1,7 +1,7 @@
 package kujiin.xml;
 
 import javafx.application.Platform;
-import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import kujiin.MainController;
 import kujiin.Tools;
 import kujiin.widgets.PlayerWidget;
@@ -27,6 +27,7 @@ public class Options {
     public static final File LOGFILE = new File(ROOTDIRECTORY, "assets/sessionlog.txt");
     public static final File XMLDIRECTORY = new File(ROOTDIRECTORY, "assets/xml/");
     public static final File OPTIONSXMLFILE = new File(XMLDIRECTORY, "options.xml");
+    public static final File DIRECTORYIMAGES = new File(ROOTDIRECTORY, "assets/img/");
     public static final File GOALSXMLFILE = new File(XMLDIRECTORY, "goals.xml");
     public static final File DIRECTORYSTYLES = new File(ROOTDIRECTORY, "assets/styles/");
     public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");
@@ -141,10 +142,11 @@ public class Options {
         setAppearanceOptions(appearanceOptions);
         marshall();
     }
-    public void setStyle(Scene scene) {
-        scene.getStylesheets().clear();
+    public void setStyle(MainController Root) {
+        Root.getStage().getIcons().add(new Image(new File(Options.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString()));
+        Root.getScene().getStylesheets().clear();
         String themefile = getAppearanceOptions().getThemefile();
-        if (themefile != null) {scene.getStylesheets().add(themefile);}
+        if (themefile != null) {Root.getScene().getStylesheets().add(themefile);}
     }
 
 // Subclasses

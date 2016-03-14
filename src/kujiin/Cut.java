@@ -1,9 +1,9 @@
 package kujiin;
 
-import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Service;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import kujiin.interfaces.Creatable;
@@ -24,7 +24,7 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     private TextField Value;
     private Goals GoalsController;
 
-    public Cut(int number, String name, int duration, This_Session thisession, ToggleButton aSwitch, TextField value) {
+    public Cut(int number, String name, int duration, String briefsummary, This_Session thisession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
         super.duration = duration;
@@ -32,8 +32,9 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
         ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
         Switch = aSwitch;
         Value = value;
-        Switch.setOnAction(event -> toggleswitch());
-        toggleswitch();
+        Switch.setTooltip(new Tooltip(briefsummary));
+        Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
+        Switch.setOnAction(event -> Tools.valueboxandlabelpairswitch(Switch, Value));
 //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
 //        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
@@ -44,23 +45,23 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     }
 
 // GUI
-    public void toggleswitch() {
-        ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
-            try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
-            catch (Exception e) {Value.setText("");}
-        };
-        if (Switch.isSelected()) {
-            Value.textProperty().addListener(integertextfield);
-            Value.setText("0");
-            Value.setDisable(false);
-        } else {
-            Value.textProperty().removeListener(integertextfield);
-            Value.setText("-");
-            Value.setDisable(true);
-        }
-    }
+//    public void toggleswitch() {
+//        ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
+//            try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
+//            catch (Exception e) {Value.setText("");}
+//        };
+//        if (Switch.isSelected()) {
+//            Value.textProperty().addListener(integertextfield);
+//            Value.setText("0");
+//            Value.setDisable(false);
+//        } else {
+//            Value.textProperty().removeListener(integertextfield);
+//            Value.setText("-");
+//            Value.setDisable(true);
+//        }
+//    }
     public void changevalue(int newvalue) {
-        if (newvalue == 0) {Switch.setSelected(false); toggleswitch();}
+        if (newvalue == 0) {Switch.setSelected(false);}
         else {
             Switch.setSelected(true);
             Value.setDisable(false);

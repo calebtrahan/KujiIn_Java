@@ -2,6 +2,7 @@ package kujiin;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -36,10 +37,12 @@ public class Tools {
     }
 
 // Gui Methods
-    public static void integerTextField(TextField txtfield, boolean setvalueatzero) {
-        txtfield.textProperty().addListener((observable, oldValue, newValue) -> {
+    public static void integerTextField(TextField txtfield, boolean setvalueatzero, boolean enableordisable) {
+        ChangeListener<String> integeronlyfield = (observable, oldValue, newValue) -> {
             try {if (newValue.matches("\\d*")) {Integer.parseInt(newValue);}  else {txtfield.setText(oldValue);}}
-            catch (Exception e) {txtfield.setText("");}});
+            catch (NumberFormatException e) {txtfield.setText("");}};
+        if (enableordisable) {txtfield.textProperty().addListener(integeronlyfield);}
+        else {txtfield.textProperty().removeListener(integeronlyfield);}
         if (setvalueatzero) {txtfield.setText("0");}
     }
     public static void doubleTextField(TextField txtfield, boolean setvalueatzero) {
@@ -101,12 +104,10 @@ public class Tools {
         } else {styleclass.removeAll(Collections.singleton("error"));}
     }
     public static void valueboxandlabelpairswitch(ToggleButton toggleButton, TextField textField) {
-        if (toggleButton.isSelected()) {
-            Tools.integerTextField(textField, true);
-        } else {
-            textField.setText("-");
-            textField.setDisable(true);
-        }
+        boolean toggled = toggleButton.isSelected();
+        Tools.integerTextField(textField, toggled, toggled);
+        if (! toggled) {textField.setText("-");}
+        textField.setDisable(! toggled);
     }
 
 // Time Methods

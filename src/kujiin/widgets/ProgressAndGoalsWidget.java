@@ -373,7 +373,7 @@ public class ProgressAndGoalsWidget implements Widget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session List");
             DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
@@ -464,7 +464,7 @@ public class ProgressAndGoalsWidget implements Widget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Cut Totals");
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
@@ -527,7 +527,7 @@ public class ProgressAndGoalsWidget implements Widget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Edit Goals");
             CutSelectorComboBox.setItems(FXCollections.observableArrayList(GOALCUTNAMES));
@@ -674,7 +674,7 @@ public class ProgressAndGoalsWidget implements Widget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Goal Pacing");
             int practicedminutes = Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false);
@@ -761,7 +761,7 @@ public class ProgressAndGoalsWidget implements Widget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Select Goal");
             ObservableList<CurrentGoalBinding> currentGoals = FXCollections.observableArrayList();
@@ -817,7 +817,7 @@ public class ProgressAndGoalsWidget implements Widget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Set A New Goal");
             GoalHoursSpinner.setEditable(true);
@@ -919,7 +919,7 @@ public class ProgressAndGoalsWidget implements Widget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Set A Goal For Multiple Cuts");
             GoalHoursSpinner.setEditable(true);
@@ -1018,7 +1018,7 @@ public class ProgressAndGoalsWidget implements Widget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Goal Achieved");
             TopLabel.setText(currentGoal.getCutName() + " Goal Achieved");
@@ -1056,7 +1056,7 @@ public class ProgressAndGoalsWidget implements Widget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle(completedgoals.size() + " Goals Achieved");
             TopLabel.setText("You Completed " + completedgoals.size() + " Goals This Session");
@@ -1126,7 +1126,7 @@ public class ProgressAndGoalsWidget implements Widget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle(titletext);
             TopLabel.setText(TopLabelText);

@@ -96,6 +96,7 @@ public class MainController implements Initializable {
     public Button ChangeAllElementsButton;
     public Scene Scene;
     public Stage Stage;
+    public Button ResetCreatorButton;
     private This_Session Session;
     private CreatorAndExporterWidget CreatorAndExporter;
     private PlayerWidget Player;
@@ -213,6 +214,8 @@ public class MainController implements Initializable {
     }
     public void ambienceswitch(ActionEvent actionEvent) {
         CreatorAndExporter.checkambience();}
+    public void resetallcreatorvalues(ActionEvent actionEvent) {
+    }
     public void changeallcutsvalues(ActionEvent actionEvent) {
         CreatorAndExporter.changeallcutvalues();}
     public void changeallelementsvalues(ActionEvent actionEvent) {
@@ -231,7 +234,7 @@ public class MainController implements Initializable {
         }
     }
 
-// Dialogs
+    // Dialogs
     public static class EditReferenceFiles extends Stage {
         public ChoiceBox<String> CutNamesChoiceBox;
         public ChoiceBox<String> CutVariationsChoiceBox;
@@ -258,7 +261,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Files Editor");
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
@@ -400,7 +403,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Ambience Editor");
             CutSelectionBox.setOnAction(event -> selectandloadcut());
@@ -413,7 +416,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Ambience Editor");
             CutSelectionBox.setOnAction(event -> selectandloadcut());
@@ -643,33 +646,6 @@ public class MainController implements Initializable {
             PreviewStartButton.setText("Start");
         }
 
-        class AmbienceSong {
-            private StringProperty name;
-            private StringProperty length;
-            private File file;
-            private String totaldurationshort;
-
-            public AmbienceSong(String name, File file) {
-                this.name = new SimpleStringProperty(name);
-                this.file = file;
-                double duration = Tools.getaudioduration(file);
-                totaldurationshort = Tools.formatlengthshort((int) duration);
-                this.length = new SimpleStringProperty(totaldurationshort);
-            }
-
-            public String getName() {
-                return name.getValue();
-            }
-
-            public File getFile() {
-                return file;
-            }
-
-            public String getTotaldurationshort() {
-                return totaldurationshort;
-            }
-        }
-
     }
     public static class ExceptionDialog extends Stage {
         public TextArea StackTraceTextField;
@@ -686,7 +662,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException ignored) {}
             System.out.println(String.format("Time %s Encountered: %s", exception.getClass().getName(), LocalDate.now()));
             exception.printStackTrace();
@@ -752,7 +728,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Change Program Options");
             Tools.doubleTextField(FadeInValue, false);
@@ -999,6 +975,32 @@ public class MainController implements Initializable {
                 if (! Tools.getanswerdialog(Root, "Confirmation", "You Have Unsaved Changes", "Exit Without Saving?")) {return;}
             }
             super.close();
+        }
+    }
+    public static class AmbienceSong {
+        private StringProperty name;
+        private StringProperty length;
+        private File file;
+        private String totaldurationshort;
+
+        public AmbienceSong(String name, File file) {
+            this.name = new SimpleStringProperty(name);
+            this.file = file;
+            double duration = Tools.getaudioduration(file);
+            totaldurationshort = Tools.formatlengthshort((int) duration);
+            this.length = new SimpleStringProperty(totaldurationshort);
+        }
+
+        public String getName() {
+            return name.getValue();
+        }
+
+        public File getFile() {
+            return file;
+        }
+
+        public String getTotaldurationshort() {
+            return totaldurationshort;
         }
     }
 

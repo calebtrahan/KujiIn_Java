@@ -66,22 +66,22 @@ public class This_Session {
         this.sessions = Root.getProgressTracker().getSessions();
         ambienceenabled = false;
         setPlayerState(PlayerWidget.PlayerState.IDLE);
-        Presession =  new Qi_Gong(0, "Presession", 0, this, Root.PreSwitch, Root.PreTime);
-        Rin = new Cut(1, "RIN", 0, this, Root.RinSwitch, Root.RinTime);
-        Kyo = new Cut(2, "KYO", 0, this, Root.KyoSwitch, Root.KyoTime);
-        Toh = new Cut(3, "TOH", 0, this, Root.TohSwitch, Root.TohTime);
-        Sha = new Cut(4, "SHA", 0, this, Root.ShaSwitch, Root.ShaTime);
-        Kai = new Cut(5, "KAI", 0, this, Root.KaiSwitch, Root.KaiTime);
-        Jin = new Cut(6, "JIN", 0, this, Root.JinSwitch, Root.JinTime);
-        Retsu = new Cut(7, "RETSU", 0, this, Root.RetsuSwitch, Root.RetsuTime);
-        Zai = new Cut(8, "ZAI", 0, this, Root.ZaiSwitch, Root.ZaiTime);
-        Zen = new Cut(9, "ZEN", 0, this, Root.ZenSwitch, Root.ZenTime);
-        Earth = new Element(10, "Earth", 0, this, Root.EarthSwitch, Root.EarthTime);
-        Air = new Element(11, "Air", 0, this, Root.AirSwitch, Root.AirTime);
-        Fire = new Element(12, "Fire", 0, this, Root.FireSwitch, Root.FireTime);
-        Water = new Element(13, "Water", 0, this, Root.WaterSwitch, Root.WaterTime);
-        Void = new Element(14, "Void", 0, this, Root.VoidSwitch, Root.VoidTime);
-        Postsession = new Qi_Gong(15, "Postsession", 0, this, Root.PostSwitch, Root.PostTime);
+        Presession =  new Qi_Gong(0, "Presession", 0, "Gather Qi Before The Session Starts", this, Root.PreSwitch, Root.PreTime);
+        Rin = new Cut(1, "RIN", 0, "Meet (Spirit & Invite Into The Body)", this, Root.RinSwitch, Root.RinTime);
+        Kyo = new Cut(2, "KYO", 0, "Troops (Manage Internal Strategy/Tools)", this, Root.KyoSwitch, Root.KyoTime);
+        Toh = new Cut(3, "TOH", 0, "Fighting (Against Myself To Attain Harmony)", this, Root.TohSwitch, Root.TohTime);
+        Sha = new Cut(4, "SHA", 0, "Person (Meet & Become Person We Met In RIN)", this, Root.ShaSwitch, Root.ShaTime);
+        Kai = new Cut(5, "KAI", 0, "All/Everything (Feeling Love & Compassion For Absolutely Everything)", this, Root.KaiSwitch, Root.KaiTime);
+        Jin = new Cut(6, "JIN", 0, "Understanding", this, Root.JinSwitch, Root.JinTime);
+        Retsu = new Cut(7, "RETSU", 0, "Dimension", this, Root.RetsuSwitch, Root.RetsuTime);
+        Zai = new Cut(8, "ZAI", 0, "Creation", this, Root.ZaiSwitch, Root.ZaiTime);
+        Zen = new Cut(9, "ZEN", 0, "Perfection", this, Root.ZenSwitch, Root.ZenTime);
+        Earth = new Element(10, "Earth", 0, "", this, Root.EarthSwitch, Root.EarthTime);
+        Air = new Element(11, "Air", 0, "", this, Root.AirSwitch, Root.AirTime);
+        Fire = new Element(12, "Fire", 0, "", this, Root.FireSwitch, Root.FireTime);
+        Water = new Element(13, "Water", 0, "", this, Root.WaterSwitch, Root.WaterTime);
+        Void = new Element(14, "Void", 0, "", this, Root.VoidSwitch, Root.VoidTime);
+        Postsession = new Qi_Gong(15, "Postsession", 0, "Gather Qi After The Session Ends", this, Root.PostSwitch, Root.PostTime);
     }
 
 // Getters And Setters
@@ -333,6 +333,7 @@ public class This_Session {
                 ambiencecheckbox.setSelected(false);
             });
             ambiencecheckerservice.setOnFailed(event -> {
+                System.out.println("Failed!!");
                 cad[0].close();
                 Tools.showerrordialog(Root, "Error", "Couldn't Check Ambience", "Check Ambience Folder Read Permissions");
                 ambiencecheckbox.setSelected(false);

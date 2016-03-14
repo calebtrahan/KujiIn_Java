@@ -64,7 +64,7 @@ public class PlayerWidget extends Stage {
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             Root.getOptions();
-            Root.getOptions().setStyle(defaultscene);
+            Root.getOptions().setStyle(Root);
         } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         setTitle("Session Player");
         Root = root;
@@ -148,7 +148,7 @@ public class PlayerWidget extends Stage {
             try {
                 scene = new Scene(fxmlLoader.load());
                 setScene(scene);
-                Root.getOptions().setStyle(scene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle(this.currentcutorelement.name + "'s Reference");
             setsizing();
@@ -161,7 +161,7 @@ public class PlayerWidget extends Stage {
             try {
                 scene = new Scene(fxmlLoader.load());
                 setScene(scene);
-                Root.getOptions().setStyle(scene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference File Preview");
             fullscreenoption = false;
@@ -197,7 +197,7 @@ public class PlayerWidget extends Stage {
                     ta.setText(sb.toString());
                     ta.setWrapText(true);
                     ContentPane.setContent(ta);
-                    Root.getOptions().setStyle(scene);
+                    Root.getOptions().setStyle(Root);
                 } else if (referenceType == ReferenceType.html) {
                     // TODO Get Dark Theme For Webview Here For Reference Files
                     WebView browser = new WebView();
@@ -230,7 +230,7 @@ public class PlayerWidget extends Stage {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Type Select");
             if (referenceType != null) {
@@ -287,7 +287,7 @@ public class PlayerWidget extends Stage {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
                 Sessions currentsessions = Root.getProgressTracker().getSessions();
                 Session thissession = currentsessions.getsession(currentsessions.totalsessioncount() - 1);
                 int thisessionminutes = thissession.getTotal_Session_Duration();

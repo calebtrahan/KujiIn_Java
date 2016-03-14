@@ -4,6 +4,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Service;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -26,7 +27,7 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
     private TextField Value;
     private Goals GoalsController;
 
-    public Qi_Gong (int number, String name, int duration, This_Session thissession, ToggleButton aSwitch, TextField value) {
+    public Qi_Gong (int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
         super.duration = duration;
@@ -35,6 +36,8 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
         Switch = aSwitch;
         Value = value;
         Switch.setOnAction(event -> toggleswitch());
+        Switch.setTooltip(new Tooltip(briefsummary));
+        Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
         toggleswitch();
     }
 

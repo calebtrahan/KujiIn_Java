@@ -41,21 +41,37 @@ public class CreatorAndExporterWidget {
     private CheckBox AmbienceSwitch;
     private TextField TotalSessionTime;
     private TextField ApproximateEndTime;
+    private ToggleButton PreSwitch;
     private TextField PreTime;
+    private ToggleButton RinSwitch;
     private TextField RinTime;
+    private ToggleButton KyoSwitch;
     private TextField KyoTime;
+    private ToggleButton TohSwitch;
     private TextField TohTime;
+    private ToggleButton ShaSwitch;
     private TextField ShaTime;
+    private ToggleButton KaiSwitch;
     private TextField KaiTime;
+    private ToggleButton JinSwitch;
     private TextField JinTime;
+    private ToggleButton RetsuSwitch;
     private TextField RetsuTime;
+    private ToggleButton ZaiSwitch;
     private TextField ZaiTime;
+    private ToggleButton ZenSwitch;
     private TextField ZenTime;
+    private ToggleButton PostSwitch;
     private TextField PostTime;
+    private ToggleButton EarthSwitch;
     private TextField EarthTime;
+    private ToggleButton AirSwitch;
     private TextField AirTime;
+    private ToggleButton FireSwitch;
     private TextField FireTime;
+    private ToggleButton WaterSwitch;
     private TextField WaterTime;
+    private ToggleButton VoidSwitch;
     private TextField VoidTime;
     private Label StatusBar;
     private ExporterState exporterState;
@@ -79,22 +95,54 @@ public class CreatorAndExporterWidget {
         TotalSessionTime = root.TotalSessionTime;
         ApproximateEndTime = root.ApproximateEndTime;
         Preset = new Preset(root);
+        PreSwitch = root.PreSwitch;
         PreTime = root.PreTime;
+        PreSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(PreSwitch, PreTime));
+        RinSwitch = root.RinSwitch;
         RinTime = root.RinTime;
+        RinSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(RinSwitch, RinTime));
+        KyoSwitch = root.KyoSwitch;
         KyoTime = root.KyoTime;
+        KyoSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(KyoSwitch, KyoTime));
+        TohSwitch = root.TohSwitch;
         TohTime = root.TohTime;
+        TohSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(TohSwitch, TohTime));
+        ShaSwitch = root.ShaSwitch;
         ShaTime = root.ShaTime;
+        ShaSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(ShaSwitch, ShaTime));
+        KaiSwitch = root.KaiSwitch;
         KaiTime = root.KaiTime;
+        KaiSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(KaiSwitch, KaiTime));
+        JinSwitch = root.JinSwitch;
         JinTime = root.JinTime;
+        JinSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(JinSwitch, JinTime));
+        RetsuSwitch = root.RetsuSwitch;
         RetsuTime = root.RetsuTime;
+        RetsuSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(RetsuSwitch, RetsuTime));
+        ZaiSwitch = root.ZaiSwitch;
         ZaiTime = root.ZaiTime;
+        ZaiSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(ZaiSwitch, ZaiTime));
+        ZenSwitch = root.ZenSwitch;
         ZenTime = root.ZenTime;
+        ZenSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(ZenSwitch, ZenTime));
+        PostSwitch = root.PostSwitch;
         PostTime = root.PostTime;
+        PostSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(PostSwitch, PostTime));
+        EarthSwitch = root.EarthSwitch;
         EarthTime = root.EarthTime;
+        EarthSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(EarthSwitch, EarthTime));
+        AirSwitch = root.AirSwitch;
         AirTime = root.AirTime;
+        AirSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(AirSwitch, AirTime));
+        FireSwitch = root.FireSwitch;
         FireTime = root.FireTime;
+        FireSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(FireSwitch, FireTime));
+        WaterSwitch = root.WaterSwitch;
         WaterTime = root.WaterTime;
+        WaterSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(WaterSwitch, WaterTime));
+        VoidSwitch = root.VoidSwitch;
         VoidTime = root.VoidTime;
+        VoidSwitch.setOnAction(event -> Tools.valueboxandlabelpairswitch(VoidSwitch, VoidTime));
         session = root.getSession();
         StatusBar = root.CreatorStatusBar;
         exporterState = ExporterState.NOT_EXPORTED;
@@ -337,17 +385,6 @@ public class CreatorAndExporterWidget {
             try {Root.getSession().setDuration(15, Integer.valueOf(newValue)); updatecreatorui();}
             catch (NumberFormatException ignored) {VoidTime.setText("0"); updatecreatorui();}
         });
-        PreTime.setTooltip(new Tooltip("Minutes To Meditate Before Practicing Selected Cuts/Elements. There Is A Ramp Into Whichever First Cut You Are Working On"));
-        RinTime.setTooltip(new Tooltip("Minutes You Want To Practice RIN"));
-        KyoTime.setTooltip(new Tooltip("Minutes You Want To Practice KYO"));
-        TohTime.setTooltip(new Tooltip("Minutes You Want To Practice TOH"));
-        ShaTime.setTooltip(new Tooltip("Minutes You Want To Practice SHA"));
-        KaiTime.setTooltip(new Tooltip("Minutes You Want To Practice KAI"));
-        JinTime.setTooltip(new Tooltip("Minutes You Want To Practice JIN"));
-        RetsuTime.setTooltip(new Tooltip("Minutes ou Want To Practice RETSU"));
-        ZaiTime.setTooltip(new Tooltip("Minutes You Want To Practice ZAI"));
-        ZenTime.setTooltip(new Tooltip("Minutes You Want To Practice ZEN"));
-        PostTime.setTooltip(new Tooltip("Minutes To Meditate After Practicing Selected Cuts/Elements. There Is A Ramp Out Of The Last Cut You Are Working On"));
         TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
         ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
         AmbienceSwitch.setTooltip(new Tooltip("Check This After You Set All Values To Check For And Enable Ambience For This Session"));
@@ -401,18 +438,22 @@ public class CreatorAndExporterWidget {
     public void changeallcutvalues() {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(Root, "Change All Cut Values To: ");
         changevaluesdialog.showAndWait();
-        Integer min = changevaluesdialog.getminutes();
-        for (Cut i : session.getallCuts()) {i.changevalue(min);}
-        if (changevaluesdialog.getincludepresession()) {session.getPresession().changevalue(min);}
-        if (changevaluesdialog.getincludepostsession()) {session.getPostsession().changevalue(min);}
+        if (changevaluesdialog.getAccepted()) {
+            Integer min = changevaluesdialog.getminutes();
+            for (Cut i : session.getallCuts()) {i.changevalue(min);}
+            if (changevaluesdialog.getincludepresession()) {session.getPresession().changevalue(min);}
+            if (changevaluesdialog.getincludepostsession()) {session.getPostsession().changevalue(min);}
+        }
     }
     public void changeallelementvalues() {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(Root, "Change All Element Values To: ");
         changevaluesdialog.showAndWait();
-        Integer min = changevaluesdialog.getminutes();
-        for (Element i : session.getallElements()) {i.changevalue(min);}
-        if (changevaluesdialog.getincludepresession()) {session.getPresession().changevalue(min);}
-        if (changevaluesdialog.getincludepostsession()) {session.getPostsession().changevalue(min);}
+        if (changevaluesdialog.getAccepted()) {
+            Integer min = changevaluesdialog.getminutes();
+            for (Element i : session.getallElements()) {i.changevalue(min);}
+            if (changevaluesdialog.getincludepresession()) {session.getPresession().changevalue(min);}
+            if (changevaluesdialog.getincludepostsession()) {session.getPostsession().changevalue(min);}
+        }
     }
     public void changevaluestopreset(ArrayList<Integer> presetvalues) {
         try {
@@ -439,93 +480,21 @@ public class CreatorAndExporterWidget {
             Integer.parseInt(ZenTime.getText()), Integer.parseInt(PostTime.getText())
         ));
     }
-
-// Widget Implementation
-//    @Override
-//    public void disable() {
-//        updateuitimeline.stop();
-//        ChangeAllValuesButton.setDisable(true);
-//        AmbienceSwitch.setDisable(true);
-//        ApproximateEndTime.setDisable(true);
-//        TotalSessionTime.setDisable(true);
-//        PreTime.setDisable(true);
-//        RinTime.setDisable(true);
-//        KyoLabel.setDisable(true);
-//        KyoTime.setDisable(true);
-//        TohLabel.setDisable(true);
-//        TohTime.setDisable(true);
-//        ShaLabel.setDisable(true);
-//        ShaTime.setDisable(true);
-//        KaiLabel.setDisable(true);
-//        KaiTime.setDisable(true);
-//        JinLabel.setDisable(true);
-//        JinTime.setDisable(true);
-//        RetsuLabel.setDisable(true);
-//        RetsuTime.setDisable(true);
-//        ZaiLabel.setDisable(true);
-//        ZaiTime.setDisable(true);
-//        ZenLabel.setDisable(true);
-//        ZenTime.setDisable(true);
-//        PostLabel.setDisable(true);
-//        PostTime.setDisable(true);
-//        LengthLabel.setDisable(true);
-//        CompletionLabel.setDisable(true);
-//        LoadPresetButton.setDisable(true);
-//        SavePresetButton.setDisable(true);
-//        StatusBar.setText("Creator Disabled While Session Player Enabled");
-//    }
-//    @Override
-//    public void enable() {
-//        updateuitimeline.play();
-//        ChangeAllValuesButton.setDisable(false);
-//        AmbienceSwitch.setDisable(false);
-//        ApproximateEndTime.setDisable(false);
-//        TotalSessionTime.setDisable(false);
-//        PreLabel.setDisable(false);
-//        PreTime.setDisable(false);
-//        RinLabel.setDisable(false);
-//        RinTime.setDisable(false);
-//        KyoLabel.setDisable(false);
-//        KyoTime.setDisable(false);
-//        TohLabel.setDisable(false);
-//        TohTime.setDisable(false);
-//        ShaLabel.setDisable(false);
-//        ShaTime.setDisable(false);
-//        KaiLabel.setDisable(false);
-//        KaiTime.setDisable(false);
-//        JinLabel.setDisable(false);
-//        JinTime.setDisable(false);
-//        RetsuLabel.setDisable(false);
-//        RetsuTime.setDisable(false);
-//        ZaiLabel.setDisable(false);
-//        ZaiTime.setDisable(false);
-//        ZenLabel.setDisable(false);
-//        ZenTime.setDisable(false);
-//        PostLabel.setDisable(false);
-//        PostTime.setDisable(false);
-//        LengthLabel.setDisable(false);
-//        CompletionLabel.setDisable(false);
-//        LoadPresetButton.setDisable(false);
-//        SavePresetButton.setDisable(false);
-//        StatusBar.setText("");
-//    }
-//    @Override
-//    public void resetallvalues() {
-//        AmbienceSwitch.setText("No Session Created");
-//        TotalSessionTime.setText("No Session Created");
-//        PreTime.setText("-");
-//        RinTime.setText("-");
-//        KyoTime.setText("-");
-//        TohTime.setText("-");
-//        ShaTime.setText("-");
-//        KaiTime.setText("-");
-//        JinTime.setText("-");
-//        RetsuTime.setText("-");
-//        ZaiTime.setText("-");
-//        ZenTime.setText("-");
-//        PostTime.setText("-");
-//    }
-//    @Override
+    public void resetallvalues() {
+        AmbienceSwitch.setText("No Session Created");
+        TotalSessionTime.setText("No Session Created");
+        PreTime.setText("-");
+        RinTime.setText("-");
+        KyoTime.setText("-");
+        TohTime.setText("-");
+        ShaTime.setText("-");
+        KaiTime.setText("-");
+        JinTime.setText("-");
+        RetsuTime.setText("-");
+        ZaiTime.setText("-");
+        ZenTime.setText("-");
+        PostTime.setText("-");
+    }
     public boolean cleanup() {
         boolean currentlyexporting = getExporterState() == ExporterState.WORKING;
         if (currentlyexporting) {
@@ -564,7 +533,7 @@ public class CreatorAndExporterWidget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle(toptext);
             setAccepted(false);
@@ -572,7 +541,7 @@ public class CreatorAndExporterWidget {
 
         @Override
         public void initialize(URL url, ResourceBundle resourceBundle) {
-            Tools.integerTextField(changeAllValuesMinutesTextField, true);
+            Tools.integerTextField(changeAllValuesMinutesTextField, true, true);
         }
     // Getters And Setters
         public Boolean getAccepted() {
@@ -609,7 +578,7 @@ public class CreatorAndExporterWidget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Exporting Session");
         }
@@ -641,7 +610,7 @@ public class CreatorAndExporterWidget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Not Well Formed");
             this.textfieldvalues = textfieldvalues;
@@ -735,14 +704,14 @@ public class CreatorAndExporterWidget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Cut Invocation");
         }
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
-            Tools.integerTextField(cutinvocationminutesTextField, true);
+            Tools.integerTextField(cutinvocationminutesTextField, true, true);
         }
 
         public int getCutinvocationduration() {
@@ -794,7 +763,7 @@ public class CreatorAndExporterWidget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(defaultscene);
+                Root.getOptions().setStyle(Root);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
