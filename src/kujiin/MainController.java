@@ -173,7 +173,7 @@ public class MainController implements Initializable {
     getProgressTracker().updateprogressui();
 }
     public void editprogramsambience(ActionEvent actionEvent) {
-        SessionAmbienceEditor sae = new SessionAmbienceEditor(this);
+        AdvancedAmbienceEditor sae = new AdvancedAmbienceEditor(this);
         sae.showAndWait();
     }
     public void editreferencefiles(ActionEvent actionEvent) {
@@ -346,7 +346,7 @@ public class MainController implements Initializable {
             }
         }
     }
-    public static class SessionAmbienceEditor extends Stage implements Initializable {
+    public static class AdvancedAmbienceEditor extends Stage implements Initializable {
         public Button RightArrow;
         public Button LeftArrow;
         public Label CutSelectionLabel;
@@ -396,9 +396,9 @@ public class MainController implements Initializable {
             this.setOnCloseRequest(event -> close());
         }
 
-        public SessionAmbienceEditor(MainController root) {
+        public AdvancedAmbienceEditor(MainController root) {
             Root = root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionAmbienceEditor.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AdvancedAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -409,9 +409,9 @@ public class MainController implements Initializable {
             CutSelectionBox.setOnAction(event -> selectandloadcut());
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
-        public SessionAmbienceEditor(MainController root, String cutname) {
+        public AdvancedAmbienceEditor(MainController root, String cutname) {
             Root = root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionAmbienceEditor.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AdvancedAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -646,6 +646,110 @@ public class MainController implements Initializable {
             PreviewStartButton.setText("Start");
         }
 
+    }
+    public static class PreviewFile extends Stage {
+        public Label CurrentTime;
+        public Slider ProgressSlider;
+        public Label TotalTime;
+        public Button PlayButton;
+        public Button PauseButton;
+        public Button StopButton;
+        public Slider VolumeSlider;
+        public Label VolumePercentage;
+        public Label TopLabel;
+        private MainController Root;
+        private Media Mediatopreview;
+        private File Filetopreview;
+        private MediaPlayer PreviewPlayer;
+
+        public PreviewFile(MainController root, File filetopreview) {
+            Filetopreview = filetopreview;
+            if (Tools.validaudiofile(Filetopreview)) {
+                Root = root;
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/PreviewAudioDialog.fxml"));
+                fxmlLoader.setController(this);
+                try {
+                    Scene defaultscene = new Scene(fxmlLoader.load());
+                    setScene(defaultscene);
+                    Root.getOptions().setStyle(Root);
+                } catch (IOException ignored) {}
+            } else {Tools.showinformationdialog(Root, "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+        }
+
+        public PreviewFile(MainController root, Media mediatopreview) {
+            Filetopreview = new File(mediatopreview.getSource());
+            if (Tools.validaudiofile(Filetopreview)) {
+                Root = root;
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/PreviewAudioDialog.fxml"));
+                fxmlLoader.setController(this);
+                try {
+                    Scene defaultscene = new Scene(fxmlLoader.load());
+                    setScene(defaultscene);
+                    Root.getOptions().setStyle(Root);
+                } catch (IOException ignored) {}
+                Mediatopreview = mediatopreview;
+                PreviewPlayer = new MediaPlayer(Mediatopreview);
+                TopLabel.setText("Loading");
+                PreviewPlayer.setOnReady(() -> {
+                    TopLabel.setText(Filetopreview.getName());
+                    TotalTime.setText(Tools.formatlengthshort((int) PreviewPlayer.getTotalDuration().toSeconds()));
+                    TotalTime.setText("00:00");
+                });
+            } else {Tools.showinformationdialog(Root, "Information", Filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+        }
+
+        public void play(ActionEvent actionEvent) {
+            if (Mediatopreview != null && PreviewPlayer != null) {
+                PreviewPlayer.play();
+                ProgressSlider.valueChangingProperty().addListener((observable, oldValue, newValue) -> {
+                    Duration seektothis = PreviewPlayer.getTotalDuration().multiply(ProgressSlider.getValue());
+                    PreviewPlayer.seek(seektothis);
+                });
+                PreviewPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                    CurrentTime.setText(Tools.formatlengthshort((int) newValue.toSeconds()));
+                    updatePositionSlider(PreviewPlayer.getCurrentTime());
+                });
+                VolumeSlider.valueChangingProperty().unbind();
+                VolumeSlider.valueProperty().bindBidirectional(PreviewPlayer.volumeProperty());
+                syncbuttons();
+            }
+        }
+        public void updatePositionSlider(Duration currenttime) {
+            if (ProgressSlider.isValueChanging()) {return;}
+            Duration total = PreviewPlayer.getTotalDuration();
+            if (total == null || currenttime == null) {ProgressSlider.setValue(0);}
+            else {ProgressSlider.setValue(currenttime.toMillis() / total.toMillis());}
+        }
+
+        public void pause(ActionEvent actionEvent) {
+            if (PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING) {PreviewPlayer.pause();}
+            syncbuttons();
+        }
+
+        public void stop(ActionEvent actionEvent) {
+            if (PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING|| PreviewPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+                PreviewPlayer.stop();
+            }
+            syncbuttons();
+        }
+
+        public void syncbuttons() {
+            PlayButton.setDisable(PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING);
+            PauseButton.setDisable(PreviewPlayer.getStatus() == MediaPlayer.Status.PAUSED || PreviewPlayer.getStatus() == MediaPlayer.Status.STOPPED);
+            StopButton.setDisable(PreviewPlayer.getStatus() == MediaPlayer.Status.STOPPED);
+        }
+    }
+    public static class SimpleAmbienceEditor extends Stage implements Initializable {
+
+
+        public SimpleAmbienceEditor() {
+
+        }
+
+        @Override
+        public void initialize(URL location, ResourceBundle resources) {
+
+        }
     }
     public static class ExceptionDialog extends Stage {
         public TextArea StackTraceTextField;

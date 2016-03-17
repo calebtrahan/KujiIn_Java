@@ -295,13 +295,13 @@ public class This_Session {
                     if (cutsorelementswithnoambience.size() > 1) {
                         Tools.showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
                         if (Tools.getanswerdialog(Root, "Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
-                            MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(Root);
+                            MainController.AdvancedAmbienceEditor ambienceEditor = new MainController.AdvancedAmbienceEditor(Root);
                             ambienceEditor.showAndWait();
                         }
                     } else {
                         Tools.showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
                         if (Tools.getanswerdialog(Root, "Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
-                            MainController.SessionAmbienceEditor ambienceEditor = new MainController.SessionAmbienceEditor(Root, ((Playable) cutsorelementswithnoambience.get(0)).name);
+                            MainController.AdvancedAmbienceEditor ambienceEditor = new MainController.AdvancedAmbienceEditor(Root, ((Playable) cutsorelementswithnoambience.get(0)).name);
                             ambienceEditor.showAndWait();
                         }
                     }

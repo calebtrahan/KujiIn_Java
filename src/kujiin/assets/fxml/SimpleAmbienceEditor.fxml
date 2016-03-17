@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="336.0" prefWidth="386.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TableView layoutX="6.0" layoutY="68.0" prefHeight="200.0" prefWidth="354.0">
+        <columns>
+          <TableColumn prefWidth="263.0" text="Name" />
+          <TableColumn prefWidth="90.0" text="Duration" />
+        </columns>
+      </TableView>
+      <ChoiceBox layoutX="202.0" layoutY="25.0" prefWidth="150.0" />
+      <HBox alignment="CENTER_RIGHT" layoutX="250.0" layoutY="296.0" prefHeight="36.0" prefWidth="110.0">
+         <children>
+            <Button mnemonicParsing="false" text="Save" />
+            <Button mnemonicParsing="false" text="Close" />
+         </children>
+      </HBox>
+      <Label layoutX="6.0" layoutY="306.0" prefHeight="16.0" prefWidth="223.0" text="StatusBar" />
+      <HBox layoutX="6.0" layoutY="270.0" prefHeight="26.0" prefWidth="215.0">
+         <children>
+            <Button mnemonicParsing="false" text="Add File(s)" />
+            <Button mnemonicParsing="false" text="Remove" />
+            <Button mnemonicParsing="false" text="Preview" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
