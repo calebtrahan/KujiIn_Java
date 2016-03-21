@@ -17,6 +17,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.widgets.CreatorAndExporterWidget;
@@ -32,6 +33,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
 // TODO Saving Preset Is Broke!
+// TODO Refactor Ambience For Cut So It's Stored In XML And Files Can Be Anywhere On The File System
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;
@@ -350,49 +352,46 @@ public class MainController implements Initializable {
         public Button RightArrow;
         public Button LeftArrow;
         public Label CutSelectionLabel;
-        public Button NewAmbienceAddButton;
-        public Button NewAmbienceRemoveButton;
-        public Button NewAmbiencePreviewButton;
-        public Slider PreviewSlider;
-        public Label PreviewCurrentTime;
-        public Label PreviewTotalTime;
-        public TextField PreviewFileName;
-        public Slider PreviewVolumeSlider;
-        public Button PreviewStartButton;
+        public ChoiceBox<String> CutOrElementSelectionBox;
+        public TableView<AmbienceSong> Actual_Table;
+        public TableColumn<AmbienceSong, String> Actual_NameColumn;
+        public TableColumn<AmbienceSong, String> Actual_DurationColumn;
+        public TextField Actual_TotalDuration;
+        public Button Actual_AddButton;
+        public Button Actual_RemoveButton;
+        public Button Actual_PreviewButton;
+        public TableView<AmbienceSong> Temp_Table;
+        public TableColumn<AmbienceSong, String> Temp_NameColumn;
+        public TableColumn<AmbienceSong, String> Temp_DurationColumn;
+        public TextField Temp_TotalDuration;
+        public Button Temp_AddButton;
+        public Button Temp_RemoveButton;
+        public Button Temp_PreviewButton;
+        public Button SaveButton;
         public Button CloseButton;
-        public Button CurrentAmbienceRemoveButton;
-        public Button CurrentAmbiencePreviewButton;
-        public ChoiceBox<String> CutSelectionBox;
-        public TableView<AmbienceSong> NewAmbienceTable;
-        public TableColumn<AmbienceSong, String> New_NameColumn;
-        public TableColumn<AmbienceSong, String> New_DurationColumn;
-        public TableView<AmbienceSong> CurrentAmbienceTable;
-        public TableColumn<AmbienceSong, String> Current_NameColumn;
-        public TableColumn<AmbienceSong, String> Current_DurationColumn;
-        public TextField Current_TotalDuration;
-        private String selectedcutname = null;
-        private Media previewmedia = null;
-        private MediaPlayer previewmediaplayer = null;
-        private ObservableList<AmbienceSong> new_songlist = FXCollections.observableArrayList();
-        private ObservableList<AmbienceSong> current_songlist = FXCollections.observableArrayList();
-        private AmbienceSong selected_new_ambiencesong;
-        private AmbienceSong selected_current_ambiencesong;
+        public Button SwitchToSimpleEditor;
+        private ObservableList<AmbienceSong> actual_ambiencesonglist = FXCollections.observableArrayList();
+        private ObservableList<AmbienceSong> temp_ambiencesonglist = FXCollections.observableArrayList();
+        private AmbienceSong selected_temp_ambiencesong;
+        private AmbienceSong selected_actual_ambiencesong;
+        private String selectedcutorelementname;
         private File tempdirectory;
         private MainController Root;
+        private PreviewFile previewdialog;
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
-            New_NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
-            New_DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
-            Current_NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
-            Current_DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
-            NewAmbienceTable.getSelectionModel().selectedItemProperty().addListener(
-                    (observable, oldValue, newValue) -> newselectionchanged(newValue));
-            CurrentAmbienceTable.getSelectionModel().selectedItemProperty().addListener(
-                    (observable, oldValue, newValue) -> currentselectionchanged(newValue));
+            Temp_NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+            Temp_DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
+            Actual_NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+            Actual_DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
+            Temp_Table.getSelectionModel().selectedItemProperty().addListener(
+                    (observable, oldValue, newValue) -> tempselectionchanged(newValue));
+            Actual_Table.getSelectionModel().selectedItemProperty().addListener(
+                    (observable, oldValue, newValue) -> actualselectionchanged(newValue));
             ObservableList<String> allnames = FXCollections.observableArrayList();
             allnames.addAll(kujiin.xml.Options.CUTNAMES);
-            CutSelectionBox.setItems(allnames);
+            CutOrElementSelectionBox.setItems(allnames);
             this.setOnCloseRequest(event -> close());
         }
 
@@ -405,8 +404,8 @@ public class MainController implements Initializable {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(Root);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Session Ambience Editor");
-            CutSelectionBox.setOnAction(event -> selectandloadcut());
+            setTitle("Advanced Ambience Editor");
+            CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
         public AdvancedAmbienceEditor(MainController root, String cutname) {
@@ -418,35 +417,36 @@ public class MainController implements Initializable {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(Root);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Session Ambience Editor");
-            CutSelectionBox.setOnAction(event -> selectandloadcut());
-            CutSelectionBox.getSelectionModel().select(kujiin.xml.Options.CUTNAMES.indexOf(cutname));
+            setTitle("Advanced Ambience Editor");
+            CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
+            CutOrElementSelectionBox.getSelectionModel().select(kujiin.xml.Options.CUTNAMES.indexOf(cutname));
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
 
     // Transfer Methods
+        // TODO Add Check Duplicates Before Moving Over (Or Ask Allow Duplicates?)
         public void rightarrowpressed(ActionEvent actionEvent) {
             // Transfer To Current Cut (use Task)
-            if (selected_new_ambiencesong != null && selectedcutname != null) {
+            if (selected_temp_ambiencesong != null && selectedcutorelementname != null) {
                 Service<Void> copyfile = new Service<Void>() {
                     @Override
                     protected Task<Void> createTask() {
                         return new Task<Void>() {
                             @Override
                             protected Void call() throws Exception {
-                                File cutdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutname);
-                                File newfile = new File(cutdirectory, selected_new_ambiencesong.name.getValue());
-                                FileUtils.copyFile(selected_new_ambiencesong.getFile(), newfile);
+                                File cutdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutorelementname);
+                                File newfile = new File(cutdirectory, selected_temp_ambiencesong.name.getValue());
+                                FileUtils.copyFile(selected_temp_ambiencesong.getFile(), newfile);
                                 return null;
                             }
                         };
                     }
                 };
                 copyfile.setOnSucceeded(event -> selectandloadcut());
-                copyfile.setOnFailed(event -> Tools.showerrordialog(Root, "Error", "Couldn't Copy File To " + selectedcutname + "'s Ambience Directory", "Check File Permissions"));
+                copyfile.setOnFailed(event -> Tools.showerrordialog(Root, "Error", "Couldn't Copy File To " + selectedcutorelementname + "'s Ambience Directory", "Check File Permissions"));
                 copyfile.start();
             } else {
-                if (selected_new_ambiencesong == null) {
+                if (selected_temp_ambiencesong == null) {
                     Tools.showinformationdialog(Root, "Information", "Cannot Transfer", "Nothing Selected");
                 } else {
                     Tools.showinformationdialog(Root, "Information", "Cannot Transfer", "No Cut Selected");
@@ -454,138 +454,101 @@ public class MainController implements Initializable {
             }
         }
         public void leftarrowpressed(ActionEvent actionEvent) {
-            if (selected_current_ambiencesong != null && selectedcutname != null) {
-                for (AmbienceSong i : NewAmbienceTable.getItems()) {
-                    if (selected_current_ambiencesong.name.getValue().equals(i.name.getValue())) {
+            if (selected_actual_ambiencesong != null && selectedcutorelementname != null) {
+                for (AmbienceSong i : Temp_Table.getItems()) {
+                    if (selected_actual_ambiencesong.name.getValue().equals(i.name.getValue())) {
                         Tools.showinformationdialog(Root, "Information", "File Already Exists", "Select A Different File To Transfer");
                         return;
                     }
                 }
-                System.out.println(new_songlist.size());
+                System.out.println(actual_ambiencesonglist.size());
                 Service<Void> copyfile = new Service<Void>() {
                     @Override
                     protected Task<Void> createTask() {
                         return new Task<Void>() {
                             @Override
                             protected Void call() throws Exception {
-                                File newfile = new File(tempdirectory, selected_current_ambiencesong.name.getValue());
-                                FileUtils.copyFile(selected_current_ambiencesong.getFile(), newfile);
+                                File newfile = new File(tempdirectory, selected_actual_ambiencesong.name.getValue());
+                                FileUtils.copyFile(selected_actual_ambiencesong.getFile(), newfile);
                                 return null;
                             }
                         };
                     }
                 };
                 copyfile.setOnSucceeded(event -> {
-                    File newfile = new File(tempdirectory, selected_current_ambiencesong.name.getValue());
-                    new_songlist.add(new AmbienceSong(newfile.getName(), newfile));
-                    System.out.println(new_songlist.size());
-                    NewAmbienceTable.setItems(new_songlist);
+                    File newfile = new File(tempdirectory, selected_actual_ambiencesong.name.getValue());
+                    actual_ambiencesonglist.add(new AmbienceSong(newfile.getName(), newfile));
+                    System.out.println(actual_ambiencesonglist.size());
+                    Temp_Table.setItems(actual_ambiencesonglist);
                 });
                 copyfile.setOnFailed(event -> Tools.showerrordialog(Root, "Error", "Couldn't Copy File To Temp Directory", "Check File Permissions"));
                 copyfile.start();
             }
         }
 
-    // New Ambience Methods
-        public void addfilestonewambience(ActionEvent actionEvent) {
+    // Temp Ambience Methods
+        public void addtotempambience(ActionEvent actionEvent) {addto(Temp_Table, temp_ambiencesonglist);}
+        public void removefromtempambience(ActionEvent actionEvent) {removefrom(Temp_Table);}
+        public void previewtempambience(ActionEvent actionEvent) {preview(selected_temp_ambiencesong);}
+        public void tempselectionchanged(AmbienceSong ambiencesong) {
+            selected_temp_ambiencesong = ambiencesong;
+        }
+
+    // Actual Ambience Methods
+        public void addtoactualambience(ActionEvent actionEvent) {addto(Actual_Table, actual_ambiencesonglist);}
+        public void removeactualambience(ActionEvent actionEvent) {removefrom(Actual_Table);}
+        public void previewactualambience(ActionEvent actionEvent) {preview(selected_actual_ambiencesong);}
+        public void actualselectionchanged(AmbienceSong ambiencesong) {selected_actual_ambiencesong = ambiencesong;}
+
+    // Table Methods
+        public void selectandloadcut() {
+            actual_ambiencesonglist.clear();
+            Actual_Table.getItems().clear();
+            int index = kujiin.xml.Options.CUTNAMES.indexOf(CutOrElementSelectionBox.getValue());
+            selectedcutorelementname = kujiin.xml.Options.CUTNAMES.get(index);
+            if (getcurrentambiencefiles()) {
+                Actual_Table.setItems(actual_ambiencesonglist);
+                CutSelectionLabel.setText(selectedcutorelementname + "'s Ambience");
+            }
+        }
+        public void addto(TableView<AmbienceSong> table, ObservableList<AmbienceSong> songlist) {
             List<File> files = Tools.multipleopenfilechooser(getScene(), "Add Files", null);
             ArrayList<File> notvalidfilenames = new ArrayList<>();
             if (files != null) {
                 for (File i : files) {
-                    if (i.getName().endsWith(".mp3") && Tools.getaudioduration(i) != 0.0) {new_songlist.add(new AmbienceSong(i.getName(), i));}
+                    if (Tools.validaudiofile(i) && Tools.getaudioduration(i) != 0.0) {
+                        songlist.add(new AmbienceSong(i.getName(), i));}
                     else {notvalidfilenames.add(i);}
                 }
+                // TODO Show Dialog Here With Invalid File Names
             }
-            if (new_songlist.size() > 0) {NewAmbienceTable.setItems(new_songlist);}
-            if (notvalidfilenames.size() > 0) {
-                StringBuilder c = new StringBuilder();
-                for (File i : notvalidfilenames) {
-                    c.append(i.getName());
-                    if (i != notvalidfilenames.get(notvalidfilenames.size() - 1)) {c.append("\n");}
+            if (songlist.size() > 0) {table.setItems(songlist);}
+        }
+        public void removefrom(TableView<AmbienceSong> table) {
+            int index = table.getSelectionModel().getSelectedIndex();
+            if (index != -1) {table.getItems().remove(index);}
+            else {Tools.showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
+        }
+        public void preview(AmbienceSong selectedsong) {
+            if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
+                if (previewdialog == null || !previewdialog.isShowing()) {
+                    previewdialog = new PreviewFile(Root, selectedsong.getFile());
+                    previewdialog.showAndWait();
                 }
-                Tools.showinformationdialog(Root, "Information", "The Files Weren't Added Because They Are Unsupported", c.toString());
             }
-        }
-        public void removefromnewambience(ActionEvent actionEvent) {
-            int index = NewAmbienceTable.getSelectionModel().getSelectedIndex();
-            if (index != -1) {
-                NewAmbienceTable.getItems().remove(index);
-            } else {
-                Tools.showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");
-            }
-        }
-        public void previewnewambience(ActionEvent actionEvent) {
-            if (selected_new_ambiencesong != null && NewAmbienceTable.getItems().size() > 0) {
-                if (previewmediaplayer != null && previewmediaplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-                    previewmediaplayer.stop();
-                    previewmediaplayer.dispose();
-                }
-                previewmedia = new Media(selected_new_ambiencesong.getFile().toURI().toString());
-                previewmediaplayer = new MediaPlayer(previewmedia);
-                PreviewTotalTime.setText(selected_new_ambiencesong.getTotaldurationshort());
-                PreviewFileName.setText(selected_new_ambiencesong.name.getValue());
-                PreviewCurrentTime.setText("00:00");
-            }
-        }
-        public void newselectionchanged(AmbienceSong ambiencesong) {
-            selected_new_ambiencesong = ambiencesong;
         }
 
-    // Current Ambience Methods
-        public void selectandloadcut() {
-            if (selected_current_ambiencesong != null) {
-                for (AmbienceSong i : CurrentAmbienceTable.getItems()) {
-                    if (i.name.getValue().equals(PreviewFileName.getText())) {resetpreviewplayer();}
-                }
-            }
-            current_songlist.clear();
-            CurrentAmbienceTable.getItems().clear();
-            int index = kujiin.xml.Options.CUTNAMES.indexOf(CutSelectionBox.getValue());
-            selectedcutname = kujiin.xml.Options.CUTNAMES.get(index);
-            if (getcurrentambiencefiles()) {
-                CurrentAmbienceTable.getItems().addAll(current_songlist);
-                CutSelectionLabel.setText(selectedcutname + "'s Ambience");
-            }
-        }
-        public void removecurrentambience(ActionEvent actionEvent) {
-            int index = CurrentAmbienceTable.getSelectionModel().getSelectedIndex();
-            if (index != -1) {
-                String filename = current_songlist.get(index).getName();
-                if (Tools.getanswerdialog(Root, "Confirmation", String.format("Remove '%s' From %s's Ambience?", filename, selectedcutname), "This Cannot Be Undone")) {
-                    if (current_songlist.get(index).getFile().delete()) {
-                        CurrentAmbienceTable.getItems().remove(index);
-                        current_songlist.remove(index);
-                        selectandloadcut();
-                    } else {
-                        Tools.showerrordialog(Root, "Error", "Couldn't Delete '" + filename + "'", "Check File Permissions");}
-                }
-            } else {
-                Tools.showinformationdialog(Root, "Information", "Nothing To Remove", "Select An Item To Remove");}
-        }
-        public void previewcurrentambience(ActionEvent actionEvent) {
-            if (selected_current_ambiencesong != null && CurrentAmbienceTable.getItems().size() > 0) {
-                if (previewmediaplayer != null && previewmediaplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-                    previewmediaplayer.stop();
-                    previewmediaplayer.dispose();
-                }
-                previewmedia = new Media(selected_current_ambiencesong.getFile().toURI().toString());
-                previewmediaplayer = new MediaPlayer(previewmedia);
-                PreviewTotalTime.setText(selected_current_ambiencesong.getTotaldurationshort());
-                PreviewFileName.setText(selected_current_ambiencesong.name.getValue());
-                PreviewCurrentTime.setText("00:00");
-            }
-        }
-        public void currentselectionchanged(AmbienceSong ambiencesong) {selected_current_ambiencesong = ambiencesong;}
         public boolean getcurrentambiencefiles() {
-            if (selectedcutname != null) {
-                File thisdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutname);
+            if (selectedcutorelementname != null) {
+                File thisdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutorelementname);
                 try {
                     for (File i : thisdirectory.listFiles()) {
-                        if (Tools.validaudiofile(i)) {current_songlist.add(new AmbienceSong(i.getName(), i));}
+                        if (Tools.validaudiofile(i)) {
+                            actual_ambiencesonglist.add(new AmbienceSong(i.getName(), i));}
                     }
                     return true;
                 } catch (NullPointerException e) {
-                    Tools.showinformationdialog(Root, "Information", selectedcutname + " Has No Ambience", "Please Add Ambience To " + selectedcutname);
+                    Tools.showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
                     return false;
                 }
             } else {
@@ -594,58 +557,159 @@ public class MainController implements Initializable {
             }
         }
 
-    // Other Methods
-        public void preview(ActionEvent actionEvent) {
-            if (previewmediaplayer != null && previewmedia != null) {
-                if (previewmediaplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-                    previewmediaplayer.stop();
-                    PreviewStartButton.setText("Start");
-                } else {
-                    previewmediaplayer.play();
-                    PreviewSlider.valueChangingProperty().addListener((observable, oldValue, newValue) -> {
-                        double position = PreviewSlider.getValue();
-                        Duration seektothis = previewmediaplayer.getTotalDuration().multiply(position);
-                        previewmediaplayer.seek(seektothis);
-                    });
-                    previewmediaplayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-                        PreviewCurrentTime.setText(Tools.formatlengthshort((int) newValue.toSeconds()));
-                        updatePositionSlider(previewmediaplayer.getCurrentTime());
-                    });
-                    PreviewVolumeSlider.valueChangingProperty().unbind();
-                    PreviewVolumeSlider.valueProperty().bindBidirectional(previewmediaplayer.volumeProperty());
-                    PreviewStartButton.setText("Stop");
-                }
-            } else {
-                Tools.showinformationdialog(Root, "Information", "Nothing To Preview", "Select A Table Item And Press Preview");}
-        }
-        public void updatePositionSlider(Duration currenttime) {
-            if (PreviewSlider.isValueChanging()) {return;}
-            Duration total = previewmediaplayer.getTotalDuration();
-            if (total == null || currenttime == null) {PreviewSlider.setValue(0);}
-            else {PreviewSlider.setValue(currenttime.toMillis() / total.toMillis());}
-        }
         public void closebuttonpressed(ActionEvent actionEvent) {close();}
         @Override
         public void close() {
+            try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
             super.close();
-            try {
-                FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
-            // Clear Out Temp Directory
-            if (previewmediaplayer != null && previewmediaplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-                previewmediaplayer.stop();
-                previewmediaplayer.dispose();
-            }
-        }
-        public void resetpreviewplayer() {
-            if (previewmediaplayer != null) {previewmediaplayer.stop(); previewmediaplayer.dispose();}
-            PreviewFileName.setText("No File Selected");
-            PreviewTotalTime.setText("--:--");
-            PreviewCurrentTime.setText("--:--");
-            PreviewSlider.setValue(0);
-            PreviewVolumeSlider.setValue(0);
-            PreviewStartButton.setText("Start");
         }
 
+        public void switchtosimple(ActionEvent actionEvent) {
+            // TODO Check If Unsaved Changes Here?
+            this.close();
+            if (selected_temp_ambiencesong != null && kujiin.xml.Options.CUTNAMES.contains(selectedcutorelementname)) {
+                new SimpleAmbienceEditor(Root, selectedcutorelementname).show();
+            } else {new SimpleAmbienceEditor(Root).show();}
+        }
+    }
+    public static class SimpleAmbienceEditor extends Stage implements Initializable {
+        public TableView<AmbienceSong> AmbienceTable;
+        public TableColumn<AmbienceSong, String> NameColumn;
+        public TableColumn<AmbienceSong, String> DurationColumn;
+        public ChoiceBox<String> CutOrElementChoiceBox;
+        public Button SaveButton;
+        public Button CloseButton;
+        public Button AddButton;
+        public Button RemoveButton;
+        public Button PreviewButton;
+        public TextField TotalDuration;
+        public Button AdvancedButton;
+        private MainController Root;
+        private ObservableList<AmbienceSong> AmbienceList = FXCollections.observableArrayList();
+        private AmbienceSong selectedambiencesong;
+        private String selectedcutorelementname;
+        private PreviewFile previewdialog;
+
+        @Override
+        public void initialize(URL location, ResourceBundle resources) {
+
+        }
+
+        public SimpleAmbienceEditor(MainController root) {
+            Root = root;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleAmbienceEditor.fxml"));
+            fxmlLoader.setController(this);
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(Root);
+            } catch (IOException ignored) {}
+            CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
+        }
+        public SimpleAmbienceEditor(MainController root, String cutorelementname) {
+            Root = root;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleAmbienceEditor.fxml"));
+            fxmlLoader.setController(this);
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(Root);
+            } catch (IOException ignored) {}
+            setOnShowing(event -> {
+                if (kujiin.xml.Options.CUTNAMES.contains(cutorelementname)) {
+                    CutOrElementChoiceBox.getSelectionModel().select(cutorelementname);
+                    selectandloadcut();
+                }
+            });
+            CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
+        }
+
+    // Table Methods
+        public void selectandloadcut() {
+            AmbienceList.clear();
+            AmbienceTable.getItems().clear();
+            int index = kujiin.xml.Options.CUTNAMES.indexOf(CutOrElementChoiceBox.getValue());
+            selectedcutorelementname = kujiin.xml.Options.CUTNAMES.get(index);
+            if (getcurrentambiencefiles()) {
+                AmbienceTable.setItems(AmbienceList);
+            }
+        }
+        public void add() {
+            List<File> filesselected = new FileChooser().showOpenMultipleDialog(Root.Scene.getWindow());
+            List<File> notvalidfilenames = new ArrayList<>();
+            if (filesselected == null || filesselected.size() == 0) {return;}
+            for (File i : filesselected) {
+                for (String x : Tools.SUPPORTEDAUDIOFORMATS) {
+                    if (i.getName().endsWith(x)) {
+                        if (Tools.getaudioduration(i) != 0.0) {AmbienceList.add(new AmbienceSong(i.getName(), i)); break;}
+                    }
+                }
+                if (! i.equals(AmbienceList.get(AmbienceList.size() - 1).getFile())) {notvalidfilenames.add(i);}
+            }
+            if (notvalidfilenames.size() > 0) {
+                Tools.showinformationdialog(Root, "Information", notvalidfilenames.size() + " Files Weren't Added Because They Are Unsupported", "");
+            }
+        }
+        public void addfiles(ActionEvent actionEvent) {
+            List<File> files = Tools.multipleopenfilechooser(getScene(), "Add Files", null);
+            ArrayList<File> notvalidfilenames = new ArrayList<>();
+            if (files != null) {
+                for (File i : files) {
+                    if (Tools.validaudiofile(i) && Tools.getaudioduration(i) != 0.0) {
+                        AmbienceList.add(new AmbienceSong(i.getName(), i));}
+                    else {notvalidfilenames.add(i);}
+                }
+                // TODO Show Dialog Here With Invalid File Names
+            }
+            if (AmbienceList.size() > 0) {AmbienceTable.setItems(AmbienceList);}
+        }
+        public void remove(ActionEvent actionEvent) {
+            int index = AmbienceTable.getSelectionModel().getSelectedIndex();
+            if (index != -1) {AmbienceTable.getItems().remove(index);}
+            else {Tools.showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
+        }
+        public void preview(ActionEvent actionEvent) {
+            if (selectedambiencesong != null && selectedambiencesong.getFile() != null && selectedambiencesong.getFile().exists()) {
+                if (previewdialog == null || !previewdialog.isShowing()) {
+                    previewdialog = new PreviewFile(Root, selectedambiencesong.getFile());
+                    previewdialog.showAndWait();
+                }
+            }
+        }
+
+        public boolean getcurrentambiencefiles() {
+            if (selectedcutorelementname != null) {
+                File thisdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutorelementname);
+                try {
+                    for (File i : thisdirectory.listFiles()) {
+                        if (Tools.validaudiofile(i)) {
+                            AmbienceList.add(new AmbienceSong(i.getName(), i));}
+                    }
+                    return true;
+                } catch (NullPointerException e) {
+                    Tools.showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
+                    return false;
+                }
+            } else {
+                Tools.showinformationdialog(Root, "Information", "No Cut Loaded", "Load A Cut's Ambience First");
+                return false;
+            }
+        }
+
+    // Dialog Methods
+        public void advancedmode(ActionEvent actionEvent) {
+            this.close();
+            if (selectedcutorelementname != null && kujiin.xml.Options.CUTNAMES.contains(selectedcutorelementname)) {
+                new AdvancedAmbienceEditor(Root, selectedcutorelementname).show();
+            } else {new AdvancedAmbienceEditor(Root).show();}
+        }
+        public void save(ActionEvent actionEvent) {
+
+        }
+        public void closedialog(ActionEvent actionEvent) {
+            // TODO Check For Unsaved Changes Here
+            close();
+        }
     }
     public static class PreviewFile extends Stage {
         public Label CurrentTime;
@@ -675,7 +739,6 @@ public class MainController implements Initializable {
                 } catch (IOException ignored) {}
             } else {Tools.showinformationdialog(Root, "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
         }
-
         public PreviewFile(MainController root, Media mediatopreview) {
             Filetopreview = new File(mediatopreview.getSource());
             if (Tools.validaudiofile(Filetopreview)) {
@@ -698,8 +761,9 @@ public class MainController implements Initializable {
             } else {Tools.showinformationdialog(Root, "Information", Filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
         }
 
+
         public void play(ActionEvent actionEvent) {
-            if (Mediatopreview != null && PreviewPlayer != null) {
+            if (PreviewPlayer != null && PreviewPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
                 PreviewPlayer.play();
                 ProgressSlider.valueChangingProperty().addListener((observable, oldValue, newValue) -> {
                     Duration seektothis = PreviewPlayer.getTotalDuration().multiply(ProgressSlider.getValue());
@@ -720,35 +784,28 @@ public class MainController implements Initializable {
             if (total == null || currenttime == null) {ProgressSlider.setValue(0);}
             else {ProgressSlider.setValue(currenttime.toMillis() / total.toMillis());}
         }
-
         public void pause(ActionEvent actionEvent) {
             if (PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING) {PreviewPlayer.pause();}
             syncbuttons();
         }
-
         public void stop(ActionEvent actionEvent) {
             if (PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING|| PreviewPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
                 PreviewPlayer.stop();
             }
             syncbuttons();
         }
-
         public void syncbuttons() {
             PlayButton.setDisable(PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING);
             PauseButton.setDisable(PreviewPlayer.getStatus() == MediaPlayer.Status.PAUSED || PreviewPlayer.getStatus() == MediaPlayer.Status.STOPPED);
             StopButton.setDisable(PreviewPlayer.getStatus() == MediaPlayer.Status.STOPPED);
         }
-    }
-    public static class SimpleAmbienceEditor extends Stage implements Initializable {
-
-
-        public SimpleAmbienceEditor() {
-
-        }
-
-        @Override
-        public void initialize(URL location, ResourceBundle resources) {
-
+        public void reset() {
+            if (Mediatopreview != null) {PreviewPlayer.stop(); PreviewPlayer.dispose();}
+            TopLabel.setText("No File Selected");
+            TotalTime.setText("--:--");
+            CurrentTime.setText("--:--");
+            ProgressSlider.setValue(0);
+            VolumeSlider.setValue(0);
         }
     }
     public static class ExceptionDialog extends Stage {

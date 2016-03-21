@@ -1,64 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="559.0" prefWidth="684.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="487.0" prefWidth="726.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Button fx:id="RightArrow" layoutX="329.0" layoutY="204.0" mnemonicParsing="false" onAction="#rightarrowpressed" text="-&gt;" />
-      <Button fx:id="LeftArrow" layoutX="329.0" layoutY="261.0" mnemonicParsing="false" onAction="#leftarrowpressed" text="&lt;-" />
-      <Label layoutX="122.0" layoutY="64.0" text="New Ambience" />
-      <Label fx:id="CutSelectionLabel" alignment="BOTTOM_CENTER" layoutX="365.0" layoutY="45.0" prefHeight="35.0" prefWidth="303.0" text="Select A Cut Above" textAlignment="CENTER">
-         <font>
-            <Font name="System Bold" size="17.0" />
-         </font></Label>
-      <Label layoutX="14.0" prefHeight="52.0" prefWidth="303.0" text="Session Ambience Editor">
+      <Label layoutX="14.0" prefHeight="52.0" prefWidth="331.0" text="Advanced Ambience Editor">
          <font>
             <Font size="26.0" />
          </font>
       </Label>
-      <HBox alignment="TOP_RIGHT" layoutX="83.0" layoutY="435.0" prefHeight="35.0" prefWidth="234.0">
+      <VBox layoutX="388.0" layoutY="39.0" prefHeight="411.0" prefWidth="322.0">
          <children>
-            <Button fx:id="NewAmbienceAddButton" mnemonicParsing="false" onAction="#addfilestonewambience" text="Add File(s)" />
-            <Button fx:id="NewAmbienceRemoveButton" mnemonicParsing="false" onAction="#removefromnewambience" text="Remove" />
-            <Button fx:id="NewAmbiencePreviewButton" mnemonicParsing="false" onAction="#previewnewambience" text="Preview" />
+            <Label fx:id="CutSelectionLabel" alignment="BOTTOM_CENTER" prefHeight="24.0" prefWidth="325.0" text="No Cut Or Element Selected" textAlignment="CENTER">
+               <font>
+                  <Font name="System Bold" size="17.0" />
+               </font>
+            </Label>
+            <TableView fx:id="Actual_Table" prefHeight="364.0" prefWidth="322.0">
+               <columns>
+                  <TableColumn fx:id="Actual_NameColumn" prefWidth="226.0" text="Name" />
+                  <TableColumn fx:id="Actual_DurationColumn" prefWidth="95.0" text="Duration" />
+               </columns>
+            </TableView>
+            <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="322.0">
+               <children>
+                  <TextField fx:id="Actual_TotalDuration" prefHeight="26.0" prefWidth="155.0">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Button fx:id="Actual_AddButton" mnemonicParsing="false" onAction="#addtoactualambience" prefHeight="10.0" prefWidth="42.0" text="Add">
+                     <font>
+                        <Font size="12.0" />
+                     </font></Button>
+                  <Button fx:id="Actual_RemoveButton" mnemonicParsing="false" onAction="#removeactualambience" text="Remove">
+                     <font>
+                        <Font size="12.0" />
+                     </font></Button>
+                  <Button fx:id="Actual_PreviewButton" mnemonicParsing="false" onAction="#previewactualambience" text="Preview">
+                     <font>
+                        <Font size="12.0" />
+                     </font></Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox layoutX="14.0" layoutY="39.0" prefHeight="411.0" prefWidth="322.0">
+         <children>
+            <Label alignment="CENTER" prefHeight="26.0" prefWidth="303.0" text="Temp Ambience" textAlignment="CENTER">
+               <font>
+                  <Font name="System Bold" size="17.0" />
+               </font>
+            </Label>
+            <TableView fx:id="Temp_Table" prefHeight="354.0" prefWidth="303.0">
+              <columns>
+                <TableColumn fx:id="Temp_NameColumn" prefWidth="226.0" text="Name" />
+                <TableColumn fx:id="Temp_DurationColumn" prefWidth="95.0" text="Duration" />
+              </columns>
+            </TableView>
+            <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="234.0">
+               <children>
+                  <TextField fx:id="Temp_TotalDuration" prefHeight="26.0" prefWidth="157.0">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Button fx:id="Temp_AddButton" mnemonicParsing="false" onAction="#addtotempambience" text="Add">
+                     <font>
+                        <Font size="12.0" />
+                     </font></Button>
+                  <Button fx:id="Temp_RemoveButton" mnemonicParsing="false" onAction="#removefromtempambience" text="Remove">
+                     <font>
+                        <Font size="12.0" />
+                     </font></Button>
+                  <Button fx:id="Temp_PreviewButton" mnemonicParsing="false" onAction="#previewtempambience" text="Preview">
+                     <font>
+                        <Font size="12.0" />
+                     </font></Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox alignment="CENTER" layoutX="336.0" layoutY="64.0" prefHeight="353.0" prefWidth="52.0">
+         <children>
+            <Button fx:id="RightArrow" mnemonicParsing="false" onAction="#rightarrowpressed" text="-&gt;">
+               <VBox.margin>
+                  <Insets bottom="25.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="LeftArrow" mnemonicParsing="false" onAction="#leftarrowpressed" text="&lt;-">
+               <VBox.margin>
+                  <Insets top="25.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+      <HBox alignment="CENTER" layoutX="388.0" layoutY="9.0" prefHeight="34.0" prefWidth="322.0">
+         <children>
+            <Label prefHeight="16.0" prefWidth="152.0" text="Select Cut Or Element:">
+               <HBox.margin>
+                  <Insets right="20.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <ChoiceBox fx:id="CutOrElementSelectionBox" prefHeight="26.0" prefWidth="160.0" />
          </children>
       </HBox>
-      <Label layoutX="14.0" layoutY="470.0" text="Preview Player">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <Slider fx:id="PreviewSlider" blockIncrement="1.0" layoutX="49.0" layoutY="499.0" majorTickUnit="0.1" max="1.0" prefHeight="16.0" prefWidth="244.0" showTickMarks="true" />
-      <Label fx:id="PreviewCurrentTime" layoutX="14.0" layoutY="499.0" text="--:--" />
-      <Label fx:id="PreviewTotalTime" layoutX="296.0" layoutY="499.0" text="--:--" />
-      <TextField fx:id="PreviewFileName" alignment="CENTER_RIGHT" disable="true" editable="false" layoutX="118.0" layoutY="466.0" prefHeight="26.0" prefWidth="202.0" text="No File Selected" />
-      <Slider fx:id="PreviewVolumeSlider" blockIncrement="0.1" layoutX="232.0" layoutY="525.0" majorTickUnit="0.5" max="1.0" prefHeight="16.0" prefWidth="88.0" showTickMarks="true" />
-      <Label layoutX="178.0" layoutY="525.0" text="Volume" />
-      <Button fx:id="PreviewStartButton" layoutX="14.0" layoutY="520.0" mnemonicParsing="false" onAction="#preview" text="Start" />
-      <Button fx:id="CloseButton" layoutX="618.0" layoutY="520.0" mnemonicParsing="false" onAction="#closebuttonpressed" text="Close" />
-      <HBox alignment="TOP_RIGHT" layoutX="534.0" layoutY="435.0" prefHeight="35.0" prefWidth="137.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="309.0" layoutY="455.0" prefHeight="26.0" prefWidth="401.0">
          <children>
-            <Button fx:id="CurrentAmbienceRemoveButton" mnemonicParsing="false" onAction="#removecurrentambience" text="Remove" />
-            <Button fx:id="CurrentAmbiencePreviewButton" mnemonicParsing="false" onAction="#previewcurrentambience" text="Preview" />
+            <Button fx:id="SaveButton" mnemonicParsing="false" text="Save" />
+            <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#closebuttonpressed" prefHeight="26.0" prefWidth="52.0" text="Close" />
          </children>
       </HBox>
-      <ChoiceBox fx:id="CutSelectionBox" layoutX="511.0" layoutY="13.0" prefHeight="26.0" prefWidth="160.0" />
-      <Label layoutX="439.0" layoutY="18.0" text="Select Cut:" />
-      <TableView fx:id="NewAmbienceTable" layoutX="15.0" layoutY="80.0" prefHeight="354.0" prefWidth="303.0">
-        <columns>
-          <TableColumn fx:id="New_NameColumn" prefWidth="226.0" text="Name" />
-          <TableColumn fx:id="New_DurationColumn" prefWidth="75.0" text="Duration" />
-        </columns>
-      </TableView>
-      <TableView fx:id="CurrentAmbienceTable" layoutX="368.0" layoutY="84.0" prefHeight="354.0" prefWidth="303.0">
-         <columns>
-            <TableColumn fx:id="Current_NameColumn" prefWidth="226.0" text="Name" />
-            <TableColumn fx:id="Current_DurationColumn" prefWidth="75.0" text="Duration" />
-         </columns>
-      </TableView>
-      <Label layoutX="384.0" layoutY="440.0" text="Total Duration" />
-      <TextField fx:id="Current_TotalDuration" layoutX="361.0" layoutY="457.0" prefHeight="26.0" prefWidth="127.0" />
+      <Button fx:id="SwitchToSimpleEditor" layoutX="14.0" layoutY="455.0" mnemonicParsing="false" onAction="#switchtosimple" text="Switch To Simple Editor" />
    </children>
 </AnchorPane>
