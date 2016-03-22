@@ -236,7 +236,7 @@ public class MainController implements Initializable {
         }
     }
 
-    // Dialogs
+// Dialogs
     public static class EditReferenceFiles extends Stage {
         public ChoiceBox<String> CutNamesChoiceBox;
         public ChoiceBox<String> CutVariationsChoiceBox;
@@ -247,7 +247,7 @@ public class MainController implements Initializable {
         public Button SaveButton;
         public Button LoadButton;
         public Button PreviewButton;
-        private ObservableList<String> cutnames;
+        private ObservableList<String> cutorelementnames = FXCollections.observableArrayList();
         private ObservableList<String> variations;
         private File htmldirectory = new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html");
         private File txtdirectory = new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt");
@@ -267,11 +267,10 @@ public class MainController implements Initializable {
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Files Editor");
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
-            cutnames = FXCollections.observableArrayList();
             variations = FXCollections.observableArrayList();
-            cutnames.addAll(kujiin.xml.Options.CUTNAMES);
+            cutorelementnames.addAll(kujiin.xml.Options.ALLNAMES);
             variations.addAll(Arrays.asList("html", "txt"));
-            CutNamesChoiceBox.setItems(cutnames);
+            CutNamesChoiceBox.setItems(cutorelementnames);
             CutVariationsChoiceBox.setItems(variations);
         }
 
@@ -390,7 +389,7 @@ public class MainController implements Initializable {
             Actual_Table.getSelectionModel().selectedItemProperty().addListener(
                     (observable, oldValue, newValue) -> actualselectionchanged(newValue));
             ObservableList<String> allnames = FXCollections.observableArrayList();
-            allnames.addAll(kujiin.xml.Options.CUTNAMES);
+            allnames.addAll(kujiin.xml.Options.ALLNAMES);
             CutOrElementSelectionBox.setItems(allnames);
             this.setOnCloseRequest(event -> close());
         }
@@ -419,7 +418,7 @@ public class MainController implements Initializable {
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Advanced Ambience Editor");
             CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
-            CutOrElementSelectionBox.getSelectionModel().select(kujiin.xml.Options.CUTNAMES.indexOf(cutname));
+            CutOrElementSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
 
@@ -504,8 +503,8 @@ public class MainController implements Initializable {
         public void selectandloadcut() {
             actual_ambiencesonglist.clear();
             Actual_Table.getItems().clear();
-            int index = kujiin.xml.Options.CUTNAMES.indexOf(CutOrElementSelectionBox.getValue());
-            selectedcutorelementname = kujiin.xml.Options.CUTNAMES.get(index);
+            int index = kujiin.xml.Options.ALLNAMES.indexOf(CutOrElementSelectionBox.getValue());
+            selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
             if (getcurrentambiencefiles()) {
                 Actual_Table.setItems(actual_ambiencesonglist);
                 CutSelectionLabel.setText(selectedcutorelementname + "'s Ambience");
@@ -567,7 +566,7 @@ public class MainController implements Initializable {
         public void switchtosimple(ActionEvent actionEvent) {
             // TODO Check If Unsaved Changes Here?
             this.close();
-            if (selected_temp_ambiencesong != null && kujiin.xml.Options.CUTNAMES.contains(selectedcutorelementname)) {
+            if (selected_temp_ambiencesong != null && kujiin.xml.Options.ALLNAMES.contains(selectedcutorelementname)) {
                 new SimpleAmbienceEditor(Root, selectedcutorelementname).show();
             } else {new SimpleAmbienceEditor(Root).show();}
         }
@@ -592,7 +591,13 @@ public class MainController implements Initializable {
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
-
+            NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+            DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
+            AmbienceTable.getSelectionModel().selectedItemProperty().addListener(
+                    (observable, oldValue, newValue) -> tableselectionchanged(newValue));
+            ObservableList<String> allnames = FXCollections.observableArrayList();
+            allnames.addAll(kujiin.xml.Options.ALLNAMES);
+            CutOrElementChoiceBox.setItems(allnames);
         }
 
         public SimpleAmbienceEditor(MainController root) {
@@ -616,20 +621,22 @@ public class MainController implements Initializable {
                 Root.getOptions().setStyle(Root);
             } catch (IOException ignored) {}
             setOnShowing(event -> {
-                if (kujiin.xml.Options.CUTNAMES.contains(cutorelementname)) {
+                if (kujiin.xml.Options.ALLNAMES.contains(cutorelementname)) {
                     CutOrElementChoiceBox.getSelectionModel().select(cutorelementname);
                     selectandloadcut();
                 }
             });
+
             CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
         }
 
     // Table Methods
+        public void tableselectionchanged(AmbienceSong ambienceSong) {selectedambiencesong = ambienceSong;}
         public void selectandloadcut() {
             AmbienceList.clear();
             AmbienceTable.getItems().clear();
-            int index = kujiin.xml.Options.CUTNAMES.indexOf(CutOrElementChoiceBox.getValue());
-            selectedcutorelementname = kujiin.xml.Options.CUTNAMES.get(index);
+            int index = kujiin.xml.Options.ALLNAMES.indexOf(CutOrElementChoiceBox.getValue());
+            selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
             if (getcurrentambiencefiles()) {
                 AmbienceTable.setItems(AmbienceList);
             }
@@ -699,7 +706,7 @@ public class MainController implements Initializable {
     // Dialog Methods
         public void advancedmode(ActionEvent actionEvent) {
             this.close();
-            if (selectedcutorelementname != null && kujiin.xml.Options.CUTNAMES.contains(selectedcutorelementname)) {
+            if (selectedcutorelementname != null && kujiin.xml.Options.ALLNAMES.contains(selectedcutorelementname)) {
                 new AdvancedAmbienceEditor(Root, selectedcutorelementname).show();
             } else {new AdvancedAmbienceEditor(Root).show();}
         }

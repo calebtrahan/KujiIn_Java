@@ -40,9 +40,12 @@ public class Options {
     public static final File DIRECTORYTOHRAMP = new File(DIRECTORYENTRAINMENT, "tohramp/");
     public static final File DIRECTORYELEMENTRAMP = new File(DIRECTORYENTRAINMENT, "elementramp/");
     public static final File DIRECTORYMAINCUTS = new File(DIRECTORYENTRAINMENT, "maincuts/");
-    public static final ArrayList<String> CUTNAMES = new ArrayList<>(Arrays.asList(
-            "Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Postsession"));
+    public static final ArrayList<String> QIGONGNAMES = new ArrayList<>(Arrays.asList("Presession", "Postsession"));
+    public static final ArrayList<String> CUTNAMES = new ArrayList<>(Arrays.asList("RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN"));
     public static final ArrayList<String> ELEMENTNAMES = new ArrayList<>(Arrays.asList("Earth", "Air", "Fire", "Water", "Void"));
+    public static final ArrayList<String> ALLNAMES = new ArrayList<>(
+            Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Earth", "Air", "Fire", "Water", "Void", "Postsession")
+    );
     public static final ArrayList<String> RAMPDURATIONS = new ArrayList<>(Arrays.asList("None", "2 Minutes", "3 Minutes", "5 Minutes"));
     public static ArrayList<String> STYLETHEMES = new ArrayList<>();
 /// Default Option Values
