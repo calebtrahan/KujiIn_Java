@@ -20,17 +20,13 @@ import java.util.Arrays;
 @XmlRootElement(name = "Options")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Options {
-// Directory Constants
+    // Directory Constants
     public static final File PROJECTROOT = new File(System.getProperty("user.dir"));
     public static final File ROOTDIRECTORY = new File(PROJECTROOT, "src/kujiin/");
     public static final File DIRECTORYREFERENCE = new File(ROOTDIRECTORY, "assets/reference/");
     public static final File LOGFILE = new File(ROOTDIRECTORY, "assets/sessionlog.txt");
     public static final File XMLDIRECTORY = new File(ROOTDIRECTORY, "assets/xml/");
-    public static final File OPTIONSXMLFILE = new File(XMLDIRECTORY, "options.xml");
-    public static final File DIRECTORYIMAGES = new File(ROOTDIRECTORY, "assets/img/");
-    public static final File GOALSXMLFILE = new File(XMLDIRECTORY, "goals.xml");
     public static final File DIRECTORYSTYLES = new File(ROOTDIRECTORY, "assets/styles/");
-    public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");
     public static final File SOUNDDIRECTORY = new File(ROOTDIRECTORY, "assets/sound/");
     public static final File DIRECTORYTEMP = new File(SOUNDDIRECTORY, "temp/");
     public static final File DIRECTORYAMBIENCE = new File(SOUNDDIRECTORY, "ambience/");
@@ -40,6 +36,13 @@ public class Options {
     public static final File DIRECTORYTOHRAMP = new File(DIRECTORYENTRAINMENT, "tohramp/");
     public static final File DIRECTORYELEMENTRAMP = new File(DIRECTORYENTRAINMENT, "elementramp/");
     public static final File DIRECTORYMAINCUTS = new File(DIRECTORYENTRAINMENT, "maincuts/");
+    // XML File Location Constants
+    public static final File OPTIONSXMLFILE = new File(XMLDIRECTORY, "options.xml");
+    public static final File DIRECTORYIMAGES = new File(ROOTDIRECTORY, "assets/img/");
+    public static final File GOALSXMLFILE = new File(XMLDIRECTORY, "goals.xml");
+    public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");
+
+    // Name Constants
     public static final ArrayList<String> QIGONGNAMES = new ArrayList<>(Arrays.asList("Presession", "Postsession"));
     public static final ArrayList<String> CUTNAMES = new ArrayList<>(Arrays.asList("RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN"));
     public static final ArrayList<String> ELEMENTNAMES = new ArrayList<>(Arrays.asList("Earth", "Air", "Fire", "Water", "Void"));

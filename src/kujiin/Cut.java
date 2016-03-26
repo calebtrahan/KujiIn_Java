@@ -10,6 +10,8 @@ import kujiin.interfaces.Creatable;
 import kujiin.interfaces.Exportable;
 import kujiin.interfaces.Trackable;
 import kujiin.widgets.ProgressAndGoalsWidget;
+import kujiin.xml.Ambiences;
+import kujiin.xml.Entrainments;
 import kujiin.xml.Goals;
 import kujiin.xml.Options;
 
@@ -23,6 +25,8 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     private ToggleButton Switch;
     private TextField Value;
     private Goals GoalsController;
+    private Entrainments entrainments;
+    private Ambiences ambiences;
 
     public Cut(int number, String name, int duration, String briefsummary, This_Session thisession, ToggleButton aSwitch, TextField value) {
         this.number = number;
