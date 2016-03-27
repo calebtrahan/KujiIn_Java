@@ -2,6 +2,7 @@ package kujiin.xml;
 
 import javafx.application.Platform;
 import javafx.scene.image.Image;
+import javafx.stage.Stage;
 import kujiin.MainController;
 import kujiin.Tools;
 import kujiin.widgets.PlayerWidget;
@@ -148,11 +149,11 @@ public class Options {
         setAppearanceOptions(appearanceOptions);
         marshall();
     }
-    public void setStyle(MainController Root) {
-        Root.getStage().getIcons().add(new Image(new File(Options.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString()));
-        Root.getScene().getStylesheets().clear();
+    public void setStyle(Stage stage) {
+        stage.getIcons().clear();
+        stage.getIcons().add(new Image(new File(Options.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString()));
         String themefile = getAppearanceOptions().getThemefile();
-        if (themefile != null) {Root.getScene().getStylesheets().add(themefile);}
+        if (themefile != null) {stage.getScene().getStylesheets().add(themefile);}
     }
 
 // Subclasses

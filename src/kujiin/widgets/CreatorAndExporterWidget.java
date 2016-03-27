@@ -533,7 +533,7 @@ public class CreatorAndExporterWidget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle(toptext);
             setAccepted(false);
@@ -578,7 +578,7 @@ public class CreatorAndExporterWidget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Exporting Session");
         }
@@ -610,7 +610,7 @@ public class CreatorAndExporterWidget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Not Well Formed");
             this.textfieldvalues = textfieldvalues;
@@ -704,7 +704,7 @@ public class CreatorAndExporterWidget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Cut Invocation");
         }
@@ -763,7 +763,7 @@ public class CreatorAndExporterWidget {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);

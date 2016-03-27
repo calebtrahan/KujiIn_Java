@@ -31,7 +31,9 @@ public class Entrainments {
     }
 
 // Creation Methods
-    public void build(int minutes) {}
+    public void build(int minutes) {
+
+    }
     public boolean isBuilt() {return CreatedEntrainmentList != null && CreatedEntrainmentList.size() > 0;}
     public List<Entrainment> getCreatedEntrainment() {return CreatedEntrainmentList;}
     public void reset() {CreatedEntrainmentList = null;}
@@ -108,4 +110,5 @@ public class Entrainments {
             calculatedurationservice.start();
         }
     }
+
 }

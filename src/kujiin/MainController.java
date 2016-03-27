@@ -96,8 +96,8 @@ public class MainController implements Initializable {
     public ToggleButton PreSwitch;
     public ToggleButton PostSwitch;
     public Button ChangeAllElementsButton;
-    public Scene Scene;
-    public Stage Stage;
+    private Scene Scene;
+    private Stage Stage;
     public Button ResetCreatorButton;
     private This_Session Session;
     private CreatorAndExporterWidget CreatorAndExporter;
@@ -263,7 +263,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Files Editor");
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
@@ -373,6 +373,8 @@ public class MainController implements Initializable {
         private ObservableList<AmbienceSong> temp_ambiencesonglist = FXCollections.observableArrayList();
         private AmbienceSong selected_temp_ambiencesong;
         private AmbienceSong selected_actual_ambiencesong;
+        private double temptotalduration;
+        private double actualtotalduration;
         private String selectedcutorelementname;
         private File tempdirectory;
         private MainController Root;
@@ -401,7 +403,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Advanced Ambience Editor");
             CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
@@ -414,7 +416,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Advanced Ambience Editor");
             CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
@@ -492,12 +494,26 @@ public class MainController implements Initializable {
         public void tempselectionchanged(AmbienceSong ambiencesong) {
             selected_temp_ambiencesong = ambiencesong;
         }
+        public void calculatetemptotalduration() {
+            temptotalduration = 0.0;
+            for (AmbienceSong i : Temp_Table.getItems()) {
+                temptotalduration += i.getDuration();
+            }
+            Temp_TotalDuration.setText(Tools.minstoformattedlonghoursandminutes((int) (temptotalduration / 60)));
+        }
 
     // Actual Ambience Methods
         public void addtoactualambience(ActionEvent actionEvent) {addto(Actual_Table, actual_ambiencesonglist);}
         public void removeactualambience(ActionEvent actionEvent) {removefrom(Actual_Table);}
         public void previewactualambience(ActionEvent actionEvent) {preview(selected_actual_ambiencesong);}
         public void actualselectionchanged(AmbienceSong ambiencesong) {selected_actual_ambiencesong = ambiencesong;}
+        public void calculateactualtotalduration() {
+            actualtotalduration = 0.0;
+            for (AmbienceSong i : Actual_Table.getItems()) {
+                actualtotalduration += i.getDuration();
+            }
+            Actual_TotalDuration.setText(Tools.minstoformattedlonghoursandminutes((int) (actualtotalduration / 60)));
+        }
 
     // Table Methods
         public void selectandloadcut() {
@@ -509,6 +525,7 @@ public class MainController implements Initializable {
                 Actual_Table.setItems(actual_ambiencesonglist);
                 CutSelectionLabel.setText(selectedcutorelementname + "'s Ambience");
             }
+            calculateactualtotalduration();
         }
         public void addto(TableView<AmbienceSong> table, ObservableList<AmbienceSong> songlist) {
             List<File> files = Tools.multipleopenfilechooser(getScene(), "Add Files", null);
@@ -536,7 +553,6 @@ public class MainController implements Initializable {
                 }
             }
         }
-
         public boolean getcurrentambiencefiles() {
             if (selectedcutorelementname != null) {
                 File thisdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutorelementname);
@@ -588,6 +604,7 @@ public class MainController implements Initializable {
         private AmbienceSong selectedambiencesong;
         private String selectedcutorelementname;
         private PreviewFile previewdialog;
+        private double totalselectedduration;
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
@@ -607,7 +624,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException ignored) {}
             CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
         }
@@ -618,7 +635,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException ignored) {}
             setOnShowing(event -> {
                 if (kujiin.xml.Options.ALLNAMES.contains(cutorelementname)) {
@@ -639,6 +656,7 @@ public class MainController implements Initializable {
             selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
             if (getcurrentambiencefiles()) {
                 AmbienceTable.setItems(AmbienceList);
+                TotalDuration.setText(Tools.minstoformattedlonghoursandminutes((int) (totalselectedduration / 60)));
             }
         }
         public void add() {
@@ -685,12 +703,16 @@ public class MainController implements Initializable {
         }
 
         public boolean getcurrentambiencefiles() {
+            totalselectedduration = 0.0;
             if (selectedcutorelementname != null) {
                 File thisdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutorelementname);
                 try {
                     for (File i : thisdirectory.listFiles()) {
                         if (Tools.validaudiofile(i)) {
-                            AmbienceList.add(new AmbienceSong(i.getName(), i));}
+                            AmbienceSong selectedamb = new AmbienceSong(i.getName(), i);
+                            AmbienceList.add(selectedamb);
+                            totalselectedduration += selectedamb.getDuration();
+                        }
                     }
                     return true;
                 } catch (NullPointerException e) {
@@ -742,7 +764,7 @@ public class MainController implements Initializable {
                 try {
                     Scene defaultscene = new Scene(fxmlLoader.load());
                     setScene(defaultscene);
-                    Root.getOptions().setStyle(Root);
+                    Root.getOptions().setStyle(this);
                 } catch (IOException ignored) {}
             } else {Tools.showinformationdialog(Root, "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
         }
@@ -755,7 +777,7 @@ public class MainController implements Initializable {
                 try {
                     Scene defaultscene = new Scene(fxmlLoader.load());
                     setScene(defaultscene);
-                    Root.getOptions().setStyle(Root);
+                    Root.getOptions().setStyle(this);
                 } catch (IOException ignored) {}
                 Mediatopreview = mediatopreview;
                 PreviewPlayer = new MediaPlayer(Mediatopreview);
@@ -830,7 +852,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException ignored) {}
             System.out.println(String.format("Time %s Encountered: %s", exception.getClass().getName(), LocalDate.now()));
             exception.printStackTrace();
@@ -896,7 +918,7 @@ public class MainController implements Initializable {
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(Root);
+                Root.getOptions().setStyle(this);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Change Program Options");
             Tools.doubleTextField(FadeInValue, false);
@@ -1150,11 +1172,12 @@ public class MainController implements Initializable {
         private StringProperty length;
         private File file;
         private String totaldurationshort;
+        private double duration;
 
         public AmbienceSong(String name, File file) {
             this.name = new SimpleStringProperty(name);
             this.file = file;
-            double duration = Tools.getaudioduration(file);
+            duration = Tools.getaudioduration(file);
             totaldurationshort = Tools.formatlengthshort((int) duration);
             this.length = new SimpleStringProperty(totaldurationshort);
         }
@@ -1162,14 +1185,13 @@ public class MainController implements Initializable {
         public String getName() {
             return name.getValue();
         }
-
         public File getFile() {
             return file;
         }
-
         public String getTotaldurationshort() {
             return totaldurationshort;
         }
+        public double getDuration() {return duration;}
     }
 
 }
