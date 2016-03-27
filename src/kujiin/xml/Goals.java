@@ -171,7 +171,7 @@ public class Goals {
                 setPostsessionGoals(currentGoals.getPostsessionGoals());
                 setTotalGoals(currentGoals.getTotalGoals());
             } catch (JAXBException e) {
-                Tools.showinformationdialog(Root, "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+                Tools.gui_showinformationdialog(Root, "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -183,7 +183,7 @@ public class Goals {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.GOALSXMLFILE);
         } catch (JAXBException e) {
-            Tools.showinformationdialog(Root, "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+            Tools.gui_showinformationdialog(Root, "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
         }
     }
     public void add(int cutorelementindex, Goal newgoal) throws JAXBException {
@@ -287,7 +287,7 @@ public class Goals {
 //    public List<Goal> getgoalscompletedondate(int cutindex, LocalDate localDate) {
 //       List<Goal> goalscompletedondate = new ArrayList<>();
 //        for (Goal i : getallcutgoals(cutindex, false)) {
-//            LocalDate date = Tools.converttolocaldate(i.getDate_Completed())
+//            LocalDate date = Tools.convert_stringtolocaldate(i.getDate_Completed())
 //        }
 //    }
 
@@ -332,9 +332,9 @@ public class Goals {
         public Goal() {}
 
         public Goal(LocalDate duedate, Double goalhours, String cutname) {
-            setDate_Due(Tools.convertfromlocaldatetostring(duedate));
+            setDate_Due(Tools.convert_localdatetostring(duedate));
             setGoal_Hours(goalhours);
-            setDate_Set(Tools.convertfromlocaldatetostring(LocalDate.now()));
+            setDate_Set(Tools.convert_localdatetostring(LocalDate.now()));
             setCutName(cutname);
             setCompleted(false);
             setDate_Completed("Not Completed");

@@ -11,7 +11,7 @@
       <Label alignment="CENTER" layoutX="8.0" layoutY="14.0" prefHeight="21.0" prefWidth="345.0" text="Cut Invocation Duration" underline="true">
          <font><Font size="18.0" /></font>
       </Label>
-      <TextField fx:id="cutinvocationminutesTextField" layoutX="142.0" layoutY="91.0" prefHeight="26.0" prefWidth="49.0" />
+      <TextField fx:id="MinutesTextField" layoutX="142.0" layoutY="91.0" prefHeight="26.0" prefWidth="49.0" />
       <Label alignment="CENTER" layoutX="53.0" layoutY="58.0" prefHeight="16.0" prefWidth="261.0" text="Minutes To Practice Non-Practiced Cuts:" />
       <Label layoutX="200.0" layoutY="96.0" text="min(s)." />
    </children>

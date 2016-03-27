@@ -74,16 +74,16 @@ public class PlayerWidget extends Stage {
                 Double value = EntrainmentVolume.getValue() * 100;
                 EntrainmentVolume.setTooltip(new Tooltip(value.intValue() + "%"));
                 Session.Root.getOptions().getSessionOptions().setEntrainmentvolume(EntrainmentVolume.getValue());
-            } catch (Exception ignored) {Tools.showtimedmessage(StatusBar, "No Session Playing", 2000);}
+            } catch (Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 2000);}
         });
         AmbienceVolume.setOnMouseClicked(event -> {
             try {
                 Double value = AmbienceVolume.getValue() * 100;
                 AmbienceVolume.setTooltip(new Tooltip(value.intValue() + "%"));
                 Session.Root.getOptions().getSessionOptions().setAmbiencevolume(AmbienceVolume.getValue());
-            } catch(Exception ignored) {Tools.showtimedmessage(StatusBar, "No Session Playing", 2000);}
+            } catch(Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 2000);}
         });
-        Tools.showtimedmessage(StatusBar, "Player Disabled Until Session Is Created Or Loaded", 10000);
+        Tools.gui_showtimedmessageonlabel(StatusBar, "Player Disabled Until Session Is Created Or Loaded", 10000);
         GoalPracticedHours.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         GoalPracticedMinutes.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
         GoalSetHours.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
@@ -92,22 +92,22 @@ public class PlayerWidget extends Stage {
 
 // Button Actions
     public void play() {
-        Tools.showtimedmessage(StatusBar, Session.play(this), 3000);
+        Tools.gui_showtimedmessageonlabel(StatusBar, Session.play(this), 3000);
     }
     public void pause() {
         if (Session != null) {
-            Tools.showtimedmessage(StatusBar, Session.pause(), 3000);}
+            Tools.gui_showtimedmessageonlabel(StatusBar, Session.pause(), 3000);}
         else {
-            Tools.showtimedmessage(StatusBar, "No Session Playing", 3000);}
+            Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
     }
     public void stop() {
         if (Session != null) {
             String message = Session.stop();
-            Tools.showtimedmessage(StatusBar, message, 3000);
+            Tools.gui_showtimedmessageonlabel(StatusBar, message, 3000);
 //            if (message.equals("Session Stopped")) {resetallvalues();}
         }
         else {
-            Tools.showtimedmessage(StatusBar, "No Session Playing", 3000);}
+            Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
     }
     public void displayreferencefile() {
 //        Session.togglereferencedisplay(ReferenceFileCheckbox);
@@ -291,10 +291,10 @@ public class PlayerWidget extends Stage {
                 Sessions currentsessions = Root.getProgressTracker().getSessions();
                 Session thissession = currentsessions.getsession(currentsessions.totalsessioncount() - 1);
                 int thisessionminutes = thissession.getTotal_Session_Duration();
-                SessionDuration.setText(Tools.minstoformattedabbreviatedhoursandminutes(thisessionminutes));
+                SessionDuration.setText(Tools.format_minstohrsandmins_abbreviated(thisessionminutes));
                 SessionDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
                 int totalsessionminutes = currentsessions.getpracticedtimeinminutesforallsessions(11, true);
-                TotalPracticeDuration.setText(Tools.minstoformattedabbreviatedhoursandminutes(totalsessionminutes));
+                TotalPracticeDuration.setText(Tools.format_minstohrsandmins_abbreviated(totalsessionminutes));
                 TotalPracticeDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Completed");

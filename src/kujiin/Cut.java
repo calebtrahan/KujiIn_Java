@@ -1,5 +1,6 @@
 package kujiin;
 
+import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Service;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -27,6 +28,10 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     private Goals GoalsController;
     private Entrainments entrainments;
     private Ambiences ambiences;
+    private ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
+        try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
+        catch (Exception e) {Value.setText("");}
+    };
 
     public Cut(int number, String name, int duration, String briefsummary, This_Session thisession, ToggleButton aSwitch, TextField value) {
         this.number = number;
@@ -38,7 +43,7 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
         Value = value;
         Switch.setTooltip(new Tooltip(briefsummary));
         Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
-        Switch.setOnAction(event -> Tools.valueboxandlabelpairswitch(Switch, Value));
+        Switch.setOnAction(event -> toggleswitch());
 //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
 //        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
@@ -49,21 +54,19 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     }
 
 // GUI
-//    public void toggleswitch() {
-//        ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
-//            try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
-//            catch (Exception e) {Value.setText("");}
-//        };
-//        if (Switch.isSelected()) {
-//            Value.textProperty().addListener(integertextfield);
-//            Value.setText("0");
-//            Value.setDisable(false);
-//        } else {
-//            Value.textProperty().removeListener(integertextfield);
-//            Value.setText("-");
-//            Value.setDisable(true);
-//        }
-//    }
+    public void toggleswitch() {
+        if (Switch.isSelected()) {
+            Value.textProperty().addListener(integertextfield);
+            Value.setText("0");
+            Value.setDisable(false);
+            Value.setTooltip(new Tooltip("Practice Time For " + name + " (In Minutes)"));
+        } else {
+            Value.textProperty().removeListener(integertextfield);
+            Value.setText("-");
+            Value.setDisable(true);
+            Value.setTooltip(new Tooltip(name + " Is Disabled. Click " + name + " Button Above To Enable"));
+        }
+    }
     public void changevalue(int newvalue) {
         if (newvalue == 0) {Switch.setSelected(false);}
         else {
@@ -91,7 +94,7 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
         ambiencefiledurations = new ArrayList<>();
         try {
             for (File i : ambiencedirectory.listFiles()) {
-                double dur = Tools.getaudioduration(i);
+                double dur = Tools.audio_getduration(i);
                 if (dur > 0.0) {
                     ambiencefiles.add(i);
                     ambiencefiledurations.add(dur);
@@ -140,7 +143,7 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
             File thisfile = new File(Options.DIRECTORYMAINCUTS, filename);
             entrainmentlist.add(thisfile);
         }
-        Tools.shufflelist(entrainmentlist, 5);
+        Tools.list_shuffle(entrainmentlist, 5);
         if (number == 3) {
             File rampinfile;
             File rampoutfile;
@@ -214,6 +217,8 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     }
     @Override
     public void reset() {
+        Switch.setSelected(false);
+        toggleswitch();
         if (entrainmentlist != null) entrainmentlist.clear();
         if (entrainmentmedia != null) entrainmentmedia.clear();
         if (ambiencelist != null) ambiencelist.clear();
@@ -256,7 +261,7 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists
-        if (Tools.getanswerdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
+        if (Tools.gui_getconfirmationdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
                 "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
                 entrainmentplayer.stop();
@@ -268,7 +273,7 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     public void ambienceerror() {
         System.out.println("Ambience Error!");
         // Pause Entrainment
-        if (Tools.getanswerdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
+        if (Tools.gui_getconfirmationdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
                         "'s Ambience. Problem File Is: '" + getCurrentAmbiencePlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             ambienceplayer.stop();
@@ -319,20 +324,20 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
     //                    updateTitle("Building " + name);
     //                    System.out.println("Concatenating Entrainment For " + name);
     //                    updateMessage("Concatenating Entrainment Files");
-    //                    Tools.concatenateaudiofiles(entrainmentlist, tempentrainmenttextfile, finalentrainmentfile);
+    //                    Tools.audio_concatenatefiles(entrainmentlist, tempentrainmenttextfile, finalentrainmentfile);
     //                    if (isCancelled()) return false;
     //                    if (ambienceenabled) {
     //                        updateProgress(0.25, 1.0);
     //                        System.out.println("Concatenating Ambience For " + name);
     //                        updateMessage("Concatenating Ambience Files");
-    //                        Tools.concatenateaudiofiles(ambiencelist, tempambiencetextfile, finalambiencefile);
+    //                        Tools.audio_concatenatefiles(ambiencelist, tempambiencetextfile, finalambiencefile);
     //                        if (isCancelled()) return false;
     //                        updateProgress(0.50, 1.0);
     ////                            System.out.println("Reducing Ambience Duration For " + name);
     ////                            updateMessage("Cutting Ambience Audio To Selected Duration");
     ////                            System.out.println("Final Ambience File" + finalambiencefile.getAbsolutePath());
-    ////                            if (Tools.getaudioduration(finalambiencefile) > getdurationinseconds()) {
-    ////                                Tools.trimaudiofile(finalambiencefile, getdurationinseconds());
+    ////                            if (Tools.audio_getduration(finalambiencefile) > getdurationinseconds()) {
+    ////                                Tools.audio_trimfile(finalambiencefile, getdurationinseconds());
     ////                            }
     ////                            if (isCancelled()) return false;
     //                        updateProgress(0.75, 1.0);
@@ -362,7 +367,7 @@ public class Cut extends kujiin.widgets.Playable implements Exportable, Creatabl
 //                FileUtils.copyFile(finalentrainmentfile, getFinalexportfile());
 //                return true;
 //            } catch (IOException e) {return false;}
-//        } else {return Tools.mixaudiofiles(new ArrayList<>(Arrays.asList(finalambiencefile, finalentrainmentfile)), getFinalexportfile());}
+//        } else {return Tools.audio_mixfiles(new ArrayList<>(Arrays.asList(finalambiencefile, finalentrainmentfile)), getFinalexportfile());}
         return false;
     }
     @Override

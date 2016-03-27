@@ -293,14 +293,14 @@ public class This_Session {
                         if (i != cutsorelementswithnoambience.size() - 1) {a.append(", ");}
                     }
                     if (cutsorelementswithnoambience.size() > 1) {
-                        Tools.showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
-                        if (Tools.getanswerdialog(Root, "Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
+                        Tools.gui_showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
+                        if (Tools.gui_getconfirmationdialog(Root, "Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
                             MainController.AdvancedAmbienceEditor ambienceEditor = new MainController.AdvancedAmbienceEditor(Root);
                             ambienceEditor.showAndWait();
                         }
                     } else {
-                        Tools.showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
-                        if (Tools.getanswerdialog(Root, "Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
+                        Tools.gui_showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
+                        if (Tools.gui_getconfirmationdialog(Root, "Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
                             MainController.AdvancedAmbienceEditor ambienceEditor = new MainController.AdvancedAmbienceEditor(Root, ((Playable) cutsorelementswithnoambience.get(0)).name);
                             ambienceEditor.showAndWait();
                         }
@@ -313,15 +313,15 @@ public class This_Session {
                         for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
                             a.append("\n");
                             Playable thiscut = (Playable) cutsorelementswithreducedambience.get(i);
-                            String formattedcurrentduration = Tools.minutestoformattedhoursandmins((int) thiscut.getTotalambienceduration() / 60);
-                            String formattedexpectedduration = Tools.minutestoformattedhoursandmins(((Playable) cutsorelementswithreducedambience.get(i)).getdurationinminutes());
+                            String formattedcurrentduration = Tools.format_minstohrsandmins_short((int) thiscut.getTotalambienceduration() / 60);
+                            String formattedexpectedduration = Tools.format_minstohrsandmins_short(((Playable) cutsorelementswithreducedambience.get(i)).getdurationinminutes());
                             a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }
                         if (cutsorelementswithreducedambience.size() == 1) {
-                            ambiencecheckbox.setSelected(Tools.getanswerdialog(Root, "Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
+                            ambiencecheckbox.setSelected(Tools.gui_getconfirmationdialog(Root, "Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
                         } else {
-                            ambiencecheckbox.setSelected(Tools.getanswerdialog(Root, "Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
+                            ambiencecheckbox.setSelected(Tools.gui_getconfirmationdialog(Root, "Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
                         }
                     } else {
                         ambiencecheckbox.setSelected(true);
@@ -335,11 +335,11 @@ public class This_Session {
             ambiencecheckerservice.setOnFailed(event -> {
                 System.out.println("Failed!!");
                 cad[0].close();
-                Tools.showerrordialog(Root, "Error", "Couldn't Check Ambience", "Check Ambience Folder Read Permissions");
+                Tools.gui_showerrordialog(Root, "Error", "Couldn't Check Ambience", "Check Ambience Folder Read Permissions");
                 ambiencecheckbox.setSelected(false);
             });
             ambiencecheckerservice.start();
-        } else {Tools.showinformationdialog(Root, "Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
+        } else {Tools.gui_showinformationdialog(Root, "Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
     public boolean checksessionwellformedness(ArrayList<Integer> textfieldtimes) {
         int lastcutindex = 0;
@@ -416,6 +416,7 @@ public class This_Session {
         for (Object i : getallCutsAndElements()) {
             if (i instanceof Element) {((Element) i).reset();}
             if (i instanceof Cut) {((Cut) i).reset();}
+            if (i instanceof  Qi_Gong) {((Qi_Gong) i).reset();}
         }
     }
 
@@ -455,31 +456,31 @@ public class This_Session {
 //        exportingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(exporterservice.messageProperty());
 //        exportingSessionDialog.CancelButton.setOnAction(event -> exporterservice.cancel());
 //        exporterservice.setOnSucceeded(event -> {
-//            if (exporterservice.getValue()) {Tools.showinformationdialog("Information", "Export Succeeded", "File Saved To: ");}
-//            else {Tools.showerrordialog("Error", "Errors Occured During Export", "Please Try Again Or Contact Me For Support");}
+//            if (exporterservice.getValue()) {Tools.gui_showinformationdialog("Information", "Export Succeeded", "File Saved To: ");}
+//            else {Tools.gui_showerrordialog("Error", "Errors Occured During Export", "Please Try Again Or Contact Me For Support");}
 //            exportingSessionDialog.close();
 //        });
 //        exporterservice.setOnFailed(event -> {
 //            String v = exporterservice.getException().getMessage();
-//            Tools.showerrordialog("Error", "Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v,
+//            Tools.gui_showerrordialog("Error", "Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v,
 //                    "Please Try Again Or Contact Me For Support");
 //            This_Session.deleteprevioussession();
 //            exportingSessionDialog.close();
 //        });
 //        exporterservice.setOnCancelled(event -> {
-//            Tools.showinformationdialog("Cancelled", "Export Cancelled", "You Cancelled Export");
+//            Tools.gui_showinformationdialog("Cancelled", "Export Cancelled", "You Cancelled Export");
 //            This_Session.deleteprevioussession();
 //            exportingSessionDialog.close();
 //        });
 //        return false;
     }
     public void getnewexportsavefile() {
-//        File tempfile = Tools.savefilechooser(Root.getScene(), "Save Export File As", null);
-//        if (tempfile != null && Tools.validaudiofile(tempfile)) {
+//        File tempfile = Tools.filechooser_save(Root.getScene(), "Save Export File As", null);
+//        if (tempfile != null && Tools.audio_isValid(tempfile)) {
 //            setExportfile(tempfile);
 //        } else {
 //            if (tempfile == null) {return;}
-//            if (Tools.getanswerdialog(Root, "Confirmation", "Invalid Audio File Extension", "Save As .mp3?")) {
+//            if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Invalid Audio File Extension", "Save As .mp3?")) {
 //                String file = tempfile.getAbsolutePath();
 //                int index = file.lastIndexOf(".");
 //                String firstpart = file.substring(0, index - 1);
@@ -528,7 +529,7 @@ public class This_Session {
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
         for (Object i : itemsinsession) {totalsecondsinsession += ((Playable) i).getdurationinseconds();}
-        getPlayerWidget().TotalTotalLabel.setText(Tools.formatlengthshort(totalsecondsinsession));
+        getPlayerWidget().TotalTotalLabel.setText(Tools.format_secondsforplayerdisplay(totalsecondsinsession));
         updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
         updateuitimeline.setCycleCount(Animation.INDEFINITE);
         updateuitimeline.play();
@@ -616,7 +617,7 @@ public class This_Session {
                 getPlayerWidget().TotalSessionLabel.setText(String.format("Total Progress (%d", totalprogress.intValue()) + "%)");
                 getPlayerWidget().CutCurrentLabel.setText(((Playable) currentcutorelement).getcurrenttimeformatted());
                 getPlayerWidget().CutTotalLabel.setText(((Playable) currentcutorelement).gettotaltimeformatted());
-                getPlayerWidget().TotalCurrentLabel.setText(Tools.formatlengthshort(totalsecondselapsed));
+                getPlayerWidget().TotalCurrentLabel.setText(Tools.format_secondsforplayerdisplay(totalsecondselapsed));
                 getPlayerWidget().StatusBar.setText("Session Playing. Currently Practicing " + ((Playable) currentcutorelement).name + "...");
                 Root.getProgressTracker().updategoalsui();
                 Root.getProgressTracker().updateprogressui();
@@ -650,7 +651,7 @@ public class This_Session {
 //                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
                 try {
                     List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(((Playable) currentcutorelement).number,
-                            Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(((Playable) currentcutorelement).number, false), 2));
+                            Tools.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(((Playable) currentcutorelement).number, false), 2));
                     if (completedgoals.size() > 0) {GoalsCompletedThisSession.addAll(completedgoals);}
                     ((Playable) currentcutorelement).cleanup();
                     cutorelementcount++;
@@ -676,14 +677,14 @@ public class This_Session {
             if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
                 Goals.Goal i = GoalsCompletedThisSession.get(0);
                 int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(i.getCutName());
-                double currentpracticedhours = Tools.convertminutestodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2);
+                double currentpracticedhours = Tools.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2);
                 new ProgressAndGoalsWidget.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
             } else if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() > 1) {
                 new ProgressAndGoalsWidget.MultipleGoalsCompletedDialog(Root, GoalsCompletedThisSession).showAndWait();
             }
         });
         // TODO Prompt For Export
-//        if (Tools.getanswerdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
+//        if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            getsessionexporter();}
         Root.getProgressTracker().updategoalsui();
     }
@@ -714,7 +715,7 @@ public class This_Session {
                     progresstonextcut();
                 });
                 alertplayer.setOnError(() -> {
-                    if (Tools.getanswerdialog(Root, "Confirmation", "An Error Occured While Playing Alert File" +
+                    if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "An Error Occured While Playing Alert File" +
                             alertplayer.getMedia().getSource() + "'", "Retry Playing Alert File? (Pressing Cancel " +
                             "Will Progress To The Next Cut)")) {
                         alertplayer.stop();

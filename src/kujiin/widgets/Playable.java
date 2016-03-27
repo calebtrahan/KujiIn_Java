@@ -260,11 +260,11 @@ public class Playable {
     public int getdurationinminutes() {
         return duration;
     }
-    public Double getdurationindecimalhours() {return Tools.convertminutestodecimalhours(getdurationinminutes(), 2);}
+    public Double getdurationindecimalhours() {return Tools.convert_minstodecimalhours(getdurationinminutes(), 2);}
     public String getcurrenttimeformatted() {
-        return Tools.formatlengthshort(getSecondselapsed());
+        return Tools.format_secondsforplayerdisplay(getSecondselapsed());
     }
-    public String gettotaltimeformatted() {return Tools.formatlengthshort(getdurationinseconds());}
+    public String gettotaltimeformatted() {return Tools.format_secondsforplayerdisplay(getdurationinseconds());}
 
 // Error Handling
     protected void entrainmenterror() {}

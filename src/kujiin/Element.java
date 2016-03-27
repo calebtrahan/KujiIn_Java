@@ -28,6 +28,10 @@ public class Element extends Playable implements Creatable, Exportable, Trackabl
     private ToggleButton Switch;
     private TextField Value;
     private Goals GoalsController;
+    private ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
+        try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
+        catch (Exception e) {Value.setText("");}
+    };
 
     public Element(int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
@@ -45,25 +49,16 @@ public class Element extends Playable implements Creatable, Exportable, Trackabl
 
 // GUI
     public void toggleswitch() {
-        ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
-            try {
-                if (newValue.matches("\\d*")) {
-                    Value.setText(Integer.toString(Integer.parseInt(newValue)));
-                } else {
-                    Value.setText(oldValue);
-                }
-            } catch (Exception e) {
-                Value.setText("");
-            }
-        };
         if (Switch.isSelected()) {
             Value.textProperty().addListener(integertextfield);
             Value.setText("0");
             Value.setDisable(false);
+            Value.setTooltip(new Tooltip("Practice Time For " + name + " (In Minutes)"));
         } else {
             Value.textProperty().removeListener(integertextfield);
             Value.setText("-");
             Value.setDisable(true);
+            Value.setTooltip(new Tooltip(name + " Is Disabled. Click " + name + " Button Above To Enable"));
         }
     }
     public void changevalue(int newvalue) {
@@ -99,7 +94,7 @@ public class Element extends Playable implements Creatable, Exportable, Trackabl
         ambiencefiledurations = new ArrayList<>();
         try {
             for (File i : ambiencedirectory.listFiles()) {
-                double dur = Tools.getaudioduration(i);
+                double dur = Tools.audio_getduration(i);
                 if (dur > 0.0) {
                     ambiencefiles.add(i);
                     ambiencefiledurations.add(dur);
@@ -170,7 +165,7 @@ public class Element extends Playable implements Creatable, Exportable, Trackabl
                 File rampout = new File(rampoutdirectory, cutorelementafter.name.toLowerCase() + duration + ".mp3");
                 entrainmentlist.add(rampout);
             }
-            Tools.shufflelist(entrainmentlist, 5);
+            Tools.list_shuffle(entrainmentlist, 5);
             for (File i : entrainmentlist) {
                 entrainmentmedia.add(new Media(i.toURI().toString()));
             }
@@ -236,6 +231,8 @@ public class Element extends Playable implements Creatable, Exportable, Trackabl
     }
     @Override
     public void reset() {
+        Switch.setSelected(false);
+        toggleswitch();
         if (entrainmentlist != null) entrainmentlist.clear();
         if (entrainmentmedia != null) entrainmentmedia.clear();
         if (ambiencelist != null) ambiencelist.clear();

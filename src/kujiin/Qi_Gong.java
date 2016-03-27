@@ -26,6 +26,10 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
     private ToggleButton Switch;
     private TextField Value;
     private Goals GoalsController;
+    private ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
+        try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
+        catch (Exception e) {Value.setText("");}
+    };
 
     public Qi_Gong (int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
@@ -37,24 +41,21 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
         Value = value;
         Switch.setOnAction(event -> toggleswitch());
         Switch.setTooltip(new Tooltip(briefsummary));
-        Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
         toggleswitch();
     }
 
 // GUI
     public void toggleswitch() {
-        ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
-            try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
-            catch (Exception e) {Value.setText("");}
-        };
         if (Switch.isSelected()) {
             Value.textProperty().addListener(integertextfield);
             Value.setText("0");
             Value.setDisable(false);
+            Value.setTooltip(new Tooltip("Practice Time For " + name + " (In Minutes)"));
         } else {
             Value.textProperty().removeListener(integertextfield);
             Value.setText("-");
             Value.setDisable(true);
+            Value.setTooltip(new Tooltip(name + " Is Disabled. Click " + name + " Button Above To Enable"));
         }
     }
     public void changevalue(int newvalue) {
@@ -113,7 +114,7 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
         ambiencefiledurations = new ArrayList<>();
         try {
             for (File i : ambiencedirectory.listFiles()) {
-                double dur = Tools.getaudioduration(i);
+                double dur = Tools.audio_getduration(i);
                 if (dur > 0.0) {
                     ambiencefiles.add(i);
                     ambiencefiledurations.add(dur);
@@ -139,7 +140,7 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
         }
         for (int i = 0; i < fivetimes; i++) {entrainmentlist.add(new File(Options.DIRECTORYMAINCUTS, "Qi-Gong5.mp3"));}
         for (int i = 0; i < singletimes; i++) {entrainmentlist.add(new File(Options.DIRECTORYMAINCUTS, "Qi-Gong1.mp3"));}
-        Tools.shufflelist(entrainmentlist, 5);
+        Tools.list_shuffle(entrainmentlist, 5);
         for (File i : entrainmentlist) {entrainmentmedia.add(new Media(i.toURI().toString()));}
         return entrainmentmedia.size() > 0;
     }
@@ -198,6 +199,8 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
     }
     @Override
     public void reset() {
+        Switch.setSelected(false);
+        toggleswitch();
         if (entrainmentlist != null) entrainmentlist.clear();
         if (entrainmentmedia != null) entrainmentmedia.clear();
         if (ambiencelist != null) ambiencelist.clear();
@@ -263,17 +266,17 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
     }
     @Override
     public Double getdurationindecimalhours() {
-        return Tools.convertminutestodecimalhours(this.getdurationinminutes(), 2);
+        return Tools.convert_minstodecimalhours(this.getdurationinminutes(), 2);
     }
     @Override
     public String gettotaltimeformatted() {
-        return Tools.formatlengthshort(this.getdurationinseconds());
+        return Tools.format_secondsforplayerdisplay(this.getdurationinseconds());
     }
     @Override
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists
-        if (Tools.getanswerdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
+        if (Tools.gui_getconfirmationdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
                         "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             entrainmentplayer.stop();
@@ -285,7 +288,7 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
     public void ambienceerror() {
         System.out.println("Ambience Error!");
         // Pause Entrainment
-        if (Tools.getanswerdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
+        if (Tools.gui_getconfirmationdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
                         "'s Ambience. Problem File Is: '" + getCurrentAmbiencePlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             ambienceplayer.stop();

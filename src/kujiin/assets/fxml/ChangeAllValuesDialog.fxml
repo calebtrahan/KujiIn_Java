@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.VBox?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="94.0" prefWidth="337.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TextField fx:id="changeAllValuesMinutesTextField" layoutX="184.0" layoutY="14.0" prefHeight="26.0" prefWidth="36.0" />
+      <TextField fx:id="MinutesTextField" layoutX="184.0" layoutY="14.0" prefHeight="26.0" prefWidth="36.0" />
       <Label alignment="CENTER_RIGHT" layoutX="27.0" layoutY="19.0" prefHeight="16.0" prefWidth="147.0" text="Change All Values To:" />
       <Label layoutX="226.0" layoutY="19.0" prefHeight="16.0" prefWidth="59.0" text="Minute(s)" />
       <VBox alignment="CENTER_LEFT" layoutX="19.0" layoutY="42.0" prefHeight="42.0" prefWidth="147.0">
