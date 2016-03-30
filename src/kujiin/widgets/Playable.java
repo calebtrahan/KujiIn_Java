@@ -4,13 +4,14 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.Cut;
 import kujiin.Element;
 import kujiin.This_Session;
 import kujiin.Tools;
+import kujiin.xml.Ambiences;
+import kujiin.xml.Entrainments;
 import kujiin.xml.Options;
 
 import java.io.File;
@@ -22,15 +23,10 @@ public class Playable {
     protected int duration;
     protected This_Session thisession;
     protected File ambiencedirectory;
-    protected double totalambienceduration;
-    protected ArrayList<File> entrainmentlist;
-    protected ArrayList<File> ambiencelist;
-    protected ArrayList<File> ambiencefiles;
-    protected ArrayList<Double> ambiencefiledurations;
+    protected Ambiences ambiences;
+    protected Entrainments entrainments;
     protected int entrainmentplaycount;
     protected int ambienceplaycount;
-    protected ArrayList<Media> entrainmentmedia;
-    protected ArrayList<Media> ambiencemedia;
     protected MediaPlayer entrainmentplayer;
     protected MediaPlayer ambienceplayer;
     protected Boolean ambienceenabled;
@@ -61,8 +57,8 @@ public class Playable {
     public ArrayList<Object> getAllcutsorelementstoplay() {
         return allcutsorelementstoplay;
     }
-    public void setTotalambienceduration(double totalambienceduration) {this.totalambienceduration = totalambienceduration;}
-    public double getTotalambienceduration() {return totalambienceduration;}
+    public Ambiences getAmbiences() {return ambiences;}
+    public Entrainments getEntrainments() {return entrainments;}
     public int getSecondselapsed() {return secondselapsed;}
     public void sortElementsAndCuts() {
         ArrayList<Cut> cutlist = new ArrayList<>();
@@ -161,7 +157,7 @@ public class Playable {
                 };
             }
         }
-        entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
+        entrainmentplayer = new MediaPlayer(entrainments.getSelectedEntrainment(entrainmentplaycount).getMedia());
         entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnPlaying(() -> {
             if (entrainmentplaycount == 0) {fadeinentrainment.play();}
@@ -170,7 +166,7 @@ public class Playable {
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
         if (ambienceenabled) {
-            ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
+            ambienceplayer = new MediaPlayer(ambiences.getSelectedAmbience(ambienceplaycount).getMedia());
             ambienceplayer.setVolume(0.0);
             ambienceplayer.setOnPlaying(() -> fadeinambience.play());
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
@@ -217,7 +213,7 @@ public class Playable {
         try {
             entrainmentplaycount++;
             entrainmentplayer.dispose();
-            entrainmentplayer = new MediaPlayer(entrainmentmedia.get(entrainmentplaycount));
+            entrainmentplayer = new MediaPlayer(entrainments.getSelectedEntrainment(entrainmentplaycount).getMedia());
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
             entrainmentplayer.play();
@@ -226,7 +222,7 @@ public class Playable {
     public void playnextambience() throws IndexOutOfBoundsException {
         ambienceplaycount++;
         ambienceplayer.dispose();
-        ambienceplayer = new MediaPlayer(ambiencemedia.get(ambienceplaycount));
+        ambienceplayer = new MediaPlayer(ambiences.getSelectedAmbience(ambienceplaycount).getMedia());
         ambienceplayer.setOnEndOfMedia(this::playnextambience);
         ambienceplayer.setOnError(this::ambienceerror);
         ambienceplayer.play();

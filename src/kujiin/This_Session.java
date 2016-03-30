@@ -313,7 +313,7 @@ public class This_Session {
                         for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
                             a.append("\n");
                             Playable thiscut = (Playable) cutsorelementswithreducedambience.get(i);
-                            String formattedcurrentduration = Tools.format_minstohrsandmins_short((int) thiscut.getTotalambienceduration() / 60);
+                            String formattedcurrentduration = Tools.format_minstohrsandmins_short((int) thiscut.getAmbiences().getAmbienceDuration().toMinutes());
                             String formattedexpectedduration = Tools.format_minstohrsandmins_short(((Playable) cutsorelementswithreducedambience.get(i)).getdurationinminutes());
                             a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
