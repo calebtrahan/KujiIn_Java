@@ -1,30 +1,23 @@
 package kujiin;
 
 import javafx.beans.value.ChangeListener;
-import javafx.concurrent.Service;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import kujiin.interfaces.Creatable;
-import kujiin.interfaces.Exportable;
-import kujiin.interfaces.Trackable;
-import kujiin.widgets.Playable;
+import kujiin.widgets.Meditatable;
 import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Ambiences;
-import kujiin.xml.Goals;
 import kujiin.xml.Options;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Qi_Gong extends Playable implements Creatable, Exportable, Trackable {
+public class Qi_Gong extends Meditatable {
     private ToggleButton Switch;
     private TextField Value;
-    private Goals GoalsController;
     private ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
         try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
         catch (Exception e) {Value.setText("");}
@@ -44,6 +37,9 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
     }
 
 // GUI
+    public boolean hasValidValue() {
+    return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
+}
     public void toggleswitch() {
         if (Switch.isSelected()) {
             Value.textProperty().addListener(integertextfield);
@@ -68,7 +64,7 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
     }
 
 // Creation
-    public boolean build(ArrayList<Object> elementsorcutstoplay, boolean ambienceenabled) {
+    public boolean build(List<Meditatable> elementsorcutstoplay, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
         setAllcutsorelementstoplay(elementsorcutstoplay);
         if (name.equals("Presession")) {
@@ -76,7 +72,7 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
             if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
                 int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
                 int number;
-                int actualnumber = ((Playable) elementsorcutstoplay.get(1)).number;
+                int actualnumber = (elementsorcutstoplay.get(1)).number;
                 if (actualnumber > 9) {number = 10;}
                 else {number = actualnumber;}
                 String rampupfirstname = "ar" + number + rampdur + ".mp3";
@@ -89,7 +85,7 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
             if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
                 int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
                 int number;
-                int actualnumber = ((Playable) elementsorcutstoplay.get(elementsorcutstoplay.size() - 2)).number;
+                int actualnumber = (elementsorcutstoplay.get(elementsorcutstoplay.size() - 2)).number;
                 if (actualnumber > 9) {number = 10;}
                 else {number = actualnumber;}
                 String rampdowntopost = "zr" + number + rampdur + ".mp3";
@@ -100,21 +96,6 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
         boolean entrainmentgood = entrainments.getCreatedEntrainment().size() > 0;
         if (ambienceenabled) {return entrainmentgood && buildAmbience();}
         else {return entrainmentgood;}
-    }
-    @Override
-    public boolean isValid() {
-        return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
-    }
-    @Override
-    public boolean getambienceindirectory() {
-        try {
-            for (File i : new File(Options.DIRECTORYAMBIENCE, name).listFiles()) {if (Tools.audio_isValid(i)) ambiences.addResourceAmbience(i);}
-        } catch (NullPointerException ignored) {}
-        return ambiences.getAmbience().size() > 0;
-    }
-    @Override
-    public boolean hasenoughAmbience(int secondstocheck) {
-        return ambiences.getAmbienceDuration().toSeconds() >= secondstocheck;
     }
     @Override
     public boolean buildEntrainment() {
@@ -176,7 +157,7 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
         return ambiences.getCreatedAmbience().size() > 0;
     }
     @Override
-    public void reset() {
+    public void resetCreation() {
         Switch.setSelected(false);
         toggleswitch();
     }
@@ -266,59 +247,7 @@ public class Qi_Gong extends Playable implements Creatable, Exportable, Trackabl
     }
 
 // Goals
-    @Override
-    public void setGoalsController(Goals goals) {
-        GoalsController = goals;
-    }
-    @Override
-    public Goals getGoalsController() {
-        return GoalsController;
-    }
-    @Override
-    public void setCurrentGoal() {
-
-    }
-    @Override
-    public Goals.Goal getCurrentGoal() {
-        return null;
-    }
-    @Override
-    public void setGoals(List<Goals.Goal> goalslist) {
-
-    }
-    @Override
-    public List<Goals.Goal> getGoals(boolean includecompleted) {
-        return null;
-    }
-    @Override
-    public void checkCurrentGoal(double currrentpracticedhours) {
-
-    }
 
 // Export
-    @Override
-    public Service<Boolean> getexportservice() {
-        return null;
-    }
-    @Override
-    public Boolean exportedsuccesfully() {
-        return null;
-    }
-    @Override
-    public Boolean cleanuptempfiles() {
-        return null;
-    }
-    @Override
-    public File getFinalexportfile() {
-        return null;
-    }
-    @Override
-    public Boolean mixentrainmentandambience() {
-        return null;
-    }
-    @Override
-    public Boolean sessionreadyforFinalExport() {
-        return null;
-    }
 
 }

@@ -11,7 +11,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.widgets.CreatorAndExporterWidget;
-import kujiin.widgets.Playable;
+import kujiin.widgets.Meditatable;
 import kujiin.widgets.PlayerWidget;
 import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Goals;
@@ -59,7 +59,7 @@ public class This_Session {
     public MainController Root;
     public List<Goals.Goal> GoalsCompletedThisSession;
     private PlayerWidget playerWidget;
-    private List<Object> itemsinsession;
+    private List<Meditatable> itemsinsession;
 
     public This_Session(MainController mainController) {
         Root = mainController;
@@ -92,7 +92,7 @@ public class This_Session {
     public PlayerWidget.PlayerState getPlayerState() {return playerState;}
     public boolean isValid() {
         int totaltime = 0;
-        for (Object i : getallCutsAndElements()) {totaltime += ((Playable) i).getdurationinminutes();}
+        for (Object i : getallCutsAndElements()) {totaltime += ((Meditatable) i).getdurationinminutes();}
         return totaltime > 0;
     }
     public PlayerWidget getPlayerWidget() {
@@ -104,10 +104,10 @@ public class This_Session {
     public ArrayList<Object> getallCutsAndElements() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
     public ArrayList<Cut> getallCuts()  {return new ArrayList<>(Arrays.asList(Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen));}
     public ArrayList<Element> getallElements() {return new ArrayList<>(Arrays.asList(Earth, Air, Fire, Water, Void));}
-    public List<Object> getallitemsinSession() {
+    public List<Meditatable> getallitemsinSession() {
         return itemsinsession;
     }
-    public void setItemsinsession(List<Object> itemsinsession) {
+    public void setItemsinsession(List<Meditatable> itemsinsession) {
         this.itemsinsession = itemsinsession;
     }
     public ArrayList<Cut> getCutsinSession() {
@@ -228,7 +228,7 @@ public class This_Session {
 // Creation Methods
     public boolean sessionvaluesok() {
         for (Object i : getallCutsAndElements()) {
-            Playable cutorelement = (Playable) i;
+            Meditatable cutorelement = (Meditatable) i;
             if (cutorelement.getdurationinminutes() > 0) {return true;}
         }
         return false;
@@ -289,7 +289,7 @@ public class This_Session {
                 if (cutsorelementswithnoambience.size() > 0) {
                     StringBuilder a = new StringBuilder();
                     for (int i = 0; i < cutsorelementswithnoambience.size(); i++) {
-                        a.append(((Playable) cutsorelementswithnoambience.get(i)).name);
+                        a.append(((Meditatable) cutsorelementswithnoambience.get(i)).name);
                         if (i != cutsorelementswithnoambience.size() - 1) {a.append(", ");}
                     }
                     if (cutsorelementswithnoambience.size() > 1) {
@@ -301,7 +301,7 @@ public class This_Session {
                     } else {
                         Tools.gui_showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
                         if (Tools.gui_getconfirmationdialog(Root, "Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
-                            MainController.AdvancedAmbienceEditor ambienceEditor = new MainController.AdvancedAmbienceEditor(Root, ((Playable) cutsorelementswithnoambience.get(0)).name);
+                            MainController.AdvancedAmbienceEditor ambienceEditor = new MainController.AdvancedAmbienceEditor(Root, ((Meditatable) cutsorelementswithnoambience.get(0)).name);
                             ambienceEditor.showAndWait();
                         }
                     }
@@ -312,9 +312,9 @@ public class This_Session {
                         int count = 1;
                         for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
                             a.append("\n");
-                            Playable thiscut = (Playable) cutsorelementswithreducedambience.get(i);
+                            Meditatable thiscut = (Meditatable) cutsorelementswithreducedambience.get(i);
                             String formattedcurrentduration = Tools.format_minstohrsandmins_short((int) thiscut.getAmbiences().getAmbienceDuration().toMinutes());
-                            String formattedexpectedduration = Tools.format_minstohrsandmins_short(((Playable) cutsorelementswithreducedambience.get(i)).getdurationinminutes());
+                            String formattedexpectedduration = Tools.format_minstohrsandmins_short(((Meditatable) cutsorelementswithreducedambience.get(i)).getdurationinminutes());
                             a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }
@@ -403,20 +403,19 @@ public class This_Session {
                 if (sortSessionItems.getorderedsessionitems() == null) {return false;}
                 else {setItemsinsession(sortSessionItems.getorderedsessionitems());}
             }
-            ArrayList<Object> alliteminsession = new ArrayList<>(getallitemsinSession());
-            for (Object i : alliteminsession) {
-                if (i instanceof Cut) {if (! ((Cut) i).build(alliteminsession, ambienceenabled)) {return false;}}
-                if (i instanceof Element) {if (! ((Element) i).build(alliteminsession, ambienceenabled)) {return false;}}
-                if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(alliteminsession, ambienceenabled)) {return false;}}
+            for (Object i : getallitemsinSession()) {
+                if (i instanceof Cut) {if (! ((Cut) i).build(getallitemsinSession(), ambienceenabled)) {return false;}}
+                if (i instanceof Element) {if (! ((Element) i).build(getallitemsinSession(), ambienceenabled)) {return false;}}
+                if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(getallitemsinSession(), ambienceenabled)) {return false;}}
             }
             return true;
         } else {return false;}
     }
     public void resetcreateditems() {
         for (Object i : getallCutsAndElements()) {
-            if (i instanceof Element) {((Element) i).reset();}
-            if (i instanceof Cut) {((Cut) i).reset();}
-            if (i instanceof  Qi_Gong) {((Qi_Gong) i).reset();}
+            if (i instanceof Element) {((Element) i).resetCreation();}
+            if (i instanceof Cut) {((Cut) i).resetCreation();}
+            if (i instanceof  Qi_Gong) {((Qi_Gong) i).resetCreation();}
         }
     }
 
@@ -528,7 +527,7 @@ public class This_Session {
     public void startplayback() {
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
-        for (Object i : itemsinsession) {totalsecondsinsession += ((Playable) i).getdurationinseconds();}
+        for (Object i : itemsinsession) {totalsecondsinsession += ((Meditatable) i).getdurationinseconds();}
         getPlayerWidget().TotalTotalLabel.setText(Tools.format_secondsforplayerdisplay(totalsecondsinsession));
         updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
         updateuitimeline.setCycleCount(Animation.INDEFINITE);
@@ -546,7 +545,7 @@ public class This_Session {
         }
         else if(playerState == PlayerWidget.PlayerState.PAUSED) {
             updateuitimeline.play();
-            ((Playable) currentcutorelement).resume();
+            ((Meditatable) currentcutorelement).resume();
             setPlayerState(PlayerWidget.PlayerState.PLAYING);
             return "Resuming Session...";
         }
@@ -566,7 +565,7 @@ public class This_Session {
     }
     public String pause() {
         if (playerState == PlayerWidget.PlayerState.PLAYING) {
-            ((Playable) currentcutorelement).pause();
+            ((Meditatable) currentcutorelement).pause();
             updateuitimeline.pause();
             setPlayerState(PlayerWidget.PlayerState.PAUSED);
             return "Session Paused";
@@ -580,13 +579,13 @@ public class This_Session {
     }
     public String stop() {
         if (playerState == PlayerWidget.PlayerState.PLAYING) {
-            ((Playable) currentcutorelement).stop();
+            ((Meditatable) currentcutorelement).stop();
             updateuitimeline.stop();
             setPlayerState(PlayerWidget.PlayerState.STOPPED);
             resetthissession();
             return "Session Stopped";
         } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
-            ((Playable) currentcutorelement).stop();
+            ((Meditatable) currentcutorelement).stop();
             updateuitimeline.stop();
             setPlayerState(PlayerWidget.PlayerState.STOPPED);
             resetthissession();
@@ -605,7 +604,7 @@ public class This_Session {
                 totalsecondselapsed++;
                 Float currentprogress;
                 Float totalprogress;
-                if (((Playable) currentcutorelement).getSecondselapsed() != 0) {currentprogress = (float) ((Playable) currentcutorelement).getSecondselapsed() / (float) ((Playable) currentcutorelement).getdurationinseconds();}
+                if (((Meditatable) currentcutorelement).getSecondselapsed() != 0) {currentprogress = (float) ((Meditatable) currentcutorelement).getSecondselapsed() / (float) ((Meditatable) currentcutorelement).getdurationinseconds();}
                 else {currentprogress = (float) 0.0;}
                 if (totalsecondselapsed != 0) {totalprogress = (float) totalsecondselapsed / (float) totalsecondsinsession;}
                 else {totalprogress = (float) 0.0;}
@@ -613,20 +612,20 @@ public class This_Session {
                 getPlayerWidget().TotalProgress.setProgress(totalprogress);
                 currentprogress *= 100;
                 totalprogress *= 100;
-                getPlayerWidget().CurrentCutTopLabel.setText(String.format("%s Progress (%d", ((Playable) currentcutorelement).name, currentprogress.intValue()) + "%)");
+                getPlayerWidget().CurrentCutTopLabel.setText(String.format("%s Progress (%d", ((Meditatable) currentcutorelement).name, currentprogress.intValue()) + "%)");
                 getPlayerWidget().TotalSessionLabel.setText(String.format("Total Progress (%d", totalprogress.intValue()) + "%)");
-                getPlayerWidget().CutCurrentLabel.setText(((Playable) currentcutorelement).getcurrenttimeformatted());
-                getPlayerWidget().CutTotalLabel.setText(((Playable) currentcutorelement).gettotaltimeformatted());
+                getPlayerWidget().CutCurrentLabel.setText(((Meditatable) currentcutorelement).getcurrenttimeformatted());
+                getPlayerWidget().CutTotalLabel.setText(((Meditatable) currentcutorelement).gettotaltimeformatted());
                 getPlayerWidget().TotalCurrentLabel.setText(Tools.format_secondsforplayerdisplay(totalsecondselapsed));
-                getPlayerWidget().StatusBar.setText("Session Playing. Currently Practicing " + ((Playable) currentcutorelement).name + "...");
+                getPlayerWidget().StatusBar.setText("Session Playing. Currently Practicing " + ((Meditatable) currentcutorelement).name + "...");
                 Root.getProgressTracker().updategoalsui();
                 Root.getProgressTracker().updateprogressui();
             } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
                 getPlayerWidget().CurrentCutProgress.setProgress(1.0);
-                getPlayerWidget().CurrentCutTopLabel.setText(((Playable) currentcutorelement).name + " Completed");
-                if (! ((Playable) currentcutorelement).name.equals("Postsession")) {getPlayerWidget().StatusBar.setText("Prepare For " + ((Playable) getallitemsinSession().get(((Playable) currentcutorelement).number + 1)).name);}
-                getPlayerWidget().CutCurrentLabel.setText(((Playable) currentcutorelement).gettotaltimeformatted());
-                getPlayerWidget().CutTotalLabel.setText(((Playable) currentcutorelement).gettotaltimeformatted());
+                getPlayerWidget().CurrentCutTopLabel.setText(((Meditatable) currentcutorelement).name + " Completed");
+                if (! ((Meditatable) currentcutorelement).name.equals("Postsession")) {getPlayerWidget().StatusBar.setText("Prepare For " + getallitemsinSession().get(((Meditatable) currentcutorelement).number + 1).name);}
+                getPlayerWidget().CutCurrentLabel.setText(((Meditatable) currentcutorelement).gettotaltimeformatted());
+                getPlayerWidget().CutTotalLabel.setText(((Meditatable) currentcutorelement).gettotaltimeformatted());
             } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
                 getPlayerWidget().StatusBar.setText("Session Paused");
             } else if (playerState == PlayerWidget.PlayerState.STOPPED) {
@@ -637,8 +636,8 @@ public class This_Session {
     public void playthiscut() {
         try {
             if (Root.getOptions().getSessionOptions().getReferenceoption() != null) {displayreferencefile();}
-            Duration cutduration = ((Playable) currentcutorelement).getdurationasobject();
-            ((Playable) currentcutorelement).start();
+            Duration cutduration = ((Meditatable) currentcutorelement).getdurationasobject();
+            ((Meditatable) currentcutorelement).start();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
             timeline.setOnFinished(event -> timeline.stop());
             timeline.play();
@@ -650,20 +649,20 @@ public class This_Session {
             if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
 //                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
                 try {
-                    List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(((Playable) currentcutorelement).number,
-                            Tools.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(((Playable) currentcutorelement).number, false), 2));
+                    List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(((Meditatable) currentcutorelement).number,
+                            Tools.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(((Meditatable) currentcutorelement).number, false), 2));
                     if (completedgoals.size() > 0) {GoalsCompletedThisSession.addAll(completedgoals);}
-                    ((Playable) currentcutorelement).cleanup();
+                    ((Meditatable) currentcutorelement).cleanup();
                     cutorelementcount++;
                     currentcutorelement = getallitemsinSession().get(cutorelementcount);
                     playthiscut();
                 } catch (IndexOutOfBoundsException ignored) {
-                    ((Playable) currentcutorelement).cleanup(); endofsession();}
+                    ((Meditatable) currentcutorelement).cleanup(); endofsession();}
             } else if (playerState == PlayerWidget.PlayerState.PLAYING) {transition();}
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).show();}
     }
     public void endofsession() {
-        getPlayerWidget().CurrentCutTopLabel.setText(((Playable) currentcutorelement).name + " Completed");
+        getPlayerWidget().CurrentCutTopLabel.setText(((Meditatable) currentcutorelement).name + " Completed");
         getPlayerWidget().TotalSessionLabel.setText("Session Completed");
         closereferencefile();
         updateuitimeline.stop();
@@ -698,11 +697,11 @@ public class This_Session {
     public void transition() {
         closereferencefile();
         Session currentsession = sessions.getsession(sessions.totalsessioncount() - 1);
-        currentsession.updatecutduration(((Playable) currentcutorelement).number, ((Playable) currentcutorelement).getdurationinminutes());
+        currentsession.updatecutduration(((Meditatable) currentcutorelement).number, ((Meditatable) currentcutorelement).getdurationinminutes());
         sessions.marshall();
         Root.getProgressTracker().updategoalsui();
-        ((Playable) currentcutorelement).stop();
-        if (((Playable) currentcutorelement).name.equals("Postsession")) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
+        ((Meditatable) currentcutorelement).stop();
+        if (((Meditatable) currentcutorelement).name.equals("Postsession")) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
         else {
             if (Root.getOptions().getSessionOptions().getAlertfunction()) {
                 Media alertmedia = new Media(Root.getOptions().getSessionOptions().getAlertfilelocation());

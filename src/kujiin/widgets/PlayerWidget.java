@@ -133,14 +133,14 @@ public class PlayerWidget extends Stage {
     public static class DisplayReference extends Stage {
         public ScrollPane ContentPane;
         private MainController Root;
-        private Playable currentcutorelement;
+        private Meditatable currentcutorelement;
         private ReferenceType referenceType;
         private Boolean fullscreenoption;
         private Scene scene;
 
         public DisplayReference(MainController root, Object currentcutorelement) {
             Root = root;
-            this.currentcutorelement = (Playable) currentcutorelement;
+            this.currentcutorelement = (Meditatable) currentcutorelement;
             referenceType = Root.getOptions().getSessionOptions().getReferencetype();
             fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));

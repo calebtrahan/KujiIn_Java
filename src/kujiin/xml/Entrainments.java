@@ -9,14 +9,13 @@ import javafx.util.Duration;
 import kujiin.Cut;
 import kujiin.Qi_Gong;
 import kujiin.Tools;
-import kujiin.widgets.Playable;
+import kujiin.widgets.Meditatable;
 
 import javax.xml.bind.Element;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -28,12 +27,12 @@ public class Entrainments {
     @XmlElement(name = "Entrainment")
     private List<Entrainment> Entrainment;
     private List<Entrainment> CreatedEntrainment;
-    private Playable cutorelement;
+    private Meditatable cutorelement;
     private File directoryrampin;
     private File directoryrampout;
 
     public Entrainments() {}
-    public Entrainments(Playable cutorelement, File freqshort, File freqlong) {
+    public Entrainments(Meditatable cutorelement, File freqshort, File freqlong) {
         this.cutorelement = cutorelement;
         if (cutorelement instanceof Element) {
             directoryrampin = new File(Options.DIRECTORYELEMENTRAMP, "in/");
@@ -75,13 +74,13 @@ public class Entrainments {
 // Creation Methods
     public void addtoCreated(int index, File file) {CreatedEntrainment.add(index, new Entrainment(file));}
     public void addtoCreated(File file) {CreatedEntrainment.add(new Entrainment(file));}
-    public boolean build(int durationinminutes, ArrayList<Object> allcutsorelementstoplay) {
+    public boolean build(int durationinminutes, List<Meditatable> allcutsorelementstoplay) {
         if (hasFreqs()) {
             int index = allcutsorelementstoplay.indexOf(cutorelement);
-            Playable cutorelementbefore = null;
-            Playable cutorelementafter = null;
-            if (index != 0) {cutorelementbefore = (Playable) allcutsorelementstoplay.get(index - 1);}
-            if (index != allcutsorelementstoplay.size() - 1) {cutorelementafter = (Playable) allcutsorelementstoplay.get(index + 1);}
+            Meditatable cutorelementbefore = null;
+            Meditatable cutorelementafter = null;
+            if (index != 0) {cutorelementbefore = allcutsorelementstoplay.get(index - 1);}
+            if (index != allcutsorelementstoplay.size() - 1) {cutorelementafter = allcutsorelementstoplay.get(index + 1);}
             if (cutorelementbefore != null || cutorelementafter != null) {
                 int rampduration;
                 if (durationinminutes > 13) {rampduration = 3;}

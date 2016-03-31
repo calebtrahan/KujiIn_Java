@@ -14,7 +14,6 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import kujiin.MainController;
 import kujiin.Tools;
-import kujiin.interfaces.Widget;
 import kujiin.xml.Goals;
 import kujiin.xml.Options;
 import kujiin.xml.Session;
@@ -32,7 +31,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 // TODO Finish Making EditGoalsDialog (Also Add A Select A Different Cut Feature, And Make It So They Can Pass Cutindex Data Back And Forth)
-public class ProgressAndGoalsWidget implements Widget {
+public class ProgressAndGoalsWidget {
     public static String[] GOALCUTNAMES = {"Presession", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Earth", "Air", "Fire", "Water", "Void", "Postsession", "Total"};
     public static int CUTORELEMENTCOUNT = GOALCUTNAMES.length;
     private ComboBox<String> CutSelectorComboBox;
@@ -178,7 +177,6 @@ public class ProgressAndGoalsWidget implements Widget {
         TotalTimePracticed.setText("-");
         NumberOfSessionsPracticed.setText("-");
     }
-    @Override
     public void disable() {
         TotalTimePracticed.setDisable(true);
         NumberOfSessionsPracticed.setDisable(true);
@@ -193,7 +191,6 @@ public class ProgressAndGoalsWidget implements Widget {
         GoalMinutes.setDisable(false);
         GoalProgress.setDisable(true);
     }
-    @Override
     public void enable() {
         TotalTimePracticed.setDisable(false);
         NumberOfSessionsPracticed.setDisable(false);
@@ -208,7 +205,6 @@ public class ProgressAndGoalsWidget implements Widget {
         GoalMinutes.setDisable(false);
         GoalProgress.setDisable(false);
     }
-    @Override
     public void resetallvalues() {
         TotalTimePracticed.setText("No Sessions");
         NumberOfSessionsPracticed.setText("No Sessions");
@@ -222,7 +218,6 @@ public class ProgressAndGoalsWidget implements Widget {
             TopLabel.setText(GOALCUTNAMES[cutorelementindex]);
         } else {TopLabel.setText("Select A Cut");}
     }
-    @Override
     public boolean cleanup() {
         Goals.marshall();
         Sessions.marshall();

@@ -4,6 +4,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
+import javafx.concurrent.Service;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.Cut;
@@ -12,12 +13,14 @@ import kujiin.This_Session;
 import kujiin.Tools;
 import kujiin.xml.Ambiences;
 import kujiin.xml.Entrainments;
+import kujiin.xml.Goals;
 import kujiin.xml.Options;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
-public class Playable {
+public class Meditatable {
     public int number;
     public String name;
     protected int duration;
@@ -25,6 +28,7 @@ public class Playable {
     protected File ambiencedirectory;
     protected Ambiences ambiences;
     protected Entrainments entrainments;
+// Playback Fields
     protected int entrainmentplaycount;
     protected int ambienceplaycount;
     protected MediaPlayer entrainmentplayer;
@@ -36,10 +40,12 @@ public class Playable {
     protected Animation fadeoutambience;
     protected Timeline fadeouttimeline;
     protected int secondselapsed;
-    protected ArrayList<Cut> cutstoplay;
-    protected ArrayList<Element> elementstoplay;
-    protected ArrayList<Object> allcutsorelementstoplay;
+    protected List<Cut> cutstoplay;
+    protected List<Element> elementstoplay;
+    protected List<Meditatable> allcutsorelementstoplay;
     protected Timeline cutorelementtimeline;
+// Trackable Fields
+    protected Goals GoalsController;
 
 // Getters And Setters
     protected MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
@@ -50,11 +56,11 @@ public class Playable {
     }
     public void setCutstoplay(ArrayList<Cut> cutstoplay) {this.cutstoplay = cutstoplay;}
     public void setElementstoplay(ArrayList<Element> elementstoplay) {this.elementstoplay = elementstoplay;}
-    public void setAllcutsorelementstoplay(ArrayList<Object> allcutsorelementstoplay) {
+    public void setAllcutsorelementstoplay(List<Meditatable> allcutsorelementstoplay) {
         this.allcutsorelementstoplay = allcutsorelementstoplay;
         sortElementsAndCuts();
     }
-    public ArrayList<Object> getAllcutsorelementstoplay() {
+    public List<Meditatable> getAllcutsorelementstoplay() {
         return allcutsorelementstoplay;
     }
     public Ambiences getAmbiences() {return ambiences;}
@@ -70,8 +76,40 @@ public class Playable {
         setCutstoplay(cutlist);
         setElementstoplay(elementlist);
     }
+    public void setGoalsController(Goals goals) {
+        GoalsController = goals;
+    }
+    public Goals getGoalsController() {
+        return GoalsController;
+    }
 
-// Playback Controls
+// Creation
+    public boolean getambienceindirectory() {
+        try {
+            for (File i : new File(Options.DIRECTORYAMBIENCE, name).listFiles()) {if (Tools.audio_isValid(i)) ambiences.addResourceAmbience(i);}
+        } catch (NullPointerException ignored) {}
+        return ambiences.getAmbience().size() > 0;
+    }
+    public boolean hasenoughAmbience(int secondstocheck) {
+        return ambiences.getAmbienceDuration().toSeconds() >= secondstocheck;
+    }
+    public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {
+        setAmbienceenabled(ambienceenabled);
+        setAllcutsorelementstoplay(allcutandelementitems);
+        if (ambienceenabled) {return buildEntrainment() && buildAmbience();}
+        else {return buildEntrainment();}
+    }
+    public boolean buildEntrainment() {
+        getEntrainments().getCreatedEntrainment().clear();
+        return true;
+    }
+    public boolean buildAmbience() {
+        getAmbiences().getCreatedAmbience().clear();
+        return true;
+    }
+    public void resetCreation() {}
+
+// Playback
     public void start() {
         entrainmentplaycount = 0;
         ambienceplaycount = 0;
@@ -246,6 +284,100 @@ public class Playable {
             fadeouttimeline.stop();
             cutorelementtimeline.stop();
         } catch (Exception ignored) {}
+    }
+
+// Export
+    public Service<Boolean> getexportservice() {
+        //    return new Service<Boolean>() {
+        //        @Override
+        //        protected Task<Boolean> createTask() {
+        //            return new Task<Boolean>() {
+        //                @Override
+        //                protected Boolean call() throws Exception {
+        //                    updateTitle("Building " + name);
+        //                    System.out.println("Concatenating Entrainment For " + name);
+        //                    updateMessage("Concatenating Entrainment Files");
+        //                    Tools.audio_concatenatefiles(entrainmentlist, tempentrainmenttextfile, finalentrainmentfile);
+        //                    if (isCancelled()) return false;
+        //                    if (ambienceenabled) {
+        //                        updateProgress(0.25, 1.0);
+        //                        System.out.println("Concatenating Ambience For " + name);
+        //                        updateMessage("Concatenating Ambience Files");
+        //                        Tools.audio_concatenatefiles(ambiencelist, tempambiencetextfile, finalambiencefile);
+        //                        if (isCancelled()) return false;
+        //                        updateProgress(0.50, 1.0);
+        ////                            System.out.println("Reducing Ambience Duration For " + name);
+        ////                            updateMessage("Cutting Ambience Audio To Selected Duration");
+        ////                            System.out.println("Final Ambience File" + finalambiencefile.getAbsolutePath());
+        ////                            if (Tools.audio_getduration(finalambiencefile) > getdurationinseconds()) {
+        ////                                Tools.audio_trimfile(finalambiencefile, getdurationinseconds());
+        ////                            }
+        ////                            if (isCancelled()) return false;
+        //                        updateProgress(0.75, 1.0);
+        //                        System.out.println("Mixing Final Audio For " + name);
+        //                        updateMessage("Combining Entrainment And Ambience Files");
+        //                        mixentrainmentandambience();
+        //                        if (isCancelled()) return false;
+        //                        updateProgress(1.0, 1.0);
+        //                    } else {updateProgress(1.0, 1.0);}
+        //                    return exportedsuccessfully();
+        //                }
+        //            };
+        //        }
+        //    };
+        return null;
+    }
+    public Boolean exportedsuccesfully() {
+//        if (ambienceenabled) {return finalambiencefile.exists() && finalentrainmentfile.exists();}
+//        else {return finalentrainmentfile.exists();}
+        return false;
+    }
+    public Boolean mixentrainmentandambience() {
+//        if (! ambienceenabled) {
+//            try {
+//                FileUtils.copyFile(finalentrainmentfile, getFinalexportfile());
+//                return true;
+//            } catch (IOException e) {return false;}
+//        } else {return Tools.audio_mixfiles(new ArrayList<>(Arrays.asList(finalambiencefile, finalentrainmentfile)), getFinalexportfile());}
+        return false;
+    }
+    public Boolean sessionreadyforFinalExport() {
+//        boolean cutisgood;
+//        File entrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
+//        cutisgood = entrainmentfile.exists();
+//        if (ambienceenabled) {
+//            File ambiencefile = new File(Options.DIRECTORYTEMP, "Ambience/" + name + ".mp3");
+//            cutisgood = ambiencefile.exists();
+//        }
+//        return cutisgood;
+        return false;
+    }
+    public Boolean cleanuptempfiles() {
+//        if (tempambiencefile.exists()) {tempambiencefile.delete();}
+//        if (tempentrainmentfile.exists()) {tempentrainmentfile.delete();}
+//        if (tempentrainmenttextfile.exists()) {tempentrainmenttextfile.delete();}
+//        if (tempambiencetextfile.exists()) {tempambiencetextfile.delete();}
+        return false;
+    }
+    public File getFinalexportfile() {
+        return null;
+    }
+
+// Tracking & Goals
+    public void setCurrentGoal() {
+
+    }
+    public Goals.Goal getCurrentGoal() {
+        return null;
+    }
+    public void setGoals(List<Goals.Goal> goalslist) {
+
+    }
+    public List<Goals.Goal> getGoals(boolean includecompleted) {
+        return getGoalsController().getallcutgoals(number, includecompleted);
+    }
+    public void checkCurrentGoal(double currrentpracticedhours) {
+
     }
 
 // Session Information Getters

@@ -738,11 +738,11 @@ public class CreatorAndExporterWidget {
         public Button DownButton;
         public Button AcceptButton;
         public Button CancelButton;
-        private List<Object> sessionitems;
+        private List<Meditatable> sessionitems;
         private ObservableList<SessionItem> tableitems;
         private MainController Root;
 
-        public SortSessionItems(MainController Root, List<Object> sessionitems) {
+        public SortSessionItems(MainController Root, List<Meditatable> sessionitems) {
             this.sessionitems = sessionitems;
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SortSessionParts.fxml"));
@@ -770,7 +770,7 @@ public class CreatorAndExporterWidget {
             tableitems.clear();
             int count = 1;
             for (Object i : sessionitems) {
-                Playable item = (Playable) i;
+                Meditatable item = (Meditatable) i;
                 tableitems.add(new SessionItem(count, item.name, Tools.format_minstohrsandmins_abbreviated(item.getdurationinminutes())));
                 count++;
             }
@@ -784,8 +784,8 @@ public class CreatorAndExporterWidget {
                 return;
             }
             if (selectedindex == 0) {return;}
-            Playable selecteditem = (Playable) sessionitems.get(selectedindex);
-            Playable oneitemup = (Playable) sessionitems.get(selectedindex - 1);
+            Meditatable selecteditem = sessionitems.get(selectedindex);
+            Meditatable oneitemup = sessionitems.get(selectedindex - 1);
             if (selecteditem instanceof Cut && oneitemup instanceof Cut) {
                 if (selecteditem.number > oneitemup.number) {
                     Tools.gui_showinformationdialog(Root, "Cannot Move", selecteditem.name + " Cannot Be Moved Before " + oneitemup.name + ". Cuts Would Be Out Of Order", "Cannot Move");
@@ -807,8 +807,8 @@ public class CreatorAndExporterWidget {
                 return;
             }
             if (selectedindex == tableitems.size() - 1) {return;}
-            Playable selecteditem = (Playable) sessionitems.get(selectedindex);
-            Playable oneitemdown = (Playable) sessionitems.get(selectedindex + 1);
+            Meditatable selecteditem = sessionitems.get(selectedindex);
+            Meditatable oneitemdown = sessionitems.get(selectedindex + 1);
             if (selecteditem instanceof Cut && oneitemdown instanceof Cut) {
                 if (selecteditem.number < oneitemdown.number) {
                     Tools.gui_showinformationdialog(Root, "Cannot Move", selecteditem.name + " Cannot Be Moved After " + oneitemdown.name + ". Cuts Would Be Out Of Order", "Cannot Move");
@@ -825,7 +825,7 @@ public class CreatorAndExporterWidget {
         public void cutcheck() {
 
         }
-        public List<Object> getorderedsessionitems() {
+        public List<Meditatable> getorderedsessionitems() {
             return sessionitems;
         }
         public void accept(ActionEvent actionEvent) {

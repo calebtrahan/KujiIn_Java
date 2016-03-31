@@ -73,10 +73,6 @@ public class Ambiences {
 // Created Ambience Methods
     public void addCreatedAmbience(Ambience i) {CreatedAmbience.add(i);}
     public void removeCreatedAmbience() {}
-
-
-
-
     public boolean isBuilt() {return CreatedAmbience != null && CreatedAmbience.size() > 0;}
     public boolean hasEnoughAmbience(int minutes) {return false;}
     public void reset() {

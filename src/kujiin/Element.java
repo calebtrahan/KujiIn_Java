@@ -1,32 +1,26 @@
 package kujiin;
 
 import javafx.beans.value.ChangeListener;
-import javafx.concurrent.Service;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import kujiin.interfaces.Creatable;
-import kujiin.interfaces.Exportable;
-import kujiin.interfaces.Trackable;
-import kujiin.widgets.Playable;
+import kujiin.widgets.Meditatable;
 import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.Ambiences;
 import kujiin.xml.Goals;
 import kujiin.xml.Options;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
 // TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
-public class Element extends Playable implements Creatable, Exportable, Trackable {
+public class Element extends Meditatable {
     private ToggleButton Switch;
     private TextField Value;
-    private Goals GoalsController;
     private ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
         try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
         catch (Exception e) {Value.setText("");}
@@ -47,6 +41,9 @@ public class Element extends Playable implements Creatable, Exportable, Trackabl
     }
 
 // GUI
+    public boolean hasValidValue() {
+    return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
+}
     public void toggleswitch() {
         if (Switch.isSelected()) {
             Value.textProperty().addListener(integertextfield);
@@ -73,31 +70,6 @@ public class Element extends Playable implements Creatable, Exportable, Trackabl
     }
 
 // Creation
-    @Override
-    public boolean build(ArrayList<Object> elementstoplay, boolean ambienceenabled) {
-        setAmbienceenabled(ambienceenabled);
-        setAllcutsorelementstoplay(elementstoplay);
-        if (ambienceenabled) {
-            return buildAmbience() && buildEntrainment();
-        } else {
-            return buildEntrainment();
-        }
-    }
-    @Override
-    public boolean isValid() {
-        return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
-    }
-    @Override
-    public boolean getambienceindirectory() {
-        try {
-            for (File i : new File(Options.DIRECTORYAMBIENCE, name).listFiles()) {if (Tools.audio_isValid(i)) ambiences.addResourceAmbience(i);}
-        } catch (NullPointerException ignored) {}
-        return ambiences.getAmbience().size() > 0;
-    }
-    @Override
-    public boolean hasenoughAmbience(int secondstocheck) {
-        return ambiences.getAmbienceDuration().toSeconds() >= secondstocheck;
-    }
     @Override
     public boolean buildEntrainment() {
         return entrainments.build(getdurationinminutes(), getAllcutsorelementstoplay());
@@ -149,7 +121,7 @@ public class Element extends Playable implements Creatable, Exportable, Trackabl
         return ambiences.getCreatedAmbience().size() > 0;
     }
     @Override
-    public void reset() {
+    public void resetCreation() {
         Switch.setSelected(false);
         toggleswitch();
     }
@@ -180,57 +152,8 @@ public class Element extends Playable implements Creatable, Exportable, Trackabl
             super.playnextambience();
         } catch (IndexOutOfBoundsException ignored) {}
     }
-    // Playback Getters
-    @Override
-    public Duration getdurationasobject() {
-        return super.getdurationasobject();
-    }
-    @Override
-    public int getdurationinseconds() {
-        return super.getdurationinseconds();
-    }
-    @Override
-    public int getdurationinminutes() {
-        return super.getdurationinminutes();
-    }
-    @Override
-    public Double getdurationindecimalhours() {
-        return super.getdurationindecimalhours();
-    }
-    @Override
-    public String getcurrenttimeformatted() {
-        return super.getcurrenttimeformatted();
-    }
-    @Override
-    public String gettotaltimeformatted() {
-        return super.gettotaltimeformatted();
-    }
-    @Override
-    public void entrainmenterror() {
-        super.entrainmenterror();
-    }
-    @Override
-    public void ambienceerror() {
-        super.ambienceerror();
-    }
 
 // Goals
-    @Override
-    public void setGoalsController(Goals goals) {
-        GoalsController = goals;
-    }
-    @Override
-    public Goals getGoalsController() {
-        return GoalsController;
-    }
-    @Override
-    public void setCurrentGoal() {
-
-    }
-    @Override
-    public Goals.Goal getCurrentGoal() {
-        return GoalsController.getcurrentgoal(number);
-    }
     @Override
     public void setGoals(List<Goals.Goal> goalslist) {
         GoalsController.update(goalslist, number);
@@ -245,29 +168,5 @@ public class Element extends Playable implements Creatable, Exportable, Trackabl
     }
 
 // Export
-    @Override
-    public Service<Boolean> getexportservice() {
-        return null;
-    }
-    @Override
-    public Boolean exportedsuccesfully() {
-        return null;
-    }
-    @Override
-    public Boolean cleanuptempfiles() {
-        return null;
-    }
-    @Override
-    public File getFinalexportfile() {
-        return null;
-    }
-    @Override
-    public Boolean mixentrainmentandambience() {
-        return null;
-    }
-    @Override
-    public Boolean sessionreadyforFinalExport() {
-        return null;
-    }
 
 }
