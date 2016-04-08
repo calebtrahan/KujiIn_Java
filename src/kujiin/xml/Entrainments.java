@@ -1,207 +1,283 @@
 package kujiin.xml;
 
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaException;
-import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import kujiin.Cut;
-import kujiin.Qi_Gong;
+import kujiin.MainController;
 import kujiin.Tools;
-import kujiin.widgets.Meditatable;
 
-import javax.xml.bind.Element;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Entrainments {
-    private Entrainment rampinfile;
-    private Entrainment freqshort;
-    private Entrainment freqlong;
-    private Entrainment rampoutfile;
-    @XmlElement(name = "Entrainment")
-    private List<Entrainment> Entrainment;
-    private List<Entrainment> CreatedEntrainment;
-    private Meditatable cutorelement;
-    private File directoryrampin;
-    private File directoryrampout;
+    private Entrainment Presession;
+    private Entrainment Rin;
+    private Entrainment Kyo;
+    private Entrainment Toh;
+    private Entrainment Sha;
+    private Entrainment Kai;
+    private Entrainment Jin;
+    private Entrainment Retsu;
+    private Entrainment Zai;
+    private Entrainment Zen;
+    private Entrainment Earth;
+    private Entrainment Air;
+    private Entrainment Fire;
+    private Entrainment Water;
+    private Entrainment Void;
+    private Entrainment Postsession;
+    private MainController Root;
 
     public Entrainments() {}
-    public Entrainments(Meditatable cutorelement, File freqshort, File freqlong) {
-        this.cutorelement = cutorelement;
-        if (cutorelement instanceof Element) {
-            directoryrampin = new File(Options.DIRECTORYELEMENTRAMP, "in/");
-            directoryrampout = new File(Options.DIRECTORYELEMENTRAMP, "out/");
-        } else if (cutorelement instanceof Cut && cutorelement.number == 3) {
-            directoryrampin = Options.DIRECTORYTOHRAMP;
-            directoryrampout = Options.DIRECTORYTOHRAMP;
-        } else if (cutorelement instanceof Qi_Gong) {
-            directoryrampin = Options.DIRECTORYRAMPUP;
-            directoryrampout = Options.DIRECTORYRAMPDOWN;
-        }
-        if (freqshort != null && freqshort.exists()) {this.freqshort = new Entrainment(freqshort);}
-        if (freqlong != null && freqlong.exists()) {this.freqlong = new Entrainment(freqlong);}
+    public Entrainments(MainController Root) {this.Root = Root;}
+
+// Getters And Setters
+    public Entrainment getPresession() {
+        return Presession;
     }
-    public Entrainments(File freqshort, File freqlong, List<Entrainment> entrainments) {
-        if (freqshort != null && freqshort.exists()) {this.freqshort = new Entrainment(freqshort);}
-        if (freqlong != null && freqlong.exists()) {this.freqlong = new Entrainment(freqlong);}
-        CreatedEntrainment = entrainments;
+    public void setPresession(Entrainment presession) {
+        Presession = presession;
+    }
+    public Entrainment getRin() {
+        return Rin;
+    }
+    public void setRin(Entrainment rin) {
+        Rin = rin;
+    }
+    public Entrainment getKyo() {
+        return Kyo;
+    }
+    public void setKyo(Entrainment kyo) {
+        Kyo = kyo;
+    }
+    public Entrainment getToh() {
+        return Toh;
+    }
+    public void setToh(Entrainment toh) {
+        Toh = toh;
+    }
+    public Entrainment getSha() {
+        return Sha;
+    }
+    public void setSha(Entrainment sha) {
+        Sha = sha;
+    }
+    public Entrainment getKai() {
+        return Kai;
+    }
+    public void setKai(Entrainment kai) {
+        Kai = kai;
+    }
+    public Entrainment getJin() {
+        return Jin;
+    }
+    public void setJin(Entrainment jin) {
+        Jin = jin;
+    }
+    public Entrainment getRetsu() {
+        return Retsu;
+    }
+    public void setRetsu(Entrainment retsu) {
+        Retsu = retsu;
+    }
+    public Entrainment getZai() {
+        return Zai;
+    }
+    public void setZai(Entrainment zai) {
+        Zai = zai;
+    }
+    public Entrainment getZen() {
+        return Zen;
+    }
+    public void setZen(Entrainment zen) {
+        Zen = zen;
+    }
+    public Entrainment getEarth() {
+        return Earth;
+    }
+    public void setEarth(Entrainment earth) {
+        Earth = earth;
+    }
+    public Entrainment getAir() {
+        return Air;
+    }
+    public void setAir(Entrainment air) {
+        Air = air;
+    }
+    public Entrainment getFire() {
+        return Fire;
+    }
+    public void setFire(Entrainment fire) {
+        Fire = fire;
+    }
+    public Entrainment getWater() {
+        return Water;
+    }
+    public void setWater(Entrainment water) {
+        Water = water;
+    }
+    public Entrainment getVoid() {
+        return Void;
+    }
+    public void setVoid(Entrainment aVoid) {
+        Void = aVoid;
+    }
+    public Entrainment getPostsession() {
+        return Postsession;
+    }
+    public void setPostsession(Entrainment postsession) {
+        Postsession = postsession;
     }
 
-// Getters And Setters For XML
-    public List<Entrainment> getEntrainment() {
-        return Entrainment;
-    }
-    public void setEntrainment(List<Entrainment> entrainment) {
-        Entrainment = entrainment;
-    }
-    public List<Entrainment> getCreatedEntrainment() {return CreatedEntrainment;}
-    public void setCreatedEntrainment(List<Entrainments.Entrainment> createdEntrainment) {
-        CreatedEntrainment = createdEntrainment;
-    }
-
-// Valid Entrainment Methods
-    public boolean hasFreqs() {return freqshort != null && freqlong != null && freqshort.getFile().exists() && freqlong.getFile().exists();}
-    public boolean hasRamp() {
-        return rampinfile != null && rampoutfile != null && rampinfile.getFile().exists() && rampoutfile.getFile().exists();
-    }
-
-// Creation Methods
-    public void addtoCreated(int index, File file) {CreatedEntrainment.add(index, new Entrainment(file));}
-    public void addtoCreated(File file) {CreatedEntrainment.add(new Entrainment(file));}
-    public boolean build(int durationinminutes, List<Meditatable> allcutsorelementstoplay) {
-        if (hasFreqs()) {
-            int index = allcutsorelementstoplay.indexOf(cutorelement);
-            Meditatable cutorelementbefore = null;
-            Meditatable cutorelementafter = null;
-            if (index != 0) {cutorelementbefore = allcutsorelementstoplay.get(index - 1);}
-            if (index != allcutsorelementstoplay.size() - 1) {cutorelementafter = allcutsorelementstoplay.get(index + 1);}
-            if (cutorelementbefore != null || cutorelementafter != null) {
-                int rampduration;
-                if (durationinminutes > 13) {rampduration = 3;}
-                else if (durationinminutes > 8) {rampduration = 2;}
-                else {rampduration = 1;}
-                if (cutorelementbefore != null) {
-                    rampinfile = new Entrainment(new File(directoryrampin, cutorelementbefore.name.toLowerCase() + rampduration + ".mp3"));
-                    durationinminutes -= rampduration;
-                }
-                if (cutorelementafter != null) {
-                    rampoutfile = new Entrainment(new File(directoryrampout, cutorelementafter.name.toLowerCase() + rampduration + ".mp3"));
-                    durationinminutes -= rampduration;
-                }
+// XML Processing
+    public void unmarshall() {
+        if (Options.SESSIONSXMLFILE.exists()) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(Entrainments.class);
+                Unmarshaller createMarshaller = context.createUnmarshaller();
+                Entrainments entrainments = (Entrainments) createMarshaller.unmarshal(Options.ENTRAINMENTXMLFILE);
+                setPresession(entrainments.getPresession());
+                setRin(entrainments.getRin());
+                setKyo(entrainments.getKyo());
+                setToh(entrainments.getToh());
+                setSha(entrainments.getSha());
+                setKai(entrainments.getKai());
+                setJin(entrainments.getJin());
+                setRetsu(entrainments.getRetsu());
+                setZai(entrainments.getZai());
+                setZen(entrainments.getZen());
+                setEarth(entrainments.getEarth());
+                setAir(entrainments.getAir());
+                setFire(entrainments.getFire());
+                setWater(entrainments.getWater());
+                setVoid(entrainments.getVoid());
+                setPostsession(entrainments.getPostsession());
+            } catch (JAXBException e) {
+                Tools.gui_showinformationdialog(Root, "Information", "Couldn't Read Entrainment XML File", "Check Read File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
             }
-            int longtimes = (int) Math.ceil(durationinminutes / freqlong.getDurationinMinutes());
-            int shorttimes = (int) Math.ceil(durationinminutes % freqshort.getDurationinMinutes());
-            for (int i = 0; i < longtimes; i++) {CreatedEntrainment.add(freqlong);}
-            for (int i = 0; i < shorttimes; i++) {CreatedEntrainment.add(freqshort);}
-            Tools.list_shuffle(CreatedEntrainment, 5);
-            if (rampinfile != null) {CreatedEntrainment.add(0, rampinfile);}
-            if (rampoutfile != null) {CreatedEntrainment.add(rampoutfile);}
-            return getCreatedEntrainment().size() > 0 && getTotalCreatedEntrainmentDuration().toMinutes() >= durationinminutes;
-        } else {return false;}
+        }
     }
-    public boolean isBuilt() {return CreatedEntrainment != null && CreatedEntrainment.size() > 0;}
-    public void reset() {
-        CreatedEntrainment = null;}
-    public Entrainment getSelectedEntrainment(int index) {return getEntrainment().get(index);}
-//
-    public Duration getTotalEntrainmentDuration() {
-        Duration duration = new Duration(0.0);
-        for (Entrainment i : getEntrainment()) {duration.add(i.getDuration());}
-        return duration;
-    }
-    public Duration getTotalCreatedEntrainmentDuration() {
-        Duration duration = new Duration(0.0);
-        for (Entrainment i : getCreatedEntrainment()) {duration.add(i.getDuration());}
-        return duration;
+    public void marshall() {
+        try {
+            JAXBContext context = JAXBContext.newInstance(Entrainments.class);
+            Marshaller createMarshaller = context.createMarshaller();
+            createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            createMarshaller.marshal(this, Options.ENTRAINMENTXMLFILE);
+        } catch (JAXBException e) {Tools.gui_showinformationdialog(Root, "Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());}
     }
 
-// Creation Methods
+// Other Methods
+    public Entrainment getcutorelementsEntrainment(int index) {
+        if (index == 0) {return getPresession();}
+        else if (index == 1) {return getRin();}
+        else if (index == 2) {return getKyo();}
+        else if (index == 3) {return getToh();}
+        else if (index == 4) {return getSha();}
+        else if (index == 5) {return getKai();}
+        else if (index == 6) {return getJin();}
+        else if (index == 7) {return getRetsu();}
+        else if (index == 8) {return getZai();}
+        else if (index == 9) {return getZen();}
+        else if (index == 10) {return getEarth();}
+        else if (index == 11) {return getAir();}
+        else if (index == 12) {return getFire();}
+        else if (index == 13) {return getWater();}
+        else if (index == 14) {return getVoid();}
+        else if (index == 15) {return getPostsession();}
+        else {return null;}
+    }
+    public void setcutorelementsEntrainment(int index, Entrainment entrainment) {
+        if (index == 0) {setPresession(entrainment);}
+        else if (index == 1) {setRin(entrainment);}
+        else if (index == 2) {setKyo(entrainment);}
+        else if (index == 3) {setToh(entrainment);}
+        else if (index == 4) {setSha(entrainment);}
+        else if (index == 5) {setKai(entrainment);}
+        else if (index == 6) {setJin(entrainment);}
+        else if (index == 7) {setRetsu(entrainment);}
+        else if (index == 8) {setZai(entrainment);}
+        else if (index == 9) {setZen(entrainment);}
+        else if (index == 10) {setEarth(entrainment);}
+        else if (index == 11) {setAir(entrainment);}
+        else if (index == 12) {setFire(entrainment);}
+        else if (index == 13) {setWater(entrainment);}
+        else if (index == 14) {setVoid(entrainment);}
+        else if (index == 15) {setPostsession(entrainment);}
+    }
 
-// Entrainment Subclass
+    // Entrainment Subclass
+    @XmlAccessorType(XmlAccessType.PROPERTY)
     public class Entrainment {
-        private File file;
-        private String name;
-        private Duration duration;
-        private Media media;
+        private SoundFile rampinfile;
+        private SoundFile freqshort;
+        private SoundFile freqlong;
+        private SoundFile rampoutfile;
+        private List<SoundFile> CreatedEntrainment;
 
-        public Entrainment() {
-        }
-        public Entrainment(File file) {
-            if (file != null) {
-                this.file = file;
-                this.name = file.getName().substring(0, file.getName().lastIndexOf("."));
-                this.media = new Media(this.file.toURI().toString());
-                calculateduration();
-            }
-        }
+        public Entrainment() {}
 
     // Getters And Setters
-        @XmlElement
-        public File getFile() {
-            return file;
+        public SoundFile getRampinfile() {
+            return rampinfile;
         }
-        public void setFile(File file) {
-            this.file = file;
+        public void setRampinfile(SoundFile rampinfile) {
+            this.rampinfile = rampinfile;
         }
-        @XmlElement
-        public String getName() {
-            return name;
+        public SoundFile getFreqshort() {
+            return freqshort;
         }
-        public void setName(String name) {
-            this.name = name;
+        public void setFreqshort(SoundFile freqshort) {
+            this.freqshort = freqshort;
         }
-        @XmlElement
-        public Duration getDuration() {
-            return duration;
+        public SoundFile getFreqlong() {
+            return freqlong;
         }
-        public void setDuration(Duration duration) {
-            this.duration = duration;
+        public void setFreqlong(SoundFile freqlong) {
+            this.freqlong = freqlong;
         }
-        @XmlElement
-        public Media getMedia() {
-            return media;
+        public SoundFile getRampoutfile() {
+            return rampoutfile;
         }
-        public void setMedia(Media media) {
-            this.media = media;
-        }
-        public double getDurationinMillis() {
-            return getDuration().toMillis();
-        }
-        public double getDurationinSeconds() {
-            return getDuration().toSeconds();
-        }
-        public double getDurationinMinutes() {
-            return getDuration().toMinutes();
+        public void setRampoutfile(SoundFile rampoutfile) {
+            this.rampoutfile = rampoutfile;
         }
 
-    // Utility Methods
-        private void calculateduration() {
-            Service<Void> calculatedurationservice = new Service<Void>() {
-                @Override
-                protected Task<Void> createTask() {
-                    return new Task<Void>() {
-                        @Override
-                        protected Void call() throws Exception {
-                            try {
-                                MediaPlayer shortplayer = new MediaPlayer(new Media(getFile().toURI().toString()));
-                                shortplayer.setOnReady(() -> {
-                                    setDuration(shortplayer.getTotalDuration());
-                                    shortplayer.dispose();
-                                });
-                            } catch (MediaException | NullPointerException ignored) {
-                            }
-                            return null;
-                        }
-                    };
-                }
-            };
-            calculatedurationservice.start();
+    // Add/Remove Created Entrainment
+        public void addcreated(SoundFile soundFile) {CreatedEntrainment.add(soundFile);}
+        public void addcreated(int index, SoundFile soundFile) {CreatedEntrainment.add(soundFile);}
+        public void addcreated(List<SoundFile> soundFiles) {CreatedEntrainment.addAll(soundFiles);}
+        public SoundFile getcreated(int index) {return CreatedEntrainment.get(index);}
+        public SoundFile getcreated(String name) {
+            for (SoundFile i : CreatedEntrainment) {
+                if (i.getName().equals(name)) return i;
+            }
+            return null;
         }
+        public SoundFile getcreated(File file) {
+            for (SoundFile i : CreatedEntrainment) {
+                if (i.getFile().equals(file)) return i;
+            }
+            return null;
+        }
+        public List<SoundFile> getAllCreated() {return CreatedEntrainment;}
+        public void removecreated(SoundFile soundFile) {CreatedEntrainment.remove(soundFile);}
+        public void removecreated(int index) {CreatedEntrainment.remove(index);}
+        public void clearcreated() {CreatedEntrainment.clear();}
+
+    // Information Methods
+        public Duration gettotalCreatedDuration() {
+            Duration duration = new Duration(0.0);
+            for (SoundFile i : CreatedEntrainment) {duration.add(i.getDuration());}
+            return duration;
+        }
+
+    // Other Methods
+        public void shuffleCreated() {Collections.shuffle(CreatedEntrainment);}
     }
 }

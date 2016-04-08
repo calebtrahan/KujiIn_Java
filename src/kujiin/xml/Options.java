@@ -32,16 +32,14 @@ public class Options {
     public static final File DIRECTORYTEMP = new File(SOUNDDIRECTORY, "temp/");
     public static final File DIRECTORYAMBIENCE = new File(SOUNDDIRECTORY, "ambience/");
     public static final File DIRECTORYENTRAINMENT = new File(SOUNDDIRECTORY, "entrainment/");
-    public static final File DIRECTORYRAMPUP = new File(DIRECTORYENTRAINMENT, "ramp/up/");
-    public static final File DIRECTORYRAMPDOWN = new File(DIRECTORYENTRAINMENT, "ramp/down/");
-    public static final File DIRECTORYTOHRAMP = new File(DIRECTORYENTRAINMENT, "tohramp/");
-    public static final File DIRECTORYELEMENTRAMP = new File(DIRECTORYENTRAINMENT, "elementramp/");
-    public static final File DIRECTORYMAINCUTS = new File(DIRECTORYENTRAINMENT, "maincuts/");
+    public static final File DIRECTORYRAMP = new File(DIRECTORYENTRAINMENT, "ramp/");
     // XML File Location Constants
     public static final File OPTIONSXMLFILE = new File(XMLDIRECTORY, "options.xml");
     public static final File DIRECTORYIMAGES = new File(ROOTDIRECTORY, "assets/img/");
     public static final File GOALSXMLFILE = new File(XMLDIRECTORY, "goals.xml");
     public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");
+    public static final File ENTRAINMENTXMLFILE = new File(XMLDIRECTORY, "entrainment.xml");
+    public static final File AMBIENCEXMLFILE = new File(XMLDIRECTORY, "ambience.xml");
 
     // Name Constants
     public static final ArrayList<String> QIGONGNAMES = new ArrayList<>(Arrays.asList("Presession", "Postsession"));

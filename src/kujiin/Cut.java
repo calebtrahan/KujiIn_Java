@@ -5,15 +5,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
 import kujiin.widgets.Meditatable;
 import kujiin.widgets.ProgressAndGoalsWidget;
-import kujiin.xml.Ambiences;
 import kujiin.xml.Options;
+import kujiin.xml.SoundFile;
 
 import java.io.File;
-import java.util.List;
-import java.util.Random;
 
 public class Cut extends Meditatable {
     private ToggleButton Switch;
@@ -24,11 +21,10 @@ public class Cut extends Meditatable {
     };
 
     public Cut(int number, String name, int duration, String briefsummary, This_Session thisession, ToggleButton aSwitch, TextField value) {
-        this.number = number;
-        this.name = name;
-        super.duration = duration;
-        super.thisession = thisession;
-        ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
+        super(number, name, duration, thisession);
+        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, name + "5.mp3")));}
+        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, name + "1.mp3")));}
+        ambience.actual_retrievefromdefaultdirectory(name);
         Switch = aSwitch;
         Value = value;
         Switch.setTooltip(new Tooltip(briefsummary));
@@ -73,96 +69,28 @@ public class Cut extends Meditatable {
 // Creation
     @Override
     public boolean buildEntrainment() {
-        File rampin1 = new File(Options.DIRECTORYTOHRAMP, "3in1.mp3");
-        File rampin2 = new File(Options.DIRECTORYTOHRAMP, "3in2.mp3");
-        File rampout1 = new File(Options.DIRECTORYTOHRAMP, "3out1.mp3");
-        File rampout2 = new File(Options.DIRECTORYTOHRAMP, "3out2.mp3");
-        File rampoutspecial1 = new File(Options.DIRECTORYTOHRAMP, "3outpostsession1.mp3");
-        File rampoutspecial2 = new File(Options.DIRECTORYTOHRAMP, "3outpostsession2.mp3");
-        int fivetimes = 0;
-        int singletimes = 0;
-        if (duration != 0) {
-            fivetimes = duration / 5;
-            singletimes = duration % 5;
-        }
+        if (duration == 0) {return false;}
+        int adjustedduration = duration;
+        if (number == 3) {adjustedduration -= 2;}
+        int fivetimes = adjustedduration / 5;
+        int singletimes = adjustedduration % 5;
+        for (int i = 0; i < fivetimes; i++) {entrainment.addcreated(entrainment.getFreqlong());}
+        for (int i = 0; i < singletimes; i++) {entrainment.addcreated(entrainment.getFreqshort());}
+        entrainment.shuffleCreated();
         if (number == 3) {
-            int adjustedduration = duration;
-            if (duration <= 5) adjustedduration -= 2;
-            else adjustedduration -= 4;
-            fivetimes = adjustedduration / 5;
-            singletimes = adjustedduration % 5;
+            int index = allcutsorelementstoplay.indexOf(this);
+            Meditatable cutorelementbefore = null;
+            Meditatable cutorelementafter = null;
+            if (index != 0) {cutorelementbefore = allcutsorelementstoplay.get(index - 1);}
+            if (index != allcutsorelementstoplay.size() - 1) {cutorelementafter = allcutsorelementstoplay.get(index + 1);}
+            if (cutorelementbefore != null && cutorelementbefore.name.equals("Presession")) {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoinqi.mp3")));}
+            else {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohin.mp3")));}
+            if (cutorelementafter != null && cutorelementafter.name.equals("Postsession")) {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoutqi.mp3")));}
+            else {entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohout.mp3")));}
+            entrainment.addcreated(0, entrainment.getRampinfile());
+            entrainment.addcreated(entrainment.getRampoutfile());
         }
-        for (int i = 0; i < fivetimes; i++) {
-            String filename = name + "5.mp3";
-            File thisfile = new File(Options.DIRECTORYMAINCUTS, filename);
-            entrainments.addtoCreated(thisfile);
-        }
-        for (int i = 0; i < singletimes; i++) {
-            String filename = name + "1.mp3";
-            File thisfile = new File(Options.DIRECTORYMAINCUTS, filename);
-            entrainments.addtoCreated(thisfile);
-        }
-        Tools.list_shuffle(entrainments.getCreatedEntrainment(), 5);
-        if (number == 3) {
-            File rampinfile;
-            File rampoutfile;
-            if (duration <= 5) {rampinfile = rampin1; rampoutfile = rampout1;}
-            else {rampinfile = rampin2; rampoutfile = rampout2;}
-            if (cutstoplay.size() - cutstoplay.indexOf(this) <= 2) {
-                if (duration <= 5) entrainments.addtoCreated(rampoutspecial1);
-                else entrainments.addtoCreated(rampoutspecial2);
-            } else {
-                entrainments.addtoCreated(0, rampinfile);
-                entrainments.addtoCreated(rampoutfile);
-            }
-        }
-        return entrainments.getCreatedEntrainment().size() > 0;
-    }
-    @Override
-    public boolean buildAmbience() {
-        ambiences.reset();
-        Duration currentduration = new Duration(0.0);
-    // Ambience Is >= Session Duration
-        if (hasenoughAmbience(getdurationinseconds())) {
-            for (Ambiences.Ambience i : ambiences.getAmbience()) {
-                if (ambiences.getCreatedAmbienceDuration().toSeconds() < getdurationinseconds()) {
-                    ambiences.addCreatedAmbience(i);
-                    currentduration.add(i.getDuration());
-                } else {break;}
-            }
-    // Shuffle/Loop Ambience Randomly
-        } else {
-            Random randint = new Random();
-            while (currentduration.toSeconds() < getdurationinseconds()) {
-                List<Ambiences.Ambience> createdambience = ambiences.getCreatedAmbience();
-                Ambiences.Ambience selectedambience = ambiences.getSelectedAmbience(randint.nextInt(ambiences.getAmbience().size() - 1));
-                if (createdambience.size() < 2) {
-                    ambiences.addCreatedAmbience(selectedambience);
-                    currentduration.add(selectedambience.getDuration());
-                } else if (createdambience.size() == 2) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                } else if (createdambience.size() == 3) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                } else if (createdambience.size() <= 5) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                } else if (createdambience.size() > 5) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3)) && !selectedambience.equals(createdambience.get(createdambience.size() - 4))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                }
-            }
-        }
-        return ambiences.getCreatedAmbience().size() > 0;
+        return entrainment.getAllCreated().size() > 0 && entrainment.gettotalCreatedDuration().toMinutes() >= getdurationinminutes();
     }
     @Override
     public void resetCreation() {

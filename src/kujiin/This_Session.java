@@ -14,10 +14,7 @@ import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.Meditatable;
 import kujiin.widgets.PlayerWidget;
 import kujiin.widgets.ProgressAndGoalsWidget;
-import kujiin.xml.Goals;
-import kujiin.xml.Options;
-import kujiin.xml.Session;
-import kujiin.xml.Sessions;
+import kujiin.xml.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,12 +57,18 @@ public class This_Session {
     public List<Goals.Goal> GoalsCompletedThisSession;
     private PlayerWidget playerWidget;
     private List<Meditatable> itemsinsession;
+    private Entrainments entrainments;
+    private Ambiences ambiences;
 
     public This_Session(MainController mainController) {
         Root = mainController;
         this.sessions = Root.getProgressTracker().getSessions();
         ambienceenabled = false;
         setPlayerState(PlayerWidget.PlayerState.IDLE);
+        entrainments = new Entrainments(Root);
+        entrainments.unmarshall();
+        ambiences = new Ambiences(Root);
+        ambiences.unmarshall();
         Presession =  new Qi_Gong(0, "Presession", 0, "Gather Qi Before The Session Starts", this, Root.PreSwitch, Root.PreTime);
         Rin = new Cut(1, "RIN", 0, "Meet (Spirit & Invite Into The Body)", this, Root.RinSwitch, Root.RinTime);
         Kyo = new Cut(2, "KYO", 0, "Troops (Manage Internal Strategy/Tools)", this, Root.KyoSwitch, Root.KyoTime);
@@ -124,6 +127,19 @@ public class This_Session {
         }
         return elementsinsession;
     }
+    public Entrainments getEntrainments() {
+        return entrainments;
+    }
+    public void setEntrainments(Entrainments entrainments) {
+        this.entrainments = entrainments;
+    }
+    public Ambiences getAmbiences() {
+        return ambiences;
+    }
+    public void setAmbiences(Ambiences ambiences) {
+        this.ambiences = ambiences;
+    }
+
     // Cut And Element Getters
     public Qi_Gong getPresession() {
         return Presession;
@@ -313,7 +329,7 @@ public class This_Session {
                         for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
                             a.append("\n");
                             Meditatable thiscut = (Meditatable) cutsorelementswithreducedambience.get(i);
-                            String formattedcurrentduration = Tools.format_minstohrsandmins_short((int) thiscut.getAmbiences().getAmbienceDuration().toMinutes());
+                            String formattedcurrentduration = Tools.format_minstohrsandmins_short((int) thiscut.getAmbience().gettotalActualDuration().toMinutes());
                             String formattedexpectedduration = Tools.format_minstohrsandmins_short(((Meditatable) cutsorelementswithreducedambience.get(i)).getdurationinminutes());
                             a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;

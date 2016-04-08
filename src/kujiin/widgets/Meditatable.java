@@ -11,23 +11,21 @@ import kujiin.Cut;
 import kujiin.Element;
 import kujiin.This_Session;
 import kujiin.Tools;
-import kujiin.xml.Ambiences;
-import kujiin.xml.Entrainments;
-import kujiin.xml.Goals;
-import kujiin.xml.Options;
+import kujiin.xml.*;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Meditatable {
     public int number;
     public String name;
     protected int duration;
     protected This_Session thisession;
-    protected File ambiencedirectory;
-    protected Ambiences ambiences;
-    protected Entrainments entrainments;
+    protected File defaultambiencedirectory;
+    protected Ambiences.Ambience ambience;
+    protected Entrainments.Entrainment entrainment;
 // Playback Fields
     protected int entrainmentplaycount;
     protected int ambienceplaycount;
@@ -47,6 +45,16 @@ public class Meditatable {
 // Trackable Fields
     protected Goals GoalsController;
 
+    public Meditatable(int number, String name, int duration, This_Session thissession) {
+        this.number = number;
+        this.name = name;
+        this.duration = duration;
+        this.thisession = thissession;
+        defaultambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
+        entrainment = thissession.getEntrainments().getcutorelementsEntrainment(number);
+        ambience = thissession.getAmbiences().getcutorelementsAmbience(number);
+    }
+
 // Getters And Setters
     protected MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
     protected MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
@@ -63,8 +71,8 @@ public class Meditatable {
     public List<Meditatable> getAllcutsorelementstoplay() {
         return allcutsorelementstoplay;
     }
-    public Ambiences getAmbiences() {return ambiences;}
-    public Entrainments getEntrainments() {return entrainments;}
+    public Ambiences.Ambience getAmbience() {return ambience;}
+    public Entrainments.Entrainment getEntrainment() {return entrainment;}
     public int getSecondselapsed() {return secondselapsed;}
     public void sortElementsAndCuts() {
         ArrayList<Cut> cutlist = new ArrayList<>();
@@ -86,12 +94,12 @@ public class Meditatable {
 // Creation
     public boolean getambienceindirectory() {
         try {
-            for (File i : new File(Options.DIRECTORYAMBIENCE, name).listFiles()) {if (Tools.audio_isValid(i)) ambiences.addResourceAmbience(i);}
+            for (File i : new File(Options.DIRECTORYAMBIENCE, name).listFiles()) {if (Tools.audio_isValid(i)) ambience.actual_addfromfile(i);}
         } catch (NullPointerException ignored) {}
-        return ambiences.getAmbience().size() > 0;
+        return ambience.getAmbience().size() > 0;
     }
     public boolean hasenoughAmbience(int secondstocheck) {
-        return ambiences.getAmbienceDuration().toSeconds() >= secondstocheck;
+        return ambience.gettotalActualDuration().toSeconds() >= secondstocheck;
     }
     public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
@@ -100,12 +108,52 @@ public class Meditatable {
         else {return buildEntrainment();}
     }
     public boolean buildEntrainment() {
-        getEntrainments().getCreatedEntrainment().clear();
+        getEntrainment().clearcreated();
         return true;
     }
     public boolean buildAmbience() {
-        getAmbiences().getCreatedAmbience().clear();
-        return true;
+        ambience.created_clear();
+        Duration currentduration = new Duration(0.0);
+        // Ambience Is >= Session Duration
+        if (hasenoughAmbience(getdurationinseconds())) {
+            for (SoundFile i : ambience.getAmbience()) {
+                if (ambience.gettotalCreatedDuration().toSeconds() < getdurationinseconds()) {
+                    ambience.created_add(i);
+                    currentduration.add(i.getDuration());
+                } else {break;}
+            }
+        } else {
+            Random randint = new Random();
+            while (currentduration.toSeconds() < getdurationinseconds()) {
+                List<SoundFile> createdambience = ambience.created_getAll();
+                SoundFile selectedambience = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
+                if (createdambience.size() < 2) {
+                    ambience.created_add(selectedambience);
+                    currentduration.add(selectedambience.getDuration());
+                } else if (createdambience.size() == 2) {
+                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1))) {
+                        ambience.created_add(selectedambience);
+                        currentduration.add(selectedambience.getDuration());
+                    }
+                } else if (createdambience.size() == 3) {
+                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2))) {
+                        ambience.created_add(selectedambience);
+                        currentduration.add(selectedambience.getDuration());
+                    }
+                } else if (createdambience.size() <= 5) {
+                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3))) {
+                        ambience.created_add(selectedambience);
+                        currentduration.add(selectedambience.getDuration());
+                    }
+                } else if (createdambience.size() > 5) {
+                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3)) && !selectedambience.equals(createdambience.get(createdambience.size() - 4))) {
+                        ambience.created_add(selectedambience);
+                        currentduration.add(selectedambience.getDuration());
+                    }
+                }
+            }
+        }
+        return ambience.created_getAll().size() > 0;
     }
     public void resetCreation() {}
 
@@ -195,7 +243,7 @@ public class Meditatable {
                 };
             }
         }
-        entrainmentplayer = new MediaPlayer(entrainments.getSelectedEntrainment(entrainmentplaycount).getMedia());
+        entrainmentplayer = new MediaPlayer(entrainment.getcreated(entrainmentplaycount).toMedia());
         entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnPlaying(() -> {
             if (entrainmentplaycount == 0) {fadeinentrainment.play();}
@@ -204,7 +252,7 @@ public class Meditatable {
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
         if (ambienceenabled) {
-            ambienceplayer = new MediaPlayer(ambiences.getSelectedAmbience(ambienceplaycount).getMedia());
+            ambienceplayer = new MediaPlayer(ambience.created_get(ambienceplaycount).toMedia());
             ambienceplayer.setVolume(0.0);
             ambienceplayer.setOnPlaying(() -> fadeinambience.play());
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
@@ -251,7 +299,7 @@ public class Meditatable {
         try {
             entrainmentplaycount++;
             entrainmentplayer.dispose();
-            entrainmentplayer = new MediaPlayer(entrainments.getSelectedEntrainment(entrainmentplaycount).getMedia());
+            entrainmentplayer = new MediaPlayer(entrainment.getcreated(entrainmentplaycount).toMedia());
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
             entrainmentplayer.play();
@@ -260,7 +308,7 @@ public class Meditatable {
     public void playnextambience() throws IndexOutOfBoundsException {
         ambienceplaycount++;
         ambienceplayer.dispose();
-        ambienceplayer = new MediaPlayer(ambiences.getSelectedAmbience(ambienceplaycount).getMedia());
+        ambienceplayer = new MediaPlayer(ambience.created_get(ambienceplaycount).toMedia());
         ambienceplayer.setOnEndOfMedia(this::playnextambience);
         ambienceplayer.setOnError(this::ambienceerror);
         ambienceplayer.play();

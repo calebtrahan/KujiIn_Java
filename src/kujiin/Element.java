@@ -5,16 +5,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
 import kujiin.widgets.Meditatable;
 import kujiin.widgets.ProgressAndGoalsWidget;
-import kujiin.xml.Ambiences;
 import kujiin.xml.Goals;
 import kujiin.xml.Options;
+import kujiin.xml.SoundFile;
 
 import java.io.File;
 import java.util.List;
-import java.util.Random;
 
 // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
 // TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
@@ -27,11 +25,10 @@ public class Element extends Meditatable {
     };
 
     public Element(int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
-        this.number = number;
-        this.name = name;
-        super.duration = duration;
-        super.thisession = thissession;
-        ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
+        super(number, name, duration, thissession);
+        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "ELEMENT5.mp3")));}
+        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "ELEMENT1.mp3")));}
+        ambience.actual_retrievefromdefaultdirectory(name);
         Switch = aSwitch;
         Value = value;
         Switch.setOnAction(event -> toggleswitch());
@@ -72,53 +69,32 @@ public class Element extends Meditatable {
 // Creation
     @Override
     public boolean buildEntrainment() {
-        return entrainments.build(getdurationinminutes(), getAllcutsorelementstoplay());
-    }
-    @Override
-    public boolean buildAmbience() {
-        ambiences.reset();
-        Duration currentduration = new Duration(0.0);
-        // Ambience Is >= Session Duration
-        if (hasenoughAmbience(getdurationinseconds())) {
-            for (Ambiences.Ambience i : ambiences.getAmbience()) {
-                if (ambiences.getCreatedAmbienceDuration().toSeconds() < getdurationinseconds()) {
-                    ambiences.addCreatedAmbience(i);
-                    currentduration.add(i.getDuration());
-                } else {break;}
+        int index = allcutsorelementstoplay.indexOf(this);
+        Meditatable cutorelementbefore = null;
+        Meditatable cutorelementafter = null;
+        if (index != 0) {cutorelementbefore = allcutsorelementstoplay.get(index - 1);}
+        if (index != allcutsorelementstoplay.size() - 1) {cutorelementafter = allcutsorelementstoplay.get(index + 1);}
+        int durationinminutes = getdurationinminutes();
+        SoundFile rampinfile = null;
+        SoundFile rampoutfile = null;
+        if (cutorelementbefore != null || cutorelementafter != null) {
+            if (cutorelementbefore != null) {
+               rampinfile = new SoundFile(new File(Options.DIRECTORYRAMP, "elementin" + cutorelementbefore.name.toLowerCase() + ".mp3"));
+                durationinminutes -= 1;
             }
-            // Shuffle/Loop Ambience Randomly
-        } else {
-            Random randint = new Random();
-            while (currentduration.toSeconds() < getdurationinseconds()) {
-                List<Ambiences.Ambience> createdambience = ambiences.getCreatedAmbience();
-                Ambiences.Ambience selectedambience = ambiences.getSelectedAmbience(randint.nextInt(ambiences.getAmbience().size() - 1));
-                if (createdambience.size() < 2) {
-                    ambiences.addCreatedAmbience(selectedambience);
-                    currentduration.add(selectedambience.getDuration());
-                } else if (createdambience.size() == 2) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                } else if (createdambience.size() == 3) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                } else if (createdambience.size() <= 5) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                } else if (createdambience.size() > 5) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3)) && !selectedambience.equals(createdambience.get(createdambience.size() - 4))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                }
+            if (cutorelementafter != null) {
+                rampoutfile = new SoundFile(new File(Options.DIRECTORYRAMP, "elementout" + cutorelementafter.name.toLowerCase() + ".mp3"));
+                durationinminutes -= 1;
             }
         }
-        return ambiences.getCreatedAmbience().size() > 0;
+        int fivetimes = (int) Math.ceil(durationinminutes / 5);
+        int singletimes = (int) Math.ceil(durationinminutes % 5);
+        for (int i = 0; i < fivetimes; i++) {entrainment.addcreated(entrainment.getFreqlong());}
+        for (int i = 0; i < singletimes; i++) {entrainment.addcreated(entrainment.getFreqshort());}
+        entrainment.shuffleCreated();
+        if (rampinfile != null) {entrainment.addcreated(0, rampinfile);}
+        if (rampoutfile != null) {entrainment.addcreated(rampoutfile);}
+        return entrainment.getAllCreated().size() > 0 && entrainment.gettotalCreatedDuration().toMinutes() >= getdurationinminutes();
     }
     @Override
     public void resetCreation() {

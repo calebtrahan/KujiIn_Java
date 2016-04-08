@@ -8,12 +8,10 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.widgets.Meditatable;
 import kujiin.widgets.ProgressAndGoalsWidget;
-import kujiin.xml.Ambiences;
 import kujiin.xml.Options;
+import kujiin.xml.SoundFile;
 
 import java.io.File;
-import java.util.List;
-import java.util.Random;
 
 public class Qi_Gong extends Meditatable {
     private ToggleButton Switch;
@@ -24,11 +22,10 @@ public class Qi_Gong extends Meditatable {
     };
 
     public Qi_Gong (int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
-        this.number = number;
-        this.name = name;
-        super.duration = duration;
-        super.thisession = thissession;
-        ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
+        super(number, name, duration, thissession);
+        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "Qi-Gong5.mp3")));}
+        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "Qi-Gong1.mp3")));}
+        ambience.actual_retrievefromdefaultdirectory(name);
         Switch = aSwitch;
         Value = value;
         Switch.setOnAction(event -> toggleswitch());
@@ -64,97 +61,33 @@ public class Qi_Gong extends Meditatable {
     }
 
 // Creation
-    public boolean build(List<Meditatable> elementsorcutstoplay, boolean ambienceenabled) {
-        setAmbienceenabled(ambienceenabled);
-        setAllcutsorelementstoplay(elementsorcutstoplay);
-        if (name.equals("Presession")) {
-            buildEntrainment();
-            if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-                int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
-                int number;
-                int actualnumber = (elementsorcutstoplay.get(1)).number;
-                if (actualnumber > 9) {number = 10;}
-                else {number = actualnumber;}
-                String rampupfirstname = "ar" + number + rampdur + ".mp3";
-                File ramptofirstcut = new File(Options.DIRECTORYRAMPUP, rampupfirstname);
-                entrainments.addtoCreated(ramptofirstcut);
-            }
-        }
-        if (name.equals("Postsession")) {
-            buildEntrainment();
-            if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-                int rampdur = thisession.Root.getOptions().getSessionOptions().getRampduration();
-                int number;
-                int actualnumber = (elementsorcutstoplay.get(elementsorcutstoplay.size() - 2)).number;
-                if (actualnumber > 9) {number = 10;}
-                else {number = actualnumber;}
-                String rampdowntopost = "zr" + number + rampdur + ".mp3";
-                File thisfile = new File(Options.DIRECTORYRAMPDOWN, rampdowntopost);
-                entrainments.addtoCreated(0, thisfile);
-            }
-        }
-        boolean entrainmentgood = entrainments.getCreatedEntrainment().size() > 0;
-        if (ambienceenabled) {return entrainmentgood && buildAmbience();}
-        else {return entrainmentgood;}
-    }
     @Override
     public boolean buildEntrainment() {
-        int fivetimes = 0;
-        int singletimes = 0;
-        if (duration != 0) {
-            fivetimes = duration / 5;
-            singletimes = duration % 5;
-        }
-        for (int i = 0; i < fivetimes; i++) {entrainments.addtoCreated(new File(Options.DIRECTORYMAINCUTS, "Qi-Gong5.mp3"));}
-        for (int i = 0; i < singletimes; i++) {entrainments.addtoCreated(new File(Options.DIRECTORYMAINCUTS, "Qi-Gong1.mp3"));}
-        Tools.list_shuffle(entrainments.getCreatedEntrainment(), 5);
-        return entrainments.getCreatedEntrainment().size() > 0;
-    }
-    @Override
-    public boolean buildAmbience() {
-        ambiences.reset();
-        Duration currentduration = new Duration(0.0);
-        // Ambience Is >= Session Duration
-        if (hasenoughAmbience(getdurationinseconds())) {
-            for (Ambiences.Ambience i : ambiences.getAmbience()) {
-                if (ambiences.getCreatedAmbienceDuration().toSeconds() < getdurationinseconds()) {
-                    ambiences.addCreatedAmbience(i);
-                    currentduration.add(i.getDuration());
-                } else {break;}
+        int adjustedduration = duration;
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {adjustedduration -= 2;}
+        int fivetimes = adjustedduration / 5;
+        int singletimes = adjustedduration % 5;
+        for (int i = 0; i < fivetimes; i++) {entrainment.addcreated(entrainment.getFreqlong());}
+        for (int i = 0; i < singletimes; i++) {entrainment.addcreated(entrainment.getFreqshort());}
+        entrainment.shuffleCreated();
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+            int index = allcutsorelementstoplay.indexOf(this);
+            Meditatable cutorelementbefore = null;
+            Meditatable cutorelementafter = null;
+            if (index != 0) {cutorelementbefore = allcutsorelementstoplay.get(index - 1);}
+            if (index != allcutsorelementstoplay.size() - 1) {cutorelementafter = allcutsorelementstoplay.get(index + 1);}
+            if (name.equals("Presession") && cutorelementafter != null) {
+                String rampupfirstname = "qiin" + cutorelementafter.name.toLowerCase() + ".mp3";
+                entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampupfirstname)));
+                entrainment.addcreated(entrainment.getRampinfile());
             }
-            // Shuffle/Loop Ambience Randomly
-        } else {
-            Random randint = new Random();
-            while (currentduration.toSeconds() < getdurationinseconds()) {
-                List<Ambiences.Ambience> createdambience = ambiences.getCreatedAmbience();
-                Ambiences.Ambience selectedambience = ambiences.getSelectedAmbience(randint.nextInt(ambiences.getAmbience().size() - 1));
-                if (createdambience.size() < 2) {
-                    ambiences.addCreatedAmbience(selectedambience);
-                    currentduration.add(selectedambience.getDuration());
-                } else if (createdambience.size() == 2) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                } else if (createdambience.size() == 3) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                } else if (createdambience.size() <= 5) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                } else if (createdambience.size() > 5) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3)) && !selectedambience.equals(createdambience.get(createdambience.size() - 4))) {
-                        ambiences.addCreatedAmbience(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
-                    }
-                }
+            if (name.equals("Postsession") && cutorelementbefore != null) {
+                String rampdowntopost = "qiout" + cutorelementbefore.name.toLowerCase() + ".mp3";
+                entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampdowntopost)));
+                entrainment.addcreated(0, entrainment.getRampoutfile());
             }
         }
-        return ambiences.getCreatedAmbience().size() > 0;
+        return entrainment.getAllCreated().size() > 0 && entrainment.gettotalCreatedDuration().toMinutes() >= getdurationinminutes();
     }
     @Override
     public void resetCreation() {
@@ -245,7 +178,6 @@ public class Qi_Gong extends Meditatable {
             ambienceplayer.setOnError(this::ambienceerror);
         } else {thisession.error_endplayback();}
     }
-
 // Goals
 
 // Export
