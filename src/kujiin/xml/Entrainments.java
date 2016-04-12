@@ -1,6 +1,5 @@
 package kujiin.xml;
 
-import javafx.util.Duration;
 import kujiin.MainController;
 import kujiin.Tools;
 
@@ -10,8 +9,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import java.io.File;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -32,6 +31,7 @@ public class Entrainments {
     private Entrainment Water;
     private Entrainment Void;
     private Entrainment Postsession;
+    private final List<Entrainment> AllEntrainment = new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));
     private MainController Root;
 
     public Entrainments() {}
@@ -137,7 +137,7 @@ public class Entrainments {
 
 // XML Processing
     public void unmarshall() {
-        if (Options.SESSIONSXMLFILE.exists()) {
+        if (Options.ENTRAINMENTXMLFILE.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Entrainments.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
@@ -160,6 +160,11 @@ public class Entrainments {
                 setPostsession(entrainments.getPostsession());
             } catch (JAXBException e) {
                 Tools.gui_showinformationdialog(Root, "Information", "Couldn't Read Entrainment XML File", "Check Read File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+            }
+        } else {
+            for (int i = 0; i < AllEntrainment.size(); i++) {
+                Entrainment selectedentrainment = AllEntrainment.get(i);
+                selectedentrainment = new Entrainment();
             }
         }
     }
@@ -209,75 +214,5 @@ public class Entrainments {
         else if (index == 13) {setWater(entrainment);}
         else if (index == 14) {setVoid(entrainment);}
         else if (index == 15) {setPostsession(entrainment);}
-    }
-
-    // Entrainment Subclass
-    @XmlAccessorType(XmlAccessType.PROPERTY)
-    public class Entrainment {
-        private SoundFile rampinfile;
-        private SoundFile freqshort;
-        private SoundFile freqlong;
-        private SoundFile rampoutfile;
-        private List<SoundFile> CreatedEntrainment;
-
-        public Entrainment() {}
-
-    // Getters And Setters
-        public SoundFile getRampinfile() {
-            return rampinfile;
-        }
-        public void setRampinfile(SoundFile rampinfile) {
-            this.rampinfile = rampinfile;
-        }
-        public SoundFile getFreqshort() {
-            return freqshort;
-        }
-        public void setFreqshort(SoundFile freqshort) {
-            this.freqshort = freqshort;
-        }
-        public SoundFile getFreqlong() {
-            return freqlong;
-        }
-        public void setFreqlong(SoundFile freqlong) {
-            this.freqlong = freqlong;
-        }
-        public SoundFile getRampoutfile() {
-            return rampoutfile;
-        }
-        public void setRampoutfile(SoundFile rampoutfile) {
-            this.rampoutfile = rampoutfile;
-        }
-
-    // Add/Remove Created Entrainment
-        public void addcreated(SoundFile soundFile) {CreatedEntrainment.add(soundFile);}
-        public void addcreated(int index, SoundFile soundFile) {CreatedEntrainment.add(soundFile);}
-        public void addcreated(List<SoundFile> soundFiles) {CreatedEntrainment.addAll(soundFiles);}
-        public SoundFile getcreated(int index) {return CreatedEntrainment.get(index);}
-        public SoundFile getcreated(String name) {
-            for (SoundFile i : CreatedEntrainment) {
-                if (i.getName().equals(name)) return i;
-            }
-            return null;
-        }
-        public SoundFile getcreated(File file) {
-            for (SoundFile i : CreatedEntrainment) {
-                if (i.getFile().equals(file)) return i;
-            }
-            return null;
-        }
-        public List<SoundFile> getAllCreated() {return CreatedEntrainment;}
-        public void removecreated(SoundFile soundFile) {CreatedEntrainment.remove(soundFile);}
-        public void removecreated(int index) {CreatedEntrainment.remove(index);}
-        public void clearcreated() {CreatedEntrainment.clear();}
-
-    // Information Methods
-        public Duration gettotalCreatedDuration() {
-            Duration duration = new Duration(0.0);
-            for (SoundFile i : CreatedEntrainment) {duration.add(i.getDuration());}
-            return duration;
-        }
-
-    // Other Methods
-        public void shuffleCreated() {Collections.shuffle(CreatedEntrainment);}
     }
 }

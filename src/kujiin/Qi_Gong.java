@@ -23,9 +23,8 @@ public class Qi_Gong extends Meditatable {
 
     public Qi_Gong (int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         super(number, name, duration, thissession);
-        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "Qi-Gong5.mp3")));}
-        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "Qi-Gong1.mp3")));}
-        ambience.actual_retrievefromdefaultdirectory(name);
+//        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "Qi-Gong5.mp3")));}
+//        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "Qi-Gong1.mp3")));}
         Switch = aSwitch;
         Value = value;
         Switch.setOnAction(event -> toggleswitch());
@@ -67,8 +66,8 @@ public class Qi_Gong extends Meditatable {
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {adjustedduration -= 2;}
         int fivetimes = adjustedduration / 5;
         int singletimes = adjustedduration % 5;
-        for (int i = 0; i < fivetimes; i++) {entrainment.addcreated(entrainment.getFreqlong());}
-        for (int i = 0; i < singletimes; i++) {entrainment.addcreated(entrainment.getFreqshort());}
+        for (int i = 0; i < fivetimes; i++) {entrainment.created_add(entrainment.getFreqlong());}
+        for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
         entrainment.shuffleCreated();
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
             int index = allcutsorelementstoplay.indexOf(this);
@@ -79,18 +78,19 @@ public class Qi_Gong extends Meditatable {
             if (name.equals("Presession") && cutorelementafter != null) {
                 String rampupfirstname = "qiin" + cutorelementafter.name.toLowerCase() + ".mp3";
                 entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampupfirstname)));
-                entrainment.addcreated(entrainment.getRampinfile());
+                entrainment.created_add(entrainment.getRampinfile());
             }
             if (name.equals("Postsession") && cutorelementbefore != null) {
                 String rampdowntopost = "qiout" + cutorelementbefore.name.toLowerCase() + ".mp3";
                 entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampdowntopost)));
-                entrainment.addcreated(0, entrainment.getRampoutfile());
+                entrainment.created_add(0, entrainment.getRampoutfile());
             }
         }
-        return entrainment.getAllCreated().size() > 0 && entrainment.gettotalCreatedDuration().toMinutes() >= getdurationinminutes();
+        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().toMinutes() >= getdurationinminutes();
     }
     @Override
     public void resetCreation() {
+        super.resetCreation();
         Switch.setSelected(false);
         toggleswitch();
     }

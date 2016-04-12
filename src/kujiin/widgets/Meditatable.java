@@ -24,8 +24,8 @@ public class Meditatable {
     protected int duration;
     protected This_Session thisession;
     protected File defaultambiencedirectory;
-    protected Ambiences.Ambience ambience;
-    protected Entrainments.Entrainment entrainment;
+    protected Ambience ambience;
+    protected Entrainment entrainment;
 // Playback Fields
     protected int entrainmentplaycount;
     protected int ambienceplaycount;
@@ -71,8 +71,8 @@ public class Meditatable {
     public List<Meditatable> getAllcutsorelementstoplay() {
         return allcutsorelementstoplay;
     }
-    public Ambiences.Ambience getAmbience() {return ambience;}
-    public Entrainments.Entrainment getEntrainment() {return entrainment;}
+    public Ambience getAmbience() {return ambience;}
+    public Entrainment getEntrainment() {return entrainment;}
     public int getSecondselapsed() {return secondselapsed;}
     public void sortElementsAndCuts() {
         ArrayList<Cut> cutlist = new ArrayList<>();
@@ -92,15 +92,6 @@ public class Meditatable {
     }
 
 // Creation
-    public boolean getambienceindirectory() {
-        try {
-            for (File i : new File(Options.DIRECTORYAMBIENCE, name).listFiles()) {if (Tools.audio_isValid(i)) ambience.actual_addfromfile(i);}
-        } catch (NullPointerException ignored) {}
-        return ambience.getAmbience().size() > 0;
-    }
-    public boolean hasenoughAmbience(int secondstocheck) {
-        return ambience.gettotalActualDuration().toSeconds() >= secondstocheck;
-    }
     public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
         setAllcutsorelementstoplay(allcutandelementitems);
@@ -108,14 +99,14 @@ public class Meditatable {
         else {return buildEntrainment();}
     }
     public boolean buildEntrainment() {
-        getEntrainment().clearcreated();
+        getEntrainment().created_clear();
         return true;
     }
     public boolean buildAmbience() {
         ambience.created_clear();
         Duration currentduration = new Duration(0.0);
         // Ambience Is >= Session Duration
-        if (hasenoughAmbience(getdurationinseconds())) {
+        if (ambience.hasEnoughAmbience(getdurationinseconds())) {
             for (SoundFile i : ambience.getAmbience()) {
                 if (ambience.gettotalCreatedDuration().toSeconds() < getdurationinseconds()) {
                     ambience.created_add(i);
@@ -155,7 +146,10 @@ public class Meditatable {
         }
         return ambience.created_getAll().size() > 0;
     }
-    public void resetCreation() {}
+    public void resetCreation() {
+        entrainment.created_clear();
+        ambience.created_clear();
+    }
 
 // Playback
     public void start() {
@@ -243,7 +237,7 @@ public class Meditatable {
                 };
             }
         }
-        entrainmentplayer = new MediaPlayer(entrainment.getcreated(entrainmentplaycount).toMedia());
+        entrainmentplayer = new MediaPlayer(entrainment.created_get(entrainmentplaycount).toMedia());
         entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnPlaying(() -> {
             if (entrainmentplaycount == 0) {fadeinentrainment.play();}
@@ -299,7 +293,7 @@ public class Meditatable {
         try {
             entrainmentplaycount++;
             entrainmentplayer.dispose();
-            entrainmentplayer = new MediaPlayer(entrainment.getcreated(entrainmentplaycount).toMedia());
+            entrainmentplayer = new MediaPlayer(entrainment.created_get(entrainmentplaycount).toMedia());
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
             entrainmentplayer.play();

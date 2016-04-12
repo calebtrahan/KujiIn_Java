@@ -1,6 +1,5 @@
 package kujiin.xml;
 
-import javafx.util.Duration;
 import kujiin.MainController;
 import kujiin.Tools;
 
@@ -10,12 +9,16 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import java.io.File;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlRootElement
 public class Ambiences {
+    @XmlElement(name="Presession")
     private Ambience Presession;
     private Ambience Rin;
     private Ambience Kyo;
@@ -32,6 +35,7 @@ public class Ambiences {
     private Ambience Water;
     private Ambience Void;
     private Ambience Postsession;
+    private final List<Ambience> AllAmbiences = new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));
     private MainController Root;
 
     public Ambiences() {}
@@ -137,39 +141,48 @@ public class Ambiences {
 
 // XML Processing
     public void unmarshall() {
-    if (Options.SESSIONSXMLFILE.exists()) {
-        try {
-            JAXBContext context = JAXBContext.newInstance(Ambiences.class);
-            Unmarshaller createMarshaller = context.createUnmarshaller();
-            Ambiences ambiences = (Ambiences) createMarshaller.unmarshal(Options.AMBIENCEXMLFILE);
-            setPresession(ambiences.getPresession());
-            setRin(ambiences.getRin());
-            setKyo(ambiences.getKyo());
-            setToh(ambiences.getToh());
-            setSha(ambiences.getSha());
-            setKai(ambiences.getKai());
-            setJin(ambiences.getJin());
-            setRetsu(ambiences.getRetsu());
-            setZai(ambiences.getZai());
-            setZen(ambiences.getZen());
-            setEarth(ambiences.getEarth());
-            setAir(ambiences.getAir());
-            setFire(ambiences.getFire());
-            setWater(ambiences.getWater());
-            setVoid(ambiences.getVoid());
-            setPostsession(ambiences.getPostsession());
-        } catch (JAXBException e) {
-            Tools.gui_showinformationdialog(Root, "Information", "Couldn't Read Ambience XML File", "Check Read File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());
+        if (Options.AMBIENCEXMLFILE.exists()) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(Ambiences.class);
+                Unmarshaller createMarshaller = context.createUnmarshaller();
+                Ambiences ambiences = (Ambiences) createMarshaller.unmarshal(Options.AMBIENCEXMLFILE);
+                setPresession(ambiences.getPresession());
+                setRin(ambiences.getRin());
+                setKyo(ambiences.getKyo());
+                setToh(ambiences.getToh());
+                setSha(ambiences.getSha());
+                setKai(ambiences.getKai());
+                setJin(ambiences.getJin());
+                setRetsu(ambiences.getRetsu());
+                setZai(ambiences.getZai());
+                setZen(ambiences.getZen());
+                setEarth(ambiences.getEarth());
+                setAir(ambiences.getAir());
+                setFire(ambiences.getFire());
+                setWater(ambiences.getWater());
+                setVoid(ambiences.getVoid());
+                setPostsession(ambiences.getPostsession());
+            } catch (JAXBException e) {
+                Tools.gui_showinformationdialog(Root, "Information", "Couldn't Read Ambience XML File", "Check Read File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());
+            }
+        } else {
+            for (int i = 0; i < AllAmbiences.size(); i++) {
+                Ambience selectedambience = AllAmbiences.get(i);
+                selectedambience = new Ambience();
+                setcutorelementsAmbience(i, selectedambience);
+                getcutorelementsAmbience(i).actual_retrievefromdefaultdirectory(Options.ALLNAMES.get(i));
+            }
         }
     }
-}
     public void marshall() {
         try {
             JAXBContext context = JAXBContext.newInstance(Ambiences.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.AMBIENCEXMLFILE);
-        } catch (JAXBException e) {Tools.gui_showinformationdialog(Root, "Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
+        } catch (JAXBException e) {
+            e.printStackTrace();
+            Tools.gui_showinformationdialog(Root, "Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
     }
 
     // Other Methods
@@ -211,97 +224,4 @@ public class Ambiences {
         else if (index == 15) {Postsession = ambience;}
     }
 
-// Ambience Subclass
-    @XmlAccessorType(XmlAccessType.PROPERTY)
-    public class Ambience {
-        private List<SoundFile> Ambience;
-        private List<SoundFile> CreatedAmbience;
-
-    // Getters And Setters
-        public List<SoundFile> getAmbience() {
-            return Ambience;
-        }
-        public void setAmbience(List<SoundFile> ambience) {
-            this.Ambience = ambience;
-        }
-
-    // Ambience Editing Methods
-        // Actual Ambience
-        public void actual_retrievefromdefaultdirectory(String name) {
-            for (File i : new File(Options.DIRECTORYAMBIENCE, name).listFiles()) {
-                actual_addfromfile(i);}
-        }
-        private boolean actual_addfromfile(File file) {
-            if (Tools.audio_isValid(file)) {
-                SoundFile tempfile = new SoundFile(file);
-                if (!ambienceexistsinActual(tempfile)) {
-                    actual_add(tempfile); return true;}
-                else {return false;}
-            } else {return false;}
-        }
-        private void actual_initialize() {if (Ambience == null) Ambience = new ArrayList<>();}
-        public void actual_add(SoundFile soundFile) {
-            actual_initialize(); Ambience.add(soundFile);}
-        public void actual_add(int index, SoundFile soundFile) {
-            actual_initialize(); Ambience.add(index, soundFile);}
-        public void actual_add(List<SoundFile> soundFiles) {
-            actual_initialize(); Ambience.addAll(soundFiles);}
-        public SoundFile actual_get(int index) {return Ambience.get(index);}
-        public SoundFile actual_get(String name) {
-            for (SoundFile i : getAmbience()) {
-                if (i.getName().equals(name)) return i;
-            }
-            return null;
-        }
-        public SoundFile actual_get(File file) {
-            for (SoundFile i : getAmbience()) {
-                if (i.getFile().equals(file)) return i;
-            }
-            return null;
-        }
-        public void actual_remove(SoundFile soundFile) {Ambience.remove(soundFile);}
-        public void actual_remove(int index) {Ambience.remove(index);}
-        // Created Ambience
-        private void created_initialize() {if (CreatedAmbience == null) CreatedAmbience = new ArrayList<>();}
-        public void created_add(SoundFile soundFile) {
-            created_initialize(); CreatedAmbience.add(soundFile);}
-        public void created_add(List<SoundFile> soundFiles) {
-            created_initialize(); CreatedAmbience.addAll(soundFiles);}
-        public SoundFile created_get(int index) {return CreatedAmbience.get(index);}
-        public SoundFile created_get(String name) {
-            for (SoundFile i : CreatedAmbience) {
-                if (i.getName().equals(name)) return i;
-            }
-            return null;
-        }
-        public SoundFile created_get(File file) {
-            for (SoundFile i : CreatedAmbience) {
-                if (i.getFile().equals(file)) return i;
-            }
-            return null;
-        }
-        public List<SoundFile> created_getAll() {return CreatedAmbience;}
-        public void created_remove(SoundFile soundFile) {CreatedAmbience.remove(soundFile);}
-        public void created_remove(int index) {CreatedAmbience.remove(index);}
-        public void created_clear() {CreatedAmbience.clear();}
-
-    // Validation Methods
-        public boolean ambienceexistsinActual(SoundFile soundFile) {return Ambience.contains(soundFile);}
-        public boolean ambienceexistsinCreated(SoundFile soundFile) {return CreatedAmbience.contains(soundFile);}
-        public boolean hasEnoughActualAmbience() {return false;}
-
-    // Information Methods
-        public Duration gettotalActualDuration() {
-            Duration duration = new Duration(0.0);
-            for (SoundFile i : Ambience) {duration.add(i.getDuration());}
-            return duration;
-        }
-        public Duration gettotalCreatedDuration() {
-            Duration duration = new Duration(0.0);
-            for (SoundFile i : CreatedAmbience) {duration.add(i.getDuration());}
-            return duration;
-        }
-
-    // Playback Methods
-    }
 }

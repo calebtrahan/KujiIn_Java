@@ -104,7 +104,7 @@ public class This_Session {
     public void setPlayerWidget(PlayerWidget playerWidget) {
         this.playerWidget = playerWidget;
     }
-    public ArrayList<Object> getallCutsAndElements() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
+    public ArrayList<Meditatable> getallCutsAndElements() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
     public ArrayList<Cut> getallCuts()  {return new ArrayList<>(Arrays.asList(Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen));}
     public ArrayList<Element> getallElements() {return new ArrayList<>(Arrays.asList(Earth, Air, Fire, Water, Void));}
     public List<Meditatable> getallitemsinSession() {
@@ -249,43 +249,21 @@ public class This_Session {
         }
         return false;
     }
+    // TODO Refactor CheckAmbience Into Meditatable And Subclasses
     public void checkambience(CheckBox ambiencecheckbox) {
         if (sessionvaluesok()) {
-            ArrayList<Object> cutsorelementswithnoambience = new ArrayList<>();
-            ArrayList<Object> cutsorelementswithreducedambience = new ArrayList<>();
-            Object[] tempcuts = getallCutsAndElements().toArray();
+            ArrayList<Meditatable> cutsorelementswithnoambience = new ArrayList<>();
+            ArrayList<Meditatable> cutsorelementswithreducedambience = new ArrayList<>();
             Service<Void> ambiencecheckerservice = new Service<Void>() {
                 @Override
                 protected Task<Void> createTask() {
                     return new Task<Void>() {
                         @Override
                         protected Void call() throws Exception {
-                            for (Object i : tempcuts) {
-                                if (i instanceof Cut) {
-                                    Cut thiscut = (Cut) i;
-                                    updateMessage(String.format("Currently Checking %s...", thiscut.name));
-                                    if (thiscut.getdurationinminutes() != 0) {
-                                        if (thiscut.getambienceindirectory()) {
-                                            if (!thiscut.hasenoughAmbience(thiscut.getdurationinseconds())) {cutsorelementswithreducedambience.add(thiscut);}
-                                        } else {cutsorelementswithnoambience.add(thiscut);}
-                                    }
-                                } else if (i instanceof Element) {
-                                    Element thiselement = (Element) i;
-                                    updateMessage(String.format("Currently Checking %s...", thiselement.name));
-                                    if (thiselement.getdurationinminutes() != 0) {
-                                        if (thiselement.getambienceindirectory()) {
-                                            if (!thiselement.hasenoughAmbience(thiselement.getdurationinseconds())) {cutsorelementswithreducedambience.add(thiselement);}
-                                        } else {cutsorelementswithnoambience.add(thiselement);}
-                                    }
-                                } else if (i instanceof Qi_Gong) {
-                                    Qi_Gong thisqigong = (Qi_Gong) i;
-                                    updateMessage(String.format("Currently Checking %s...", thisqigong.name));
-                                    if (thisqigong.getdurationinminutes() != 0) {
-                                        if (thisqigong.getambienceindirectory()) {
-                                            if (!thisqigong.hasenoughAmbience(thisqigong.getdurationinseconds())) {cutsorelementswithreducedambience.add(thisqigong);}
-                                        } else {cutsorelementswithnoambience.add(thisqigong);}
-                                    }
-                                }
+                            for (Meditatable i : getallCutsAndElements()) {
+                                updateMessage(String.format("Currently Checking %s...", i.name));
+                                if (! i.getAmbience().hasAnyAmbience()) {cutsorelementswithnoambience.add(i);}
+                                else if (! i.getAmbience().hasEnoughAmbience(i.getdurationinseconds())) {cutsorelementswithreducedambience.add(i);}
                             }
                             updateMessage("Done Checking Ambience");
                             return null;
@@ -305,19 +283,19 @@ public class This_Session {
                 if (cutsorelementswithnoambience.size() > 0) {
                     StringBuilder a = new StringBuilder();
                     for (int i = 0; i < cutsorelementswithnoambience.size(); i++) {
-                        a.append(((Meditatable) cutsorelementswithnoambience.get(i)).name);
+                        a.append(cutsorelementswithnoambience.get(i).name);
                         if (i != cutsorelementswithnoambience.size() - 1) {a.append(", ");}
                     }
                     if (cutsorelementswithnoambience.size() > 1) {
                         Tools.gui_showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
                         if (Tools.gui_getconfirmationdialog(Root, "Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
-                            MainController.AdvancedAmbienceEditor ambienceEditor = new MainController.AdvancedAmbienceEditor(Root);
+                            MainController.AdvancedAmbienceEditor ambienceEditor = new MainController.AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences());
                             ambienceEditor.showAndWait();
                         }
                     } else {
                         Tools.gui_showerrordialog(Root, "Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
                         if (Tools.gui_getconfirmationdialog(Root, "Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
-                            MainController.AdvancedAmbienceEditor ambienceEditor = new MainController.AdvancedAmbienceEditor(Root, ((Meditatable) cutsorelementswithnoambience.get(0)).name);
+                            MainController.AdvancedAmbienceEditor ambienceEditor = new MainController.AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences(), cutsorelementswithnoambience.get(0).name);
                             ambienceEditor.showAndWait();
                         }
                     }
@@ -328,9 +306,9 @@ public class This_Session {
                         int count = 1;
                         for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
                             a.append("\n");
-                            Meditatable thiscut = (Meditatable) cutsorelementswithreducedambience.get(i);
+                            Meditatable thiscut = cutsorelementswithreducedambience.get(i);
                             String formattedcurrentduration = Tools.format_minstohrsandmins_short((int) thiscut.getAmbience().gettotalActualDuration().toMinutes());
-                            String formattedexpectedduration = Tools.format_minstohrsandmins_short(((Meditatable) cutsorelementswithreducedambience.get(i)).getdurationinminutes());
+                            String formattedexpectedduration = Tools.format_minstohrsandmins_short(cutsorelementswithreducedambience.get(i).getdurationinminutes());
                             a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }

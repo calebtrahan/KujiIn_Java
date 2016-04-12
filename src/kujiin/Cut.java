@@ -22,9 +22,8 @@ public class Cut extends Meditatable {
 
     public Cut(int number, String name, int duration, String briefsummary, This_Session thisession, ToggleButton aSwitch, TextField value) {
         super(number, name, duration, thisession);
-        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, name + "5.mp3")));}
-        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, name + "1.mp3")));}
-        ambience.actual_retrievefromdefaultdirectory(name);
+//        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, name + "5.mp3")));}
+//        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, name + "1.mp3")));}
         Switch = aSwitch;
         Value = value;
         Switch.setTooltip(new Tooltip(briefsummary));
@@ -74,8 +73,8 @@ public class Cut extends Meditatable {
         if (number == 3) {adjustedduration -= 2;}
         int fivetimes = adjustedduration / 5;
         int singletimes = adjustedduration % 5;
-        for (int i = 0; i < fivetimes; i++) {entrainment.addcreated(entrainment.getFreqlong());}
-        for (int i = 0; i < singletimes; i++) {entrainment.addcreated(entrainment.getFreqshort());}
+        for (int i = 0; i < fivetimes; i++) {entrainment.created_add(entrainment.getFreqlong());}
+        for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
         entrainment.shuffleCreated();
         if (number == 3) {
             int index = allcutsorelementstoplay.indexOf(this);
@@ -87,13 +86,14 @@ public class Cut extends Meditatable {
             else {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohin.mp3")));}
             if (cutorelementafter != null && cutorelementafter.name.equals("Postsession")) {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoutqi.mp3")));}
             else {entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohout.mp3")));}
-            entrainment.addcreated(0, entrainment.getRampinfile());
-            entrainment.addcreated(entrainment.getRampoutfile());
+            entrainment.created_add(0, entrainment.getRampinfile());
+            entrainment.created_add(entrainment.getRampoutfile());
         }
-        return entrainment.getAllCreated().size() > 0 && entrainment.gettotalCreatedDuration().toMinutes() >= getdurationinminutes();
+        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().toMinutes() >= getdurationinminutes();
     }
     @Override
     public void resetCreation() {
+        super.resetCreation();
         Switch.setSelected(false);
         toggleswitch();
     }

@@ -23,7 +23,10 @@ import javafx.util.Duration;
 import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.PlayerWidget;
 import kujiin.widgets.ProgressAndGoalsWidget;
+import kujiin.xml.Ambience;
+import kujiin.xml.Ambiences;
 import kujiin.xml.Options;
+import kujiin.xml.SoundFile;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -120,6 +123,7 @@ public class MainController implements Initializable {
         CreatorStatusBar.setText("");
     }
     public boolean cleanup() {
+        getSession().getAmbiences().marshall();
         return getCreatorAndExporter().cleanup() && getProgressTracker().cleanup();
     }
 
@@ -175,7 +179,7 @@ public class MainController implements Initializable {
     getProgressTracker().updateprogressui();
 }
     public void editprogramsambience(ActionEvent actionEvent) {
-        AdvancedAmbienceEditor sae = new AdvancedAmbienceEditor(this);
+        AdvancedAmbienceEditor sae = new AdvancedAmbienceEditor(this, getSession().getAmbiences());
         sae.showAndWait();
     }
     public void editreferencefiles(ActionEvent actionEvent) {
@@ -380,6 +384,8 @@ public class MainController implements Initializable {
         private File tempdirectory;
         private MainController Root;
         private PreviewFile previewdialog;
+        private Ambiences ambiences;
+        private Ambience selectedambience;
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
@@ -397,8 +403,9 @@ public class MainController implements Initializable {
             this.setOnCloseRequest(event -> close());
         }
 
-        public AdvancedAmbienceEditor(MainController root) {
+        public AdvancedAmbienceEditor(MainController root, Ambiences ambiences) {
             Root = root;
+            this.ambiences = ambiences;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AdvancedAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -410,8 +417,9 @@ public class MainController implements Initializable {
             CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
-        public AdvancedAmbienceEditor(MainController root, String cutname) {
+        public AdvancedAmbienceEditor(MainController root, Ambiences ambiences, String cutname) {
             Root = root;
+            this.ambiences = ambiences;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AdvancedAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -424,7 +432,6 @@ public class MainController implements Initializable {
             CutOrElementSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
-
     // Transfer Methods
         // TODO Add Check Duplicates Before Moving Over (Or Ask Allow Duplicates?)
         public void rightarrowpressed(ActionEvent actionEvent) {
@@ -518,17 +525,20 @@ public class MainController implements Initializable {
 
     // Table Methods
         public void selectandloadcut() {
-            actual_ambiencesonglist.clear();
-            Actual_Table.getItems().clear();
-            int index = kujiin.xml.Options.ALLNAMES.indexOf(CutOrElementSelectionBox.getValue());
-            selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
-            if (getcurrentambiencefiles()) {
-                Actual_Table.setItems(actual_ambiencesonglist);
-                CutSelectionLabel.setText(selectedcutorelementname + "'s Ambience");
+            int index = CutOrElementSelectionBox.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                selectedambience = ambiences.getcutorelementsAmbience(index);
+                actual_ambiencesonglist.clear();
+                Actual_Table.getItems().clear();
+                selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
+                if (populateactualambiencetable()) {
+                    Actual_Table.setItems(actual_ambiencesonglist);
+                    CutSelectionLabel.setText(selectedcutorelementname + "'s Ambience");
+                }
+                calculateactualtotalduration();
             }
-            calculateactualtotalduration();
         }
-        public void addto(TableView<AmbienceSong> table, ObservableList<AmbienceSong> songlist) {
+        private void addto(TableView<AmbienceSong> table, ObservableList<AmbienceSong> songlist) {
             List<File> files = Tools.filechooser_multiple(getScene(), "Add Files", null);
             ArrayList<File> notvalidfilenames = new ArrayList<>();
             if (files != null) {
@@ -541,12 +551,12 @@ public class MainController implements Initializable {
             }
             if (songlist.size() > 0) {table.setItems(songlist);}
         }
-        public void removefrom(TableView<AmbienceSong> table) {
+        private void removefrom(TableView<AmbienceSong> table) {
             int index = table.getSelectionModel().getSelectedIndex();
             if (index != -1) {table.getItems().remove(index);}
             else {Tools.gui_showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
         }
-        public void preview(AmbienceSong selectedsong) {
+        private void preview(AmbienceSong selectedsong) {
             if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
                 if (previewdialog == null || !previewdialog.isShowing()) {
                     previewdialog = new PreviewFile(Root, selectedsong.getFile());
@@ -554,16 +564,15 @@ public class MainController implements Initializable {
                 }
             }
         }
-        public boolean getcurrentambiencefiles() {
+        private boolean populateactualambiencetable() {
+            actual_ambiencesonglist.clear();
             if (selectedcutorelementname != null) {
-                File thisdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutorelementname);
                 try {
-                    for (File i : thisdirectory.listFiles()) {
-                        if (Tools.audio_isValid(i)) {
-                            actual_ambiencesonglist.add(new AmbienceSong(i.getName(), i));}
+                    for (SoundFile i : selectedambience.getAmbience()) {
+                        actual_ambiencesonglist.add(new AmbienceSong(i.getName(), i.getFile()));
                     }
                     return true;
-                } catch (NullPointerException e) {
+                } catch (Exception e) {
                     Tools.gui_showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
                     return false;
                 }
@@ -584,8 +593,8 @@ public class MainController implements Initializable {
             // TODO Check If Unsaved Changes Here?
             this.close();
             if (selected_temp_ambiencesong != null && kujiin.xml.Options.ALLNAMES.contains(selectedcutorelementname)) {
-                new SimpleAmbienceEditor(Root, selectedcutorelementname).show();
-            } else {new SimpleAmbienceEditor(Root).show();}
+                new SimpleAmbienceEditor(Root, Root.getSession().getAmbiences(), selectedcutorelementname).show();
+            } else {new SimpleAmbienceEditor(Root, Root.getSession().getAmbiences()).show();}
         }
     }
     public static class SimpleAmbienceEditor extends Stage implements Initializable {
@@ -605,6 +614,8 @@ public class MainController implements Initializable {
         private AmbienceSong selectedambiencesong;
         private String selectedcutorelementname;
         private PreviewFile previewdialog;
+        private Ambiences ambiences;
+        private Ambience selectedambience;
         private double totalselectedduration;
 
         @Override
@@ -618,8 +629,9 @@ public class MainController implements Initializable {
             CutOrElementChoiceBox.setItems(allnames);
         }
 
-        public SimpleAmbienceEditor(MainController root) {
+        public SimpleAmbienceEditor(MainController root, Ambiences ambiences) {
             Root = root;
+            this.ambiences = ambiences;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -629,8 +641,9 @@ public class MainController implements Initializable {
             } catch (IOException ignored) {}
             CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
         }
-        public SimpleAmbienceEditor(MainController root, String cutorelementname) {
+        public SimpleAmbienceEditor(MainController root, Ambiences ambiences, String cutorelementname) {
             Root = root;
+            this.ambiences = ambiences;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -644,7 +657,6 @@ public class MainController implements Initializable {
                     selectandloadcut();
                 }
             });
-
             CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
         }
 
@@ -730,8 +742,8 @@ public class MainController implements Initializable {
         public void advancedmode(ActionEvent actionEvent) {
             this.close();
             if (selectedcutorelementname != null && kujiin.xml.Options.ALLNAMES.contains(selectedcutorelementname)) {
-                new AdvancedAmbienceEditor(Root, selectedcutorelementname).show();
-            } else {new AdvancedAmbienceEditor(Root).show();}
+                new AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences(), selectedcutorelementname).show();
+            } else {new AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences()).show();}
         }
         public void save(ActionEvent actionEvent) {
 
