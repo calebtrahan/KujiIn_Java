@@ -179,8 +179,10 @@ public class MainController implements Initializable {
     getProgressTracker().updateprogressui();
 }
     public void editprogramsambience(ActionEvent actionEvent) {
+        getStage().setIconified(true);
         AdvancedAmbienceEditor sae = new AdvancedAmbienceEditor(this, getSession().getAmbiences());
         sae.showAndWait();
+        getStage().setIconified(false);
     }
     public void editreferencefiles(ActionEvent actionEvent) {
         EditReferenceFiles a = new EditReferenceFiles(this);
@@ -414,6 +416,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Advanced Ambience Editor");
             CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
@@ -428,12 +431,14 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Advanced Ambience Editor");
             CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
             CutOrElementSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
+
     // Transfer Methods
         // TODO Add Check Duplicates Before Moving Over (Or Ask Allow Duplicates?)
         public void rightarrowpressed(ActionEvent actionEvent) {
@@ -495,7 +500,10 @@ public class MainController implements Initializable {
         }
 
     // Temp Ambience Methods
-        public void addtotempambience(ActionEvent actionEvent) {addto(Temp_Table, temp_soundfilelist, temp_ambiencesonglist);}
+        public void addtotempambience(ActionEvent actionEvent) {
+            if (temp_soundfilelist == null) {temp_soundfilelist = new ArrayList<>();}
+            if (temp_ambiencesonglist == null) {temp_ambiencesonglist = FXCollections.observableArrayList();}
+            addto(Temp_Table, temp_soundfilelist, temp_ambiencesonglist);}
         public void removefromtempambience(ActionEvent actionEvent) {removefrom(Temp_Table, temp_soundfilelist, temp_ambiencesonglist);}
         public void previewtempambience(ActionEvent actionEvent) {preview(selected_temp_ambiencesong);}
         public void tempselectionchanged(AmbienceSong ambiencesong) {
@@ -510,7 +518,10 @@ public class MainController implements Initializable {
         }
 
     // Actual Ambience Methods
-        public void addtoactualambience(ActionEvent actionEvent) {addto(Actual_Table, actual_soundfilelist, actual_ambiencesonglist);}
+        public void addtoactualambience(ActionEvent actionEvent) {
+            if (actual_soundfilelist == null) {actual_soundfilelist = new ArrayList<>();}
+            if (actual_ambiencesonglist == null) {actual_ambiencesonglist = FXCollections.observableArrayList();}
+            addto(Actual_Table, actual_soundfilelist, actual_ambiencesonglist);}
         public void removeactualambience(ActionEvent actionEvent) {removefrom(Actual_Table, actual_soundfilelist, actual_ambiencesonglist);}
         public void previewactualambience(ActionEvent actionEvent) {preview(selected_actual_ambiencesong);}
         public void actualselectionchanged(AmbienceSong ambiencesong) {selected_actual_ambiencesong = ambiencesong;}
@@ -561,6 +572,8 @@ public class MainController implements Initializable {
                     AmbienceSong tempsong = new AmbienceSong(soundFile);
                     songlist.add(tempsong);
                     table.getItems().add(tempsong);
+                    calculateactualtotalduration();
+                    calculatetemptotalduration();
                 });
         }
         private void removefrom(TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
@@ -607,6 +620,7 @@ public class MainController implements Initializable {
                     if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
                 }
                 ambiences.setcutorelementsAmbience(index, selectedambience);
+                ambiences.marshall();
             } else {Tools.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closebuttonpressed(ActionEvent actionEvent) {
@@ -662,6 +676,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException ignored) {}
             CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
         }
@@ -674,6 +689,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException ignored) {}
             setOnShowing(event -> {
                 if (kujiin.xml.Options.ALLNAMES.contains(cutorelementname)) {
@@ -793,44 +809,44 @@ public class MainController implements Initializable {
         private MediaPlayer PreviewPlayer;
 
         public PreviewFile(MainController root, File filetopreview) {
-            Filetopreview = filetopreview;
-            if (Tools.audio_isValid(Filetopreview)) {
+            if (Tools.audio_isValid(filetopreview)) {
                 Root = root;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/PreviewAudioDialog.fxml"));
                 fxmlLoader.setController(this);
+                setOnHidden(event -> {
+                    if (PreviewPlayer != null) {PreviewPlayer.dispose();}
+                    close();
+                });
                 try {
                     Scene defaultscene = new Scene(fxmlLoader.load());
                     setScene(defaultscene);
                     Root.getOptions().setStyle(this);
+                    this.setResizable(false);
+                    Filetopreview = filetopreview;
+                    TopLabel.setText(Filetopreview.getName().substring(0, Filetopreview.getName().lastIndexOf(".")));
+                    Mediatopreview = new Media(Filetopreview.toURI().toString());
+                    PreviewPlayer = new MediaPlayer(Mediatopreview);
+                    PlayButton.setDisable(true);
+                    PauseButton.setDisable(true);
+                    StopButton.setDisable(true);
+                    PreviewPlayer.setOnReady(() -> {
+                        CurrentTime.setText(Tools.format_secondsforplayerdisplay(0));
+                        TotalTime.setText(Tools.format_secondsforplayerdisplay((int) PreviewPlayer.getTotalDuration().toSeconds()));
+                        PlayButton.setDisable(false);
+                        PauseButton.setDisable(false);
+                        StopButton.setDisable(false);
+                    });
+                    VolumeSlider.setValue(0.0);
+                    VolumePercentage.setText("0%");
                 } catch (IOException ignored) {}
             } else {Tools.gui_showinformationdialog(Root, "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
         }
-        public PreviewFile(MainController root, Media mediatopreview) {
-            Filetopreview = new File(mediatopreview.getSource());
-            if (Tools.audio_isValid(Filetopreview)) {
-                Root = root;
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/PreviewAudioDialog.fxml"));
-                fxmlLoader.setController(this);
-                try {
-                    Scene defaultscene = new Scene(fxmlLoader.load());
-                    setScene(defaultscene);
-                    Root.getOptions().setStyle(this);
-                } catch (IOException ignored) {}
-                Mediatopreview = mediatopreview;
-                PreviewPlayer = new MediaPlayer(Mediatopreview);
-                TopLabel.setText("Loading");
-                PreviewPlayer.setOnReady(() -> {
-                    TopLabel.setText(Filetopreview.getName());
-                    TotalTime.setText(Tools.format_secondsforplayerdisplay((int) PreviewPlayer.getTotalDuration().toSeconds()));
-                    TotalTime.setText("00:00");
-                });
-            } else {Tools.gui_showinformationdialog(Root, "Information", Filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
-        }
-
 
         public void play(ActionEvent actionEvent) {
-            if (PreviewPlayer != null && PreviewPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+            if (PreviewPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
                 PreviewPlayer.play();
+                VolumeSlider.setValue(1.0);
+                VolumePercentage.setText("100%");
                 ProgressSlider.valueChangingProperty().addListener((observable, oldValue, newValue) -> {
                     Duration seektothis = PreviewPlayer.getTotalDuration().multiply(ProgressSlider.getValue());
                     PreviewPlayer.seek(seektothis);
@@ -840,8 +856,14 @@ public class MainController implements Initializable {
                     updatePositionSlider(PreviewPlayer.getCurrentTime());
                 });
                 VolumeSlider.valueChangingProperty().unbind();
+                VolumeSlider.setOnMouseDragged(event -> {
+                    Double value = VolumeSlider.getValue() * 100;
+                    VolumePercentage.setText(value.intValue() + "%");
+                });
                 VolumeSlider.valueProperty().bindBidirectional(PreviewPlayer.volumeProperty());
-                syncbuttons();
+                PreviewPlayer.setOnPlaying(this::syncbuttons);
+                PreviewPlayer.setOnPaused(this::syncbuttons);
+                PreviewPlayer.setOnStopped(this::syncbuttons);
             }
         }
         public void updatePositionSlider(Duration currenttime) {
@@ -855,7 +877,7 @@ public class MainController implements Initializable {
             syncbuttons();
         }
         public void stop(ActionEvent actionEvent) {
-            if (PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING|| PreviewPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+            if (PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING || PreviewPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
                 PreviewPlayer.stop();
             }
             syncbuttons();

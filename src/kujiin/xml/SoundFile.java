@@ -1,9 +1,6 @@
 package kujiin.xml;
 
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.scene.media.Media;
-import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import kujiin.Tools;
 
@@ -58,32 +55,11 @@ public class SoundFile {
         if (file == null) {return false;}
         return Tools.audio_isValid(file);
     }
-    private MediaPlayer getdurationmediaplayer() {
-        return new MediaPlayer(media);
-    }
-    public Service<Boolean> getcalculatedurationservice() {
-        media = new Media(getFile().toURI().toString());
-        if (duration == null) {
-            return new Service<Boolean>() {
-                @Override
-                protected Task<Boolean> createTask() {
-                    return new Task<Boolean>() {
-                        @Override
-                        protected Boolean call() throws Exception {
-                            try {
-                                MediaPlayer shortplayer = new MediaPlayer(media);
-                                shortplayer.setOnReady(() -> {
-                                    setDuration(shortplayer.getTotalDuration().toMillis());
-                                    shortplayer.dispose();
-                                });
-                                return getDuration() != null || getDuration() > 0.0;
-                            } catch (MediaException | NullPointerException ignored) {
-                                return false;
-                            }
-                        }
-                    };
-                }
-            };
-        } else {return null;}
+    private void calculateduration() {
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setOnReady(() -> {
+            setDuration(mediaPlayer.getTotalDuration().toMillis());
+            mediaPlayer.dispose();
+        });
     }
 }

@@ -16,6 +16,7 @@ public class Main extends Application {
         Root = fxmlLoader.getController();
         primaryStage.setTitle("Kuji-In");
         primaryStage.setScene(Scene);
+        primaryStage.setResizable(false);
         primaryStage.setOnShowing(event -> {
             Root.setScene(Scene);
             Root.setStage(primaryStage);

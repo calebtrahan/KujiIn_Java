@@ -1,43 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="80.0" prefWidth="408.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="93.0" prefWidth="408.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox alignment="CENTER" layoutX="13.0" layoutY="22.0" prefHeight="20.0" prefWidth="380.0">
+      <HBox alignment="CENTER" layoutX="13.0" layoutY="30.0" prefHeight="20.0" prefWidth="380.0">
          <children>
-            <Label fx:id="CurrentTime" text="--:--">
+            <Label fx:id="CurrentTime" alignment="CENTER" minHeight="16.0" minWidth="40.0" prefHeight="16.0" prefWidth="50.0" text="--:--" textAlignment="RIGHT">
                <HBox.margin>
                   <Insets right="5.0" />
                </HBox.margin>
             </Label>
-            <Slider fx:id="ProgressSlider" prefHeight="16.0" prefWidth="323.0" />
-            <Label fx:id="TotalTime" text="--:--">
+            <Slider fx:id="ProgressSlider" blockIncrement="0.1" majorTickUnit="1.0" max="1.0" prefHeight="16.0" prefWidth="323.0" />
+            <Label fx:id="TotalTime" alignment="CENTER" minHeight="16.0" minWidth="40.0" prefHeight="16.0" prefWidth="50.0" text="--:--">
                <HBox.margin>
                   <Insets left="5.0" />
                </HBox.margin>
             </Label>
          </children>
       </HBox>
-      <HBox alignment="CENTER_RIGHT" layoutX="241.0" layoutY="48.0" prefHeight="26.0" prefWidth="152.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="241.0" layoutY="61.0" prefHeight="26.0" prefWidth="152.0">
          <children>
-            <Button fx:id="PlayButton" mnemonicParsing="false" text="Play" onAction="#play"/>
-            <Button fx:id="PauseButton" mnemonicParsing="false" text="Pause" onAction="#pause"/>
-            <Button fx:id="StopButton" mnemonicParsing="false" text="Stop" onAction="#stop"/>
+            <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#play" text="Play" />
+            <Button fx:id="PauseButton" mnemonicParsing="false" onAction="#pause" text="Pause" />
+            <Button fx:id="StopButton" mnemonicParsing="false" onAction="#stop" text="Stop" />
          </children>
       </HBox>
-      <HBox alignment="CENTER" layoutX="13.0" layoutY="48.0" prefHeight="26.0" prefWidth="190.0">
+      <HBox alignment="CENTER" layoutX="13.0" layoutY="61.0" prefHeight="26.0" prefWidth="190.0">
          <children>
             <Label text="Volume">
                <HBox.margin>
                   <Insets right="5.0" />
                </HBox.margin>
             </Label>
-            <Slider fx:id="VolumeSlider" prefHeight="16.0" prefWidth="72.0" />
-            <Label fx:id="VolumePercentage" text="100%" />
+            <Slider fx:id="VolumeSlider" blockIncrement="0.1" max="1.0" prefHeight="16.0" prefWidth="72.0" />
+            <Label fx:id="VolumePercentage" minWidth="34.0" text="100%">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin></Label>
          </children>
       </HBox>
       <Label fx:id="TopLabel" alignment="CENTER" layoutX="13.0" layoutY="6.0" prefHeight="16.0" prefWidth="380.0" textAlignment="CENTER">

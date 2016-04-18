@@ -26,7 +26,7 @@
             </TableView>
             <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="322.0">
                <children>
-                  <TextField fx:id="Actual_TotalDuration" prefHeight="26.0" prefWidth="155.0">
+                  <TextField fx:id="Actual_TotalDuration" alignment="CENTER" prefHeight="26.0" prefWidth="155.0">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>
@@ -54,15 +54,15 @@
                   <Font name="System Bold" size="17.0" />
                </font>
             </Label>
-            <TableView fx:id="Temp_Table" prefHeight="354.0" prefWidth="303.0">
+            <TableView fx:id="Temp_Table" maxWidth="322.0" prefHeight="354.0" prefWidth="322.0">
               <columns>
-                <TableColumn fx:id="Temp_NameColumn" prefWidth="226.0" text="Name" />
-                <TableColumn fx:id="Temp_DurationColumn" prefWidth="95.0" text="Duration" />
+                <TableColumn fx:id="Temp_NameColumn" maxWidth="227.0" prefWidth="227.0" text="Name" />
+                <TableColumn fx:id="Temp_DurationColumn" maxWidth="95.0" prefWidth="95.0" text="Duration" />
               </columns>
             </TableView>
             <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="234.0">
                <children>
-                  <TextField fx:id="Temp_TotalDuration" prefHeight="26.0" prefWidth="157.0">
+                  <TextField fx:id="Temp_TotalDuration" alignment="CENTER" prefHeight="26.0" prefWidth="157.0">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>
