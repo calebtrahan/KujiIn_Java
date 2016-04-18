@@ -514,7 +514,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : Temp_Table.getItems()) {
                 temptotalduration += i.getDuration();
             }
-            Temp_TotalDuration.setText(Tools.format_minstohrsandmins_long((int) (temptotalduration / 60)));
+            Temp_TotalDuration.setText(Tools.format_minstohrsandmins_long((int) ((temptotalduration / 1000) / 60)));
         }
 
     // Actual Ambience Methods
@@ -530,7 +530,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : Actual_Table.getItems()) {
                 actualtotalduration += i.getDuration();
             }
-            Actual_TotalDuration.setText(Tools.format_minstohrsandmins_long((int) (actualtotalduration / 60)));
+            Actual_TotalDuration.setText(Tools.format_minstohrsandmins_long((int) ((actualtotalduration / 1000) / 60)));
         }
 
     // Table Methods
@@ -540,6 +540,8 @@ public class MainController implements Initializable {
                 selectedambience = ambiences.getcutorelementsAmbience(index);
                 if (actual_ambiencesonglist == null) {actual_ambiencesonglist = FXCollections.observableArrayList();}
                 else {actual_ambiencesonglist.clear();}
+                if (actual_soundfilelist == null) {actual_soundfilelist = new ArrayList<>();}
+                else {actual_soundfilelist.clear();}
                 Actual_Table.getItems().clear();
                 selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
                 if (populateactualambiencetable()) {
@@ -582,6 +584,8 @@ public class MainController implements Initializable {
                 table.getItems().remove(index);
                 soundfilelist.remove(index);
                 songlist.remove(index);
+                calculateactualtotalduration();
+                calculatetemptotalduration();
             }
             else {Tools.gui_showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
         }
@@ -597,12 +601,14 @@ public class MainController implements Initializable {
             actual_ambiencesonglist.clear();
             if (selectedcutorelementname != null) {
                 try {
+                    if (selectedambience.getAmbience() == null) {return false;}
                     for (SoundFile i : selectedambience.getAmbience()) {
                         actual_soundfilelist.add(i);
                         actual_ambiencesonglist.add(new AmbienceSong(i));
                     }
                     return true;
                 } catch (Exception e) {
+                    e.printStackTrace();
                     Tools.gui_showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
                     return false;
                 }
@@ -621,6 +627,7 @@ public class MainController implements Initializable {
                 }
                 ambiences.setcutorelementsAmbience(index, selectedambience);
                 ambiences.marshall();
+                Tools.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedcutorelementname, "");
             } else {Tools.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closebuttonpressed(ActionEvent actionEvent) {
@@ -648,7 +655,8 @@ public class MainController implements Initializable {
         public TextField TotalDuration;
         public Button AdvancedButton;
         private MainController Root;
-        private ObservableList<AmbienceSong> AmbienceList = FXCollections.observableArrayList();
+        private ObservableList<AmbienceSong> AmbienceList;
+        private ArrayList<SoundFile> SoundList;
         private AmbienceSong selectedambiencesong;
         private String selectedcutorelementname;
         private PreviewFile previewdialog;
@@ -703,13 +711,19 @@ public class MainController implements Initializable {
     // Table Methods
         public void tableselectionchanged(AmbienceSong ambienceSong) {selectedambiencesong = ambienceSong;}
         public void selectandloadcut() {
-            AmbienceList.clear();
-            AmbienceTable.getItems().clear();
-            int index = kujiin.xml.Options.ALLNAMES.indexOf(CutOrElementChoiceBox.getValue());
-            selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
-            if (getcurrentambiencefiles()) {
-                AmbienceTable.setItems(AmbienceList);
-                TotalDuration.setText(Tools.format_minstohrsandmins_long((int) (totalselectedduration / 60)));
+            int index = CutOrElementChoiceBox.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                selectedambience = ambiences.getcutorelementsAmbience(index);
+                if (AmbienceList == null) {AmbienceList = FXCollections.observableArrayList();}
+                else {AmbienceList.clear();}
+                if (SoundList == null) {SoundList = new ArrayList<>();}
+                else {SoundList.clear();}
+                AmbienceTable.getItems().clear();
+                selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
+                if (populateactualambiencetable()) {
+                    AmbienceTable.setItems(AmbienceList);
+                }
+                calculatetotalduration();
             }
         }
         public void add() {
@@ -733,17 +747,36 @@ public class MainController implements Initializable {
             ArrayList<File> notvalidfilenames = new ArrayList<>();
             if (files != null) {
                 for (File i : files) {
-                    if (Tools.audio_isValid(i) && Tools.audio_getduration(i) != 0.0) {
-                        AmbienceList.add(new AmbienceSong(new SoundFile(i)));}
+                    SoundFile soundFile = new SoundFile(i);
+                    if (soundFile.isValid()) {
+                        addandcalculateduration(soundFile);
+                    }
                     else {notvalidfilenames.add(i);}
                 }
                 // TODO Show Dialog Here With Invalid File Names
             }
             if (AmbienceList.size() > 0) {AmbienceTable.setItems(AmbienceList);}
         }
+        public void addandcalculateduration(SoundFile soundFile) {
+            MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
+            calculatedurationplayer.setOnReady(() -> {
+                soundFile.setDuration(calculatedurationplayer.getTotalDuration().toMillis());
+                calculatedurationplayer.dispose();
+                SoundList.add(soundFile);
+                AmbienceSong tempsong = new AmbienceSong(soundFile);
+                AmbienceList.add(tempsong);
+                AmbienceTable.getItems().add(tempsong);
+                calculatetotalduration();
+            });
+        }
         public void remove(ActionEvent actionEvent) {
             int index = AmbienceTable.getSelectionModel().getSelectedIndex();
-            if (index != -1) {AmbienceTable.getItems().remove(index);}
+            if (index != -1) {
+                AmbienceTable.getItems().remove(index);
+                AmbienceList.remove(index);
+                SoundList.remove(index);
+                calculatetotalduration();
+            }
             else {Tools.gui_showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
         }
         public void preview(ActionEvent actionEvent) {
@@ -754,21 +787,18 @@ public class MainController implements Initializable {
                 }
             }
         }
-
-        public boolean getcurrentambiencefiles() {
-            totalselectedduration = 0.0;
+        public boolean populateactualambiencetable() {
+            AmbienceList.clear();
             if (selectedcutorelementname != null) {
-                File thisdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutorelementname);
                 try {
-                    for (File i : thisdirectory.listFiles()) {
-                        if (Tools.audio_isValid(i)) {
-                            AmbienceSong selectedamb = new AmbienceSong(new SoundFile(i));
-                            AmbienceList.add(selectedamb);
-                            totalselectedduration += selectedamb.getDuration();
-                        }
+                    if (selectedambience.getAmbience() == null) {return false;}
+                    for (SoundFile i : selectedambience.getAmbience()) {
+                        SoundList.add(i);
+                        AmbienceList.add(new AmbienceSong(i));
                     }
                     return true;
-                } catch (NullPointerException e) {
+                } catch (Exception e) {
+                    e.printStackTrace();
                     Tools.gui_showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
                     return false;
                 }
@@ -776,6 +806,13 @@ public class MainController implements Initializable {
                 Tools.gui_showinformationdialog(Root, "Information", "No Cut Loaded", "Load A Cut's Ambience First");
                 return false;
             }
+        }
+        public void calculatetotalduration() {
+            totalselectedduration = 0.0;
+            for (AmbienceSong i : AmbienceTable.getItems()) {
+                totalselectedduration += i.getDuration();
+            }
+            TotalDuration.setText(Tools.format_minstohrsandmins_long((int) ((totalselectedduration / 1000) / 60)));
         }
 
     // Dialog Methods
@@ -786,7 +823,15 @@ public class MainController implements Initializable {
             } else {new AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences()).show();}
         }
         public void save(ActionEvent actionEvent) {
-
+            int index = CutOrElementChoiceBox.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                for (SoundFile i : SoundList) {
+                    if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
+                }
+                ambiences.setcutorelementsAmbience(index, selectedambience);
+                ambiences.marshall();
+                Tools.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedcutorelementname, "");
+            } else {Tools.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closedialog(ActionEvent actionEvent) {
             // TODO Check For Unsaved Changes Here
@@ -1242,8 +1287,8 @@ public class MainController implements Initializable {
         public AmbienceSong(SoundFile soundFile) {
             this.name = new SimpleStringProperty(soundFile.getName());
             this.file = soundFile.getFile();
-            duration = soundFile.getDurationinSeconds();
-            this.length = new SimpleStringProperty(Tools.format_secondsforplayerdisplay((int) duration));
+            duration = soundFile.getDuration();
+            this.length = new SimpleStringProperty(Tools.format_secondsforplayerdisplay((int) (duration / 1000)));
         }
 
         public String getName() {

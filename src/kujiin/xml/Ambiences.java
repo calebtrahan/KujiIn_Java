@@ -9,7 +9,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +17,6 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement
 public class Ambiences {
-    @XmlElement(name="Presession")
     private Ambience Presession;
     private Ambience Rin;
     private Ambience Kyo;
@@ -170,7 +168,6 @@ public class Ambiences {
                 Ambience selectedambience = AllAmbiences.get(i);
                 selectedambience = new Ambience();
                 setcutorelementsAmbience(i, selectedambience);
-                getcutorelementsAmbience(i).actual_retrievefromdefaultdirectory(Options.ALLNAMES.get(i));
             }
         }
     }
@@ -185,7 +182,7 @@ public class Ambiences {
             Tools.gui_showinformationdialog(Root, "Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
     }
 
-    // Other Methods
+// Other Methods
     public Ambience getcutorelementsAmbience(int index) {
         if (index == 0) {return Presession;}
         else if (index == 1) {return Rin;}
@@ -223,5 +220,4 @@ public class Ambiences {
         else if (index == 14) {Void = ambience;}
         else if (index == 15) {Postsession = ambience;}
     }
-
 }

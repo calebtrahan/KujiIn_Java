@@ -1,7 +1,6 @@
 package kujiin.xml;
 
 import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import kujiin.Tools;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -46,20 +45,9 @@ public class SoundFile {
         this.duration = duration;
     }
     public Media toMedia() {return media;}
-    public double getDurationinMillis() {return duration;}
-    public double getDurationinSeconds() {return duration /= 1000;}
-    public double getDurationinMinutes() {return  (duration / 1000) / 60;}
-
     // Utility Methods
     public boolean isValid() {
         if (file == null) {return false;}
         return Tools.audio_isValid(file);
-    }
-    private void calculateduration() {
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.setOnReady(() -> {
-            setDuration(mediaPlayer.getTotalDuration().toMillis());
-            mediaPlayer.dispose();
-        });
     }
 }

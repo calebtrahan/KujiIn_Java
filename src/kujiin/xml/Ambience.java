@@ -1,5 +1,7 @@
 package kujiin.xml;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import kujiin.Tools;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -28,13 +30,6 @@ public class Ambience {
 
     // Ambience Editing Methods
     // Actual Ambience
-    public void actual_retrievefromdefaultdirectory(String name) {
-        try {
-            for (File i : new File(Options.DIRECTORYAMBIENCE, name).listFiles()) {
-                actual_addfromfile(i);
-            }
-        } catch (NullPointerException ignored) {}
-    }
     private boolean actual_addfromfile(File file) {
         if (Tools.audio_isValid(file)) {
             SoundFile tempfile = new SoundFile(file);
@@ -45,11 +40,30 @@ public class Ambience {
     }
     private void actual_initialize() {if (Ambience == null) Ambience = new ArrayList<>();}
     public void actual_add(SoundFile soundFile) {
-        actual_initialize(); Ambience.add(soundFile);}
+        actual_initialize();
+        if (soundFile.getDuration() == null) {
+            System.out.println("Trying To Calculate Duration For " + soundFile.getFile().getName());
+            MediaPlayer calcdurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
+            calcdurationplayer.setOnReady(() -> {
+                soundFile.setDuration(calcdurationplayer.getTotalDuration().toMillis());
+                Ambience.add(soundFile);
+                calcdurationplayer.dispose();
+            });
+        } else {Ambience.add(soundFile);}
+    }
     public void actual_add(int index, SoundFile soundFile) {
-        actual_initialize(); Ambience.add(index, soundFile);}
-    public void actual_add(List<SoundFile> soundFiles) {
-        actual_initialize(); Ambience.addAll(soundFiles);}
+        actual_initialize();
+        if (soundFile.getDuration() == null) {
+            MediaPlayer calcdurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
+            calcdurationplayer.setOnReady(() -> {
+                soundFile.setDuration(calcdurationplayer.getTotalDuration().toMillis());
+                Ambience.add(index, soundFile);
+                calcdurationplayer.dispose();
+            });
+        } else {
+            Ambience.add(soundFile);
+        }
+    }
     public SoundFile actual_get(int index) {return Ambience.get(index);}
     public SoundFile actual_get(String name) {
         for (SoundFile i : getAmbience()) {
