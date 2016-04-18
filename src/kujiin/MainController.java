@@ -978,6 +978,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Change Program Options");
             doubleTextField(FadeInValue, false);

@@ -65,6 +65,7 @@ public class PlayerWidget extends Stage {
             setScene(defaultscene);
             Root.getOptions();
             Root.getOptions().setStyle(this);
+            this.setResizable(false);
         } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         setTitle("Session Player");
         Root = root;
@@ -149,6 +150,7 @@ public class PlayerWidget extends Stage {
                 scene = new Scene(fxmlLoader.load());
                 setScene(scene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle(this.currentcutorelement.name + "'s Reference");
             setsizing();
@@ -162,6 +164,7 @@ public class PlayerWidget extends Stage {
                 scene = new Scene(fxmlLoader.load());
                 setScene(scene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference File Preview");
             fullscreenoption = false;
@@ -231,6 +234,7 @@ public class PlayerWidget extends Stage {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Type Select");
             if (referenceType != null) {
@@ -288,6 +292,7 @@ public class PlayerWidget extends Stage {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
                 Sessions currentsessions = Root.getProgressTracker().getSessions();
                 Session thissession = currentsessions.getsession(currentsessions.totalsessioncount() - 1);
                 int thisessionminutes = thissession.getTotal_Session_Duration();

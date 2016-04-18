@@ -516,6 +516,7 @@ public class CreatorAndExporterWidget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle(toptext);
             setAccepted(false);
@@ -564,6 +565,7 @@ public class CreatorAndExporterWidget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Exporting Session");
         }
@@ -596,6 +598,7 @@ public class CreatorAndExporterWidget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Not Well Formed");
             this.textfieldvalues = textfieldvalues;
@@ -690,6 +693,7 @@ public class CreatorAndExporterWidget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Cut Invocation");
             MinutesTextField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -751,6 +755,7 @@ public class CreatorAndExporterWidget {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
