@@ -375,7 +375,9 @@ public class MainController implements Initializable {
         public Button CloseButton;
         public Button SwitchToSimpleEditor;
         private ObservableList<AmbienceSong> actual_ambiencesonglist = FXCollections.observableArrayList();
+        private ArrayList<SoundFile> actual_soundfilelist;
         private ObservableList<AmbienceSong> temp_ambiencesonglist = FXCollections.observableArrayList();
+        private ArrayList<SoundFile> temp_soundfilelist;
         private AmbienceSong selected_temp_ambiencesong;
         private AmbienceSong selected_actual_ambiencesong;
         private double temptotalduration;
@@ -464,31 +466,28 @@ public class MainController implements Initializable {
         }
         public void leftarrowpressed(ActionEvent actionEvent) {
             if (selected_actual_ambiencesong != null && selectedcutorelementname != null) {
+                File newtempfile = new File(tempdirectory, selected_actual_ambiencesong.name.getValue());
                 for (AmbienceSong i : Temp_Table.getItems()) {
                     if (selected_actual_ambiencesong.name.getValue().equals(i.name.getValue())) {
                         Tools.gui_showinformationdialog(Root, "Information", "File Already Exists", "Select A Different File To Transfer");
                         return;
                     }
                 }
-                System.out.println(actual_ambiencesonglist.size());
                 Service<Void> copyfile = new Service<Void>() {
                     @Override
                     protected Task<Void> createTask() {
                         return new Task<Void>() {
                             @Override
                             protected Void call() throws Exception {
-                                File newfile = new File(tempdirectory, selected_actual_ambiencesong.name.getValue());
-                                FileUtils.copyFile(selected_actual_ambiencesong.getFile(), newfile);
+                                FileUtils.copyFile(selected_actual_ambiencesong.getFile(), newtempfile);
                                 return null;
                             }
                         };
                     }
                 };
                 copyfile.setOnSucceeded(event -> {
-                    File newfile = new File(tempdirectory, selected_actual_ambiencesong.name.getValue());
-                    actual_ambiencesonglist.add(new AmbienceSong(newfile.getName(), newfile));
-                    System.out.println(actual_ambiencesonglist.size());
-                    Temp_Table.setItems(actual_ambiencesonglist);
+                    temp_ambiencesonglist.add(new AmbienceSong(new SoundFile(newtempfile)));
+                    Temp_Table.setItems(temp_ambiencesonglist);
                 });
                 copyfile.setOnFailed(event -> Tools.gui_showerrordialog(Root, "Error", "Couldn't Copy File To Temp Directory", "Check File Permissions"));
                 copyfile.start();
@@ -496,8 +495,8 @@ public class MainController implements Initializable {
         }
 
     // Temp Ambience Methods
-        public void addtotempambience(ActionEvent actionEvent) {addto(Temp_Table, temp_ambiencesonglist);}
-        public void removefromtempambience(ActionEvent actionEvent) {removefrom(Temp_Table);}
+        public void addtotempambience(ActionEvent actionEvent) {addto(Temp_Table, temp_soundfilelist, temp_ambiencesonglist);}
+        public void removefromtempambience(ActionEvent actionEvent) {removefrom(Temp_Table, temp_soundfilelist, temp_ambiencesonglist);}
         public void previewtempambience(ActionEvent actionEvent) {preview(selected_temp_ambiencesong);}
         public void tempselectionchanged(AmbienceSong ambiencesong) {
             selected_temp_ambiencesong = ambiencesong;
@@ -511,8 +510,8 @@ public class MainController implements Initializable {
         }
 
     // Actual Ambience Methods
-        public void addtoactualambience(ActionEvent actionEvent) {addto(Actual_Table, actual_ambiencesonglist);}
-        public void removeactualambience(ActionEvent actionEvent) {removefrom(Actual_Table);}
+        public void addtoactualambience(ActionEvent actionEvent) {addto(Actual_Table, actual_soundfilelist, actual_ambiencesonglist);}
+        public void removeactualambience(ActionEvent actionEvent) {removefrom(Actual_Table, actual_soundfilelist, actual_ambiencesonglist);}
         public void previewactualambience(ActionEvent actionEvent) {preview(selected_actual_ambiencesong);}
         public void actualselectionchanged(AmbienceSong ambiencesong) {selected_actual_ambiencesong = ambiencesong;}
         public void calculateactualtotalduration() {
@@ -528,7 +527,8 @@ public class MainController implements Initializable {
             int index = CutOrElementSelectionBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 selectedambience = ambiences.getcutorelementsAmbience(index);
-                actual_ambiencesonglist.clear();
+                if (actual_ambiencesonglist == null) {actual_ambiencesonglist = FXCollections.observableArrayList();}
+                else {actual_ambiencesonglist.clear();}
                 Actual_Table.getItems().clear();
                 selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
                 if (populateactualambiencetable()) {
@@ -538,22 +538,38 @@ public class MainController implements Initializable {
                 calculateactualtotalduration();
             }
         }
-        private void addto(TableView<AmbienceSong> table, ObservableList<AmbienceSong> songlist) {
+        private void addto(TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
             List<File> files = Tools.filechooser_multiple(getScene(), "Add Files", null);
             ArrayList<File> notvalidfilenames = new ArrayList<>();
             if (files != null) {
                 for (File i : files) {
-                    if (Tools.audio_isValid(i) && Tools.audio_getduration(i) != 0.0) {
-                        songlist.add(new AmbienceSong(i.getName(), i));}
-                    else {notvalidfilenames.add(i);}
+                    SoundFile soundFile = new SoundFile(i);
+                    if (soundFile.isValid()) {
+                        addandcalculateduration(soundFile, table, soundfilelist, songlist);
+                    } else {notvalidfilenames.add(i);}
                 }
+                if (notvalidfilenames.size() > 0) {Tools.gui_showinformationdialog(Root, "Files Couldn't Be Added", "These Files Couldn't Be Added", notvalidfilenames.toString());}
                 // TODO Show Dialog Here With Invalid File Names
             }
-            if (songlist.size() > 0) {table.setItems(songlist);}
         }
-        private void removefrom(TableView<AmbienceSong> table) {
+        public void addandcalculateduration(SoundFile soundFile, TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
+                MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
+                calculatedurationplayer.setOnReady(() -> {
+                    soundFile.setDuration(calculatedurationplayer.getTotalDuration().toMillis());
+                    calculatedurationplayer.dispose();
+                    soundfilelist.add(soundFile);
+                    AmbienceSong tempsong = new AmbienceSong(soundFile);
+                    songlist.add(tempsong);
+                    table.getItems().add(tempsong);
+                });
+        }
+        private void removefrom(TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
             int index = table.getSelectionModel().getSelectedIndex();
-            if (index != -1) {table.getItems().remove(index);}
+            if (index != -1) {
+                table.getItems().remove(index);
+                soundfilelist.remove(index);
+                songlist.remove(index);
+            }
             else {Tools.gui_showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
         }
         private void preview(AmbienceSong selectedsong) {
@@ -569,7 +585,8 @@ public class MainController implements Initializable {
             if (selectedcutorelementname != null) {
                 try {
                     for (SoundFile i : selectedambience.getAmbience()) {
-                        actual_ambiencesonglist.add(new AmbienceSong(i.getName(), i.getFile()));
+                        actual_soundfilelist.add(i);
+                        actual_ambiencesonglist.add(new AmbienceSong(i));
                     }
                     return true;
                 } catch (Exception e) {
@@ -582,13 +599,20 @@ public class MainController implements Initializable {
             }
         }
 
-        public void closebuttonpressed(ActionEvent actionEvent) {close();}
-        @Override
-        public void close() {
-            try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
-            super.close();
+    // Dialog Methods
+        public void save(ActionEvent actionEvent) {
+            int index = CutOrElementSelectionBox.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                for (SoundFile i : actual_soundfilelist) {
+                    if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
+                }
+                ambiences.setcutorelementsAmbience(index, selectedambience);
+            } else {Tools.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
-
+        public void closebuttonpressed(ActionEvent actionEvent) {
+            try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
+            close();
+        }
         public void switchtosimple(ActionEvent actionEvent) {
             // TODO Check If Unsaved Changes Here?
             this.close();
@@ -679,7 +703,7 @@ public class MainController implements Initializable {
             for (File i : filesselected) {
                 for (String x : Tools.SUPPORTEDAUDIOFORMATS) {
                     if (i.getName().endsWith(x)) {
-                        if (Tools.audio_getduration(i) != 0.0) {AmbienceList.add(new AmbienceSong(i.getName(), i)); break;}
+                        if (Tools.audio_getduration(i) != 0.0) {AmbienceList.add(new AmbienceSong(new SoundFile(i))); break;}
                     }
                 }
                 if (! i.equals(AmbienceList.get(AmbienceList.size() - 1).getFile())) {notvalidfilenames.add(i);}
@@ -694,7 +718,7 @@ public class MainController implements Initializable {
             if (files != null) {
                 for (File i : files) {
                     if (Tools.audio_isValid(i) && Tools.audio_getduration(i) != 0.0) {
-                        AmbienceList.add(new AmbienceSong(i.getName(), i));}
+                        AmbienceList.add(new AmbienceSong(new SoundFile(i)));}
                     else {notvalidfilenames.add(i);}
                 }
                 // TODO Show Dialog Here With Invalid File Names
@@ -722,7 +746,7 @@ public class MainController implements Initializable {
                 try {
                     for (File i : thisdirectory.listFiles()) {
                         if (Tools.audio_isValid(i)) {
-                            AmbienceSong selectedamb = new AmbienceSong(i.getName(), i);
+                            AmbienceSong selectedamb = new AmbienceSong(new SoundFile(i));
                             AmbienceList.add(selectedamb);
                             totalselectedduration += selectedamb.getDuration();
                         }
@@ -1190,15 +1214,13 @@ public class MainController implements Initializable {
         private StringProperty name;
         private StringProperty length;
         private File file;
-        private String totaldurationshort;
         private double duration;
 
-        public AmbienceSong(String name, File file) {
-            this.name = new SimpleStringProperty(name);
-            this.file = file;
-            duration = Tools.audio_getduration(file);
-            totaldurationshort = Tools.format_secondsforplayerdisplay((int) duration);
-            this.length = new SimpleStringProperty(totaldurationshort);
+        public AmbienceSong(SoundFile soundFile) {
+            this.name = new SimpleStringProperty(soundFile.getName());
+            this.file = soundFile.getFile();
+            duration = soundFile.getDurationinSeconds();
+            this.length = new SimpleStringProperty(Tools.format_secondsforplayerdisplay((int) duration));
         }
 
         public String getName() {
@@ -1207,10 +1229,6 @@ public class MainController implements Initializable {
         public File getFile() {
             return file;
         }
-        public String getTotaldurationshort() {
-            return totaldurationshort;
-        }
         public double getDuration() {return duration;}
     }
-
 }

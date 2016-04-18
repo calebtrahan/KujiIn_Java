@@ -1,7 +1,5 @@
 package kujiin.xml;
 
-import javafx.util.Duration;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -72,9 +70,9 @@ public class Entrainment {
     public void created_clear() {CreatedEntrainment.clear();}
 
     // Information Methods
-    public Duration gettotalCreatedDuration() {
-        Duration duration = new Duration(0.0);
-        for (SoundFile i : CreatedEntrainment) {duration.add(i.getDuration());}
+    public Double gettotalCreatedDuration() {
+        Double duration = 0.0;
+        for (SoundFile i : CreatedEntrainment) {duration += i.getDuration();}
         return duration;
     }
 

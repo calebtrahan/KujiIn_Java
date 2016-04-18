@@ -104,42 +104,42 @@ public class Meditatable {
     }
     public boolean buildAmbience() {
         ambience.created_clear();
-        Duration currentduration = new Duration(0.0);
+        Double currentduration = 0.0;
         // Ambience Is >= Session Duration
         if (ambience.hasEnoughAmbience(getdurationinseconds())) {
             for (SoundFile i : ambience.getAmbience()) {
-                if (ambience.gettotalCreatedDuration().toSeconds() < getdurationinseconds()) {
+                if (((ambience.gettotalCreatedDuration() / 1000) / 60) < getdurationinseconds()) {
                     ambience.created_add(i);
-                    currentduration.add(i.getDuration());
+                    currentduration += i.getDuration();
                 } else {break;}
             }
         } else {
             Random randint = new Random();
-            while (currentduration.toSeconds() < getdurationinseconds()) {
+            while ((currentduration / 1000) < getdurationinseconds()) {
                 List<SoundFile> createdambience = ambience.created_getAll();
                 SoundFile selectedambience = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
                 if (createdambience.size() < 2) {
                     ambience.created_add(selectedambience);
-                    currentduration.add(selectedambience.getDuration());
+                    currentduration += selectedambience.getDuration();
                 } else if (createdambience.size() == 2) {
                     if (!selectedambience.equals(createdambience.get(createdambience.size() - 1))) {
                         ambience.created_add(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
+                        currentduration += selectedambience.getDuration();
                     }
                 } else if (createdambience.size() == 3) {
                     if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2))) {
                         ambience.created_add(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
+                        currentduration += selectedambience.getDuration();
                     }
                 } else if (createdambience.size() <= 5) {
                     if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3))) {
                         ambience.created_add(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
+                        currentduration += selectedambience.getDuration();
                     }
                 } else if (createdambience.size() > 5) {
                     if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3)) && !selectedambience.equals(createdambience.get(createdambience.size() - 4))) {
                         ambience.created_add(selectedambience);
-                        currentduration.add(selectedambience.getDuration());
+                        currentduration += selectedambience.getDuration();
                     }
                 }
             }

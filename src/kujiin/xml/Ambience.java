@@ -1,6 +1,5 @@
 package kujiin.xml;
 
-import javafx.util.Duration;
 import kujiin.Tools;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -93,23 +92,29 @@ public class Ambience {
     // Validation Methods
     public boolean hasAnyAmbience() {return Ambience != null && Ambience.size() > 0;}
     public boolean hasEnoughAmbience(int seconds) {
-        return gettotalActualDuration().toSeconds() >= seconds;
+        return gettotalActualDuration() / 1000 >= seconds;
     }
     public boolean ambienceexistsinActual(SoundFile soundFile) {
-        try {return Ambience.contains(soundFile);}
+        try {
+            if (Ambience.contains(soundFile)) {return true;}
+            for (SoundFile i : Ambience) {
+                if (i.getFile().equals(soundFile.getFile())) {return true;}
+            }
+            return false;
+        }
         catch (NullPointerException ignored) {return false;}
     }
     public boolean ambienceexistsinCreated(SoundFile soundFile) {return CreatedAmbience.contains(soundFile);}
 
     // Information Methods
-    public Duration gettotalActualDuration() {
-        Duration duration = new Duration(0.0);
-        for (SoundFile i : Ambience) {duration.add(i.getDuration());}
+    public Double gettotalActualDuration() {
+        Double duration = 0.0;
+        for (SoundFile i : Ambience) {duration += i.getDuration();}
         return duration;
     }
-    public Duration gettotalCreatedDuration() {
-        Duration duration = new Duration(0.0);
-        for (SoundFile i : CreatedAmbience) {duration.add(i.getDuration());}
+    public Double gettotalCreatedDuration() {
+        Double duration = 0.0;
+        for (SoundFile i : CreatedAmbience) {duration += i.getDuration();}
         return duration;
     }
 

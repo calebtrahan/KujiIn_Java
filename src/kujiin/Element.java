@@ -93,7 +93,7 @@ public class Element extends Meditatable {
         entrainment.shuffleCreated();
         if (rampinfile != null) {entrainment.created_add(0, rampinfile);}
         if (rampoutfile != null) {entrainment.created_add(rampoutfile);}
-        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().toMinutes() >= getdurationinminutes();
+        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() / 1000 >= getdurationinseconds();
     }
     @Override
     public void resetCreation() {

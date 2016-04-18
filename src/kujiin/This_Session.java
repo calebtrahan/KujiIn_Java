@@ -307,7 +307,7 @@ public class This_Session {
                         for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
                             a.append("\n");
                             Meditatable thiscut = cutsorelementswithreducedambience.get(i);
-                            String formattedcurrentduration = Tools.format_minstohrsandmins_short((int) thiscut.getAmbience().gettotalActualDuration().toMinutes());
+                            String formattedcurrentduration = Tools.format_minstohrsandmins_short((int) ((thiscut.getAmbience().gettotalActualDuration() / 1000) / 60));
                             String formattedexpectedduration = Tools.format_minstohrsandmins_short(cutsorelementswithreducedambience.get(i).getdurationinminutes());
                             a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;

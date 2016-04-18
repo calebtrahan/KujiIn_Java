@@ -86,7 +86,7 @@ public class Qi_Gong extends Meditatable {
                 entrainment.created_add(0, entrainment.getRampoutfile());
             }
         }
-        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().toMinutes() >= getdurationinminutes();
+        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() / 1000 >= getdurationinseconds();
     }
     @Override
     public void resetCreation() {

@@ -5,7 +5,7 @@ import javafx.concurrent.Task;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
+import kujiin.Tools;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,7 +15,7 @@ import java.io.File;
 public class SoundFile {
     private File file;
     private String name;
-    private Duration duration;
+    private Double duration;
     private Media media;
 
     public SoundFile() {
@@ -26,7 +26,6 @@ public class SoundFile {
             this.file = file;
             this.name = file.getName().substring(0, file.getName().lastIndexOf("."));
             this.media = new Media(this.file.toURI().toString());
-            calculateduration();
         }
     }
 
@@ -43,47 +42,48 @@ public class SoundFile {
     public void setName(String name) {
         this.name = name;
     }
-    public Duration getDuration() {
+    public Double getDuration() {
         return duration;
     }
-    public void setDuration(Duration duration) {
+    public void setDuration(Double duration) {
         this.duration = duration;
     }
     public Media toMedia() {return media;}
-    public double getDurationinMillis() {
-        return getDuration().toMillis();
-    }
-    public double getDurationinSeconds() {
-        return getDuration().toSeconds();
-    }
-    public double getDurationinMinutes() {
-        return getDuration().toMinutes();
-    }
+    public double getDurationinMillis() {return duration;}
+    public double getDurationinSeconds() {return duration /= 1000;}
+    public double getDurationinMinutes() {return  (duration / 1000) / 60;}
 
     // Utility Methods
-    private void calculateduration() {
+    public boolean isValid() {
+        if (file == null) {return false;}
+        return Tools.audio_isValid(file);
+    }
+    private MediaPlayer getdurationmediaplayer() {
+        return new MediaPlayer(media);
+    }
+    public Service<Boolean> getcalculatedurationservice() {
         media = new Media(getFile().toURI().toString());
         if (duration == null) {
-            Service<Void> calculatedurationservice = new Service<Void>() {
+            return new Service<Boolean>() {
                 @Override
-                protected Task<Void> createTask() {
-                    return new Task<Void>() {
+                protected Task<Boolean> createTask() {
+                    return new Task<Boolean>() {
                         @Override
-                        protected Void call() throws Exception {
+                        protected Boolean call() throws Exception {
                             try {
                                 MediaPlayer shortplayer = new MediaPlayer(media);
                                 shortplayer.setOnReady(() -> {
-                                    setDuration(shortplayer.getTotalDuration());
+                                    setDuration(shortplayer.getTotalDuration().toMillis());
                                     shortplayer.dispose();
                                 });
+                                return getDuration() != null || getDuration() > 0.0;
                             } catch (MediaException | NullPointerException ignored) {
+                                return false;
                             }
-                            return null;
                         }
                     };
                 }
             };
-            calculatedurationservice.start();
-        }
+        } else {return null;}
     }
 }
