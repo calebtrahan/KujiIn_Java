@@ -581,6 +581,10 @@ public class MainController implements Initializable {
         private void removefrom(TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
             int index = table.getSelectionModel().getSelectedIndex();
             if (index != -1) {
+                SoundFile soundFile = soundfilelist.get(index);
+                if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
+                    soundFile.getFile().delete();
+                }
                 table.getItems().remove(index);
                 soundfilelist.remove(index);
                 songlist.remove(index);
@@ -772,6 +776,10 @@ public class MainController implements Initializable {
         public void remove(ActionEvent actionEvent) {
             int index = AmbienceTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {
+                SoundFile soundFile = SoundList.get(index);
+                if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
+                    soundFile.getFile().delete();
+                }
                 AmbienceTable.getItems().remove(index);
                 AmbienceList.remove(index);
                 SoundList.remove(index);
