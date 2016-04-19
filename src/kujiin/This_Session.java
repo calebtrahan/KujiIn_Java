@@ -44,7 +44,6 @@ public class This_Session {
     private Element Fire;
     private Element Water;
     private Element Void;
-    private Boolean ambienceenabled;
     private PlayerWidget.PlayerState playerState;
     private Object currentcutorelement;
     private Timeline updateuitimeline;
@@ -63,7 +62,6 @@ public class This_Session {
     public This_Session(MainController mainController) {
         Root = mainController;
         this.sessions = Root.getProgressTracker().getSessions();
-        ambienceenabled = false;
         setPlayerState(PlayerWidget.PlayerState.IDLE);
         entrainments = new Entrainments(Root);
         entrainments.unmarshall();
@@ -88,9 +86,6 @@ public class This_Session {
     }
 
 // Getters And Setters
-    public void setAmbienceenabled(Boolean ambienceenabled) {
-        this.ambienceenabled = ambienceenabled;
-    }
     public void setPlayerState(PlayerWidget.PlayerState playerState) {this.playerState = playerState;}
     public PlayerWidget.PlayerState getPlayerState() {return playerState;}
     public boolean isValid() {
@@ -403,9 +398,9 @@ public class This_Session {
                 else {setItemsinsession(sortSessionItems.getorderedsessionitems());}
             }
             for (Object i : getallitemsinSession()) {
-                if (i instanceof Cut) {if (! ((Cut) i).build(getallitemsinSession(), ambienceenabled)) {return false;}}
-                if (i instanceof Element) {if (! ((Element) i).build(getallitemsinSession(), ambienceenabled)) {return false;}}
-                if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(getallitemsinSession(), ambienceenabled)) {return false;}}
+                if (i instanceof Cut) {if (! ((Cut) i).build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}}
+                if (i instanceof Element) {if (! ((Element) i).build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}}
+                if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}}
             }
             return true;
         } else {return false;}

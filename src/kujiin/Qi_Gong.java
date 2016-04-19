@@ -29,6 +29,11 @@ public class Qi_Gong extends Meditatable {
         Value = value;
         Switch.setOnAction(event -> toggleswitch());
         Switch.setTooltip(new Tooltip(briefsummary));
+        if (number == 0) {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Preceding The Session"));}
+        else {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Following The Session"));}
+        if (entrainment == null) {System.out.println("Entrainment Is Null");}
+        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/Qi-Gong1.mp3"))); entrainment.calculateshortfreqduration();}
+        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/Qi-Gong5.mp3"))); entrainment.calculatelongfreqduration();}
         toggleswitch();
     }
 
@@ -86,7 +91,7 @@ public class Qi_Gong extends Meditatable {
                 entrainment.created_add(0, entrainment.getRampoutfile());
             }
         }
-        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() / 1000 >= getdurationinseconds();
+        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() > 0.0;
     }
     @Override
     public void resetCreation() {

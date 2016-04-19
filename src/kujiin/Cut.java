@@ -29,6 +29,8 @@ public class Cut extends Meditatable {
         Switch.setTooltip(new Tooltip(briefsummary));
         Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
         Switch.setOnAction(event -> toggleswitch());
+        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + super.name + "1.mp3"))); entrainment.calculateshortfreqduration();}
+        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + super.name + "5.mp3"))); entrainment.calculatelongfreqduration();}
 //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
 //        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
@@ -88,8 +90,9 @@ public class Cut extends Meditatable {
             else {entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohout.mp3")));}
             entrainment.created_add(0, entrainment.getRampinfile());
             entrainment.created_add(entrainment.getRampoutfile());
+
         }
-        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() / 1000 >= getdurationinseconds();
+        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() > 0.0;
     }
     @Override
     public void resetCreation() {

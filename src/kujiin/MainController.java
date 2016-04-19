@@ -122,6 +122,7 @@ public class MainController implements Initializable {
     }
     public boolean cleanup() {
         getSession().getAmbiences().marshall();
+        getSession().getEntrainments().marshall();
         return getCreatorAndExporter().cleanup() && getProgressTracker().cleanup();
     }
 

@@ -33,6 +33,8 @@ public class Element extends Meditatable {
         Switch.setOnAction(event -> toggleswitch());
         Switch.setTooltip(new Tooltip(briefsummary));
         Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
+        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/ELEMENT1.mp3"))); entrainment.calculateshortfreqduration();}
+        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/ELEMENT5.mp3"))); entrainment.calculatelongfreqduration();}
         toggleswitch();
     }
 

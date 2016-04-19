@@ -5,6 +5,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
 import javafx.concurrent.Service;
+import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.Cut;
@@ -91,9 +92,15 @@ public class Meditatable {
 
 // Creation
     public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {
+        System.out.println("Called Build With Ambience Set At " + Boolean.toString(ambienceenabled));
         setAmbienceenabled(ambienceenabled);
         setAllcutsorelementstoplay(allcutandelementitems);
-        if (ambienceenabled) {return buildEntrainment() && buildAmbience();}
+        if (ambienceenabled) {
+            boolean entrainmentgood = buildEntrainment();
+            boolean ambiencegood = buildAmbience();
+            System.out.println(name + "'s Entrainment Is: " + Boolean.toString(entrainmentgood));
+            System.out.println(name + "'s Ambience Is: " + Boolean.toString(ambiencegood));
+            return entrainmentgood && ambiencegood;}
         else {return buildEntrainment();}
     }
     public boolean buildEntrainment() {
@@ -101,6 +108,7 @@ public class Meditatable {
         return true;
     }
     public boolean buildAmbience() {
+        System.out.println("Called Build Ambience");
         ambience.created_clear();
         double currentdurationinmillis = 0.0;
         // TODO Convert To Millis For Duration Comparing
@@ -235,7 +243,7 @@ public class Meditatable {
                 };
             }
         }
-        entrainmentplayer = new MediaPlayer(entrainment.created_get(entrainmentplaycount).toMedia());
+        entrainmentplayer = new MediaPlayer(new Media(entrainment.created_get(entrainmentplaycount).getFile().toURI().toString()));
         entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnPlaying(() -> {
             if (entrainmentplaycount == 0) {fadeinentrainment.play();}
@@ -244,7 +252,7 @@ public class Meditatable {
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
         if (ambienceenabled) {
-            ambienceplayer = new MediaPlayer(ambience.created_get(ambienceplaycount).toMedia());
+            ambienceplayer = new MediaPlayer(new Media(ambience.created_get(ambienceplaycount).getFile().toURI().toString()));
             ambienceplayer.setVolume(0.0);
             ambienceplayer.setOnPlaying(() -> fadeinambience.play());
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
@@ -291,7 +299,7 @@ public class Meditatable {
         try {
             entrainmentplaycount++;
             entrainmentplayer.dispose();
-            entrainmentplayer = new MediaPlayer(entrainment.created_get(entrainmentplaycount).toMedia());
+            entrainmentplayer = new MediaPlayer(new Media(entrainment.created_get(entrainmentplaycount).getFile().toURI().toString()));
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
             entrainmentplayer.play();
@@ -300,7 +308,7 @@ public class Meditatable {
     public void playnextambience() throws IndexOutOfBoundsException {
         ambienceplaycount++;
         ambienceplayer.dispose();
-        ambienceplayer = new MediaPlayer(ambience.created_get(ambienceplaycount).toMedia());
+        ambienceplayer = new MediaPlayer(new Media(ambience.created_get(ambienceplaycount).getFile().toURI().toString()));
         ambienceplayer.setOnEndOfMedia(this::playnextambience);
         ambienceplayer.setOnError(this::ambienceerror);
         ambienceplayer.play();

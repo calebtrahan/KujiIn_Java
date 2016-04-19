@@ -164,9 +164,7 @@ public class CreatorAndExporterWidget {
         // TODO Check Exporter Here
         if (creatorState == CreatorState.NOT_CREATED) {
             if (creationchecks()) {
-                session.setAmbienceenabled(AmbienceSwitch.isSelected());
                 session.create(session.getallsessionvalues());
-//                disable();
                 ExportButton.setDisable(false);
                 session.Root.PlayButton.setDisable(false);
                 setCreatorState(CreatorState.CREATED);
@@ -414,7 +412,6 @@ public class CreatorAndExporterWidget {
             }
         } else {
             session.resetcreateditems();
-            session.setAmbienceenabled(false);
         }
     }
     public void changeallcutvalues() {

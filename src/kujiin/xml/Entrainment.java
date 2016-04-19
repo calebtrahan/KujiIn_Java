@@ -1,21 +1,20 @@
 package kujiin.xml;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Entrainment {
-    @XmlElement
     private SoundFile rampinfile;
-    @XmlElement
     private SoundFile freqshort;
-    @XmlElement
     private SoundFile freqlong;
-    @XmlElement
     private SoundFile rampoutfile;
     private List<SoundFile> CreatedEntrainment;
 
@@ -48,9 +47,9 @@ public class Entrainment {
     }
 
     // Add/Remove Created Entrainment
-    public void created_add(SoundFile soundFile) {CreatedEntrainment.add(soundFile);}
-    public void created_add(int index, SoundFile soundFile) {CreatedEntrainment.add(soundFile);}
-    public void created_add(List<SoundFile> soundFiles) {CreatedEntrainment.addAll(soundFiles);}
+    private void created_initialize() {if (CreatedEntrainment == null) CreatedEntrainment = new ArrayList<>();}
+    public void created_add(SoundFile soundFile) {created_initialize(); CreatedEntrainment.add(soundFile);}
+    public void created_add(int index, SoundFile soundFile) {created_initialize();  CreatedEntrainment.add(soundFile);}
     public SoundFile created_get(int index) {return CreatedEntrainment.get(index);}
     public SoundFile created_get(String name) {
         for (SoundFile i : CreatedEntrainment) {
@@ -72,8 +71,26 @@ public class Entrainment {
     // Information Methods
     public Double gettotalCreatedDuration() {
         Double duration = 0.0;
-        for (SoundFile i : CreatedEntrainment) {duration += i.getDuration();}
+        for (SoundFile i : CreatedEntrainment) {
+            if (i.getDuration() != null) {
+                duration += i.getDuration();
+            }
+        }
         return duration;
+    }
+    public void calculateshortfreqduration() {
+        MediaPlayer mediaPlayer = new MediaPlayer(new Media(getFreqshort().getFile().toURI().toString()));
+        mediaPlayer.setOnReady(() -> {
+            getFreqshort().setDuration(mediaPlayer.getTotalDuration().toMillis());
+            mediaPlayer.dispose();
+        });
+    }
+    public void calculatelongfreqduration() {
+        MediaPlayer mediaPlayer = new MediaPlayer(new Media(getFreqlong().getFile().toURI().toString()));
+        mediaPlayer.setOnReady(() -> {
+            getFreqlong().setDuration(mediaPlayer.getTotalDuration().toMillis());
+            mediaPlayer.dispose();
+        });
     }
 
     // Other Methods

@@ -9,11 +9,13 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlRootElement
 public class Entrainments {
     private Entrainment Presession;
     private Entrainment Rin;
@@ -165,6 +167,7 @@ public class Entrainments {
             for (int i = 0; i < AllEntrainment.size(); i++) {
                 Entrainment selectedentrainment = AllEntrainment.get(i);
                 selectedentrainment = new Entrainment();
+                setcutorelementsEntrainment(i, selectedentrainment);
             }
         }
     }
@@ -174,7 +177,10 @@ public class Entrainments {
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.ENTRAINMENTXMLFILE);
-        } catch (JAXBException e) {Tools.gui_showinformationdialog(Root, "Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());}
+        } catch (JAXBException e) {
+            e.printStackTrace();
+            Tools.gui_showinformationdialog(Root, "Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+        }
     }
 
 // Other Methods

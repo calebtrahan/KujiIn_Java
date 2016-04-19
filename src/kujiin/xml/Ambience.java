@@ -6,16 +6,13 @@ import kujiin.Tools;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Ambience {
-    @XmlElement
     private List<SoundFile> Ambience;
-    @XmlElement
     private List<SoundFile> CreatedAmbience;
 
     public Ambience() {}
@@ -83,9 +80,10 @@ public class Ambience {
     private void created_initialize() {if (CreatedAmbience == null) CreatedAmbience = new ArrayList<>();}
     public void created_add(SoundFile soundFile) {
         created_initialize(); CreatedAmbience.add(soundFile);}
-    public void created_add(List<SoundFile> soundFiles) {
-        created_initialize(); CreatedAmbience.addAll(soundFiles);}
-    public SoundFile created_get(int index) {return CreatedAmbience.get(index);}
+    public SoundFile created_get(int index) {
+        if (CreatedAmbience == null) {System.out.println("Created Ambience Is Null");}
+        return CreatedAmbience.get(index);
+    }
     public SoundFile created_get(String name) {
         for (SoundFile i : CreatedAmbience) {
             if (i.getName().equals(name)) return i;
@@ -101,7 +99,7 @@ public class Ambience {
     public List<SoundFile> created_getAll() {return CreatedAmbience;}
     public void created_remove(SoundFile soundFile) {CreatedAmbience.remove(soundFile);}
     public void created_remove(int index) {CreatedAmbience.remove(index);}
-    public void created_clear() {CreatedAmbience.clear();}
+    public void created_clear() {if (CreatedAmbience != null) CreatedAmbience.clear();}
 
     // Validation Methods
     public boolean hasAnyAmbience() {return Ambience != null && Ambience.size() > 0;}
@@ -128,7 +126,9 @@ public class Ambience {
     }
     public Double gettotalCreatedDuration() {
         Double duration = 0.0;
-        for (SoundFile i : CreatedAmbience) {duration += i.getDuration();}
+        if (CreatedAmbience != null) {
+            for (SoundFile i : CreatedAmbience) {duration += i.getDuration();}
+        }
         return duration;
     }
 

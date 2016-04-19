@@ -1,6 +1,5 @@
 package kujiin.xml;
 
-import javafx.scene.media.Media;
 import kujiin.Tools;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -12,7 +11,6 @@ public class SoundFile {
     private File file;
     private String name;
     private Double duration;
-    private Media media;
 
     public SoundFile() {
 
@@ -21,7 +19,6 @@ public class SoundFile {
         if (file != null) {
             this.file = file;
             this.name = file.getName().substring(0, file.getName().lastIndexOf("."));
-            this.media = new Media(this.file.toURI().toString());
         }
     }
 
@@ -44,7 +41,7 @@ public class SoundFile {
     public void setDuration(Double duration) {
         this.duration = duration;
     }
-    public Media toMedia() {return media;}
+
     // Utility Methods
     public boolean isValid() {
         if (file == null) {return false;}
