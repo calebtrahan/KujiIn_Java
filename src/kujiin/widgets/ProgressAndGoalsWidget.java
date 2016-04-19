@@ -298,8 +298,9 @@ public class ProgressAndGoalsWidget {
                 GoalMinutes.setText(mins.toString());
                 GoalProgress.setProgress(progress);
                 if (Root.getPlayer() != null && Root.getPlayer().isShowing()) {
-                    playerWidget.GoalSetHours.setText(hrs.toString());
-                    playerWidget.GoalSetMinutes.setText(mins.toString());
+                    Double practiceddecimalhours = Tools.convert_minstodecimalhours(practicedminutes, 1);
+                    Double goaldecimalhours = Tools.convert_minstodecimalhours(goal.intValue(), 1);
+                    playerWidget.GoalProgressLabel.setText(String.format("%s hrs > %s hrs (%s", practiceddecimalhours, goaldecimalhours, progress.intValue() * 100) + "%)");
                     playerWidget.GoalProgressBar.setProgress(progress);
                 }
             } else {
@@ -307,12 +308,13 @@ public class ProgressAndGoalsWidget {
                 GoalMinutes.setText("?");
                 GoalProgress.setProgress(0.0);
                 if (playerWidget != null && playerWidget.isShowing()) {
-                    playerWidget.GoalSetHours.setText("?");
-                    playerWidget.GoalSetMinutes.setText("?");
+                    playerWidget.GoalProgressLabel.setText("No Goal Set");
                     playerWidget.GoalProgressBar.setProgress(0.0);
                 }
             }
-            TopLabel.setText(GOALCUTNAMES[cutorelementindex]);
+            String goalcutname = GOALCUTNAMES[cutorelementindex];
+            TopLabel.setText(goalcutname);
+            if (playerWidget != null && playerWidget.isShowing()) {playerWidget.GoalTopLabel.setText("Current " + goalcutname + " Goal");}
         } catch (NullPointerException ignored) {
             if (cutorelementindex != -1) {
                 TopLabel.setText(GOALCUTNAMES[cutorelementindex]);

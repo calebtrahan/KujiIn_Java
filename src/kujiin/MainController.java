@@ -986,7 +986,7 @@ public class MainController implements Initializable {
         private kujiin.xml.Options Options;
         private File AlertFile;
         private boolean valuechanged;
-        private ObservableList<String> rampselections = FXCollections.observableArrayList(kujiin.xml.Options.RAMPDURATIONS);
+        private ObservableList<Integer> rampselections = FXCollections.observableArrayList(kujiin.xml.Options.RAMPDURATIONS);
         private MainController Root;
         private PlayerWidget.ReferenceType tempreferencetype;
 
@@ -1135,6 +1135,7 @@ public class MainController implements Initializable {
         public void ramptoggle() {
             boolean enabled = RampSwitch.isSelected();
             if (enabled) {RampSwitch.setText("ON");}
+            else {RampSwitch.setText("OFF");}
             RampDurationChoiceBox.setDisable(! enabled);
             RampTopLabel.setDisable(! enabled);
         }
@@ -1154,7 +1155,7 @@ public class MainController implements Initializable {
             TooltipsCheckBox.setSelected(Options.getProgramOptions().getTooltips());
             HelpDialogsCheckBox.setSelected(Options.getProgramOptions().getHelpdialogs());
             RampSwitch.setSelected(Options.getSessionOptions().getRampenabled());
-            RampDurationChoiceBox.setItems(rampselections);
+            RampDurationChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList(rampselections.get(0) + " Minutes")));
             if (Options.getSessionOptions().getRampduration() == 2) {RampDurationChoiceBox.getSelectionModel().select(0);}
             else if (Options.getSessionOptions().getRampduration() == 3) {RampDurationChoiceBox.getSelectionModel().select(1);}
             else if (Options.getSessionOptions().getRampduration() == 4) {RampDurationChoiceBox.getSelectionModel().select(2);}

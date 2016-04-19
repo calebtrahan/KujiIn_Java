@@ -13,7 +13,7 @@
         <entrainmentvolume>0.6</entrainmentvolume>
         <fadeinduration>10.0</fadeinduration>
         <fadeoutduration>10.0</fadeoutduration>
-        <rampduration>3</rampduration>
+        <rampduration>2</rampduration>
         <rampenabled>true</rampenabled>
         <referencefullscreen>false</referencefullscreen>
         <referenceoption>false</referenceoption>

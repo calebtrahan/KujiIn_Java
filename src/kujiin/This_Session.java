@@ -607,7 +607,7 @@ public class This_Session {
                 currentprogress *= 100;
                 totalprogress *= 100;
                 getPlayerWidget().CurrentCutTopLabel.setText(String.format("%s (%d", ((Meditatable) currentcutorelement).name, currentprogress.intValue()) + "%)");
-                getPlayerWidget().TotalSessionLabel.setText(String.format("Total (%d", totalprogress.intValue()) + "%)");
+                getPlayerWidget().TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
                 getPlayerWidget().CutCurrentLabel.setText(((Meditatable) currentcutorelement).getcurrenttimeformatted());
                 getPlayerWidget().CutTotalLabel.setText(((Meditatable) currentcutorelement).gettotaltimeformatted());
                 getPlayerWidget().TotalCurrentLabel.setText(Tools.format_secondsforplayerdisplay(totalsecondselapsed));

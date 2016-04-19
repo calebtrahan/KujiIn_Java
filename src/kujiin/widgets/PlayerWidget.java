@@ -48,14 +48,18 @@ public class PlayerWidget extends Stage {
     public ProgressBar TotalProgress;
     public Label TotalTotalLabel;
     public Label TotalSessionLabel;
-    public TextField GoalPracticedHours;
-    public TextField GoalPracticedMinutes;
+    public Label GoalTopLabel;
+    public Label GoalProgressLabel;
     public ProgressBar GoalProgressBar;
-    public TextField GoalSetHours;
-    public TextField GoalSetMinutes;
     private This_Session Session;
     private MainController Root;
 
+    // TODO Simplify Goal Widget On Player To Only Show Percentage So It Looks More Clean And Elegant
+        // [Label] Current {cutorelementname} goal
+        // [Label] x.x hrs > x.x hrs (xx%)
+        // [ProgressBar] Progress
+    // TODO Sync Reference File GUI With XML
+    // TODO Session Player Isn't Moving To The Next Meditatable
     public PlayerWidget(MainController root) {
         Root = root;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
@@ -85,10 +89,6 @@ public class PlayerWidget extends Stage {
             } catch(Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 2000);}
         });
         Tools.gui_showtimedmessageonlabel(StatusBar, "Player Disabled Until Session Is Created Or Loaded", 10000);
-        GoalPracticedHours.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        GoalPracticedMinutes.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        GoalSetHours.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-        GoalSetMinutes.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
     }
 
 // Button Actions
