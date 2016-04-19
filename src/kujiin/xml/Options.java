@@ -30,7 +30,6 @@ public class Options {
     public static final File DIRECTORYSTYLES = new File(ROOTDIRECTORY, "assets/styles/");
     public static final File SOUNDDIRECTORY = new File(ROOTDIRECTORY, "assets/sound/");
     public static final File DIRECTORYTEMP = new File(SOUNDDIRECTORY, "temp/");
-    public static final File DIRECTORYAMBIENCE = new File(SOUNDDIRECTORY, "ambience/");
     public static final File DIRECTORYENTRAINMENT = new File(SOUNDDIRECTORY, "entrainment/");
     public static final File DIRECTORYRAMP = new File(DIRECTORYENTRAINMENT, "ramp/");
     // XML File Location Constants

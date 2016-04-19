@@ -260,13 +260,18 @@ public class This_Session {
                     return new Task<Void>() {
                         @Override
                         protected Void call() throws Exception {
-                            for (Meditatable i : getallCutsAndElements()) {
-                                updateMessage(String.format("Currently Checking %s...", i.name));
-                                if (! i.getAmbience().hasAnyAmbience()) {cutsorelementswithnoambience.add(i);}
-                                else if (! i.getAmbience().hasEnoughAmbience(i.getdurationinseconds())) {cutsorelementswithreducedambience.add(i);}
+                            try {
+                                for (Meditatable i : getallCutsAndElements()) {
+                                    updateMessage(String.format("Currently Checking %s...", i.name));
+                                    if (! i.getAmbience().hasAnyAmbience()) {cutsorelementswithnoambience.add(i);}
+                                    else if (! i.getAmbience().hasEnoughAmbience(i.getdurationinseconds())) {cutsorelementswithreducedambience.add(i);}
+                                }
+                                updateMessage("Done Checking Ambience");
+                                return null;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                return null;
                             }
-                            updateMessage("Done Checking Ambience");
-                            return null;
                         }
                     };
                 }

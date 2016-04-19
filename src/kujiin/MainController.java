@@ -4,8 +4,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -444,58 +442,27 @@ public class MainController implements Initializable {
         public void rightarrowpressed(ActionEvent actionEvent) {
             // Transfer To Current Cut (use Task)
             if (selected_temp_ambiencesong != null && selectedcutorelementname != null) {
-                Service<Void> copyfile = new Service<Void>() {
-                    @Override
-                    protected Task<Void> createTask() {
-                        return new Task<Void>() {
-                            @Override
-                            protected Void call() throws Exception {
-                                File cutdirectory = new File(kujiin.xml.Options.DIRECTORYAMBIENCE, selectedcutorelementname);
-                                File newfile = new File(cutdirectory, selected_temp_ambiencesong.name.getValue());
-                                FileUtils.copyFile(selected_temp_ambiencesong.getFile(), newfile);
-                                return null;
-                            }
-                        };
-                    }
-                };
-                copyfile.setOnSucceeded(event -> selectandloadcut());
-                copyfile.setOnFailed(event -> Tools.gui_showerrordialog(Root, "Error", "Couldn't Copy File To " + selectedcutorelementname + "'s Ambience Directory", "Check File Permissions"));
-                copyfile.start();
-            } else {
-                if (selected_temp_ambiencesong == null) {
-                    Tools.gui_showinformationdialog(Root, "Information", "Cannot Transfer", "Nothing Selected");
-                } else {
-                    Tools.gui_showinformationdialog(Root, "Information", "Cannot Transfer", "No Cut Selected");
+                if (! Actual_Table.getItems().contains(selected_temp_ambiencesong)) {
+                    int tempindex = Temp_Table.getItems().indexOf(selected_actual_ambiencesong);
+                    actual_ambiencesonglist.add(temp_ambiencesonglist.get(tempindex));
+                    actual_soundfilelist.add(temp_soundfilelist.get(tempindex));
+                    Actual_Table.getItems().add(selected_temp_ambiencesong);
+                    calculateactualtotalduration();
                 }
+            } else {
+                if (selected_temp_ambiencesong == null) {Tools.gui_showinformationdialog(Root, "Information", "Cannot Transfer", "Nothing Selected");}
+                else {Tools.gui_showinformationdialog(Root, "Information", "Cannot Transfer", "No Cut Selected");}
             }
         }
         public void leftarrowpressed(ActionEvent actionEvent) {
             if (selected_actual_ambiencesong != null && selectedcutorelementname != null) {
-                File newtempfile = new File(tempdirectory, selected_actual_ambiencesong.name.getValue());
-                for (AmbienceSong i : Temp_Table.getItems()) {
-                    if (selected_actual_ambiencesong.name.getValue().equals(i.name.getValue())) {
-                        Tools.gui_showinformationdialog(Root, "Information", "File Already Exists", "Select A Different File To Transfer");
-                        return;
-                    }
+                if (! Temp_Table.getItems().contains(selected_actual_ambiencesong)) {
+                    int actualindex = Actual_Table.getItems().indexOf(selected_actual_ambiencesong);
+                    temp_ambiencesonglist.add(actual_ambiencesonglist.get(actualindex));
+                    temp_soundfilelist.add(actual_soundfilelist.get(actualindex));
+                    Temp_Table.getItems().add(selected_actual_ambiencesong);
+                    calculatetemptotalduration();
                 }
-                Service<Void> copyfile = new Service<Void>() {
-                    @Override
-                    protected Task<Void> createTask() {
-                        return new Task<Void>() {
-                            @Override
-                            protected Void call() throws Exception {
-                                FileUtils.copyFile(selected_actual_ambiencesong.getFile(), newtempfile);
-                                return null;
-                            }
-                        };
-                    }
-                };
-                copyfile.setOnSucceeded(event -> {
-                    temp_ambiencesonglist.add(new AmbienceSong(new SoundFile(newtempfile)));
-                    Temp_Table.setItems(temp_ambiencesonglist);
-                });
-                copyfile.setOnFailed(event -> Tools.gui_showerrordialog(Root, "Error", "Couldn't Copy File To Temp Directory", "Check File Permissions"));
-                copyfile.start();
             }
         }
 

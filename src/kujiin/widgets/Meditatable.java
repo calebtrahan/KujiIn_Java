@@ -23,7 +23,6 @@ public class Meditatable {
     public String name;
     protected int duration;
     protected This_Session thisession;
-    protected File defaultambiencedirectory;
     protected Ambience ambience;
     protected Entrainment entrainment;
 // Playback Fields
@@ -50,7 +49,6 @@ public class Meditatable {
         this.name = name;
         this.duration = duration;
         this.thisession = thissession;
-        defaultambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
         entrainment = thissession.getEntrainments().getcutorelementsEntrainment(number);
         ambience = thissession.getAmbiences().getcutorelementsAmbience(number);
     }
@@ -104,42 +102,42 @@ public class Meditatable {
     }
     public boolean buildAmbience() {
         ambience.created_clear();
-        Double currentduration = 0.0;
-        // Ambience Is >= Session Duration
-        if (ambience.hasEnoughAmbience(getdurationinseconds())) {
+        double currentdurationinmillis = 0.0;
+        // TODO Convert To Millis For Duration Comparing
+        if (ambience.hasEnoughAmbience(getdurationinmillis())) {
             for (SoundFile i : ambience.getAmbience()) {
-                if (((ambience.gettotalCreatedDuration() / 1000) / 60) < getdurationinseconds()) {
+                if (ambience.gettotalCreatedDuration() < getdurationinmillis()) {
                     ambience.created_add(i);
-                    currentduration += i.getDuration();
+                    currentdurationinmillis += i.getDuration();
                 } else {break;}
             }
         } else {
             Random randint = new Random();
-            while ((currentduration / 1000) < getdurationinseconds()) {
+            while (currentdurationinmillis < getdurationinmillis()) {
                 List<SoundFile> createdambience = ambience.created_getAll();
-                SoundFile selectedambience = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
+                SoundFile selectedsoundfile = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
                 if (createdambience.size() < 2) {
-                    ambience.created_add(selectedambience);
-                    currentduration += selectedambience.getDuration();
+                    ambience.created_add(selectedsoundfile);
+                    currentdurationinmillis += selectedsoundfile.getDuration();
                 } else if (createdambience.size() == 2) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1))) {
-                        ambience.created_add(selectedambience);
-                        currentduration += selectedambience.getDuration();
+                    if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1))) {
+                        ambience.created_add(selectedsoundfile);
+                        currentdurationinmillis += selectedsoundfile.getDuration();
                     }
                 } else if (createdambience.size() == 3) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2))) {
-                        ambience.created_add(selectedambience);
-                        currentduration += selectedambience.getDuration();
+                    if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2))) {
+                        ambience.created_add(selectedsoundfile);
+                        currentdurationinmillis += selectedsoundfile.getDuration();
                     }
                 } else if (createdambience.size() <= 5) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3))) {
-                        ambience.created_add(selectedambience);
-                        currentduration += selectedambience.getDuration();
+                    if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3))) {
+                        ambience.created_add(selectedsoundfile);
+                        currentdurationinmillis += selectedsoundfile.getDuration();
                     }
                 } else if (createdambience.size() > 5) {
-                    if (!selectedambience.equals(createdambience.get(createdambience.size() - 1)) && !selectedambience.equals(createdambience.get(createdambience.size() - 2)) && !selectedambience.equals(createdambience.get(createdambience.size() - 3)) && !selectedambience.equals(createdambience.get(createdambience.size() - 4))) {
-                        ambience.created_add(selectedambience);
-                        currentduration += selectedambience.getDuration();
+                    if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 4))) {
+                        ambience.created_add(selectedsoundfile);
+                        currentdurationinmillis += selectedsoundfile.getDuration();
                     }
                 }
             }
@@ -424,6 +422,7 @@ public class Meditatable {
 
 // Session Information Getters
     public Duration getdurationasobject() {return new Duration((double) getdurationinseconds() * 1000);}
+    public int getdurationinmillis() {return (duration * 60) * 1000;}
     public int getdurationinseconds() {
         return duration * 60;
     }

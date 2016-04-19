@@ -105,8 +105,8 @@ public class Ambience {
 
     // Validation Methods
     public boolean hasAnyAmbience() {return Ambience != null && Ambience.size() > 0;}
-    public boolean hasEnoughAmbience(int seconds) {
-        return gettotalActualDuration() / 1000 >= seconds;
+    public boolean hasEnoughAmbience(int milliseconds) {
+        return gettotalActualDuration() >= milliseconds;
     }
     public boolean ambienceexistsinActual(SoundFile soundFile) {
         try {
