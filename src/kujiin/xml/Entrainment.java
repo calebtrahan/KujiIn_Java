@@ -49,7 +49,7 @@ public class Entrainment {
     // Add/Remove Created Entrainment
     private void created_initialize() {if (CreatedEntrainment == null) CreatedEntrainment = new ArrayList<>();}
     public void created_add(SoundFile soundFile) {created_initialize(); CreatedEntrainment.add(soundFile);}
-    public void created_add(int index, SoundFile soundFile) {created_initialize();  CreatedEntrainment.add(soundFile);}
+    public void created_add(int index, SoundFile soundFile) {created_initialize();  CreatedEntrainment.add(index, soundFile);}
     public SoundFile created_get(int index) {return CreatedEntrainment.get(index);}
     public SoundFile created_get(String name) {
         for (SoundFile i : CreatedEntrainment) {

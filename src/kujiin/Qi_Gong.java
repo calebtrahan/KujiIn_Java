@@ -67,10 +67,8 @@ public class Qi_Gong extends Meditatable {
 // Creation
     @Override
     public boolean buildEntrainment() {
-        int adjustedduration = duration;
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {adjustedduration -= 2;}
-        int fivetimes = adjustedduration / 5;
-        int singletimes = adjustedduration % 5;
+        int fivetimes = duration / 5;
+        int singletimes = duration % 5;
         for (int i = 0; i < fivetimes; i++) {entrainment.created_add(entrainment.getFreqlong());}
         for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
         entrainment.shuffleCreated();

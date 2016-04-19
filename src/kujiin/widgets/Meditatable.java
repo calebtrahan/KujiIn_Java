@@ -92,15 +92,9 @@ public class Meditatable {
 
 // Creation
     public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {
-        System.out.println("Called Build With Ambience Set At " + Boolean.toString(ambienceenabled));
         setAmbienceenabled(ambienceenabled);
         setAllcutsorelementstoplay(allcutandelementitems);
-        if (ambienceenabled) {
-            boolean entrainmentgood = buildEntrainment();
-            boolean ambiencegood = buildAmbience();
-            System.out.println(name + "'s Entrainment Is: " + Boolean.toString(entrainmentgood));
-            System.out.println(name + "'s Ambience Is: " + Boolean.toString(ambiencegood));
-            return entrainmentgood && ambiencegood;}
+        if (ambienceenabled) {return buildEntrainment() && buildAmbience();}
         else {return buildEntrainment();}
     }
     public boolean buildEntrainment() {
