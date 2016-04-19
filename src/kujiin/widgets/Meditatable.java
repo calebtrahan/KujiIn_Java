@@ -102,7 +102,6 @@ public class Meditatable {
         return true;
     }
     public boolean buildAmbience() {
-        System.out.println("Called Build Ambience");
         ambience.created_clear();
         double currentdurationinmillis = 0.0;
         // TODO Convert To Millis For Duration Comparing
