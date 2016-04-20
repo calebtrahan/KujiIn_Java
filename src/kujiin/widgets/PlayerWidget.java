@@ -59,7 +59,6 @@ public class PlayerWidget extends Stage {
         // [Label] x.x hrs > x.x hrs (xx%)
         // [ProgressBar] Progress
     // TODO Sync Reference File GUI With XML
-    // TODO Session Player Isn't Moving To The Next Meditatable
     public PlayerWidget(MainController root) {
         Root = root;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
@@ -70,6 +69,9 @@ public class PlayerWidget extends Stage {
             Root.getOptions();
             Root.getOptions().setStyle(this);
             this.setResizable(false);
+            this.setOnCloseRequest(event -> {
+                if (endsessionprematurely()) {close();}
+            });
         } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         setTitle("Session Player");
         Root = root;
@@ -88,48 +90,65 @@ public class PlayerWidget extends Stage {
                 Session.Root.getOptions().getSessionOptions().setAmbiencevolume(AmbienceVolume.getValue());
             } catch(Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 2000);}
         });
+        ReferenceSwitch.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
+        togglereference(null);
         Tools.gui_showtimedmessageonlabel(StatusBar, "Player Disabled Until Session Is Created Or Loaded", 10000);
     }
 
 // Button Actions
     public void play() {
         Tools.gui_showtimedmessageonlabel(StatusBar, Session.play(this), 3000);
+        syncplaybackbuttons();
     }
     public void pause() {
-        if (Session != null) {
-            Tools.gui_showtimedmessageonlabel(StatusBar, Session.pause(), 3000);}
-        else {
-            Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
+        if (Session != null) {Tools.gui_showtimedmessageonlabel(StatusBar, Session.pause(), 3000);}
+        else {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
+        syncplaybackbuttons();
     }
     public void stop() {
-        if (Session != null) {
-            String message = Session.stop();
-            Tools.gui_showtimedmessageonlabel(StatusBar, message, 3000);
-//            if (message.equals("Session Stopped")) {resetallvalues();}
+        if (Session != null) {Tools.gui_showtimedmessageonlabel(StatusBar, Session.stop(), 3000);}
+        else {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
+        syncplaybackbuttons();
+    }
+    private void syncplaybackbuttons() {
+        PlayerState currentstate = Session.getPlayerState();
+        PlayButton.setDisable(currentstate == PlayerState.PLAYING);
+        PauseButton.setDisable(currentstate == PlayerState.PAUSED || currentstate == PlayerState.STOPPED);
+        StopButton.setDisable(currentstate == PlayerState.STOPPED);
+    }
+    private boolean endsessionprematurely() {
+        if (Session.getPlayerState() == PlayerState.PLAYING || Session.getPlayerState() == PlayerState.PAUSED || Session.getPlayerState() == PlayerState.TRANSITIONING) {
+            pause();
+            if (Tools.gui_getconfirmationdialog(Root, "End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {Session.stop(); return true;}
+            else {play(); return false;}
+        } else {return true;}
+    }
+    public void togglereference(ActionEvent actionEvent) {
+        Root.getOptions().getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
+        if (ReferenceSwitch.isSelected()) {ReferenceSwitch.setText("ON");} else {ReferenceSwitch.setText("OFF");}
+        ReferenceHTMLButton.setDisable(! ReferenceSwitch.isSelected());
+        ReferenceTXTButton.setDisable(! ReferenceSwitch.isSelected());
+        if (! ReferenceSwitch.isSelected()) {
+            ReferenceHTMLButton.setSelected(false);
+            ReferenceTXTButton.setSelected(false);
         }
-        else {
-            Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
     }
-    public void displayreferencefile() {
-//        Session.togglereferencedisplay(ReferenceFileCheckbox);
+    public void htmlreferenceoptionselected(ActionEvent actionEvent) {
+        if (ReferenceSwitch.isSelected()) {
+            ReferenceTXTButton.setSelected(! ReferenceHTMLButton.isSelected());
+            if (ReferenceHTMLButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
+            else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
+        } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
     }
-    public void statusSwitch() {
-//        if (onOffSwitch.isSelected()) {enable();
-//        } else {disable();}
-    }
-
-// Widget Implementation
-    public boolean cleanup() {
-        Session.stop();
-        return Session.getPlayerState() != PlayerState.PLAYING;
-    }
-    public void readytoplay() {
-//        CutPlayingText.setText("Ready To Play");
-//        SessionPlayingText.setText("Ready To Play");
-//        ReferenceFileCheckbox.setText("Reference");
+    public void txtreferenceoptionselected(ActionEvent actionEvent) {
+        if (ReferenceSwitch.isSelected()) {
+            ReferenceHTMLButton.setSelected(! ReferenceTXTButton.isSelected());
+            if (ReferenceTXTButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
+            else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
+        } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
     }
 
-// Dialogs
+    // Dialogs
     // TODO Style Reference Display
     public static class DisplayReference extends Stage {
         public ScrollPane ContentPane;

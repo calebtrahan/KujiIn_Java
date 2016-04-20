@@ -45,7 +45,7 @@ public class This_Session {
     private Element Water;
     private Element Void;
     private PlayerWidget.PlayerState playerState;
-    private Object currentcutorelement;
+    private Meditatable currentcutorelement;
     private Timeline updateuitimeline;
     private Sessions sessions;
     private int totalsecondselapsed;
@@ -539,7 +539,7 @@ public class This_Session {
         }
         else if(playerState == PlayerWidget.PlayerState.PAUSED) {
             updateuitimeline.play();
-            ((Meditatable) currentcutorelement).resume();
+            currentcutorelement.resume();
             setPlayerState(PlayerWidget.PlayerState.PLAYING);
             return "Resuming Session...";
         }
@@ -559,7 +559,7 @@ public class This_Session {
     }
     public String pause() {
         if (playerState == PlayerWidget.PlayerState.PLAYING) {
-            ((Meditatable) currentcutorelement).pause();
+            currentcutorelement.pause();
             updateuitimeline.pause();
             setPlayerState(PlayerWidget.PlayerState.PAUSED);
             return "Session Paused";
@@ -573,13 +573,13 @@ public class This_Session {
     }
     public String stop() {
         if (playerState == PlayerWidget.PlayerState.PLAYING) {
-            ((Meditatable) currentcutorelement).stop();
+            currentcutorelement.stop();
             updateuitimeline.stop();
             setPlayerState(PlayerWidget.PlayerState.STOPPED);
             resetthissession();
             return "Session Stopped";
         } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
-            ((Meditatable) currentcutorelement).stop();
+            currentcutorelement.stop();
             updateuitimeline.stop();
             setPlayerState(PlayerWidget.PlayerState.STOPPED);
             resetthissession();
@@ -598,7 +598,7 @@ public class This_Session {
                 totalsecondselapsed++;
                 Float currentprogress;
                 Float totalprogress;
-                if (((Meditatable) currentcutorelement).getSecondselapsed() != 0) {currentprogress = (float) ((Meditatable) currentcutorelement).getSecondselapsed() / (float) ((Meditatable) currentcutorelement).getdurationinseconds();}
+                if (currentcutorelement.getSecondselapsed() != 0) {currentprogress = (float) currentcutorelement.getSecondselapsed() / (float) currentcutorelement.getdurationinseconds();}
                 else {currentprogress = (float) 0.0;}
                 if (totalsecondselapsed != 0) {totalprogress = (float) totalsecondselapsed / (float) totalsecondsinsession;}
                 else {totalprogress = (float) 0.0;}
@@ -606,20 +606,20 @@ public class This_Session {
                 getPlayerWidget().TotalProgress.setProgress(totalprogress);
                 currentprogress *= 100;
                 totalprogress *= 100;
-                getPlayerWidget().CurrentCutTopLabel.setText(String.format("%s (%d", ((Meditatable) currentcutorelement).name, currentprogress.intValue()) + "%)");
+                getPlayerWidget().CurrentCutTopLabel.setText(String.format("%s (%d", currentcutorelement.name, currentprogress.intValue()) + "%)");
                 getPlayerWidget().TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
-                getPlayerWidget().CutCurrentLabel.setText(((Meditatable) currentcutorelement).getcurrenttimeformatted());
-                getPlayerWidget().CutTotalLabel.setText(((Meditatable) currentcutorelement).gettotaltimeformatted());
+                getPlayerWidget().CutCurrentLabel.setText(currentcutorelement.getcurrenttimeformatted());
+                getPlayerWidget().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
                 getPlayerWidget().TotalCurrentLabel.setText(Tools.format_secondsforplayerdisplay(totalsecondselapsed));
-                getPlayerWidget().StatusBar.setText("Session Playing. Currently Practicing " + ((Meditatable) currentcutorelement).name + "...");
+                getPlayerWidget().StatusBar.setText("Session Playing. Currently Practicing " + currentcutorelement.name + "...");
                 Root.getProgressTracker().updategoalsui();
                 Root.getProgressTracker().updateprogressui();
             } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
                 getPlayerWidget().CurrentCutProgress.setProgress(1.0);
-                getPlayerWidget().CurrentCutTopLabel.setText(((Meditatable) currentcutorelement).name + " Completed");
-                if (! ((Meditatable) currentcutorelement).name.equals("Postsession")) {getPlayerWidget().StatusBar.setText("Prepare For " + getallitemsinSession().get(((Meditatable) currentcutorelement).number + 1).name);}
-                getPlayerWidget().CutCurrentLabel.setText(((Meditatable) currentcutorelement).gettotaltimeformatted());
-                getPlayerWidget().CutTotalLabel.setText(((Meditatable) currentcutorelement).gettotaltimeformatted());
+                getPlayerWidget().CurrentCutTopLabel.setText(currentcutorelement.name + " Completed");
+                if (! currentcutorelement.name.equals("Postsession")) {getPlayerWidget().StatusBar.setText("Prepare For " + getallitemsinSession().get(currentcutorelement.number + 1).name);}
+                getPlayerWidget().CutCurrentLabel.setText(currentcutorelement.gettotaltimeformatted());
+                getPlayerWidget().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
             } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
                 getPlayerWidget().StatusBar.setText("Session Paused");
             } else if (playerState == PlayerWidget.PlayerState.STOPPED) {
@@ -630,8 +630,8 @@ public class This_Session {
     public void playthiscut() {
         try {
             if (Root.getOptions().getSessionOptions().getReferenceoption() != null) {displayreferencefile();}
-            Duration cutduration = ((Meditatable) currentcutorelement).getdurationasobject();
-            ((Meditatable) currentcutorelement).start();
+            Duration cutduration = new Duration(currentcutorelement.getdurationinmillis());
+            currentcutorelement.start();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
             timeline.setOnFinished(event -> timeline.stop());
             timeline.play();
@@ -639,24 +639,25 @@ public class This_Session {
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
     public void progresstonextcut() {
+        System.out.println("Called Progress To Next Cut");
         try {
             if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
 //                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
                 try {
-                    List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(((Meditatable) currentcutorelement).number,
-                            Tools.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(((Meditatable) currentcutorelement).number, false), 2));
+                    List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcutorelement.number,
+                            Tools.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(currentcutorelement.number, false), 2));
                     if (completedgoals.size() > 0) {GoalsCompletedThisSession.addAll(completedgoals);}
-                    ((Meditatable) currentcutorelement).cleanup();
+                    currentcutorelement.cleanup();
                     cutorelementcount++;
                     currentcutorelement = getallitemsinSession().get(cutorelementcount);
                     playthiscut();
                 } catch (IndexOutOfBoundsException ignored) {
-                    ((Meditatable) currentcutorelement).cleanup(); endofsession();}
+                    currentcutorelement.cleanup(); endofsession();}
             } else if (playerState == PlayerWidget.PlayerState.PLAYING) {transition();}
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).show();}
     }
     public void endofsession() {
-        getPlayerWidget().CurrentCutTopLabel.setText(((Meditatable) currentcutorelement).name + " Completed");
+        getPlayerWidget().CurrentCutTopLabel.setText(currentcutorelement.name + " Completed");
         getPlayerWidget().TotalSessionLabel.setText("Session Completed");
         closereferencefile();
         updateuitimeline.stop();
@@ -691,11 +692,11 @@ public class This_Session {
     public void transition() {
         closereferencefile();
         Session currentsession = sessions.getsession(sessions.totalsessioncount() - 1);
-        currentsession.updatecutduration(((Meditatable) currentcutorelement).number, ((Meditatable) currentcutorelement).getdurationinminutes());
+        currentsession.updatecutduration(currentcutorelement.number, currentcutorelement.getdurationinminutes());
         sessions.marshall();
         Root.getProgressTracker().updategoalsui();
-        ((Meditatable) currentcutorelement).stop();
-        if (((Meditatable) currentcutorelement).name.equals("Postsession")) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
+        currentcutorelement.stop();
+        if (currentcutorelement.name.equals("Postsession")) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
         else {
             if (Root.getOptions().getSessionOptions().getAlertfunction()) {
                 Media alertmedia = new Media(Root.getOptions().getSessionOptions().getAlertfilelocation());

@@ -422,8 +422,8 @@ public class Meditatable {
     }
 
 // Session Information Getters
-    public Duration getdurationasobject() {return new Duration((double) getdurationinseconds() * 1000);}
-    public int getdurationinmillis() {return (duration * 60) * 1000;}
+    public Duration getdurationasobject() {return new Duration(getdurationinmillis());}
+    public int getdurationinmillis() {return getdurationinseconds() * 1000;}
     public int getdurationinseconds() {
         return duration * 60;
     }

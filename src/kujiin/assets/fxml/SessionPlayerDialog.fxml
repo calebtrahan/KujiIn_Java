@@ -44,13 +44,13 @@
                         <Insets right="20.0" />
                      </HBox.margin>
                   </Label>
-                  <CheckBox fx:id="ReferenceSwitch" mnemonicParsing="false" text="OFF" />
-                  <RadioButton fx:id="ReferenceHTMLButton" mnemonicParsing="false" text="HTML">
+                  <CheckBox fx:id="ReferenceSwitch" mnemonicParsing="false" onAction="#togglereference" text="OFF" />
+                  <RadioButton fx:id="ReferenceHTMLButton" mnemonicParsing="false" onAction="#htmlreferenceoptionselected" text="HTML">
                      <HBox.margin>
                         <Insets left="20.0" right="5.0" />
                      </HBox.margin>
                   </RadioButton>
-                  <RadioButton fx:id="ReferenceTXTButton" mnemonicParsing="false" text="TXT">
+                  <RadioButton fx:id="ReferenceTXTButton" mnemonicParsing="false" onAction="#txtreferenceoptionselected" text="TXT">
                      <HBox.margin>
                         <Insets left="5.0" right="5.0" />
                      </HBox.margin>
