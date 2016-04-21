@@ -113,8 +113,8 @@ public class ProgressAndGoalsWidget {
                 };
             }
         };
-        getgoals.setOnSucceeded(event -> updategoalsui());
-        getgoals.setOnFailed(event -> updategoalsui());
+        getgoals.setOnSucceeded(event -> updaterootgoalsui());
+        getgoals.setOnFailed(event -> updaterootgoalsui());
         getgoals.start();
         PreAndPostOption.setOnAction(this::cutselectionchanged);
         cutorelementindex = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
@@ -141,7 +141,7 @@ public class ProgressAndGoalsWidget {
             if (cutorelementindex == -1) {resetallvalues();}
             else {
                 updateprogressui();
-                updategoalsui();
+                updaterootgoalsui();
             }
         } catch (NullPointerException ignored) {resetallvalues();}
     }
@@ -163,7 +163,7 @@ public class ProgressAndGoalsWidget {
                 Goals.add(cutorelementindex, new Goals.Goal(setANewGoalForSingleCutDialog.getGoaldate(), setANewGoalForSingleCutDialog.getGoalhours(), GOALCUTNAMES[cutorelementindex]));}
             catch (JAXBException ignored) {Tools.gui_showerrordialog(Root, "Error", "Couldn't Add Goal", "Check File Permissions");}
         }
-        updategoalsui();
+        updaterootgoalsui();
     }
     public void opengoaleditor() {
         if (cutorelementindex == -1) {Tools.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Please Select A Cut To Edit Its Goals"); return;}
@@ -276,8 +276,26 @@ public class ProgressAndGoalsWidget {
             return currentpracticedminutes >= currentGoals.get(currentGoals.size() - 1).getGoal_Hours().intValue();
         } catch (Exception e) {return false;}
     }
-    public void updategoalsui() {
+    public void updateplayergoalsui() {
+        PlayerWidget playerWidget = Root.getPlayer();
+        if (playerWidget != null && playerWidget.isShowing()) {
+            double practiceddecimalhours = Tools.convert_minstodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutorelementindex, PreAndPostOption.isSelected()), 2);
+            playerWidget.GoalTopLabel.setText("Current " + GOALCUTNAMES[cutorelementindex] + " Goal");
+            try {
+                Double goal = Goals.getgoal(cutorelementindex, 0, false).getGoal_Hours();
+                Double goaldecimalhours = Tools.convert_minstodecimalhours(new Double(goal * 60).intValue(), 1);
+                Double progress = goaldecimalhours / practiceddecimalhours;
+                playerWidget.GoalProgressLabel.setText(String.format("%s hrs > %s hrs (%s", practiceddecimalhours, goaldecimalhours, progress.intValue() * 100) + "%)");
+                playerWidget.GoalProgressBar.setProgress(progress);
+            } catch (NullPointerException ignored) {
+                playerWidget.GoalProgressLabel.setText("No Goal Set (" + practiceddecimalhours + " current hrs)");
+                playerWidget.GoalProgressBar.setProgress(0.0);
+            }
+        }
+    }
+    public void updaterootgoalsui() {
         // TODO Update Session Player Goals UI As Well Along With The One On ROOT
+        updateplayergoalsui();
         try {
 //            Goals.sortallcompletedgoals();
             NewGoalButton.setDisable(cutorelementindex == -1);
@@ -288,7 +306,6 @@ public class ProgressAndGoalsWidget {
             Integer minutes = practicedminutes % 60;
             PracticedHours.setText(hours.toString());
             PracticedMinutes.setText(minutes.toString());
-            PlayerWidget playerWidget = Root.getPlayer();
             if (goal != null) {
                 Double progress = Tools.convert_minstodecimalhours(practicedminutes, 2) / goal;
                 goal *= 60;
@@ -297,24 +314,12 @@ public class ProgressAndGoalsWidget {
                 GoalHours.setText(hrs.toString());
                 GoalMinutes.setText(mins.toString());
                 GoalProgress.setProgress(progress);
-                if (Root.getPlayer() != null && Root.getPlayer().isShowing()) {
-                    Double practiceddecimalhours = Tools.convert_minstodecimalhours(practicedminutes, 1);
-                    Double goaldecimalhours = Tools.convert_minstodecimalhours(goal.intValue(), 1);
-                    playerWidget.GoalProgressLabel.setText(String.format("%s hrs > %s hrs (%s", practiceddecimalhours, goaldecimalhours, progress.intValue() * 100) + "%)");
-                    playerWidget.GoalProgressBar.setProgress(progress);
-                }
             } else {
                 GoalHours.setText("?");
                 GoalMinutes.setText("?");
                 GoalProgress.setProgress(0.0);
-                if (playerWidget != null && playerWidget.isShowing()) {
-                    playerWidget.GoalProgressLabel.setText("No Goal Set");
-                    playerWidget.GoalProgressBar.setProgress(0.0);
-                }
             }
-            String goalcutname = GOALCUTNAMES[cutorelementindex];
-            TopLabel.setText(goalcutname);
-            if (playerWidget != null && playerWidget.isShowing()) {playerWidget.GoalTopLabel.setText("Current " + goalcutname + " Goal");}
+            TopLabel.setText(GOALCUTNAMES[cutorelementindex]);
         } catch (NullPointerException ignored) {
             if (cutorelementindex != -1) {
                 TopLabel.setText(GOALCUTNAMES[cutorelementindex]);
@@ -326,7 +331,6 @@ public class ProgressAndGoalsWidget {
                 PracticedMinutes.setText(minutes.toString());
                 GoalMinutes.setText("?");
                 GoalHours.setText("?");
-
             } else {
                 PracticedHours.setText("-");
                 PracticedMinutes.setText("-");
@@ -337,7 +341,6 @@ public class ProgressAndGoalsWidget {
             CurrentGoalsButton.setDisable(cutorelementindex == -1);
             GoalProgress.setProgress(0.0);
         } catch (ArrayIndexOutOfBoundsException ignored) {resetallvalues();}
-
     }
     public List<kujiin.xml.Goals.Goal> getcurrentgoallist(boolean includecompleted) {
         if (cutorelementindex != null) {return Goals.getallcutgoals(cutorelementindex, includecompleted);}

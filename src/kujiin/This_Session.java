@@ -612,7 +612,7 @@ public class This_Session {
                 getPlayerWidget().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
                 getPlayerWidget().TotalCurrentLabel.setText(Tools.format_secondsforplayerdisplay(totalsecondselapsed));
                 getPlayerWidget().StatusBar.setText("Session Playing. Currently Practicing " + currentcutorelement.name + "...");
-                Root.getProgressTracker().updategoalsui();
+                Root.getProgressTracker().updaterootgoalsui();
                 Root.getProgressTracker().updateprogressui();
             } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
                 getPlayerWidget().CurrentCutProgress.setProgress(1.0);
@@ -680,7 +680,7 @@ public class This_Session {
         // TODO Prompt For Export
 //        if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            getsessionexporter();}
-        Root.getProgressTracker().updategoalsui();
+        Root.getProgressTracker().updaterootgoalsui();
     }
     public void resetthissession() {
         updateuitimeline = null;
@@ -694,7 +694,7 @@ public class This_Session {
         Session currentsession = sessions.getsession(sessions.totalsessioncount() - 1);
         currentsession.updatecutduration(currentcutorelement.number, currentcutorelement.getdurationinminutes());
         sessions.marshall();
-        Root.getProgressTracker().updategoalsui();
+        Root.getProgressTracker().updaterootgoalsui();
         currentcutorelement.stop();
         if (currentcutorelement.name.equals("Postsession")) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
         else {

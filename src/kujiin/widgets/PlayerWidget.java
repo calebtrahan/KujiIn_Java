@@ -23,8 +23,6 @@ import java.io.IOException;
 
 // TODO Reference Display Isn't Switching Off If On When Checbox Unselected
 // TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
-// TODO Playback Problems
-    // TOH Freq Is Way Too Loud!
 // TODO Reference Display Isn't Displaying Text But Is Styled -> FIX!
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
 

@@ -174,7 +174,7 @@ public class MainController implements Initializable {
     public void changesessionoptions(ActionEvent actionEvent) {
     new ChangeProgramOptions(this).showAndWait();
     Options.marshall();
-    getProgressTracker().updategoalsui();
+    getProgressTracker().updaterootgoalsui();
     getProgressTracker().updateprogressui();
 }
     public void editprogramsambience(ActionEvent actionEvent) {
