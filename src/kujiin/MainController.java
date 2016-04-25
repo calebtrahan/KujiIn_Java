@@ -17,6 +17,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import kujiin.widgets.CreatorAndExporterWidget;
 import kujiin.widgets.PlayerWidget;
@@ -34,7 +35,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
 // TODO Saving Preset Is Broke!
-// TODO Refactor Ambience For Cut So It's Stored In XML And Files Can Be Anywhere On The File System
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;
@@ -416,6 +416,12 @@ public class MainController implements Initializable {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
+                this.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                    @Override
+                    public void handle(WindowEvent event) {
+
+                    }
+                });
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Advanced Ambience Editor");
             CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
@@ -484,6 +490,9 @@ public class MainController implements Initializable {
             }
             Temp_TotalDuration.setText(Tools.format_minstohrsandmins_long((int) ((temptotalduration / 1000) / 60)));
         }
+        public void deletetempambiencefromdirectory() {
+            try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
+        }
 
     // Actual Ambience Methods
         public void addtoactualambience(ActionEvent actionEvent) {
@@ -530,7 +539,6 @@ public class MainController implements Initializable {
                     } else {notvalidfilenames.add(i);}
                 }
                 if (notvalidfilenames.size() > 0) {Tools.gui_showinformationdialog(Root, "Files Couldn't Be Added", "These Files Couldn't Be Added", notvalidfilenames.toString());}
-                // TODO Show Dialog Here With Invalid File Names
             }
         }
         public void addandcalculateduration(SoundFile soundFile, TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
@@ -591,6 +599,17 @@ public class MainController implements Initializable {
         }
 
     // Dialog Methods
+        public boolean unsavedchanges() {
+            if (CutOrElementSelectionBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
+            try {
+                if (actual_soundfilelist.size() != selectedambience.getAmbience().size()) {return true;}
+                List<SoundFile> ambiencelist = selectedambience.getAmbience();
+                for (SoundFile x : actual_soundfilelist) {
+                    if (! ambiencelist.contains(x)) {return true;}
+                }
+                return false;
+            } catch (NullPointerException ignored) {return false;}
+        }
         public void save(ActionEvent actionEvent) {
             int index = CutOrElementSelectionBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
@@ -603,12 +622,18 @@ public class MainController implements Initializable {
             } else {Tools.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closebuttonpressed(ActionEvent actionEvent) {
-            try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
+            if (unsavedchanges()) {
+                if (Tools.gui_getconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Closing?")) {save(null);}
+                else {return;}
+            }
             close();
         }
         public void switchtosimple(ActionEvent actionEvent) {
-            // TODO Check If Unsaved Changes Here?
+            if (unsavedchanges()) {
+                if (Tools.gui_getconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Switching To Simple Mode?")) {save(null);}
+            }
             this.close();
+            deletetempambiencefromdirectory();
             if (selected_temp_ambiencesong != null && kujiin.xml.Options.ALLNAMES.contains(selectedcutorelementname)) {
                 new SimpleAmbienceEditor(Root, Root.getSession().getAmbiences(), selectedcutorelementname).show();
             } else {new SimpleAmbienceEditor(Root, Root.getSession().getAmbiences()).show();}
@@ -725,7 +750,9 @@ public class MainController implements Initializable {
                     }
                     else {notvalidfilenames.add(i);}
                 }
-                // TODO Show Dialog Here With Invalid File Names
+                if (notvalidfilenames.size() > 0) {
+                    Tools.gui_showinformationdialog(Root, "Couldn't Add Files", "Supported Audio Formats: " + Tools.audio_getsupportedText(), "Couldn't Add " + notvalidfilenames.size() + "Files");
+                }
             }
             if (AmbienceList.size() > 0) {AmbienceTable.setItems(AmbienceList);}
         }
@@ -790,9 +817,23 @@ public class MainController implements Initializable {
             }
             TotalDuration.setText(Tools.format_minstohrsandmins_long((int) ((totalselectedduration / 1000) / 60)));
         }
+        public boolean unsavedchanges() {
+            if (CutOrElementChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
+            try {
+                if (SoundList.size() != selectedambience.getAmbience().size()) {return true;}
+                List<SoundFile> ambiencelist = selectedambience.getAmbience();
+                for (SoundFile x : SoundList) {
+                    if (! ambiencelist.contains(x)) {return true;}
+                }
+                return false;
+            } catch (NullPointerException ignored) {return false;}
+        }
 
     // Dialog Methods
         public void advancedmode(ActionEvent actionEvent) {
+            if (unsavedchanges()) {
+                if (Tools.gui_getconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Switching To Advanced Mode?")) {save(null);}
+            }
             this.close();
             if (selectedcutorelementname != null && kujiin.xml.Options.ALLNAMES.contains(selectedcutorelementname)) {
                 new AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences(), selectedcutorelementname).show();
@@ -810,7 +851,10 @@ public class MainController implements Initializable {
             } else {Tools.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closedialog(ActionEvent actionEvent) {
-            // TODO Check For Unsaved Changes Here
+            if (unsavedchanges()) {
+                if (Tools.gui_getconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Closing?")) {save(null);}
+                else {return;}
+            }
             close();
         }
     }
@@ -1276,4 +1320,5 @@ public class MainController implements Initializable {
         }
         public double getDuration() {return duration;}
     }
+
 }

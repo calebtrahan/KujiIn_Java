@@ -172,7 +172,7 @@ public class CreatorAndExporterWidget {
         } else {setCreatorState(CreatorState.NOT_CREATED);}
     }
     public boolean creationchecks() {
-        if (! gettextfieldtimes()) {Tools.gui_showerrordialog(Root, "Error Creating Session", "At Least One Cut's Value Must Not Be 0", "Cannot Create Session"); return false;}
+        if (! gettextfieldtimes()) {Tools.gui_showerrordialog(Root, "Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session"); return false;}
         if (! session.checksessionwellformedness(session.getcutsessionvalues(true))) {return false;}
         // TODO Refactor Goals Here
         ArrayList<Integer> notgoodongoals = session.Root.getProgressTracker().precreationgoalchecks(session.getcutsessionvalues(true));

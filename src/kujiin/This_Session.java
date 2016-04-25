@@ -244,7 +244,6 @@ public class This_Session {
         }
         return false;
     }
-    // TODO Refactor CheckAmbience Into Meditatable And Subclasses
     public void checkambience(CheckBox ambiencecheckbox) {
         if (sessionvaluesok()) {
             ArrayList<Meditatable> cutsorelementswithnoambience = new ArrayList<>();
@@ -629,7 +628,7 @@ public class This_Session {
     }
     public void playthiscut() {
         try {
-            if (Root.getOptions().getSessionOptions().getReferenceoption() != null) {displayreferencefile();}
+            if (Root.getOptions().getSessionOptions().getReferenceoption() != null && Root.getOptions().getSessionOptions().getReferenceoption()) {displayreferencefile();}
             Duration cutduration = new Duration(currentcutorelement.getdurationinmillis());
             currentcutorelement.start();
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
@@ -639,7 +638,6 @@ public class This_Session {
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
     public void progresstonextcut() {
-        System.out.println("Called Progress To Next Cut");
         try {
             if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
 //                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
@@ -755,7 +753,7 @@ public class This_Session {
         displayReference.show();
     }
     public void closereferencefile() {
-        if (displayReference != null) {
+        if (displayReference != null && displayReference.isShowing()) {
             displayReference.close();
             displayReference = null;
         }
