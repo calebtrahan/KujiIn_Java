@@ -19,19 +19,17 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-// TODO Refactor Into Meditation Program -> And Add 5 Elements To Be Practiced With or Without Cuts
-
 // TODO Reference Display Isn't Switching Off If On When Checbox Unselected
 // TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
 // TODO Reference Display Isn't Displaying Text But Is Styled -> FIX!
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
 
+// TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
 public class PlayerWidget extends Stage {
     public Button PlayButton;
     public Button PauseButton;
     public Button StopButton;
     public Label StatusBar;
-    public CheckBox ReferenceSwitch;
     public RadioButton ReferenceHTMLButton;
     public RadioButton ReferenceTXTButton;
     public Slider EntrainmentVolume;
@@ -47,8 +45,10 @@ public class PlayerWidget extends Stage {
     public Label TotalTotalLabel;
     public Label TotalSessionLabel;
     public Label GoalTopLabel;
-    public Label GoalProgressLabel;
+    public Label GoalCurrrentLabel;
     public ProgressBar GoalProgressBar;
+    public Label GoalSetLabel;
+    public ToggleButton ReferenceToggleButton;
     private This_Session Session;
     private MainController Root;
 
@@ -88,7 +88,7 @@ public class PlayerWidget extends Stage {
                 Session.Root.getOptions().getSessionOptions().setAmbiencevolume(AmbienceVolume.getValue());
             } catch(Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 2000);}
         });
-        ReferenceSwitch.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
+        ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
         togglereference(null);
         Tools.gui_showtimedmessageonlabel(StatusBar, "Player Disabled Until Session Is Created Or Loaded", 10000);
     }
@@ -122,24 +122,23 @@ public class PlayerWidget extends Stage {
         } else {return true;}
     }
     public void togglereference(ActionEvent actionEvent) {
-        Root.getOptions().getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
-        if (ReferenceSwitch.isSelected()) {ReferenceSwitch.setText("ON");} else {ReferenceSwitch.setText("OFF");}
-        ReferenceHTMLButton.setDisable(! ReferenceSwitch.isSelected());
-        ReferenceTXTButton.setDisable(! ReferenceSwitch.isSelected());
-        if (! ReferenceSwitch.isSelected()) {
+        Root.getOptions().getSessionOptions().setReferenceoption(ReferenceToggleButton.isSelected());
+        ReferenceHTMLButton.setDisable(! ReferenceToggleButton.isSelected());
+        ReferenceTXTButton.setDisable(! ReferenceToggleButton.isSelected());
+        if (! ReferenceToggleButton.isSelected()) {
             ReferenceHTMLButton.setSelected(false);
             ReferenceTXTButton.setSelected(false);
         }
     }
     public void htmlreferenceoptionselected(ActionEvent actionEvent) {
-        if (ReferenceSwitch.isSelected()) {
+        if (ReferenceToggleButton.isSelected()) {
             ReferenceTXTButton.setSelected(! ReferenceHTMLButton.isSelected());
             if (ReferenceHTMLButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
             else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
         } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
     }
     public void txtreferenceoptionselected(ActionEvent actionEvent) {
-        if (ReferenceSwitch.isSelected()) {
+        if (ReferenceToggleButton.isSelected()) {
             ReferenceHTMLButton.setSelected(! ReferenceTXTButton.isSelected());
             if (ReferenceTXTButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
             else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}

@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -65,7 +66,7 @@ public class Entrainment {
     public List<SoundFile> created_getAll() {return CreatedEntrainment;}
     public void created_remove(SoundFile soundFile) {CreatedEntrainment.remove(soundFile);}
     public void created_remove(int index) {CreatedEntrainment.remove(index);}
-    public void created_clear() {CreatedEntrainment.clear();}
+    public void created_clear() {if (CreatedEntrainment != null) CreatedEntrainment.clear();}
 
     // Information Methods
     public Double gettotalCreatedDuration() {
@@ -93,8 +94,5 @@ public class Entrainment {
     }
 
     // Other Methods
-    public void shuffleCreated() {
-        // TODO Throws NullPointerException Here
-//        Collections.shuffle(CreatedEntrainment);
-    }
+    public void shuffleCreated() {if (CreatedEntrainment != null) Collections.shuffle(CreatedEntrainment);}
 }

@@ -4,14 +4,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="253.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label alignment="CENTER" layoutX="35.0" layoutY="3.0" prefHeight="22.0" prefWidth="498.0" text="Session Player" textAlignment="CENTER">
          <font>
             <Font name="System Bold" size="19.0" />
          </font>
       </Label>
-      <HBox alignment="TOP_RIGHT" layoutX="400.0" layoutY="221.0" prefHeight="23.0" prefWidth="158.0">
+      <HBox alignment="TOP_RIGHT" layoutX="400.0" layoutY="241.0" prefHeight="23.0" prefWidth="158.0">
          <children>
             <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#play" prefHeight="0.0" prefWidth="60.0" text="Play">
                <font>
@@ -92,9 +92,9 @@
                </font></Label>
             <HBox alignment="CENTER" prefHeight="30.0" prefWidth="340.0">
                <children>
-                  <Label fx:id="GoalProgressLabel1" alignment="CENTER" prefHeight="16.0" prefWidth="75.0" text="999.99 hrs" />
+                  <Label fx:id="GoalCurrrentLabel" alignment="CENTER" prefHeight="16.0" prefWidth="75.0" text="999.99 hrs" />
                   <ProgressBar fx:id="GoalProgressBar" prefHeight="16.0" prefWidth="158.0" progress="0.0" />
-                  <Label fx:id="GoalProgressLabel" alignment="CENTER" prefHeight="16.0" prefWidth="75.0" text="999.99 hrs" />
+                  <Label fx:id="GoalSetLabel" alignment="CENTER" prefHeight="16.0" prefWidth="75.0" text="999.99 hrs" />
                </children>
             </HBox>
          </children>
@@ -136,29 +136,10 @@
             </HBox>
          </children>
       </VBox>
-      <HBox alignment="CENTER" layoutX="192.0" layoutY="190.0" prefHeight="25.0" prefWidth="374.0">
+      <Label fx:id="StatusBar" layoutX="14.0" layoutY="244.0" prefHeight="16.0" prefWidth="374.0" />
+      <VBox alignment="CENTER" layoutX="388.0" layoutY="178.0" prefHeight="63.0" prefWidth="151.0">
          <children>
-            <Label alignment="TOP_LEFT" text="Reference Display" textAlignment="CENTER">
-               <font>
-                  <Font name="System Bold" size="15.0" />
-               </font>
-               <HBox.margin>
-                  <Insets right="10.0" />
-               </HBox.margin>
-            </Label>
-            <CheckBox fx:id="ReferenceSwitch" mnemonicParsing="false" onAction="#togglereference" text="OFF">
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </CheckBox>
-            <Label alignment="CENTER" text="Type">
-               <font>
-                  <Font name="System Bold" size="13.0" />
-               </font>
-               <HBox.margin>
-                  <Insets bottom="1.0" left="8.0" />
-               </HBox.margin>
-            </Label>
+            <ToggleButton fx:id="ReferenceToggleButton" mnemonicParsing="false" text="Reference Display" />
             <HBox alignment="CENTER" prefHeight="25.0" prefWidth="133.0">
                <children>
                   <RadioButton fx:id="ReferenceHTMLButton" mnemonicParsing="false" onAction="#htmlreferenceoptionselected" text="HTML">
@@ -174,7 +155,6 @@
                </children>
             </HBox>
          </children>
-      </HBox>
-      <Label fx:id="StatusBar" layoutX="19.0" layoutY="225.0" prefHeight="16.0" prefWidth="374.0" />
+      </VBox>
    </children>
 </AnchorPane>

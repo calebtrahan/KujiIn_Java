@@ -98,7 +98,7 @@ public class Meditatable {
         else {return buildEntrainment();}
     }
     public boolean buildEntrainment() {
-        getEntrainment().created_clear();
+        entrainment.created_clear();
         return true;
     }
     public boolean buildAmbience() {

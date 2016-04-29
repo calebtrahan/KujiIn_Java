@@ -1,4 +1,4 @@
-package kujiin.widgets;
+package kujiin.dialogs;
 
 import javafx.stage.Stage;
 
