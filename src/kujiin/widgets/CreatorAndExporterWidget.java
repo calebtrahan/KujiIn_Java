@@ -19,14 +19,10 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.*;
-import kujiin.xml.Goals;
-import kujiin.xml.Options;
 import kujiin.xml.Preset;
 
-import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
 
 // TODO Get FFMPEG Working To Mix Audio Files Together
@@ -163,47 +159,13 @@ public class CreatorAndExporterWidget {
         }
         // TODO Check Exporter Here
         if (creatorState == CreatorState.NOT_CREATED) {
-            if (creationchecks()) {
-                session.create(session.getallsessionvalues());
-                ExportButton.setDisable(false);
-                session.Root.PlayButton.setDisable(false);
-                setCreatorState(CreatorState.CREATED);
-            }
+            if (! gettextfieldtimes()) {Tools.gui_showerrordialog(Root, "Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session"); return;}
+            boolean creationstate = session.create();
+            ExportButton.setDisable(! creationstate);
+            session.Root.PlayButton.setDisable(! creationstate);
+            if (creationstate) setCreatorState(CreatorState.CREATED);
+            else {setCreatorState(CreatorState.NOT_CREATED);}
         } else {setCreatorState(CreatorState.NOT_CREATED);}
-    }
-    public boolean creationchecks() {
-        if (! gettextfieldtimes()) {Tools.gui_showerrordialog(Root, "Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session"); return false;}
-        if (! session.checksessionwellformedness(session.getcutsessionvalues(true))) {return false;}
-        // TODO Refactor Goals Here
-        ArrayList<Integer> notgoodongoals = session.Root.getProgressTracker().precreationgoalchecks(session.getcutsessionvalues(true));
-        if (! notgoodongoals.isEmpty()) {
-            StringBuilder notgoodtext = new StringBuilder();
-            for (int i = 0; i < notgoodongoals.size(); i++) {
-                if (i == 0 && notgoodongoals.size() > 1) {notgoodtext.append("\n");}
-                notgoodtext.append(ProgressAndGoalsWidget.GOALCUTNAMES[notgoodongoals.get(i)]);
-                if (notgoodongoals.size() > 1) {
-                    if (i != notgoodtext.length() - 1) {notgoodtext.append(", ");}
-                    if (i == notgoodongoals.size() / 2) {notgoodtext.append("\n");}
-                }
-            }
-            if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Goals Aren't Long Enough For " + notgoodtext.toString(), "Set Goals For These Cuts Before Creating This Session?")) {
-                ProgressAndGoalsWidget.SetANewGoalForMultipleCuts s = new ProgressAndGoalsWidget.SetANewGoalForMultipleCuts(Root, notgoodongoals, Tools.list_getmaxintegervalue(notgoodongoals));
-                s.showAndWait();
-                if (s.isAccepted()) {
-                    List<Integer> cutindexes = s.getSelectedCutIndexes();
-                    Double goalhours = s.getGoalhours();
-                    LocalDate goaldate = s.getGoaldate();
-                    boolean goalssetsuccessfully = true;
-                    for (Integer i : cutindexes) {
-                        try {
-                            Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours, ProgressAndGoalsWidget.GOALCUTNAMES[i]));}
-                        catch (JAXBException ignored) {goalssetsuccessfully = false; Tools.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + ProgressAndGoalsWidget.GOALCUTNAMES[i], "Check File Permissions");}
-                    }
-                    if (goalssetsuccessfully) {Tools.gui_showinformationdialog(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");}
-                }
-                return true;
-            } else {return true;}
-        } else {return true;}
     }
 
 // Export
@@ -574,22 +536,18 @@ public class CreatorAndExporterWidget {
             CurrentLabel.textProperty().unbind();
         }
     }
-    public static class SessionNotWellformedDialog extends Stage {
-        public Button returntoCreatorButton;
+    public static class CutsMissingDialog  extends Stage {
         public Button addmissingCutsButton;
         public ListView<Text> sessionlistview;
-        public Label sessionmissingcutsLabel;
         public Button CreateAnywayButton;
-        public Label explanationLabel;
-        private ArrayList<Integer> textfieldvalues;
-        private int lastcutindex;
+        private ArrayList<Cut> allcuts;
         private int invocationduration;
         private boolean createsession;
         private MainController Root;
 
-        public SessionNotWellformedDialog(MainController root, ArrayList<Integer> textfieldvalues, String cutsmissingtext, int lastcutindex) {
+        public CutsMissingDialog(MainController root, ArrayList<Cut> allcuts) {
             Root = root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionNotWellformedDialog.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CutsOutOfOrderOrMissing.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -597,55 +555,37 @@ public class CreatorAndExporterWidget {
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Session Not Well Formed");
-            this.textfieldvalues = textfieldvalues;
-            this.lastcutindex = lastcutindex;
-            sessionmissingcutsLabel.setText(cutsmissingtext);
+            setTitle("Cuts Missing");
             populatelistview();
-            explanationLabel.setText(("Your Practiced Cuts Do Not Connect! Due To The Nature Of The Kuji-In I Recommend " +
-                    "Connecting All Cuts From RIN All The Way To Your Last Cut (") + Options.CUTNAMES.get(lastcutindex) +
-                    ") Or Your This_Session Might Not Have The Energy It Needs");
             setCreatesession(false);
         }
 
+        public int getlastworkingcutindex() {
+            int lastcutindex = 0;
+            for (Cut i : allcuts) {
+                if (i.getdurationinminutes() > 0) {lastcutindex = i.number;}
+            }
+            return lastcutindex;
+        }
         public void populatelistview() {
-            ArrayList<String> items = new ArrayList<>();
             ObservableList<Text> sessionitems = FXCollections.observableArrayList();
-            int count = 0;
-            boolean thisitemmissing;
-            for (int i = 0; i < textfieldvalues.size() - 1; i++) {
-                // TODO IMPORTANT Index Out Of Bounds Here
-                String name = Options.CUTNAMES.get(i);
-                String minutes;
-                if (i <= lastcutindex || i == textfieldvalues.size() - 1) {
-                    thisitemmissing = false;
-                    if (i == 0 || i == 10) {
-                        if (textfieldvalues.get(i) == 0) {
-                            minutes = "Ramp Only";
-                        } else {
-                            String time = Tools.format_minstohrsandmins_short(textfieldvalues.get(i));
-                            minutes = String.format("%s + Ramp", time);
-                        }
-                    } else {
-                        if (textfieldvalues.get(i) == 0) {
-                            thisitemmissing = true;
-                            minutes = " Missing Value! ";
-                        }
-                        else {minutes = Tools.format_minstohrsandmins_short(textfieldvalues.get(i));}
-                    }
-                    String txt = String.format("%d: %s (%s )", count + 1, name, minutes);
-                    Text item = new Text();
-                    item.setText(txt);
-                    if (thisitemmissing) item.setStyle("-fx-font-weight:bold; -fx-font-style: italic;");
-                    sessionitems.add(item);
-                    count++;
+            for (int i=0; i<getlastworkingcutindex(); i++) {
+                Text item = new Text();
+                StringBuilder currentcuttext = new StringBuilder();
+                Cut selectedcut = allcuts.get(i-1);
+                currentcuttext.append(selectedcut.number).append(". ").append(selectedcut.name);
+                if (selectedcut.getdurationinminutes() > 0) {
+                    currentcuttext.append(" (").append(Tools.format_minstohrsandmins_short(selectedcut.getdurationinminutes())).append(")");
+                } else {
+                    currentcuttext.append(" (Missing Value!)");
+                    item.setStyle("-fx-font-weight:bold; -fx-font-style: italic;");
                 }
+                item.setText(currentcuttext.toString());
+                sessionitems.add(item);
             }
             sessionlistview.setItems(sessionitems);
         }
-
         public void returntoCreator(Event event) {this.close();}
-
         public void addmissingcutstoSession(Event event) {
             CutInvocationDialog cutdurationdialog = new CutInvocationDialog(Root);
             cutdurationdialog.showAndWait();
@@ -653,26 +593,21 @@ public class CreatorAndExporterWidget {
             setCreatesession(true);
             this.close();
         }
-
         public void createSessionwithoutmissingcuts(Event event) {
             if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
                 setCreatesession(true);
                 this.close();
             }
         }
-
         public int getInvocationduration() {
             return invocationduration;
         }
-
         public void setInvocationduration(int invocationduration) {
             this.invocationduration = invocationduration;
         }
-
         public boolean isCreatesession() {
             return createsession;
         }
-
         public void setCreatesession(boolean createsession) {this.createsession = createsession;}
     }
     public static class CutInvocationDialog extends Stage {
@@ -763,9 +698,10 @@ public class CreatorAndExporterWidget {
         }
 
         public void itemselected() {
-            boolean validitemselected = SessionItemsTable.getSelectionModel().getSelectedIndex() != -1;
-            UpButton.setDisable(! validitemselected);
-            DownButton.setDisable(! validitemselected);
+            int index = SessionItemsTable.getSelectionModel().getSelectedIndex();
+            boolean validitemselected = index != -1;
+            UpButton.setDisable(! validitemselected && index == 0);
+            DownButton.setDisable(! validitemselected && index == SessionItemsTable.getItems().size() - 1);
         }
         public void populatetable() {
             SessionItemsTable.getItems().clear();

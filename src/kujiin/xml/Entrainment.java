@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -95,5 +94,7 @@ public class Entrainment {
 
     // Other Methods
     public void shuffleCreated() {
-        Collections.shuffle(CreatedEntrainment);}
+        // TODO Throws NullPointerException Here
+//        Collections.shuffle(CreatedEntrainment);
+    }
 }

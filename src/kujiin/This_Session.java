@@ -16,7 +16,9 @@ import kujiin.widgets.PlayerWidget;
 import kujiin.widgets.ProgressAndGoalsWidget;
 import kujiin.xml.*;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -135,7 +137,7 @@ public class This_Session {
         this.ambiences = ambiences;
     }
 
-    // Cut And Element Getters
+// Cut And Element Getters
     public Qi_Gong getPresession() {
         return Presession;
     }
@@ -185,7 +187,7 @@ public class This_Session {
         return Void;
     }
 
-    // GUI
+// GUI
     public void setDuration(int elementorcutindex, int duration) {
         if (elementorcutindex == 0) {Presession.setDuration(duration);}
         if (elementorcutindex == 1) {Rin.setDuration(duration);}
@@ -223,6 +225,7 @@ public class This_Session {
         if (elementorcutindex == 15) {return Void.getdurationinminutes();}
         return 0;
     }
+
     public ArrayList<Integer> getallsessionvalues() {
         ArrayList<Integer> values = new ArrayList<>();
         for (int i=0; i<=15; i++) {values.add(getDuration(i));}
@@ -334,33 +337,97 @@ public class This_Session {
             ambiencecheckerservice.start();
         } else {Tools.gui_showinformationdialog(Root, "Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
-    public boolean checksessionwellformedness(ArrayList<Integer> textfieldtimes) {
-        int lastcutindex = 0;
-        for (int i = 0; i < textfieldtimes.size(); i++) {
-            if (textfieldtimes.get(i) > 0) {lastcutindex = i;}
-        }
-        // Get NonSequential Cuts
-        ArrayList<Integer> indexestochange = new ArrayList<>();
-        for (int i = 0; i < lastcutindex; i++) {
-            if (i > 0) {if (textfieldtimes.get(i) == 0) {indexestochange.add(i);}}
-        }
-        if (indexestochange.size() > 0) {
-            ArrayList<String> cutsmissinglist = new ArrayList<>();
-            for (Integer x : indexestochange) {cutsmissinglist.add(Options.CUTNAMES.get(x));}
-            StringBuilder cutsmissingtext = new StringBuilder();
-            for (int i = 0; i < cutsmissinglist.size(); i++) {
-                cutsmissingtext.append(cutsmissinglist.get(i));
-                if (i != cutsmissinglist.size() - 1) {cutsmissingtext.append(", ");}
-            }
-            CreatorAndExporterWidget.SessionNotWellformedDialog notWellformedDialog = new CreatorAndExporterWidget.SessionNotWellformedDialog(Root, textfieldtimes, cutsmissingtext.toString(), lastcutindex);
-            notWellformedDialog.showAndWait();
-            if (notWellformedDialog.isCreatesession()) {
-                int invocationduration = notWellformedDialog.getInvocationduration();
-                for (int i : indexestochange) {textfieldtimes.set(i, invocationduration);}
-                return true;
-            } else {return false;}
+    public boolean checkcutsinorder() {
+
+        ArrayList<Cut> missingcuts = new ArrayList<>();
+        ArrayList<Cut> cutsinsession = new ArrayList<>();
+        for (Meditatable i : getallCutsAndElements()) {if (i instanceof Cut) {cutsinsession.add((Cut) i);}}
+        if (missingcuts.size() > 0) {
+            // TODO Connect CutsMissing Dialog Here And Pass The Information Back Into Session Cut Values
+//            CreatorAndExporterWidget.CutsMissingDialog notWellformedDialog = new CreatorAndExporterWidget.CutsMissingDialog(Root, textfieldtimes, cutsmissingtext.toString(), lastcutindex);
+//            notWellformedDialog.showAndWait();
+//            if (notWellformedDialog.isCreatesession()) {
+//                int invocationduration = notWellformedDialog.getInvocationduration();
+//            }
+//                for (int i : indexestochange) {textfieldtimes.set(i, invocationduration);}
+//                return true;
+//            } else {return false;}
+//        }
+//
+//
+//
+//
+//
+//
+//
+//        int lastcutindex = 0;
+//        for (int i = 0; i < textfieldtimes.size(); i++) {
+//            if (textfieldtimes.get(i) > 0) {lastcutindex = i;}
+//        }
+//        // Get NonSequential Cuts
+//        ArrayList<Integer> indexestochange = new ArrayList<>();
+//        for (int i = 0; i < lastcutindex; i++) {
+//            if (i > 0) {if (textfieldtimes.get(i) == 0) {indexestochange.add(i);}}
+//        }
+//        if (indexestochange.size() > 0) {
+//            ArrayList<String> cutsmissinglist = new ArrayList<>();
+//            for (Integer x : indexestochange) {cutsmissinglist.add(Options.CUTNAMES.get(x));}
+//            StringBuilder cutsmissingtext = new StringBuilder();
+//            for (int i = 0; i < cutsmissinglist.size(); i++) {
+//                cutsmissingtext.append(cutsmissinglist.get(i));
+//                if (i != cutsmissinglist.size() - 1) {cutsmissingtext.append(", ");}
+//            }
+//            CreatorAndExporterWidget.CutsMissingDialog notWellformedDialog = new CreatorAndExporterWidget.CutsMissingDialog(Root, textfieldtimes, cutsmissingtext.toString(), lastcutindex);
+//            notWellformedDialog.showAndWait();
+//            if (notWellformedDialog.isCreatesession()) {
+//                int invocationduration = notWellformedDialog.getInvocationduration();
+//                for (int i : indexestochange) {textfieldtimes.set(i, invocationduration);}
+//                return true;
+//            } else {return false;}
+//        }
         }
         return true;
+    }
+    public void checkgoals() {
+        ArrayList<Integer> notgoodongoals = Root.getProgressTracker().precreationgoalchecks(getcutsessionvalues(true));
+        if (! notgoodongoals.isEmpty()) {
+            StringBuilder notgoodtext = new StringBuilder();
+            for (int i = 0; i < notgoodongoals.size(); i++) {
+                if (i == 0 && notgoodongoals.size() > 1) {
+                    notgoodtext.append("\n");
+                }
+                notgoodtext.append(ProgressAndGoalsWidget.GOALCUTNAMES[notgoodongoals.get(i)]);
+                if (notgoodongoals.size() > 1) {
+                    if (i != notgoodtext.length() - 1) {
+                        notgoodtext.append(", ");
+                    }
+                    if (i == notgoodongoals.size() / 2) {
+                        notgoodtext.append("\n");
+                    }
+                }
+            }
+            if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Goals Aren't Long Enough For " + notgoodtext.toString(), "Set Goals For These Cuts Before Creating This Session?")) {
+                ProgressAndGoalsWidget.SetANewGoalForMultipleCuts s = new ProgressAndGoalsWidget.SetANewGoalForMultipleCuts(Root, notgoodongoals, Tools.list_getmaxintegervalue(notgoodongoals));
+                s.showAndWait();
+                if (s.isAccepted()) {
+                    List<Integer> cutindexes = s.getSelectedCutIndexes();
+                    Double goalhours = s.getGoalhours();
+                    LocalDate goaldate = s.getGoaldate();
+                    boolean goalssetsuccessfully = true;
+                    for (Integer i : cutindexes) {
+                        try {
+                            Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours, ProgressAndGoalsWidget.GOALCUTNAMES[i]));
+                        } catch (JAXBException ignored) {
+                            goalssetsuccessfully = false;
+                            Tools.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + ProgressAndGoalsWidget.GOALCUTNAMES[i], "Check File Permissions");
+                        }
+                    }
+                    if (goalssetsuccessfully) {
+                        Tools.gui_showinformationdialog(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
+                    }
+                }
+            }
+        }
     }
     public boolean setupcutsinsession() {
         itemsinsession = new ArrayList<>();
@@ -383,24 +450,24 @@ public class This_Session {
         setItemsinsession(itemsinsession);
         return getallitemsinSession().size() > 0;
     }
-    public boolean create(ArrayList<Integer> textfieldtimes) {
-        if (checksessionwellformedness(textfieldtimes)) {
-            setupcutsinsession();
-            boolean haselements = false;
-            boolean hascuts = false;
-            for (Object i : getallitemsinSession()) {if (i instanceof Element) haselements = true;}
-            for (Object i : getallitemsinSession()) {if (i instanceof Cut) hascuts = true;}
-            if (haselements && hascuts || haselements && ! hascuts) {
+    public boolean create() {
+        if (setupcutsinsession()) {
+            int cutcount = 0;
+            int elementcount = 0;
+            for (Object i : getallitemsinSession()) {if (i instanceof Element) elementcount++;}
+            for (Object i : getallitemsinSession()) {if (i instanceof Cut) cutcount++;}
+            if (cutcount > 0) {checkcutsinorder();}
+            if (elementcount > 0 || cutcount > 0) {
                 CreatorAndExporterWidget.SortSessionItems sortSessionItems = new CreatorAndExporterWidget.SortSessionItems(Root, getallitemsinSession());
                 sortSessionItems.showAndWait();
-                if (sortSessionItems.getorderedsessionitems() == null) {return false;}
-                else {setItemsinsession(sortSessionItems.getorderedsessionitems());}
+                if (sortSessionItems.getorderedsessionitems() != null) {setItemsinsession(sortSessionItems.getorderedsessionitems());}
             }
             for (Object i : getallitemsinSession()) {
                 if (i instanceof Cut) {if (! ((Cut) i).build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}}
                 if (i instanceof Element) {if (! ((Element) i).build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}}
                 if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}}
             }
+            checkgoals();
             return true;
         } else {return false;}
     }
