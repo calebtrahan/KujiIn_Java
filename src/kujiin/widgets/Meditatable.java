@@ -164,6 +164,8 @@ public class Meditatable {
                 protected void interpolate(double frac) {
                     double entrainmentvolume = frac * thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
                     getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+                    thisession.Root.getPlayer().StopButton.setDisable(true);
+                    thisession.Root.getPlayer().PauseButton.setDisable(true);
                     thisession.Root.getPlayer().EntrainmentVolume.setValue(entrainmentvolume);
                     Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
                     thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
@@ -172,6 +174,8 @@ public class Meditatable {
             };
             fadeinentrainment.setOnFinished(event -> {
                 thisession.Root.getPlayer().EntrainmentVolume.setDisable(false);
+                thisession.Root.getPlayer().StopButton.setDisable(false);
+                thisession.Root.getPlayer().PauseButton.setDisable(false);
                 thisession.Root.getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
                 thisession.Root.getPlayer().EntrainmentVolume.setOnMouseDragged(event1 -> {
                     thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
@@ -215,6 +219,8 @@ public class Meditatable {
                     getCurrentEntrainmentPlayer().setVolume(fadeoutvolume);
                     thisession.Root.getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
                     thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
+                    thisession.Root.getPlayer().PauseButton.setDisable(true);
+                    thisession.Root.getPlayer().StopButton.setDisable(true);
                     Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
                     thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                 }

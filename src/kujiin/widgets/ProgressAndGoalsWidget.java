@@ -281,15 +281,14 @@ public class ProgressAndGoalsWidget {
         if (playerWidget != null && playerWidget.isShowing()) {
             double practiceddecimalhours = Tools.convert_minstodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutorelementindex, PreAndPostOption.isSelected()), 2);
             playerWidget.GoalTopLabel.setText("Current " + GOALCUTNAMES[cutorelementindex] + " Goal");
-            playerWidget.GoalCurrrentLabel.setText(practiceddecimalhours + " hrs");
             try {
                 Double goal = Goals.getgoal(cutorelementindex, 0, false).getGoal_Hours();
                 Double goaldecimalhours = Tools.convert_minstodecimalhours(new Double(goal * 60).intValue(), 1);
                 Double progress = goaldecimalhours / practiceddecimalhours;
-                playerWidget.GoalSetLabel.setText(goaldecimalhours + "hrs");
+                playerWidget.GoalProgressLabel.setText(String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue() * 100) + "%)");
                 playerWidget.GoalProgressBar.setProgress(progress);
             } catch (NullPointerException ignored) {
-                playerWidget.GoalSetLabel.setText("??");
+                playerWidget.GoalProgressLabel.setText("No Goal Set (" + practiceddecimalhours + " Current hrs)");
                 playerWidget.GoalProgressBar.setProgress(0.0);
             }
         }

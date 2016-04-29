@@ -4,26 +4,26 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="254.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label alignment="CENTER" layoutX="35.0" layoutY="3.0" prefHeight="22.0" prefWidth="498.0" text="Session Player" textAlignment="CENTER">
          <font>
             <Font name="System Bold" size="19.0" />
          </font>
       </Label>
-      <HBox alignment="TOP_RIGHT" layoutX="400.0" layoutY="241.0" prefHeight="23.0" prefWidth="158.0">
+      <HBox alignment="TOP_RIGHT" layoutX="356.0" layoutY="224.0" prefHeight="23.0" prefWidth="198.0">
          <children>
-            <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#play" prefHeight="0.0" prefWidth="60.0" text="Play">
+            <Button fx:id="PlayButton" minWidth="51.0" mnemonicParsing="false" onAction="#play" text="Play">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="PauseButton" mnemonicParsing="false" onAction="#pause" text="Pause">
+            <Button fx:id="PauseButton" minWidth="51.0" mnemonicParsing="false" onAction="#pause" text="Pause">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="StopButton" mnemonicParsing="false" onAction="#stop" text="Stop">
+            <Button fx:id="StopButton" minWidth="51.0" mnemonicParsing="false" onAction="#stop" text="Stop">
                <font>
                   <Font size="12.0" />
                </font>
@@ -81,9 +81,9 @@
             </HBox>
          </children>
       </VBox>
-      <VBox alignment="CENTER" layoutX="2.0" layoutY="127.0" prefHeight="63.0" prefWidth="330.0">
+      <VBox alignment="CENTER" layoutX="16.0" layoutY="127.0" prefHeight="102.0" prefWidth="273.0">
          <children>
-            <Label fx:id="GoalTopLabel" alignment="CENTER" prefHeight="16.0" prefWidth="298.0" text="Current %s Goal">
+            <Label fx:id="GoalTopLabel" alignment="CENTER" prefHeight="16.0" prefWidth="298.0" text="Goal Tracker">
                <VBox.margin>
                   <Insets bottom="3.0" />
                </VBox.margin>
@@ -92,11 +92,10 @@
                </font></Label>
             <HBox alignment="CENTER" prefHeight="30.0" prefWidth="340.0">
                <children>
-                  <Label fx:id="GoalCurrrentLabel" alignment="CENTER" prefHeight="16.0" prefWidth="75.0" text="999.99 hrs" />
-                  <ProgressBar fx:id="GoalProgressBar" prefHeight="16.0" prefWidth="158.0" progress="0.0" />
-                  <Label fx:id="GoalSetLabel" alignment="CENTER" prefHeight="16.0" prefWidth="75.0" text="999.99 hrs" />
+                  <Label fx:id="GoalProgressLabel" alignment="CENTER" prefHeight="16.0" prefWidth="406.0" text="Nothing Playing" />
                </children>
             </HBox>
+            <ProgressBar fx:id="GoalProgressBar" prefHeight="27.0" prefWidth="287.0" progress="0.0" />
          </children>
       </VBox>
       <VBox alignment="CENTER" layoutX="332.0" layoutY="127.0" prefHeight="56.0" prefWidth="226.0">
@@ -136,12 +135,12 @@
             </HBox>
          </children>
       </VBox>
-      <Label fx:id="StatusBar" layoutX="14.0" layoutY="244.0" prefHeight="16.0" prefWidth="374.0" />
-      <VBox alignment="CENTER" layoutX="388.0" layoutY="178.0" prefHeight="63.0" prefWidth="151.0">
+      <Label fx:id="StatusBar" layoutX="16.0" layoutY="228.0" prefHeight="16.0" prefWidth="338.0" />
+      <HBox layoutX="289.0" layoutY="188.0" prefHeight="30.0" prefWidth="265.0">
          <children>
-            <ToggleButton fx:id="ReferenceToggleButton" mnemonicParsing="false" text="Reference Display" />
-            <HBox alignment="CENTER" prefHeight="25.0" prefWidth="133.0">
+            <HBox alignment="CENTER" prefHeight="30.0" prefWidth="263.0">
                <children>
+                  <ToggleButton fx:id="ReferenceToggleButton" mnemonicParsing="false" text="Reference Display" />
                   <RadioButton fx:id="ReferenceHTMLButton" mnemonicParsing="false" onAction="#htmlreferenceoptionselected" text="HTML">
                      <HBox.margin>
                         <Insets left="5.0" right="5.0" />
@@ -155,6 +154,6 @@
                </children>
             </HBox>
          </children>
-      </VBox>
+      </HBox>
    </children>
 </AnchorPane>

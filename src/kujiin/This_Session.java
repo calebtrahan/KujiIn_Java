@@ -607,6 +607,7 @@ public class This_Session {
             updateuitimeline.play();
             currentcutorelement.resume();
             setPlayerState(PlayerWidget.PlayerState.PLAYING);
+            System.out.println("Resuming Session");
             return "Resuming Session...";
         }
         else if(playerState == PlayerWidget.PlayerState.STOPPED) {

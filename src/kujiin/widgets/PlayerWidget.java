@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import kujiin.MainController;
 import kujiin.This_Session;
 import kujiin.Tools;
+import kujiin.xml.Options;
 import kujiin.xml.Session;
 import kujiin.xml.Sessions;
 
@@ -45,18 +46,14 @@ public class PlayerWidget extends Stage {
     public Label TotalTotalLabel;
     public Label TotalSessionLabel;
     public Label GoalTopLabel;
-    public Label GoalCurrrentLabel;
     public ProgressBar GoalProgressBar;
-    public Label GoalSetLabel;
     public ToggleButton ReferenceToggleButton;
+    public Label GoalProgressLabel;
     private This_Session Session;
     private MainController Root;
 
-    // TODO Simplify Goal Widget On Player To Only Show Percentage So It Looks More Clean And Elegant
-        // [Label] Current {cutorelementname} goal
-        // [Label] x.x hrs > x.x hrs (xx%)
-        // [ProgressBar] Progress
     // TODO Sync Reference File GUI With XML
+    // TODO On Resume Do Not Fade In Players (Or Fade In Much Shorter)
     public PlayerWidget(MainController root) {
         Root = root;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
@@ -79,18 +76,18 @@ public class PlayerWidget extends Stage {
                 Double value = EntrainmentVolume.getValue() * 100;
                 EntrainmentVolume.setTooltip(new Tooltip(value.intValue() + "%"));
                 Session.Root.getOptions().getSessionOptions().setEntrainmentvolume(EntrainmentVolume.getValue());
-            } catch (Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 2000);}
+            } catch (Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "Session Not Playing", 2000);}
         });
         AmbienceVolume.setOnMouseClicked(event -> {
             try {
                 Double value = AmbienceVolume.getValue() * 100;
                 AmbienceVolume.setTooltip(new Tooltip(value.intValue() + "%"));
                 Session.Root.getOptions().getSessionOptions().setAmbiencevolume(AmbienceVolume.getValue());
-            } catch(Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 2000);}
+            } catch(Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "Session Not Playing", 2000);}
         });
         ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
         togglereference(null);
-        Tools.gui_showtimedmessageonlabel(StatusBar, "Player Disabled Until Session Is Created Or Loaded", 10000);
+        StatusBar.setText("Session Not Playing");
     }
 
 // Button Actions
@@ -113,6 +110,19 @@ public class PlayerWidget extends Stage {
         PlayButton.setDisable(currentstate == PlayerState.PLAYING);
         PauseButton.setDisable(currentstate == PlayerState.PAUSED || currentstate == PlayerState.STOPPED);
         StopButton.setDisable(currentstate == PlayerState.STOPPED);
+        if (currentstate == PlayerState.PLAYING) {
+            PlayButton.setText("Playing");
+            PauseButton.setText("Pause");
+            StopButton.setText("Stop");
+        } else if (currentstate == PlayerState.PAUSED) {
+            PlayButton.setText("Resume");
+            PauseButton.setText("Paused");
+            StopButton.setText("Stop");
+        } else if (currentstate == PlayerState.STOPPED) {
+            PlayButton.setText("Play");
+            PauseButton.setText("Pause");
+            StopButton.setText("Stopped");
+        }
     }
     private boolean endsessionprematurely() {
         if (Session.getPlayerState() == PlayerState.PLAYING || Session.getPlayerState() == PlayerState.PAUSED || Session.getPlayerState() == PlayerState.TRANSITIONING) {
@@ -155,9 +165,9 @@ public class PlayerWidget extends Stage {
         private Boolean fullscreenoption;
         private Scene scene;
 
-        public DisplayReference(MainController root, Object currentcutorelement) {
+        public DisplayReference(MainController root, Meditatable currentcutorelement) {
             Root = root;
-            this.currentcutorelement = (Meditatable) currentcutorelement;
+            this.currentcutorelement = currentcutorelement;
             referenceType = Root.getOptions().getSessionOptions().getReferencetype();
             fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
@@ -187,8 +197,9 @@ public class PlayerWidget extends Stage {
             setsizing();
             WebView browser = new WebView();
             WebEngine webEngine = browser.getEngine();
-            ContentPane.setContent(browser);
+            webEngine.setUserStyleSheetLocation(new File(Options.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
             webEngine.loadContent(htmlcontent);
+            ContentPane.setContent(browser);
         }
 
         public void setsizing() {
@@ -221,9 +232,8 @@ public class PlayerWidget extends Stage {
                     // TODO Get Dark Theme For Webview Here For Reference Files
                     WebView browser = new WebView();
                     WebEngine webEngine = browser.getEngine();
-//                    Root.getOptions().setStyle(scene);
-//                    webEngine.setUserStyleSheetLocation(new File(Options.DIRECTORYSTYLES, "dark.css").toURI().toString());
                     webEngine.load(referencefile.toURI().toString());
+                    webEngine.setUserStyleSheetLocation(new File(Options.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
                     ContentPane.setContent(browser);
                 }
             }

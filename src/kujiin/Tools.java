@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import kujiin.widgets.PlayerWidget;
 import kujiin.xml.Options;
 import org.apache.commons.io.FileUtils;
 
@@ -27,9 +26,7 @@ public class Tools {
     public static final String[] SUPPORTEDAUDIOFORMATS = {"mp3", "aac", "wav", "aif", "aiff", "m4a"};
 
 // Menu Methods
-    public static void menu_howtouse(MainController root) {
-        new PlayerWidget.DisplayReference(root, Tools.file_getcontents(new File(Options.DIRECTORYREFERENCE, "html/JIN.html"))).showAndWait();
-    }
+    public static void menu_howtouse(MainController root) {}
     public static void menu_aboutthisprogram() {}
     public static void menu_contactme() {
 
