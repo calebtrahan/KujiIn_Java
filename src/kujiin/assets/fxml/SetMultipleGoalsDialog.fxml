@@ -1,49 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="218.0" prefWidth="407.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="183.0" prefWidth="578.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="TopLabel" alignment="CENTER" layoutX="29.0" layoutY="4.0" prefHeight="20.0" prefWidth="349.0" text="Set A Goal For Multiple Cuts">
+      <Label fx:id="TopLabel" alignment="CENTER" layoutX="12.0" layoutY="4.0" prefHeight="21.0" prefWidth="544.0" text="Set A Goal For Multiple Cuts/Elements">
          <font>
             <Font size="18.0" />
          </font></Label>
-      <Spinner fx:id="GoalHoursSpinner" layoutX="12.0" layoutY="145.0" prefHeight="26.0" prefWidth="77.0" />
-      <DatePicker fx:id="GoalDatePicker" layoutX="240.0" layoutY="145.0" prefHeight="26.0" prefWidth="155.0" />
-      <Label layoutX="280.0" layoutY="119.0" text="Goal Date" />
-      <Button fx:id="CurrentGoalsButton" layoutX="14.0" layoutY="185.0" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" prefHeight="26.0" prefWidth="95.0" text="Edit Goals" />
-      <Spinner fx:id="GoalMinutesSpinner" layoutX="106.0" layoutY="145.0" prefHeight="26.0" prefWidth="77.0" />
-      <Label layoutX="33.0" layoutY="127.0" text="Hours" />
-      <Label layoutX="122.0" layoutY="127.0" text="Minutes" />
-      <HBox alignment="BOTTOM_RIGHT" layoutX="263.0" layoutY="185.0" prefHeight="26.0" prefWidth="134.0">
+      <DatePicker fx:id="GoalDatePicker" layoutX="94.0" layoutY="110.0" prefHeight="26.0" prefWidth="155.0" />
+      <Label layoutX="20.0" layoutY="115.0" text="Goal Date" />
+      <Button fx:id="CurrentGoalsButton" layoutX="16.0" layoutY="143.0" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" prefHeight="26.0" prefWidth="95.0" text="Edit Goals" />
+      <HBox alignment="BOTTOM_RIGHT" layoutX="387.0" layoutY="143.0" prefHeight="26.0" prefWidth="180.0">
          <children>
-            <Button fx:id="OKButton" mnemonicParsing="false" onMousePressed="#Accept" prefHeight="26.0" prefWidth="59.0" text="Accept" />
+            <Button fx:id="OKButton" mnemonicParsing="false" onMousePressed="#Accept" text="Accept" />
             <Button fx:id="CancelButton" mnemonicParsing="false" onMousePressed="#cancelgoalsetting" text="Cancel" />
          </children>
       </HBox>
-      <ToggleButton fx:id="Presession" layoutX="3.0" layoutY="58.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="95.0" text="Presession" />
-      <VBox layoutX="240.0" layoutY="32.0" prefHeight="78.0" prefWidth="66.0">
+      <ToggleButton fx:id="Presession" layoutX="16.0" layoutY="38.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="95.0" text="Presession" />
+      <VBox layoutX="411.0" layoutY="25.0" prefHeight="78.0" prefWidth="66.0" />
+      <VBox layoutX="171.0" layoutY="32.0" prefHeight="78.0" prefWidth="66.0" />
+      <ToggleButton fx:id="Postsession" layoutX="465.0" layoutY="38.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="95.0" text="Postsession" />
+      <HBox layoutX="17.0" layoutY="74.0" prefHeight="26.0" prefWidth="544.0">
          <children>
-            <ToggleButton fx:id="RETSU" mnemonicParsing="false" prefWidth="95.0" text="RETSU" />
-            <ToggleButton fx:id="ZAI" mnemonicParsing="false" prefWidth="95.0" text="ZAI" />
-            <ToggleButton fx:id="ZEN" mnemonicParsing="false" prefWidth="95.0" text="ZEN" />
+            <ToggleButton fx:id="RIN" mnemonicParsing="false" prefWidth="95.0" text="Rin" />
+            <ToggleButton fx:id="KYO" mnemonicParsing="false" prefWidth="95.0" text="Kyo" />
+            <ToggleButton fx:id="TOH" mnemonicParsing="false" prefWidth="95.0" text="Toh" />
+            <ToggleButton fx:id="SHA" mnemonicParsing="false" prefWidth="95.0" text="Sha" />
+            <ToggleButton fx:id="KAI" mnemonicParsing="false" prefWidth="95.0" text="Kai" />
+            <ToggleButton fx:id="JIN" mnemonicParsing="false" prefWidth="95.0" text="Jin" />
+            <ToggleButton fx:id="RETSU" mnemonicParsing="false" prefWidth="95.0" text="Retsu" />
+            <ToggleButton fx:id="ZAI" mnemonicParsing="false" prefWidth="95.0" text="Zai" />
+            <ToggleButton fx:id="ZEN" mnemonicParsing="false" prefWidth="95.0" text="Zen" />
          </children>
-      </VBox>
-      <VBox layoutX="102.0" layoutY="32.0" prefHeight="78.0" prefWidth="66.0">
+      </HBox>
+      <HBox alignment="CENTER" layoutX="128.0" layoutY="28.0" prefHeight="46.0" prefWidth="321.0">
          <children>
-            <ToggleButton fx:id="RIN" mnemonicParsing="false" prefWidth="95.0" text="RIN" />
-            <ToggleButton fx:id="KYO" mnemonicParsing="false" prefWidth="95.0" text="KYO" />
-            <ToggleButton fx:id="TOH" mnemonicParsing="false" prefWidth="95.0" text="TOH" />
+            <ToggleButton fx:id="Earth" minWidth="60.0" mnemonicParsing="false" text="Earth" />
+            <ToggleButton fx:id="Air" minWidth="60.0" mnemonicParsing="false" text="Air" />
+            <ToggleButton fx:id="Fire" minWidth="60.0" mnemonicParsing="false" text="Fire" />
+            <ToggleButton fx:id="Water" minWidth="60.0" mnemonicParsing="false" text="Water" />
+            <ToggleButton fx:id="Void" minWidth="60.0" mnemonicParsing="false" text="Void" />
          </children>
-      </VBox>
-      <VBox layoutX="171.0" layoutY="32.0" prefHeight="78.0" prefWidth="66.0">
+      </HBox>
+      <HBox alignment="CENTER" layoutX="297.0" layoutY="104.0" prefHeight="38.0" prefWidth="259.0">
          <children>
-            <ToggleButton fx:id="SHA" mnemonicParsing="false" prefWidth="95.0" text="SHA" />
-            <ToggleButton fx:id="KAI" mnemonicParsing="false" prefWidth="95.0" text="KAI" />
-            <ToggleButton fx:id="JIN" mnemonicParsing="false" prefWidth="95.0" text="JIN" />
+            <Label text="Hours">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Spinner fx:id="GoalHoursSpinner" prefHeight="26.0" prefWidth="77.0">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </Spinner>
+            <Label text="Minutes">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </Label>
+            <Spinner fx:id="GoalMinutesSpinner" prefHeight="26.0" prefWidth="77.0" />
          </children>
-      </VBox>
-      <ToggleButton fx:id="Postsession" layoutX="309.0" layoutY="58.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="95.0" text="Postsession" />
+      </HBox>
    </children>
 </AnchorPane>

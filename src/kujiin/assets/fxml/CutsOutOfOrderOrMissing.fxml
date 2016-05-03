@@ -16,7 +16,7 @@
          <children>
             <Button fx:id="AddMissingCutsButton" mnemonicParsing="false" onMousePressed="#addmissingcutstoSession" text="Add Missing Cuts" />
             <Button fx:id="CreateAnywayButton" mnemonicParsing="false" onMousePressed="#createSessionwithoutmissingcuts" text="Create Anyway" />
-            <Button fx:id="CancelCreationButton" mnemonicParsing="false" text="Cancel Creation" />
+            <Button fx:id="CancelCreationButton" mnemonicParsing="false" text="Cancel Creation" onAction="#cancelcreation"/>
          </children>
       </HBox>
    </children>

@@ -13,10 +13,10 @@
             <TableColumn fx:id="DurationColumn" prefWidth="201.0" text="Duration" />
         </columns>
       </TableView>
-      <HBox layoutX="14.0" layoutY="351.0" prefHeight="29.0" prefWidth="167.0">
+      <HBox layoutX="14.0" layoutY="351.0" prefHeight="29.0" prefWidth="97.0">
          <children>
-            <Button fx:id="UpButton" mnemonicParsing="false" onAction="#moveitemup" text="Move Up" />
-            <Button fx:id="DownButton" mnemonicParsing="false" onAction="#moveitemdown" text="Move Down" />
+            <Button fx:id="UpButton" mnemonicParsing="false" onAction="#moveitemup" text="Up" />
+            <Button fx:id="DownButton" mnemonicParsing="false" onAction="#moveitemdown" text="Down" />
          </children>
       </HBox>
       <Label alignment="CENTER" layoutX="13.0" layoutY="4.0" prefHeight="20.0" prefWidth="352.0" text="Set Session Playback Order" textAlignment="CENTER">

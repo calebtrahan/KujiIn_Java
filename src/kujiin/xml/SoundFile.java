@@ -1,6 +1,6 @@
 package kujiin.xml;
 
-import kujiin.Util;
+import kujiin.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

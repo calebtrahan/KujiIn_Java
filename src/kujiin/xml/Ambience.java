@@ -2,7 +2,7 @@ package kujiin.xml;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import kujiin.Util;
+import kujiin.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

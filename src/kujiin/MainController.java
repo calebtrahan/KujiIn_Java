@@ -19,9 +19,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-import kujiin.widgets.CreatorAndExporterWidget;
-import kujiin.widgets.PlayerWidget;
-import kujiin.widgets.ProgressAndGoalsWidget;
+import kujiin.ui.CreatorAndExporterUI;
+import kujiin.ui.PlayerUI;
+import kujiin.ui.ProgressAndGoalsUI;
+import kujiin.util.This_Session;
+import kujiin.util.Util;
 import kujiin.xml.Ambience;
 import kujiin.xml.Ambiences;
 import kujiin.xml.Options;
@@ -102,9 +104,9 @@ public class MainController implements Initializable {
     private Scene Scene;
     private Stage Stage;
     private This_Session Session;
-    private CreatorAndExporterWidget CreatorAndExporter;
-    private PlayerWidget Player;
-    private ProgressAndGoalsWidget ProgressTracker;
+    private CreatorAndExporterUI CreatorAndExporter;
+    private PlayerUI Player;
+    private ProgressAndGoalsUI ProgressTracker;
     private Options Options;
 
 // Event Handlers
@@ -116,9 +118,9 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setOptions(new Options(this));
         getOptions().unmarshall();
-        setProgressTracker(new ProgressAndGoalsWidget(this));
+        setProgressTracker(new ProgressAndGoalsUI(this));
         setSession(new This_Session(this));
-        setCreatorAndExporter(new CreatorAndExporterWidget(this));
+        setCreatorAndExporter(new CreatorAndExporterUI(this));
         CreatorStatusBar.setText("");
     }
     public boolean cleanup() {
@@ -134,22 +136,22 @@ public class MainController implements Initializable {
     public void setSession(This_Session session) {
         this.Session = session;
     }
-    public CreatorAndExporterWidget getCreatorAndExporter() {
+    public CreatorAndExporterUI getCreatorAndExporter() {
         return CreatorAndExporter;
     }
-    public void setCreatorAndExporter(CreatorAndExporterWidget creatorAndExporter) {
+    public void setCreatorAndExporter(CreatorAndExporterUI creatorAndExporter) {
         this.CreatorAndExporter = creatorAndExporter;
     }
-    public PlayerWidget getPlayer() {
+    public PlayerUI getPlayer() {
         return Player;
     }
-    public void setPlayer(PlayerWidget player) {
+    public void setPlayer(PlayerUI player) {
         this.Player = player;
     }
-    public ProgressAndGoalsWidget getProgressTracker() {
+    public ProgressAndGoalsUI getProgressTracker() {
         return ProgressTracker;
     }
-    public void setProgressTracker(ProgressAndGoalsWidget progressTracker) {
+    public void setProgressTracker(ProgressAndGoalsUI progressTracker) {
         this.ProgressTracker = progressTracker;
     }
     public Options getOptions() {
@@ -241,10 +243,10 @@ public class MainController implements Initializable {
 // Session Player Widget
     public void playthisession(ActionEvent actionEvent) {
         getCreatorAndExporter().togglecreator();
-        if (getCreatorAndExporter().getCreatorState() == CreatorAndExporterWidget.CreatorState.CREATED) {
+        if (getCreatorAndExporter().getCreatorState() == CreatorAndExporterUI.CreatorState.CREATED) {
             if (getPlayer() != null && getPlayer().isShowing()) {return;}
             getStage().setIconified(true);
-            setPlayer(new PlayerWidget(this));
+            setPlayer(new PlayerUI(this));
             getPlayer().showAndWait();
             getStage().setIconified(false);
         }
@@ -353,7 +355,7 @@ public class MainController implements Initializable {
         public void preview(ActionEvent actionEvent) {
             if (MainTextArea.getText().length() > 0 && selectedvariation != null) {
                 if (selectedvariation.equals("html")) {
-                    PlayerWidget.DisplayReference dr = new PlayerWidget.DisplayReference(Root, MainTextArea.getText());
+                    PlayerUI.DisplayReference dr = new PlayerUI.DisplayReference(Root, MainTextArea.getText());
                     dr.showAndWait();
                 } else {
                     Util.gui_showinformationdialog(Root, "Information", "Preview Is For Html Content Not Available For Text Only", "Cannot Open Preview");
@@ -1048,7 +1050,7 @@ public class MainController implements Initializable {
         private boolean valuechanged;
         private ObservableList<Integer> rampselections = FXCollections.observableArrayList(kujiin.xml.Options.RAMPDURATIONS);
         private MainController Root;
-        private PlayerWidget.ReferenceType tempreferencetype;
+        private PlayerUI.ReferenceType tempreferencetype;
 
         public ChangeProgramOptions(MainController root) {
             Root = root;
@@ -1183,12 +1185,12 @@ public class MainController implements Initializable {
         public void HTMLTypeSelected() {
             ReferenceHTMLRadioButton.setSelected(true);
             ReferenceTXTRadioButton.setSelected(false);
-            tempreferencetype = PlayerWidget.ReferenceType.html;
+            tempreferencetype = PlayerUI.ReferenceType.html;
         }
         public void TXTTypeSelected() {
             ReferenceHTMLRadioButton.setSelected(false);
             ReferenceTXTRadioButton.setSelected(true);
-            tempreferencetype = PlayerWidget.ReferenceType.txt;
+            tempreferencetype = PlayerUI.ReferenceType.txt;
         }
 
     // Ramp Methods

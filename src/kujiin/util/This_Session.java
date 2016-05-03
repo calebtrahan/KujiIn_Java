@@ -1,4 +1,4 @@
-package kujiin;
+package kujiin.util;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -9,11 +9,11 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import kujiin.MainController;
 import kujiin.dialogs.SimpleTextDialogWithCancelButton;
-import kujiin.widgets.CreatorAndExporterWidget;
-import kujiin.widgets.Meditatable;
-import kujiin.widgets.PlayerWidget;
-import kujiin.widgets.ProgressAndGoalsWidget;
+import kujiin.ui.CreatorAndExporterUI;
+import kujiin.ui.PlayerUI;
+import kujiin.ui.ProgressAndGoalsUI;
 import kujiin.xml.*;
 
 import javax.xml.bind.JAXBException;
@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // TODO Double Check That Reference Files Switch On And Off And Work With The Options Being In XML
 // TODO Work On Completed Goals
@@ -45,17 +46,17 @@ public class This_Session {
     private Element Fire;
     private Element Water;
     private Element Void;
-    private PlayerWidget.PlayerState playerState;
+    private PlayerUI.PlayerState playerState;
     private Meditatable currentcutorelement;
     private Timeline updateuitimeline;
     private Sessions sessions;
     private int totalsecondselapsed;
     private int totalsecondsinsession;
     private int cutorelementcount;
-    private PlayerWidget.DisplayReference displayReference;
+    private PlayerUI.DisplayReference displayReference;
     public MainController Root;
     public List<Goals.Goal> GoalsCompletedThisSession;
-    private PlayerWidget playerWidget;
+    private PlayerUI playerUI;
     private List<Meditatable> itemsinsession;
     private Entrainments entrainments;
     private Ambiences ambiences;
@@ -63,7 +64,7 @@ public class This_Session {
     public This_Session(MainController mainController) {
         Root = mainController;
         this.sessions = Root.getProgressTracker().getSessions();
-        setPlayerState(PlayerWidget.PlayerState.IDLE);
+        setPlayerState(PlayerUI.PlayerState.IDLE);
         entrainments = new Entrainments(Root);
         entrainments.unmarshall();
         ambiences = new Ambiences(Root);
@@ -87,18 +88,18 @@ public class This_Session {
     }
 
 // Getters And Setters
-    public void setPlayerState(PlayerWidget.PlayerState playerState) {this.playerState = playerState;}
-    public PlayerWidget.PlayerState getPlayerState() {return playerState;}
+    public void setPlayerState(PlayerUI.PlayerState playerState) {this.playerState = playerState;}
+    public PlayerUI.PlayerState getPlayerState() {return playerState;}
     public boolean isValid() {
         int totaltime = 0;
         for (Object i : getallCutsAndElements()) {totaltime += ((Meditatable) i).getdurationinminutes();}
         return totaltime > 0;
     }
-    public PlayerWidget getPlayerWidget() {
-        return playerWidget;
+    public PlayerUI getPlayerUI() {
+        return playerUI;
     }
-    public void setPlayerWidget(PlayerWidget playerWidget) {
-        this.playerWidget = playerWidget;
+    public void setPlayerUI(PlayerUI playerUI) {
+        this.playerUI = playerUI;
     }
     public ArrayList<Meditatable> getallCutsAndElements() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
     public ArrayList<Cut> getallCuts()  {return new ArrayList<>(Arrays.asList(Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen));}
@@ -337,37 +338,42 @@ public class This_Session {
         } else {
             Util.gui_showinformationdialog(Root, "Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
-    public boolean checkcutsinorder() {
+    public Util.AnswerType checkcutsinorder() {
         int workingcutcount = 0;
         for (Meditatable i : getallCutsAndElements()) {if (i instanceof Cut) {if (i.getdurationinminutes() > 0) workingcutcount++;}}
         if (workingcutcount < getallCuts().size()) {
-            CreatorAndExporterWidget.CutsMissingDialog cutsMissingDialog = new CreatorAndExporterWidget.CutsMissingDialog(Root, getallCuts());
+            CreatorAndExporterUI.CutsMissingDialog cutsMissingDialog = new CreatorAndExporterUI.CutsMissingDialog(Root, getallCuts());
             cutsMissingDialog.showAndWait();
             itemsinsession.clear();
             setupcutsinsession();
-            return cutsMissingDialog.isCreatesession();
-        } else {return true;}
+            return cutsMissingDialog.getResult();
+        } else {return Util.AnswerType.YES;}
     }
-    public void checkgoals() {
-        ArrayList<Integer> notgoodongoals = Root.getProgressTracker().precreationgoalchecks(getcutsessionvalues(true));
+    public Util.AnswerType checkgoals() {
+        ArrayList<Meditatable> notgoodongoals = Root.getProgressTracker().precreationgoalchecks(getallitemsinSession());
+        List<Integer>  notgooddurations = new ArrayList<>();
         if (! notgoodongoals.isEmpty()) {
-            StringBuilder notgoodtext = new StringBuilder();
-            for (int i = 0; i < notgoodongoals.size(); i++) {
-                if (i == 0 && notgoodongoals.size() > 1) {
-                    notgoodtext.append("\n");
+            boolean presessionmissinggoals = false;
+            int cutcount = 0;
+            int elementcount = 0;
+            boolean postsessionmissinggoals = false;
+            for (Meditatable i : notgoodongoals) {
+                if (i instanceof Cut) {cutcount++;}
+                if (i instanceof Element) {elementcount++;}
+                else {
+                    if (i.name.equals("Presession")) {presessionmissinggoals = true;}
+                    if (i.name.equals("Postsession")) {postsessionmissinggoals = true;}
                 }
-                notgoodtext.append(ProgressAndGoalsWidget.GOALCUTNAMES[notgoodongoals.get(i)]);
-                if (notgoodongoals.size() > 1) {
-                    if (i != notgoodtext.length() - 1) {
-                        notgoodtext.append(", ");
-                    }
-                    if (i == notgoodongoals.size() / 2) {
-                        notgoodtext.append("\n");
-                    }
-                }
+                notgooddurations.add(i.getdurationinminutes());
             }
-            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Goals Aren't Long Enough For " + notgoodtext.toString(), "Set Goals For These Cuts Before Creating This Session?")) {
-                ProgressAndGoalsWidget.SetANewGoalForMultipleCuts s = new ProgressAndGoalsWidget.SetANewGoalForMultipleCuts(Root, notgoodongoals, Util.list_getmaxintegervalue(notgoodongoals));
+            StringBuilder notgoodtext = new StringBuilder();
+            if (presessionmissinggoals) {notgoodtext.append("Presession\n");}
+            if (cutcount > 0) {notgoodtext.append(cutcount).append(" Cut(s)\n");}
+            if (elementcount > 0) {notgoodtext.append(elementcount).append(" Element(s)\n");}
+            if (postsessionmissinggoals) {notgoodtext.append("Postsession\n");}
+
+            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?")) {
+                ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, notgoodongoals, Util.list_getmaxintegervalue(notgooddurations));
                 s.showAndWait();
                 if (s.isAccepted()) {
                     List<Integer> cutindexes = s.getSelectedCutIndexes();
@@ -376,10 +382,10 @@ public class This_Session {
                     boolean goalssetsuccessfully = true;
                     for (Integer i : cutindexes) {
                         try {
-                            Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours, ProgressAndGoalsWidget.GOALCUTNAMES[i]));
+                            Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours, ProgressAndGoalsUI.GOALCUTNAMES[i]));
                         } catch (JAXBException ignored) {
                             goalssetsuccessfully = false;
-                            Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + ProgressAndGoalsWidget.GOALCUTNAMES[i], "Check File Permissions");
+                            Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + ProgressAndGoalsUI.GOALCUTNAMES[i], "Check File Permissions");
                         }
                     }
                     if (goalssetsuccessfully) {
@@ -388,6 +394,7 @@ public class This_Session {
                 }
             }
         }
+        return null;
     }
     public boolean setupcutsinsession() {
         itemsinsession = new ArrayList<>();
@@ -410,17 +417,30 @@ public class This_Session {
         setItemsinsession(itemsinsession);
         return getallitemsinSession().size() > 0;
     }
+    public boolean wellformedsessionquickcheck() {
+        boolean wellformed = true;
+        ArrayList<Cut> cutsinsession = getallitemsinSession().stream().filter(i -> i instanceof Cut).map(i -> (Cut) i).collect(Collectors.toCollection(ArrayList::new));
+        int cutcount = 1;
+        for (Cut i : cutsinsession) {
+            if (i.number != cutcount) {wellformed = false;}
+            cutcount++;
+        }
+        return wellformed;
+    }
     public boolean create() {
         if (setupcutsinsession()) {
             int cutcount = 0;
             int elementcount = 0;
-            for (Object i : getallitemsinSession()) {if (i instanceof Element) elementcount++;}
-            for (Object i : getallitemsinSession()) {if (i instanceof Cut) cutcount++;}
-            if (cutcount > 0) {checkcutsinorder();}
+            for (Meditatable i : getallitemsinSession()) {if (i instanceof Element) elementcount++;}
+            for (Meditatable i : getallitemsinSession()) {if (i instanceof Cut) cutcount++;}
+            if (cutcount > 0) {if (checkcutsinorder() == Util.AnswerType.CANCEL) return false;}
             if (elementcount > 0 || cutcount > 0) {
-                CreatorAndExporterWidget.SortSessionItems sortSessionItems = new CreatorAndExporterWidget.SortSessionItems(Root, getallitemsinSession());
-                sortSessionItems.showAndWait();
-                if (sortSessionItems.getorderedsessionitems() != null) {setItemsinsession(sortSessionItems.getorderedsessionitems());}
+                if (cutcount > 0 && ! wellformedsessionquickcheck()) {
+                    CreatorAndExporterUI.SortSessionItems sortSessionItems = new CreatorAndExporterUI.SortSessionItems(Root, getallitemsinSession());
+                    sortSessionItems.showAndWait();
+                    if (sortSessionItems.getResult() != null && sortSessionItems.getResult() == Util.AnswerType.CANCEL) {return false;}
+                    if (sortSessionItems.getorderedsessionitems() != null) {setItemsinsession(sortSessionItems.getorderedsessionitems());}
+                }
             }
             for (Object i : getallitemsinSession()) {
                 if (i instanceof Cut) {if (! ((Cut) i).build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}}
@@ -441,7 +461,7 @@ public class This_Session {
 
 // Export
     public Service<Boolean> getsessionexporter() {
-//        CreatorAndExporterWidget.ExportingSessionDialog exportingSessionDialog = new CreatorAndExporterWidget.ExportingSessionDialog(this);
+//        CreatorAndExporterUI.ExportingSessionDialog exportingSessionDialog = new CreatorAndExporterUI.ExportingSessionDialog(this);
         return new Service<Boolean>() {
             @Override
             protected Task<Boolean> createTask() {
@@ -548,7 +568,7 @@ public class This_Session {
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
         for (Object i : itemsinsession) {totalsecondsinsession += ((Meditatable) i).getdurationinseconds();}
-        getPlayerWidget().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(totalsecondsinsession));
+        getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(totalsecondsinsession));
         updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
         updateuitimeline.setCycleCount(Animation.INDEFINITE);
         updateuitimeline.play();
@@ -557,63 +577,63 @@ public class This_Session {
         playthiscut();
         sessions.createnewsession();
     }
-    public String play(PlayerWidget playerWidget) {
-        if (playerState == PlayerWidget.PlayerState.IDLE) {
-            setPlayerWidget(playerWidget);
+    public String play(PlayerUI playerUI) {
+        if (playerState == PlayerUI.PlayerState.IDLE) {
+            setPlayerUI(playerUI);
             startplayback();
             return "Playing Session...";
         }
-        else if(playerState == PlayerWidget.PlayerState.PAUSED) {
+        else if(playerState == PlayerUI.PlayerState.PAUSED) {
             updateuitimeline.play();
             currentcutorelement.resume();
-            setPlayerState(PlayerWidget.PlayerState.PLAYING);
+            setPlayerState(PlayerUI.PlayerState.PLAYING);
             System.out.println("Resuming Session");
             return "Resuming Session...";
         }
-        else if(playerState == PlayerWidget.PlayerState.STOPPED) {
-            setPlayerWidget(playerWidget);
+        else if(playerState == PlayerUI.PlayerState.STOPPED) {
+            setPlayerUI(playerUI);
             startplayback();
             return "Playing Session...";
         }
-        else if(playerState == PlayerWidget.PlayerState.PLAYING) {
+        else if(playerState == PlayerUI.PlayerState.PLAYING) {
             return "Already Playing";
         }
-        else if(playerState == PlayerWidget.PlayerState.TRANSITIONING) {
+        else if(playerState == PlayerUI.PlayerState.TRANSITIONING) {
             return "Transistioning To The Next Cut";
         } else {
             return "";
         }
     }
     public String pause() {
-        if (playerState == PlayerWidget.PlayerState.PLAYING) {
+        if (playerState == PlayerUI.PlayerState.PLAYING) {
             currentcutorelement.pause();
             updateuitimeline.pause();
-            setPlayerState(PlayerWidget.PlayerState.PAUSED);
+            setPlayerState(PlayerUI.PlayerState.PAUSED);
             return "Session Paused";
-        } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
+        } else if (playerState == PlayerUI.PlayerState.PAUSED) {
             return "Already Paused";
-        } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
+        } else if (playerState == PlayerUI.PlayerState.TRANSITIONING) {
             return "Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Pause";
         } else {
             return "No Session Playing";
         }
     }
     public String stop() {
-        if (playerState == PlayerWidget.PlayerState.PLAYING) {
+        if (playerState == PlayerUI.PlayerState.PLAYING) {
             currentcutorelement.stop();
             updateuitimeline.stop();
-            setPlayerState(PlayerWidget.PlayerState.STOPPED);
+            setPlayerState(PlayerUI.PlayerState.STOPPED);
             resetthissession();
             return "Session Stopped";
-        } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
+        } else if (playerState == PlayerUI.PlayerState.PAUSED) {
             currentcutorelement.stop();
             updateuitimeline.stop();
-            setPlayerState(PlayerWidget.PlayerState.STOPPED);
+            setPlayerState(PlayerUI.PlayerState.STOPPED);
             resetthissession();
             return "Session Stopped";
-        } else if (playerState == PlayerWidget.PlayerState.IDLE) {
+        } else if (playerState == PlayerUI.PlayerState.IDLE) {
             return "No Session Playing, Cannot Stop";
-        } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
+        } else if (playerState == PlayerUI.PlayerState.TRANSITIONING) {
             return "Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Stop";
         } else {
             return "";
@@ -621,7 +641,7 @@ public class This_Session {
     }
     public void updateplayerui() {
         try {
-            if (playerState == PlayerWidget.PlayerState.PLAYING) {
+            if (playerState == PlayerUI.PlayerState.PLAYING) {
                 totalsecondselapsed++;
                 Float currentprogress;
                 Float totalprogress;
@@ -629,28 +649,29 @@ public class This_Session {
                 else {currentprogress = (float) 0.0;}
                 if (totalsecondselapsed != 0) {totalprogress = (float) totalsecondselapsed / (float) totalsecondsinsession;}
                 else {totalprogress = (float) 0.0;}
-                getPlayerWidget().CurrentCutProgress.setProgress(currentprogress);
-                getPlayerWidget().TotalProgress.setProgress(totalprogress);
+                getPlayerUI().CurrentCutProgress.setProgress(currentprogress);
+                getPlayerUI().TotalProgress.setProgress(totalprogress);
                 currentprogress *= 100;
                 totalprogress *= 100;
-                getPlayerWidget().CurrentCutTopLabel.setText(String.format("%s (%d", currentcutorelement.name, currentprogress.intValue()) + "%)");
-                getPlayerWidget().TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
-                getPlayerWidget().CutCurrentLabel.setText(currentcutorelement.getcurrenttimeformatted());
-                getPlayerWidget().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
-                getPlayerWidget().TotalCurrentLabel.setText(Util.format_secondsforplayerdisplay(totalsecondselapsed));
-                getPlayerWidget().StatusBar.setText("Session Playing. Currently Practicing " + currentcutorelement.name + "...");
+                getPlayerUI().CurrentCutTopLabel.setText(String.format("%s (%d", currentcutorelement.name, currentprogress.intValue()) + "%)");
+                getPlayerUI().TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
+                getPlayerUI().CutCurrentLabel.setText(currentcutorelement.getcurrenttimeformatted());
+                getPlayerUI().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
+                getPlayerUI().TotalCurrentLabel.setText(Util.format_secondsforplayerdisplay(totalsecondselapsed));
+                getPlayerUI().StatusBar.setText("Session Playing. Currently Practicing " + currentcutorelement.name + "...");
                 Root.getProgressTracker().updaterootgoalsui();
                 Root.getProgressTracker().updateprogressui();
-            } else if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
-                getPlayerWidget().CurrentCutProgress.setProgress(1.0);
-                getPlayerWidget().CurrentCutTopLabel.setText(currentcutorelement.name + " Completed");
-                if (! currentcutorelement.name.equals("Postsession")) {getPlayerWidget().StatusBar.setText("Prepare For " + getallitemsinSession().get(currentcutorelement.number + 1).name);}
-                getPlayerWidget().CutCurrentLabel.setText(currentcutorelement.gettotaltimeformatted());
-                getPlayerWidget().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
-            } else if (playerState == PlayerWidget.PlayerState.PAUSED) {
-                getPlayerWidget().StatusBar.setText("Session Paused");
-            } else if (playerState == PlayerWidget.PlayerState.STOPPED) {
-                getPlayerWidget().StatusBar.setText("Session Stopped");
+            } else if (playerState == PlayerUI.PlayerState.TRANSITIONING) {
+                getPlayerUI().CurrentCutProgress.setProgress(1.0);
+                getPlayerUI().CurrentCutTopLabel.setText(currentcutorelement.name + " Completed");
+                if (! currentcutorelement.name.equals("Postsession")) {
+                    getPlayerUI().StatusBar.setText("Prepare For " + getallitemsinSession().get(currentcutorelement.number + 1).name);}
+                getPlayerUI().CutCurrentLabel.setText(currentcutorelement.gettotaltimeformatted());
+                getPlayerUI().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
+            } else if (playerState == PlayerUI.PlayerState.PAUSED) {
+                getPlayerUI().StatusBar.setText("Session Paused");
+            } else if (playerState == PlayerUI.PlayerState.STOPPED) {
+                getPlayerUI().StatusBar.setText("Session Stopped");
             }
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
@@ -662,12 +683,12 @@ public class This_Session {
             Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
             timeline.setOnFinished(event -> timeline.stop());
             timeline.play();
-            setPlayerState(PlayerWidget.PlayerState.PLAYING);
+            setPlayerState(PlayerUI.PlayerState.PLAYING);
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
     public void progresstonextcut() {
         try {
-            if (playerState == PlayerWidget.PlayerState.TRANSITIONING) {
+            if (playerState == PlayerUI.PlayerState.TRANSITIONING) {
 //                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
                 try {
                     List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcutorelement.number,
@@ -679,28 +700,28 @@ public class This_Session {
                     playthiscut();
                 } catch (IndexOutOfBoundsException ignored) {
                     currentcutorelement.cleanup(); endofsession();}
-            } else if (playerState == PlayerWidget.PlayerState.PLAYING) {transition();}
+            } else if (playerState == PlayerUI.PlayerState.PLAYING) {transition();}
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).show();}
     }
     public void endofsession() {
-        getPlayerWidget().CurrentCutTopLabel.setText(currentcutorelement.name + " Completed");
-        getPlayerWidget().TotalSessionLabel.setText("Session Completed");
+        getPlayerUI().CurrentCutTopLabel.setText(currentcutorelement.name + " Completed");
+        getPlayerUI().TotalSessionLabel.setText("Session Completed");
         closereferencefile();
         updateuitimeline.stop();
-        setPlayerState(PlayerWidget.PlayerState.STOPPED);
+        setPlayerState(PlayerUI.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
         // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It Then Change Session Finsished Dialog To Showandwait
-        PlayerWidget.SessionFinishedDialog sess = new PlayerWidget.SessionFinishedDialog(Root);
+        PlayerUI.SessionFinishedDialog sess = new PlayerUI.SessionFinishedDialog(Root);
         sess.show();
         sess.setOnHidden(event -> {
             System.out.println("Session Finished Dialog Is Closed/Hidden");
             if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
                 Goals.Goal i = GoalsCompletedThisSession.get(0);
-                int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(i.getCutName());
+                int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsUI.GOALCUTNAMES)).indexOf(i.getCutName());
                 double currentpracticedhours = Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2);
-                new ProgressAndGoalsWidget.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
+                new ProgressAndGoalsUI.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
             } else if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() > 1) {
-                new ProgressAndGoalsWidget.MultipleGoalsCompletedDialog(Root, GoalsCompletedThisSession).showAndWait();
+                new ProgressAndGoalsUI.MultipleGoalsCompletedDialog(Root, GoalsCompletedThisSession).showAndWait();
             }
         });
         // TODO Prompt For Export
@@ -722,13 +743,13 @@ public class This_Session {
         sessions.marshall();
         Root.getProgressTracker().updaterootgoalsui();
         currentcutorelement.stop();
-        if (currentcutorelement.name.equals("Postsession")) {setPlayerState(PlayerWidget.PlayerState.TRANSITIONING); progresstonextcut();}
+        if (currentcutorelement.name.equals("Postsession")) {setPlayerState(PlayerUI.PlayerState.TRANSITIONING); progresstonextcut();}
         else {
             if (Root.getOptions().getSessionOptions().getAlertfunction()) {
                 Media alertmedia = new Media(Root.getOptions().getSessionOptions().getAlertfilelocation());
                 MediaPlayer alertplayer = new MediaPlayer(alertmedia);
                 alertplayer.play();
-                setPlayerState(PlayerWidget.PlayerState.TRANSITIONING);
+                setPlayerState(PlayerUI.PlayerState.TRANSITIONING);
                 alertplayer.setOnEndOfMedia(() -> {
                     alertplayer.stop();
                     alertplayer.dispose();
@@ -747,7 +768,7 @@ public class This_Session {
                     }
                 });
             } else {
-                setPlayerState(PlayerWidget.PlayerState.TRANSITIONING);
+                setPlayerState(PlayerUI.PlayerState.TRANSITIONING);
                 progresstonextcut();
             }
         }
@@ -759,7 +780,7 @@ public class This_Session {
 // Reference Files
     public void choosereferencetype() {
         if (! Root.getOptions().getSessionOptions().getReferenceoption() && Root.getOptions().getSessionOptions().getReferencetype() == null) {
-            PlayerWidget.ReferenceTypeDialog reftype = new PlayerWidget.ReferenceTypeDialog(Root);
+            PlayerUI.ReferenceTypeDialog reftype = new PlayerUI.ReferenceTypeDialog(Root);
             reftype.showAndWait();
             Root.getOptions().getSessionOptions().setReferencetype(reftype.getReferenceType());
             Root.getOptions().getSessionOptions().setReferencefullscreen(reftype.getFullscreen());
@@ -769,7 +790,7 @@ public class This_Session {
     public void togglereferencedisplay(CheckBox ReferenceFileCheckbox) {
         if (ReferenceFileCheckbox.isSelected()) {choosereferencetype();}
         ReferenceFileCheckbox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
-        if (ReferenceFileCheckbox.isSelected()  && playerState == PlayerWidget.PlayerState.PLAYING) {displayreferencefile();}
+        if (ReferenceFileCheckbox.isSelected()  && playerState == PlayerUI.PlayerState.PLAYING) {displayreferencefile();}
         else {
             Root.getOptions().getSessionOptions().setReferenceoption(false);
             Root.getOptions().getSessionOptions().setReferencetype(null);
@@ -777,7 +798,7 @@ public class This_Session {
         }
     }
     public void displayreferencefile() {
-        displayReference = new PlayerWidget.DisplayReference(Root, currentcutorelement);
+        displayReference = new PlayerUI.DisplayReference(Root, currentcutorelement);
         displayReference.show();
     }
     public void closereferencefile() {

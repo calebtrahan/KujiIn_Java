@@ -1,4 +1,4 @@
-package kujiin.widgets;
+package kujiin.util;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -8,10 +8,7 @@ import javafx.concurrent.Service;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import kujiin.Cut;
-import kujiin.Element;
-import kujiin.This_Session;
-import kujiin.Util;
+import kujiin.ui.PlayerUI;
 import kujiin.xml.*;
 
 import java.io.File;
@@ -447,13 +444,13 @@ public class Meditatable {
     protected void ambienceerror() {}
 
 // Reference Files
-    protected File getReferenceFile() {
-        PlayerWidget.ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
+    public File getReferenceFile() {
+        PlayerUI.ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
         if (referenceType == null) {return null;}
-        if (referenceType == PlayerWidget.ReferenceType.html) {
+        if (referenceType == PlayerUI.ReferenceType.html) {
             String name = this.name + ".html";
             return new File(Options.DIRECTORYREFERENCE, "html/" + name);
-        } else if (referenceType == PlayerWidget.ReferenceType.txt) {
+        } else if (referenceType == PlayerUI.ReferenceType.txt) {
             String name = this.name + ".txt";
             return new File(Options.DIRECTORYREFERENCE, "txt/" + name);
         } else {return null;}

@@ -1,4 +1,4 @@
-package kujiin.widgets;
+package kujiin.ui;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -10,8 +10,9 @@ import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import kujiin.MainController;
-import kujiin.This_Session;
-import kujiin.Util;
+import kujiin.util.Meditatable;
+import kujiin.util.This_Session;
+import kujiin.util.Util;
 import kujiin.xml.Options;
 import kujiin.xml.Session;
 import kujiin.xml.Sessions;
@@ -26,7 +27,7 @@ import java.io.IOException;
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
 
 // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
-public class PlayerWidget extends Stage {
+public class PlayerUI extends Stage {
     public Button PlayButton;
     public Button PauseButton;
     public Button StopButton;
@@ -54,7 +55,7 @@ public class PlayerWidget extends Stage {
 
     // TODO Sync Reference File GUI With XML
     // TODO On Resume Do Not Fade In Players (Or Fade In Much Shorter)
-    public PlayerWidget(MainController root) {
+    public PlayerUI(MainController root) {
         Root = root;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
         fxmlLoader.setController(this);

@@ -1,8 +1,8 @@
 package kujiin.xml;
 
 import kujiin.MainController;
-import kujiin.Util;
 import kujiin.lib.BeanComparator;
+import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

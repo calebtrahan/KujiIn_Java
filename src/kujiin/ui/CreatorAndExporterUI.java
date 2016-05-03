@@ -1,4 +1,4 @@
-package kujiin.widgets;
+package kujiin.ui;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -18,7 +18,8 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import kujiin.*;
+import kujiin.MainController;
+import kujiin.util.*;
 import kujiin.xml.Preset;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ import java.util.*;
 
 // TODO Get FFMPEG Working To Mix Audio Files Together
     // Not Supported Stream?
-public class CreatorAndExporterWidget {
+public class CreatorAndExporterUI {
     private Button ChangeAllValuesButton;
     private Button ExportButton;
     private Button LoadPresetButton;
@@ -79,7 +80,7 @@ public class CreatorAndExporterWidget {
     private Timeline updateuitimeline;
     private MainController Root;
 
-    public CreatorAndExporterWidget(MainController root) {
+    public CreatorAndExporterUI(MainController root) {
         Root = root;
         LoadPresetButton = root.LoadPresetButton;
         SavePresetButton = root.SavePresetButton;
@@ -150,9 +151,9 @@ public class CreatorAndExporterWidget {
 
 // Creation
     public void togglecreator() {
-        if (session.getPlayerState() == PlayerWidget.PlayerState.PLAYING ||
-            session.getPlayerState() == PlayerWidget.PlayerState.PAUSED ||
-            session.getPlayerState() == PlayerWidget.PlayerState.TRANSITIONING) {
+        if (session.getPlayerState() == PlayerUI.PlayerState.PLAYING ||
+            session.getPlayerState() == PlayerUI.PlayerState.PAUSED ||
+            session.getPlayerState() == PlayerUI.PlayerState.TRANSITIONING) {
             if (Util.gui_getokcancelconfirmationdialog(Root, "Stop Session", "In Order To Edit Session Values The Session Player Must Be Stopped And Reset", "Stop And Reset Session Player?")) {
                 if (! session.stop().equals("Session Stopped")) {return;}
             } else {return;}
@@ -548,7 +549,7 @@ public class CreatorAndExporterWidget {
         public Button CancelCreationButton;
         private ArrayList<Cut> allcuts;
         private ArrayList<Cut> missingcuts;
-        private boolean createsession;
+        private Util.AnswerType result;
         private MainController Root;
 
         public CutsMissingDialog(MainController root, ArrayList<Cut> allcuts) {
@@ -565,7 +566,6 @@ public class CreatorAndExporterWidget {
             setTitle("Cuts Missing");
             this.allcuts = allcuts;
             populatelistview();
-            setCreatesession(false);
             Util.gui_showinformationdialog(Root, "Cuts Missing", "Due To The Nature Of Kuji-In, Each Cut Should Connect From RIN Up, Or The Later Cuts Might Lack The Energy They Need", "Use This Dialog To Connect Cuts, Or Cancel Without Creating");
         }
 
@@ -605,24 +605,31 @@ public class CreatorAndExporterWidget {
                         Root.getSession().setDuration(i.number, cutdurationdialog.getDuration());
                     }
                 }
-                setCreatesession(true);
-            } else {setCreatesession(false);}
+            }
+            setResult(Util.AnswerType.YES);
             this.close();
         }
         public void createSessionwithoutmissingcuts(Event event) {
             if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
-                setCreatesession(true);
-                this.close();
-            } else {setCreatesession(false);}
-        }
-        public boolean isCreatesession() {
-            return createsession;
-        }
-        public void setCreatesession(boolean createsession) {this.createsession = createsession;}
-        public void dialogclosed() {
-            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
+                setResult(Util.AnswerType.YES);
                 this.close();
             }
+        }
+        public void dialogclosed() {
+            if (result == null && Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Close Dialog Without Creating", "This Will Return To The Creator")) {
+                setResult(Util.AnswerType.CANCEL);
+                this.close();
+            }
+        }
+        public Util.AnswerType getResult() {
+            return result;
+        }
+        public void setResult(Util.AnswerType result) {
+            this.result = result;
+        }
+        public void cancelcreation(ActionEvent actionEvent) {
+            setResult(Util.AnswerType.CANCEL);
+            this.close();
         }
     }
     public static class CutInvocationDialog extends Stage {
@@ -651,20 +658,16 @@ public class CreatorAndExporterWidget {
             });
             MinutesTextField.setText("0");
         }
-
         public int getDuration() {
             return duration;
         }
-
         public void setDuration(int duration) {
             this.duration = duration;
         }
-
         public void CancelButtonPressed(Event event) {
             setDuration(0);
             this.close();
         }
-
         public void OKButtonPressed(Event event) {
             try {
                 int value = Integer.parseInt(MinutesTextField.getText());
@@ -693,6 +696,7 @@ public class CreatorAndExporterWidget {
         private List<Meditatable> sessionitems;
         private ObservableList<SessionItem> tableitems;
         private MainController Root;
+        private Util.AnswerType result;
 
         public SortSessionItems(MainController Root, List<Meditatable> sessionitems) {
             this.sessionitems = sessionitems;
@@ -711,6 +715,8 @@ public class CreatorAndExporterWidget {
             DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
             SessionItemsTable.setOnMouseClicked(event -> itemselected());
             tableitems = FXCollections.observableArrayList();
+            UpButton.setDisable(true);
+            DownButton.setDisable(true);
             populatetable();
         }
 
@@ -718,7 +724,7 @@ public class CreatorAndExporterWidget {
             int index = SessionItemsTable.getSelectionModel().getSelectedIndex();
             boolean validitemselected = index != -1;
             UpButton.setDisable(! validitemselected && index == 0);
-            DownButton.setDisable(! validitemselected && index == SessionItemsTable.getItems().size() - 1);
+            DownButton.setDisable(! validitemselected && index != SessionItemsTable.getItems().size() - 1);
         }
         public void populatetable() {
             SessionItemsTable.getItems().clear();
@@ -791,10 +797,17 @@ public class CreatorAndExporterWidget {
             close();
         }
         public void dialogClosed() {
-            
             if (Util.gui_getokcancelconfirmationdialog(Root, "Cancel Creation", "Cancel Creation", "This Will Return To The Creator Main Window")) {
+                setResult(Util.AnswerType.CANCEL);
                 this.close();
             }
+        }
+
+        public Util.AnswerType getResult() {
+            return result;
+        }
+        public void setResult(Util.AnswerType result) {
+            this.result = result;
         }
 
         class SessionItem {

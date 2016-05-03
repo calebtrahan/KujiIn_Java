@@ -1,7 +1,7 @@
 package kujiin.xml;
 
-import kujiin.Util;
-import kujiin.widgets.ProgressAndGoalsWidget;
+import kujiin.ui.ProgressAndGoalsUI;
+import kujiin.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -350,7 +350,7 @@ public class Session {
     public boolean sessionnotEmpty() {
         int count = 0;
         for (Integer i : getallcuttimes()) {
-            if (count > 0 && count < ProgressAndGoalsWidget.CUTORELEMENTCOUNT - 1) {if (i > 0) {return true;}}
+            if (count > 0 && count < ProgressAndGoalsUI.CUTORELEMENTCOUNT - 1) {if (i > 0) {return true;}}
             count++;
         }
         return false;

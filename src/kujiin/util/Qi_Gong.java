@@ -1,4 +1,4 @@
-package kujiin;
+package kujiin.util;
 
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TextField;
@@ -6,8 +6,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import kujiin.widgets.Meditatable;
-import kujiin.widgets.ProgressAndGoalsWidget;
+import kujiin.ui.ProgressAndGoalsUI;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
@@ -108,8 +107,8 @@ public class Qi_Gong extends Meditatable {
     public void tick() {
         super.tick();
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            ProgressAndGoalsWidget progressAndGoalsWidget = thisession.Root.getProgressTracker();
-            progressAndGoalsWidget.getSessions().getsession(progressAndGoalsWidget.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
+            ProgressAndGoalsUI progressAndGoalsUI = thisession.Root.getProgressTracker();
+            progressAndGoalsUI.getSessions().getsession(progressAndGoalsUI.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
         }
     }
     @Override

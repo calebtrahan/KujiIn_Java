@@ -4,8 +4,8 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kujiin.MainController;
-import kujiin.Util;
-import kujiin.widgets.PlayerWidget;
+import kujiin.ui.PlayerUI;
+import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -62,7 +62,7 @@ public class Options {
     private static final String THEMEFILELOCATION = new File(DIRECTORYSTYLES, "dark.css").toURI().toString();
     private static final Boolean RAMPENABLED = true;
     private static final Integer RAMPDURATION = 2;
-    private static final PlayerWidget.ReferenceType REFERENCE_TYPE = null;
+    private static final PlayerUI.ReferenceType REFERENCE_TYPE = null;
     private static final Boolean REFERENCEDISPLAY = false;
     private static final Boolean REFERENCEFULLSCREEN = true;
     private ProgramOptions ProgramOptions;
@@ -187,7 +187,7 @@ public class Options {
         private Boolean alertfunction;
         private Integer rampduration;
         private Boolean referenceoption;
-        private PlayerWidget.ReferenceType referencetype;
+        private PlayerUI.ReferenceType referencetype;
         private Boolean referencefullscreen;
 
         public SessionOptions() {}
@@ -247,10 +247,10 @@ public class Options {
         public void setReferenceoption(Boolean referenceoption) {
             this.referenceoption = referenceoption;
         }
-        public PlayerWidget.ReferenceType getReferencetype() {
+        public PlayerUI.ReferenceType getReferencetype() {
             return referencetype;
         }
-        public void setReferencetype(PlayerWidget.ReferenceType referencetype) {
+        public void setReferencetype(PlayerUI.ReferenceType referencetype) {
             this.referencetype = referencetype;
         }
         public Boolean getReferencefullscreen() {

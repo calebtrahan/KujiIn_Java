@@ -1,4 +1,4 @@
-package kujiin;
+package kujiin.util;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import kujiin.MainController;
 import kujiin.xml.Options;
 import org.apache.commons.io.FileUtils;
 

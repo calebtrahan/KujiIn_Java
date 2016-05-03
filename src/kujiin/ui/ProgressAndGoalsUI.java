@@ -1,4 +1,4 @@
-package kujiin.widgets;
+package kujiin.ui;
 
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -13,7 +13,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import kujiin.MainController;
-import kujiin.Util;
+import kujiin.util.Meditatable;
+import kujiin.util.Util;
 import kujiin.xml.Goals;
 import kujiin.xml.Options;
 import kujiin.xml.Session;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 // TODO Finish Making EditGoalsDialog (Also Add A Select A Different Cut Feature, And Make It So They Can Pass Cutindex Data Back And Forth)
-public class ProgressAndGoalsWidget {
+public class ProgressAndGoalsUI {
     public static String[] GOALCUTNAMES = {"Presession", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Earth", "Air", "Fire", "Water", "Void", "Postsession", "Total"};
     public static int CUTORELEMENTCOUNT = GOALCUTNAMES.length;
     private ComboBox<String> CutSelectorComboBox;
@@ -56,7 +57,7 @@ public class ProgressAndGoalsWidget {
     private Label StatusBar;
     private MainController Root;
 
-    public ProgressAndGoalsWidget(MainController root) {
+    public ProgressAndGoalsUI(MainController root) {
         Root = root;
         NewGoalButton = root.newgoalButton;
         CurrentGoalsButton = root.viewcurrrentgoalsButton;
@@ -263,15 +264,14 @@ public class ProgressAndGoalsWidget {
     }
 
 // Goal Specific Methods
-    public ArrayList<Integer> precreationgoalchecks(ArrayList<Integer> textfieldtimes) {
-        ArrayList<Integer> notgoodcuts = new ArrayList<>();
-        for (int i = 0; i < textfieldtimes.size(); i++) {
-            Integer val = textfieldtimes.get(i);
-            if (val != 0 && ! checkifgoalsetandlongenough(i, val)) {
-                notgoodcuts.add(i);
+    public ArrayList<Meditatable> precreationgoalchecks(List<Meditatable> cutsandelementsinsession) {
+        ArrayList<Meditatable> notgoodelementselementsorcuts = new ArrayList<>();
+        for (Meditatable i : cutsandelementsinsession) {
+            if (i.getdurationinminutes() != 0 && ! checkifgoalsetandlongenough(i.number, i.getdurationinminutes())) {
+                notgoodelementselementsorcuts.add(i);
             }
         }
-        return notgoodcuts;
+        return notgoodelementselementsorcuts;
     }
     public boolean checkifgoalsetandlongenough(int cut_index, int duration) {
         try {
@@ -282,19 +282,19 @@ public class ProgressAndGoalsWidget {
         } catch (Exception e) {return false;}
     }
     public void updateplayergoalsui() {
-        PlayerWidget playerWidget = Root.getPlayer();
-        if (playerWidget != null && playerWidget.isShowing()) {
+        PlayerUI playerUI = Root.getPlayer();
+        if (playerUI != null && playerUI.isShowing()) {
             double practiceddecimalhours = Util.convert_minstodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutorelementindex, PreAndPostOption.isSelected()), 2);
-            playerWidget.GoalTopLabel.setText("Current " + GOALCUTNAMES[cutorelementindex] + " Goal");
+            playerUI.GoalTopLabel.setText("Current " + GOALCUTNAMES[cutorelementindex] + " Goal");
             try {
                 Double goal = Goals.getgoal(cutorelementindex, 0, false).getGoal_Hours();
                 Double goaldecimalhours = Util.convert_minstodecimalhours(new Double(goal * 60).intValue(), 1);
                 Double progress = goaldecimalhours / practiceddecimalhours;
-                playerWidget.GoalProgressLabel.setText(String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue() * 100) + "%)");
-                playerWidget.GoalProgressBar.setProgress(progress);
+                playerUI.GoalProgressLabel.setText(String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue() * 100) + "%)");
+                playerUI.GoalProgressBar.setProgress(progress);
             } catch (NullPointerException ignored) {
-                playerWidget.GoalProgressLabel.setText("No Goal Set (" + practiceddecimalhours + " Current hrs)");
-                playerWidget.GoalProgressBar.setProgress(0.0);
+                playerUI.GoalProgressLabel.setText("No Goal Set (" + practiceddecimalhours + " Current hrs)");
+                playerUI.GoalProgressBar.setProgress(0.0);
             }
         }
     }
@@ -521,7 +521,7 @@ public class ProgressAndGoalsWidget {
         public ChoiceBox<String> CutSelectorComboBox;
         public Button GoalPacingButton;
         private MainController Root;
-        private ProgressAndGoalsWidget ProgressAndGoals;
+        private ProgressAndGoalsUI ProgressAndGoals;
         private List<kujiin.xml.Goals.Goal> CurrentGoalList;
         private kujiin.xml.Goals.Goal SelectedGoal;
         private Integer cutindex;
@@ -585,7 +585,7 @@ public class ProgressAndGoalsWidget {
                 int count = 1;
                 int cutindex = ProgressAndGoals.getCutorelementindex();
                 CurrentGoalList = new ArrayList<>();
-                String name = ProgressAndGoalsWidget.GOALCUTNAMES[cutindex];
+                String name = ProgressAndGoalsUI.GOALCUTNAMES[cutindex];
                 if (cutindex != 11) {TopLabel.setText(name + "'s Goals");}
                 else {TopLabel.setText(name + " Goals");}
                 for (kujiin.xml.Goals.Goal i : ProgressAndGoals.getGoal().getallcutgoals(cutindex, ShowCompletedCheckBox.isSelected())) {
@@ -807,7 +807,7 @@ public class ProgressAndGoalsWidget {
         }
     }
     public static class SetANewGoalForSingleCut extends Stage {
-        private ProgressAndGoalsWidget progressAndGoalsWidget;
+        private ProgressAndGoalsUI progressAndGoalsUI;
         public Spinner<Integer> GoalHoursSpinner;
         public Spinner<Integer> GoalMinutesSpinner;
         public DatePicker GoalDatePicker;
@@ -823,7 +823,7 @@ public class ProgressAndGoalsWidget {
 
         public SetANewGoalForSingleCut(int cutindex, MainController root) {
             Root = root;
-            progressAndGoalsWidget = Root.getProgressTracker();
+            progressAndGoalsUI = Root.getProgressTracker();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetNewGoalDialog.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -838,9 +838,9 @@ public class ProgressAndGoalsWidget {
             GoalDatePicker.setValue(LocalDate.now());
             practicedminutes = Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false);
             try {
-                List<kujiin.xml.Goals.Goal> currentgoals = progressAndGoalsWidget.getGoal().getallcutgoals(cutindex, false);
+                List<kujiin.xml.Goals.Goal> currentgoals = progressAndGoalsUI.getGoal().getallcutgoals(cutindex, false);
                 System.out.println(currentgoals.size());
-                goalminutes = Util.convertdecimalhourstominutes(progressAndGoalsWidget.getGoal().getgoal(cutindex, currentgoals.size() - 1, false).getGoal_Hours());
+                goalminutes = Util.convertdecimalhourstominutes(progressAndGoalsUI.getGoal().getgoal(cutindex, currentgoals.size() - 1, false).getGoal_Hours());
                 GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(goalminutes / 60, Integer.MAX_VALUE, goalminutes / 60));
                 GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, goalminutes % 60));
             } catch (NullPointerException ignored) {
@@ -898,9 +898,10 @@ public class ProgressAndGoalsWidget {
             setGoaldate(GoalDatePicker.getValue());
             super.close();
         }
-        public void viewcurrentgoals(Event event) {progressAndGoalsWidget.opengoaleditor();}
+        public void viewcurrentgoals(Event event) {
+            progressAndGoalsUI.opengoaleditor();}
     }
-    public static class SetANewGoalForMultipleCuts extends Stage {
+    public static class SetANewGoalForMultipleCutsOrElements extends Stage {
         public ToggleButton Presession;
         public ToggleButton RIN;
         public ToggleButton KYO;
@@ -912,7 +913,12 @@ public class ProgressAndGoalsWidget {
         public ToggleButton ZAI;
         public ToggleButton ZEN;
         public ToggleButton Postsession;
-        private ProgressAndGoalsWidget progressAndGoalsWidget;
+        public ToggleButton Earth;
+        public ToggleButton Air;
+        public ToggleButton Fire;
+        public ToggleButton Water;
+        public ToggleButton Void;
+        private ProgressAndGoalsUI progressAndGoalsUI;
         private MainController Root;
         public Spinner<Integer> GoalHoursSpinner;
         public Spinner<Integer> GoalMinutesSpinner;
@@ -924,9 +930,9 @@ public class ProgressAndGoalsWidget {
         private LocalDate goaldate;
         private Double goalhours;
 
-        public SetANewGoalForMultipleCuts(MainController root, ArrayList<Integer> cutindexes, int expectedminutes) {
+        public SetANewGoalForMultipleCutsOrElements(MainController root, ArrayList<Meditatable> cutindexes, int expectedminutes) {
             Root = root;
-            progressAndGoalsWidget = Root.getProgressTracker();
+            progressAndGoalsUI = Root.getProgressTracker();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetMultipleGoalsDialog.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -941,7 +947,7 @@ public class ProgressAndGoalsWidget {
             GoalDatePicker.setValue(LocalDate.now());
             GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(expectedminutes / 60, Integer.MAX_VALUE, expectedminutes / 60));
             GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(expectedminutes % 60, 59, expectedminutes % 60));
-            for (Integer i : cutindexes) {select(i, true);}
+            for (Meditatable i : cutindexes) {select(i.number, true);}
         }
 
     // Getters And Setters
@@ -974,7 +980,12 @@ public class ProgressAndGoalsWidget {
             if (index == 7) {RETSU.setSelected(value);}
             if (index == 8) {ZAI.setSelected(value);}
             if (index == 9) {ZEN.setSelected(value);}
-            if (index == 10) {Postsession.setSelected(value);}
+            if (index == 10) {ZEN.setSelected(value);}
+            if (index == 11) {ZEN.setSelected(value);}
+            if (index == 12) {ZEN.setSelected(value);}
+            if (index == 13) {ZEN.setSelected(value);}
+            if (index == 14) {ZEN.setSelected(value);}
+            if (index == 15) {Postsession.setSelected(value);}
         }
         public boolean getselected(int index) {
             if (index == 0) {return Presession.isSelected();}
@@ -987,13 +998,18 @@ public class ProgressAndGoalsWidget {
             if (index == 7) {return RETSU.isSelected();}
             if (index == 8) {return ZAI.isSelected();}
             if (index == 9) {return ZEN.isSelected();}
-            if (index == 10) {return Postsession.isSelected();}
+            if (index == 10) {return ZEN.isSelected();}
+            if (index == 11) {return ZEN.isSelected();}
+            if (index == 12) {return ZEN.isSelected();}
+            if (index == 13) {return ZEN.isSelected();}
+            if (index == 14) {return ZEN.isSelected();}
+            if (index == 15) {return Postsession.isSelected();}
             return false;
         }
 
     // Button Actions
         public void viewcurrentgoals(Event event) {
-            progressAndGoalsWidget.opengoaleditor();
+            progressAndGoalsUI.opengoaleditor();
         }
         public void Accept(Event event) {
             if (getSelectedCutIndexes().isEmpty()) {
@@ -1080,7 +1096,7 @@ public class ProgressAndGoalsWidget {
             ObservableList<CompletedGoalsAtEndOfSessionBinding> newcompletedgoals = FXCollections.observableArrayList();
             for (kujiin.xml.Goals.Goal i : completedgoals) {
                 String cutname = i.getCutName();
-                int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsWidget.GOALCUTNAMES)).indexOf(cutname);
+                int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsUI.GOALCUTNAMES)).indexOf(cutname);
                 String practicedhours = Double.toString(Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2));
                 String goalhours = i.getGoal_Hours().toString();
                 String dateset = i.getDate_Set();
