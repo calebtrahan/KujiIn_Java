@@ -14,7 +14,7 @@ public class SimpleTextDialog extends Stage {
 
     public SimpleTextDialog(MainController root, String toptitle, String message) {
         Root = root;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleTextDialog.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("kujiin/assets/fxml/SimpleTextDialog.fxml"));
         fxmlLoader.setController(this);
         try {
             Scene defaultscene = new Scene(fxmlLoader.load());

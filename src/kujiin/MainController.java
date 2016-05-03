@@ -200,7 +200,7 @@ public class MainController implements Initializable {
         if (cleanup()) {System.exit(0);}
     }
 
-// Total Progress And Goals Widget
+// Total Progress And Goals UI
     public void updatetotalprogresswidget(ActionEvent actionEvent) {
         ProgressTracker.updateprogressui();}
     public void displaylistofsessions(Event event) {
@@ -213,13 +213,8 @@ public class MainController implements Initializable {
     public void viewcurrentgoals(Event event) {
         ProgressTracker.opengoaleditor();}
 
-// Creator And Exporter Widget
-    public void loadpreset(ActionEvent actionEvent) {
-        Util.AnswerType answer = Util.gui_getyesnocancelconfirmationdialog(this, "Test", "Testing", "123");
-        System.out.println(answer.toString());
-
-//        CreatorAndExporter.loadpreset();
-    }
+// Creator And Exporter UI
+    public void loadpreset(ActionEvent actionEvent) {CreatorAndExporter.loadpreset();}
     public void savepreset(ActionEvent actionEvent) {
         CreatorAndExporter.savepreset();}
     public void toggleexporter(ActionEvent actionEvent) {
@@ -440,7 +435,7 @@ public class MainController implements Initializable {
         public AdvancedAmbienceEditor(MainController root, Ambiences ambiences, String cutname) {
             Root = root;
             this.ambiences = ambiences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AdvancedAmbienceEditor.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AdvancedAmbienceEditor.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());

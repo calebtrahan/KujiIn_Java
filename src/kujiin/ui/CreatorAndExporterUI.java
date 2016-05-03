@@ -254,16 +254,6 @@ public class CreatorAndExporterUI {
     }
 
 // Other Methods
-    public boolean checkforffmpeg() {
-    boolean good = false;
-    try {
-        ProcessBuilder processBuilder = new ProcessBuilder(Arrays.asList("ffmpeg", "-version"));
-        final Process checkforffmpeg = processBuilder.start();
-        checkforffmpeg.waitFor();
-        good = checkforffmpeg.exitValue() == 0;
-    } catch (IOException | InterruptedException ignored) {good = false;}
-    return good;
-}
     public void setuptextfields() {
         PreTime.textProperty().addListener((observable, oldValue, newValue) -> {
             try {Root.getSession().setDuration(0, Integer.valueOf(newValue)); updatecreatorui();}
@@ -352,12 +342,11 @@ public class CreatorAndExporterUI {
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
             ApproximateEndTime.setText(sdf.format(cal.getTime()));
         } else {
-            TotalSessionTime.setText("-");
-            ApproximateEndTime.setText("-");
+            TotalSessionTime.setText("");
+            ApproximateEndTime.setText("");
         }
         if (AmbienceSwitch.isSelected()) {
             AmbienceSwitch.setSelected(false);
-            session.resetcreateditems();
             Util.gui_showtimedmessageonlabel(StatusBar, "Session Values Changed, Ambience Unselected", 5000);
         }
     }
@@ -420,23 +409,10 @@ public class CreatorAndExporterUI {
             Integer.parseInt(PreTime.getText()), Integer.parseInt(RinTime.getText()), Integer.parseInt(KyoTime.getText()),
             Integer.parseInt(TohTime.getText()), Integer.parseInt(ShaTime.getText()), Integer.parseInt(KaiTime.getText()),
             Integer.parseInt(JinTime.getText()), Integer.parseInt(RetsuTime.getText()), Integer.parseInt(ZaiTime.getText()),
-            Integer.parseInt(ZenTime.getText()), Integer.parseInt(PostTime.getText())
+            Integer.parseInt(ZenTime.getText()), Integer.parseInt(EarthTime.getText()), Integer.parseInt(AirTime.getText()),
+            Integer.parseInt(FireTime.getText()), Integer.parseInt(WaterTime.getText()), Integer.parseInt(VoidTime.getText()),
+            Integer.parseInt(PostTime.getText())
         ));
-    }
-    public void resetallvalues() {
-        AmbienceSwitch.setText("No Session Created");
-        TotalSessionTime.setText("No Session Created");
-        PreTime.setText("-");
-        RinTime.setText("-");
-        KyoTime.setText("-");
-        TohTime.setText("-");
-        ShaTime.setText("-");
-        KaiTime.setText("-");
-        JinTime.setText("-");
-        RetsuTime.setText("-");
-        ZaiTime.setText("-");
-        ZenTime.setText("-");
-        PostTime.setText("-");
     }
     public boolean cleanup() {
         boolean currentlyexporting = getExporterState() == ExporterState.WORKING;
@@ -448,19 +424,17 @@ public class CreatorAndExporterUI {
 
 // Presets
     public void loadpreset() {
-        if (Preset.openpreset() && Preset.validpreset()) {
+        if (Preset.openpreset() != null && Preset.validpreset()) {
             changevaluestopreset(Preset.getpresettimes());
         } else {
+
             Util.gui_showinformationdialog(Root, "Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
     }
     public void savepreset() {
         Preset.setpresettimes(getcreatorvalues());
-        if (! Preset.validpreset()) {
-            Util.gui_showinformationdialog(Root, "Information", "Cannot Save Preset", "All Values Are 0"); return;}
-        if (Preset.savepreset()) {
-            Util.gui_showtimedmessageonlabel(StatusBar, "Preset Successfully Saved", 4000);}
-        else {
-            Util.gui_showerrordialog(Root, "Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
+        if (! Preset.validpreset()) {Util.gui_showinformationdialog(Root, "Information", "Cannot Save Preset", "All Values Are 0"); return;}
+        if (Preset.savepreset()) {Util.gui_showtimedmessageonlabel(StatusBar, "Preset Successfully Saved", 4000);}
+        else {Util.gui_showerrordialog(Root, "Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
     }
 
 // Subclasses/Dialogs

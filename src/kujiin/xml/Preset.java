@@ -27,6 +27,11 @@ public class Preset {
     private Integer RetsuTime;
     private Integer ZaiTime;
     private Integer ZenTime;
+    private Integer EarthTime;
+    private Integer AirTime;
+    private Integer FireTime;
+    private Integer WaterTime;
+    private Integer VoidTime;
     private Integer PostTime;
     private MainController Root;
 
@@ -101,7 +106,38 @@ public class Preset {
     public void setPostTime(Integer postTime) {
         PostTime = postTime;
     }
+    public Integer getEarthTime() {
+        return EarthTime;
+    }
+    public void setEarthTime(Integer earthTime) {
+        EarthTime = earthTime;
+    }
+    public Integer getAirTime() {
+        return AirTime;
+    }
+    public void setAirTime(Integer airTime) {
+        AirTime = airTime;
+    }
+    public Integer getFireTime() {
+        return FireTime;
+    }
+    public void setFireTime(Integer fireTime) {
+        FireTime = fireTime;
+    }
+    public Integer getWaterTime() {
+        return WaterTime;
+    }
+    public void setWaterTime(Integer waterTime) {
+        WaterTime = waterTime;
+    }
+    public Integer getVoidTime() {
+        return VoidTime;
+    }
+    public void setVoidTime(Integer voidTime) {
+        VoidTime = voidTime;
+    }
 
+// XML Processing
     public void marshall(File presetfile) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(Preset.class);
         Marshaller createMarshaller = context.createMarshaller();
@@ -121,25 +157,30 @@ public class Preset {
         setRetsuTime(loadedsession.getRetsuTime());
         setZaiTime(loadedsession.getZaiTime());
         setZenTime(loadedsession.getZenTime());
+        setEarthTime(loadedsession.getEarthTime());
+        setAirTime(loadedsession.getAirTime());
+        setFireTime(loadedsession.getFireTime());
+        setWaterTime(loadedsession.getWaterTime());
+        setVoidTime(loadedsession.getVoidTime());
         setPostTime(loadedsession.getPostTime());
     }
+
+// Methods
     public boolean savepreset() {
         File presetfile = Util.filechooser_save(Root.getScene(), "Save Preset As", null);
         if (presetfile != null && Util.file_extensioncorrect(Root, "xml", presetfile).getName().endsWith(".xml")) {
             try {
-                marshall(null);
+                marshall(presetfile);
                 return true;
-            } catch (JAXBException e) {
-                return false;
-            }
+            } catch (JAXBException e) {return false;}
         } else {return false;}
     }
-    public boolean openpreset() {
+    public File openpreset() {
         File presetfile = Util.filechooser_single(Root.getScene(), "Load Session Preset", null);
         if (presetfile != null && presetfile.getName().endsWith(".xml")) {
-            try {unmarshall(presetfile); return true;}
-            catch (JAXBException ignored) {return false;}
-        } else {return false;}
+            try {unmarshall(presetfile); return presetfile;}
+            catch (JAXBException ignored) {return null;}
+        } else {return presetfile;}
     }
     public ArrayList<Integer> getpresettimes() {
         return new ArrayList<>(Arrays.asList(
@@ -158,11 +199,17 @@ public class Preset {
             setRetsuTime(creatorvalues.get(7));
             setZaiTime(creatorvalues.get(8));
             setZenTime(creatorvalues.get(9));
-            setPostTime(creatorvalues.get(10));
+            setEarthTime(creatorvalues.get(10));
+            setAirTime(creatorvalues.get(11));
+            setFireTime(creatorvalues.get(12));
+            setWaterTime(creatorvalues.get(13));
+            setVoidTime(creatorvalues.get(14));
+            setPostTime(creatorvalues.get(15));
         } catch (ArrayIndexOutOfBoundsException ignored) {}
     }
     public boolean validpreset() {
         for (Integer i : getpresettimes()) {if (i == null) {return false;}}
         return true;
     }
+
 }
