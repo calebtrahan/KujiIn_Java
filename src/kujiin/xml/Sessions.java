@@ -1,7 +1,7 @@
 package kujiin.xml;
 
 import kujiin.MainController;
-import kujiin.Tools;
+import kujiin.Util;
 import kujiin.widgets.ProgressAndGoalsWidget;
 
 import javax.xml.bind.JAXBContext;
@@ -41,7 +41,7 @@ public class Sessions {
                 Sessions noises1 = (Sessions) createMarshaller.unmarshal(Options.SESSIONSXMLFILE);
                 setSession(noises1.getSession());
             } catch (JAXBException e) {
-                Tools.gui_showinformationdialog(Root, "Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
+                Util.gui_showinformationdialog(Root, "Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -51,12 +51,13 @@ public class Sessions {
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.SESSIONSXMLFILE);
-        } catch (JAXBException e) {Tools.gui_showinformationdialog(Root, "Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
+        } catch (JAXBException e) {
+            Util.gui_showinformationdialog(Root, "Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
     }
     public void createnewsession() {
         try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
         catch (JAXBException ignored) {
-            Tools.gui_showerrordialog(Root, "Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
+            Util.gui_showerrordialog(Root, "Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
     public void addsession(Session session) throws JAXBException {
         if (Options.SESSIONSXMLFILE.exists()) {unmarshall();}

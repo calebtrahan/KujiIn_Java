@@ -11,7 +11,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import kujiin.MainController;
 import kujiin.This_Session;
-import kujiin.Tools;
+import kujiin.Util;
 import kujiin.xml.Options;
 import kujiin.xml.Session;
 import kujiin.xml.Sessions;
@@ -76,14 +76,16 @@ public class PlayerWidget extends Stage {
                 Double value = EntrainmentVolume.getValue() * 100;
                 EntrainmentVolume.setTooltip(new Tooltip(value.intValue() + "%"));
                 Session.Root.getOptions().getSessionOptions().setEntrainmentvolume(EntrainmentVolume.getValue());
-            } catch (Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "Session Not Playing", 2000);}
+            } catch (Exception ignored) {
+                Util.gui_showtimedmessageonlabel(StatusBar, "Session Not Playing", 2000);}
         });
         AmbienceVolume.setOnMouseClicked(event -> {
             try {
                 Double value = AmbienceVolume.getValue() * 100;
                 AmbienceVolume.setTooltip(new Tooltip(value.intValue() + "%"));
                 Session.Root.getOptions().getSessionOptions().setAmbiencevolume(AmbienceVolume.getValue());
-            } catch(Exception ignored) {Tools.gui_showtimedmessageonlabel(StatusBar, "Session Not Playing", 2000);}
+            } catch(Exception ignored) {
+                Util.gui_showtimedmessageonlabel(StatusBar, "Session Not Playing", 2000);}
         });
         ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
         togglereference(null);
@@ -92,17 +94,21 @@ public class PlayerWidget extends Stage {
 
 // Button Actions
     public void play() {
-        Tools.gui_showtimedmessageonlabel(StatusBar, Session.play(this), 3000);
+        Util.gui_showtimedmessageonlabel(StatusBar, Session.play(this), 3000);
         syncplaybackbuttons();
     }
     public void pause() {
-        if (Session != null) {Tools.gui_showtimedmessageonlabel(StatusBar, Session.pause(), 3000);}
-        else {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
+        if (Session != null) {
+            Util.gui_showtimedmessageonlabel(StatusBar, Session.pause(), 3000);}
+        else {
+            Util.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
         syncplaybackbuttons();
     }
     public void stop() {
-        if (Session != null) {Tools.gui_showtimedmessageonlabel(StatusBar, Session.stop(), 3000);}
-        else {Tools.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
+        if (Session != null) {
+            Util.gui_showtimedmessageonlabel(StatusBar, Session.stop(), 3000);}
+        else {
+            Util.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
         syncplaybackbuttons();
     }
     private void syncplaybackbuttons() {
@@ -127,7 +133,7 @@ public class PlayerWidget extends Stage {
     private boolean endsessionprematurely() {
         if (Session.getPlayerState() == PlayerState.PLAYING || Session.getPlayerState() == PlayerState.PAUSED || Session.getPlayerState() == PlayerState.TRANSITIONING) {
             pause();
-            if (Tools.gui_getconfirmationdialog(Root, "End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {Session.stop(); return true;}
+            if (Util.gui_getokcancelconfirmationdialog(Root, "End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {Session.stop(); return true;}
             else {play(); return false;}
         } else {return true;}
     }
@@ -322,10 +328,10 @@ public class PlayerWidget extends Stage {
                 Sessions currentsessions = Root.getProgressTracker().getSessions();
                 Session thissession = currentsessions.getsession(currentsessions.totalsessioncount() - 1);
                 int thisessionminutes = thissession.getTotal_Session_Duration();
-                SessionDuration.setText(Tools.format_minstohrsandmins_abbreviated(thisessionminutes));
+                SessionDuration.setText(Util.format_minstohrsandmins_abbreviated(thisessionminutes));
                 SessionDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
                 int totalsessionminutes = currentsessions.getpracticedtimeinminutesforallsessions(11, true);
-                TotalPracticeDuration.setText(Tools.format_minstohrsandmins_abbreviated(totalsessionminutes));
+                TotalPracticeDuration.setText(Util.format_minstohrsandmins_abbreviated(totalsessionminutes));
                 TotalPracticeDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Completed");

@@ -2,7 +2,7 @@ package kujiin.xml;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import kujiin.Tools;
+import kujiin.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -28,7 +28,7 @@ public class Ambience {
     // Ambience Editing Methods
     // Actual Ambience
     private boolean actual_addfromfile(File file) {
-        if (Tools.audio_isValid(file)) {
+        if (Util.audio_isValid(file)) {
             SoundFile tempfile = new SoundFile(file);
             if (!ambienceexistsinActual(tempfile)) {
                 actual_add(tempfile); return true;}

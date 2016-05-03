@@ -151,17 +151,17 @@ public class Qi_Gong extends Meditatable {
     }
     @Override
     public Double getdurationindecimalhours() {
-        return Tools.convert_minstodecimalhours(this.getdurationinminutes(), 2);
+        return Util.convert_minstodecimalhours(this.getdurationinminutes(), 2);
     }
     @Override
     public String gettotaltimeformatted() {
-        return Tools.format_secondsforplayerdisplay(this.getdurationinseconds());
+        return Util.format_secondsforplayerdisplay(this.getdurationinseconds());
     }
     @Override
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists
-        if (Tools.gui_getconfirmationdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
+        if (Util.gui_getokcancelconfirmationdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
                         "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             entrainmentplayer.stop();
@@ -173,7 +173,7 @@ public class Qi_Gong extends Meditatable {
     public void ambienceerror() {
         System.out.println("Ambience Error!");
         // Pause Entrainment
-        if (Tools.gui_getconfirmationdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
+        if (Util.gui_getokcancelconfirmationdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
                         "'s Ambience. Problem File Is: '" + getCurrentAmbiencePlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             ambienceplayer.stop();

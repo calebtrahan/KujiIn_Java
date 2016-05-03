@@ -21,7 +21,7 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class Tools {
+public class Util {
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     public static final String[] SUPPORTEDAUDIOFORMATS = {"mp3", "aac", "wav", "aif", "aiff", "m4a"};
 
@@ -33,7 +33,7 @@ public class Tools {
     }
 
 // Gui Methods
-    public static boolean gui_getconfirmationdialog(MainController root, String titletext, String headertext, String contenttext) {
+    public static boolean gui_getokcancelconfirmationdialog(MainController root, String titletext, String headertext, String contenttext) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setTitle(titletext);
         a.setHeaderText(headertext);
@@ -42,6 +42,28 @@ public class Tools {
         dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
         Optional<ButtonType> answer = a.showAndWait();
         return answer.isPresent() && answer.get() == ButtonType.OK;
+    }
+    public static AnswerType gui_getyesnocancelconfirmationdialog(MainController root, String titletext, String headertext, String contenttext) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setTitle(titletext);
+        a.setHeaderText(headertext);
+        a.setContentText(contenttext);
+        ButtonType yes = new ButtonType("Yes");
+        ButtonType no = new ButtonType("No");
+        ButtonType cancel = new ButtonType("Cancel");
+        a.getButtonTypes().clear();
+        a.getButtonTypes().add(yes);
+        a.getButtonTypes().add(no);
+        a.getButtonTypes().add(cancel);
+        DialogPane dialogPane = a.getDialogPane();
+        dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
+        Optional<ButtonType> answer = a.showAndWait();
+        if (answer.isPresent()) {
+            if (answer.get() == yes) {return AnswerType.YES;}
+            if (answer.get() == no) {return AnswerType.NO;}
+            if (answer.get() == cancel) {return AnswerType.CANCEL;}
+        }
+        return AnswerType.CANCEL;
     }
     public static void gui_showinformationdialog(MainController root, String titletext, String headertext, String contexttext) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
@@ -215,7 +237,7 @@ public class Tools {
         return formatter.format(currentDate.getTime());
     }
     public static String checkifdateoverdue(String DateFormatted) {
-        LocalDate datedue = Tools.convert_stringtolocaldate(DateFormatted);
+        LocalDate datedue = Util.convert_stringtolocaldate(DateFormatted);
         int daystilldue = Period.between(LocalDate.now(), datedue).getDays();
         if (daystilldue > 1) {return DateFormatted;}
         if (daystilldue == 1) {return "Tomorrow";}
@@ -278,12 +300,12 @@ public class Tools {
     }
     public static File file_extensioncorrect(MainController root, String expectedextension, File filetocheck) {
         if (! filetocheck.getName().contains(".")) {
-            if (Tools.gui_getconfirmationdialog(root, "Confirmation", "Invalid Extension", "Save As A ." + expectedextension + " File?")) {
+            if (Util.gui_getokcancelconfirmationdialog(root, "Confirmation", "Invalid Extension", "Save As A ." + expectedextension + " File?")) {
                 return new File(filetocheck.getAbsolutePath().concat("." + expectedextension));
             } else {return filetocheck;}
         } else {
             String extension = filetocheck.getName().substring(filetocheck.getName().lastIndexOf("."));
-            if (Tools.gui_getconfirmationdialog(root, "Confirmation", "Invalid Extension " + extension, "Rename As ." + expectedextension + "?")) {
+            if (Util.gui_getokcancelconfirmationdialog(root, "Confirmation", "Invalid Extension " + extension, "Rename As ." + expectedextension + "?")) {
                 String filewithoutextension = filetocheck.getAbsolutePath().substring(0, filetocheck.getName().lastIndexOf("."));
                 return new File(filewithoutextension.concat("." + expectedextension));
             } else {
@@ -394,7 +416,7 @@ public class Tools {
             p = cmdlist.start();
             int exitcode = p.waitFor();
             System.out.println("Finished Concatenating Audio");
-//                if (Tools.audio_checkduration(finalentrainmentfile, getdurationinseconds())) {break;}
+//                if (Util.audio_checkduration(finalentrainmentfile, getdurationinseconds())) {break;}
 //                else {
 //                    if (count > 3) {return false;}
 //                    else {count++;}
@@ -497,5 +519,9 @@ public class Tools {
     public static boolean sendstacktracetodeveloper(String stacktrace) {
         // TODO Email Stacktrace To Me
         return false;
+    }
+
+    public enum AnswerType {
+        YES, NO, CANCEL
     }
 }

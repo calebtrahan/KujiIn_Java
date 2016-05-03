@@ -1,7 +1,7 @@
 package kujiin.xml;
 
 import kujiin.MainController;
-import kujiin.Tools;
+import kujiin.Util;
 import kujiin.lib.BeanComparator;
 
 import javax.xml.bind.JAXBContext;
@@ -171,7 +171,7 @@ public class Goals {
                 setPostsessionGoals(currentGoals.getPostsessionGoals());
                 setTotalGoals(currentGoals.getTotalGoals());
             } catch (JAXBException e) {
-                Tools.gui_showinformationdialog(Root, "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+                Util.gui_showinformationdialog(Root, "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -183,7 +183,7 @@ public class Goals {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.GOALSXMLFILE);
         } catch (JAXBException e) {
-            Tools.gui_showinformationdialog(Root, "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+            Util.gui_showinformationdialog(Root, "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
         }
     }
     public void add(int cutorelementindex, Goal newgoal) throws JAXBException {
@@ -287,7 +287,7 @@ public class Goals {
 //    public List<Goal> getgoalscompletedondate(int cutindex, LocalDate localDate) {
 //       List<Goal> goalscompletedondate = new ArrayList<>();
 //        for (Goal i : getallcutgoals(cutindex, false)) {
-//            LocalDate date = Tools.convert_stringtolocaldate(i.getDate_Completed())
+//            LocalDate date = Util.convert_stringtolocaldate(i.getDate_Completed())
 //        }
 //    }
 
@@ -302,7 +302,7 @@ public class Goals {
         for (Goal i : getallcutgoals(cutorelementindex, true)) {
             boolean completed = currentpracticedhours >= i.getGoal_Hours();
             i.setCompleted(completed);
-            if (completed && ! i.getCompleted()) {i.setDate_Completed(Tools.gettodaysdate());}
+            if (completed && ! i.getCompleted()) {i.setDate_Completed(Util.gettodaysdate());}
         }
     }
     public List<Goal> completecutgoals(int cutorelementindex, double currentpracticedhours) {
@@ -312,7 +312,7 @@ public class Goals {
             boolean notcompletedbefore = ! i.getCompleted();
             if (completed && notcompletedbefore) {
                 i.setCompleted(true);
-                i.setDate_Completed(Tools.gettodaysdate());
+                i.setDate_Completed(Util.gettodaysdate());
                 completedthisession.add(i);
             }
         }
@@ -332,9 +332,9 @@ public class Goals {
         public Goal() {}
 
         public Goal(LocalDate duedate, Double goalhours, String cutname) {
-            setDate_Due(Tools.convert_localdatetostring(duedate));
+            setDate_Due(Util.convert_localdatetostring(duedate));
             setGoal_Hours(goalhours);
-            setDate_Set(Tools.convert_localdatetostring(LocalDate.now()));
+            setDate_Set(Util.convert_localdatetostring(LocalDate.now()));
             setCutName(cutname);
             setCompleted(false);
             setDate_Completed("Not Completed");

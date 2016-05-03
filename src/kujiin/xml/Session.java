@@ -1,6 +1,6 @@
 package kujiin.xml;
 
-import kujiin.Tools;
+import kujiin.Util;
 import kujiin.widgets.ProgressAndGoalsWidget;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -68,9 +68,9 @@ public class Session {
         Void_Duration = void_duration;
         Postsession_Duration = postsession_duration;
         Total_Session_Duration = total_session_duration;
-        setDate_Practiced(Tools.gettodaysdate());
+        setDate_Practiced(Util.gettodaysdate());
     }
-    public Session() {setDate_Practiced(Tools.gettodaysdate());}
+    public Session() {setDate_Practiced(Util.gettodaysdate());}
 
 // Getters And Setters
     public Integer getPresession_Duration() {

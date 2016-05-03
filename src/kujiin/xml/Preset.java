@@ -1,7 +1,7 @@
 package kujiin.xml;
 
 import kujiin.MainController;
-import kujiin.Tools;
+import kujiin.Util;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -124,8 +124,8 @@ public class Preset {
         setPostTime(loadedsession.getPostTime());
     }
     public boolean savepreset() {
-        File presetfile = Tools.filechooser_save(Root.getScene(), "Save Preset As", null);
-        if (presetfile != null && Tools.file_extensioncorrect(Root, "xml", presetfile).getName().endsWith(".xml")) {
+        File presetfile = Util.filechooser_save(Root.getScene(), "Save Preset As", null);
+        if (presetfile != null && Util.file_extensioncorrect(Root, "xml", presetfile).getName().endsWith(".xml")) {
             try {
                 marshall(null);
                 return true;
@@ -135,7 +135,7 @@ public class Preset {
         } else {return false;}
     }
     public boolean openpreset() {
-        File presetfile = Tools.filechooser_single(Root.getScene(), "Load Session Preset", null);
+        File presetfile = Util.filechooser_single(Root.getScene(), "Load Session Preset", null);
         if (presetfile != null && presetfile.getName().endsWith(".xml")) {
             try {unmarshall(presetfile); return true;}
             catch (JAXBException ignored) {return false;}

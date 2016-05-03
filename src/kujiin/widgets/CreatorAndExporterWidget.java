@@ -153,13 +153,14 @@ public class CreatorAndExporterWidget {
         if (session.getPlayerState() == PlayerWidget.PlayerState.PLAYING ||
             session.getPlayerState() == PlayerWidget.PlayerState.PAUSED ||
             session.getPlayerState() == PlayerWidget.PlayerState.TRANSITIONING) {
-            if (Tools.gui_getconfirmationdialog(Root, "Stop Session", "In Order To Edit Session Values The Session Player Must Be Stopped And Reset", "Stop And Reset Session Player?")) {
+            if (Util.gui_getokcancelconfirmationdialog(Root, "Stop Session", "In Order To Edit Session Values The Session Player Must Be Stopped And Reset", "Stop And Reset Session Player?")) {
                 if (! session.stop().equals("Session Stopped")) {return;}
             } else {return;}
         }
         // TODO Check Exporter Here
         if (creatorState == CreatorState.NOT_CREATED) {
-            if (! gettextfieldtimes()) {Tools.gui_showerrordialog(Root, "Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session"); return;}
+            if (! gettextfieldtimes()) {
+                Util.gui_showerrordialog(Root, "Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session"); return;}
             boolean creationstate = session.create();
             ExportButton.setDisable(! creationstate);
             session.Root.PlayButton.setDisable(! creationstate);
@@ -193,12 +194,12 @@ public class CreatorAndExporterWidget {
 //                    } else {
 //                        // TODO Continue Fixing Logic Here
 //                        if (session.getExportfile().exists()) {
-//                            if (!Tools.gui_getconfirmationdialog(Root, "Confirmation", "Overwrite Saved Exported Session?", "Saved Session: " + session.getExportfile().getAbsolutePath())) {
+//                            if (!Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Overwrite Saved Exported Session?", "Saved Session: " + session.getExportfile().getAbsolutePath())) {
 //                                session.getnewexportsavefile();
 //                            }
 //                        } else {session.getnewexportsavefile();}
 //                    }
-//                    if (session.getExportfile() == null) {Tools.gui_showtimedmessageonlabel(StatusBar, "Export Session Cancelled", 3000); return;}
+//                    if (session.getExportfile() == null) {Util.gui_showtimedmessageonlabel(StatusBar, "Export Session Cancelled", 3000); return;}
 //                    exportserviceindex = 0;
 //                    ArrayList<Cut> cutsinsession = session.getCutsinsession();
 //                    for (Cut i : cutsinsession) {
@@ -210,18 +211,18 @@ public class CreatorAndExporterWidget {
 //                    setExporterState(ExporterState.WORKING);
 //                    exportnextservice();
 //                } else {
-//                    Tools.gui_showerrordialog(Root, "Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
+//                    Util.gui_showerrordialog(Root, "Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
 //                    // TODO Open A Browser Showing How To Install FFMPEG
 //                }
 //            } else if (getExporterState() == ExporterState.WORKING) {
-//                Tools.gui_showtimedmessageonlabel(StatusBar, "Session Currently Being Exported", 3000);
+//                Util.gui_showtimedmessageonlabel(StatusBar, "Session Currently Being Exported", 3000);
 //            } else {
-//                if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Session Already Exported", "Export Again?")) {
+//                if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Already Exported", "Export Again?")) {
 //                    setExporterState(ExporterState.NOT_EXPORTED);
 //                    startexport();
 //                }
 //            }
-//        } else {Tools.gui_showinformationdialog(Root, "Information", "Cannot Export", "No Cuts Selected");}
+//        } else {Util.gui_showinformationdialog(Root, "Information", "Cannot Export", "No Cuts Selected");}
     }
     private void exportnextservice() {
 //        System.out.println("Starting Next Export Service");
@@ -343,7 +344,7 @@ public class CreatorAndExporterWidget {
             totalsessiontime += rampduration * 2;
             if (rampduration > 0) {TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + rampduration + "Mins. On Both Presession And Postsession"));}
             else {TotalSessionTime.setTooltip(null);}
-            TotalSessionTime.setText(Tools.format_minstohrsandmins_short(totalsessiontime));
+            TotalSessionTime.setText(Util.format_minstohrsandmins_short(totalsessiontime));
             ApproximateEndTime.setTooltip(new Tooltip("Time You Finish Will Vary Depending On When You Start Playback"));
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, totalsessiontime);
@@ -356,7 +357,7 @@ public class CreatorAndExporterWidget {
         if (AmbienceSwitch.isSelected()) {
             AmbienceSwitch.setSelected(false);
             session.resetcreateditems();
-            Tools.gui_showtimedmessageonlabel(StatusBar, "Session Values Changed, Ambience Unselected", 5000);
+            Util.gui_showtimedmessageonlabel(StatusBar, "Session Values Changed, Ambience Unselected", 5000);
         }
     }
     public boolean gettextfieldtimes() {
@@ -369,7 +370,7 @@ public class CreatorAndExporterWidget {
             if (gettextfieldtimes()) {
                 session.checkambience(AmbienceSwitch);
             } else {
-                Tools.gui_showinformationdialog(Root, "Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
+                Util.gui_showinformationdialog(Root, "Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
                 AmbienceSwitch.setSelected(false);
             }
         } else {
@@ -410,7 +411,7 @@ public class CreatorAndExporterWidget {
             ZenTime.setText(presetvalues.get(9).toString());
             PostTime.setText(presetvalues.get(10).toString());
         } catch (ArrayIndexOutOfBoundsException ignored) {
-            Tools.gui_showerrordialog(Root, "Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
+            Util.gui_showerrordialog(Root, "Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
         }
     }
     public ArrayList<Integer> getcreatorvalues() {
@@ -439,7 +440,7 @@ public class CreatorAndExporterWidget {
     public boolean cleanup() {
         boolean currentlyexporting = getExporterState() == ExporterState.WORKING;
         if (currentlyexporting) {
-            Tools.gui_showinformationdialog(Root, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
+            Util.gui_showinformationdialog(Root, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
         } else {This_Session.deleteprevioussession();}
         return ! currentlyexporting;
     }
@@ -448,13 +449,17 @@ public class CreatorAndExporterWidget {
     public void loadpreset() {
         if (Preset.openpreset() && Preset.validpreset()) {
             changevaluestopreset(Preset.getpresettimes());
-        } else {Tools.gui_showinformationdialog(Root, "Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
+        } else {
+            Util.gui_showinformationdialog(Root, "Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
     }
     public void savepreset() {
         Preset.setpresettimes(getcreatorvalues());
-        if (! Preset.validpreset()) {Tools.gui_showinformationdialog(Root, "Information", "Cannot Save Preset", "All Values Are 0"); return;}
-        if (Preset.savepreset()) {Tools.gui_showtimedmessageonlabel(StatusBar, "Preset Successfully Saved", 4000);}
-        else {Tools.gui_showerrordialog(Root, "Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
+        if (! Preset.validpreset()) {
+            Util.gui_showinformationdialog(Root, "Information", "Cannot Save Preset", "All Values Are 0"); return;}
+        if (Preset.savepreset()) {
+            Util.gui_showtimedmessageonlabel(StatusBar, "Preset Successfully Saved", 4000);}
+        else {
+            Util.gui_showerrordialog(Root, "Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
     }
 
 // Subclasses/Dialogs
@@ -537,11 +542,12 @@ public class CreatorAndExporterWidget {
         }
     }
     public static class CutsMissingDialog  extends Stage {
-        public Button addmissingCutsButton;
-        public ListView<Text> sessionlistview;
+        public Button AddMissingCutsButton;
+        public ListView<Text> SessionListView;
         public Button CreateAnywayButton;
+        public Button CancelCreationButton;
         private ArrayList<Cut> allcuts;
-        private int invocationduration;
+        private ArrayList<Cut> missingcuts;
         private boolean createsession;
         private MainController Root;
 
@@ -554,10 +560,13 @@ public class CreatorAndExporterWidget {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
+                this.setOnCloseRequest(event -> dialogclosed());
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Cuts Missing");
+            this.allcuts = allcuts;
             populatelistview();
             setCreatesession(false);
+            Util.gui_showinformationdialog(Root, "Cuts Missing", "Due To The Nature Of Kuji-In, Each Cut Should Connect From RIN Up, Or The Later Cuts Might Lack The Energy They Need", "Use This Dialog To Connect Cuts, Or Cancel Without Creating");
         }
 
         public int getlastworkingcutindex() {
@@ -572,43 +581,49 @@ public class CreatorAndExporterWidget {
             for (int i=0; i<getlastworkingcutindex(); i++) {
                 Text item = new Text();
                 StringBuilder currentcuttext = new StringBuilder();
-                Cut selectedcut = allcuts.get(i-1);
+                Cut selectedcut = allcuts.get(i);
                 currentcuttext.append(selectedcut.number).append(". ").append(selectedcut.name);
                 if (selectedcut.getdurationinminutes() > 0) {
-                    currentcuttext.append(" (").append(Tools.format_minstohrsandmins_short(selectedcut.getdurationinminutes())).append(")");
+                    currentcuttext.append(" (").append(Util.format_minstohrsandmins_short(selectedcut.getdurationinminutes())).append(")");
                 } else {
+                    if (missingcuts == null) {missingcuts = new ArrayList<>();}
+                    missingcuts.add(selectedcut);
                     currentcuttext.append(" (Missing Value!)");
                     item.setStyle("-fx-font-weight:bold; -fx-font-style: italic;");
                 }
                 item.setText(currentcuttext.toString());
                 sessionitems.add(item);
             }
-            sessionlistview.setItems(sessionitems);
+            SessionListView.setItems(sessionitems);
         }
-        public void returntoCreator(Event event) {this.close();}
         public void addmissingcutstoSession(Event event) {
-            CutInvocationDialog cutdurationdialog = new CutInvocationDialog(Root);
-            cutdurationdialog.showAndWait();
-            setInvocationduration(cutdurationdialog.getDuration());
-            setCreatesession(true);
+            if (missingcuts != null && missingcuts.size() > 0) {
+                CutInvocationDialog cutdurationdialog = new CutInvocationDialog(Root);
+                cutdurationdialog.showAndWait();
+                for (Cut i : missingcuts) {
+                    if (cutdurationdialog.getDuration() != 0) {
+                        Root.getSession().setDuration(i.number, cutdurationdialog.getDuration());
+                    }
+                }
+                setCreatesession(true);
+            } else {setCreatesession(false);}
             this.close();
         }
         public void createSessionwithoutmissingcuts(Event event) {
-            if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
+            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
                 setCreatesession(true);
                 this.close();
-            }
-        }
-        public int getInvocationduration() {
-            return invocationduration;
-        }
-        public void setInvocationduration(int invocationduration) {
-            this.invocationduration = invocationduration;
+            } else {setCreatesession(false);}
         }
         public boolean isCreatesession() {
             return createsession;
         }
         public void setCreatesession(boolean createsession) {this.createsession = createsession;}
+        public void dialogclosed() {
+            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
+                this.close();
+            }
+        }
     }
     public static class CutInvocationDialog extends Stage {
         public Button CancelButton;
@@ -657,12 +672,13 @@ public class CreatorAndExporterWidget {
                     setDuration(value);
                     this.close();
                 } else {
-                    if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Cut Invocation Value Is 0", "Continue With Zero Value (These Cuts Won't Be Included)" )) {
+                    if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Cut Invocation Value Is 0", "Continue With Zero Value (These Cuts Won't Be Included)" )) {
                         setDuration(0);
                         this.close();
                     }
                 }
-            } catch (NumberFormatException e) {Tools.gui_showerrordialog(Root, "Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
+            } catch (NumberFormatException e) {
+                Util.gui_showerrordialog(Root, "Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
         }
     }
     public static class SortSessionItems extends Stage {
@@ -688,6 +704,7 @@ public class CreatorAndExporterWidget {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
+                this.setOnCloseRequest(event -> dialogClosed());
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
@@ -709,7 +726,7 @@ public class CreatorAndExporterWidget {
             int count = 1;
             for (Object i : sessionitems) {
                 Meditatable item = (Meditatable) i;
-                tableitems.add(new SessionItem(count, item.name, Tools.format_minstohrsandmins_abbreviated(item.getdurationinminutes())));
+                tableitems.add(new SessionItem(count, item.name, Util.format_minstohrsandmins_abbreviated(item.getdurationinminutes())));
                 count++;
             }
             SessionItemsTable.setItems(tableitems);
@@ -718,7 +735,7 @@ public class CreatorAndExporterWidget {
             int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
             if (selectedindex == -1) {return;}
             if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
-                Tools.gui_showinformationdialog(Root, "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
+                Util.gui_showinformationdialog(Root, "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
                 return;
             }
             if (selectedindex == 0) {return;}
@@ -726,12 +743,12 @@ public class CreatorAndExporterWidget {
             Meditatable oneitemup = sessionitems.get(selectedindex - 1);
             if (selecteditem instanceof Cut && oneitemup instanceof Cut) {
                 if (selecteditem.number > oneitemup.number) {
-                    Tools.gui_showinformationdialog(Root, "Cannot Move", selecteditem.name + " Cannot Be Moved Before " + oneitemup.name + ". Cuts Would Be Out Of Order", "Cannot Move");
+                    Util.gui_showinformationdialog(Root, "Cannot Move", selecteditem.name + " Cannot Be Moved Before " + oneitemup.name + ". Cuts Would Be Out Of Order", "Cannot Move");
                     return;
                 }
             }
             if (oneitemup instanceof Qi_Gong) {
-                Tools.gui_showinformationdialog(Root, "Cannot Move", "Cannot Replace Presession", "Cannot Move");
+                Util.gui_showinformationdialog(Root, "Cannot Move", "Cannot Replace Presession", "Cannot Move");
                 return;
             }
             Collections.swap(sessionitems, selectedindex, selectedindex - 1);
@@ -741,7 +758,7 @@ public class CreatorAndExporterWidget {
             int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
             if (selectedindex == -1) {return;}
             if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
-                Tools.gui_showinformationdialog(Root, "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
+                Util.gui_showinformationdialog(Root, "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
                 return;
             }
             if (selectedindex == tableitems.size() - 1) {return;}
@@ -749,12 +766,12 @@ public class CreatorAndExporterWidget {
             Meditatable oneitemdown = sessionitems.get(selectedindex + 1);
             if (selecteditem instanceof Cut && oneitemdown instanceof Cut) {
                 if (selecteditem.number < oneitemdown.number) {
-                    Tools.gui_showinformationdialog(Root, "Cannot Move", selecteditem.name + " Cannot Be Moved After " + oneitemdown.name + ". Cuts Would Be Out Of Order", "Cannot Move");
+                    Util.gui_showinformationdialog(Root, "Cannot Move", selecteditem.name + " Cannot Be Moved After " + oneitemdown.name + ". Cuts Would Be Out Of Order", "Cannot Move");
                     return;
                 }
             }
             if (oneitemdown instanceof Qi_Gong) {
-                Tools.gui_showinformationdialog(Root, "Cannot Move", "Cannot Replace Postsession", "Cannot Move");
+                Util.gui_showinformationdialog(Root, "Cannot Move", "Cannot Replace Postsession", "Cannot Move");
                 return;
             }
             Collections.swap(sessionitems, selectedindex, selectedindex + 1);
@@ -772,6 +789,12 @@ public class CreatorAndExporterWidget {
         public void cancel(ActionEvent actionEvent) {
             sessionitems = null;
             close();
+        }
+        public void dialogClosed() {
+            
+            if (Util.gui_getokcancelconfirmationdialog(Root, "Cancel Creation", "Cancel Creation", "This Will Return To The Creator Main Window")) {
+                this.close();
+            }
         }
 
         class SessionItem {

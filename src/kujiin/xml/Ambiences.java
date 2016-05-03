@@ -1,7 +1,7 @@
 package kujiin.xml;
 
 import kujiin.MainController;
-import kujiin.Tools;
+import kujiin.Util;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -161,7 +161,7 @@ public class Ambiences {
                 setVoid(ambiences.getVoid());
                 setPostsession(ambiences.getPostsession());
             } catch (JAXBException e) {
-                Tools.gui_showinformationdialog(Root, "Information", "Couldn't Read Ambience XML File", "Check Read File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());
+                Util.gui_showinformationdialog(Root, "Information", "Couldn't Read Ambience XML File", "Check Read File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());
             }
         } else {
             for (int i = 0; i < AllAmbiences.size(); i++) {
@@ -179,7 +179,7 @@ public class Ambiences {
             createMarshaller.marshal(this, Options.AMBIENCEXMLFILE);
         } catch (JAXBException e) {
             e.printStackTrace();
-            Tools.gui_showinformationdialog(Root, "Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
+            Util.gui_showinformationdialog(Root, "Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
     }
 
 // Other Methods

@@ -4,7 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kujiin.MainController;
-import kujiin.Tools;
+import kujiin.Util;
 import kujiin.widgets.PlayerWidget;
 
 import javax.xml.bind.JAXBContext;
@@ -106,7 +106,7 @@ public class Options {
                 setSessionOptions(options.getSessionOptions());
                 setAppearanceOptions(options.getAppearanceOptions());
             } catch (JAXBException ignored) {
-                Platform.runLater(() -> Tools.gui_showinformationdialog(Root, "Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
+                Platform.runLater(() -> Util.gui_showinformationdialog(Root, "Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
             }
         } else {
@@ -121,7 +121,7 @@ public class Options {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, OPTIONSXMLFILE);
         } catch (JAXBException e) {
-            Tools.gui_showinformationdialog(Root, "Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
+            Util.gui_showinformationdialog(Root, "Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
         }
     }
     public void resettodefaults() {

@@ -11,7 +11,7 @@ import javafx.util.Duration;
 import kujiin.Cut;
 import kujiin.Element;
 import kujiin.This_Session;
-import kujiin.Tools;
+import kujiin.Util;
 import kujiin.xml.*;
 
 import java.io.File;
@@ -344,20 +344,20 @@ public class Meditatable {
         //                    updateTitle("Building " + name);
         //                    System.out.println("Concatenating Entrainment For " + name);
         //                    updateMessage("Concatenating Entrainment Files");
-        //                    Tools.audio_concatenatefiles(entrainmentlist, tempentrainmenttextfile, finalentrainmentfile);
+        //                    Util.audio_concatenatefiles(entrainmentlist, tempentrainmenttextfile, finalentrainmentfile);
         //                    if (isCancelled()) return false;
         //                    if (ambienceenabled) {
         //                        updateProgress(0.25, 1.0);
         //                        System.out.println("Concatenating Ambience For " + name);
         //                        updateMessage("Concatenating Ambience Files");
-        //                        Tools.audio_concatenatefiles(ambiencelist, tempambiencetextfile, finalambiencefile);
+        //                        Util.audio_concatenatefiles(ambiencelist, tempambiencetextfile, finalambiencefile);
         //                        if (isCancelled()) return false;
         //                        updateProgress(0.50, 1.0);
         ////                            System.out.println("Reducing Ambience Duration For " + name);
         ////                            updateMessage("Cutting Ambience Audio To Selected Duration");
         ////                            System.out.println("Final Ambience File" + finalambiencefile.getAbsolutePath());
-        ////                            if (Tools.audio_getduration(finalambiencefile) > getdurationinseconds()) {
-        ////                                Tools.audio_trimfile(finalambiencefile, getdurationinseconds());
+        ////                            if (Util.audio_getduration(finalambiencefile) > getdurationinseconds()) {
+        ////                                Util.audio_trimfile(finalambiencefile, getdurationinseconds());
         ////                            }
         ////                            if (isCancelled()) return false;
         //                        updateProgress(0.75, 1.0);
@@ -385,7 +385,7 @@ public class Meditatable {
 //                FileUtils.copyFile(finalentrainmentfile, getFinalexportfile());
 //                return true;
 //            } catch (IOException e) {return false;}
-//        } else {return Tools.audio_mixfiles(new ArrayList<>(Arrays.asList(finalambiencefile, finalentrainmentfile)), getFinalexportfile());}
+//        } else {return Util.audio_mixfiles(new ArrayList<>(Arrays.asList(finalambiencefile, finalentrainmentfile)), getFinalexportfile());}
         return false;
     }
     public Boolean sessionreadyforFinalExport() {
@@ -436,11 +436,11 @@ public class Meditatable {
     public int getdurationinminutes() {
         return duration;
     }
-    public Double getdurationindecimalhours() {return Tools.convert_minstodecimalhours(getdurationinminutes(), 2);}
+    public Double getdurationindecimalhours() {return Util.convert_minstodecimalhours(getdurationinminutes(), 2);}
     public String getcurrenttimeformatted() {
-        return Tools.format_secondsforplayerdisplay(getSecondselapsed());
+        return Util.format_secondsforplayerdisplay(getSecondselapsed());
     }
-    public String gettotaltimeformatted() {return Tools.format_secondsforplayerdisplay(getdurationinseconds());}
+    public String gettotaltimeformatted() {return Util.format_secondsforplayerdisplay(getdurationinseconds());}
 
 // Error Handling
     protected void entrainmenterror() {}

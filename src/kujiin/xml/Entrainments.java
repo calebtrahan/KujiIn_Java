@@ -1,7 +1,7 @@
 package kujiin.xml;
 
 import kujiin.MainController;
-import kujiin.Tools;
+import kujiin.Util;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -161,7 +161,7 @@ public class Entrainments {
                 setVoid(entrainments.getVoid());
                 setPostsession(entrainments.getPostsession());
             } catch (JAXBException e) {
-                Tools.gui_showinformationdialog(Root, "Information", "Couldn't Read Entrainment XML File", "Check Read File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+                Util.gui_showinformationdialog(Root, "Information", "Couldn't Read Entrainment XML File", "Check Read File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
             }
         } else {
             for (int i = 0; i < AllEntrainment.size(); i++) {
@@ -179,7 +179,7 @@ public class Entrainments {
             createMarshaller.marshal(this, Options.ENTRAINMENTXMLFILE);
         } catch (JAXBException e) {
             e.printStackTrace();
-            Tools.gui_showinformationdialog(Root, "Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+            Util.gui_showinformationdialog(Root, "Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
         }
     }
 

@@ -1,6 +1,6 @@
 package kujiin.xml;
 
-import kujiin.Tools;
+import kujiin.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -45,6 +45,6 @@ public class SoundFile {
     // Utility Methods
     public boolean isValid() {
         if (file == null) {return false;}
-        return Tools.audio_isValid(file);
+        return Util.audio_isValid(file);
     }
 }

@@ -35,6 +35,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
 // TODO Saving Preset Is Broke!
+// TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;
@@ -107,7 +108,7 @@ public class MainController implements Initializable {
     private Options Options;
 
 // Event Handlers
-    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Tools.gui_showinformationdialog(this, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
+    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Util.gui_showinformationdialog(this, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
     public final EventHandler<ActionEvent> CHECKBOXONOFFLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("ON");} else {a.setText("OFF");}};
     public final EventHandler<ActionEvent> CHECKBOXYESNOLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("YES");} else {a.setText("NO");}};
 
@@ -187,9 +188,12 @@ public class MainController implements Initializable {
         EditReferenceFiles a = new EditReferenceFiles(this);
         a.showAndWait();
     }
-    public void howtouseprogram(ActionEvent actionEvent) {Tools.menu_howtouse(this);}
-    public void aboutthisprogram(ActionEvent actionEvent) {Tools.menu_aboutthisprogram();}
-    public void contactme(ActionEvent actionEvent) {Tools.menu_contactme();}
+    public void howtouseprogram(ActionEvent actionEvent) {
+        Util.menu_howtouse(this);}
+    public void aboutthisprogram(ActionEvent actionEvent) {
+        Util.menu_aboutthisprogram();}
+    public void contactme(ActionEvent actionEvent) {
+        Util.menu_contactme();}
     public void close(ActionEvent actionEvent) {
         if (cleanup()) {System.exit(0);}
     }
@@ -209,7 +213,11 @@ public class MainController implements Initializable {
 
 // Creator And Exporter Widget
     public void loadpreset(ActionEvent actionEvent) {
-        CreatorAndExporter.loadpreset();}
+        Util.AnswerType answer = Util.gui_getyesnocancelconfirmationdialog(this, "Test", "Testing", "123");
+        System.out.println(answer.toString());
+
+//        CreatorAndExporter.loadpreset();
+    }
     public void savepreset(ActionEvent actionEvent) {
         CreatorAndExporter.savepreset();}
     public void toggleexporter(ActionEvent actionEvent) {
@@ -217,7 +225,7 @@ public class MainController implements Initializable {
     }
     public void exportsession(Event event) {
         //        CreatorAndExporter.startexport();}
-        Tools.gui_showtimedmessageonlabel(CreatorStatusBar, "Exporter Is Broken. FFMPEG Is Being A Pain In The Ass", 3000);
+        Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Exporter Is Broken. FFMPEG Is Being A Pain In The Ass", 3000);
     }
     public void ambienceswitch(ActionEvent actionEvent) {
         CreatorAndExporter.checkambience();}
@@ -309,22 +317,22 @@ public class MainController implements Initializable {
             } else {
                 MainTextArea.clear();
                 StatusBar.setTextFill(Color.RED);
-                Tools.gui_showtimedmessageonlabel(StatusBar, "Select A Cut And Variation And Press 'Load' First", 3000);
+                Util.gui_showtimedmessageonlabel(StatusBar, "Select A Cut And Variation And Press 'Load' First", 3000);
             }
         }
 
     // File Methods
         public void savefile(ActionEvent actionEvent) {
-            if (Tools.file_writecontents(selectedfile, Tools.file_getcontents(selectedfile))) {
+            if (Util.file_writecontents(selectedfile, Util.file_getcontents(selectedfile))) {
                 String text = selectedcut + "'s Reference File (" + selectedvariation + " Variation) Has Been Saved";
-                Tools.gui_showtimedmessageonlabel(StatusBar, text, 5000);
+                Util.gui_showtimedmessageonlabel(StatusBar, text, 5000);
             } else {
-                Tools.gui_showerrordialog(Root, "Error", "Couldn't Save", "Does The File Exist/Do You Have Access To It?");}
+                Util.gui_showerrordialog(Root, "Error", "Couldn't Save", "Does The File Exist/Do You Have Access To It?");}
         }
         public void loadnewfile(ActionEvent actionEvent) {
             if (! CutNamesChoiceBox.getValue().equals("") && ! CutVariationsChoiceBox.getValue().equals("")) {
                 if (unsavedchanges()) {
-                    if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Document Has Unsaved Changes", "Save These Changes Before Loading A Different File?")) {savefile(null);}
+                    if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Document Has Unsaved Changes", "Save These Changes Before Loading A Different File?")) {savefile(null);}
                     else {return;}
                 }
                 selectedcut = CutNamesChoiceBox.getValue();
@@ -332,12 +340,12 @@ public class MainController implements Initializable {
                 SelectReferenceFileLabel.setText(String.format("%s's Reference File (%s Variation)", selectedcut, selectedvariation));
                 if (selectedvariation.equals("html")) {selectedfile = new File(htmldirectory, selectedcut + ".html");}
                 else {selectedfile = new File(txtdirectory, selectedcut + ".txt");}
-                MainTextArea.setText(Tools.file_getcontents(selectedfile));
+                MainTextArea.setText(Util.file_getcontents(selectedfile));
             } else {
                 if (CutNamesChoiceBox.getValue().equals("")) {
-                    Tools.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
+                    Util.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
                 else {
-                    Tools.gui_showinformationdialog(Root, "Information", "No Variation Selected", "Select A Variation To Load");}
+                    Util.gui_showinformationdialog(Root, "Information", "No Variation Selected", "Select A Variation To Load");}
                 SelectReferenceFileLabel.setText("Select A Cut Name And Variation And Press 'Load'");
             }
         }
@@ -348,7 +356,7 @@ public class MainController implements Initializable {
                     PlayerWidget.DisplayReference dr = new PlayerWidget.DisplayReference(Root, MainTextArea.getText());
                     dr.showAndWait();
                 } else {
-                    Tools.gui_showinformationdialog(Root, "Information", "Preview Is For Html Content Not Available For Text Only", "Cannot Open Preview");
+                    Util.gui_showinformationdialog(Root, "Information", "Preview Is For Html Content Not Available For Text Only", "Cannot Open Preview");
                 }
             }
         }
@@ -457,8 +465,10 @@ public class MainController implements Initializable {
                     calculateactualtotalduration();
                 }
             } else {
-                if (selected_temp_ambiencesong == null) {Tools.gui_showinformationdialog(Root, "Information", "Cannot Transfer", "Nothing Selected");}
-                else {Tools.gui_showinformationdialog(Root, "Information", "Cannot Transfer", "No Cut Selected");}
+                if (selected_temp_ambiencesong == null) {
+                    Util.gui_showinformationdialog(Root, "Information", "Cannot Transfer", "Nothing Selected");}
+                else {
+                    Util.gui_showinformationdialog(Root, "Information", "Cannot Transfer", "No Cut Selected");}
             }
         }
         public void leftarrowpressed(ActionEvent actionEvent) {
@@ -488,7 +498,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : Temp_Table.getItems()) {
                 temptotalduration += i.getDuration();
             }
-            Temp_TotalDuration.setText(Tools.format_minstohrsandmins_long((int) ((temptotalduration / 1000) / 60)));
+            Temp_TotalDuration.setText(Util.format_minstohrsandmins_long((int) ((temptotalduration / 1000) / 60)));
         }
         public void deletetempambiencefromdirectory() {
             try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
@@ -507,7 +517,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : Actual_Table.getItems()) {
                 actualtotalduration += i.getDuration();
             }
-            Actual_TotalDuration.setText(Tools.format_minstohrsandmins_long((int) ((actualtotalduration / 1000) / 60)));
+            Actual_TotalDuration.setText(Util.format_minstohrsandmins_long((int) ((actualtotalduration / 1000) / 60)));
         }
 
     // Table Methods
@@ -529,7 +539,7 @@ public class MainController implements Initializable {
             }
         }
         private void addto(TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
-            List<File> files = Tools.filechooser_multiple(getScene(), "Add Files", null);
+            List<File> files = Util.filechooser_multiple(getScene(), "Add Files", null);
             ArrayList<File> notvalidfilenames = new ArrayList<>();
             if (files != null) {
                 for (File i : files) {
@@ -538,7 +548,8 @@ public class MainController implements Initializable {
                         addandcalculateduration(soundFile, table, soundfilelist, songlist);
                     } else {notvalidfilenames.add(i);}
                 }
-                if (notvalidfilenames.size() > 0) {Tools.gui_showinformationdialog(Root, "Files Couldn't Be Added", "These Files Couldn't Be Added", notvalidfilenames.toString());}
+                if (notvalidfilenames.size() > 0) {
+                    Util.gui_showinformationdialog(Root, "Files Couldn't Be Added", "These Files Couldn't Be Added", notvalidfilenames.toString());}
             }
         }
         public void addandcalculateduration(SoundFile soundFile, TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
@@ -558,7 +569,7 @@ public class MainController implements Initializable {
             int index = table.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 SoundFile soundFile = soundfilelist.get(index);
-                if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
                     soundFile.getFile().delete();
                 }
                 table.getItems().remove(index);
@@ -567,7 +578,8 @@ public class MainController implements Initializable {
                 calculateactualtotalduration();
                 calculatetemptotalduration();
             }
-            else {Tools.gui_showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
+            else {
+                Util.gui_showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
         }
         private void preview(AmbienceSong selectedsong) {
             if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
@@ -589,11 +601,11 @@ public class MainController implements Initializable {
                     return true;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Tools.gui_showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
+                    Util.gui_showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
                     return false;
                 }
             } else {
-                Tools.gui_showinformationdialog(Root, "Information", "No Cut Loaded", "Load A Cut's Ambience First");
+                Util.gui_showinformationdialog(Root, "Information", "No Cut Loaded", "Load A Cut's Ambience First");
                 return false;
             }
         }
@@ -618,19 +630,20 @@ public class MainController implements Initializable {
                 }
                 ambiences.setcutorelementsAmbience(index, selectedambience);
                 ambiences.marshall();
-                Tools.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedcutorelementname, "");
-            } else {Tools.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
+                Util.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedcutorelementname, "");
+            } else {
+                Util.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closebuttonpressed(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (Tools.gui_getconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Closing?")) {save(null);}
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Closing?")) {save(null);}
                 else {return;}
             }
             close();
         }
         public void switchtosimple(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (Tools.gui_getconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Switching To Simple Mode?")) {save(null);}
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Switching To Simple Mode?")) {save(null);}
             }
             this.close();
             deletetempambiencefromdirectory();
@@ -728,19 +741,19 @@ public class MainController implements Initializable {
             List<File> notvalidfilenames = new ArrayList<>();
             if (filesselected == null || filesselected.size() == 0) {return;}
             for (File i : filesselected) {
-                for (String x : Tools.SUPPORTEDAUDIOFORMATS) {
+                for (String x : Util.SUPPORTEDAUDIOFORMATS) {
                     if (i.getName().endsWith(x)) {
-                        if (Tools.audio_getduration(i) != 0.0) {AmbienceList.add(new AmbienceSong(new SoundFile(i))); break;}
+                        if (Util.audio_getduration(i) != 0.0) {AmbienceList.add(new AmbienceSong(new SoundFile(i))); break;}
                     }
                 }
                 if (! i.equals(AmbienceList.get(AmbienceList.size() - 1).getFile())) {notvalidfilenames.add(i);}
             }
             if (notvalidfilenames.size() > 0) {
-                Tools.gui_showinformationdialog(Root, "Information", notvalidfilenames.size() + " Files Weren't Added Because They Are Unsupported", "");
+                Util.gui_showinformationdialog(Root, "Information", notvalidfilenames.size() + " Files Weren't Added Because They Are Unsupported", "");
             }
         }
         public void addfiles(ActionEvent actionEvent) {
-            List<File> files = Tools.filechooser_multiple(getScene(), "Add Files", null);
+            List<File> files = Util.filechooser_multiple(getScene(), "Add Files", null);
             ArrayList<File> notvalidfilenames = new ArrayList<>();
             if (files != null) {
                 for (File i : files) {
@@ -751,7 +764,7 @@ public class MainController implements Initializable {
                     else {notvalidfilenames.add(i);}
                 }
                 if (notvalidfilenames.size() > 0) {
-                    Tools.gui_showinformationdialog(Root, "Couldn't Add Files", "Supported Audio Formats: " + Tools.audio_getsupportedText(), "Couldn't Add " + notvalidfilenames.size() + "Files");
+                    Util.gui_showinformationdialog(Root, "Couldn't Add Files", "Supported Audio Formats: " + Util.audio_getsupportedText(), "Couldn't Add " + notvalidfilenames.size() + "Files");
                 }
             }
             if (AmbienceList.size() > 0) {AmbienceTable.setItems(AmbienceList);}
@@ -772,7 +785,7 @@ public class MainController implements Initializable {
             int index = AmbienceTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 SoundFile soundFile = SoundList.get(index);
-                if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
                     soundFile.getFile().delete();
                 }
                 AmbienceTable.getItems().remove(index);
@@ -780,7 +793,8 @@ public class MainController implements Initializable {
                 SoundList.remove(index);
                 calculatetotalduration();
             }
-            else {Tools.gui_showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
+            else {
+                Util.gui_showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
         }
         public void preview(ActionEvent actionEvent) {
             if (selectedambiencesong != null && selectedambiencesong.getFile() != null && selectedambiencesong.getFile().exists()) {
@@ -802,11 +816,11 @@ public class MainController implements Initializable {
                     return true;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Tools.gui_showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
+                    Util.gui_showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
                     return false;
                 }
             } else {
-                Tools.gui_showinformationdialog(Root, "Information", "No Cut Loaded", "Load A Cut's Ambience First");
+                Util.gui_showinformationdialog(Root, "Information", "No Cut Loaded", "Load A Cut's Ambience First");
                 return false;
             }
         }
@@ -815,7 +829,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : AmbienceTable.getItems()) {
                 totalselectedduration += i.getDuration();
             }
-            TotalDuration.setText(Tools.format_minstohrsandmins_long((int) ((totalselectedduration / 1000) / 60)));
+            TotalDuration.setText(Util.format_minstohrsandmins_long((int) ((totalselectedduration / 1000) / 60)));
         }
         public boolean unsavedchanges() {
             if (CutOrElementChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
@@ -832,7 +846,7 @@ public class MainController implements Initializable {
     // Dialog Methods
         public void advancedmode(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (Tools.gui_getconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Switching To Advanced Mode?")) {save(null);}
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Switching To Advanced Mode?")) {save(null);}
             }
             this.close();
             if (selectedcutorelementname != null && kujiin.xml.Options.ALLNAMES.contains(selectedcutorelementname)) {
@@ -847,12 +861,13 @@ public class MainController implements Initializable {
                 }
                 ambiences.setcutorelementsAmbience(index, selectedambience);
                 ambiences.marshall();
-                Tools.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedcutorelementname, "");
-            } else {Tools.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
+                Util.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedcutorelementname, "");
+            } else {
+                Util.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closedialog(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (Tools.gui_getconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Closing?")) {save(null);}
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Closing?")) {save(null);}
                 else {return;}
             }
             close();
@@ -874,7 +889,7 @@ public class MainController implements Initializable {
         private MediaPlayer PreviewPlayer;
 
         public PreviewFile(MainController root, File filetopreview) {
-            if (Tools.audio_isValid(filetopreview)) {
+            if (Util.audio_isValid(filetopreview)) {
                 Root = root;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/PreviewAudioDialog.fxml"));
                 fxmlLoader.setController(this);
@@ -895,8 +910,8 @@ public class MainController implements Initializable {
                     PauseButton.setDisable(true);
                     StopButton.setDisable(true);
                     PreviewPlayer.setOnReady(() -> {
-                        CurrentTime.setText(Tools.format_secondsforplayerdisplay(0));
-                        TotalTime.setText(Tools.format_secondsforplayerdisplay((int) PreviewPlayer.getTotalDuration().toSeconds()));
+                        CurrentTime.setText(Util.format_secondsforplayerdisplay(0));
+                        TotalTime.setText(Util.format_secondsforplayerdisplay((int) PreviewPlayer.getTotalDuration().toSeconds()));
                         PlayButton.setDisable(false);
                         PauseButton.setDisable(false);
                         StopButton.setDisable(false);
@@ -904,7 +919,8 @@ public class MainController implements Initializable {
                     VolumeSlider.setValue(0.0);
                     VolumePercentage.setText("0%");
                 } catch (IOException ignored) {}
-            } else {Tools.gui_showinformationdialog(Root, "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+            } else {
+                Util.gui_showinformationdialog(Root, "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
         }
 
         public void play(ActionEvent actionEvent) {
@@ -917,7 +933,7 @@ public class MainController implements Initializable {
                     PreviewPlayer.seek(seektothis);
                 });
                 PreviewPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-                    CurrentTime.setText(Tools.format_secondsforplayerdisplay((int) newValue.toSeconds()));
+                    CurrentTime.setText(Util.format_secondsforplayerdisplay((int) newValue.toSeconds()));
                     updatePositionSlider(PreviewPlayer.getCurrentTime());
                 });
                 VolumeSlider.valueChangingProperty().unbind();
@@ -988,14 +1004,14 @@ public class MainController implements Initializable {
 
         public void exit(ActionEvent actionEvent) {
             if (NotifyMeCheckbox.isSelected()) {
-                Tools.sendstacktracetodeveloper(StackTraceTextField.getText());
+                Util.sendstacktracetodeveloper(StackTraceTextField.getText());
             }
             this.close();
             System.exit(1);
         }
         public void continueprogram(ActionEvent actionEvent) {
             if (NotifyMeCheckbox.isSelected()) {
-                Tools.sendstacktracetodeveloper(StackTraceTextField.getText());
+                Util.sendstacktracetodeveloper(StackTraceTextField.getText());
             }
             this.close();
         }
@@ -1095,7 +1111,7 @@ public class MainController implements Initializable {
                     checkalertfile();
                 }
             } else {
-                if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "This Will Disable The Audible Alert File Played In Between Cuts", "Really Disable This Feature?")) {
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "This Will Disable The Audible Alert File Played In Between Cuts", "Really Disable This Feature?")) {
                     AlertFile = null;
                     checkalertfile();
                 } else {
@@ -1105,17 +1121,17 @@ public class MainController implements Initializable {
             }
         }
         public File getnewalertfile() {
-            File newfile = Tools.filechooser_single(getScene(), "Select A New Alert File", null);
+            File newfile = Util.filechooser_single(getScene(), "Select A New Alert File", null);
             if (newfile != null) {
-                if (Tools.audio_isValid(newfile)) {
-                    double duration = Tools.audio_getduration(newfile);
+                if (Util.audio_isValid(newfile)) {
+                    double duration = Util.audio_getduration(newfile);
                     if (duration > 10000) {
-                        if (!Tools.gui_getconfirmationdialog(Root, "Validation", "Alert File Is longer Than 10 Seconds",
+                        if (!Util.gui_getokcancelconfirmationdialog(Root, "Validation", "Alert File Is longer Than 10 Seconds",
                                 String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
                                         "Really Use It?", duration))) {newfile = null;}
                     }
                 } else {
-                    Tools.gui_showinformationdialog(Root, "Information", newfile.getName() + " Isn't A Valid Audio File", "Supported Audio Formats: " + Tools.audio_getsupportedText());
+                    Util.gui_showinformationdialog(Root, "Information", newfile.getName() + " Isn't A Valid Audio File", "Supported Audio Formats: " + Util.audio_getsupportedText());
                     newfile = null;
                 }
             }
@@ -1123,10 +1139,10 @@ public class MainController implements Initializable {
         }
         public boolean checkalertfile() {
             boolean good;
-            if (AlertFile != null && Tools.audio_isValid(AlertFile)) {
+            if (AlertFile != null && Util.audio_isValid(AlertFile)) {
                 good = true;
                 Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());
-                String audioduration = Tools.format_secondsforplayerdisplay((int) Tools.audio_getduration(AlertFile));
+                String audioduration = Util.format_secondsforplayerdisplay((int) Util.audio_getduration(AlertFile));
                 AlertFileTextField.setText(String.format("%s (%s)", AlertFile.getName(), audioduration));
             } else {
                 good = false;
@@ -1258,10 +1274,11 @@ public class MainController implements Initializable {
             Double ambiencevolume = new Double(AmbienceVolumePercentage.getText()) / 100;
             boolean entrainmentgood = entrainmentvolume <= 100.0 && entrainmentvolume > 0.0;
             boolean ambiencegood = ambiencevolume <= 100.0 && ambiencevolume > 0.0;
-            Tools.gui_validate(EntrainmentVolumePercentage, entrainmentgood);
-            Tools.gui_validate(AmbienceVolumePercentage, ambiencegood);
+            Util.gui_validate(EntrainmentVolumePercentage, entrainmentgood);
+            Util.gui_validate(AmbienceVolumePercentage, ambiencegood);
             boolean alertfilegood = checkalertfile();
-            if (AlertSwitch.isSelected()) {Tools.gui_validate(AlertFileTextField, alertfilegood);}
+            if (AlertSwitch.isSelected()) {
+                Util.gui_validate(AlertFileTextField, alertfilegood);}
             return entrainmentgood && ambiencegood && alertfilegood;
         }
         public void resettodefaults(ActionEvent actionEvent) {
@@ -1270,17 +1287,19 @@ public class MainController implements Initializable {
             valuechanged = true;
         }
         public void deleteallsessions(ActionEvent actionEvent) {
-            if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
                 if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
-                    Tools.gui_showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
-                } else {Tools.gui_showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
+                    Util.gui_showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                } else {
+                    Util.gui_showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }
         }
         public void deleteallgoals(ActionEvent actionEvent) {
-            if (Tools.gui_getconfirmationdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
                 if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
-                    Tools.gui_showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
-                } else {Tools.gui_showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
+                    Util.gui_showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                } else {
+                    Util.gui_showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }
         }
 
@@ -1294,7 +1313,7 @@ public class MainController implements Initializable {
         @Override
         public void close() {
             if (valuechanged) {
-                if (! Tools.gui_getconfirmationdialog(Root, "Confirmation", "You Have Unsaved Changes", "Exit Without Saving?")) {return;}
+                if (! Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "You Have Unsaved Changes", "Exit Without Saving?")) {return;}
             }
             super.close();
         }
@@ -1309,7 +1328,7 @@ public class MainController implements Initializable {
             this.name = new SimpleStringProperty(soundFile.getName());
             this.file = soundFile.getFile();
             duration = soundFile.getDuration();
-            this.length = new SimpleStringProperty(Tools.format_secondsforplayerdisplay((int) (duration / 1000)));
+            this.length = new SimpleStringProperty(Util.format_secondsforplayerdisplay((int) (duration / 1000)));
         }
 
         public String getName() {
