@@ -658,7 +658,6 @@ public class This_Session {
                 getPlayerUI().CutCurrentLabel.setText(currentcutorelement.getcurrenttimeformatted());
                 getPlayerUI().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
                 getPlayerUI().TotalCurrentLabel.setText(Util.format_secondsforplayerdisplay(totalsecondselapsed));
-                getPlayerUI().StatusBar.setText("Session Playing. Currently Practicing " + currentcutorelement.name + "...");
                 Root.getProgressTracker().updaterootgoalsui();
                 Root.getProgressTracker().updateprogressui();
             } else if (playerState == PlayerUI.PlayerState.TRANSITIONING) {
