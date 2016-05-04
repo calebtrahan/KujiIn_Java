@@ -134,7 +134,7 @@ public class PlayerUI extends Stage {
     private boolean endsessionprematurely() {
         if (Session.getPlayerState() == PlayerState.PLAYING || Session.getPlayerState() == PlayerState.PAUSED || Session.getPlayerState() == PlayerState.TRANSITIONING) {
             pause();
-            if (Util.gui_getokcancelconfirmationdialog(Root, "End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {Session.stop(); return true;}
+            if (Util.gui_getokcancelconfirmationdialog(Root, "End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {Session.stop(); Session.closereferencefile(); return true;}
             else {play(); return false;}
         } else {return true;}
     }

@@ -398,7 +398,7 @@ public class This_Session {
     }
     public boolean setupcutsinsession() {
         itemsinsession = new ArrayList<>();
-        if (Presession.getdurationinminutes() != 0) {itemsinsession.add(Presession);}
+        if (Presession.getdurationinminutes() != 0 || Root.getOptions().getSessionOptions().getRampenabled()) {itemsinsession.add(Presession);}
         if (Rin.getdurationinminutes() != 0) {itemsinsession.add(Rin);}
         if (Kyo.getdurationinminutes() != 0) {itemsinsession.add(Kyo);}
         if (Toh.getdurationinminutes() != 0) {itemsinsession.add(Toh);}
@@ -413,7 +413,7 @@ public class This_Session {
         if (Fire.getdurationinminutes() != 0) {itemsinsession.add(Fire);}
         if (Water.getdurationinminutes() != 0) {itemsinsession.add(Water);}
         if (Void.getdurationinminutes() != 0) {itemsinsession.add(Void);}
-        if (Postsession.getdurationinminutes() != 0) {itemsinsession.add(Postsession);}
+        if (Postsession.getdurationinminutes() != 0 || Root.getOptions().getSessionOptions().getRampenabled()) {itemsinsession.add(Postsession);}
         setItemsinsession(itemsinsession);
         return getallitemsinSession().size() > 0;
     }

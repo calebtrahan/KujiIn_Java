@@ -88,7 +88,11 @@ public class Qi_Gong extends Meditatable {
                 entrainment.created_add(0, entrainment.getRampoutfile());
             }
         }
-        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() > 0.0;
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+            return entrainment.created_getAll().size() > 0;
+        } else {
+            return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() > 0.0;
+        }
     }
     @Override
     public void resetCreation() {
