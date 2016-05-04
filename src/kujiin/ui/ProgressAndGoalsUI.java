@@ -281,6 +281,9 @@ public class ProgressAndGoalsUI {
             return currentpracticedminutes >= currentGoals.get(currentGoals.size() - 1).getGoal_Hours().intValue();
         } catch (Exception e) {return false;}
     }
+    // TODO !IMPORTANT Fix Goal Multiple Goal Setter (Minutes Was Stuck At 30)
+    // TODO !IMPORTANT Neither Volume Slider Connected To Player After Cut Switched
+    // TODO !IMPORTANT Fix Memory Leak
     public void updateplayergoalsui() {
         PlayerUI playerUI = Root.getPlayer();
         if (playerUI != null && playerUI.isShowing()) {
@@ -290,8 +293,8 @@ public class ProgressAndGoalsUI {
                 Double goal = Goals.getgoal(cutorelementindex, 0, false).getGoal_Hours();
                 Double goaldecimalhours = Util.convert_minstodecimalhours(new Double(goal * 60).intValue(), 1);
                 Double progress = goaldecimalhours / practiceddecimalhours;
-                playerUI.GoalProgressLabel.setText(String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue() * 100) + "%)");
-                playerUI.GoalProgressBar.setProgress(progress);
+                playerUI.GoalProgressLabel.setText(String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue()) + "%)");
+                playerUI.GoalProgressBar.setProgress(progress / 100);
             } catch (NullPointerException ignored) {
                 playerUI.GoalProgressLabel.setText("No Goal Set (" + practiceddecimalhours + " Current hrs)");
                 playerUI.GoalProgressBar.setProgress(0.0);
