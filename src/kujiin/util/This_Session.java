@@ -692,7 +692,7 @@ public class This_Session {
 //                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
                 try {
                     List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcutorelement.number,
-                            Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(currentcutorelement.number, false), 2));
+                            Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(currentcutorelement.number, false), 2));
                     if (completedgoals.size() > 0) {GoalsCompletedThisSession.addAll(completedgoals);}
                     currentcutorelement.cleanup();
                     cutorelementcount++;
@@ -718,7 +718,7 @@ public class This_Session {
             if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
                 Goals.Goal i = GoalsCompletedThisSession.get(0);
                 int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsUI.GOALCUTNAMES)).indexOf(i.getCutName());
-                double currentpracticedhours = Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2);
+                double currentpracticedhours = Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(cutindex, false), 2);
                 new ProgressAndGoalsUI.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
             } else if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() > 1) {
                 new ProgressAndGoalsUI.MultipleGoalsCompletedDialog(Root, GoalsCompletedThisSession).showAndWait();

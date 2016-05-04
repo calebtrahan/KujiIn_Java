@@ -38,8 +38,6 @@ public class Goals {
     private List<Goal> TotalGoals;
     private MainController Root;
 
-    // TODO Unify Completed And Current Goals With The IsCompleted() Boolean
-
     public Goals() {}
     public Goals(MainController root) {
         Root = root;
@@ -294,7 +292,7 @@ public class Goals {
 // Goal Completion Methods
     public void sortallcompletedgoals() {
         for (int i = 0; i <= 10; i++) {
-            double currentpracticedhours = Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(i, false);
+            double currentpracticedhours = Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(i, false);
             sortcompletedgoals(i, currentpracticedhours);
         }
     }

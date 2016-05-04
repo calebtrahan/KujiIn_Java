@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 // TODO Reference Display Isn't Switching Off If On When Checbox Unselected
 // TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
-// TODO Reference Display Isn't Displaying Text But Is Styled -> FIX!
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
 
 // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
@@ -236,7 +235,6 @@ public class PlayerUI extends Stage {
                     ContentPane.setContent(ta);
                     Root.getOptions().setStyle(this);
                 } else if (referenceType == ReferenceType.html) {
-                    // TODO Get Dark Theme For Webview Here For Reference Files
                     WebView browser = new WebView();
                     WebEngine webEngine = browser.getEngine();
                     webEngine.load(referencefile.toURI().toString());
@@ -331,7 +329,7 @@ public class PlayerUI extends Stage {
                 int thisessionminutes = thissession.getTotal_Session_Duration();
                 SessionDuration.setText(Util.format_minstohrsandmins_abbreviated(thisessionminutes));
                 SessionDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
-                int totalsessionminutes = currentsessions.getpracticedtimeinminutesforallsessions(11, true);
+                int totalsessionminutes = currentsessions.sessioninformation_getallsessiontotals(11, true);
                 TotalPracticeDuration.setText(Util.format_minstohrsandmins_abbreviated(totalsessionminutes));
                 TotalPracticeDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}

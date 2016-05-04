@@ -94,7 +94,7 @@ public class Sessions {
 
 // Session Information Getters
     // TODO Refactor These Methods So They Make More Sense
-    public int getpracticetimeinminutesforthissession(int index, Boolean includepreandpost) {
+    public int sessioninformation_getindividualsessiontotals(int index, Boolean includepreandpost) {
         try {
             int totalminutes = 0;
             kujiin.xml.Session thissession = getsession(totalsessioncount() - 1);
@@ -113,7 +113,7 @@ public class Sessions {
             return totalminutes;
         } catch (NullPointerException ignored) {return 0;}
     }
-    public int getpracticedtimeinminutesforallsessions(int index, Boolean includepreandpost) {
+    public int sessioninformation_getallsessiontotals(int index, Boolean includepreandpost) {
         try {
             int totalminutes = 0;
             if (index == ProgressAndGoalsUI.GOALCUTNAMES.length - 1) {
@@ -129,11 +129,11 @@ public class Sessions {
             return totalminutes;
         } catch (NullPointerException ignored) {return 0;}
     }
-    public int averagepracticetimeinminutes(int index, Boolean includepreandpost) {
-        try {return getpracticedtimeinminutesforallsessions(index, includepreandpost) / getSession().size();}
+    public int sessioninformation_getaveragepracticetime(int index, Boolean includepreandpost) {
+        try {return sessioninformation_getallsessiontotals(index, includepreandpost) / getSession().size();}
         catch (NullPointerException | ArithmeticException ignored) {return 0;}
     }
-    public int cutsessionscount(int index) {
+    public int sessioninformation_getsessioncount(int index) {
         try {
             int sessioncount = 0;
             for (kujiin.xml.Session i : getSession()) {

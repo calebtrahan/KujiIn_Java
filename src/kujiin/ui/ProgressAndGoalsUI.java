@@ -236,9 +236,9 @@ public class ProgressAndGoalsUI {
         try {
             if (cutorelementindex == -1) {PreAndPostOption.setDisable(true);}
             else {
-                int averagesessionduration = Sessions.averagepracticetimeinminutes(cutorelementindex, PreAndPostOption.isSelected());
-                int totalminutespracticed = Sessions.getpracticedtimeinminutesforallsessions(cutorelementindex, PreAndPostOption.isSelected());
-                int numberofsessionspracticed = Sessions.cutsessionscount(cutorelementindex);
+                int averagesessionduration = Sessions.sessioninformation_getaveragepracticetime(cutorelementindex, PreAndPostOption.isSelected());
+                int totalminutespracticed = Sessions.sessioninformation_getallsessiontotals(cutorelementindex, PreAndPostOption.isSelected());
+                int numberofsessionspracticed = Sessions.sessioninformation_getsessioncount(cutorelementindex);
                 boolean sessionsgood = averagesessionduration != 0 || totalminutespracticed != 0 || numberofsessionspracticed != 0;
                 String nonetext = "No Sessions";
                 if (sessionsgood) {
@@ -276,7 +276,7 @@ public class ProgressAndGoalsUI {
     public boolean checkifgoalsetandlongenough(int cut_index, int duration) {
         try {
             List<kujiin.xml.Goals.Goal> currentGoals = Goals.sort(Goals.getallcutgoals(cut_index, false));
-            int currentpracticedminutes = Sessions.getpracticedtimeinminutesforallsessions(cut_index, PreAndPostOption.isSelected());
+            int currentpracticedminutes = Sessions.sessioninformation_getallsessiontotals(cut_index, PreAndPostOption.isSelected());
             currentpracticedminutes += duration;
             return currentpracticedminutes >= currentGoals.get(currentGoals.size() - 1).getGoal_Hours().intValue();
         } catch (Exception e) {return false;}
@@ -284,7 +284,7 @@ public class ProgressAndGoalsUI {
     public void updateplayergoalsui() {
         PlayerUI playerUI = Root.getPlayer();
         if (playerUI != null && playerUI.isShowing()) {
-            double practiceddecimalhours = Util.convert_minstodecimalhours(Sessions.getpracticedtimeinminutesforallsessions(cutorelementindex, PreAndPostOption.isSelected()), 2);
+            double practiceddecimalhours = Util.convert_minstodecimalhours(Sessions.sessioninformation_getallsessiontotals(cutorelementindex, PreAndPostOption.isSelected()), 2);
             playerUI.GoalTopLabel.setText("Current " + GOALCUTNAMES[cutorelementindex] + " Goal");
             try {
                 Double goal = Goals.getgoal(cutorelementindex, 0, false).getGoal_Hours();
@@ -299,13 +299,12 @@ public class ProgressAndGoalsUI {
         }
     }
     public void updaterootgoalsui() {
-        // TODO Update Session Player Goals UI As Well Along With The One On ROOT
         updateplayergoalsui();
         try {
 //            Goals.sortallcompletedgoals();
             NewGoalButton.setDisable(cutorelementindex == -1);
             CurrentGoalsButton.setDisable(cutorelementindex == -1);
-            int practicedminutes = Sessions.getpracticedtimeinminutesforallsessions(cutorelementindex, PreAndPostOption.isSelected());
+            int practicedminutes = Sessions.sessioninformation_getallsessiontotals(cutorelementindex, PreAndPostOption.isSelected());
             Double goal = Goals.getgoal(cutorelementindex, 0, false).getGoal_Hours();
             Integer hours = practicedminutes / 60;
             Integer minutes = practicedminutes % 60;
@@ -329,7 +328,7 @@ public class ProgressAndGoalsUI {
             if (cutorelementindex != -1) {
                 TopLabel.setText(GOALCUTNAMES[cutorelementindex]);
                 Util.gui_showtimedmessageonlabel(StatusBar, "No Current Goal Set (" + Goals.getcompletedgoalcount(cutorelementindex) + " Completed)", 4000);
-                int practicedminutes = Sessions.getpracticedtimeinminutesforallsessions(cutorelementindex, PreAndPostOption.isSelected());
+                int practicedminutes = Sessions.sessioninformation_getallsessiontotals(cutorelementindex, PreAndPostOption.isSelected());
                 Integer hours = practicedminutes / 60;
                 Integer minutes = practicedminutes % 60;
                 PracticedHours.setText(hours.toString());
@@ -590,7 +589,7 @@ public class ProgressAndGoalsUI {
                 else {TopLabel.setText(name + " Goals");}
                 for (kujiin.xml.Goals.Goal i : ProgressAndGoals.getGoal().getallcutgoals(cutindex, ShowCompletedCheckBox.isSelected())) {
                     currentGoals.add(new CurrentGoalBinding(count, Double.toString(i.getGoal_Hours()), i.getDate_Set(),
-                            i.getpercentagecompleted(ProgressAndGoals.getSessions().getpracticedtimeinminutesforallsessions(cutindex, false)),
+                            i.getpercentagecompleted(ProgressAndGoals.getSessions().sessioninformation_getallsessiontotals(cutindex, false)),
                             i.getCompleted(), i.getDate_Completed()));
                     CurrentGoalList.add(i);
                     count++;
@@ -654,7 +653,7 @@ public class ProgressAndGoalsUI {
     // Goal pacing
         public void goalpacing(ActionEvent actionEvent) {
             if (getselectedgoal() != null && CurrentGoalList != null && getCutindex() != null) {
-                new GoalPacingDialog(Root, getselectedgoal(), CurrentGoalList, Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false)).showAndWait();
+                new GoalPacingDialog(Root, getselectedgoal(), CurrentGoalList, Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(cutindex, false)).showAndWait();
             }
         }
     }
@@ -686,7 +685,7 @@ public class ProgressAndGoalsUI {
                 this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Goal Pacing");
-            int practicedminutes = Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false);
+            int practicedminutes = Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(cutindex, false);
             int goalminutes = Util.convertdecimalhourstominutes(currentGoal.getGoal_Hours());
             GoalDuration.setText(Util.format_minstohrsandmins_abbreviated(goalminutes));
             GoalDueDate.setText(CurrentGoal.getDate_Due());
@@ -836,7 +835,7 @@ public class ProgressAndGoalsUI {
             GoalHoursSpinner.setEditable(true);
             GoalMinutesSpinner.setEditable(true);
             GoalDatePicker.setValue(LocalDate.now());
-            practicedminutes = Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false);
+            practicedminutes = Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(cutindex, false);
             try {
                 List<kujiin.xml.Goals.Goal> currentgoals = progressAndGoalsUI.getGoal().getallcutgoals(cutindex, false);
                 System.out.println(currentgoals.size());
@@ -1097,7 +1096,7 @@ public class ProgressAndGoalsUI {
             for (kujiin.xml.Goals.Goal i : completedgoals) {
                 String cutname = i.getCutName();
                 int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsUI.GOALCUTNAMES)).indexOf(cutname);
-                String practicedhours = Double.toString(Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().getpracticedtimeinminutesforallsessions(cutindex, false), 2));
+                String practicedhours = Double.toString(Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(cutindex, false), 2));
                 String goalhours = i.getGoal_Hours().toString();
                 String dateset = i.getDate_Set();
                 Integer daystaken = (int) ChronoUnit.DAYS.between(Util.convert_stringtolocaldate(i.getDate_Set()), Util.convert_stringtolocaldate(i.getDate_Due()));

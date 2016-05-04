@@ -101,7 +101,6 @@ public class Meditatable {
     public boolean buildAmbience() {
         ambience.created_clear();
         double currentdurationinmillis = 0.0;
-        // TODO Convert To Millis For Duration Comparing
         if (ambience.hasEnoughAmbience(getdurationinmillis())) {
             for (SoundFile i : ambience.getAmbience()) {
                 if (ambience.gettotalCreatedDuration() < getdurationinmillis()) {
