@@ -61,7 +61,7 @@
       <HBox alignment="TOP_RIGHT" layoutX="54.0" layoutY="565.0" prefHeight="28.0" prefWidth="377.0" />
       <HBox alignment="CENTER_RIGHT" layoutX="351.0" layoutY="240.0" prefHeight="23.0" prefWidth="239.0">
          <children>
-            <CheckBox fx:id="AmbienceSwitch" mnemonicParsing="false" onAction="#ambienceswitch" text="Add Ambience">
+            <CheckBox fx:id="AmbienceSwitch" mnemonicParsing="false" onAction="#ambienceswitch" text="Ambience">
                <HBox.margin>
                   <Insets right="5.0" />
                </HBox.margin>
@@ -138,15 +138,15 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="31.0" prefWidth="593.0">
                <children>
-                  <TextField fx:id="RinTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="KyoTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="TohTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="ShaTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="KaiTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="JinTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="RetsuTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="ZaiTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="ZenTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
+                  <TextField fx:id="RinTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="KyoTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="TohTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="ShaTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="KaiTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="JinTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="RetsuTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="ZaiTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="ZenTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
                </children>
             </HBox>
          </children>
@@ -192,11 +192,11 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="18.0" prefWidth="331.0">
                <children>
-                  <TextField fx:id="EarthTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="AirTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="FireTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="WaterTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="VoidTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
+                  <TextField fx:id="EarthTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="AirTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="FireTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="WaterTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="VoidTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
                </children>
                <VBox.margin>
                   <Insets top="-1.0" />
@@ -230,8 +230,8 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="32.0" prefWidth="137.0">
                <children>
-                  <TextField fx:id="PreTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
-                  <TextField fx:id="PostTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="-" />
+                  <TextField fx:id="PreTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="PostTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
                </children>
             </HBox>
          </children>

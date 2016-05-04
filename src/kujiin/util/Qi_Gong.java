@@ -48,7 +48,7 @@ public class Qi_Gong extends Meditatable {
             Value.setTooltip(new Tooltip("Practice Time For " + name + " (In Minutes)"));
         } else {
             Value.textProperty().removeListener(integertextfield);
-            Value.setText("-");
+            Value.setText("0");
             Value.setDisable(true);
             Value.setTooltip(new Tooltip(name + " Is Disabled. Click " + name + " Button Above To Enable"));
         }

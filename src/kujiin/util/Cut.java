@@ -28,6 +28,7 @@ public class Cut extends Meditatable {
         Switch.setTooltip(new Tooltip(briefsummary));
         Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
         Switch.setOnAction(event -> toggleswitch());
+        toggleswitch();
         if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + super.name + "1.mp3"))); entrainment.calculateshortfreqduration();}
         if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + super.name + "5.mp3"))); entrainment.calculatelongfreqduration();}
 //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
@@ -51,7 +52,7 @@ public class Cut extends Meditatable {
             Value.setTooltip(new Tooltip("Practice Time For " + name + " (In Minutes)"));
         } else {
             Value.textProperty().removeListener(integertextfield);
-            Value.setText("-");
+            Value.setText("0");
             Value.setDisable(true);
             Value.setTooltip(new Tooltip(name + " Is Disabled. Click " + name + " Button Above To Enable"));
         }
