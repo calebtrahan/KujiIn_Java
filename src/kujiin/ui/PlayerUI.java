@@ -1,5 +1,6 @@
 package kujiin.ui;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -145,6 +146,7 @@ public class PlayerUI extends Stage {
             ReferenceHTMLButton.setSelected(false);
             ReferenceTXTButton.setSelected(false);
         }
+        Platform.runLater(() -> Root.getOptions().marshall());
     }
     public void htmlreferenceoptionselected(ActionEvent actionEvent) {
         if (ReferenceToggleButton.isSelected()) {
@@ -152,6 +154,7 @@ public class PlayerUI extends Stage {
             if (ReferenceHTMLButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
             else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
         } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
+        Platform.runLater(() -> Root.getOptions().marshall());
     }
     public void txtreferenceoptionselected(ActionEvent actionEvent) {
         if (ReferenceToggleButton.isSelected()) {
@@ -159,6 +162,7 @@ public class PlayerUI extends Stage {
             if (ReferenceTXTButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
             else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
         } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
+        Platform.runLater(() -> Root.getOptions().marshall());
     }
 
     // Dialogs

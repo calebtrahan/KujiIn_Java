@@ -42,7 +42,6 @@ public class Meditatable {
     protected List<Element> elementstoplay;
     protected List<Meditatable> allcutsorelementstoplay;
     protected Timeline cutorelementtimeline;
-// Trackable Fields
     protected Goals GoalsController;
 
     public Meditatable(int number, String name, int duration, This_Session thissession) {
@@ -150,6 +149,7 @@ public class Meditatable {
     }
 
 // Playback
+    // TODO Find Out Why Fade Animations Are Accruing Indefinite Memory
     public void setupfadeanimations() {
     // PLAY
         double fadeinduration = thisession.Root.getOptions().getSessionOptions().getFadeinduration();
@@ -391,20 +391,20 @@ public class Meditatable {
     public void start() {
         entrainmentplaycount = 0;
         ambienceplaycount = 0;
-        setupfadeanimations();
+//        setupfadeanimations();
         entrainmentplayer = new MediaPlayer(new Media(entrainment.created_get(entrainmentplaycount).getFile().toURI().toString()));
         entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
-        fade_entrainment_play.play();
+        if (fade_entrainment_play != null) {fade_entrainment_play.play();}
         if (ambienceenabled) {
             ambienceplayer = new MediaPlayer(new Media(ambience.created_get(ambienceplaycount).getFile().toURI().toString()));
             ambienceplayer.setVolume(0.0);
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.play();
-            fade_ambience_play.play();
+            if (fade_ambience_play != null) {fade_ambience_play.play();}
         }
         cutorelementtimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> tick()));
         cutorelementtimeline.setCycleCount(Animation.INDEFINITE);
@@ -413,23 +413,23 @@ public class Meditatable {
     public void resume() {
         entrainmentplayer.setVolume(0.0);
         entrainmentplayer.play();
-        fade_entrainment_resume.play();
+        if (fade_entrainment_resume != null) {fade_entrainment_resume.play();}
         if (ambienceenabled) {
             ambienceplayer.setVolume(0.0);
             ambienceplayer.play();
-            fade_ambience_resume.play();
+            if (fade_ambience_resume != null) {fade_ambience_resume.play();}
         }
         cutorelementtimeline.play();
     }
     public void pause() {
-        if (fade_entrainment_pause.getStatus() != Animation.Status.RUNNING) {
+        if (fade_entrainment_pause != null && fade_entrainment_pause.getStatus() != Animation.Status.RUNNING) {
             fade_entrainment_pause.playFromStart();
-            if (ambienceenabled) fade_ambience_pause.playFromStart();
+            if (ambienceenabled && fade_ambience_pause != null) fade_ambience_pause.playFromStart();
         }
         cutorelementtimeline.pause();
     }
     public void stop() {
-        if (fade_entrainment_stop.getStatus() != Animation.Status.RUNNING) {
+        if (fade_ambience_stop != null && fade_entrainment_stop.getStatus() != Animation.Status.RUNNING) {
             fade_entrainment_stop.playFromStart();
             if (ambienceenabled) {fade_ambience_stop.playFromStart();}
         }
@@ -443,7 +443,7 @@ public class Meditatable {
             }
             secondselapsed++;
             if ((getdurationinseconds() - secondselapsed) <= thisession.Root.getOptions().getSessionOptions().getFadeoutduration()) {
-                if (fade_ambience_stop.getStatus() != Animation.Status.RUNNING) {startfadeout();}
+                startfadeout();
                 thisession.Root.getPlayer().StatusBar.setText("Fading Out Of " + name);
             }
         }
@@ -461,31 +461,39 @@ public class Meditatable {
         } catch (IndexOutOfBoundsException ignored) {}
     }
     public void playnextambience() throws IndexOutOfBoundsException {
-        ambienceplaycount++;
-        ambienceplayer.dispose();
-        thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbind();
-        ambienceplayer = new MediaPlayer(new Media(ambience.created_get(ambienceplaycount).getFile().toURI().toString()));
-        ambienceplayer.setOnEndOfMedia(this::playnextambience);
-        ambienceplayer.setOnError(this::ambienceerror);
-        ambienceplayer.play();
-        ambienceplayer.setOnPlaying(() -> thisession.Root.getPlayer().AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty()));
+        try {
+            ambienceplaycount++;
+            ambienceplayer.dispose();
+            thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbind();
+            ambienceplayer = new MediaPlayer(new Media(ambience.created_get(ambienceplaycount).getFile().toURI().toString()));
+            ambienceplayer.setOnEndOfMedia(this::playnextambience);
+            ambienceplayer.setOnError(this::ambienceerror);
+            ambienceplayer.play();
+            ambienceplayer.setOnPlaying(() -> thisession.Root.getPlayer().AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty()));
+        } catch (IndexOutOfBoundsException ignored) {}
     }
     public void startfadeout() {
-        thisession.Root.getPlayer().EntrainmentVolume.valueProperty().unbindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
-        fade_entrainment_stop.play();
-        if (ambienceenabled) {
-            thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
-            fade_ambience_stop.play();
+        if (fade_entrainment_stop != null && fade_entrainment_stop.getStatus() != Animation.Status.RUNNING) {
+            thisession.Root.getPlayer().EntrainmentVolume.valueProperty().unbindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
+            fade_entrainment_stop.play();
+            if (ambienceenabled && fade_ambience_stop != null) {
+                thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
+                fade_ambience_stop.play();
+            }
         }
     }
     public void cleanup() {
         try {
-            if (ambienceenabled) {getCurrentAmbiencePlayer().dispose();}
             getCurrentEntrainmentPlayer().dispose();
-            fade_entrainment_play.stop();
-            fade_ambience_play.stop();
-            fade_ambience_stop.stop();
-            fade_entrainment_play.stop();
+            if (ambienceenabled) {getCurrentAmbiencePlayer().dispose();}
+            if (fade_entrainment_play != null) {fade_entrainment_play.stop();}
+            if (fade_entrainment_pause != null) {fade_entrainment_pause.stop();}
+            if (fade_entrainment_resume != null) {fade_entrainment_resume.stop();}
+            if (fade_entrainment_stop != null) {fade_entrainment_stop.stop();}
+            if (fade_ambience_play != null) {fade_ambience_play.stop();}
+            if (fade_ambience_pause != null) {fade_ambience_pause.stop();}
+            if (fade_ambience_resume != null) {fade_ambience_resume.stop();}
+            if (fade_ambience_stop != null) {fade_ambience_stop.stop();}
             cutorelementtimeline.stop();
         } catch (Exception ignored) {}
     }
