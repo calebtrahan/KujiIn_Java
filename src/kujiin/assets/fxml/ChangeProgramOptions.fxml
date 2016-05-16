@@ -49,7 +49,7 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefHeight="28.0" prefWidth="487.0">
                      <children>
-                        <Label prefHeight="16.0" prefWidth="110.0" text="Session Options">
+                        <Label prefHeight="19.0" prefWidth="132.0" text="Session Options">
                            <HBox.margin>
                               <Insets left="5.0" />
                            </HBox.margin>
@@ -86,7 +86,7 @@
                         <Button fx:id="AlertFileSelectButton" mnemonicParsing="false" onAction="#openandtestnewfile" text="Open File" />
                      </children>
                   </HBox>
-                  <Label alignment="CENTER" contentDisplay="TOP" prefHeight="16.0" prefWidth="476.0" text="Reference" textAlignment="CENTER">
+                  <Label alignment="CENTER" contentDisplay="TOP" prefHeight="16.0" prefWidth="476.0" text="Reference Display" textAlignment="CENTER">
                      <font>
                         <Font size="15.0" />
                      </font>
@@ -138,14 +138,14 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefHeight="28.0" prefWidth="487.0">
                      <children>
-                        <Label prefHeight="17.0" prefWidth="118.0" text="Playback Options">
+                        <Label prefHeight="19.0" prefWidth="139.0" text="Playback Options">
                            <HBox.margin>
                               <Insets left="5.0" />
                            </HBox.margin>
                            <font>
                               <Font size="15.0" />
                            </font></Label>
-                        <Line endX="240.0" startX="-100.0" HBox.hgrow="ALWAYS">
+                        <Line endX="200.0" startX="-100.0" HBox.hgrow="ALWAYS">
                            <HBox.margin>
                               <Insets left="20.0" />
                            </HBox.margin>
@@ -171,10 +171,10 @@
                   </HBox>
                   <HBox prefHeight="34.0" prefWidth="406.0">
                      <children>
-                        <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="200.0">
+                        <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="210.0">
                            <children>
                               <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="80.0" text="Fade In:" />
-                              <TextField fx:id="FadeInValue" prefWidth="50.0">
+                              <TextField fx:id="FadeInValue" prefWidth="60.0">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" />
                                  </HBox.margin>
@@ -182,14 +182,14 @@
                               <Label text="seconds" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="162.0">
+                        <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="183.0">
                            <children>
-                              <Label alignment="CENTER_RIGHT" prefHeight="42.0" prefWidth="80.0" text="Entrainment" textAlignment="RIGHT" wrapText="true">
+                              <Label alignment="CENTER_RIGHT" prefHeight="42.0" prefWidth="90.0" text="Entrainment" textAlignment="RIGHT" wrapText="true">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="EntrainmentVolumePercentage" prefHeight="26.0" prefWidth="50.0">
+                              <TextField fx:id="EntrainmentVolumePercentage" prefHeight="26.0" prefWidth="60.0">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" />
                                  </HBox.margin>
@@ -204,10 +204,10 @@
                   </HBox>
                   <HBox prefHeight="34.0" prefWidth="406.0">
                      <children>
-                        <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="200.0">
+                        <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="210.0">
                            <children>
                               <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="80.0" text="Fade Out:" />
-                              <TextField fx:id="FadeOutValue" prefWidth="50.0">
+                              <TextField fx:id="FadeOutValue" prefWidth="60.0">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" />
                                  </HBox.margin>
@@ -215,10 +215,10 @@
                               <Label text="seconds" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="152.0">
+                        <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="182.0">
                            <children>
-                              <Label alignment="CENTER_RIGHT" prefHeight="34.0" prefWidth="80.0" text="Ambience" textAlignment="RIGHT" wrapText="true" />
-                              <TextField fx:id="AmbienceVolumePercentage" prefWidth="50.0">
+                              <Label alignment="CENTER_RIGHT" minWidth="84.0" prefHeight="26.0" prefWidth="89.0" text="Ambience" textAlignment="RIGHT" wrapText="true" />
+                              <TextField fx:id="AmbienceVolumePercentage" prefWidth="60.0">
                                  <HBox.margin>
                                     <Insets left="5.0" right="5.0" />
                                  </HBox.margin>
@@ -234,7 +234,7 @@
                         <Insets top="4.0" />
                      </VBox.margin>
                   </HBox>
-                  <Label alignment="CENTER" contentDisplay="TOP" prefHeight="16.0" prefWidth="476.0" text="Presession &amp; Postsession Ramp" textAlignment="CENTER">
+                  <Label alignment="CENTER" contentDisplay="TOP" prefHeight="16.0" prefWidth="476.0" text="Qi-Gong Ramp" textAlignment="CENTER">
                      <font>
                         <Font size="15.0" />
                      </font>

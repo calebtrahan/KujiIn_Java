@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 @XmlRootElement(name = "Options")
 @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -48,7 +47,6 @@ public class Options {
     public static final ArrayList<String> ALLNAMES = new ArrayList<>(
             Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Earth", "Air", "Fire", "Water", "Void", "Postsession")
     );
-    public static final ArrayList<Integer> RAMPDURATIONS = new ArrayList<>(Collections.singletonList(2));
     public static ArrayList<String> STYLETHEMES = new ArrayList<>();
 /// Default Option Values
     private static final Boolean TOOLTIPS = true;

@@ -1043,7 +1043,6 @@ public class MainController implements Initializable {
         private kujiin.xml.Options Options;
         private File AlertFile;
         private boolean valuechanged;
-        private ObservableList<Integer> rampselections = FXCollections.observableArrayList(kujiin.xml.Options.RAMPDURATIONS);
         private MainController Root;
         private PlayerUI.ReferenceType tempreferencetype;
 
@@ -1058,30 +1057,77 @@ public class MainController implements Initializable {
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Change Program Options");
+            setTitle("Preferences");
             doubleTextField(FadeInValue, false);
             doubleTextField(FadeOutValue, false);
             doubleTextField(EntrainmentVolumePercentage, false);
             doubleTextField(AmbienceVolumePercentage, false);
             kujiin.xml.Options.STYLETHEMES.clear();
+
+        // Add Listeners
+            setuplisteners();
+            setuptooltips();
+            populatefromxml();
+            referencetoggle();
+            ramptoggle();
+        }
+    // Setup Methods
+        public void populatefromxml() {
+        // Program Options
+            TooltipsCheckBox.setSelected(Root.getOptions().getProgramOptions().getTooltips());
+            HelpDialogsCheckBox.setSelected(Root.getOptions().getProgramOptions().getHelpdialogs());
+        // Session Options
+            AlertSwitch.setSelected(Root.getOptions().getSessionOptions().getAlertfunction());
+            try {AlertFile = new File(Options.getSessionOptions().getAlertfilelocation());}
+            catch (NullPointerException ignored) {AlertFile = null;}
+            checkalertfile();
+        // Playback Options
+            RampSwitch.setSelected(Options.getSessionOptions().getRampenabled());
+            FadeInValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeinduration()));
+            FadeOutValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeoutduration()));
+            EntrainmentVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getEntrainmentvolume() * 100));
+            AmbienceVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getAmbiencevolume() * 100));
+        // Appearance Options
             try {
                 for (File i : kujiin.xml.Options.DIRECTORYSTYLES.listFiles()) {
                     if (i.getName().endsWith(".css")) {kujiin.xml.Options.STYLETHEMES.add(i.getName().substring(0, i.getName().length() - 4));}
                 }
                 if (kujiin.xml.Options.STYLETHEMES.size() != 0) {
-                    ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(kujiin.xml.Options.STYLETHEMES));
-                }
+                    ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(kujiin.xml.Options.STYLETHEMES));}
             } catch (NullPointerException e) {ProgramThemeChoiceBox.getItems().clear(); ProgramThemeChoiceBox.setDisable(true);}
-            TooltipsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+        }
+        public void setuptooltips() {
+            TooltipsCheckBox.setTooltip(new Tooltip("Display Messages Like These When Hovering Over Program Controls"));
+            if (Root.getOptions().getProgramOptions().getTooltips()) {
+                HelpDialogsCheckBox.setTooltip(new Tooltip(""));
+                AlertSwitch.setTooltip(new Tooltip("Enable A Sound File Played In Between Different Session Parts"));
+                RampSwitch.setTooltip(new Tooltip("Enable A Ramp In Between Session Parts To Smooth Mental Transition"));
+                FadeInValue.setTooltip(new Tooltip("Seconds To Fade In Audio Into Session Part"));
+                FadeOutValue.setTooltip(new Tooltip("Seconds To Fade Out Audio Out Of Session Part"));
+                EntrainmentVolumePercentage.setTooltip(new Tooltip("Default Volume Percentage For Entrainment (Changeable In Session)"));
+                AmbienceVolumePercentage.setTooltip(new Tooltip("Default Volume Percentage For Ambience (Changeable In Session)"));
+                DeleteAllGoalsButton.setTooltip(new Tooltip("Delete ALL Goals Past, Present And Completed (This CANNOT Be Undone)"));
+                DeleteAllSessionsProgressButton.setTooltip((new Tooltip("Delete ALL Sessions Past, Present And Completed (This CANNOT Be Undone)")));
+            } else {
+                HelpDialogsCheckBox.setTooltip(null);
+                AlertSwitch.setTooltip(null);
+                RampSwitch.setTooltip(null);
+                FadeInValue.setTooltip(null);
+                FadeOutValue.setTooltip(null);
+                EntrainmentVolumePercentage.setTooltip(null);
+                AmbienceVolumePercentage.setTooltip(null);
+                DeleteAllGoalsButton.setTooltip(null);
+                DeleteAllSessionsProgressButton.setTooltip(null);
+            }
+        }
+        public void setuplisteners() {
+            TooltipsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {setuptooltips(); changedvalue();});
             HelpDialogsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeInValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             AmbienceVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            ProgramThemeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-                selectnewtheme();
-                changedvalue();
-            });
+            ProgramThemeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {selectnewtheme(); changedvalue();});
             AlertSwitch.setOnMouseClicked(event -> alertfiletoggle());
             AlertSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
             ReferenceSwitch.setOnMouseClicked(event -> referencetoggle());
@@ -1094,10 +1140,6 @@ public class MainController implements Initializable {
             FullscreenCheckbox.setOnMouseClicked(event -> setFullscreenOption());
             AlertFileTextField.setEditable(false);
             AlertFileTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-            loadoptionsfromxml();
-            checkalertfile();
-            referencetoggle();
-            ramptoggle();
         }
 
     // Alert File Methods
@@ -1113,7 +1155,6 @@ public class MainController implements Initializable {
                     checkalertfile();
                 } else {
                     AlertSwitch.setSelected(true);
-                    alertfiletoggle();
                 }
             }
         }
@@ -1208,23 +1249,6 @@ public class MainController implements Initializable {
                 }
             }
         }
-        public void loadoptionsfromxml() {
-            TooltipsCheckBox.setSelected(Options.getProgramOptions().getTooltips());
-            HelpDialogsCheckBox.setSelected(Options.getProgramOptions().getHelpdialogs());
-            RampSwitch.setSelected(Options.getSessionOptions().getRampenabled());
-            RampDurationChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList(rampselections.get(0) + " Minutes")));
-            if (Options.getSessionOptions().getRampduration() == 2) {RampDurationChoiceBox.getSelectionModel().select(0);}
-            else if (Options.getSessionOptions().getRampduration() == 3) {RampDurationChoiceBox.getSelectionModel().select(1);}
-            else if (Options.getSessionOptions().getRampduration() == 4) {RampDurationChoiceBox.getSelectionModel().select(2);}
-            FadeInValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeinduration()));
-            FadeOutValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeoutduration()));
-            EntrainmentVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getEntrainmentvolume() * 100));
-            AmbienceVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getAmbiencevolume() * 100));
-            AlertSwitch.setSelected(Options.getSessionOptions().getAlertfunction());
-            try {AlertFile = new File(Options.getSessionOptions().getAlertfilelocation());}
-            catch (NullPointerException ignored) {AlertFile = null;}
-            checkalertfile();
-        }
         public boolean apply(ActionEvent actionEvent) {
             try {
                 if (checkvalues()) {
@@ -1280,7 +1304,6 @@ public class MainController implements Initializable {
         }
         public void resettodefaults(ActionEvent actionEvent) {
             Options.resettodefaults();
-            loadoptionsfromxml();
             valuechanged = true;
         }
         public void deleteallsessions(ActionEvent actionEvent) {
@@ -1312,6 +1335,8 @@ public class MainController implements Initializable {
             if (valuechanged) {
                 if (! Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "You Have Unsaved Changes", "Exit Without Saving?")) {return;}
             }
+            Root.setOptions(Options);
+            Root.getOptions().marshall();
             super.close();
         }
     }

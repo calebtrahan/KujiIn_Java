@@ -29,7 +29,7 @@
           </Menu>
         </menus>
       </MenuBar>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="657.0" layoutY="36.0" prefHeight="29.0" prefWidth="239.0" text="Progress &amp; Goals Tracker" textAlignment="CENTER">
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="607.0" layoutY="37.0" prefHeight="29.0" prefWidth="316.0" text="Progress &amp; Goals Tracker" textAlignment="CENTER">
          <font>
             <Font name="System Bold" size="19.0" />
          </font>
@@ -43,12 +43,12 @@
             <Font size="16.0" />
          </font>
       </Label>
-      <Label fx:id="CreatorStatusBar" layoutX="10.0" layoutY="265.0" prefHeight="26.0" prefWidth="582.0">
+      <Label fx:id="CreatorStatusBar" layoutX="10.0" layoutY="270.0" prefHeight="26.0" prefWidth="582.0">
          <font>
             <Font size="10.0" />
          </font></Label>
       <ComboBox fx:id="GoalCutComboBox" layoutX="725.0" layoutY="68.0" prefHeight="26.0" prefWidth="146.0" promptText="Select..." />
-      <Button fx:id="LoadPresetButton" layoutX="413.0" layoutY="39.0" mnemonicParsing="false" onAction="#loadpreset" prefHeight="23.0" prefWidth="82.0" text="Load Preset">
+      <Button fx:id="LoadPresetButton" layoutX="402.0" layoutY="39.0" mnemonicParsing="false" onAction="#loadpreset" prefHeight="23.0" prefWidth="93.0" text="Load Preset">
          <font>
             <Font size="12.0" />
          </font>
@@ -257,14 +257,14 @@
             <Font name="System Bold" size="19.0" />
          </font>
       </Label>
-      <HBox layoutX="10.0" layoutY="240.0" prefHeight="26.0" prefWidth="309.0">
+      <HBox layoutX="10.0" layoutY="240.0" prefHeight="26.0" prefWidth="353.0">
          <children>
-            <Button fx:id="ChangeAllCutsButton" mnemonicParsing="false" onAction="#changeallcutsvalues" prefHeight="23.0" prefWidth="106.0" text="Change All Cuts">
+            <Button fx:id="ChangeAllCutsButton" mnemonicParsing="false" onAction="#changeallcutsvalues" text="Change All Cuts">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="ChangeAllElementsButton" mnemonicParsing="false" onAction="#changeallelementsvalues" prefHeight="23.0" prefWidth="132.0" text="Change All Elements">
+            <Button fx:id="ChangeAllElementsButton" mnemonicParsing="false" onAction="#changeallelementsvalues" text="Change All Elements">
                <font>
                   <Font size="12.0" />
                </font>
@@ -294,7 +294,10 @@
             </HBox>
             <HBox alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="316.0">
                <children>
-                  <CheckBox fx:id="PrePostSwitch" mnemonicParsing="false" onAction="#updatetotalprogresswidget" prefHeight="18.0" prefWidth="127.0" text="Include Qi-Gong" />
+                  <CheckBox fx:id="PrePostSwitch" mnemonicParsing="false" onAction="#updatetotalprogresswidget" text="Include Qi-Gong">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin></CheckBox>
                   <Button fx:id="ListOfSessionsButton" mnemonicParsing="false" onMousePressed="#displaylistofsessions" prefHeight="23.0" prefWidth="126.0" text="View All Sessions">
                      <font>
                         <Font size="12.0" />
@@ -313,7 +316,7 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label fx:id="GoalTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="135.0" text="No Cut Selected" textAlignment="CENTER">
+                  <Label fx:id="GoalTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="135.0" textAlignment="CENTER">
                      <font>
                         <Font size="15.0" />
                      </font>
@@ -325,20 +328,26 @@
                   </Label>
                </children>
                <VBox.margin>
-                  <Insets bottom="2.0" top="20.0" />
+                  <Insets bottom="5.0" top="15.0" />
                </VBox.margin>
             </HBox>
             <HBox prefHeight="59.0" prefWidth="366.0">
                <children>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="58.0">
                      <children>
-                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="45.0" text="Hrs" />
+                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="45.0" text="Hrs">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin></Label>
                         <TextField fx:id="GoalPracticedHours" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="58.0" text="1043" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="45.0">
                      <children>
-                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="39.0" text="Mins" />
+                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="39.0" text="Mins">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin></Label>
                         <TextField fx:id="GoalPracticedMinutes" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="45.0" text="59">
                            <VBox.margin>
                               <Insets left="5.0" />
@@ -348,7 +357,10 @@
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="133.0">
                      <children>
-                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="172.0" text="   Progress" />
+                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="172.0" text="   Progress">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin></Label>
                         <ProgressBar fx:id="goalsprogressbar" prefHeight="23.0" prefWidth="150.0" progress="0.0" />
                      </children>
                      <HBox.margin>
@@ -357,7 +369,10 @@
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="49.0" prefWidth="58.0">
                      <children>
-                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="29.0" text="Hrs" />
+                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="29.0" text="Hrs">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin></Label>
                         <TextField fx:id="GoalSetHours" alignment="CENTER" editable="false" prefWidth="32.0" text="9999">
                            <VBox.margin>
                               <Insets right="5.0" />
@@ -367,27 +382,30 @@
                   </VBox>
                   <VBox alignment="CENTER" prefHeight="70.0" prefWidth="45.0">
                      <children>
-                        <Label alignment="CENTER" text="Mins" />
+                        <Label alignment="CENTER" text="Mins">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin></Label>
                         <TextField fx:id="GoalSetMinutes" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="46.0" text="59" />
                      </children>
                   </VBox>
                </children>
             </HBox>
-            <HBox alignment="CENTER" prefHeight="70.0" prefWidth="316.0">
+            <HBox alignment="CENTER_RIGHT" prefHeight="70.0" prefWidth="316.0">
                <children>
-                  <Label fx:id="GoalStatusBar" prefHeight="22.0" prefWidth="164.0" textAlignment="CENTER" wrapText="true">
+                  <Label fx:id="GoalStatusBar" prefHeight="22.0" prefWidth="157.0" textAlignment="CENTER" wrapText="true">
                      <font>
                         <Font size="10.0" />
                      </font>
                   </Label>
-                  <HBox alignment="CENTER_RIGHT" prefHeight="41.0" prefWidth="155.0">
+                  <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="156.0">
                      <children>
-                        <Button fx:id="newgoalButton" mnemonicParsing="false" onMousePressed="#setnewgoal" prefHeight="23.0" prefWidth="69.0" text="New Goal">
+                        <Button fx:id="newgoalButton" mnemonicParsing="false" onMousePressed="#setnewgoal" text="New Goal">
                            <font>
                               <Font size="12.0" />
                            </font>
                         </Button>
-                        <Button fx:id="viewcurrrentgoalsButton" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" prefWidth="80.0" text="Goal Editor">
+                        <Button fx:id="viewcurrrentgoalsButton" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" text="Goal Editor">
                            <font>
                               <Font size="12.0" />
                            </font>

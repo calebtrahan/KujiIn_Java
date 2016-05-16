@@ -168,6 +168,7 @@ public class Meditatable {
                         thisession.Root.getPlayer().PauseButton.setDisable(true);
                         thisession.Root.getPlayer().EntrainmentVolume.setValue(entrainmentvolume);
                         Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
+                        System.out.println(name + "'s Entrainment Play Animation: " + value + "%");
                         thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                         thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
                     }
@@ -194,6 +195,7 @@ public class Meditatable {
                         getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                         thisession.Root.getPlayer().AmbienceVolume.setValue(ambiencevolume);
                         Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
+                        System.out.println(name + "'s Ambience Play Animation: " + value + "%");
                         thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
                         thisession.Root.getPlayer().AmbienceVolume.setDisable(true);
                     }
@@ -238,6 +240,7 @@ public class Meditatable {
                     thisession.Root.getPlayer().PauseButton.setDisable(true);
                     thisession.Root.getPlayer().EntrainmentVolume.setValue(entrainmentvolume);
                     Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
+                    System.out.println(name + "'s Entrainment Resume Animation: " + value + "%");
                     thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
                 }
@@ -265,6 +268,7 @@ public class Meditatable {
                     getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                     thisession.Root.getPlayer().AmbienceVolume.setValue(ambiencevolume);
                     Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
+                    System.out.println(name + "'s Ambience Resume Animation: " + value + "%");
                     thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
                     thisession.Root.getPlayer().AmbienceVolume.setDisable(true);
                 }
@@ -296,6 +300,7 @@ public class Meditatable {
                     thisession.Root.getPlayer().PauseButton.setDisable(true);
                     thisession.Root.getPlayer().StopButton.setDisable(true);
                     Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
+                    System.out.println(name + "'s Entrainment Pause Animation: " + value + "%");
                     thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                 }
             };
@@ -317,6 +322,7 @@ public class Meditatable {
                     thisession.Root.getPlayer().AmbienceVolume.setValue(fadeoutvolume);
                     thisession.Root.getPlayer().AmbienceVolume.setDisable(true);
                     Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
+                    System.out.println(name + "'s Ambience Pause Animation: " + value + "%");
                     thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
                 }
             };
@@ -343,6 +349,7 @@ public class Meditatable {
                         thisession.Root.getPlayer().PauseButton.setDisable(true);
                         thisession.Root.getPlayer().StopButton.setDisable(true);
                         Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
+                        System.out.println(name + "'s Entrainment Stop Animation: " + value + "%");
                         thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     }
                 };
@@ -364,6 +371,7 @@ public class Meditatable {
                         thisession.Root.getPlayer().AmbienceVolume.setValue(fadeoutvolume);
                         thisession.Root.getPlayer().AmbienceVolume.setDisable(true);
                         Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
+                        System.out.println(name + "'s Ambience Stop Animation: " + value + "%");
                         thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
                     }
                 };
@@ -391,7 +399,7 @@ public class Meditatable {
     public void start() {
         entrainmentplaycount = 0;
         ambienceplaycount = 0;
-//        setupfadeanimations();
+        setupfadeanimations();
         entrainmentplayer = new MediaPlayer(new Media(entrainment.created_get(entrainmentplaycount).getFile().toURI().toString()));
         entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
@@ -448,7 +456,7 @@ public class Meditatable {
             }
         }
     }
-    public void playnextentrainment() throws IndexOutOfBoundsException {
+    public void playnextentrainment() {
         try {
             entrainmentplaycount++;
             entrainmentplayer.dispose();
@@ -457,10 +465,16 @@ public class Meditatable {
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
             entrainmentplayer.play();
-            entrainmentplayer.setOnPlaying(() -> thisession.Root.getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty()));
-        } catch (IndexOutOfBoundsException ignored) {}
+            entrainmentplayer.setOnPlaying(() -> {
+                thisession.Root.getPlayer().EntrainmentVolume.valueProperty().unbind();
+                thisession.Root.getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+            });
+        } catch (IndexOutOfBoundsException ignored) {
+            entrainmentplayer.dispose();
+            cleanup();
+        }
     }
-    public void playnextambience() throws IndexOutOfBoundsException {
+    public void playnextambience() {
         try {
             ambienceplaycount++;
             ambienceplayer.dispose();
@@ -469,8 +483,11 @@ public class Meditatable {
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.play();
-            ambienceplayer.setOnPlaying(() -> thisession.Root.getPlayer().AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty()));
-        } catch (IndexOutOfBoundsException ignored) {}
+            ambienceplayer.setOnPlaying(() -> {
+                thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbind();
+                thisession.Root.getPlayer().AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
+            });
+        } catch (IndexOutOfBoundsException ignored) {ambienceplayer.dispose();}
     }
     public void startfadeout() {
         if (fade_entrainment_stop != null && fade_entrainment_stop.getStatus() != Animation.Status.RUNNING) {

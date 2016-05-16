@@ -207,7 +207,11 @@ public class This_Session {
         if (elementorcutindex == 15) {Void.setDuration(duration);}
     }
     public int getDuration(int elementorcutindex) {
-        if (elementorcutindex == 0) {return Presession.getdurationinminutes();}
+        if (elementorcutindex == 0) {
+            int value = Presession.getdurationinminutes();
+            if (Root.getOptions().getSessionOptions().getRampenabled()) {value -= Root.getOptions().getSessionOptions().getRampduration();}
+            return value;
+        }
         if (elementorcutindex == 1) {return Rin.getdurationinminutes();}
         if (elementorcutindex == 2) {return Kyo.getdurationinminutes();}
         if (elementorcutindex == 3) {return Toh.getdurationinminutes();}
@@ -217,12 +221,16 @@ public class This_Session {
         if (elementorcutindex == 7) {return Retsu.getdurationinminutes();}
         if (elementorcutindex == 8) {return Zai.getdurationinminutes();}
         if (elementorcutindex == 9) {return Zen.getdurationinminutes();}
-        if (elementorcutindex == 10) {return Postsession.getdurationinminutes();}
-        if (elementorcutindex == 11) {return Earth.getdurationinminutes();}
-        if (elementorcutindex == 12) {return Air.getdurationinminutes();}
-        if (elementorcutindex == 13) {return Fire.getdurationinminutes();}
-        if (elementorcutindex == 14) {return Water.getdurationinminutes();}
-        if (elementorcutindex == 15) {return Void.getdurationinminutes();}
+        if (elementorcutindex == 10) {return Earth.getdurationinminutes();}
+        if (elementorcutindex == 11) {return Air.getdurationinminutes();}
+        if (elementorcutindex == 12) {return Fire.getdurationinminutes();}
+        if (elementorcutindex == 13) {return Water.getdurationinminutes();}
+        if (elementorcutindex == 14) {return Void.getdurationinminutes();}
+        if (elementorcutindex == 15) {
+            int value = Postsession.getdurationinminutes();
+            if (Root.getOptions().getSessionOptions().getRampenabled()) {value -= Root.getOptions().getSessionOptions().getRampduration();}
+            return value;
+        }
         return 0;
     }
 
