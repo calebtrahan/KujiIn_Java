@@ -136,8 +136,14 @@ public class This_Session {
     public void setAmbiences(Ambiences ambiences) {
         this.ambiences = ambiences;
     }
+    public PlayerUI.DisplayReference getDisplayReference() {
+        return displayReference;
+    }
+    public void setDisplayReference(PlayerUI.DisplayReference displayReference) {
+        this.displayReference = displayReference;
+    }
 
-// Cut And Element Getters
+    // Cut And Element Getters
     public Qi_Gong getPresession() {
         return Presession;
     }

@@ -169,6 +169,13 @@ public class PlayerUI extends Stage {
     // TODO Style Reference Display
     public static class DisplayReference extends Stage {
         public ScrollPane ContentPane;
+        public Slider EntrainmentVolumeSlider;
+        public Label EntrainmentVolumePercentage;
+        public Slider AmbienceVolumeSlider;
+        public Label AmbienceVolumePercentage;
+        public Button PlayButton;
+        public Button PauseButton;
+        public Button StopButton;
         private MainController Root;
         private Meditatable currentcutorelement;
         private ReferenceType referenceType;
@@ -348,7 +355,7 @@ public class PlayerUI extends Stage {
         html, txt
     }
     public enum PlayerState {
-        PLAYING, PAUSED, STOPPED, TRANSITIONING, IDLE
+        PLAYING, PAUSED, STOPPED, TRANSITIONING, IDLE, FADING_PLAY, FADING_RESUME, FADING_PAUSE, FADING_STOP
     }
 
 }

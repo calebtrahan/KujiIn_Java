@@ -38,6 +38,7 @@ import java.time.LocalDate;
 import java.util.*;
 // TODO Saving Preset Is Broke!
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
+// TODO Integrate Pause/Play/Stop Button & Volume Controls On The Very Bottom Of Reference Display
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;

@@ -152,142 +152,92 @@ public class Meditatable {
     // TODO Find Out Why Fade Animations Are Accruing Indefinite Memory
     public void setupfadeanimations() {
     // PLAY
-        double fadeinduration = thisession.Root.getOptions().getSessionOptions().getFadeinduration();
-        if (fadeinduration > 0.0) {
+        if (thisession.Root.getOptions().getSessionOptions().getFadeinduration() > 0.0) {
             if (fade_entrainment_play == null) {
                 fade_entrainment_play = new Transition() {
-                    {
-                        setCycleDuration(new Duration(fadeinduration * 1000));
-                    }
+                    {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeinduration() * 1000)); volume_unbindentrainment(); toggleplayerbuttons();}
 
                     @Override
                     protected void interpolate(double frac) {
                         double entrainmentvolume = frac * thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
                         getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
-                        thisession.Root.getPlayer().StopButton.setDisable(true);
-                        thisession.Root.getPlayer().PauseButton.setDisable(true);
                         thisession.Root.getPlayer().EntrainmentVolume.setValue(entrainmentvolume);
                         Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
-                        System.out.println(name + "'s Entrainment Play Animation: " + value + "%");
                         thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                        thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
+                        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                            thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
+                            thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                        }
                     }
                 };
-                fade_entrainment_play.setOnFinished(event -> {
-                    thisession.Root.getPlayer().EntrainmentVolume.setDisable(false);
-                    thisession.Root.getPlayer().StopButton.setDisable(false);
-                    thisession.Root.getPlayer().PauseButton.setDisable(false);
-                    thisession.Root.getPlayer().EntrainmentVolume.valueProperty().unbind();
-                    thisession.Root.getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
-                    thisession.Root.getPlayer().EntrainmentVolume.setOnMouseDragged(event1 -> {
-                        thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
-                        Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
-                        thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                    });
-                });
+                fade_entrainment_play.setOnFinished(event -> {toggleplayerbuttons(); volume_unbindentrainment(); volume_bindentrainment();});
             }
-            if (ambienceenabled && fade_ambience_resume == null) {
+            if (ambienceenabled && fade_ambience_play == null) {
                 fade_ambience_play = new Transition() {
-                    {setCycleDuration(new Duration(fadeinduration * 1000));}
+                    {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeinduration() * 1000)); volume_unbindambience(); toggleplayerbuttons();}
                     @Override
                     protected void interpolate(double frac) {
                         double ambiencevolume = frac * thisession.Root.getOptions().getSessionOptions().getAmbiencevolume();
                         getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                         thisession.Root.getPlayer().AmbienceVolume.setValue(ambiencevolume);
                         Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
-                        System.out.println(name + "'s Ambience Play Animation: " + value + "%");
                         thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
-                        thisession.Root.getPlayer().AmbienceVolume.setDisable(true);
+                        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                            thisession.getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
+                            thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
+                        }
                     }
                 };
-                fade_ambience_play.setOnFinished(event -> {
-                    thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbind();
-                    thisession.Root.getPlayer().AmbienceVolume.setDisable(false);
-                    thisession.Root.getPlayer().AmbienceVolume.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
-                    thisession.Root.getPlayer().AmbienceVolume.setOnMouseDragged(event1 -> {
-                        thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().AmbienceVolume.getValue());
-                        Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
-                        thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
-                    });
-                });
+                fade_ambience_play.setOnFinished(event -> {toggleplayerbuttons(); volume_unbindambience(); volume_bindambience();});
             }
         } else {
-            thisession.Root.getPlayer().EntrainmentVolume.setOnMouseDragged(event1 -> {
-                thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
-                Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
-                thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-            });
-            if (ambienceenabled) {
-                thisession.Root.getPlayer().AmbienceVolume.setOnMouseDragged(event1 -> {
-                    thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().AmbienceVolume.getValue());
-                    Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
-                    thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
-                });
-            }
+            toggleplayerbuttons();
+            volume_unbindentrainment();
+            volume_bindentrainment();
+            if (ambienceenabled) {volume_unbindambience(); volume_bindambience();}
         }
     // RESUME
         if (fade_entrainment_resume == null) {
             fade_entrainment_resume = new Transition() {
-                {setCycleDuration(new Duration(2000));}
+                {setCycleDuration(new Duration(2000)); volume_unbindentrainment(); toggleplayerbuttons();}
 
                 @Override
                 protected void interpolate(double frac) {
                     double entrainmentvolume = frac * thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
                     getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
-                    thisession.Root.getPlayer().PlayButton.setDisable(true);
-                    thisession.Root.getPlayer().PlayButton.setText("Resuming");
-                    thisession.Root.getPlayer().StopButton.setDisable(true);
-                    thisession.Root.getPlayer().PauseButton.setDisable(true);
                     thisession.Root.getPlayer().EntrainmentVolume.setValue(entrainmentvolume);
                     Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
-                    System.out.println(name + "'s Entrainment Resume Animation: " + value + "%");
                     thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                    thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
+                    if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                        thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
+                        thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                    }
                 }
             };
-            fade_entrainment_resume.setOnFinished(event -> {
-                thisession.Root.getPlayer().EntrainmentVolume.setDisable(false);
-                thisession.Root.getPlayer().PlayButton.setText("Play");
-                thisession.Root.getPlayer().StopButton.setDisable(false);
-                thisession.Root.getPlayer().PauseButton.setDisable(false);
-                thisession.Root.getPlayer().EntrainmentVolume.valueProperty().unbind();
-                thisession.Root.getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
-                thisession.Root.getPlayer().EntrainmentVolume.setOnMouseDragged(event1 -> {
-                    thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
-                    Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
-                    thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                });
-            });
+            fade_entrainment_resume.setOnFinished(event -> {toggleplayerbuttons(); volume_unbindentrainment(); volume_bindentrainment();});
         }
         if (ambienceenabled && fade_ambience_resume == null) {
             fade_ambience_resume = new Transition() {
-                {setCycleDuration(new Duration(2000));}
+                {setCycleDuration(new Duration(2000)); volume_unbindambience(); toggleplayerbuttons();}
                 @Override
                 protected void interpolate(double frac) {
                     double ambiencevolume = frac * thisession.Root.getOptions().getSessionOptions().getAmbiencevolume();
                     getCurrentAmbiencePlayer().setVolume(ambiencevolume);
                     thisession.Root.getPlayer().AmbienceVolume.setValue(ambiencevolume);
                     Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
-                    System.out.println(name + "'s Ambience Resume Animation: " + value + "%");
                     thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
-                    thisession.Root.getPlayer().AmbienceVolume.setDisable(true);
+                    if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                        thisession.getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
+                        thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
+                    }
                 }
             };
-            fade_ambience_resume.setOnFinished(event -> {
-                thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbind();
-                thisession.Root.getPlayer().AmbienceVolume.setDisable(false);
-                thisession.Root.getPlayer().AmbienceVolume.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
-                thisession.Root.getPlayer().AmbienceVolume.setOnMouseDragged(event1 -> {
-                    thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().AmbienceVolume.getValue());
-                    Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
-                    thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
-                });
-            });
+            fade_ambience_resume.setOnFinished(event -> {toggleplayerbuttons(); volume_unbindambience();volume_bindambience();});
         }
     // PAUSE
         if (fade_entrainment_pause == null) {
             fade_entrainment_pause = new Transition() {
-                {setCycleDuration(new Duration(2000));}
+                {setCycleDuration(new Duration(2000)); volume_unbindentrainment(); toggleplayerbuttons();}
                 @Override
                 protected void interpolate(double frac) {
                     double entvol = thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
@@ -295,24 +245,19 @@ public class Meditatable {
                     double fadeoutvolume = entvol - entrainmentvolume;
                     getCurrentEntrainmentPlayer().setVolume(fadeoutvolume);
                     thisession.Root.getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
-                    thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
-                    thisession.Root.getPlayer().PlayButton.setDisable(true);
-                    thisession.Root.getPlayer().PauseButton.setDisable(true);
-                    thisession.Root.getPlayer().StopButton.setDisable(true);
                     Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
-                    System.out.println(name + "'s Entrainment Pause Animation: " + value + "%");
                     thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                    if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                        thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
+                        thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                    }
                 }
             };
-            fade_entrainment_pause.setOnFinished(event -> {
-                entrainmentplayer.pause();
-                thisession.Root.getPlayer().PlayButton.setDisable(false);
-                thisession.Root.getPlayer().PlayButton.setText("Resume");
-            });
+            fade_entrainment_pause.setOnFinished(event -> {volume_unbindentrainment(); entrainmentplayer.pause(); toggleplayerbuttons();});
         }
         if (ambienceenabled && fade_ambience_pause == null) {
             fade_ambience_pause = new Transition() {
-                {setCycleDuration(new Duration(2000));}
+                {setCycleDuration(new Duration(2000)); toggleplayerbuttons(); volume_unbindambience();}
                 @Override
                 protected void interpolate(double frac) {
                     double ambvol = thisession.Root.getOptions().getSessionOptions().getAmbiencevolume();
@@ -322,20 +267,20 @@ public class Meditatable {
                     thisession.Root.getPlayer().AmbienceVolume.setValue(fadeoutvolume);
                     thisession.Root.getPlayer().AmbienceVolume.setDisable(true);
                     Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
-                    System.out.println(name + "'s Ambience Pause Animation: " + value + "%");
                     thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
+                    if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                        thisession.getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
+                        thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
+                    }
                 }
             };
-            fade_ambience_pause.setOnFinished(event -> ambienceplayer.pause());
+            fade_ambience_pause.setOnFinished(event -> { volume_unbindambience(); ambienceplayer.pause(); toggleplayerbuttons();});
         }
     // STOP
-        double fadeoutduration = thisession.Root.getOptions().getSessionOptions().getFadeoutduration();
-        if (fadeoutduration > 0.0) {
+        if (thisession.Root.getOptions().getSessionOptions().getFadeoutduration() > 0.0) {
             if (fade_entrainment_stop == null) {
                 fade_entrainment_stop = new Transition() {
-                    {
-                        setCycleDuration(new Duration(fadeoutduration * 1000));
-                    }
+                    {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000)); volume_unbindentrainment(); toggleplayerbuttons();}
 
                     @Override
                     protected void interpolate(double frac) {
@@ -344,24 +289,19 @@ public class Meditatable {
                         double fadeoutvolume = entvol - entrainmentvolume;
                         getCurrentEntrainmentPlayer().setVolume(fadeoutvolume);
                         thisession.Root.getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
-                        thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
-                        thisession.Root.getPlayer().PlayButton.setDisable(true);
-                        thisession.Root.getPlayer().PauseButton.setDisable(true);
-                        thisession.Root.getPlayer().StopButton.setDisable(true);
                         Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
-                        System.out.println(name + "'s Entrainment Stop Animation: " + value + "%");
                         thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                            thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
+                            thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                        }
                     }
                 };
-                fade_entrainment_stop.setOnFinished(event -> {
-                    entrainmentplayer.stop();
-                    entrainmentplayer.dispose();
-                    thisession.Root.getPlayer().PlayButton.setDisable(false);
-                });
+                fade_entrainment_stop.setOnFinished(event -> {toggleplayerbuttons(); volume_unbindentrainment(); entrainmentplayer.stop(); entrainmentplayer.dispose();});
             }
             if (ambienceenabled && fade_ambience_stop == null) {
                 fade_ambience_stop = new Transition() {
-                    {setCycleDuration(new Duration(fadeoutduration * 1000));}
+                    {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000)); volume_unbindambience(); toggleplayerbuttons();}
                     @Override
                     protected void interpolate(double frac) {
                         double ambvol = thisession.Root.getOptions().getSessionOptions().getAmbiencevolume();
@@ -369,30 +309,21 @@ public class Meditatable {
                         double fadeoutvolume = ambvol - ambiencevolume;
                         getCurrentAmbiencePlayer().setVolume(fadeoutvolume);
                         thisession.Root.getPlayer().AmbienceVolume.setValue(fadeoutvolume);
-                        thisession.Root.getPlayer().AmbienceVolume.setDisable(true);
                         Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
-                        System.out.println(name + "'s Ambience Stop Animation: " + value + "%");
                         thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
+                        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                            thisession.getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
+                            thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
+                        }
                     }
                 };
-                fade_entrainment_stop.setOnFinished(event -> {
-                    ambienceplayer.stop();
-                    ambienceplayer.dispose();
-                });
+                fade_entrainment_stop.setOnFinished(event -> {toggleplayerbuttons(); volume_unbindambience(); ambienceplayer.stop(); ambienceplayer.dispose();});
             }
         } else {
-            thisession.Root.getPlayer().EntrainmentVolume.setOnMouseDragged(event1 -> {
-                thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
-                Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
-                thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-            });
-            if (ambienceenabled) {
-                thisession.Root.getPlayer().AmbienceVolume.setOnMouseDragged(event1 -> {
-                    thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().AmbienceVolume.getValue());
-                    Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
-                    thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
-                });
-            }
+            toggleplayerbuttons();
+            volume_unbindentrainment();
+            volume_bindentrainment();
+            if (ambienceenabled) {volume_unbindambience(); volume_bindambience();}
         }
 
     }
@@ -460,14 +391,13 @@ public class Meditatable {
         try {
             entrainmentplaycount++;
             entrainmentplayer.dispose();
-            thisession.Root.getPlayer().EntrainmentVolume.valueProperty().unbind();
             entrainmentplayer = new MediaPlayer(new Media(entrainment.created_get(entrainmentplaycount).getFile().toURI().toString()));
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
             entrainmentplayer.play();
             entrainmentplayer.setOnPlaying(() -> {
-                thisession.Root.getPlayer().EntrainmentVolume.valueProperty().unbind();
-                thisession.Root.getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+                volume_unbindentrainment();
+                volume_bindentrainment();
             });
         } catch (IndexOutOfBoundsException ignored) {
             entrainmentplayer.dispose();
@@ -478,14 +408,13 @@ public class Meditatable {
         try {
             ambienceplaycount++;
             ambienceplayer.dispose();
-            thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbind();
             ambienceplayer = new MediaPlayer(new Media(ambience.created_get(ambienceplaycount).getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.play();
             ambienceplayer.setOnPlaying(() -> {
-                thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbind();
-                thisession.Root.getPlayer().AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
+                volume_unbindambience();
+                volume_bindambience();
             });
         } catch (IndexOutOfBoundsException ignored) {ambienceplayer.dispose();}
     }
@@ -513,6 +442,157 @@ public class Meditatable {
             if (fade_ambience_stop != null) {fade_ambience_stop.stop();}
             cutorelementtimeline.stop();
         } catch (Exception ignored) {}
+    }
+    public void toggleplayerbuttons() {
+        if (thisession.getPlayerState() == null) {return;}
+        String fadetext = "Fading";
+        String transitiontext = "Transitioning";
+        boolean referenceenabled = thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing();
+        boolean playing = thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING;
+        boolean paused = thisession.getPlayerState() == PlayerUI.PlayerState.PAUSED;
+        boolean stopped = thisession.getPlayerState() == PlayerUI.PlayerState.STOPPED;
+        boolean transitioning = thisession.getPlayerState() == PlayerUI.PlayerState.TRANSITIONING;
+        boolean fade_play = thisession.getPlayerState() == PlayerUI.PlayerState.FADING_PLAY;
+        boolean fade_resume = thisession.getPlayerState() == PlayerUI.PlayerState.FADING_RESUME;
+        boolean fade_pause = thisession.getPlayerState() == PlayerUI.PlayerState.FADING_PAUSE;
+        boolean fade_stop = thisession.getPlayerState() == PlayerUI.PlayerState.FADING_STOP;
+    // Playing
+        thisession.Root.getPlayer().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
+        thisession.Root.getPlayer().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop);
+        thisession.Root.getPlayer().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop);
+        if (referenceenabled) {
+            thisession.getDisplayReference().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
+            thisession.getDisplayReference().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop);
+            thisession.getDisplayReference().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop);
+        }
+        if (fade_pause || fade_play || fade_resume || fade_stop) {
+            thisession.Root.getPlayer().PlayButton.setText(fadetext);
+            thisession.Root.getPlayer().PauseButton.setText(fadetext);
+            thisession.Root.getPlayer().StopButton.setText(fadetext);
+            thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
+            if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
+            else {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
+            if (referenceenabled) {
+                thisession.getDisplayReference().PlayButton.setText(fadetext);
+                thisession.getDisplayReference().PauseButton.setText(fadetext);
+                thisession.getDisplayReference().StopButton.setText(fadetext);
+                thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);
+                if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
+                else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
+            }
+        } else if (transitioning) {
+            thisession.Root.getPlayer().PlayButton.setText(transitiontext);
+            thisession.Root.getPlayer().PauseButton.setText(transitiontext);
+            thisession.Root.getPlayer().StopButton.setText(transitiontext);
+            thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
+            if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
+            else {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
+            if (referenceenabled) {
+                thisession.getDisplayReference().PlayButton.setText(transitiontext);
+                thisession.getDisplayReference().PauseButton.setText(transitiontext);
+                thisession.getDisplayReference().StopButton.setText(transitiontext);
+                thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);
+                if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
+                else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
+            }
+        } else {
+            if (playing) {
+                thisession.Root.getPlayer().PlayButton.setText("Playing");
+                thisession.Root.getPlayer().PauseButton.setText("Pause");
+                thisession.Root.getPlayer().StopButton.setText("Stop");
+                thisession.Root.getPlayer().EntrainmentVolume.setDisable(false);
+                if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(false);}
+                else {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
+                if (referenceenabled) {
+                    thisession.getDisplayReference().PlayButton.setText("Playing");
+                    thisession.getDisplayReference().PauseButton.setText("Pause");
+                    thisession.getDisplayReference().StopButton.setText("Stop");
+                    thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);
+                    if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);}
+                    else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
+                }
+            }
+            if (paused) {
+                thisession.Root.getPlayer().PlayButton.setText("Resume");
+                thisession.Root.getPlayer().PauseButton.setText("Paused");
+                thisession.Root.getPlayer().StopButton.setText("Stop");
+                thisession.Root.getPlayer().EntrainmentVolume.setDisable(false);
+                if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(false);}
+                else {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
+                if (referenceenabled) {
+                    thisession.getDisplayReference().PlayButton.setText("Resume");
+                    thisession.getDisplayReference().PauseButton.setText("Paused");
+                    thisession.getDisplayReference().StopButton.setText("Stop");
+                    thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);
+                    if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);}
+                    else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
+                }
+            }
+            if (stopped) {
+                thisession.Root.getPlayer().PlayButton.setText("Play");
+                thisession.Root.getPlayer().PauseButton.setText("Stopped");
+                thisession.Root.getPlayer().StopButton.setText("Stopped");
+                thisession.Root.getPlayer().EntrainmentVolume.setDisable(false);
+                if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(false);}
+                else {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
+                if (referenceenabled) {
+                    thisession.getDisplayReference().PlayButton.setText("Play");
+                    thisession.getDisplayReference().PauseButton.setText("Stopped");
+                    thisession.getDisplayReference().StopButton.setText("Stopped");
+                    thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);
+                    if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);}
+                    else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
+                }
+            }
+        }
+    }
+    public void volume_bindentrainment() {
+        thisession.Root.getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
+        thisession.Root.getPlayer().EntrainmentVolume.setOnMouseDragged(event1 -> {
+            thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
+            Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
+            thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+        });
+        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+            thisession.getDisplayReference().EntrainmentVolumeSlider.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
+            thisession.getDisplayReference().EntrainmentVolumeSlider.setOnMouseDragged(event1 -> {
+                thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
+                Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
+                thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                thisession.Root.getPlayer().EntrainmentVolume.setValue(value /= 100);
+                thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+            });
+        }
+    }
+    public void volume_unbindentrainment() {
+        thisession.Root.getPlayer().EntrainmentVolume.valueProperty().unbind();
+        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+            thisession.getDisplayReference().EntrainmentVolumeSlider.valueProperty().unbind();
+        }
+    }
+    public void volume_bindambience() {
+        thisession.Root.getPlayer().AmbienceVolume.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
+        thisession.Root.getPlayer().AmbienceVolume.setOnMouseDragged(event1 -> {
+            thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().AmbienceVolume.getValue());
+            Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
+            thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
+        });
+        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+            thisession.getDisplayReference().AmbienceVolumeSlider.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
+            thisession.getDisplayReference().AmbienceVolumeSlider.setOnMouseDragged(event1 -> {
+                thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
+                Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
+                thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                thisession.Root.getPlayer().AmbienceVolume.setValue(value /= 100);
+                thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
+            });
+        }
+    }
+    public void volume_unbindambience() {
+        thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbind();
+        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+            thisession.getDisplayReference().AmbienceVolumeSlider.valueProperty().unbind();
+        }
     }
 
 // Export
