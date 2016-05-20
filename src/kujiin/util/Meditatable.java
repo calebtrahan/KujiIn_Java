@@ -581,8 +581,8 @@ public class Meditatable {
             thisession.getDisplayReference().AmbienceVolumeSlider.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
             thisession.getDisplayReference().AmbienceVolumeSlider.setOnMouseDragged(event1 -> {
                 thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
-                Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
-                thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
+                thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
                 thisession.Root.getPlayer().AmbienceVolume.setValue(value /= 100);
                 thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
             });

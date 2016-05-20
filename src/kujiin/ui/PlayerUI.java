@@ -176,6 +176,7 @@ public class PlayerUI extends Stage {
         public Button PlayButton;
         public Button PauseButton;
         public Button StopButton;
+        public Label StatusBar;
         private MainController Root;
         private Meditatable currentcutorelement;
         private ReferenceType referenceType;
