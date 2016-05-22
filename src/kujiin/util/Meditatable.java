@@ -248,7 +248,7 @@ public class Meditatable {
                     Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
                     thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
-                        thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
+                        thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
                         thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     }
                 }
@@ -269,7 +269,7 @@ public class Meditatable {
                     Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
                     thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
                     if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
-                        thisession.getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
+                        thisession.getDisplayReference().AmbienceVolumeSlider.setValue(fadeoutvolume);
                         thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
                     }
                 }
@@ -292,7 +292,7 @@ public class Meditatable {
                         Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
                         thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                         if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
-                            thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
+                            thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
                             thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                         }
                     }
@@ -312,7 +312,7 @@ public class Meditatable {
                         Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
                         thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
                         if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
-                            thisession.getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
+                            thisession.getDisplayReference().AmbienceVolumeSlider.setValue(fadeoutvolume);
                             thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
                         }
                     }
@@ -578,9 +578,9 @@ public class Meditatable {
             thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
         });
         if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
-            thisession.getDisplayReference().AmbienceVolumeSlider.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
+            thisession.getDisplayReference().AmbienceVolumeSlider.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
             thisession.getDisplayReference().AmbienceVolumeSlider.setOnMouseDragged(event1 -> {
-                thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
+                thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().AmbienceVolume.getValue());
                 Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
                 thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
                 thisession.Root.getPlayer().AmbienceVolume.setValue(value /= 100);

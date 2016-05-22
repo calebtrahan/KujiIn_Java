@@ -72,6 +72,8 @@ public class PlayerUI extends Stage {
         setTitle("Session Player");
         Root = root;
         Session = root.getSession();
+        EntrainmentVolume.setDisable(true);
+        EntrainmentVolumePercentage.setText("0%");
         EntrainmentVolume.setOnMouseClicked(event -> {
             try {
                 Double value = EntrainmentVolume.getValue() * 100;
@@ -80,6 +82,8 @@ public class PlayerUI extends Stage {
             } catch (Exception ignored) {
                 Util.gui_showtimedmessageonlabel(StatusBar, "Session Not Playing", 2000);}
         });
+        AmbienceVolume.setDisable(true);
+        AmbienceVolumePercentage.setText("0%");
         AmbienceVolume.setOnMouseClicked(event -> {
             try {
                 Double value = AmbienceVolume.getValue() * 100;
@@ -255,6 +259,10 @@ public class PlayerUI extends Stage {
                 }
             }
         }
+
+        public void play(ActionEvent actionEvent) {Root.getSession().play(Root.getPlayer());}
+        public void pause(ActionEvent actionEvent) {Root.getSession().pause();}
+        public void stop(ActionEvent actionEvent) {Root.getSession().stop();}
     }
     public static class ReferenceTypeDialog extends Stage {
         private MainController Root;

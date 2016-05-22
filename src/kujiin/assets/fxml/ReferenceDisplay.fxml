@@ -37,9 +37,9 @@
                         <Insets right="5.0" />
                      </HBox.margin>
                   </Label>
-                  <Button fx:id="PlayButton" mnemonicParsing="false" text="Play" />
-                  <Button fx:id="PauseButton" mnemonicParsing="false" text="Pause" />
-                  <Button fx:id="StopButton" mnemonicParsing="false" text="Stop">
+                  <Button fx:id="PlayButton" mnemonicParsing="false" text="Play" onAction="#play"/>
+                  <Button fx:id="PauseButton" mnemonicParsing="false" text="Pause" onAction="#pause"/>
+                  <Button fx:id="StopButton" mnemonicParsing="false" text="Stop" onAction="#stop">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
