@@ -38,7 +38,6 @@ import java.time.LocalDate;
 import java.util.*;
 // TODO Saving Preset Is Broke!
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
-// TODO Integrate Pause/Play/Stop Button & Volume Controls On The Very Bottom Of Reference Display
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;
@@ -127,6 +126,7 @@ public class MainController implements Initializable {
     public boolean cleanup() {
         getSession().getAmbiences().marshall();
         getSession().getEntrainments().marshall();
+        getOptions().marshall();
         return getCreatorAndExporter().cleanup() && getProgressTracker().cleanup();
     }
 
@@ -1250,7 +1250,7 @@ public class MainController implements Initializable {
                 }
             }
         }
-        public boolean apply(ActionEvent actionEvent) {
+        public void apply(ActionEvent actionEvent) {
             try {
                 if (checkvalues()) {
                     Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
@@ -1273,11 +1273,9 @@ public class MainController implements Initializable {
                     Options.marshall();
                     valuechanged = false;
                     ApplyButton.setDisable(true);
-                    return true;
-                } else {return false;}
+                }
             } catch (Exception e) {
                 e.printStackTrace();
-                return false;
             }
         }
         public void accept(ActionEvent actionEvent) {

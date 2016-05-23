@@ -140,7 +140,7 @@
          <children>
             <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="263.0">
                <children>
-                  <ToggleButton fx:id="ReferenceToggleButton" mnemonicParsing="false" text="Reference" />
+                  <ToggleButton fx:id="ReferenceToggleButton" mnemonicParsing="false" text="Reference" onAction="#togglereference"/>
                   <RadioButton fx:id="ReferenceHTMLButton" mnemonicParsing="false" onAction="#htmlreferenceoptionselected" text="HTML">
                      <HBox.margin>
                         <Insets left="5.0" right="5.0" />

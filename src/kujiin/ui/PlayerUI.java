@@ -21,7 +21,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-// TODO Reference Display Isn't Switching Off If On When Checbox Unselected
 // TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
 

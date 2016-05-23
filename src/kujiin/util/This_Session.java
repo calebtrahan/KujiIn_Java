@@ -597,7 +597,7 @@ public class This_Session {
         getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(totalsecondsinsession));
         updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
         updateuitimeline.setCycleCount(Animation.INDEFINITE);
-        updateuitimeline.play();
+//        updateuitimeline.play();
         cutorelementcount = 0;
         currentcutorelement = itemsinsession.get(cutorelementcount);
         playthiscut();
@@ -641,7 +641,7 @@ public class This_Session {
                 getPlayerUI().CutCurrentLabel.setText(currentcutorelement.getcurrenttimeformatted());
                 getPlayerUI().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
                 getPlayerUI().TotalCurrentLabel.setText(Util.format_secondsforplayerdisplay(totalsecondselapsed));
-                if (getDisplayReference().isShowing()) {
+                if (getDisplayReference() != null && getDisplayReference().isShowing()) {
                     getDisplayReference().CurrentProgress.setProgress(currentprogress / 100);
                     getDisplayReference().CurrentPercentage.setText(currentprogress.intValue() + "%");
                     getDisplayReference().TotalProgress.setProgress(totalprogress / 100);
