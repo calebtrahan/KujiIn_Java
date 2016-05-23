@@ -238,7 +238,7 @@ public class MainController implements Initializable {
 
 // Session Player Widget
     public void playthisession(ActionEvent actionEvent) {
-        getCreatorAndExporter().togglecreator();
+        getCreatorAndExporter().createsession();
         if (getCreatorAndExporter().getCreatorState() == CreatorAndExporterUI.CreatorState.CREATED) {
             if (getPlayer() != null && getPlayer().isShowing()) {return;}
             getStage().setIconified(true);

@@ -150,24 +150,18 @@ public class CreatorAndExporterUI {
     }
 
 // Creation
-    public void togglecreator() {
-        if (session.getPlayerState() == PlayerUI.PlayerState.PLAYING ||
-            session.getPlayerState() == PlayerUI.PlayerState.PAUSED ||
-            session.getPlayerState() == PlayerUI.PlayerState.TRANSITIONING) {
-            if (Util.gui_getokcancelconfirmationdialog(Root, "Stop Session", "In Order To Edit Session Values The Session Player Must Be Stopped And Reset", "Stop And Reset Session Player?")) {
-                if (! session.stop().equals("Session Stopped")) {return;}
-            } else {return;}
-        }
+    public void createsession() {
         // TODO Check Exporter Here
-        if (creatorState == CreatorState.NOT_CREATED) {
             if (! gettextfieldtimes()) {
-                Util.gui_showerrordialog(Root, "Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session"); return;}
+                Util.gui_showerrordialog(Root, "Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session");
+                setCreatorState(CreatorState.NOT_CREATED);
+                return;
+            }
             boolean creationstate = session.create();
             ExportButton.setDisable(! creationstate);
             session.Root.PlayButton.setDisable(! creationstate);
             if (creationstate) setCreatorState(CreatorState.CREATED);
             else {setCreatorState(CreatorState.NOT_CREATED);}
-        } else {setCreatorState(CreatorState.NOT_CREATED);}
     }
 
 // Export

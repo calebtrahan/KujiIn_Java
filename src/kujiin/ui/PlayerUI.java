@@ -1,6 +1,5 @@
 package kujiin.ui;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -52,9 +51,8 @@ public class PlayerUI extends Stage {
     public Label GoalProgressLabel;
     private This_Session Session;
     private MainController Root;
+    public ReferenceType defaultreferencetype = ReferenceType.html;
 
-    // TODO Sync Reference File GUI With XML
-    // TODO On Resume Do Not Fade In Players (Or Fade In Much Shorter)
     public PlayerUI(MainController root) {
         Root = root;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
@@ -65,9 +63,7 @@ public class PlayerUI extends Stage {
             Root.getOptions();
             Root.getOptions().setStyle(this);
             this.setResizable(false);
-            this.setOnCloseRequest(event -> {
-                if (endsessionprematurely()) {close();}
-            });
+            this.setOnCloseRequest(event -> {if (endsessionprematurely()) {close(); cleanupPlayer();} else {show();}});
         } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         setTitle("Session Player");
         Root = root;
@@ -92,49 +88,16 @@ public class PlayerUI extends Stage {
             } catch(Exception ignored) {
                 Util.gui_showtimedmessageonlabel(StatusBar, "Session Not Playing", 2000);}
         });
-        ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
+        boolean referenceenabled = Root.getOptions().getSessionOptions().getReferenceoption();
+        ReferenceToggleButton.setSelected(referenceenabled);
         togglereference(null);
         StatusBar.setText("Session Not Playing");
     }
 
 // Button Actions
-    public void play() {
-        Util.gui_showtimedmessageonlabel(StatusBar, Session.play(this), 3000);
-        syncplaybackbuttons();
-    }
-    public void pause() {
-        if (Session != null) {
-            Util.gui_showtimedmessageonlabel(StatusBar, Session.pause(), 3000);}
-        else {
-            Util.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
-        syncplaybackbuttons();
-    }
-    public void stop() {
-        if (Session != null) {
-            Util.gui_showtimedmessageonlabel(StatusBar, Session.stop(), 3000);}
-        else {
-            Util.gui_showtimedmessageonlabel(StatusBar, "No Session Playing", 3000);}
-        syncplaybackbuttons();
-    }
-    private void syncplaybackbuttons() {
-        PlayerState currentstate = Session.getPlayerState();
-        PlayButton.setDisable(currentstate == PlayerState.PLAYING);
-        PauseButton.setDisable(currentstate == PlayerState.PAUSED || currentstate == PlayerState.STOPPED);
-        StopButton.setDisable(currentstate == PlayerState.STOPPED);
-        if (currentstate == PlayerState.PLAYING) {
-            PlayButton.setText("Playing");
-            PauseButton.setText("Pause");
-            StopButton.setText("Stop");
-        } else if (currentstate == PlayerState.PAUSED) {
-            PlayButton.setText("Resume");
-            PauseButton.setText("Paused");
-            StopButton.setText("Stop");
-        } else if (currentstate == PlayerState.STOPPED) {
-            PlayButton.setText("Play");
-            PauseButton.setText("Pause");
-            StopButton.setText("Stopped");
-        }
-    }
+    public void play() {Session.play(this);}
+    public void pause() {Session.pause();}
+    public void stop() {Session.stop();}
     private boolean endsessionprematurely() {
         if (Session.getPlayerState() == PlayerState.PLAYING || Session.getPlayerState() == PlayerState.PAUSED || Session.getPlayerState() == PlayerState.TRANSITIONING) {
             pause();
@@ -149,8 +112,12 @@ public class PlayerUI extends Stage {
         if (! ReferenceToggleButton.isSelected()) {
             ReferenceHTMLButton.setSelected(false);
             ReferenceTXTButton.setSelected(false);
+            Root.getOptions().getSessionOptions().setReferencetype(null);
+        } else {
+            if (Root.getOptions().getSessionOptions().getReferencetype() == ReferenceType.html) {ReferenceHTMLButton.setSelected(true); htmlreferenceoptionselected(null);}
+            else if (Root.getOptions().getSessionOptions().getReferencetype() == ReferenceType.txt) { ReferenceTXTButton.setSelected(true); txtreferenceoptionselected(null);}
+            else {Root.getOptions().getSessionOptions().setReferencetype(defaultreferencetype); togglereference(null);}
         }
-        Platform.runLater(() -> Root.getOptions().marshall());
     }
     public void htmlreferenceoptionselected(ActionEvent actionEvent) {
         if (ReferenceToggleButton.isSelected()) {
@@ -158,7 +125,6 @@ public class PlayerUI extends Stage {
             if (ReferenceHTMLButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
             else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
         } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
-        Platform.runLater(() -> Root.getOptions().marshall());
     }
     public void txtreferenceoptionselected(ActionEvent actionEvent) {
         if (ReferenceToggleButton.isSelected()) {
@@ -166,8 +132,8 @@ public class PlayerUI extends Stage {
             if (ReferenceTXTButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
             else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
         } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
-        Platform.runLater(() -> Root.getOptions().marshall());
     }
+    public void cleanupPlayer() {}
 
     // Dialogs
     // TODO Style Reference Display
@@ -180,7 +146,11 @@ public class PlayerUI extends Stage {
         public Button PlayButton;
         public Button PauseButton;
         public Button StopButton;
-        public Label StatusBar;
+        public ProgressBar TotalProgress;
+        public ProgressBar CurrentProgress;
+        public Label CurrentName;
+        public Label CurrentPercentage;
+        public Label TotalPercentage;
         private MainController Root;
         private Meditatable currentcutorelement;
         private ReferenceType referenceType;

@@ -142,6 +142,18 @@ public class This_Session {
     public void setDisplayReference(PlayerUI.DisplayReference displayReference) {
         this.displayReference = displayReference;
     }
+    public int getTotalsecondselapsed() {
+        return totalsecondselapsed;
+    }
+    public void setTotalsecondselapsed(int totalsecondselapsed) {
+        this.totalsecondselapsed = totalsecondselapsed;
+    }
+    public int getTotalsecondsinsession() {
+        return totalsecondsinsession;
+    }
+    public void setTotalsecondsinsession(int totalsecondsinsession) {
+        this.totalsecondsinsession = totalsecondsinsession;
+    }
 
     // Cut And Element Getters
     public Qi_Gong getPresession() {
@@ -581,7 +593,7 @@ public class This_Session {
     public void startplayback() {
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
-        for (Object i : itemsinsession) {totalsecondsinsession += ((Meditatable) i).getdurationinseconds();}
+        for (Meditatable i : itemsinsession) {totalsecondsinsession += i.getdurationinseconds();}
         getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(totalsecondsinsession));
         updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
         updateuitimeline.setCycleCount(Animation.INDEFINITE);
@@ -591,75 +603,32 @@ public class This_Session {
         playthiscut();
         sessions.createnewsession();
     }
-    public String play(PlayerUI playerUI) {
-        if (playerState == PlayerUI.PlayerState.IDLE) {
-            setPlayerUI(playerUI);
-            startplayback();
-            return "Playing Session...";
-        }
-        else if(playerState == PlayerUI.PlayerState.PAUSED) {
-            updateuitimeline.play();
-            currentcutorelement.resume();
-            setPlayerState(PlayerUI.PlayerState.PLAYING);
-            System.out.println("Resuming Session");
-            return "Resuming Session...";
-        }
-        else if(playerState == PlayerUI.PlayerState.STOPPED) {
-            setPlayerUI(playerUI);
-            startplayback();
-            return "Playing Session...";
-        }
-        else if(playerState == PlayerUI.PlayerState.PLAYING) {
-            return "Already Playing";
-        }
-        else if(playerState == PlayerUI.PlayerState.TRANSITIONING) {
-            return "Transistioning To The Next Cut";
-        } else {
-            return "";
-        }
+    public void play(PlayerUI playerUI) {
+        if (playerState == PlayerUI.PlayerState.IDLE || playerState == PlayerUI.PlayerState.STOPPED) {setPlayerUI(playerUI); startplayback();}
+        else if(playerState == PlayerUI.PlayerState.PAUSED) {updateuitimeline.play(); currentcutorelement.resume();}
     }
-    public String pause() {
+    public void pause() {
         if (playerState == PlayerUI.PlayerState.PLAYING) {
             currentcutorelement.pause();
             updateuitimeline.pause();
-            setPlayerState(PlayerUI.PlayerState.PAUSED);
-            return "Session Paused";
-        } else if (playerState == PlayerUI.PlayerState.PAUSED) {
-            return "Already Paused";
-        } else if (playerState == PlayerUI.PlayerState.TRANSITIONING) {
-            return "Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Pause";
-        } else {
-            return "No Session Playing";
         }
     }
-    public String stop() {
-        if (playerState == PlayerUI.PlayerState.PLAYING) {
+    public void stop() {
+        if (playerState == PlayerUI.PlayerState.PLAYING || playerState == PlayerUI.PlayerState.PAUSED) {
             currentcutorelement.stop();
             updateuitimeline.stop();
-            setPlayerState(PlayerUI.PlayerState.STOPPED);
             resetthissession();
-            return "Session Stopped";
-        } else if (playerState == PlayerUI.PlayerState.PAUSED) {
-            currentcutorelement.stop();
-            updateuitimeline.stop();
-            setPlayerState(PlayerUI.PlayerState.STOPPED);
-            resetthissession();
-            return "Session Stopped";
-        } else if (playerState == PlayerUI.PlayerState.IDLE) {
-            return "No Session Playing, Cannot Stop";
-        } else if (playerState == PlayerUI.PlayerState.TRANSITIONING) {
-            return "Currently Transitioning To The Next Cut. Please Wait Till At The Next Cut To Stop";
-        } else {
-            return "";
+            closereferencefile();
         }
     }
     public void updateplayerui() {
         try {
             if (playerState == PlayerUI.PlayerState.PLAYING) {
+                currentcutorelement.secondselapsed++;
                 totalsecondselapsed++;
                 Float currentprogress;
                 Float totalprogress;
-                if (currentcutorelement.getSecondselapsed() != 0) {currentprogress = (float) currentcutorelement.getSecondselapsed() / (float) currentcutorelement.getdurationinseconds();}
+                if (currentcutorelement.secondselapsed != 0) {currentprogress = (float) currentcutorelement.secondselapsed / (float) currentcutorelement.getdurationinseconds();}
                 else {currentprogress = (float) 0.0;}
                 if (totalsecondselapsed != 0) {totalprogress = (float) totalsecondselapsed / (float) totalsecondsinsession;}
                 else {totalprogress = (float) 0.0;}
@@ -672,19 +641,16 @@ public class This_Session {
                 getPlayerUI().CutCurrentLabel.setText(currentcutorelement.getcurrenttimeformatted());
                 getPlayerUI().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
                 getPlayerUI().TotalCurrentLabel.setText(Util.format_secondsforplayerdisplay(totalsecondselapsed));
+                if (getDisplayReference().isShowing()) {
+                    getDisplayReference().CurrentProgress.setProgress(currentprogress / 100);
+                    getDisplayReference().CurrentPercentage.setText(currentprogress.intValue() + "%");
+                    getDisplayReference().TotalProgress.setProgress(totalprogress / 100);
+                    getDisplayReference().TotalPercentage.setText(totalprogress.intValue() + "%");
+                    getDisplayReference().CurrentName.setText(currentcutorelement.name);
+                }
                 Root.getProgressTracker().updaterootgoalsui();
                 Root.getProgressTracker().updateprogressui();
-            } else if (playerState == PlayerUI.PlayerState.TRANSITIONING) {
-                getPlayerUI().CurrentCutProgress.setProgress(1.0);
-                getPlayerUI().CurrentCutTopLabel.setText(currentcutorelement.name + " Completed");
-                if (! currentcutorelement.name.equals("Postsession")) {
-                    getPlayerUI().StatusBar.setText("Prepare For " + getallitemsinSession().get(currentcutorelement.number + 1).name);}
-                getPlayerUI().CutCurrentLabel.setText(currentcutorelement.gettotaltimeformatted());
-                getPlayerUI().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
-            } else if (playerState == PlayerUI.PlayerState.PAUSED) {
-                getPlayerUI().StatusBar.setText("Session Paused");
-            } else if (playerState == PlayerUI.PlayerState.STOPPED) {
-                getPlayerUI().StatusBar.setText("Session Stopped");
+                currentcutorelement.tick();
             }
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
