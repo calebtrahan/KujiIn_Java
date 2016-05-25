@@ -166,18 +166,19 @@ public class CreatorAndExporterUI {
 
 // Export
     public void toggleexport() {
-        if (exporterState == ExporterState.NOT_EXPORTED) {
-
-        } else if (exporterState == ExporterState.WORKING) {
-
-        } else if (exporterState == ExporterState.FAILED) {
-
-        } else if (exporterState == ExporterState.COMPLETED) {
-
-        } else if (exporterState == ExporterState.CANCELLED) {
-
-        } else {
-
+        switch (exporterState) {
+            case NOT_EXPORTED:
+                break;
+            case WORKING:
+                break;
+            case FAILED:
+                break;
+            case COMPLETED:
+                break;
+            case CANCELLED:
+                break;
+            default:
+                break;
         }
     }
     public void startexport() {

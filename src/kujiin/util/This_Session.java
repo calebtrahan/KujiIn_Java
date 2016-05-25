@@ -667,19 +667,28 @@ public class This_Session {
     }
     public void progresstonextcut() {
         try {
-            if (playerState == PlayerUI.PlayerState.TRANSITIONING) {
+            switch (playerState) {
+                case TRANSITIONING:
 //                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
-                try {
-                    List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcutorelement.number,
-                            Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(currentcutorelement.number, false), 2));
-                    if (completedgoals.size() > 0) {GoalsCompletedThisSession.addAll(completedgoals);}
-                    currentcutorelement.cleanup();
-                    cutorelementcount++;
-                    currentcutorelement = getallitemsinSession().get(cutorelementcount);
-                    playthiscut();
-                } catch (IndexOutOfBoundsException ignored) {
-                    currentcutorelement.cleanup(); endofsession();}
-            } else if (playerState == PlayerUI.PlayerState.PLAYING) {transition();}
+                    try {
+                        List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcutorelement.number,
+                                Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(currentcutorelement.number, false), 2));
+                        if (completedgoals.size() > 0) {
+                            GoalsCompletedThisSession.addAll(completedgoals);
+                        }
+                        currentcutorelement.cleanup();
+                        cutorelementcount++;
+                        currentcutorelement = getallitemsinSession().get(cutorelementcount);
+                        playthiscut();
+                    } catch (IndexOutOfBoundsException ignored) {
+                        currentcutorelement.cleanup();
+                        endofsession();
+                    }
+                    break;
+                case PLAYING:
+                    transition();
+                    break;
+            }
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).show();}
     }
     public void endofsession() {

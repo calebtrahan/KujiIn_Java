@@ -184,40 +184,93 @@ public class Ambiences {
 
 // Other Methods
     public Ambience getcutorelementsAmbience(int index) {
-        if (index == 0) {return Presession;}
-        else if (index == 1) {return Rin;}
-        else if (index == 2) {return Kyo;}
-        else if (index == 3) {return Toh;}
-        else if (index == 4) {return Sha;}
-        else if (index == 5) {return Kai;}
-        else if (index == 6) {return Jin;}
-        else if (index == 7) {return Retsu;}
-        else if (index == 8) {return Zai;}
-        else if (index == 9) {return Zen;}
-        else if (index == 10) {return Earth;}
-        else if (index == 11) {return Air;}
-        else if (index == 12) {return Fire;}
-        else if (index == 13) {return Water;}
-        else if (index == 14) {return Void;}
-        else if (index == 15) {return Postsession;}
-        else {return null;}
+        switch (index) {
+            case 0:
+                return Presession;
+            case 1:
+                return Rin;
+            case 2:
+                return Kyo;
+            case 3:
+                return Toh;
+            case 4:
+                return Sha;
+            case 5:
+                return Kai;
+            case 6:
+                return Jin;
+            case 7:
+                return Retsu;
+            case 8:
+                return Zai;
+            case 9:
+                return Zen;
+            case 10:
+                return Earth;
+            case 11:
+                return Air;
+            case 12:
+                return Fire;
+            case 13:
+                return Water;
+            case 14:
+                return Void;
+            case 15:
+                return Postsession;
+            default:
+                return null;
+        }
     }
     public void setcutorelementsAmbience(int index, Ambience ambience) {
-        if (index == 0) {Presession = ambience;}
-        else if (index == 1) {Rin = ambience;}
-        else if (index == 2) {Kyo = ambience;}
-        else if (index == 3) {Toh = ambience;}
-        else if (index == 4) {Sha = ambience;}
-        else if (index == 5) {Kai = ambience;}
-        else if (index == 6) {Jin = ambience;}
-        else if (index == 7) {Retsu = ambience;}
-        else if (index == 8) {Zai = ambience;}
-        else if (index == 9) {Zen = ambience;}
-        else if (index == 10) {Earth = ambience;}
-        else if (index == 11) {Air = ambience;}
-        else if (index == 12) {Fire = ambience;}
-        else if (index == 13) {Water = ambience;}
-        else if (index == 14) {Void = ambience;}
-        else if (index == 15) {Postsession = ambience;}
+        switch (index) {
+            case 0:
+                Presession = ambience;
+                break;
+            case 1:
+                Rin = ambience;
+                break;
+            case 2:
+                Kyo = ambience;
+                break;
+            case 3:
+                Toh = ambience;
+                break;
+            case 4:
+                Sha = ambience;
+                break;
+            case 5:
+                Kai = ambience;
+                break;
+            case 6:
+                Jin = ambience;
+                break;
+            case 7:
+                Retsu = ambience;
+                break;
+            case 8:
+                Zai = ambience;
+                break;
+            case 9:
+                Zen = ambience;
+                break;
+            case 10:
+                Earth = ambience;
+                break;
+            case 11:
+                Air = ambience;
+                break;
+            case 12:
+                Fire = ambience;
+                break;
+            case 13:
+                Water = ambience;
+                break;
+            case 14:
+                Void = ambience;
+                break;
+            case 15:
+                Postsession = ambience;
+                break;
+        }
     }
 }

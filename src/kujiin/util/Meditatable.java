@@ -745,13 +745,18 @@ public class Meditatable {
     public File getReferenceFile() {
         PlayerUI.ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
         if (referenceType == null) {return null;}
-        if (referenceType == PlayerUI.ReferenceType.html) {
-            String name = this.name + ".html";
-            return new File(Options.DIRECTORYREFERENCE, "html/" + name);
-        } else if (referenceType == PlayerUI.ReferenceType.txt) {
-            String name = this.name + ".txt";
-            return new File(Options.DIRECTORYREFERENCE, "txt/" + name);
-        } else {return null;}
+        switch (referenceType) {
+            case html: {
+                String name = this.name + ".html";
+                return new File(Options.DIRECTORYREFERENCE, "html/" + name);
+            }
+            case txt: {
+                String name = this.name + ".txt";
+                return new File(Options.DIRECTORYREFERENCE, "txt/" + name);
+            }
+            default:
+                return null;
+        }
     }
 
 }

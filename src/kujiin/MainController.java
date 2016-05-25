@@ -1274,9 +1274,7 @@ public class MainController implements Initializable {
                     valuechanged = false;
                     ApplyButton.setDisable(true);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) {e.printStackTrace();}
         }
         public void accept(ActionEvent actionEvent) {
             apply(null);
@@ -1297,8 +1295,7 @@ public class MainController implements Initializable {
             Util.gui_validate(EntrainmentVolumePercentage, entrainmentgood);
             Util.gui_validate(AmbienceVolumePercentage, ambiencegood);
             boolean alertfilegood = checkalertfile();
-            if (AlertSwitch.isSelected()) {
-                Util.gui_validate(AlertFileTextField, alertfilegood);}
+            if (AlertSwitch.isSelected()) {Util.gui_validate(AlertFileTextField, alertfilegood);}
             return entrainmentgood && ambiencegood && alertfilegood;
         }
         public void resettodefaults(ActionEvent actionEvent) {

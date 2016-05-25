@@ -185,40 +185,93 @@ public class Entrainments {
 
 // Other Methods
     public Entrainment getcutorelementsEntrainment(int index) {
-        if (index == 0) {return getPresession();}
-        else if (index == 1) {return getRin();}
-        else if (index == 2) {return getKyo();}
-        else if (index == 3) {return getToh();}
-        else if (index == 4) {return getSha();}
-        else if (index == 5) {return getKai();}
-        else if (index == 6) {return getJin();}
-        else if (index == 7) {return getRetsu();}
-        else if (index == 8) {return getZai();}
-        else if (index == 9) {return getZen();}
-        else if (index == 10) {return getEarth();}
-        else if (index == 11) {return getAir();}
-        else if (index == 12) {return getFire();}
-        else if (index == 13) {return getWater();}
-        else if (index == 14) {return getVoid();}
-        else if (index == 15) {return getPostsession();}
-        else {return null;}
+        switch (index) {
+            case 0:
+                return getPresession();
+            case 1:
+                return getRin();
+            case 2:
+                return getKyo();
+            case 3:
+                return getToh();
+            case 4:
+                return getSha();
+            case 5:
+                return getKai();
+            case 6:
+                return getJin();
+            case 7:
+                return getRetsu();
+            case 8:
+                return getZai();
+            case 9:
+                return getZen();
+            case 10:
+                return getEarth();
+            case 11:
+                return getAir();
+            case 12:
+                return getFire();
+            case 13:
+                return getWater();
+            case 14:
+                return getVoid();
+            case 15:
+                return getPostsession();
+            default:
+                return null;
+        }
     }
     public void setcutorelementsEntrainment(int index, Entrainment entrainment) {
-        if (index == 0) {setPresession(entrainment);}
-        else if (index == 1) {setRin(entrainment);}
-        else if (index == 2) {setKyo(entrainment);}
-        else if (index == 3) {setToh(entrainment);}
-        else if (index == 4) {setSha(entrainment);}
-        else if (index == 5) {setKai(entrainment);}
-        else if (index == 6) {setJin(entrainment);}
-        else if (index == 7) {setRetsu(entrainment);}
-        else if (index == 8) {setZai(entrainment);}
-        else if (index == 9) {setZen(entrainment);}
-        else if (index == 10) {setEarth(entrainment);}
-        else if (index == 11) {setAir(entrainment);}
-        else if (index == 12) {setFire(entrainment);}
-        else if (index == 13) {setWater(entrainment);}
-        else if (index == 14) {setVoid(entrainment);}
-        else if (index == 15) {setPostsession(entrainment);}
+        switch (index) {
+            case 0:
+                setPresession(entrainment);
+                break;
+            case 1:
+                setRin(entrainment);
+                break;
+            case 2:
+                setKyo(entrainment);
+                break;
+            case 3:
+                setToh(entrainment);
+                break;
+            case 4:
+                setSha(entrainment);
+                break;
+            case 5:
+                setKai(entrainment);
+                break;
+            case 6:
+                setJin(entrainment);
+                break;
+            case 7:
+                setRetsu(entrainment);
+                break;
+            case 8:
+                setZai(entrainment);
+                break;
+            case 9:
+                setZen(entrainment);
+                break;
+            case 10:
+                setEarth(entrainment);
+                break;
+            case 11:
+                setAir(entrainment);
+                break;
+            case 12:
+                setFire(entrainment);
+                break;
+            case 13:
+                setWater(entrainment);
+                break;
+            case 14:
+                setVoid(entrainment);
+                break;
+            case 15:
+                setPostsession(entrainment);
+                break;
+        }
     }
 }

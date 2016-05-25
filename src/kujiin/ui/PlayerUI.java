@@ -113,9 +113,20 @@ public class PlayerUI extends Stage {
             ReferenceTXTButton.setSelected(false);
             Root.getOptions().getSessionOptions().setReferencetype(null);
         } else {
-            if (Root.getOptions().getSessionOptions().getReferencetype() == ReferenceType.html) {ReferenceHTMLButton.setSelected(true); htmlreferenceoptionselected(null);}
-            else if (Root.getOptions().getSessionOptions().getReferencetype() == ReferenceType.txt) { ReferenceTXTButton.setSelected(true); txtreferenceoptionselected(null);}
-            else {Root.getOptions().getSessionOptions().setReferencetype(defaultreferencetype); togglereference(null);}
+            switch (Root.getOptions().getSessionOptions().getReferencetype()) {
+                case html:
+                    ReferenceHTMLButton.setSelected(true);
+                    htmlreferenceoptionselected(null);
+                    break;
+                case txt:
+                    ReferenceTXTButton.setSelected(true);
+                    txtreferenceoptionselected(null);
+                    break;
+                default:
+                    Root.getOptions().getSessionOptions().setReferencetype(defaultreferencetype);
+                    togglereference(null);
+                    break;
+            }
         }
     }
     public void htmlreferenceoptionselected(ActionEvent actionEvent) {
@@ -208,23 +219,32 @@ public class PlayerUI extends Stage {
         public void loadcontent() {
             File referencefile = currentcutorelement.getReferenceFile();
             if (referencefile != null) {
-                if (referenceType == ReferenceType.txt) {
-                    StringBuilder sb = new StringBuilder();
-                    try (FileInputStream fis = new FileInputStream(referencefile);
-                         BufferedInputStream bis = new BufferedInputStream(fis)) {
-                        while (bis.available() > 0) {sb.append((char) bis.read());}
-                    } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-                    TextArea ta = new TextArea();
-                    ta.setText(sb.toString());
-                    ta.setWrapText(true);
-                    ContentPane.setContent(ta);
-                    Root.getOptions().setStyle(this);
-                } else if (referenceType == ReferenceType.html) {
-                    WebView browser = new WebView();
-                    WebEngine webEngine = browser.getEngine();
-                    webEngine.load(referencefile.toURI().toString());
-                    webEngine.setUserStyleSheetLocation(new File(Options.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
-                    ContentPane.setContent(browser);
+                switch (referenceType) {
+                    case txt:
+                        StringBuilder sb = new StringBuilder();
+                        try (FileInputStream fis = new FileInputStream(referencefile);
+                             BufferedInputStream bis = new BufferedInputStream(fis)) {
+                            while (bis.available() > 0) {
+                                sb.append((char) bis.read());
+                            }
+                        } catch (Exception e) {
+                            new MainController.ExceptionDialog(Root, e).showAndWait();
+                        }
+                        TextArea ta = new TextArea();
+                        ta.setText(sb.toString());
+                        ta.setWrapText(true);
+                        ContentPane.setContent(ta);
+                        Root.getOptions().setStyle(this);
+                        break;
+                    case html:
+                        WebView browser = new WebView();
+                        WebEngine webEngine = browser.getEngine();
+                        webEngine.load(referencefile.toURI().toString());
+                        webEngine.setUserStyleSheetLocation(new File(Options.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
+                        ContentPane.setContent(browser);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -258,8 +278,14 @@ public class PlayerUI extends Stage {
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Type Select");
             if (referenceType != null) {
-                if (referenceType == ReferenceType.txt) {TextOption.setSelected(true);}
-                else if (referenceType == ReferenceType.html) {HTMLOption.setSelected(true);}
+                switch (referenceType) {
+                    case txt:
+                        TextOption.setSelected(true);
+                        break;
+                    case html:
+                        HTMLOption.setSelected(true);
+                        break;
+                }
             }
             FullScreenOption.setSelected(fullscreen);
         }
