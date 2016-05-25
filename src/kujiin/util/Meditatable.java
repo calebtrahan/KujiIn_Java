@@ -544,8 +544,7 @@ public class Meditatable {
                     if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);}
                     else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
                 }
-            }
-            if (paused) {
+            } else if (paused) {
                 thisession.Root.getPlayer().PlayButton.setText("Resume");
                 thisession.Root.getPlayer().PauseButton.setText("Paused");
                 thisession.Root.getPlayer().StopButton.setText("Stop");
@@ -560,8 +559,7 @@ public class Meditatable {
                     if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);}
                     else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
                 }
-            }
-            if (stopped) {
+            } else if (stopped) {
                 thisession.Root.getPlayer().PlayButton.setText("Play");
                 thisession.Root.getPlayer().PauseButton.setText("Stopped");
                 thisession.Root.getPlayer().StopButton.setText("Stopped");
