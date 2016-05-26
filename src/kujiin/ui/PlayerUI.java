@@ -113,6 +113,9 @@ public class PlayerUI extends Stage {
             ReferenceTXTButton.setSelected(false);
             Root.getOptions().getSessionOptions().setReferencetype(null);
         } else {
+            if (Root.getOptions().getSessionOptions().getReferencetype() == null) {
+                Root.getOptions().getSessionOptions().setReferencetype(Options.REFERENCE_TYPE);
+            }
             switch (Root.getOptions().getSessionOptions().getReferencetype()) {
                 case html:
                     ReferenceHTMLButton.setSelected(true);

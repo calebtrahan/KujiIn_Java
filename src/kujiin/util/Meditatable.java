@@ -476,20 +476,24 @@ public class Meditatable {
             if (fade_ambience_stop != null) {fade_ambience_stop.stop();}
         } catch (Exception ignored) {}
     }
+    public void setvolumeenabled(boolean enabled) {
+        if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(! enabled);}
+        else {thisession.Root.getPlayer().AmbienceVolume.setDisable(! enabled);}
+        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+            if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(! enabled);}
+            else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(! enabled);}
+        }
+    }
     public void toggleplayerbuttons() {
         if (thisession.getPlayerState() == null) {return;}
-        String fadetext = "Fading";
-        String transitiontext = "Transitioning";
         boolean referenceenabled = thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing();
         boolean playing = thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING;
         boolean paused = thisession.getPlayerState() == PlayerUI.PlayerState.PAUSED;
         boolean stopped = thisession.getPlayerState() == PlayerUI.PlayerState.STOPPED;
-        boolean transitioning = thisession.getPlayerState() == PlayerUI.PlayerState.TRANSITIONING;
         boolean fade_play = thisession.getPlayerState() == PlayerUI.PlayerState.FADING_PLAY;
         boolean fade_resume = thisession.getPlayerState() == PlayerUI.PlayerState.FADING_RESUME;
         boolean fade_pause = thisession.getPlayerState() == PlayerUI.PlayerState.FADING_PAUSE;
         boolean fade_stop = thisession.getPlayerState() == PlayerUI.PlayerState.FADING_STOP;
-    // Playing
         thisession.Root.getPlayer().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
         thisession.Root.getPlayer().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop);
         thisession.Root.getPlayer().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop);
@@ -498,83 +502,75 @@ public class Meditatable {
             thisession.getDisplayReference().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop);
             thisession.getDisplayReference().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop);
         }
-        if (fade_pause || fade_play || fade_resume || fade_stop) {
-            thisession.Root.getPlayer().PlayButton.setText(fadetext);
-            thisession.Root.getPlayer().PauseButton.setText(fadetext);
-            thisession.Root.getPlayer().StopButton.setText(fadetext);
-            thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
-            if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
-            else {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
-            if (referenceenabled) {
-                thisession.getDisplayReference().PlayButton.setText(fadetext);
-                thisession.getDisplayReference().PauseButton.setText(fadetext);
-                thisession.getDisplayReference().StopButton.setText(fadetext);
-                thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);
-                if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
-                else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
-            }
-        } else if (transitioning) {
-            thisession.Root.getPlayer().PlayButton.setText(transitiontext);
-            thisession.Root.getPlayer().PauseButton.setText(transitiontext);
-            thisession.Root.getPlayer().StopButton.setText(transitiontext);
-            thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
-            if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
-            else {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
-            if (referenceenabled) {
-                thisession.getDisplayReference().PlayButton.setText(transitiontext);
-                thisession.getDisplayReference().PauseButton.setText(transitiontext);
-                thisession.getDisplayReference().StopButton.setText(transitiontext);
-                thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);
-                if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
-                else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
-            }
-        } else {
-            if (playing) {
-                thisession.Root.getPlayer().PlayButton.setText("Playing");
-                thisession.Root.getPlayer().PauseButton.setText("Pause");
-                thisession.Root.getPlayer().StopButton.setText("Stop");
-                thisession.Root.getPlayer().EntrainmentVolume.setDisable(false);
-                if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(false);}
-                else {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
-                if (referenceenabled) {
-                    thisession.getDisplayReference().PlayButton.setText("Playing");
-                    thisession.getDisplayReference().PauseButton.setText("Pause");
-                    thisession.getDisplayReference().StopButton.setText("Stop");
-                    thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);
-                    if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);}
-                    else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
-                }
-            } else if (paused) {
-                thisession.Root.getPlayer().PlayButton.setText("Resume");
-                thisession.Root.getPlayer().PauseButton.setText("Paused");
-                thisession.Root.getPlayer().StopButton.setText("Stop");
-                thisession.Root.getPlayer().EntrainmentVolume.setDisable(false);
-                if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(false);}
-                else {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
-                if (referenceenabled) {
-                    thisession.getDisplayReference().PlayButton.setText("Resume");
-                    thisession.getDisplayReference().PauseButton.setText("Paused");
-                    thisession.getDisplayReference().StopButton.setText("Stop");
-                    thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);
-                    if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);}
-                    else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
-                }
-            } else if (stopped) {
-                thisession.Root.getPlayer().PlayButton.setText("Play");
-                thisession.Root.getPlayer().PauseButton.setText("Stopped");
-                thisession.Root.getPlayer().StopButton.setText("Stopped");
-                thisession.Root.getPlayer().EntrainmentVolume.setDisable(false);
-                if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(false);}
-                else {thisession.Root.getPlayer().AmbienceVolume.setDisable(true);}
-                if (referenceenabled) {
-                    thisession.getDisplayReference().PlayButton.setText("Play");
-                    thisession.getDisplayReference().PauseButton.setText("Stopped");
-                    thisession.getDisplayReference().StopButton.setText("Stopped");
-                    thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);
-                    if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);}
-                    else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);}
-                }
-            }
+        String playbuttontext;
+        String pausebuttontext;
+        String stopbuttontext;
+        String statusbartext;
+        switch (thisession.getPlayerState()) {
+            case PLAYING:
+                playbuttontext = "Playing";
+                pausebuttontext = "Paused";
+                stopbuttontext = "Stop";
+                statusbartext = "Session Playing";
+                break;
+            case PAUSED:
+                playbuttontext = "Resume";
+                pausebuttontext = "Paused";
+                stopbuttontext = "Stop";
+                statusbartext = "Session Paused";
+                break;
+            case STOPPED:
+                playbuttontext = "Play";
+                pausebuttontext = "Stopped";
+                stopbuttontext = "Stopped";
+                statusbartext = "Session Stopped";
+                break;
+            case TRANSITIONING:
+                playbuttontext = "Transitioning";
+                pausebuttontext = "Transitioning";
+                stopbuttontext = "Transitioning";
+                statusbartext = "Session Transitioning, Please Wait";
+                break;
+            case FADING_PLAY:
+                playbuttontext = "Starting";
+                pausebuttontext = "Starting";
+                stopbuttontext = "Starting";
+                statusbartext = "Session Starting";
+                break;
+            case FADING_RESUME:
+                playbuttontext = "Resuming";
+                pausebuttontext = "Resuming";
+                stopbuttontext = "Resuming";
+                statusbartext = "Session Resuming";
+                break;
+            case FADING_PAUSE:
+                playbuttontext = "Pausing";
+                pausebuttontext = "Pausing";
+                stopbuttontext = "Pausing";
+                statusbartext = "Session Pausing";
+                break;
+            case FADING_STOP:
+                playbuttontext = "Stopping";
+                pausebuttontext = "Stopping";
+                stopbuttontext = "Stopping";
+                statusbartext = "Session Stopping";
+                break;
+            default:
+                playbuttontext = "";
+                pausebuttontext = "";
+                stopbuttontext = "";
+                statusbartext = "";
+                break;
+        }
+        setvolumeenabled(thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING);
+        thisession.Root.getPlayer().PlayButton.setText(playbuttontext);
+        thisession.Root.getPlayer().PauseButton.setText(pausebuttontext);
+        thisession.Root.getPlayer().StopButton.setText(stopbuttontext);
+        thisession.Root.getPlayer().StatusBar.setText(statusbartext);
+        if (referenceenabled) {
+            thisession.getDisplayReference().PlayButton.setText(playbuttontext);
+            thisession.getDisplayReference().PauseButton.setText(pausebuttontext);
+            thisession.getDisplayReference().StopButton.setText(stopbuttontext);
         }
     }
     public void volume_bindentrainment() {

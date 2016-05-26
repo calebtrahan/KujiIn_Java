@@ -49,20 +49,20 @@ public class Options {
     );
     public static ArrayList<String> STYLETHEMES = new ArrayList<>();
 /// Default Option Values
-    private static final Boolean TOOLTIPS = true;
-    private static final Boolean HELPDIALOGS = true;
-    private static final Double ENTRAINMENTVOLUME = 0.6; // Default Entrainment Volume (Textfield -> In Percentage)
-    private static final Double AMBIENCEVOLUME = 1.0; // Default Ambience Volume (Textfield -> In Percentage)
-    private static final Double FADEINDURATION = 10.0; // Fade In Duration (Textfield -> In Decimal Seconds)
-    private static final Double FADEOUTDURATION = 10.0; // Fade Out Duration (Textfield -> In Decimal Seconds)
-    private static final Boolean ALERTFUNCTION = true;
-    private static final String ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
-    private static final String THEMEFILELOCATION = new File(DIRECTORYSTYLES, "dark.css").toURI().toString();
-    private static final Boolean RAMPENABLED = true;
-    private static final Integer RAMPDURATION = 2;
-    private static final PlayerUI.ReferenceType REFERENCE_TYPE = null;
-    private static final Boolean REFERENCEDISPLAY = false;
-    private static final Boolean REFERENCEFULLSCREEN = true;
+    public static final Boolean TOOLTIPS = true;
+    public static final Boolean HELPDIALOGS = true;
+    public static final Double ENTRAINMENTVOLUME = 0.6; // Default Entrainment Volume (Textfield -> In Percentage)
+    public static final Double AMBIENCEVOLUME = 1.0; // Default Ambience Volume (Textfield -> In Percentage)
+    public static final Double FADEINDURATION = 10.0; // Fade In Duration (Textfield -> In Decimal Seconds)
+    public static final Double FADEOUTDURATION = 10.0; // Fade Out Duration (Textfield -> In Decimal Seconds)
+    public static final Boolean ALERTFUNCTION = true;
+    public static final String ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
+    public static final String THEMEFILELOCATION = new File(DIRECTORYSTYLES, "dark.css").toURI().toString();
+    public static final Boolean RAMPENABLED = true;
+    public static final Integer RAMPDURATION = 2;
+    public static final PlayerUI.ReferenceType REFERENCE_TYPE = PlayerUI.ReferenceType.html;
+    public static final Boolean REFERENCEDISPLAY = false;
+    public static final Boolean REFERENCEFULLSCREEN = true;
     private ProgramOptions ProgramOptions;
     private SessionOptions SessionOptions;
     private AppearanceOptions AppearanceOptions;
