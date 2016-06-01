@@ -31,14 +31,12 @@ import kujiin.xml.SoundFile;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 // TODO Saving Preset Is Broke!
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
 
@@ -267,6 +265,7 @@ public class MainController implements Initializable {
         private String selectedcutorelement;
         private MainController Root;
         private PlayerUI.ReferenceType referenceType;
+        private Integer previouslyselectedindex;
 
         public EditReferenceFiles(MainController root) {
             Root = root;
@@ -282,7 +281,7 @@ public class MainController implements Initializable {
             cutorelementnames.addAll(kujiin.xml.Options.ALLNAMES);
             CutNamesChoiceBox.setItems(cutorelementnames);
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
-            CutNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {cutorelementselectionchanged(oldValue);});
+            CutNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {previouslyselectedindex = oldValue.intValue();});
             if (kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION != null) {
                 setReferenceType(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);
                 HTMLVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.html);
@@ -300,16 +299,11 @@ public class MainController implements Initializable {
 
     // Text Area Methods
         private boolean unsavedchanges() {
-            if (selectedfile == null) {return false;}
-            try {
-                Scanner sc1 = new Scanner(selectedfile);
-                Scanner sc2 = new Scanner(MainTextArea.getText());
-                while (sc1.hasNext() && sc2.hasNext()) {if (! sc1.next().equals(sc2.next())) {return false;}}
-                return true;
-            } catch (FileNotFoundException | NullPointerException ignored) {return false;}
+            try {return MainTextArea.getText().equals(Util.file_getcontents(selectedfile));}
+            catch (Exception e) {return false;}
         }
-        private void cutorelementselectionchanged(Number oldindex) {
-            if (unsavedchanges()) {
+        public void newcutorelementselected(ActionEvent actionEvent) {
+            if (unsavedchanges() && previouslyselectedindex != null) {
                 Util.AnswerType answerType = Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading A Different Cut/Element");
                 switch (answerType) {
                     case YES:
@@ -318,7 +312,7 @@ public class MainController implements Initializable {
                     case NO:
                         break;
                     case CANCEL:
-                        CutNamesChoiceBox.getSelectionModel().select(oldindex.intValue());
+                        CutNamesChoiceBox.getSelectionModel().select(previouslyselectedindex);
                         return;
                 }
             }
@@ -353,12 +347,12 @@ public class MainController implements Initializable {
                 Util.gui_showerrordialog(Root, "Error", "Couldn't Save", "Does The File Exist/Do You Have Access To It?");}
         }
         public void loadselectedfile() {
-            if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
-                selectedcutorelement = CutNamesChoiceBox.getValue();
+            if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
+                selectedcutorelement = CutNamesChoiceBox.getSelectionModel().getSelectedItem();
                 selectnewfile();
                 MainTextArea.setText(Util.file_getcontents(selectedfile));
             } else {
-                if (CutNamesChoiceBox.getValue().equals("")) {Util.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
+                if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1) {Util.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
                 else {Util.gui_showinformationdialog(Root, "Information", "No Variation Selected", "Select A Variation To Load");}
             }
         }
@@ -432,7 +426,8 @@ public class MainController implements Initializable {
         this.close();
     }
 
-    }
+
+}
     public static class AdvancedAmbienceEditor extends Stage implements Initializable {
         public Button RightArrow;
         public Button LeftArrow;

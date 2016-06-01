@@ -20,7 +20,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Label>
-                  <ChoiceBox fx:id="CutNamesChoiceBox" prefHeight="26.0" prefWidth="150.0">
+                  <ChoiceBox fx:id="CutNamesChoiceBox" onAction="#newcutorelementselected" prefHeight="26.0" prefWidth="150.0">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
@@ -33,12 +33,12 @@
                   <RadioButton fx:id="TEXTVariation" mnemonicParsing="false" onAction="#textselected" text="text" />
                </children>
             </HBox>
-            <TextArea fx:id="MainTextArea" prefHeight="480.0" prefWidth="769.0">
+            <TextArea fx:id="MainTextArea" prefHeight="476.0" prefWidth="779.0">
                <VBox.margin>
                   <Insets left="5.0" right="5.0" />
                </VBox.margin>
             </TextArea>
-            <HBox alignment="CENTER_LEFT" minHeight="37.0">
+            <HBox alignment="CENTER" minHeight="37.0">
                <children>
                   <Button fx:id="PreviewButton" minWidth="64.0" mnemonicParsing="false" onAction="#preview" text="Preview">
                      <HBox.margin>
