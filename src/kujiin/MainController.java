@@ -35,7 +35,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Scanner;
 // TODO Saving Preset Is Broke!
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
 
@@ -188,8 +191,10 @@ public class MainController implements Initializable {
         getStage().setIconified(false);
     }
     public void editreferencefiles(ActionEvent actionEvent) {
+        getStage().setIconified(true);
         EditReferenceFiles a = new EditReferenceFiles(this);
         a.showAndWait();
+        getStage().setIconified(false);
     }
     public void howtouseprogram(ActionEvent actionEvent) {
         Util.menu_howtouse(this);}
@@ -251,22 +256,17 @@ public class MainController implements Initializable {
 // Dialogs
     public static class EditReferenceFiles extends Stage {
         public ChoiceBox<String> CutNamesChoiceBox;
-        public ChoiceBox<String> CutVariationsChoiceBox;
         public TextArea MainTextArea;
         public Button CloseButton;
-        public Label SelectReferenceFileLabel;
         public Label StatusBar;
         public Button SaveButton;
-        public Button LoadButton;
         public Button PreviewButton;
-        private ObservableList<String> cutorelementnames = FXCollections.observableArrayList();
-        private ObservableList<String> variations;
-        private File htmldirectory = new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html");
-        private File txtdirectory = new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt");
+        public RadioButton HTMLVariation;
+        public RadioButton TEXTVariation;
         private File selectedfile;
-        private String selectedcut;
-        private String selectedvariation;
+        private String selectedcutorelement;
         private MainController Root;
+        private PlayerUI.ReferenceType referenceType;
 
         public EditReferenceFiles(MainController root) {
             Root = root;
@@ -278,17 +278,24 @@ public class MainController implements Initializable {
                 Root.getOptions().setStyle(this);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Files Editor");
-            MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
-            variations = FXCollections.observableArrayList();
+            ObservableList<String> cutorelementnames = FXCollections.observableArrayList();
             cutorelementnames.addAll(kujiin.xml.Options.ALLNAMES);
-            variations.addAll(Arrays.asList("html", "txt"));
             CutNamesChoiceBox.setItems(cutorelementnames);
-            CutVariationsChoiceBox.setItems(variations);
+            MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
+            CutNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {cutorelementselectionchanged(oldValue);});
+            if (kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION != null) {
+                setReferenceType(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);
+                HTMLVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.html);
+                TEXTVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.txt);
+            }
         }
 
-        public void closewindow(Event event) {
-            // Check If Unsaved Text
-            this.close();
+    // Getters And Setters
+        public PlayerUI.ReferenceType getReferenceType() {
+            return referenceType;
+        }
+        public void setReferenceType(PlayerUI.ReferenceType referenceType) {
+            this.referenceType = referenceType;
         }
 
     // Text Area Methods
@@ -301,63 +308,130 @@ public class MainController implements Initializable {
                 return true;
             } catch (FileNotFoundException | NullPointerException ignored) {return false;}
         }
+        private void cutorelementselectionchanged(Number oldindex) {
+            if (unsavedchanges()) {
+                Util.AnswerType answerType = Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading A Different Cut/Element");
+                switch (answerType) {
+                    case YES:
+                        saveselectedfile(null);
+                        break;
+                    case NO:
+                        break;
+                    case CANCEL:
+                        CutNamesChoiceBox.getSelectionModel().select(oldindex.intValue());
+                        return;
+                }
+            }
+            selectnewfile();
+            loadselectedfile();
+        }
         private void textchanged() {
-            if (selectedvariation != null && selectedcut != null) {
-                if (selectedvariation.equals("html")) {
-                    StatusBar.setTextFill(Color.BLACK);
-                    if (MainTextArea.getText().matches(".*\\<[^>]+>.*")) {StatusBar.setText("Valid .html File");}
-                    else {StatusBar.setText("Not Valid .html");}
-                } else {
-                    StatusBar.setTextFill(Color.RED);
-                    if (MainTextArea.getText().length() == 0) {StatusBar.setText("No Text Entered");}
-                    else {StatusBar.setText("");}
+            if (referenceType != null && selectedcutorelement != null) {
+                switch (referenceType) {
+                    case html:
+                        if (Util.String_validhtml(MainTextArea.getText())) {StatusBar.setTextFill(Color.BLACK); StatusBar.setText("");}
+                        else {StatusBar.setTextFill(Color.RED); StatusBar.setText("Not Valid .html");}
+                        break;
+                    case txt:
+                        if (MainTextArea.getText().length() == 0) {StatusBar.setTextFill(Color.RED); StatusBar.setText("No Text Entered");}
+                        else {StatusBar.setTextFill(Color.BLACK); StatusBar.setText("");}
+                        break;
                 }
             } else {
                 MainTextArea.clear();
                 StatusBar.setTextFill(Color.RED);
-                Util.gui_showtimedmessageonlabel(StatusBar, "Select A Cut And Variation And Press 'Load' First", 3000);
+                Util.gui_showtimedmessageonlabel(StatusBar, "No Cut Or Element Selected", 3000);
             }
         }
 
-    // File Methods
-        public void savefile(ActionEvent actionEvent) {
+    // Other Methods
+        public void saveselectedfile(ActionEvent actionEvent) {
             if (Util.file_writecontents(selectedfile, Util.file_getcontents(selectedfile))) {
-                String text = selectedcut + "'s Reference File (" + selectedvariation + " Variation) Has Been Saved";
+                String text = selectedcutorelement + "'s Reference File (" + referenceType.toString() + " Variation) Has Been Saved";
                 Util.gui_showtimedmessageonlabel(StatusBar, text, 5000);
             } else {
                 Util.gui_showerrordialog(Root, "Error", "Couldn't Save", "Does The File Exist/Do You Have Access To It?");}
         }
-        public void loadnewfile(ActionEvent actionEvent) {
-            if (! CutNamesChoiceBox.getValue().equals("") && ! CutVariationsChoiceBox.getValue().equals("")) {
-                if (unsavedchanges()) {
-                    if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Document Has Unsaved Changes", "Save These Changes Before Loading A Different File?")) {savefile(null);}
-                    else {return;}
-                }
-                selectedcut = CutNamesChoiceBox.getValue();
-                selectedvariation = CutVariationsChoiceBox.getValue();
-                SelectReferenceFileLabel.setText(String.format("%s's Reference File (%s Variation)", selectedcut, selectedvariation));
-                if (selectedvariation.equals("html")) {selectedfile = new File(htmldirectory, selectedcut + ".html");}
-                else {selectedfile = new File(txtdirectory, selectedcut + ".txt");}
+        public void loadselectedfile() {
+            if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
+                selectedcutorelement = CutNamesChoiceBox.getValue();
+                selectnewfile();
                 MainTextArea.setText(Util.file_getcontents(selectedfile));
             } else {
-                if (CutNamesChoiceBox.getValue().equals("")) {
-                    Util.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
-                else {
-                    Util.gui_showinformationdialog(Root, "Information", "No Variation Selected", "Select A Variation To Load");}
-                SelectReferenceFileLabel.setText("Select A Cut Name And Variation And Press 'Load'");
+                if (CutNamesChoiceBox.getValue().equals("")) {Util.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
+                else {Util.gui_showinformationdialog(Root, "Information", "No Variation Selected", "Select A Variation To Load");}
             }
         }
-
+        public void selectnewfile() {
+            if (referenceType == null || selectedcutorelement == null) {selectedfile = null; return;}
+            switch (referenceType) {
+                case html:
+                    selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html"), selectedcutorelement + ".html");
+                    break;
+                case txt:
+                    selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt"), selectedcutorelement + ".txt");
+                    break;
+            }
+        }
+        public void htmlselected(ActionEvent actionEvent) {
+            if (unsavedchanges()) {
+                Util.AnswerType answerType = Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading HTML Variation");
+                switch (answerType) {
+                    case YES:
+                        saveselectedfile(null);
+                        break;
+                    case NO:
+                        break;
+                    case CANCEL:
+                        HTMLVariation.setSelected(false);
+                        TEXTVariation.setSelected(true);
+                        return;
+                }
+            }
+            // Test If Unsaved Changes Here
+            TEXTVariation.setSelected(false);
+            referenceType = PlayerUI.ReferenceType.html;
+            selectnewfile();
+            loadselectedfile();
+        }
+        public void textselected(ActionEvent actionEvent) {
+            if (unsavedchanges()) {
+                Util.AnswerType answerType = Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading TXT Variation");
+                switch (answerType) {
+                    case YES:
+                        saveselectedfile(null);
+                        break;
+                    case NO:
+                        break;
+                    case CANCEL:
+                        HTMLVariation.setSelected(true);
+                        TEXTVariation.setSelected(false);
+                        return;
+                }
+            }
+            // Test If Unsaved Changes Here
+            HTMLVariation.setSelected(false);
+            referenceType = PlayerUI.ReferenceType.txt;
+            selectnewfile();
+            loadselectedfile();
+        }
         public void preview(ActionEvent actionEvent) {
-            if (MainTextArea.getText().length() > 0 && selectedvariation != null) {
-                if (selectedvariation.equals("html")) {
+            if (MainTextArea.getText().length() > 0 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
+                if (referenceType == PlayerUI.ReferenceType.html) {
                     PlayerUI.DisplayReference dr = new PlayerUI.DisplayReference(Root, MainTextArea.getText());
                     dr.showAndWait();
                 } else {
-                    Util.gui_showinformationdialog(Root, "Information", "Preview Is For Html Content Not Available For Text Only", "Cannot Open Preview");
+                    Util.gui_showinformationdialog(Root, "Information", "Preview Is For Html Content, And Is Not Available For Text Only", "Cannot Open Preview");
                 }
             }
         }
+
+    // Dialog Methods
+        public void closewindow(Event event) {
+        // Check If Unsaved Text
+        this.close();
+    }
+
     }
     public static class AdvancedAmbienceEditor extends Stage implements Initializable {
         public Button RightArrow;

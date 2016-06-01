@@ -49,20 +49,20 @@ public class Options {
     );
     public static ArrayList<String> STYLETHEMES = new ArrayList<>();
 /// Default Option Values
-    public static final Boolean TOOLTIPS = true;
-    public static final Boolean HELPDIALOGS = true;
-    public static final Double ENTRAINMENTVOLUME = 0.6; // Default Entrainment Volume (Textfield -> In Percentage)
-    public static final Double AMBIENCEVOLUME = 1.0; // Default Ambience Volume (Textfield -> In Percentage)
-    public static final Double FADEINDURATION = 10.0; // Fade In Duration (Textfield -> In Decimal Seconds)
-    public static final Double FADEOUTDURATION = 10.0; // Fade Out Duration (Textfield -> In Decimal Seconds)
-    public static final Boolean ALERTFUNCTION = true;
-    public static final String ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
-    public static final String THEMEFILELOCATION = new File(DIRECTORYSTYLES, "dark.css").toURI().toString();
-    public static final Boolean RAMPENABLED = true;
-    public static final Integer RAMPDURATION = 2;
-    public static final PlayerUI.ReferenceType REFERENCE_TYPE = PlayerUI.ReferenceType.html;
-    public static final Boolean REFERENCEDISPLAY = false;
-    public static final Boolean REFERENCEFULLSCREEN = true;
+    public static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
+    public static final Boolean DEFAULT_HELP_DIALOGS_OPTION = true;
+    public static final Double DEFAULT_ENTRAINMENTVOLUME = 0.6; // Default Entrainment Volume (Textfield -> In Percentage)
+    public static final Double DEFAULT_AMBIENCEVOLUME = 1.0; // Default Ambience Volume (Textfield -> In Percentage)
+    public static final Double DEFAULT_FADEINDURATION = 10.0; // Fade In Duration (Textfield -> In Decimal Seconds)
+    public static final Double DEFAULTFADEOUTDURATION = 10.0; // Fade Out Duration (Textfield -> In Decimal Seconds)
+    public static final Boolean DEFAULT_ALERTFUNCTION_OPTION = true;
+    public static final String DEFAULT_ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
+    public static final String DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "dark.css").toURI().toString();
+    public static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
+    public static final Integer DEFAULT_RAMP_DURATION = 2;
+    public static final PlayerUI.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = PlayerUI.ReferenceType.html;
+    public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
+    public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
     private ProgramOptions ProgramOptions;
     private SessionOptions SessionOptions;
     private AppearanceOptions AppearanceOptions;
@@ -124,24 +124,24 @@ public class Options {
     }
     public void resettodefaults() {
         kujiin.xml.Options.ProgramOptions programOptions = new ProgramOptions();
-        programOptions.setTooltips(TOOLTIPS);
-        programOptions.setHelpdialogs(HELPDIALOGS);
+        programOptions.setTooltips(DEFAULT_TOOLTIPS_OPTION);
+        programOptions.setHelpdialogs(DEFAULT_HELP_DIALOGS_OPTION);
         setProgramOptions(programOptions);
         kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
-        sessionOptions.setFadeoutduration(FADEOUTDURATION);
-        sessionOptions.setAmbiencevolume(AMBIENCEVOLUME);
-        sessionOptions.setAlertfunction(ALERTFUNCTION);
-        sessionOptions.setAlertfilelocation(ALERTFILELOCATION);
-        sessionOptions.setFadeinduration(FADEINDURATION);
-        sessionOptions.setEntrainmentvolume(ENTRAINMENTVOLUME);
-        sessionOptions.setRampenabled(RAMPENABLED);
-        sessionOptions.setRampduration(RAMPDURATION);
-        sessionOptions.setReferenceoption(REFERENCEDISPLAY);
-        sessionOptions.setReferencetype(REFERENCE_TYPE);
-        sessionOptions.setReferencefullscreen(REFERENCEFULLSCREEN);
+        sessionOptions.setFadeoutduration(DEFAULTFADEOUTDURATION);
+        sessionOptions.setAmbiencevolume(DEFAULT_AMBIENCEVOLUME);
+        sessionOptions.setAlertfunction(DEFAULT_ALERTFUNCTION_OPTION);
+        sessionOptions.setAlertfilelocation(DEFAULT_ALERTFILELOCATION);
+        sessionOptions.setFadeinduration(DEFAULT_FADEINDURATION);
+        sessionOptions.setEntrainmentvolume(DEFAULT_ENTRAINMENTVOLUME);
+        sessionOptions.setRampenabled(DEFAULT_RAMP_ENABLED_OPTION);
+        sessionOptions.setRampduration(DEFAULT_RAMP_DURATION);
+        sessionOptions.setReferenceoption(DEFAULT_REFERENCE_DISPLAY);
+        sessionOptions.setReferencetype(DEFAULT_REFERENCE_TYPE_OPTION);
+        sessionOptions.setReferencefullscreen(DEFAULT_REFERENCE_FULLSCREEN_OPTION);
         setSessionOptions(sessionOptions);
         kujiin.xml.Options.AppearanceOptions appearanceOptions = new AppearanceOptions();
-        appearanceOptions.setThemefile(THEMEFILELOCATION);
+        appearanceOptions.setThemefile(DEFAULT_THEMEFILE);
         setAppearanceOptions(appearanceOptions);
         marshall();
     }

@@ -23,6 +23,7 @@ public class Main extends Application {
             Root.getOptions().setStyle(primaryStage);
         });
         primaryStage.show();
+//        test();
     }
 
     public static void main(String[] args) {
@@ -35,6 +36,10 @@ public class Main extends Application {
             super.stop();
             System.exit(0);
         }
+    }
+
+    public void test() {
+
     }
 
 }

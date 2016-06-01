@@ -10,6 +10,10 @@ import javafx.util.Duration;
 import kujiin.MainController;
 import kujiin.xml.Options;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -267,7 +271,7 @@ public class Util {
     public static String file_getcontents(File file) {
         try {
             return org.apache.commons.io.FileUtils.readFileToString(file);
-        } catch (IOException ignored) {return "";}
+        } catch (IOException ignored) {return null;}
     }
     public static boolean file_writecontents(File file, String contents) {
         try {
@@ -501,6 +505,16 @@ public class Util {
             }
         }
         return newname.toString();
+    }
+    public static boolean String_validhtml(String text) {
+        SAXBuilder builder = new SAXBuilder();
+        try {builder.build(IOUtils.toInputStream(text, "UTF-8")); return true;}
+        catch (IOException | JDOMException e) {return false;}
+    }
+    public static boolean String_validhtml(File file) {
+        SAXBuilder builder = new SAXBuilder();
+        try {Document document = builder.build(file); return true;}
+        catch (IOException | JDOMException e) {return false;}
     }
 
 // List Methods

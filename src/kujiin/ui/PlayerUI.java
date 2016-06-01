@@ -114,7 +114,7 @@ public class PlayerUI extends Stage {
             Root.getOptions().getSessionOptions().setReferencetype(null);
         } else {
             if (Root.getOptions().getSessionOptions().getReferencetype() == null) {
-                Root.getOptions().getSessionOptions().setReferencetype(Options.REFERENCE_TYPE);
+                Root.getOptions().getSessionOptions().setReferencetype(Options.DEFAULT_REFERENCE_TYPE_OPTION);
             }
             switch (Root.getOptions().getSessionOptions().getReferencetype()) {
                 case html:
@@ -171,21 +171,25 @@ public class PlayerUI extends Stage {
         private Scene scene;
 
         public DisplayReference(MainController root, Meditatable currentcutorelement) {
-            Root = root;
-            this.currentcutorelement = currentcutorelement;
-            referenceType = Root.getOptions().getSessionOptions().getReferencetype();
-            fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
-            fxmlLoader.setController(this);
-            try {
-                scene = new Scene(fxmlLoader.load());
-                setScene(scene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-            setTitle(this.currentcutorelement.name + "'s Reference");
-            setsizing();
-            loadcontent();
+            if (isValid()) {
+                Root = root;
+                this.currentcutorelement = currentcutorelement;
+                referenceType = Root.getOptions().getSessionOptions().getReferencetype();
+                fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
+                fxmlLoader.setController(this);
+                try {
+                    scene = new Scene(fxmlLoader.load());
+                    setScene(scene);
+                    Root.getOptions().setStyle(this);
+                    this.setResizable(false);
+                } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+                setTitle(this.currentcutorelement.name + "'s Reference");
+                setsizing();
+                loadcontent();
+            } else {
+                Util.gui_showinformationdialog(Root, "Cannot Display", "Cannot Display Reference File", "Non-Existent, Invalid Or Empty Reference File");
+            }
         }
         public DisplayReference(MainController root, String htmlcontent) {
             Root = root;
@@ -250,6 +254,19 @@ public class PlayerUI extends Stage {
                         break;
                 }
             }
+        }
+        public boolean isValid() {
+            if (referenceType == null) {return false;}
+            File referencefile = currentcutorelement.getReferenceFile();
+            String contents = Util.file_getcontents(referencefile);
+            if (contents == null) {return false;}
+            switch (referenceType) {
+                case html:
+                    return contents.length() > 0 && Util.String_validhtml(contents);
+                case txt:
+                    return contents.length() > 0;
+            }
+            return true;
         }
 
         public void play(ActionEvent actionEvent) {Root.getSession().play(Root.getPlayer());}

@@ -477,11 +477,11 @@ public class Meditatable {
         } catch (Exception ignored) {}
     }
     public void setvolumeenabled(boolean enabled) {
+        thisession.Root.getPlayer().EntrainmentVolume.setDisable(! enabled);
         if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(! enabled);}
-        else {thisession.Root.getPlayer().AmbienceVolume.setDisable(! enabled);}
         if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
-            if (ambienceenabled) {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(! enabled);}
-            else {thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(! enabled);}
+            thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(! enabled);
+            if (ambienceenabled) {thisession.getDisplayReference().AmbienceVolumeSlider.setDisable(! enabled);}
         }
     }
     public void toggleplayerbuttons() {
