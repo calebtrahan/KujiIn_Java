@@ -509,7 +509,7 @@ public class Util {
     public static boolean String_validhtml(String text) {
         SAXBuilder builder = new SAXBuilder();
         try {builder.build(IOUtils.toInputStream(text, "UTF-8")); return true;}
-        catch (IOException | JDOMException e) {return false;}
+        catch (IOException | JDOMException | NullPointerException e) {return false;}
     }
     public static boolean String_validhtml(File file) {
         SAXBuilder builder = new SAXBuilder();

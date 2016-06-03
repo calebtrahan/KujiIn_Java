@@ -286,7 +286,8 @@ public class MainController implements Initializable {
                 setReferenceType(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);
                 HTMLVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.html);
                 TEXTVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.txt);
-            }
+                PreviewButton.setDisable(! HTMLVariation.isSelected());
+            } else {PreviewButton.setDisable(false);}
         }
 
     // Getters And Setters
@@ -300,10 +301,12 @@ public class MainController implements Initializable {
     // Text Area Methods
         private boolean unsavedchanges() {
             try {return MainTextArea.getText().equals(Util.file_getcontents(selectedfile));}
-            catch (Exception e) {return false;}
+            catch (Exception e) {e.printStackTrace(); return false;}
         }
         public void newcutorelementselected(ActionEvent actionEvent) {
-            if (unsavedchanges() && previouslyselectedindex != null) {
+            HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
+            TEXTVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
+            if (previouslyselectedindex != null && selectedfile != null && unsavedchanges()) {
                 Util.AnswerType answerType = Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading A Different Cut/Element");
                 switch (answerType) {
                     case YES:
@@ -320,14 +323,14 @@ public class MainController implements Initializable {
             loadselectedfile();
         }
         private void textchanged() {
-            if (referenceType != null && selectedcutorelement != null) {
-                switch (referenceType) {
+            if (getReferenceType() != null && selectedcutorelement != null) {
+                switch (getReferenceType()) {
                     case html:
-                        if (Util.String_validhtml(MainTextArea.getText())) {StatusBar.setTextFill(Color.BLACK); StatusBar.setText("");}
+                        if (MainTextArea.getText() != null && Util.String_validhtml(MainTextArea.getText())) {StatusBar.setTextFill(Color.BLACK); StatusBar.setText("");}
                         else {StatusBar.setTextFill(Color.RED); StatusBar.setText("Not Valid .html");}
                         break;
                     case txt:
-                        if (MainTextArea.getText().length() == 0) {StatusBar.setTextFill(Color.RED); StatusBar.setText("No Text Entered");}
+                        if (MainTextArea.getText() != null && MainTextArea.getText().length() == 0) {StatusBar.setTextFill(Color.RED); StatusBar.setText("No Text Entered");}
                         else {StatusBar.setTextFill(Color.BLACK); StatusBar.setText("");}
                         break;
                 }
@@ -341,7 +344,7 @@ public class MainController implements Initializable {
     // Other Methods
         public void saveselectedfile(ActionEvent actionEvent) {
             if (Util.file_writecontents(selectedfile, Util.file_getcontents(selectedfile))) {
-                String text = selectedcutorelement + "'s Reference File (" + referenceType.toString() + " Variation) Has Been Saved";
+                String text = selectedcutorelement + "'s Reference File (" + getReferenceType().toString() + " Variation) Has Been Saved";
                 Util.gui_showtimedmessageonlabel(StatusBar, text, 5000);
             } else {
                 Util.gui_showerrordialog(Root, "Error", "Couldn't Save", "Does The File Exist/Do You Have Access To It?");}
@@ -351,14 +354,16 @@ public class MainController implements Initializable {
                 selectedcutorelement = CutNamesChoiceBox.getSelectionModel().getSelectedItem();
                 selectnewfile();
                 MainTextArea.setText(Util.file_getcontents(selectedfile));
+                StatusBar.setTextFill(Color.BLACK);
+                StatusBar.setText("");
             } else {
                 if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1) {Util.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
                 else {Util.gui_showinformationdialog(Root, "Information", "No Variation Selected", "Select A Variation To Load");}
             }
         }
         public void selectnewfile() {
-            if (referenceType == null || selectedcutorelement == null) {selectedfile = null; return;}
-            switch (referenceType) {
+            if (getReferenceType() == null || selectedcutorelement == null) {selectedfile = null; return;}
+            switch (getReferenceType()) {
                 case html:
                     selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html"), selectedcutorelement + ".html");
                     break;
@@ -384,7 +389,8 @@ public class MainController implements Initializable {
             }
             // Test If Unsaved Changes Here
             TEXTVariation.setSelected(false);
-            referenceType = PlayerUI.ReferenceType.html;
+            PreviewButton.setDisable(! HTMLVariation.isSelected());
+            setReferenceType(PlayerUI.ReferenceType.html);
             selectnewfile();
             loadselectedfile();
         }
@@ -405,13 +411,14 @@ public class MainController implements Initializable {
             }
             // Test If Unsaved Changes Here
             HTMLVariation.setSelected(false);
-            referenceType = PlayerUI.ReferenceType.txt;
+            PreviewButton.setDisable(! HTMLVariation.isSelected());
+            setReferenceType(PlayerUI.ReferenceType.txt);
             selectnewfile();
             loadselectedfile();
         }
         public void preview(ActionEvent actionEvent) {
             if (MainTextArea.getText().length() > 0 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
-                if (referenceType == PlayerUI.ReferenceType.html) {
+                if (getReferenceType() == PlayerUI.ReferenceType.html) {
                     PlayerUI.DisplayReference dr = new PlayerUI.DisplayReference(Root, MainTextArea.getText());
                     dr.showAndWait();
                 } else {
@@ -425,7 +432,6 @@ public class MainController implements Initializable {
         // Check If Unsaved Text
         this.close();
     }
-
 
 }
     public static class AdvancedAmbienceEditor extends Stage implements Initializable {

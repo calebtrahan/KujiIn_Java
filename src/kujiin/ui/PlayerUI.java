@@ -193,7 +193,7 @@ public class PlayerUI extends Stage {
         }
         public DisplayReference(MainController root, String htmlcontent) {
             Root = root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferencePreview.fxml"));
             fxmlLoader.setController(this);
             try {
                 scene = new Scene(fxmlLoader.load());
