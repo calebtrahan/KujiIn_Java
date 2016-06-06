@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import kujiin.util.Util;
 
 
 public class Main extends Application {
@@ -21,6 +22,10 @@ public class Main extends Application {
             Root.setScene(Scene);
             Root.setStage(primaryStage);
             Root.getOptions().setStyle(primaryStage);
+        });
+        primaryStage.setOnCloseRequest(event -> {
+            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Really Exit?", "")) {System.exit(0);}
+            else {event.consume();}
         });
         primaryStage.show();
 //        test();

@@ -282,14 +282,13 @@ public class MainController implements Initializable {
             CutNamesChoiceBox.setItems(cutorelementnames);
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
             CutNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {previouslyselectedindex = oldValue.intValue();});
-            if (kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION != null) {
-                setReferenceType(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);
-                HTMLVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.html);
-                TEXTVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.txt);
-                PreviewButton.setDisable(! HTMLVariation.isSelected());
-            } else {PreviewButton.setDisable(false);}
+            HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
+            TEXTVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
+            setReferenceType(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);
+            HTMLVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.html);
+            TEXTVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.txt);
+            PreviewButton.setDisable(! HTMLVariation.isSelected());
         }
-
     // Getters And Setters
         public PlayerUI.ReferenceType getReferenceType() {
             return referenceType;
@@ -366,9 +365,11 @@ public class MainController implements Initializable {
             switch (getReferenceType()) {
                 case html:
                     selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html"), selectedcutorelement + ".html");
+                    if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root, e);}}
                     break;
                 case txt:
                     selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt"), selectedcutorelement + ".txt");
+                    if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root, e);}}
                     break;
             }
         }
