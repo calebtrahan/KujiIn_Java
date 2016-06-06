@@ -265,7 +265,7 @@ public class MainController implements Initializable {
         private String selectedcutorelement;
         private MainController Root;
         private PlayerUI.ReferenceType referenceType;
-        private Integer previouslyselectedindex;
+        private ArrayList<Integer> userselectedindexes;
 
         public EditReferenceFiles(MainController root) {
             Root = root;
@@ -279,16 +279,19 @@ public class MainController implements Initializable {
             setTitle("Reference Files Editor");
             ObservableList<String> cutorelementnames = FXCollections.observableArrayList();
             cutorelementnames.addAll(kujiin.xml.Options.ALLNAMES);
+            userselectedindexes = new ArrayList<>();
             CutNamesChoiceBox.setItems(cutorelementnames);
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
-            CutNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {previouslyselectedindex = oldValue.intValue();});
+            CutNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {if (oldValue != null) userselectedindexes.add(oldValue.intValue());});
             HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             TEXTVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             setReferenceType(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);
             HTMLVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.html);
             TEXTVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.txt);
-            PreviewButton.setDisable(! HTMLVariation.isSelected());
+            PreviewButton.setDisable(true);
+            SaveButton.setDisable(true);
         }
+
     // Getters And Setters
         public PlayerUI.ReferenceType getReferenceType() {
             return referenceType;
@@ -299,13 +302,14 @@ public class MainController implements Initializable {
 
     // Text Area Methods
         private boolean unsavedchanges() {
+            // TODO String Comparisons Don't Work As Apache Commons And Java Library Create Different Strings I Think?
             try {return MainTextArea.getText().equals(Util.file_getcontents(selectedfile));}
             catch (Exception e) {e.printStackTrace(); return false;}
         }
         public void newcutorelementselected(ActionEvent actionEvent) {
             HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             TEXTVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
-            if (previouslyselectedindex != null && selectedfile != null && unsavedchanges()) {
+            if (userselectedindexes.size() > 0 && selectedfile != null && unsavedchanges()) {
                 Util.AnswerType answerType = Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading A Different Cut/Element");
                 switch (answerType) {
                     case YES:
@@ -314,15 +318,17 @@ public class MainController implements Initializable {
                     case NO:
                         break;
                     case CANCEL:
-                        CutNamesChoiceBox.getSelectionModel().select(previouslyselectedindex);
+                        CutNamesChoiceBox.getSelectionModel().select(userselectedindexes.get(userselectedindexes.size() - 1));
                         return;
                 }
             }
-            selectnewfile();
             loadselectedfile();
         }
         private void textchanged() {
-            if (getReferenceType() != null && selectedcutorelement != null) {
+            if (getReferenceType() != null && selectedcutorelement != null && selectedfile != null) {
+                boolean hasvalidtext = MainTextArea.getText() != null && MainTextArea.getText().length() > 0;
+                PreviewButton.setDisable(! hasvalidtext || getReferenceType() == PlayerUI.ReferenceType.txt);
+                SaveButton.setDisable(MainTextArea.getText() == null || Util.file_getcontents(selectedfile).equals(MainTextArea.getText().toCharArray()));
                 switch (getReferenceType()) {
                     case html:
                         if (MainTextArea.getText() != null && Util.String_validhtml(MainTextArea.getText())) {StatusBar.setTextFill(Color.BLACK); StatusBar.setText("");}
@@ -342,25 +348,29 @@ public class MainController implements Initializable {
 
     // Other Methods
         public void saveselectedfile(ActionEvent actionEvent) {
-            if (Util.file_writecontents(selectedfile, Util.file_getcontents(selectedfile))) {
+            if (Util.file_writecontents(selectedfile, MainTextArea.getText())) {
                 String text = selectedcutorelement + "'s Reference File (" + getReferenceType().toString() + " Variation) Has Been Saved";
-                Util.gui_showtimedmessageonlabel(StatusBar, text, 5000);
-            } else {
-                Util.gui_showerrordialog(Root, "Error", "Couldn't Save", "Does The File Exist/Do You Have Access To It?");}
+                Util.gui_showinformationdialog(Root, "Changes Saved", text, "");
+            } else {Util.gui_showerrordialog(Root, "Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
         }
         public void loadselectedfile() {
             if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
                 selectedcutorelement = CutNamesChoiceBox.getSelectionModel().getSelectedItem();
                 selectnewfile();
-                MainTextArea.setText(Util.file_getcontents(selectedfile));
+                String contents = Util.file_getcontents(selectedfile);
+                System.out.println(contents.length());
+                MainTextArea.setText(contents);
+                PreviewButton.setDisable(TEXTVariation.isSelected() || contents == null || contents.length() == 0);
                 StatusBar.setTextFill(Color.BLACK);
                 StatusBar.setText("");
             } else {
                 if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1) {Util.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
                 else {Util.gui_showinformationdialog(Root, "Information", "No Variation Selected", "Select A Variation To Load");}
+                PreviewButton.setDisable(true);
             }
         }
         public void selectnewfile() {
+            System.out.println("Selecting New File");
             if (getReferenceType() == null || selectedcutorelement == null) {selectedfile = null; return;}
             switch (getReferenceType()) {
                 case html:
@@ -372,6 +382,7 @@ public class MainController implements Initializable {
                     if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root, e);}}
                     break;
             }
+            System.out.println(selectedfile.getAbsolutePath());
         }
         public void htmlselected(ActionEvent actionEvent) {
             if (unsavedchanges()) {
