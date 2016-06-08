@@ -270,8 +270,17 @@ public class Util {
     }
     public static String file_getcontents(File file) {
         try {
-            return org.apache.commons.io.FileUtils.readFileToString(file);
-        } catch (IOException ignored) {return null;}
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                StringBuilder sb = new StringBuilder();
+                String line = br.readLine();
+                while (line != null) {
+                    sb.append(line);
+                    sb.append("\n");
+                    line = br.readLine();
+                }
+                return sb.toString();
+            }
+        } catch (IOException e) {e.printStackTrace(); return null;}
     }
     public static boolean file_writecontents(File file, String contents) {
         try {

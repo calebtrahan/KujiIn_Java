@@ -22,6 +22,7 @@ import kujiin.MainController;
 import kujiin.util.*;
 import kujiin.xml.Preset;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -382,6 +383,15 @@ public class CreatorAndExporterUI {
             if (changevaluesdialog.getincludepostsession()) {session.getPostsession().changevalue(min);}
         }
     }
+    public boolean cleanup() {
+        boolean currentlyexporting = getExporterState() == ExporterState.WORKING;
+        if (currentlyexporting) {
+            Util.gui_showinformationdialog(Root, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
+        } else {This_Session.deleteprevioussession();}
+        return ! currentlyexporting;
+    }
+
+// Presets
     public void changevaluestopreset(ArrayList<Integer> presetvalues) {
         try {
             PreTime.setText(presetvalues.get(0).toString());
@@ -394,36 +404,31 @@ public class CreatorAndExporterUI {
             RetsuTime.setText(presetvalues.get(7).toString());
             ZaiTime.setText(presetvalues.get(8).toString());
             ZenTime.setText(presetvalues.get(9).toString());
-            PostTime.setText(presetvalues.get(10).toString());
+            EarthTime.setText(presetvalues.get(10).toString());
+            AirTime.setText(presetvalues.get(11).toString());
+            FireTime.setText(presetvalues.get(12).toString());
+            WaterTime.setText(presetvalues.get(13).toString());
+            VoidTime.setText(presetvalues.get(14).toString());
+            PostTime.setText(presetvalues.get(15).toString());
         } catch (ArrayIndexOutOfBoundsException ignored) {
             Util.gui_showerrordialog(Root, "Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
         }
     }
     public ArrayList<Integer> getcreatorvalues() {
         return new ArrayList<>(Arrays.asList(
-            Integer.parseInt(PreTime.getText()), Integer.parseInt(RinTime.getText()), Integer.parseInt(KyoTime.getText()),
-            Integer.parseInt(TohTime.getText()), Integer.parseInt(ShaTime.getText()), Integer.parseInt(KaiTime.getText()),
-            Integer.parseInt(JinTime.getText()), Integer.parseInt(RetsuTime.getText()), Integer.parseInt(ZaiTime.getText()),
-            Integer.parseInt(ZenTime.getText()), Integer.parseInt(EarthTime.getText()), Integer.parseInt(AirTime.getText()),
-            Integer.parseInt(FireTime.getText()), Integer.parseInt(WaterTime.getText()), Integer.parseInt(VoidTime.getText()),
-            Integer.parseInt(PostTime.getText())
-        ));
+                Integer.parseInt(PreTime.getText()), Integer.parseInt(RinTime.getText()), Integer.parseInt(KyoTime.getText()),
+                Integer.parseInt(TohTime.getText()), Integer.parseInt(ShaTime.getText()), Integer.parseInt(KaiTime.getText()),
+                Integer.parseInt(JinTime.getText()), Integer.parseInt(RetsuTime.getText()), Integer.parseInt(ZaiTime.getText()),
+                Integer.parseInt(ZenTime.getText()), Integer.parseInt(EarthTime.getText()), Integer.parseInt(AirTime.getText()),
+                Integer.parseInt(FireTime.getText()), Integer.parseInt(WaterTime.getText()), Integer.parseInt(VoidTime.getText()),
+                Integer.parseInt(PostTime.getText()))
+        );
     }
-    public boolean cleanup() {
-        boolean currentlyexporting = getExporterState() == ExporterState.WORKING;
-        if (currentlyexporting) {
-            Util.gui_showinformationdialog(Root, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
-        } else {This_Session.deleteprevioussession();}
-        return ! currentlyexporting;
-    }
-
-// Presets
     public void loadpreset() {
-        if (Preset.openpreset() != null && Preset.validpreset()) {
+        File presetfile = Preset.openpreset();
+        if (presetfile != null && Preset.validpreset()) {
             changevaluestopreset(Preset.getpresettimes());
-        } else {
-
-            Util.gui_showinformationdialog(Root, "Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
+        } else {if (presetfile != null) Util.gui_showinformationdialog(Root, "Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
     }
     public void savepreset() {
         Preset.setpresettimes(getcreatorvalues());

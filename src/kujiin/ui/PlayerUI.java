@@ -23,8 +23,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 // TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
-
 // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
+
 public class PlayerUI extends Stage {
     public Button PlayButton;
     public Button PauseButton;
@@ -149,7 +149,6 @@ public class PlayerUI extends Stage {
     public void cleanupPlayer() {}
 
     // Dialogs
-    // TODO Style Reference Display
     public static class DisplayReference extends Stage {
         public ScrollPane ContentPane;
         public Slider EntrainmentVolumeSlider;

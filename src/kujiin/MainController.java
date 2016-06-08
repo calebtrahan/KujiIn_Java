@@ -219,8 +219,7 @@ public class MainController implements Initializable {
 
 // Creator And Exporter UI
     public void loadpreset(ActionEvent actionEvent) {CreatorAndExporter.loadpreset();}
-    public void savepreset(ActionEvent actionEvent) {
-        CreatorAndExporter.savepreset();}
+    public void savepreset(ActionEvent actionEvent) {CreatorAndExporter.savepreset();}
     public void toggleexporter(ActionEvent actionEvent) {
         getCreatorAndExporter().toggleexport();
     }
@@ -290,6 +289,19 @@ public class MainController implements Initializable {
             TEXTVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == PlayerUI.ReferenceType.txt);
             PreviewButton.setDisable(true);
             SaveButton.setDisable(true);
+            this.setOnCloseRequest(event -> {
+                if (unsavedchanges()) {
+                    switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", CutNamesChoiceBox.getValue() + " " + getReferenceType().name() + " Variation Has Unsaved Changes", "Save Changes Before Exiting?")) {
+                        case YES:
+                            saveselectedfile(null);
+                            break;
+                        case NO:
+                            break;
+                        case CANCEL:
+                            event.consume();
+                    }
+                }
+            });
         }
 
     // Getters And Setters
@@ -302,9 +314,9 @@ public class MainController implements Initializable {
 
     // Text Area Methods
         private boolean unsavedchanges() {
-            // TODO String Comparisons Don't Work As Apache Commons And Java Library Create Different Strings I Think?
-            try {return MainTextArea.getText().equals(Util.file_getcontents(selectedfile));}
-            catch (Exception e) {e.printStackTrace(); return false;}
+            try {
+                return ! MainTextArea.getText().equals(Util.file_getcontents(selectedfile));
+            } catch (Exception e) {e.printStackTrace(); return false;}
         }
         public void newcutorelementselected(ActionEvent actionEvent) {
             HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
@@ -358,11 +370,11 @@ public class MainController implements Initializable {
                 selectedcutorelement = CutNamesChoiceBox.getSelectionModel().getSelectedItem();
                 selectnewfile();
                 String contents = Util.file_getcontents(selectedfile);
-                System.out.println(contents.length());
                 MainTextArea.setText(contents);
                 PreviewButton.setDisable(TEXTVariation.isSelected() || contents == null || contents.length() == 0);
                 StatusBar.setTextFill(Color.BLACK);
                 StatusBar.setText("");
+                SaveButton.setDisable(true);
             } else {
                 if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1) {Util.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
                 else {Util.gui_showinformationdialog(Root, "Information", "No Variation Selected", "Select A Variation To Load");}
@@ -370,7 +382,6 @@ public class MainController implements Initializable {
             }
         }
         public void selectnewfile() {
-            System.out.println("Selecting New File");
             if (getReferenceType() == null || selectedcutorelement == null) {selectedfile = null; return;}
             switch (getReferenceType()) {
                 case html:
@@ -382,7 +393,6 @@ public class MainController implements Initializable {
                     if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root, e);}}
                     break;
             }
-            System.out.println(selectedfile.getAbsolutePath());
         }
         public void htmlselected(ActionEvent actionEvent) {
             if (unsavedchanges()) {
@@ -429,13 +439,12 @@ public class MainController implements Initializable {
             loadselectedfile();
         }
         public void preview(ActionEvent actionEvent) {
-            if (MainTextArea.getText().length() > 0 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
-                if (getReferenceType() == PlayerUI.ReferenceType.html) {
-                    PlayerUI.DisplayReference dr = new PlayerUI.DisplayReference(Root, MainTextArea.getText());
-                    dr.showAndWait();
-                } else {
-                    Util.gui_showinformationdialog(Root, "Information", "Preview Is For Html Content, And Is Not Available For Text Only", "Cannot Open Preview");
+            if (MainTextArea.getText().length() > 0 && HTMLVariation.isSelected() && getReferenceType() == PlayerUI.ReferenceType.html) {
+                if (! Util.String_validhtml(MainTextArea.getText())) {
+                    if (! Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Html Code In Text Area Is Not Valid HTML", "Preview Anyways?")) {return;}
                 }
+                PlayerUI.DisplayReference dr = new PlayerUI.DisplayReference(Root, MainTextArea.getText());
+                dr.showAndWait();
             }
         }
 
@@ -449,7 +458,6 @@ public class MainController implements Initializable {
     public static class AdvancedAmbienceEditor extends Stage implements Initializable {
         public Button RightArrow;
         public Button LeftArrow;
-        public Label CutSelectionLabel;
         public ChoiceBox<String> CutOrElementSelectionBox;
         public TableView<AmbienceSong> Actual_Table;
         public TableColumn<AmbienceSong, String> Actual_NameColumn;
@@ -583,7 +591,9 @@ public class MainController implements Initializable {
             for (AmbienceSong i : Temp_Table.getItems()) {
                 temptotalduration += i.getDuration();
             }
-            Temp_TotalDuration.setText(Util.format_minstohrsandmins_long((int) ((temptotalduration / 1000) / 60)));
+            String longtext = Util.format_minstohrsandmins_long((int) ((temptotalduration / 1000) / 60));
+            if (longtext.length() < 20) {Temp_TotalDuration.setText(longtext);}
+            else {Temp_TotalDuration.setText(Util.format_minstohrsandmins_short((int) ((temptotalduration / 1000) / 60)));}
         }
         public void deletetempambiencefromdirectory() {
             try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
@@ -602,7 +612,9 @@ public class MainController implements Initializable {
             for (AmbienceSong i : Actual_Table.getItems()) {
                 actualtotalduration += i.getDuration();
             }
-            Actual_TotalDuration.setText(Util.format_minstohrsandmins_long((int) ((actualtotalduration / 1000) / 60)));
+            String longtext = Util.format_minstohrsandmins_long((int) ((actualtotalduration / 1000) / 60));
+            if (longtext.length() < 20) {Actual_TotalDuration.setText(longtext);}
+            else {Actual_TotalDuration.setText(Util.format_minstohrsandmins_short((int) ((actualtotalduration / 1000) / 60)));}
         }
 
     // Table Methods
@@ -618,7 +630,6 @@ public class MainController implements Initializable {
                 selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
                 if (populateactualambiencetable()) {
                     Actual_Table.setItems(actual_ambiencesonglist);
-                    CutSelectionLabel.setText(selectedcutorelementname + "'s Ambience");
                 }
                 calculateactualtotalduration();
             }
@@ -780,6 +791,7 @@ public class MainController implements Initializable {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
+                setTitle("Simple Ambience Editor");
             } catch (IOException ignored) {}
             CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
         }
@@ -793,6 +805,7 @@ public class MainController implements Initializable {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
+                setTitle("Simple Ambience Editor");
             } catch (IOException ignored) {}
             setOnShowing(event -> {
                 if (kujiin.xml.Options.ALLNAMES.contains(cutorelementname)) {

@@ -185,7 +185,8 @@ public class Preset {
     public ArrayList<Integer> getpresettimes() {
         return new ArrayList<>(Arrays.asList(
                 getPreTime(), getRinTime(), getKyoTime(), getTohTime(), getShaTime(), getKaiTime(),
-                getJinTime(), getRetsuTime(), getZaiTime(), getZenTime(), getPostTime()));
+                getJinTime(), getRetsuTime(), getZaiTime(), getZenTime(), getEarthTime(), getAirTime(),
+                getFireTime(), getWaterTime(), getVoidTime(), getPostTime()));
     }
     public void setpresettimes(ArrayList<Integer> creatorvalues) {
         try {

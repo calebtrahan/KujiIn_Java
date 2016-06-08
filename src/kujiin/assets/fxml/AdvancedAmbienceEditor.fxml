@@ -6,32 +6,30 @@
 <?import javafx.scene.text.*?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="487.0" prefWidth="726.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label layoutX="14.0" prefHeight="52.0" prefWidth="331.0" text="Advanced Ambience Editor">
-         <font>
-            <Font size="26.0" />
-         </font>
-      </Label>
       <VBox layoutX="388.0" layoutY="39.0" prefHeight="411.0" prefWidth="322.0">
          <children>
-            <Label fx:id="CutSelectionLabel" alignment="BOTTOM_CENTER" prefHeight="24.0" prefWidth="325.0" text="No Cut Or Element Selected" textAlignment="CENTER">
+            <Label alignment="BOTTOM_CENTER" prefHeight="24.0" prefWidth="325.0" text="Actual Ambience" textAlignment="CENTER">
                <font>
-                  <Font name="System Bold" size="17.0" />
+                  <Font name="System Bold Italic" size="16.0" />
                </font>
+               <VBox.margin>
+                  <Insets bottom="3.0" />
+               </VBox.margin>
             </Label>
             <TableView fx:id="Actual_Table" prefHeight="364.0" prefWidth="322.0">
                <columns>
-                  <TableColumn fx:id="Actual_NameColumn" prefWidth="226.0" text="Name" />
+                  <TableColumn fx:id="Actual_NameColumn" prefWidth="227.0" text="Name" />
                   <TableColumn fx:id="Actual_DurationColumn" prefWidth="95.0" text="Duration" />
                </columns>
             </TableView>
-            <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="322.0">
+            <HBox alignment="CENTER_LEFT" prefHeight="29.0" prefWidth="322.0">
                <children>
-                  <TextField fx:id="Actual_TotalDuration" alignment="CENTER" prefHeight="26.0" prefWidth="155.0">
+                  <TextField fx:id="Actual_TotalDuration" alignment="CENTER" prefHeight="26.0" prefWidth="148.0">
                      <HBox.margin>
-                        <Insets right="5.0" />
+                        <Insets right="3.0" />
                      </HBox.margin>
                   </TextField>
-                  <Button fx:id="Actual_AddButton" mnemonicParsing="false" onAction="#addtoactualambience" prefHeight="10.0" prefWidth="42.0" text="Add">
+                  <Button fx:id="Actual_AddButton" mnemonicParsing="false" onAction="#addtoactualambience" text="Add">
                      <font>
                         <Font size="12.0" />
                      </font></Button>
@@ -49,22 +47,25 @@
       </VBox>
       <VBox layoutX="14.0" layoutY="39.0" prefHeight="411.0" prefWidth="322.0">
          <children>
-            <Label alignment="CENTER" prefHeight="26.0" prefWidth="303.0" text="Temp Ambience" textAlignment="CENTER">
+            <Label alignment="CENTER" prefHeight="24.0" prefWidth="326.0" text="Temporary Ambience" textAlignment="CENTER">
                <font>
-                  <Font name="System Bold" size="17.0" />
+                  <Font name="System Bold Italic" size="16.0" />
                </font>
+               <VBox.margin>
+                  <Insets bottom="3.0" />
+               </VBox.margin>
             </Label>
-            <TableView fx:id="Temp_Table" maxWidth="322.0" prefHeight="354.0" prefWidth="322.0">
+            <TableView fx:id="Temp_Table" prefHeight="364.0" prefWidth="322.0">
               <columns>
                 <TableColumn fx:id="Temp_NameColumn" maxWidth="227.0" prefWidth="227.0" text="Name" />
                 <TableColumn fx:id="Temp_DurationColumn" maxWidth="95.0" prefWidth="95.0" text="Duration" />
               </columns>
             </TableView>
-            <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="234.0">
+            <HBox alignment="CENTER_LEFT" prefHeight="29.0" prefWidth="322.0">
                <children>
-                  <TextField fx:id="Temp_TotalDuration" alignment="CENTER" prefHeight="26.0" prefWidth="157.0">
+                  <TextField fx:id="Temp_TotalDuration" alignment="CENTER" prefHeight="29.0" prefWidth="148.0" HBox.hgrow="ALWAYS">
                      <HBox.margin>
-                        <Insets right="5.0" />
+                        <Insets right="3.0" />
                      </HBox.margin>
                   </TextField>
                   <Button fx:id="Temp_AddButton" mnemonicParsing="false" onAction="#addtotempambience" text="Add">
@@ -97,23 +98,23 @@
             </Button>
          </children>
       </VBox>
-      <HBox alignment="CENTER" layoutX="388.0" layoutY="9.0" prefHeight="34.0" prefWidth="322.0">
+      <HBox alignment="CENTER" layoutX="14.0" layoutY="9.0" prefHeight="34.0" prefWidth="696.0">
          <children>
-            <Label prefHeight="16.0" prefWidth="152.0" text="Select Cut Or Element:">
+            <Label text="Select Cut Or Element:">
                <HBox.margin>
                   <Insets right="20.0" />
                </HBox.margin>
                <font>
-                  <Font size="14.0" />
+                  <Font name="System Bold" size="17.0" />
                </font>
             </Label>
             <ChoiceBox fx:id="CutOrElementSelectionBox" prefHeight="26.0" prefWidth="160.0" />
          </children>
       </HBox>
-      <HBox alignment="CENTER_RIGHT" layoutX="309.0" layoutY="455.0" prefHeight="26.0" prefWidth="401.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="388.0" layoutY="455.0" prefHeight="26.0" prefWidth="322.0">
          <children>
             <Button fx:id="SaveButton" mnemonicParsing="false" onAction="#save" text="Save" />
-            <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#closebuttonpressed" prefHeight="26.0" prefWidth="52.0" text="Close" />
+            <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#closebuttonpressed" text="Close" />
          </children>
       </HBox>
       <Button fx:id="SwitchToSimpleEditor" layoutX="14.0" layoutY="455.0" mnemonicParsing="false" onAction="#switchtosimple" text="Switch To Simple Editor" />
