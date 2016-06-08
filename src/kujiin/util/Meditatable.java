@@ -145,7 +145,6 @@ public class Meditatable {
     }
 
 // Playback
-    // TODO Find Out Why Fade Animations Are Accruing Indefinite Memory
     public void setupfadeanimations() {
     // PLAY
         if (thisession.Root.getOptions().getSessionOptions().getFadeinduration() > 0.0) {

@@ -109,7 +109,7 @@ public class Element extends Meditatable {
         super.tick();
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             ProgressAndGoalsUI progressAndGoalsUI = thisession.Root.getProgressTracker();
-            progressAndGoalsUI.getSessions().getsession(progressAndGoalsUI.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
+            progressAndGoalsUI.getSessions().sessioninformation_getspecificsession(progressAndGoalsUI.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
         }
     }
     @Override

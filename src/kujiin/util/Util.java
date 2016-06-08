@@ -70,6 +70,31 @@ public class Util {
         }
         return AnswerType.CANCEL;
     }
+    public static AnswerType gui_getyesnocancelconfirmationdialog(MainController root, String titletext, String headertext, String contenttext, String yesbuttontext, String nobuttontext, String cancelbuttontext) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setTitle(titletext);
+        a.setHeaderText(headertext);
+        a.setContentText(contenttext);
+        ButtonType yes;
+        ButtonType no;
+        ButtonType cancel;
+        if (yesbuttontext != null) {yes = new ButtonType("Yes");} else {yes = new ButtonType(yesbuttontext);}
+        if (nobuttontext != null) {no = new ButtonType("No");} else {no = new ButtonType(nobuttontext);}
+        if (cancelbuttontext != null) {cancel = new ButtonType("Cancel");} else {cancel = new ButtonType(cancelbuttontext);}
+        a.getButtonTypes().clear();
+        a.getButtonTypes().add(yes);
+        a.getButtonTypes().add(no);
+        a.getButtonTypes().add(cancel);
+        DialogPane dialogPane = a.getDialogPane();
+        dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
+        Optional<ButtonType> answer = a.showAndWait();
+        if (answer.isPresent()) {
+            if (answer.get() == yes) {return AnswerType.YES;}
+            if (answer.get() == no) {return AnswerType.NO;}
+            if (answer.get() == cancel) {return AnswerType.CANCEL;}
+        }
+        return AnswerType.CANCEL;
+    }
     public static void gui_showinformationdialog(MainController root, String titletext, String headertext, String contexttext) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setTitle(titletext);

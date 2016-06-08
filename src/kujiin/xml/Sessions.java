@@ -93,11 +93,10 @@ public class Sessions {
     }
 
 // Session Information Getters
-    // TODO Refactor These Methods So They Make More Sense
     public int sessioninformation_getindividualsessiontotals(int index, Boolean includepreandpost) {
         try {
             int totalminutes = 0;
-            kujiin.xml.Session thissession = getsession(totalsessioncount() - 1);
+            kujiin.xml.Session thissession = sessioninformation_getspecificsession(sessioninformation_totalsessioncount() - 1);
             if (index == 0) {
                 // Pre And Post
                 totalminutes += thissession.getcutduration(0);
@@ -142,12 +141,12 @@ public class Sessions {
             return sessioncount;
         } catch (NullPointerException ignored) {return 0;}
     }
-    public int totalsessioncount() {
+    public int sessioninformation_totalsessioncount() {
         try {
             return getSession().size();
         } catch (NullPointerException ignored) {return 0;}
     }
-    public Session getsession(int index) {
+    public Session sessioninformation_getspecificsession(int index) {
         return getSession().get(index);
     }
 

@@ -183,34 +183,6 @@ public class ProgressAndGoalsUI {
         TotalTimePracticed.setText("-");
         NumberOfSessionsPracticed.setText("-");
     }
-    public void disable() {
-        TotalTimePracticed.setDisable(true);
-        NumberOfSessionsPracticed.setDisable(true);
-        AverageSessionDuration.setDisable(true);
-        PreAndPostOption.setDisable(true);
-        SessionListButton.setDisable(true);
-        NewGoalButton.setDisable(true);
-        CurrentGoalsButton.setDisable(true);
-        PracticedHours.setDisable(true);
-        PracticedMinutes.setDisable(false);
-        GoalHours.setDisable(false);
-        GoalMinutes.setDisable(false);
-        GoalProgress.setDisable(true);
-    }
-    public void enable() {
-        TotalTimePracticed.setDisable(false);
-        NumberOfSessionsPracticed.setDisable(false);
-        AverageSessionDuration.setDisable(false);
-        PreAndPostOption.setDisable(false);
-        SessionListButton.setDisable(false);
-        NewGoalButton.setDisable(false);
-        CurrentGoalsButton.setDisable(false);
-        PracticedHours.setDisable(false);
-        PracticedMinutes.setDisable(false);
-        GoalHours.setDisable(false);
-        GoalMinutes.setDisable(false);
-        GoalProgress.setDisable(false);
-    }
     public void resetallvalues() {
         TotalTimePracticed.setText("No Sessions");
         NumberOfSessionsPracticed.setText("No Sessions");
@@ -282,8 +254,6 @@ public class ProgressAndGoalsUI {
         } catch (Exception e) {return false;}
     }
     // TODO !IMPORTANT Fix Goal Multiple Goal Setter (Minutes Was Stuck At 30)
-    // TODO !IMPORTANT Neither Volume Slider Connected To Player After Cut Switched
-    // TODO !IMPORTANT Fix Memory Leak
     public void updateplayergoalsui() {
         PlayerUI playerUI = Root.getPlayer();
         if (playerUI != null && playerUI.isShowing()) {
@@ -307,6 +277,14 @@ public class ProgressAndGoalsUI {
 //            Goals.sortallcompletedgoals();
             NewGoalButton.setDisable(cutorelementindex == -1);
             CurrentGoalsButton.setDisable(cutorelementindex == -1);
+            if (cutorelementindex == -1) {
+                NewGoalButton.setTooltip(new Tooltip("Select A Cut Or Element Above To Set A Goal"));
+                CurrentGoalsButton.setTooltip(new Tooltip("Select A Cut Or Element Above To See/Edit Current Goals"));
+            } else {
+                String cutorelementname = Options.ALLNAMES.get(cutorelementindex);
+                NewGoalButton.setTooltip(new Tooltip("Set A New Goal For " + cutorelementname));
+                CurrentGoalsButton.setTooltip(new Tooltip("View/Edit Goals For " + cutorelementname));
+            }
             int practicedminutes = Sessions.sessioninformation_getallsessiontotals(cutorelementindex, PreAndPostOption.isSelected());
             Double goal = Goals.getgoal(cutorelementindex, 0, false).getGoal_Hours();
             Integer hours = practicedminutes / 60;
@@ -516,7 +494,6 @@ public class ProgressAndGoalsUI {
         public Button CloseButton;
         public TableColumn<CurrentGoalBinding, Boolean> IsCompletedColumn;
         public TableColumn<CurrentGoalBinding, String> CompletionDateColumn;
-        public Label TopLabel;
         public CheckBox ShowCompletedCheckBox;
         public Button AddGoalButton;
         public Button RemoveGoalButton;
@@ -528,7 +505,7 @@ public class ProgressAndGoalsUI {
         private kujiin.xml.Goals.Goal SelectedGoal;
         private Integer cutindex;
 
-        public EditGoalsDialog(MainController root, int cutindex) {
+        public EditGoalsDialog(MainController root, Integer cutindex) {
             Root = root;
             ProgressAndGoals = Root.getProgressTracker();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplayGoals.fxml"));
@@ -539,11 +516,24 @@ public class ProgressAndGoalsUI {
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Edit Goals");
+            String name = ProgressAndGoalsUI.GOALCUTNAMES[cutindex];
+            setTitle("View/Edit " + name + "'s Goals");
             CutSelectorComboBox.setItems(FXCollections.observableArrayList(GOALCUTNAMES));
             populatetable();
-            if (cutindex == -1) {TopLabel.setText("Select A Cut");}
-            else {CutSelectorComboBox.getSelectionModel().select(cutindex);}
+            CutSelectorComboBox.getSelectionModel().select(cutindex);
+            setOnCloseRequest(event -> {
+                if (cutindex != null && cutindex != -1 && goalschanged()) {
+                    switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Unsaved Changes To " + ProgressAndGoalsUI.GOALCUTNAMES[cutindex], "Save Before Exiting")) {
+                        case YES:
+                            savechanges();
+                            break;
+                        case NO:
+                            break;
+                        case CANCEL:
+                            event.consume();
+                    }
+                }
+            });
         }
 
     // Getters And Setters
@@ -557,7 +547,7 @@ public class ProgressAndGoalsUI {
 
     // Cut Selection Methods
         public boolean goalschanged() {
-            List<kujiin.xml.Goals.Goal> goalsfromxml = ProgressAndGoals.getGoal().getallcutgoals(ProgressAndGoals.getCutorelementindex(), true);
+            List<kujiin.xml.Goals.Goal> goalsfromxml = ProgressAndGoals.getGoal().getallcutgoals(ProgressAndGoals.getCutorelementindex(), ShowCompletedCheckBox.isSelected());
             System.out.println(CurrentGoalList.containsAll(goalsfromxml));
             System.out.println(goalsfromxml.size() + " Compared To: " + CurrentGoalList.size());
             return ! CurrentGoalList.containsAll(goalsfromxml) ||  goalsfromxml.size() != CurrentGoalList.size();
@@ -584,12 +574,12 @@ public class ProgressAndGoalsUI {
         public void populatetable() {
             try {
                 ObservableList<CurrentGoalBinding> currentGoals = FXCollections.observableArrayList();
-                int count = 1;
                 int cutindex = ProgressAndGoals.getCutorelementindex();
                 CurrentGoalList = new ArrayList<>();
                 String name = ProgressAndGoalsUI.GOALCUTNAMES[cutindex];
-                if (cutindex != 11) {TopLabel.setText(name + "'s Goals");}
-                else {TopLabel.setText(name + " Goals");}
+                if (cutindex != ProgressAndGoalsUI.GOALCUTNAMES.length - 1) {setTitle("View/Edit " + name + "'s Goals");}
+                else {setTitle(name + " Goals");}
+                int count = 1;
                 for (kujiin.xml.Goals.Goal i : ProgressAndGoals.getGoal().getallcutgoals(cutindex, ShowCompletedCheckBox.isSelected())) {
                     currentGoals.add(new CurrentGoalBinding(count, Double.toString(i.getGoal_Hours()), i.getDate_Set(),
                             i.getpercentagecompleted(ProgressAndGoals.getSessions().sessioninformation_getallsessiontotals(cutindex, false)),
@@ -948,7 +938,7 @@ public class ProgressAndGoalsUI {
             GoalMinutesSpinner.setEditable(true);
             GoalDatePicker.setValue(LocalDate.now());
             GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(expectedminutes / 60, Integer.MAX_VALUE, expectedminutes / 60));
-            GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(expectedminutes % 60, 59, expectedminutes % 60));
+            GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, expectedminutes % 60));
             for (Meditatable i : cutindexes) {select(i.number, true);}
         }
 

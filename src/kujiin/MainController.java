@@ -316,7 +316,7 @@ public class MainController implements Initializable {
         private boolean unsavedchanges() {
             try {
                 return ! MainTextArea.getText().equals(Util.file_getcontents(selectedfile));
-            } catch (Exception e) {e.printStackTrace(); return false;}
+            } catch (Exception e) {return false;}
         }
         public void newcutorelementselected(ActionEvent actionEvent) {
             HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);

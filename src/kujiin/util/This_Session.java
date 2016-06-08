@@ -397,7 +397,6 @@ public class This_Session {
             if (cutcount > 0) {notgoodtext.append(cutcount).append(" Cut(s)\n");}
             if (elementcount > 0) {notgoodtext.append(elementcount).append(" Element(s)\n");}
             if (postsessionmissinggoals) {notgoodtext.append("Postsession\n");}
-
             if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?")) {
                 ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, notgoodongoals, Util.list_getmaxintegervalue(notgooddurations));
                 s.showAndWait();
@@ -406,6 +405,7 @@ public class This_Session {
                     Double goalhours = s.getGoalhours();
                     LocalDate goaldate = s.getGoaldate();
                     boolean goalssetsuccessfully = true;
+                    // TODO Only Add Goals If They Are Higher (And A Later Date) Than All Other Goals For That Cut/Element
                     for (Integer i : cutindexes) {
                         try {
                             Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours, ProgressAndGoalsUI.GOALCUTNAMES[i]));
@@ -726,7 +726,7 @@ public class This_Session {
     }
     public void transition() {
         closereferencefile();
-        Session currentsession = sessions.getsession(sessions.totalsessioncount() - 1);
+        Session currentsession = sessions.sessioninformation_getspecificsession(sessions.sessioninformation_totalsessioncount() - 1);
         currentsession.updatecutduration(currentcutorelement.number, currentcutorelement.getdurationinminutes());
         sessions.marshall();
         Root.getProgressTracker().updaterootgoalsui();

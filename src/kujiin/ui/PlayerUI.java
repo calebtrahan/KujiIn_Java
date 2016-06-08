@@ -359,7 +359,7 @@ public class PlayerUI extends Stage {
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
                 Sessions currentsessions = Root.getProgressTracker().getSessions();
-                Session thissession = currentsessions.getsession(currentsessions.totalsessioncount() - 1);
+                Session thissession = currentsessions.sessioninformation_getspecificsession(currentsessions.sessioninformation_totalsessioncount() - 1);
                 int thisessionminutes = thissession.getTotal_Session_Duration();
                 SessionDuration.setText(Util.format_minstohrsandmins_abbreviated(thisessionminutes));
                 SessionDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
