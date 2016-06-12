@@ -62,7 +62,7 @@ public class PlayerUI extends Stage {
             Root.getOptions();
             Root.getOptions().setStyle(this);
             this.setResizable(false);
-            this.setOnCloseRequest(event -> {if (endsessionprematurely()) {close(); cleanupPlayer();} else {show();}});
+            this.setOnCloseRequest(event -> {if (endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}});
         } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         setTitle("Session Player");
         Root = root;
@@ -90,7 +90,9 @@ public class PlayerUI extends Stage {
         boolean referenceenabled = Root.getOptions().getSessionOptions().getReferenceoption();
         ReferenceToggleButton.setSelected(referenceenabled);
         togglereference(null);
-        StatusBar.setText("Session Not Playing");
+        PlayButton.setText("Start");
+        PauseButton.setDisable(true);
+        StopButton.setDisable(true);
     }
 
 // Button Actions
@@ -112,6 +114,7 @@ public class PlayerUI extends Stage {
             ReferenceHTMLButton.setSelected(false);
             ReferenceTXTButton.setSelected(false);
             Root.getOptions().getSessionOptions().setReferencetype(null);
+            if (Session.getDisplayReference() != null && Session.getDisplayReference().isShowing()) {Session.closereferencefile();}
         } else {
             if (Root.getOptions().getSessionOptions().getReferencetype() == null) {
                 Root.getOptions().getSessionOptions().setReferencetype(Options.DEFAULT_REFERENCE_TYPE_OPTION);
@@ -130,6 +133,8 @@ public class PlayerUI extends Stage {
                     togglereference(null);
                     break;
             }
+            System.out.println(Session.getPlayerState());
+            if (Session.getPlayerState() == PlayerState.PLAYING && (Session.getDisplayReference() == null || ! Session.getDisplayReference().isShowing())) {Session.displayreferencefile();}
         }
     }
     public void htmlreferenceoptionselected(ActionEvent actionEvent) {
@@ -170,11 +175,11 @@ public class PlayerUI extends Stage {
         private Scene scene;
 
         public DisplayReference(MainController root, Meditatable currentcutorelement) {
+            Root = root;
+            this.currentcutorelement = currentcutorelement;
+            referenceType = Root.getOptions().getSessionOptions().getReferencetype();
+            fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
             if (isValid()) {
-                Root = root;
-                this.currentcutorelement = currentcutorelement;
-                referenceType = Root.getOptions().getSessionOptions().getReferencetype();
-                fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
                 fxmlLoader.setController(this);
                 try {
@@ -183,11 +188,23 @@ public class PlayerUI extends Stage {
                     Root.getOptions().setStyle(this);
                     this.setResizable(false);
                 } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+                // TODO Find Out Why ESC Event Filter Is Crashing The Whole App
+//                this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+//                    if (Root.getSession().getPlayerState() == PlayerState.PLAYING) {
+//                        switch (event.getCode()) {
+//                            case ESCAPE:
+//                                close();
+//                                break;
+//                            case UP:
+//                                break;
+//                            case DOWN:
+//                                break;
+//                        }
+//                    }
+//                });
                 setTitle(this.currentcutorelement.name + "'s Reference");
                 setsizing();
                 loadcontent();
-            } else {
-                Util.gui_showinformationdialog(Root, "Cannot Display", "Cannot Display Reference File", "Non-Existent, Invalid Or Empty Reference File");
             }
         }
         public DisplayReference(MainController root, String htmlcontent) {
@@ -255,22 +272,39 @@ public class PlayerUI extends Stage {
             }
         }
         public boolean isValid() {
-            if (referenceType == null) {return false;}
+            if (referenceType == null) {
+                Util.gui_showinformationdialog(Root, "Cannot Display", "No Reference Type/Variation Selected", "Select A Type/Variation");
+                return false;
+            }
             File referencefile = currentcutorelement.getReferenceFile();
+            if (! referencefile.exists()) {
+                Util.gui_showinformationdialog(Root, "Cannot Display", "Cannot Display Reference File", "Non-Existent Reference File");
+                return false;
+            }
             String contents = Util.file_getcontents(referencefile);
-            if (contents == null) {return false;}
+            if (contents == null) {
+                Util.gui_showinformationdialog(Root, "Cannot Display", "Cannot Display Empty Reference File", "Use The Reference Editor To Add New Reference Content");
+                return false;
+            }
             switch (referenceType) {
                 case html:
                     return contents.length() > 0 && Util.String_validhtml(contents);
                 case txt:
                     return contents.length() > 0;
+                default:
+                    return false;
             }
-            return true;
         }
 
         public void play(ActionEvent actionEvent) {Root.getSession().play(Root.getPlayer());}
         public void pause(ActionEvent actionEvent) {Root.getSession().pause();}
         public void stop(ActionEvent actionEvent) {Root.getSession().stop();}
+        @Override
+        public void close() {
+            super.close();
+            Root.getPlayer().ReferenceToggleButton.setSelected(false);
+            Root.getPlayer().togglereference(null);
+        }
     }
     public static class ReferenceTypeDialog extends Stage {
         private MainController Root;

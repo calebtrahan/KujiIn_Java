@@ -184,7 +184,7 @@ public class MainController implements Initializable {
 }
     public void editprogramsambience(ActionEvent actionEvent) {
         getStage().setIconified(true);
-        AdvancedAmbienceEditor sae = new AdvancedAmbienceEditor(this, getSession().getAmbiences());
+        SimpleAmbienceEditor sae = new SimpleAmbienceEditor(this, getSession().getAmbiences());
         sae.showAndWait();
         getStage().setIconified(false);
     }
@@ -794,6 +794,7 @@ public class MainController implements Initializable {
                 setTitle("Simple Ambience Editor");
             } catch (IOException ignored) {}
             CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
+            NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
         }
         public SimpleAmbienceEditor(MainController root, Ambiences ambiences, String cutorelementname) {
             Root = root;

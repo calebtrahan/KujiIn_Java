@@ -397,27 +397,34 @@ public class This_Session {
             if (cutcount > 0) {notgoodtext.append(cutcount).append(" Cut(s)\n");}
             if (elementcount > 0) {notgoodtext.append(elementcount).append(" Element(s)\n");}
             if (postsessionmissinggoals) {notgoodtext.append("Postsession\n");}
-            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?")) {
-                ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, notgoodongoals, Util.list_getmaxintegervalue(notgooddurations));
-                s.showAndWait();
-                if (s.isAccepted()) {
-                    List<Integer> cutindexes = s.getSelectedCutIndexes();
-                    Double goalhours = s.getGoalhours();
-                    LocalDate goaldate = s.getGoaldate();
-                    boolean goalssetsuccessfully = true;
-                    // TODO Only Add Goals If They Are Higher (And A Later Date) Than All Other Goals For That Cut/Element
-                    for (Integer i : cutindexes) {
-                        try {
-                            Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours, ProgressAndGoalsUI.GOALCUTNAMES[i]));
-                        } catch (JAXBException ignored) {
-                            goalssetsuccessfully = false;
-                            Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + ProgressAndGoalsUI.GOALCUTNAMES[i], "Check File Permissions");
+            switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?", "Set Goal", "Continue Anyway", "Cancel Playback")) {
+                case YES:
+                    ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, notgoodongoals, Util.list_getmaxintegervalue(notgooddurations));
+                    s.showAndWait();
+                    if (s.isAccepted()) {
+                        List<Integer> cutindexes = s.getSelectedCutIndexes();
+                        Double goalhours = s.getGoalhours();
+                        LocalDate goaldate = s.getGoaldate();
+                        boolean goalssetsuccessfully = true;
+                        // TODO Only Add Goals If They Are Higher (And A Later Date) Than All Other Goals For That Cut/Element
+                        for (Integer i : cutindexes) {
+                            try {
+                                Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours, ProgressAndGoalsUI.GOALCUTNAMES[i]));
+                            } catch (JAXBException ignored) {
+                                goalssetsuccessfully = false;
+                                Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + ProgressAndGoalsUI.GOALCUTNAMES[i], "Check File Permissions");
+                            }
+                        }
+                        if (goalssetsuccessfully) {
+                            Util.gui_showinformationdialog(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
                         }
                     }
-                    if (goalssetsuccessfully) {
-                        Util.gui_showinformationdialog(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
-                    }
-                }
+                    break;
+                case NO:
+                    break;
+                case CANCEL:
+                    // TODO Find A Way To Cancel Playback And Creation Here
+                    break;
             }
         }
         return null;

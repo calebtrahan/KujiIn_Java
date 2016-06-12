@@ -9,7 +9,7 @@
       <TableView fx:id="AmbienceTable" layoutX="6.0" layoutY="47.0" prefHeight="248.0" prefWidth="408.0">
         <columns>
           <TableColumn fx:id="NameColumn" prefWidth="253.0" text="Name" />
-          <TableColumn fx:id="DurationColumn" prefWidth="154.0" text="Duration" />
+          <TableColumn fx:id="DurationColumn" prefWidth="152.0" text="Duration" />
         </columns>
       </TableView>
       <HBox alignment="CENTER_RIGHT" layoutX="267.0" layoutY="327.0" prefHeight="26.0" prefWidth="147.0">
@@ -41,7 +41,7 @@
                   <Insets right="5.0" />
                </HBox.margin>
             </Button>
-            <TextField fx:id="TotalDuration" prefHeight="26.0" prefWidth="173.0" />
+            <TextField fx:id="TotalDuration" alignment="CENTER" prefHeight="26.0" prefWidth="173.0" />
          </children>
       </HBox>
       <HBox layoutX="69.0" layoutY="271.0" prefHeight="26.0" prefWidth="120.0" />

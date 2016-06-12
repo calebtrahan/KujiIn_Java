@@ -486,6 +486,7 @@ public class Meditatable {
     public void toggleplayerbuttons() {
         if (thisession.getPlayerState() == null) {return;}
         boolean referenceenabled = thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing();
+        boolean idle = thisession.getPlayerState() == PlayerUI.PlayerState.IDLE;
         boolean playing = thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING;
         boolean paused = thisession.getPlayerState() == PlayerUI.PlayerState.PAUSED;
         boolean stopped = thisession.getPlayerState() == PlayerUI.PlayerState.STOPPED;
@@ -494,18 +495,24 @@ public class Meditatable {
         boolean fade_pause = thisession.getPlayerState() == PlayerUI.PlayerState.FADING_PAUSE;
         boolean fade_stop = thisession.getPlayerState() == PlayerUI.PlayerState.FADING_STOP;
         thisession.Root.getPlayer().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
-        thisession.Root.getPlayer().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop);
-        thisession.Root.getPlayer().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop);
+        thisession.Root.getPlayer().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
+        thisession.Root.getPlayer().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
         if (referenceenabled) {
             thisession.getDisplayReference().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
-            thisession.getDisplayReference().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop);
-            thisession.getDisplayReference().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop);
+            thisession.getDisplayReference().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
+            thisession.getDisplayReference().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
         }
         String playbuttontext;
         String pausebuttontext;
         String stopbuttontext;
         String statusbartext;
         switch (thisession.getPlayerState()) {
+            case IDLE:
+                playbuttontext = "Playing";
+                pausebuttontext = "Paused";
+                stopbuttontext = "Stop";
+                statusbartext = "Session Playing";
+                break;
             case PLAYING:
                 playbuttontext = "Playing";
                 pausebuttontext = "Paused";
