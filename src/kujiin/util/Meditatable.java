@@ -3,6 +3,7 @@ package kujiin.util;
 import javafx.animation.Animation;
 import javafx.animation.Transition;
 import javafx.concurrent.Service;
+import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -84,8 +85,11 @@ public class Meditatable {
     public Goals getGoalsController() {
         return GoalsController;
     }
+    public Boolean getAmbienceenabled() {
+        return ambienceenabled;
+    }
 
-// Creation
+    // Creation
     public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
         setAllcutsorelementstoplay(allcutandelementitems);
@@ -222,7 +226,7 @@ public class Meditatable {
                     }
                 }
             };
-            fade_ambience_resume.setOnFinished(event -> {toggleplayerbuttons(); volume_unbindambience();volume_bindambience();});
+            fade_ambience_resume.setOnFinished(event -> {toggleplayerbuttons(); volume_unbindambience(); volume_bindambience();});
         }
     // PAUSE
         if (fade_entrainment_pause == null) {
@@ -582,18 +586,43 @@ public class Meditatable {
     public void volume_bindentrainment() {
         thisession.Root.getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
         thisession.Root.getPlayer().EntrainmentVolume.setOnMouseDragged(event1 -> {
-            thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
+//            thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
             Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
             thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+            thisession.Root.getPlayer().EntrainmentVolume.setTooltip(new Tooltip(value.intValue() + "%"));
+        });
+        thisession.Root.getPlayer().EntrainmentVolume.setOnScroll(event -> {
+            Double newvalue = thisession.Root.getPlayer().EntrainmentVolume.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
+            else {newvalue += Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
+            if (newvalue <= 1.0 && newvalue >= 0.0) {
+                Double value = Util.round_nearestmultipleof5(newvalue * 100);
+                String percentage = value.intValue() + "%";
+                thisession.Root.getPlayer().EntrainmentVolume.setValue(value / 100);
+                thisession.Root.getPlayer().EntrainmentVolume.setTooltip(new Tooltip(percentage));
+                thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(percentage);
+            }
         });
         if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
             thisession.getDisplayReference().EntrainmentVolumeSlider.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
             thisession.getDisplayReference().EntrainmentVolumeSlider.setOnMouseDragged(event1 -> {
-                thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());
-                Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
+                Double value = thisession.getDisplayReference().EntrainmentVolumeSlider.getValue() * 100;
                 thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+//                thisession.Root.getOptions().getSessionOptions().setEntrainmentvolume(thisession.getDisplayReference().EntrainmentVolumeSlider.getValue());
                 thisession.Root.getPlayer().EntrainmentVolume.setValue(value /= 100);
                 thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+            });
+            thisession.getDisplayReference().EntrainmentVolumeSlider.setOnScroll(event -> {
+                Double newvalue = thisession.getDisplayReference().EntrainmentVolumeSlider.getValue();
+                if (event.getDeltaY() < 0) {newvalue -= Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
+                else {newvalue += Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
+                if (newvalue <= 1.0 && newvalue >= 0.0) {
+                    Double value = Util.round_nearestmultipleof5(newvalue * 100);
+                    String percentage = value.intValue() + "%";
+                    thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(value / 100);
+                    thisession.getDisplayReference().EntrainmentVolumeSlider.setTooltip(new Tooltip(percentage));
+                    thisession.getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
+                }
             });
         }
     }
@@ -604,20 +633,45 @@ public class Meditatable {
         }
     }
     public void volume_bindambience() {
+        // TODO Fix Reference && Player Sync Values And Percentages
         thisession.Root.getPlayer().AmbienceVolume.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
         thisession.Root.getPlayer().AmbienceVolume.setOnMouseDragged(event1 -> {
-            thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().AmbienceVolume.getValue());
+//            thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().AmbienceVolume.getValue());
             Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
             thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
+        });
+        thisession.Root.getPlayer().AmbienceVolume.setOnScroll(event -> {
+            Double newvalue = thisession.Root.getPlayer().AmbienceVolume.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
+            else {newvalue += Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
+            if (newvalue <= 1.0 && newvalue >= 0.0) {
+                Double value = Util.round_nearestmultipleof5(newvalue * 100);
+                String percentage = value.intValue() + "%";
+                thisession.Root.getPlayer().AmbienceVolume.setValue(value / 100);
+                thisession.Root.getPlayer().AmbienceVolume.setTooltip(new Tooltip(percentage));
+                thisession.Root.getPlayer().AmbienceVolumePercentage.setText(percentage);
+            }
         });
         if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
             thisession.getDisplayReference().AmbienceVolumeSlider.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
             thisession.getDisplayReference().AmbienceVolumeSlider.setOnMouseDragged(event1 -> {
-                thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.Root.getPlayer().AmbienceVolume.getValue());
-                Double value = thisession.Root.getPlayer().AmbienceVolume.getValue() * 100;
+                Double value = thisession.getDisplayReference().AmbienceVolumeSlider.getValue() * 100;
+//                thisession.Root.getOptions().getSessionOptions().setAmbiencevolume(thisession.getDisplayReference().AmbienceVolumeSlider.getValue());
                 thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
                 thisession.Root.getPlayer().AmbienceVolume.setValue(value /= 100);
                 thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
+            });
+            thisession.getDisplayReference().AmbienceVolumeSlider.setOnScroll(event -> {
+                Double newvalue = thisession.getDisplayReference().AmbienceVolumeSlider.getValue();
+                if (event.getDeltaY() < 0) {newvalue -= Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
+                else {newvalue += Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
+                if (newvalue <= 1.0 && newvalue >= 0.0) {
+                    Double value = Util.round_nearestmultipleof5(newvalue * 100);
+                    String percentage = value.intValue() + "%";
+                    thisession.getDisplayReference().AmbienceVolumeSlider.setValue(value / 100);
+                    thisession.getDisplayReference().AmbienceVolumeSlider.setTooltip(new Tooltip(percentage));
+                    thisession.getDisplayReference().AmbienceVolumePercentage.setText(percentage);
+                }
             });
         }
     }

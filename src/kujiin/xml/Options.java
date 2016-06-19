@@ -51,6 +51,8 @@ public class Options {
 /// Default Option Values
     public static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
     public static final Boolean DEFAULT_HELP_DIALOGS_OPTION = true;
+    public static final Double FADE_VALUE_MAX_DURATION = 60.0;
+    public static final Double VOLUME_SLIDER_ADJUSTMENT_INCREMENT = 5.0;
     public static final Double DEFAULT_ENTRAINMENTVOLUME = 0.6; // Default Entrainment Volume (Textfield -> In Percentage)
     public static final Double DEFAULT_AMBIENCEVOLUME = 1.0; // Default Ambience Volume (Textfield -> In Percentage)
     public static final Double DEFAULT_FADEINDURATION = 10.0; // Fade In Duration (Textfield -> In Decimal Seconds)

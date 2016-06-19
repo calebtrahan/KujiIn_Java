@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO Double Check That Reference Files Switch On And Off And Work With The Options Being In XML
 // TODO Work On Completed Goals
 // TODO If Ramp Disabled (And No Pre/PostSession Set) Ask User If They Want TO Add A Ramp Into 1st Practiced Cut (2/3/5) Min, Then Update UI And Create Session
 // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
@@ -106,6 +105,9 @@ public class This_Session {
     public ArrayList<Element> getallElements() {return new ArrayList<>(Arrays.asList(Earth, Air, Fire, Water, Void));}
     public List<Meditatable> getallitemsinSession() {
         return itemsinsession;
+    }
+    public Meditatable getCurrentcutorelement() {
+        return currentcutorelement;
     }
     public void setItemsinsession(List<Meditatable> itemsinsession) {
         this.itemsinsession = itemsinsession;
@@ -795,6 +797,14 @@ public class This_Session {
     public void displayreferencefile() {
         displayReference = new PlayerUI.DisplayReference(Root, currentcutorelement);
         displayReference.show();
+        displayReference.setOnHidden(event -> {
+            currentcutorelement.volume_unbindentrainment();
+            currentcutorelement.volume_bindentrainment();
+            if (currentcutorelement.getAmbienceenabled()) {
+                currentcutorelement.volume_unbindambience();
+                currentcutorelement.volume_bindambience();
+            }
+        });
     }
     public void closereferencefile() {
         if (displayReference != null && displayReference.isShowing()) {

@@ -116,7 +116,7 @@
                         <Insets right="2.0" />
                      </HBox.margin>
                   </Slider>
-                  <Label fx:id="EntrainmentVolumePercentage" text="100%" />
+                  <Label fx:id="EntrainmentVolumePercentage" minWidth="35.0" text="100%" />
                </children>
             </HBox>
             <HBox alignment="CENTER_RIGHT" prefHeight="22.0" prefWidth="229.0">
@@ -130,7 +130,7 @@
                         <Insets right="2.0" />
                      </HBox.margin>
                   </Slider>
-                  <Label fx:id="AmbienceVolumePercentage" text="100%" />
+                  <Label fx:id="AmbienceVolumePercentage" minWidth="35.0" text="100%" />
                </children>
             </HBox>
          </children>
@@ -140,7 +140,7 @@
          <children>
             <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="263.0">
                <children>
-                  <ToggleButton fx:id="ReferenceToggleButton" mnemonicParsing="false" text="Reference" onAction="#togglereference"/>
+                  <ToggleButton fx:id="ReferenceToggleButton" mnemonicParsing="false" onAction="#togglereference" text="Reference" />
                   <RadioButton fx:id="ReferenceHTMLButton" mnemonicParsing="false" onAction="#htmlreferenceoptionselected" text="HTML">
                      <HBox.margin>
                         <Insets left="5.0" right="5.0" />

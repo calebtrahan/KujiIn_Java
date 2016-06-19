@@ -315,6 +315,22 @@ public class CreatorAndExporterUI {
             try {Root.getSession().setDuration(15, Integer.valueOf(newValue)); updatecreatorui();}
             catch (NumberFormatException ignored) {VoidTime.setText("0"); updatecreatorui();}
         });
+        Util.addscrolllistenerincrementdecrement(PreTime, PreSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(RinTime, RinSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(KyoTime, KyoSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(TohTime, TohSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(ShaTime, ShaSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(KaiTime, KaiSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(JinTime, JinSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(RetsuTime, RetsuSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(ZaiTime, ZaiSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(ZenTime, ZenSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(PostTime, PostSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(EarthTime, EarthSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(AirTime, AirSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(FireTime, FireSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(WaterTime, WaterSwitch, 0, Double.POSITIVE_INFINITY, 1);
+        Util.addscrolllistenerincrementdecrement(VoidTime, VoidSwitch, 0, Double.POSITIVE_INFINITY, 1);
         TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
         ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
         AmbienceSwitch.setTooltip(new Tooltip("Check This After You Set All Values To Check For And Enable Ambience For This Session"));
@@ -804,4 +820,5 @@ public class CreatorAndExporterUI {
     public enum CreatorState {
         NOT_CREATED, CREATED
     }
+
 }

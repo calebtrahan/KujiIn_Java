@@ -138,6 +138,35 @@ public class Util {
         if (! val ) {if (!styleclass.contains("error")) {styleclass.add("error");}
         } else {styleclass.removeAll(Collections.singleton("error"));}
     }
+    public static void addscrolllistenerincrementdecrement(TextField textField, double minvalue, double maxvalue, double increment) {
+        textField.setOnScroll(event -> {
+            Double newvalue = new Double(textField.getText());
+            if (event.getDeltaY() < 0) {
+                newvalue -= increment;
+                if (newvalue >= minvalue) {textField.setText(newvalue.toString());}
+            }
+            else {
+                newvalue += increment;
+                if (newvalue <= maxvalue) {textField.setText(newvalue.toString());}
+            }
+        });
+    }
+    public static void addscrolllistenerincrementdecrement(TextField textField, ToggleButton toggleButton,  double minvalue, double maxvalue, double increment) {
+        textField.setOnScroll(event -> {
+            Double newvalue = new Double(textField.getText());
+            System.out.println(event.getDeltaY());
+            if (event.getDeltaY() < 0) {
+                newvalue -= increment;
+                if (newvalue >= minvalue) {textField.setText(String.valueOf(newvalue.intValue()));}
+            }
+            else {
+                newvalue += increment;
+                if (newvalue <= maxvalue) {textField.setText(String.valueOf(newvalue.intValue()));}
+            }
+            textField.setDisable(newvalue == 0);
+            toggleButton.setSelected(newvalue != 0);
+        });
+    }
 
 // Math Methods
     public static Double rounddouble(double number, int decimalplaces) {
@@ -569,6 +598,13 @@ public class Util {
     public static boolean sendstacktracetodeveloper(String stacktrace) {
         // TODO Email Stacktrace To Me
         return false;
+    }
+
+// Math Methods
+    public static double round_nearestmultipleof5(double value) {
+        if (value % 5 == 0) {return value;}
+        else if (value % 5 < 2.5) {return value - value % 5;}
+        else {return value + (5 - value % 5);}
     }
 
     public enum AnswerType {

@@ -25,6 +25,8 @@ import java.io.IOException;
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
 // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
 
+// TODO When Fading Out, Get Current Value And Fade From There Instead Of Max Or Default Value
+
 public class PlayerUI extends Stage {
     public Button PlayButton;
     public Button PauseButton;
@@ -69,26 +71,9 @@ public class PlayerUI extends Stage {
         Session = root.getSession();
         EntrainmentVolume.setDisable(true);
         EntrainmentVolumePercentage.setText("0%");
-        EntrainmentVolume.setOnMouseClicked(event -> {
-            try {
-                Double value = EntrainmentVolume.getValue() * 100;
-                EntrainmentVolume.setTooltip(new Tooltip(value.intValue() + "%"));
-                Session.Root.getOptions().getSessionOptions().setEntrainmentvolume(EntrainmentVolume.getValue());
-            } catch (Exception ignored) {
-                Util.gui_showtimedmessageonlabel(StatusBar, "Session Not Playing", 2000);}
-        });
         AmbienceVolume.setDisable(true);
         AmbienceVolumePercentage.setText("0%");
-        AmbienceVolume.setOnMouseClicked(event -> {
-            try {
-                Double value = AmbienceVolume.getValue() * 100;
-                AmbienceVolume.setTooltip(new Tooltip(value.intValue() + "%"));
-                Session.Root.getOptions().getSessionOptions().setAmbiencevolume(AmbienceVolume.getValue());
-            } catch(Exception ignored) {
-                Util.gui_showtimedmessageonlabel(StatusBar, "Session Not Playing", 2000);}
-        });
-        boolean referenceenabled = Root.getOptions().getSessionOptions().getReferenceoption();
-        ReferenceToggleButton.setSelected(referenceenabled);
+        ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
         togglereference(null);
         PlayButton.setText("Start");
         PauseButton.setDisable(true);
@@ -133,8 +118,16 @@ public class PlayerUI extends Stage {
                     togglereference(null);
                     break;
             }
-            System.out.println(Session.getPlayerState());
-            if (Session.getPlayerState() == PlayerState.PLAYING && (Session.getDisplayReference() == null || ! Session.getDisplayReference().isShowing())) {Session.displayreferencefile();}
+            if (Session.getPlayerState() == PlayerState.PLAYING && (Session.getDisplayReference() == null || ! Session.getDisplayReference().isShowing())) {
+                Session.displayreferencefile();
+                Meditatable currentcutorelement = Session.getCurrentcutorelement();
+                currentcutorelement.volume_unbindentrainment();
+                currentcutorelement.volume_bindentrainment();
+                if (currentcutorelement.getAmbienceenabled()) {
+                    currentcutorelement.volume_unbindambience();
+                    currentcutorelement.volume_bindambience();
+                }
+            }
         }
     }
     public void htmlreferenceoptionselected(ActionEvent actionEvent) {
@@ -187,6 +180,13 @@ public class PlayerUI extends Stage {
                     setScene(scene);
                     Root.getOptions().setStyle(this);
                     this.setResizable(false);
+                    setTitle(this.currentcutorelement.name + "'s Reference");
+                    setsizing();
+                    loadcontent();
+                    AmbienceVolumeSlider.setValue(Root.getPlayer().AmbienceVolume.getValue());
+                    AmbienceVolumePercentage.setText(Root.getPlayer().AmbienceVolumePercentage.getText());
+                    EntrainmentVolumeSlider.setValue(Root.getPlayer().EntrainmentVolume.getValue());
+                    EntrainmentVolumePercentage.setText(Root.getPlayer().EntrainmentVolumePercentage.getText());
                 } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
                 // TODO Find Out Why ESC Event Filter Is Crashing The Whole App
 //                this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -202,9 +202,6 @@ public class PlayerUI extends Stage {
 //                        }
 //                    }
 //                });
-                setTitle(this.currentcutorelement.name + "'s Reference");
-                setsizing();
-                loadcontent();
             }
         }
         public DisplayReference(MainController root, String htmlcontent) {

@@ -46,7 +46,7 @@
                      </HBox.margin>
                   </Label>
                   <Slider fx:id="EntrainmentVolumeSlider" max="1.0" prefWidth="100.0" />
-                  <Label fx:id="EntrainmentVolumePercentage" text="100%">
+                  <Label fx:id="EntrainmentVolumePercentage" minWidth="35.0" text="100%">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
@@ -57,7 +57,7 @@
                      </HBox.margin>
                   </Label>
                   <Slider fx:id="AmbienceVolumeSlider" max="1.0" prefWidth="100.0" />
-                  <Label fx:id="AmbienceVolumePercentage" text="100%">
+                  <Label fx:id="AmbienceVolumePercentage" minWidth="35.0" text="100%">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>

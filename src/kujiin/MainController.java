@@ -36,6 +36,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 // TODO Saving Preset Is Broke!
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
@@ -1132,16 +1133,12 @@ public class MainController implements Initializable {
         public Button DeleteAllGoalsButton;
         public Button DeleteAllSessionsProgressButton;
         public Button DefaultsButton;
-        public ChoiceBox<String> RampDurationChoiceBox;
         public CheckBox AlertSwitch;
         public CheckBox ReferenceSwitch;
         public RadioButton ReferenceHTMLRadioButton;
         public RadioButton ReferenceTXTRadioButton;
         public CheckBox FullscreenCheckbox;
         public CheckBox RampSwitch;
-        public Label ReferenceTopLabelDisplayType;
-        public Label ReferenceTopLabelFullScreen;
-        public Label RampTopLabel;
         private kujiin.xml.Options Options;
         private File AlertFile;
         private boolean valuechanged;
@@ -1173,6 +1170,7 @@ public class MainController implements Initializable {
             referencetoggle();
             ramptoggle();
         }
+
     // Setup Methods
         public void populatefromxml() {
         // Program Options
@@ -1194,8 +1192,7 @@ public class MainController implements Initializable {
                 for (File i : kujiin.xml.Options.DIRECTORYSTYLES.listFiles()) {
                     if (i.getName().endsWith(".css")) {kujiin.xml.Options.STYLETHEMES.add(i.getName().substring(0, i.getName().length() - 4));}
                 }
-                if (kujiin.xml.Options.STYLETHEMES.size() != 0) {
-                    ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(kujiin.xml.Options.STYLETHEMES));}
+                if (kujiin.xml.Options.STYLETHEMES.size() != 0) {ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(kujiin.xml.Options.STYLETHEMES));}
             } catch (NullPointerException e) {ProgramThemeChoiceBox.getItems().clear(); ProgramThemeChoiceBox.setDisable(true);}
         }
         public void setuptooltips() {
@@ -1227,8 +1224,12 @@ public class MainController implements Initializable {
             HelpDialogsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeInValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+            Util.addscrolllistenerincrementdecrement(FadeInValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0);
+            Util.addscrolllistenerincrementdecrement(FadeOutValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0);
             EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+            Util.addscrolllistenerincrementdecrement(EntrainmentVolumePercentage, 1, 100, 1.0);
             AmbienceVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
+            Util.addscrolllistenerincrementdecrement(AmbienceVolumePercentage, 1, 100, 1.0);
             ProgramThemeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {selectnewtheme(); changedvalue();});
             AlertSwitch.setOnMouseClicked(event -> alertfiletoggle());
             AlertSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
@@ -1307,8 +1308,6 @@ public class MainController implements Initializable {
             ReferenceHTMLRadioButton.setDisable(! enabled);
             ReferenceTXTRadioButton.setDisable(! enabled);
             FullscreenCheckbox.setDisable(! enabled);
-            ReferenceTopLabelDisplayType.setDisable(! enabled);
-            ReferenceTopLabelFullScreen.setDisable(! enabled);
             if (! enabled) {
                 tempreferencetype = null;
                 ReferenceHTMLRadioButton.setSelected(false);
@@ -1336,8 +1335,6 @@ public class MainController implements Initializable {
             boolean enabled = RampSwitch.isSelected();
             if (enabled) {RampSwitch.setText("ON");}
             else {RampSwitch.setText("OFF");}
-            RampDurationChoiceBox.setDisable(! enabled);
-            RampTopLabel.setDisable(! enabled);
         }
 
     // Button Actions
@@ -1353,16 +1350,10 @@ public class MainController implements Initializable {
         }
         public void apply(ActionEvent actionEvent) {
             try {
-                if (checkvalues()) {
+                if (checkifvaluesValid()) {
                     Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
                     Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
                     Options.getSessionOptions().setRampenabled(RampSwitch.isSelected());
-                    if (RampSwitch.isSelected()) {
-                        int index = RampDurationChoiceBox.getSelectionModel().getSelectedIndex();
-                        if (index == 0) {Options.getSessionOptions().setRampduration(2);}
-                        else if (index == 1) {Options.getSessionOptions().setRampduration(3);}
-                        else if (index == 2) {Options.getSessionOptions().setRampduration(5);}
-                    } else {Options.getSessionOptions().setRampduration(null);}
                     Options.getSessionOptions().setFadeoutduration(new Double(FadeInValue.getText()));
                     Options.getSessionOptions().setFadeinduration(new Double(FadeOutValue.getText()));
                     Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
@@ -1385,10 +1376,27 @@ public class MainController implements Initializable {
             close();
         }
         public void changedvalue() {
-            ApplyButton.setDisable(false);
-            valuechanged = true;
+            boolean changedvalue = checkifvaluesChanges();
+            ApplyButton.setDisable(! changedvalue);
+            valuechanged = changedvalue;
         }
-        public boolean checkvalues() {
+        public boolean checkifvaluesChanges() {
+            try {
+                if (Options.getProgramOptions().getTooltips() != TooltipsCheckBox.isSelected()) {return true;}
+                if (Options.getProgramOptions().getHelpdialogs() != HelpDialogsCheckBox.isSelected()) {return true;}
+                if (! Objects.equals(Options.getSessionOptions().getEntrainmentvolume(), new Double(EntrainmentVolumePercentage.getText()))) {return true;}
+                if (! Objects.equals(Options.getSessionOptions().getAmbiencevolume(), new Double(AmbienceVolumePercentage.getText()))) {return true;}
+                if (! Objects.equals(Options.getSessionOptions().getFadeinduration(), new Double(FadeInValue.getText()))) {return true;}
+                if (! Objects.equals(Options.getSessionOptions().getFadeoutduration(), new Double(FadeOutValue.getText()))) {return true;}
+                if (Options.getSessionOptions().getRampenabled() != RampSwitch.isSelected()) {return true;}
+                if (Options.getSessionOptions().getReferenceoption() != ReferenceSwitch.isSelected()) {return true;}
+                if (Options.getSessionOptions().getReferencetype() != tempreferencetype) {return true;}
+                if (Options.getSessionOptions().getReferenceoption() && Options.getSessionOptions().getReferencefullscreen() != ReferenceSwitch.isSelected()) {return true;}
+                // TODO Check Appearance Options Here
+                return false;
+            } catch (NumberFormatException | NullPointerException ignored) {return false;}
+        }
+        public boolean checkifvaluesValid() {
             Double entrainmentvolume = new Double(EntrainmentVolumePercentage.getText()) / 100;
             Double ambiencevolume = new Double(AmbienceVolumePercentage.getText()) / 100;
             boolean entrainmentgood = entrainmentvolume <= 100.0 && entrainmentvolume > 0.0;
