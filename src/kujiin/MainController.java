@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 // TODO Saving Preset Is Broke!
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
+// TODO MAYBE Create Fancy Pie Chart/Graph Displaying Individual Session Details (Connect From Session List And Also Display After Completed And Premature Endings)
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;
