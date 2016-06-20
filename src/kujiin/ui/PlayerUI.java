@@ -145,6 +145,7 @@ public class PlayerUI extends Stage {
         } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
     }
     public void cleanupPlayer() {}
+    public void resetPlayer() {}
 
     // Dialogs
     public static class DisplayReference extends Stage {

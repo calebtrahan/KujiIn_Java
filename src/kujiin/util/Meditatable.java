@@ -438,7 +438,11 @@ public class Meditatable {
             }
             toggleplayerbuttons();
         }
-        // TODO Create Dialog That Shows How Long Session Was And What Was Practiced
+    // TODO Create Dialog That Shows How Long Session Was And What Was Practiced
+        for (Meditatable i : getAllcutsorelementstoplay()) {
+            if (i.name.equals(name)) {break;}
+        }
+
     }
     public void tick() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
