@@ -346,13 +346,20 @@ public class ProgressAndGoalsUI {
         public TableColumn<SessionRow, String> ZaiColumn;
         public TableColumn<SessionRow, String> ZenColumn;
         public TableColumn<SessionRow, String> TotalColumn;
+        public TableColumn<SessionRow, String> EarthColumn;
+        public TableColumn<SessionRow, String> AirColumn;
+        public TableColumn<SessionRow, String> FireColumn;
+        public TableColumn<SessionRow, String> WaterColumn;
+        public TableColumn<SessionRow, String> VoidColumn;
         public Button CloseButton;
-        private ObservableList<SessionRow> sessionlist = FXCollections.observableArrayList();
+        public Button ViewDetailsButton;
+        private List<Session> sessionlist;
         private MainController Root;
 
 
         public DisplaySessionListDialog(MainController root, List<Session> sessionlist) {
             Root = root;
+            this.sessionlist = sessionlist;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/DisplaySessionList.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -373,23 +380,34 @@ public class ProgressAndGoalsUI {
             ZaiColumn.setCellValueFactory(cellData -> cellData.getValue().zai);
             ZenColumn.setCellValueFactory(cellData -> cellData.getValue().zen);
             TotalColumn.setCellValueFactory(cellData -> cellData.getValue().total);
-            ArrayList<SessionRow> sessionRows = new ArrayList<>();
+            ObservableList<SessionRow> rowlist = FXCollections.observableArrayList();
             int count = 1;
             for (Session i : sessionlist) {
-                sessionRows.add(new SessionRow(count, i.getDate_Practiced(), i.getPresession_Duration(), i.getRin_Duration(),
+                rowlist.add(new SessionRow(count, i.getDate_Practiced(), i.getPresession_Duration(), i.getRin_Duration(),
                         i.getKyo_Duration(), i.getToh_Duration(), i.getSha_Duration(), i.getKai_Duration(), i.getJin_Duration(),
-                        i.getRetsu_Duration(), i.getZai_Duration(), i.getZen_Duration(), i.getPostsession_Duration(),
+                        i.getRetsu_Duration(), i.getZai_Duration(), i.getZen_Duration(), i.getEarth_Duration(), i.getAir_Duration(),
+                        i.getFire_Duration(), i.getWater_Duration(), i.getVoid_Duration(), i.getPostsession_Duration(),
                         i.getTotal_Session_Duration()));
                 count++;
             }
-            ObservableList<SessionRow> rowlist = FXCollections.observableArrayList();
-            rowlist.addAll(sessionRows);
+            ViewDetailsButton.setDisable(true);
             sessionsTableView.setItems(rowlist);
+            sessionsTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                ViewDetailsButton.setDisable(sessionsTableView.getSelectionModel().getSelectedIndex() == -1);
+            });
+        }
+
+        public void viewsessiondetails(ActionEvent actionEvent) {
+            int index = sessionsTableView.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                new MainController.SessionDetails(Root, sessionlist.get(index)).showAndWait();
+            }
         }
 
         public void closeDialog(Event event) {this.close();}
 
-        public class SessionRow {
+
+    public class SessionRow {
             public IntegerProperty id;
             public StringProperty datepracticed;
             public StringProperty presession;
@@ -402,23 +420,34 @@ public class ProgressAndGoalsUI {
             public StringProperty retsu;
             public StringProperty zai;
             public StringProperty zen;
+            public StringProperty earth;
+            public StringProperty air;
+            public StringProperty fire;
+            public StringProperty water;
+            public StringProperty Void;
             public StringProperty postsession;
             public StringProperty total;
 
-            public SessionRow(int id, String datepracticed, int presession, int rin, int kyo, int toh, int sha, int kai, int jin, int retsu, int zai, int zen, int postsession, int total) {
+            public SessionRow(int id, String datepracticed, int presession, int rin, int kyo, int toh, int sha, int kai, int jin, int retsu,
+                              int zai, int zen, int postsession, int earth, int air, int fire, int water, int Void, int total) {
                 this.id = new SimpleIntegerProperty(id);
                 this.datepracticed = new SimpleStringProperty(datepracticed);
-                this.presession = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(presession));
-                this.rin = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(rin));
-                this.kyo = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(kyo));
-                this.toh = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(toh));
-                this.sha = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(sha));
-                this.kai = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(kai));
-                this.jin = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(jin));
-                this.retsu = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(retsu));
-                this.zai = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(zai));
-                this.zen = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(zen));
-                this.postsession = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(postsession));
+                this.presession = new SimpleStringProperty(String.valueOf(presession));
+                this.rin = new SimpleStringProperty(String.valueOf(rin));
+                this.kyo = new SimpleStringProperty(String.valueOf(kyo));
+                this.toh = new SimpleStringProperty(String.valueOf(toh));
+                this.sha = new SimpleStringProperty(String.valueOf(sha));
+                this.kai = new SimpleStringProperty(String.valueOf(kai));
+                this.jin = new SimpleStringProperty(String.valueOf(jin));
+                this.retsu = new SimpleStringProperty(String.valueOf(retsu));
+                this.zai = new SimpleStringProperty(String.valueOf(zai));
+                this.zen = new SimpleStringProperty(String.valueOf(zen));
+                this.earth = new SimpleStringProperty(String.valueOf(earth));
+                this.air = new SimpleStringProperty(String.valueOf(air));
+                this.fire = new SimpleStringProperty(String.valueOf(fire));
+                this.water = new SimpleStringProperty(String.valueOf(water));
+                this.Void = new SimpleStringProperty(String.valueOf(Void));
+                this.postsession = new SimpleStringProperty(String.valueOf(postsession));
                 this.total = new SimpleStringProperty(Util.format_minstohrsandmins_abbreviated(total));
             }
 

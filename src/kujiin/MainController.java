@@ -10,6 +10,10 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
@@ -22,6 +26,7 @@ import javafx.util.Duration;
 import kujiin.ui.CreatorAndExporterUI;
 import kujiin.ui.PlayerUI;
 import kujiin.ui.ProgressAndGoalsUI;
+import kujiin.util.Meditatable;
 import kujiin.util.This_Session;
 import kujiin.util.Util;
 import kujiin.xml.Ambience;
@@ -197,7 +202,8 @@ public class MainController implements Initializable {
         getStage().setIconified(false);
     }
     public void howtouseprogram(ActionEvent actionEvent) {
-        Util.menu_howtouse(this);}
+        Util.menu_howtouse(this);
+    }
     public void aboutthisprogram(ActionEvent actionEvent) {
         Util.menu_aboutthisprogram();}
     public void contactme(ActionEvent actionEvent) {
@@ -1444,6 +1450,66 @@ public class MainController implements Initializable {
             Root.setOptions(Options);
             Root.getOptions().marshall();
             super.close();
+        }
+    }
+    public static class SessionDetails extends Stage implements Initializable {
+        public MainController Root;
+        public BarChart<String, java.lang.Number> SessionBarChart;
+        public CategoryAxis SessionCategoryAxis;
+        public NumberAxis SessionNumbersAxis;
+        public TextField DatePracticedTextField;
+        public TextField SessionDurationTextField;
+        public Button CloseButton;
+
+        @Override
+        public void initialize(URL location, ResourceBundle resources) {
+            DatePracticedTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+            SessionDurationTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+        }
+
+        public SessionDetails(MainController root, List<Meditatable> cutsorelementsinsession) {
+            Root = root;
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails.fxml"));
+                fxmlLoader.setController(this);
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(this);
+                this.setResizable(false);
+                SessionNumbersAxis.setLabel("Minutes");
+                SessionCategoryAxis.setLabel("Cut/Element Name");
+                setTitle("Session Details");
+                XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
+                // TODO Find Max Minutes
+                for (Meditatable i : cutsorelementsinsession) {series.getData().add(new XYChart.Data<>(i.name, i.getdurationinminutes()));}
+                SessionBarChart.getData().add(series);
+                SessionBarChart.setLegendVisible(false);
+            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
+        }
+        public SessionDetails(MainController root, kujiin.xml.Session session) {
+            Root = root;
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails.fxml"));
+                fxmlLoader.setController(this);
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(this);
+                this.setResizable(false);
+                SessionNumbersAxis.setLabel("Minutes");
+                setTitle("Session Details");
+                DatePracticedTextField.setText(session.getDate_Practiced());
+                XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
+                List<Integer> values = new ArrayList<>();
+                for (int i = 0; i < 16; i++) {
+                    int duration = session.getcutduration(i);
+                    values.add(duration);
+                    series.getData().add(new XYChart.Data<>(kujiin.xml.Options.ALLNAMES.get(i), duration));
+                }
+                SessionBarChart.getData().add(series);
+                SessionBarChart.setLegendVisible(false);
+                SessionNumbersAxis.setUpperBound(Util.list_getmaxintegervalue(values));
+                SessionDurationTextField.setText(Util.format_minstohrsandmins_long(session.getTotal_Session_Duration()));
+            } catch (IOException | NullPointerException e) {new ExceptionDialog(Root, e).showAndWait();}
         }
     }
     public static class AmbienceSong {

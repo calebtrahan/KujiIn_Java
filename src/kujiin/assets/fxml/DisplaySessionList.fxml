@@ -2,22 +2,28 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="658.0" prefWidth="941.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="655.0" prefWidth="911.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TableView fx:id="sessionsTableView" layoutX="10.0" layoutY="42.0" prefHeight="581.0" prefWidth="926.0">
+      <TableView fx:id="sessionsTableView" layoutX="10.0" layoutY="42.0" prefHeight="581.0" prefWidth="891.0">
         <columns>
           <TableColumn fx:id="DateColumn" prefWidth="84.0" style="-fx-alignment: center;" text="Date" />
-          <TableColumn fx:id="RinColumn" style="fx-alignment: center;" text="RIN" />
-            <TableColumn fx:id="KyoColumn" prefWidth="69.0" style="fx-alignment: center;" text="KYO" />
-            <TableColumn fx:id="TohColumn" prefWidth="77.0" style="fx-alignment: center;" text="TOH" />
-            <TableColumn fx:id="ShaColumn" prefWidth="75.0" style="fx-alignment: center;" text="SHA" />
-            <TableColumn fx:id="KaiColumn" prefWidth="74.0" style="fx-alignment: center;" text="KAI" />
-            <TableColumn fx:id="JinColumn" prefWidth="74.0" style="fx-alignment: center;" text="JIN" />
-            <TableColumn fx:id="RetsuColumn" prefWidth="77.0" style="fx-alignment: center;" text="RETSU" />
-            <TableColumn fx:id="ZaiColumn" prefWidth="73.0" style="fx-alignment: center;" text="ZAI" />
-            <TableColumn fx:id="ZenColumn" prefWidth="79.0" style="fx-alignment: center;" text="ZEN" />
-            <TableColumn fx:id="TotalColumn" prefWidth="155.0" style="fx-alignment: center;" text="TOTAL" />
+          <TableColumn fx:id="RinColumn" prefWidth="51.0" style="fx-alignment: center;" text="Rin" />
+            <TableColumn fx:id="KyoColumn" prefWidth="51.0" style="fx-alignment: center;" text="Kyo" />
+            <TableColumn fx:id="TohColumn" prefWidth="51.0" style="fx-alignment: center;" text="Toh" />
+            <TableColumn fx:id="ShaColumn" prefWidth="51.0" style="fx-alignment: center;" text="Sha" />
+            <TableColumn fx:id="KaiColumn" prefWidth="51.0" style="fx-alignment: center;" text="Kai" />
+            <TableColumn fx:id="JinColumn" prefWidth="51.0" style="fx-alignment: center;" text="Jin" />
+            <TableColumn fx:id="RetsuColumn" prefWidth="51.0" style="fx-alignment: center;" text="Retsu" />
+            <TableColumn fx:id="ZaiColumn" prefWidth="51.0" style="fx-alignment: center;" text="Zai" />
+            <TableColumn fx:id="ZenColumn" prefWidth="51.0" style="fx-alignment: center;" text="Zen" />
+            <TableColumn fx:id="EarthColumn" prefWidth="51.0" text="Earth" />
+            <TableColumn fx:id="AirColumn" prefWidth="51.0" text="Air" />
+            <TableColumn fx:id="FireColumn" prefWidth="51.0" text="Fire" />
+            <TableColumn fx:id="WaterColumn" prefWidth="51.0" text="Water" />
+            <TableColumn fx:id="VoidColumn" prefWidth="51.0" text="Void" />
+            <TableColumn fx:id="TotalColumn" prefWidth="90.0" style="fx-alignment: center;" text="TOTAL" />
         </columns>
       </TableView>
       <Label alignment="CENTER" layoutX="7.0" layoutY="14.0" prefHeight="20.0" prefWidth="916.0" text="Your Sessions" textAlignment="CENTER" underline="true">
@@ -25,6 +31,11 @@
             <Font size="16.0" />
          </font>
       </Label>
-      <Button fx:id="CloseButton" layoutX="874.0" layoutY="627.0" mnemonicParsing="false" onMousePressed="#closeDialog" text="Close" />
+      <HBox alignment="TOP_RIGHT" layoutX="701.0" layoutY="625.0" prefHeight="30.0" prefWidth="200.0">
+         <children>
+            <Button fx:id="ViewDetailsButton" mnemonicParsing="false" text="View Details" onAction="#viewsessiondetails"/>
+            <Button fx:id="CloseButton" mnemonicParsing="false" onMousePressed="#closeDialog" text="Close" />
+         </children>
+      </HBox>
    </children>
 </AnchorPane>
