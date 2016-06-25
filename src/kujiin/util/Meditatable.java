@@ -178,8 +178,10 @@ public class Meditatable {
                         Double value = thisession.Root.getPlayer().EntrainmentVolume.getValue() * 100;
                         thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                         if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
-                            thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
-                            thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                            try {
+                                thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
+                                thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                            } catch (NullPointerException ignored) {}
                         }
                     }
                 };

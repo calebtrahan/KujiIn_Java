@@ -145,12 +145,14 @@ public class PlayerUI extends Stage {
         } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
     }
     public void togglevolumebinding() {
-        Meditatable currentcutorelement = Session.getCurrentcutorelement();
-        currentcutorelement.volume_unbindentrainment();
-        currentcutorelement.volume_bindentrainment();
-        if (currentcutorelement.getAmbienceenabled()) {
-            currentcutorelement.volume_unbindambience();
-            currentcutorelement.volume_bindambience();
+        if (Session.getPlayerState() != PlayerState.IDLE && Session.getPlayerState() != PlayerState.STOPPED) {
+            Meditatable currentcutorelement = Session.getCurrentcutorelement();
+            currentcutorelement.volume_unbindentrainment();
+            currentcutorelement.volume_bindentrainment();
+            if (currentcutorelement.getAmbienceenabled()) {
+                currentcutorelement.volume_unbindambience();
+                currentcutorelement.volume_bindambience();
+            }
         }
     }
     public void cleanupPlayer() {}
