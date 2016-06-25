@@ -28,6 +28,8 @@ import java.io.IOException;
 // TODO Entrainment Volume Was Raised To 100% When Switching To TOH (And Also Broke Reference File)
 // TODO NullPointerException in Meditatable:181 < Meditatable:256
 
+// TODO !IMPORTANT Organize, Encapsulate And Fix This Player Binding/Unbinding Logic So It's Simple And Encapsulated
+
 // TODO Volume:
 //      Pre Ramp Is Too Loud
 
@@ -72,7 +74,7 @@ public class PlayerUI extends Stage {
             Root.getOptions();
             Root.getOptions().setStyle(this);
             this.setResizable(false);
-            this.setOnCloseRequest(event -> {if (endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}});
+            this.setOnCloseRequest(event -> {if (Session.endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}});
         } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         setTitle("Session Player");
         Root = root;
@@ -95,13 +97,6 @@ public class PlayerUI extends Stage {
     public void play() {Session.play(this);}
     public void pause() {Session.pause();}
     public void stop() {Session.stop();}
-    private boolean endsessionprematurely() {
-        if (Session.getPlayerState() == PlayerState.PLAYING || Session.getPlayerState() == PlayerState.PAUSED || Session.getPlayerState() == PlayerState.TRANSITIONING) {
-            pause();
-            if (Util.gui_getokcancelconfirmationdialog(Root, "End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {Session.stop(); Session.closereferencefile(); return true;}
-            else {play(); return false;}
-        } else {return true;}
-    }
     public void togglereference(ActionEvent actionEvent) {
         Root.getOptions().getSessionOptions().setReferenceoption(ReferenceToggleButton.isSelected());
         ReferenceHTMLButton.setDisable(! ReferenceToggleButton.isSelected());
@@ -111,7 +106,7 @@ public class PlayerUI extends Stage {
             ReferenceTXTButton.setSelected(false);
             Root.getOptions().getSessionOptions().setReferencetype(null);
             Session.closereferencefile();
-            togglevolumebinding();
+            Session.togglevolumebinding();
         } else {
             if (Root.getOptions().getSessionOptions().getReferencetype() == null) {Root.getOptions().getSessionOptions().setReferencetype(Options.DEFAULT_REFERENCE_TYPE_OPTION);}
             switch (Root.getOptions().getSessionOptions().getReferencetype()) {
@@ -126,7 +121,7 @@ public class PlayerUI extends Stage {
             }
             if (Session.getPlayerState() == PlayerState.PLAYING) {
                 Session.displayreferencefile();
-                togglevolumebinding();
+                Session.togglevolumebinding();
             }
         }
     }
@@ -143,17 +138,6 @@ public class PlayerUI extends Stage {
             if (ReferenceTXTButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
             else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
         } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
-    }
-    public void togglevolumebinding() {
-        if (Session.getPlayerState() != PlayerState.IDLE && Session.getPlayerState() != PlayerState.STOPPED) {
-            Meditatable currentcutorelement = Session.getCurrentcutorelement();
-            currentcutorelement.volume_unbindentrainment();
-            currentcutorelement.volume_bindentrainment();
-            if (currentcutorelement.getAmbienceenabled()) {
-                currentcutorelement.volume_unbindambience();
-                currentcutorelement.volume_bindambience();
-            }
-        }
     }
     public void cleanupPlayer() {}
     public void resetPlayer() {}
@@ -203,6 +187,7 @@ public class PlayerUI extends Stage {
                         Root.getPlayer().ReferenceToggleButton.setSelected(false);
                         Root.getPlayer().togglereference(null);
                     });
+                    this.setFullScreenExitHint("Press F11 To Exit FullScreen, ESC To Close Reference File");
                 } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
                 // TODO Find Out Why ESC Event Filter Is Crashing The Whole App
 //                this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {

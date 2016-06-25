@@ -39,7 +39,7 @@ public class Util {
     }
 
 // Gui Methods
-    // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified (When It's Supposed To Be)
+//     TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified (When It's Supposed To Be)
     public static boolean gui_getokcancelconfirmationdialog(MainController root, String titletext, String headertext, String contenttext) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setTitle(titletext);
@@ -155,7 +155,6 @@ public class Util {
     public static void addscrolllistenerincrementdecrement(TextField textField, ToggleButton toggleButton,  double minvalue, double maxvalue, double increment) {
         textField.setOnScroll(event -> {
             Double newvalue = new Double(textField.getText());
-            System.out.println(event.getDeltaY());
             if (event.getDeltaY() < 0) {
                 newvalue -= increment;
                 if (newvalue >= minvalue) {textField.setText(String.valueOf(newvalue.intValue()));}

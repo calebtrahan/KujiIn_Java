@@ -689,12 +689,12 @@ public class This_Session {
                         if (completedgoals.size() > 0) {
                             GoalsCompletedThisSession.addAll(completedgoals);
                         }
-                        currentcutorelement.cleanup();
+                        currentcutorelement.cleanupPlayersandAnimations();
                         cutorelementcount++;
                         currentcutorelement = getallitemsinSession().get(cutorelementcount);
                         playthiscut();
                     } catch (IndexOutOfBoundsException ignored) {
-                        currentcutorelement.cleanup();
+                        currentcutorelement.cleanupPlayersandAnimations();
                         endofsession();
                     }
                     break;
@@ -777,6 +777,19 @@ public class This_Session {
     public void error_endplayback() {
 
     }
+    public boolean endsessionprematurely() {
+        if (getPlayerState() == PlayerUI.PlayerState.PLAYING || getPlayerState() == PlayerUI.PlayerState.PAUSED || getPlayerState() == PlayerUI.PlayerState.TRANSITIONING) {
+            pause();
+            if (Util.gui_getokcancelconfirmationdialog(Root, "End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {stop(); closereferencefile(); return true;}
+            else {play(Root.getPlayer()); return false;}
+        } else {return true;}
+    }
+    public void togglevolumebinding() {
+        if (getPlayerState() != PlayerUI.PlayerState.IDLE && getPlayerState() != PlayerUI.PlayerState.STOPPED) {
+            currentcutorelement.volume_rebindentrainment();
+            if (currentcutorelement.getAmbienceenabled()) {currentcutorelement.volume_rebindambience();}
+        }
+    }
 
 // Reference Files
     public void choosereferencetype() {
@@ -805,7 +818,12 @@ public class This_Session {
         if (notalreadyshowing && referenceenabledwithvalidtype) {
             displayReference = new PlayerUI.DisplayReference(Root, currentcutorelement);
             displayReference.show();
-            displayReference.setOnHidden(event -> Root.getPlayer().togglevolumebinding());
+            displayReference.setOnHidden(event -> {
+                currentcutorelement.volume_rebindentrainment();
+                if (currentcutorelement.ambienceenabled) {
+                    currentcutorelement.volume_rebindambience();
+                }
+            });
         }
     }
     public void closereferencefile() {

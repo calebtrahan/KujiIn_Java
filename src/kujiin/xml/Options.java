@@ -53,10 +53,11 @@ public class Options {
     public static final Boolean DEFAULT_HELP_DIALOGS_OPTION = true;
     public static final Double FADE_VALUE_MAX_DURATION = 60.0;
     public static final Double VOLUME_SLIDER_ADJUSTMENT_INCREMENT = 5.0;
-    public static final Double DEFAULT_ENTRAINMENTVOLUME = 0.6; // Default Entrainment Volume (Textfield -> In Percentage)
-    public static final Double DEFAULT_AMBIENCEVOLUME = 1.0; // Default Ambience Volume (Textfield -> In Percentage)
-    public static final Double DEFAULT_FADEINDURATION = 10.0; // Fade In Duration (Textfield -> In Decimal Seconds)
-    public static final Double DEFAULTFADEOUTDURATION = 10.0; // Fade Out Duration (Textfield -> In Decimal Seconds)
+    public static final Double DEFAULT_ENTRAINMENTVOLUME = 0.6;
+    public static final Double DEFAULT_AMBIENCEVOLUME = 1.0;
+    public static final Double DEFAULT_FADEINDURATION = 10.0;
+    public static final Double DEFAULT_FADEOUTDURATION = 10.0;
+    public static final Double DEFAULT_FADERESUMEANDPAUSEDURATION = 2.0;
     public static final Boolean DEFAULT_ALERTFUNCTION_OPTION = true;
     public static final String DEFAULT_ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
     public static final String DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "dark.css").toURI().toString();
@@ -130,7 +131,7 @@ public class Options {
         programOptions.setHelpdialogs(DEFAULT_HELP_DIALOGS_OPTION);
         setProgramOptions(programOptions);
         kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
-        sessionOptions.setFadeoutduration(DEFAULTFADEOUTDURATION);
+        sessionOptions.setFadeoutduration(DEFAULT_FADEOUTDURATION);
         sessionOptions.setAmbiencevolume(DEFAULT_AMBIENCEVOLUME);
         sessionOptions.setAlertfunction(DEFAULT_ALERTFUNCTION_OPTION);
         sessionOptions.setAlertfilelocation(DEFAULT_ALERTFILELOCATION);
