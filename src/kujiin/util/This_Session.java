@@ -599,22 +599,28 @@ public class This_Session {
     }
 
 // Playback
-    public void startplayback() {
-        totalsecondselapsed = 0;
-        totalsecondsinsession = 0;
-        for (Meditatable i : itemsinsession) {totalsecondsinsession += i.getdurationinseconds();}
-        getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(totalsecondsinsession));
-        updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
-        updateuitimeline.setCycleCount(Animation.INDEFINITE);
-        updateuitimeline.play();
-        cutorelementcount = 0;
-        currentcutorelement = itemsinsession.get(cutorelementcount);
-        playthiscut();
-        sessions.createnewsession();
-    }
     public void play(PlayerUI playerUI) {
-        if (playerState == PlayerUI.PlayerState.IDLE || playerState == PlayerUI.PlayerState.STOPPED) {setPlayerUI(playerUI); startplayback();}
-        else if(playerState == PlayerUI.PlayerState.PAUSED) {updateuitimeline.play(); currentcutorelement.resume();}
+        switch (playerState) {
+            case IDLE:
+            case STOPPED:
+                setPlayerUI(playerUI);
+                totalsecondselapsed = 0;
+                totalsecondsinsession = 0;
+                for (Meditatable i : itemsinsession) {totalsecondsinsession += i.getdurationinseconds();}
+                getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(totalsecondsinsession));
+                updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
+                updateuitimeline.setCycleCount(Animation.INDEFINITE);
+                updateuitimeline.play();
+                cutorelementcount = 0;
+                currentcutorelement = itemsinsession.get(cutorelementcount);
+                sessions.createnewsession();
+                currentcutorelement.start();
+                break;
+            case PAUSED:
+                updateuitimeline.play();
+                currentcutorelement.resume();
+                break;
+        }
     }
     public void pause() {
         if (playerState == PlayerUI.PlayerState.PLAYING) {
@@ -623,6 +629,7 @@ public class This_Session {
         }
     }
     public void stop() {
+        // TODO Add Premature Ending Confirmation Here
         if (playerState == PlayerUI.PlayerState.PLAYING || playerState == PlayerUI.PlayerState.PAUSED) {
             currentcutorelement.stop();
             updateuitimeline.stop();
@@ -667,22 +674,10 @@ public class This_Session {
             }
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
-    public void playthiscut() {
-        try {
-            if (Root.getOptions().getSessionOptions().getReferenceoption() != null && Root.getOptions().getSessionOptions().getReferenceoption()) {displayreferencefile();}
-            Duration cutduration = new Duration(currentcutorelement.getdurationinmillis());
-            currentcutorelement.start();
-            Timeline timeline = new Timeline(new KeyFrame(cutduration, ae -> progresstonextcut()));
-            timeline.setOnFinished(event -> timeline.stop());
-            timeline.play();
-            setPlayerState(PlayerUI.PlayerState.PLAYING);
-        } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-    }
     public void progresstonextcut() {
         try {
             switch (playerState) {
                 case TRANSITIONING:
-//                System.out.println(TimeUtils.getformattedtime() + "> Clause 1");
                     try {
                         List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcutorelement.number,
                                 Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(currentcutorelement.number, false), 2));
@@ -692,7 +687,7 @@ public class This_Session {
                         currentcutorelement.cleanupPlayersandAnimations();
                         cutorelementcount++;
                         currentcutorelement = getallitemsinSession().get(cutorelementcount);
-                        playthiscut();
+                        currentcutorelement.start();
                     } catch (IndexOutOfBoundsException ignored) {
                         currentcutorelement.cleanupPlayersandAnimations();
                         endofsession();
@@ -713,7 +708,7 @@ public class This_Session {
         sessions.deletenonvalidsessions();
         // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It Then Change Session Finsished Dialog To Showandwait
         PlayerUI.SessionFinishedDialog sess = new PlayerUI.SessionFinishedDialog(Root);
-        sess.show();
+        sess.showAndWait();
         sess.setOnHidden(event -> {
             System.out.println("Session Finished Dialog Is Closed/Hidden");
             if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
@@ -729,6 +724,10 @@ public class This_Session {
 //        if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            getsessionexporter();}
         Root.getProgressTracker().updaterootgoalsui();
+        // TODO Create Dialog That Shows How Long Session Was And What Was Practiced
+//        for (Meditatable i : getAllcutsorelementstoplay()) {
+//            if (i.name.equals(name)) {break;}
+//        }
     }
     public void resetthissession() {
         updateuitimeline = null;

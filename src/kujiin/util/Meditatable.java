@@ -338,6 +338,7 @@ public class Meditatable {
         }
     }
     public void start() {
+        thisession.displayreferencefile();
         entrainmentplaycount = 0;
         ambienceplaycount = 0;
         setupfadeanimations();
@@ -415,7 +416,6 @@ public class Meditatable {
         toggleplayerbuttons();
     }
     public void stop() {
-        // TODO Add Premature Ending Confirmation Here
         volume_unbindentrainment();
         if (fade_ambience_stop != null) {
             if (fade_ambience_stop.getStatus() == Animation.Status.RUNNING) {return;}
@@ -436,10 +436,6 @@ public class Meditatable {
             }
         }
         toggleplayerbuttons();
-    // TODO Create Dialog That Shows How Long Session Was And What Was Practiced
-//        for (Meditatable i : getAllcutsorelementstoplay()) {
-//            if (i.name.equals(name)) {break;}
-//        }
     }
     public void tick() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
