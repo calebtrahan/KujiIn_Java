@@ -551,7 +551,7 @@ public class Meditatable {
                 break;
             case PLAYING:
                 playbuttontext = "Playing";
-                pausebuttontext = "Paused";
+                pausebuttontext = "Pause";
                 stopbuttontext = "Stop";
                 statusbartext = "Session Playing";
                 break;

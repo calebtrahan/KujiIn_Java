@@ -25,7 +25,15 @@ import java.io.IOException;
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
 // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
 
-// TODO When Fading Out, Get Current Value And Fade From There Instead Of Max Or Default Value
+// TODO Entrainment Volume Was Raised To 100% When Switching To TOH (And Also Broke Reference File)
+// TODO NullPointerException in Meditatable:181 < Meditatable:256
+
+// TODO Volume:
+//      Pre Ramp Is Too Loud
+
+// TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
+
+// TODO Reference Turns Off After Each Cut Ending
 
 public class PlayerUI extends Stage {
     public Button PlayButton;
@@ -52,7 +60,7 @@ public class PlayerUI extends Stage {
     public Label GoalProgressLabel;
     private This_Session Session;
     private MainController Root;
-    public ReferenceType defaultreferencetype = ReferenceType.html;
+    public boolean displaynormaltime;
 
     public PlayerUI(MainController root) {
         Root = root;
@@ -78,6 +86,9 @@ public class PlayerUI extends Stage {
         PlayButton.setText("Start");
         PauseButton.setDisable(true);
         StopButton.setDisable(true);
+        displaynormaltime = true;
+        CutTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
+        TotalTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
     }
 
 // Button Actions
@@ -99,11 +110,10 @@ public class PlayerUI extends Stage {
             ReferenceHTMLButton.setSelected(false);
             ReferenceTXTButton.setSelected(false);
             Root.getOptions().getSessionOptions().setReferencetype(null);
-            if (Session.getDisplayReference() != null && Session.getDisplayReference().isShowing()) {Session.closereferencefile();}
+            Session.closereferencefile();
+            togglevolumebinding();
         } else {
-            if (Root.getOptions().getSessionOptions().getReferencetype() == null) {
-                Root.getOptions().getSessionOptions().setReferencetype(Options.DEFAULT_REFERENCE_TYPE_OPTION);
-            }
+            if (Root.getOptions().getSessionOptions().getReferencetype() == null) {Root.getOptions().getSessionOptions().setReferencetype(Options.DEFAULT_REFERENCE_TYPE_OPTION);}
             switch (Root.getOptions().getSessionOptions().getReferencetype()) {
                 case html:
                     ReferenceHTMLButton.setSelected(true);
@@ -113,20 +123,10 @@ public class PlayerUI extends Stage {
                     ReferenceTXTButton.setSelected(true);
                     txtreferenceoptionselected(null);
                     break;
-                default:
-                    Root.getOptions().getSessionOptions().setReferencetype(defaultreferencetype);
-                    togglereference(null);
-                    break;
             }
-            if (Session.getPlayerState() == PlayerState.PLAYING && (Session.getDisplayReference() == null || ! Session.getDisplayReference().isShowing())) {
+            if (Session.getPlayerState() == PlayerState.PLAYING) {
                 Session.displayreferencefile();
-                Meditatable currentcutorelement = Session.getCurrentcutorelement();
-                currentcutorelement.volume_unbindentrainment();
-                currentcutorelement.volume_bindentrainment();
-                if (currentcutorelement.getAmbienceenabled()) {
-                    currentcutorelement.volume_unbindambience();
-                    currentcutorelement.volume_bindambience();
-                }
+                togglevolumebinding();
             }
         }
     }
@@ -143,6 +143,15 @@ public class PlayerUI extends Stage {
             if (ReferenceTXTButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
             else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
         } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
+    }
+    public void togglevolumebinding() {
+        Meditatable currentcutorelement = Session.getCurrentcutorelement();
+        currentcutorelement.volume_unbindentrainment();
+        currentcutorelement.volume_bindentrainment();
+        if (currentcutorelement.getAmbienceenabled()) {
+            currentcutorelement.volume_unbindambience();
+            currentcutorelement.volume_bindambience();
+        }
     }
     public void cleanupPlayer() {}
     public void resetPlayer() {}
@@ -188,6 +197,10 @@ public class PlayerUI extends Stage {
                     AmbienceVolumePercentage.setText(Root.getPlayer().AmbienceVolumePercentage.getText());
                     EntrainmentVolumeSlider.setValue(Root.getPlayer().EntrainmentVolume.getValue());
                     EntrainmentVolumePercentage.setText(Root.getPlayer().EntrainmentVolumePercentage.getText());
+                    this.setOnCloseRequest(event -> {
+                        Root.getPlayer().ReferenceToggleButton.setSelected(false);
+                        Root.getPlayer().togglereference(null);
+                    });
                 } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
                 // TODO Find Out Why ESC Event Filter Is Crashing The Whole App
 //                this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -297,12 +310,6 @@ public class PlayerUI extends Stage {
         public void play(ActionEvent actionEvent) {Root.getSession().play(Root.getPlayer());}
         public void pause(ActionEvent actionEvent) {Root.getSession().pause();}
         public void stop(ActionEvent actionEvent) {Root.getSession().stop();}
-        @Override
-        public void close() {
-            super.close();
-            Root.getPlayer().ReferenceToggleButton.setSelected(false);
-            Root.getPlayer().togglereference(null);
-        }
     }
     public static class ReferenceTypeDialog extends Stage {
         private MainController Root;

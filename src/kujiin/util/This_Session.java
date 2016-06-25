@@ -648,8 +648,12 @@ public class This_Session {
                 getPlayerUI().CurrentCutTopLabel.setText(String.format("%s (%d", currentcutorelement.name, currentprogress.intValue()) + "%)");
                 getPlayerUI().TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
                 getPlayerUI().CutCurrentLabel.setText(currentcutorelement.getcurrenttimeformatted());
-                getPlayerUI().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());
+                boolean displaynormaltime = getPlayerUI().displaynormaltime;
+                if (displaynormaltime) {getPlayerUI().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());}
+                else {getPlayerUI().CutTotalLabel.setText(Util.format_secondsleftforplayerdisplay(currentcutorelement.secondselapsed, currentcutorelement.getdurationinseconds()));}
                 getPlayerUI().TotalCurrentLabel.setText(Util.format_secondsforplayerdisplay(totalsecondselapsed));
+                if (displaynormaltime) {getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(getTotalsecondsinsession()));}
+                else {getPlayerUI().TotalTotalLabel.setText(Util.format_secondsleftforplayerdisplay(totalsecondselapsed, getTotalsecondsinsession()));}
                 if (getDisplayReference() != null && getDisplayReference().isShowing()) {
                     getDisplayReference().CurrentProgress.setProgress(currentprogress / 100);
                     getDisplayReference().CurrentPercentage.setText(currentprogress.intValue() + "%");
@@ -784,27 +788,25 @@ public class This_Session {
             Root.getOptions().getSessionOptions().setReferenceoption(reftype.getEnabled());
         }
     }
-    public void togglereferencedisplay(CheckBox ReferenceFileCheckbox) {
-        if (ReferenceFileCheckbox.isSelected()) {choosereferencetype();}
-        ReferenceFileCheckbox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
-        if (ReferenceFileCheckbox.isSelected()  && playerState == PlayerUI.PlayerState.PLAYING) {displayreferencefile();}
-        else {
-            Root.getOptions().getSessionOptions().setReferenceoption(false);
-            Root.getOptions().getSessionOptions().setReferencetype(null);
-            closereferencefile();
-        }
-    }
+//    public void togglereferencedisplay(CheckBox ReferenceFileCheckbox) {
+//        if (ReferenceFileCheckbox.isSelected()) {choosereferencetype();}
+//        ReferenceFileCheckbox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
+//        if (ReferenceFileCheckbox.isSelected()  && playerState == PlayerUI.PlayerState.PLAYING) {displayreferencefile();}
+//        else {
+//            Root.getOptions().getSessionOptions().setReferenceoption(false);
+//            Root.getOptions().getSessionOptions().setReferencetype(null);
+//            closereferencefile();
+//        }
+//    }
     public void displayreferencefile() {
-        displayReference = new PlayerUI.DisplayReference(Root, currentcutorelement);
-        displayReference.show();
-        displayReference.setOnHidden(event -> {
-            currentcutorelement.volume_unbindentrainment();
-            currentcutorelement.volume_bindentrainment();
-            if (currentcutorelement.getAmbienceenabled()) {
-                currentcutorelement.volume_unbindambience();
-                currentcutorelement.volume_bindambience();
-            }
-        });
+        boolean notalreadyshowing = displayReference == null || ! displayReference.isShowing();
+        boolean referenceenabledwithvalidtype = Root.getOptions().getSessionOptions().getReferenceoption() &&
+                (Root.getOptions().getSessionOptions().getReferencetype() == PlayerUI.ReferenceType.html || Root.getOptions().getSessionOptions().getReferencetype() == PlayerUI.ReferenceType.txt);
+        if (notalreadyshowing && referenceenabledwithvalidtype) {
+            displayReference = new PlayerUI.DisplayReference(Root, currentcutorelement);
+            displayReference.show();
+            displayReference.setOnHidden(event -> Root.getPlayer().togglevolumebinding());
+        }
     }
     public void closereferencefile() {
         if (displayReference != null && displayReference.isShowing()) {

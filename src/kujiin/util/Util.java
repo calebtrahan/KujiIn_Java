@@ -9,6 +9,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import kujiin.MainController;
 import kujiin.xml.Options;
+import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.jdom2.Document;
@@ -289,6 +290,18 @@ public class Util {
             return String.format("%02d:%02d", minutes, sec);
         }
     }
+    public static String format_secondsleftforplayerdisplay(int elapsedseconds, int totalseconds) {
+        int secondsleft = totalseconds - elapsedseconds;
+        int hours = 0;
+        int minutes = 0;
+        if (secondsleft >= 3600) {hours = secondsleft / 3600; secondsleft -= hours * 3600;}
+        if (secondsleft >= 60) {minutes = secondsleft / 60; secondsleft -= minutes * 60;}
+        if (hours > 0) {
+            return String.format("-" + "%02d:%02d:%02d", hours, minutes, secondsleft);
+        } else {
+            return String.format("-" + "%02d:%02d", minutes, secondsleft);
+        }
+    }
 
 // Date Methods
     public static String gettodaysdate() {
@@ -381,6 +394,26 @@ public class Util {
                 return filetocheck;
             }
         }
+    }
+    public static File file_removetrailingnonalphabeticcharactersfromfilename(File file) {
+        try {
+            int firstindex = 0;
+            char[] filenamearray = file.getName().toCharArray();
+            for (int i = 0; i < filenamearray.length; i++) {
+                char n = filenamearray[i];
+                if (Character.isAlphabetic(n)) {
+                    firstindex = i;
+                    break;
+                }
+            }
+            String newname = file.getName().substring(firstindex, file.getName().length());
+            File newfile = new File(file.getParentFile(), newname);
+            try {
+                FileUtils.moveFile(file, newfile);
+                if (newfile.exists()) {return newfile;}
+                else {return null;}
+            } catch (FileExistsException ignored) {return newfile;}
+        } catch (Exception ignored) {return null;}
     }
 
 // Audio Methods
