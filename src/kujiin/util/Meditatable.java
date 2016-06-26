@@ -416,6 +416,7 @@ public class Meditatable {
         toggleplayerbuttons();
     }
     public void stop() {
+        thisession.closereferencefile();
         volume_unbindentrainment();
         if (fade_ambience_stop != null) {
             if (fade_ambience_stop.getStatus() == Animation.Status.RUNNING) {return;}
@@ -498,6 +499,8 @@ public class Meditatable {
             if (fade_ambience_pause != null) {fade_ambience_pause.stop();}
             if (fade_ambience_resume != null) {fade_ambience_resume.stop();}
             if (fade_ambience_stop != null) {fade_ambience_stop.stop();}
+            thisession.closereferencefile();
+            toggleplayerbuttons();
         } catch (Exception ignored) {}
     }
     public void toggleplayerbuttons() {
@@ -525,10 +528,10 @@ public class Meditatable {
         String statusbartext;
         switch (thisession.getPlayerState()) {
             case IDLE:
-                playbuttontext = "Playing";
-                pausebuttontext = "Paused";
+                playbuttontext = "Start";
+                pausebuttontext = "Pause";
                 stopbuttontext = "Stop";
-                statusbartext = "Session Playing";
+                statusbartext = "";
                 break;
             case PLAYING:
                 playbuttontext = "Playing";

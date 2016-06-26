@@ -36,6 +36,8 @@ import java.io.IOException;
 // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
 
 // TODO Reference Turns Off After Each Cut Ending
+// TODO While Fading In/Out Display Reference Selecting/Deselecting
+
 
 public class PlayerUI extends Stage {
     public Button PlayButton;
@@ -85,9 +87,6 @@ public class PlayerUI extends Stage {
         AmbienceVolumePercentage.setText("0%");
         ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
         togglereference(null);
-        PlayButton.setText("Start");
-        PauseButton.setDisable(true);
-        StopButton.setDisable(true);
         displaynormaltime = true;
         CutTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
         TotalTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
@@ -98,10 +97,11 @@ public class PlayerUI extends Stage {
     public void pause() {Session.pause();}
     public void stop() {Session.stop();}
     public void togglereference(ActionEvent actionEvent) {
-        Root.getOptions().getSessionOptions().setReferenceoption(ReferenceToggleButton.isSelected());
-        ReferenceHTMLButton.setDisable(! ReferenceToggleButton.isSelected());
-        ReferenceTXTButton.setDisable(! ReferenceToggleButton.isSelected());
-        if (! ReferenceToggleButton.isSelected()) {
+        boolean buttontoggled = ReferenceToggleButton.isSelected();
+        Root.getOptions().getSessionOptions().setReferenceoption(buttontoggled);
+        ReferenceHTMLButton.setDisable(! buttontoggled);
+        ReferenceTXTButton.setDisable(! buttontoggled);
+        if (! buttontoggled) {
             ReferenceHTMLButton.setSelected(false);
             ReferenceTXTButton.setSelected(false);
             Root.getOptions().getSessionOptions().setReferencetype(null);
@@ -140,7 +140,20 @@ public class PlayerUI extends Stage {
         } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
     }
     public void cleanupPlayer() {}
-    public void resetPlayer() {}
+    public void reset() {
+        CutCurrentLabel.setText("--:--");
+        CurrentCutProgress.setProgress(0.0);
+        CutTotalLabel.setText("--:--");
+        TotalCurrentLabel.setText("--:--");
+        TotalProgress.setProgress(0.0);
+        TotalTotalLabel.setText("--:--");
+        EntrainmentVolume.setDisable(true);
+        EntrainmentVolumePercentage.setText("0%");
+        // TODO Reset Goal UI Here
+        PlayButton.setText("Start");
+        PauseButton.setDisable(true);
+        StopButton.setDisable(true);
+    }
 
     // Dialogs
     public static class DisplayReference extends Stage {

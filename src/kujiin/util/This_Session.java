@@ -157,7 +157,7 @@ public class This_Session {
         this.totalsecondsinsession = totalsecondsinsession;
     }
 
-    // Cut And Element Getters
+// Cut And Element Getters
     public Qi_Gong getPresession() {
         return Presession;
     }
@@ -629,13 +629,10 @@ public class This_Session {
         }
     }
     public void stop() {
-        // TODO Add Premature Ending Confirmation Here
-        if (playerState == PlayerUI.PlayerState.PLAYING || playerState == PlayerUI.PlayerState.PAUSED) {
-            currentcutorelement.stop();
-            updateuitimeline.stop();
-            resetthissession();
-            closereferencefile();
-        }
+        if (! endsessionprematurely()) {return;}
+        currentcutorelement.stop();
+        updateuitimeline.stop();
+        resetthissession();
     }
     public void updateplayerui() {
         try {
@@ -681,14 +678,13 @@ public class This_Session {
                     try {
                         List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcutorelement.number,
                                 Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(currentcutorelement.number, false), 2));
-                        if (completedgoals.size() > 0) {
-                            GoalsCompletedThisSession.addAll(completedgoals);
-                        }
+                        if (completedgoals.size() > 0) {GoalsCompletedThisSession.addAll(completedgoals);}
                         currentcutorelement.cleanupPlayersandAnimations();
                         cutorelementcount++;
                         currentcutorelement = getallitemsinSession().get(cutorelementcount);
                         currentcutorelement.start();
                     } catch (IndexOutOfBoundsException ignored) {
+                        setPlayerState(PlayerUI.PlayerState.IDLE);
                         currentcutorelement.cleanupPlayersandAnimations();
                         endofsession();
                     }
@@ -702,7 +698,6 @@ public class This_Session {
     public void endofsession() {
         getPlayerUI().CurrentCutTopLabel.setText(currentcutorelement.name + " Completed");
         getPlayerUI().TotalSessionLabel.setText("Session Completed");
-        closereferencefile();
         updateuitimeline.stop();
         setPlayerState(PlayerUI.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
@@ -710,7 +705,6 @@ public class This_Session {
         PlayerUI.SessionFinishedDialog sess = new PlayerUI.SessionFinishedDialog(Root);
         sess.showAndWait();
         sess.setOnHidden(event -> {
-            System.out.println("Session Finished Dialog Is Closed/Hidden");
             if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
                 Goals.Goal i = GoalsCompletedThisSession.get(0);
                 int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsUI.GOALCUTNAMES)).indexOf(i.getCutName());
@@ -735,9 +729,9 @@ public class This_Session {
         cutorelementcount = 0;
         totalsecondselapsed = 0;
         totalsecondsinsession = 0;
+        getPlayerUI().reset();
     }
     public void transition() {
-        closereferencefile();
         Session currentsession = sessions.sessioninformation_getspecificsession(sessions.sessioninformation_totalsessioncount() - 1);
         currentsession.updatecutduration(currentcutorelement.number, currentcutorelement.getdurationinminutes());
         sessions.marshall();
@@ -779,7 +773,7 @@ public class This_Session {
     public boolean endsessionprematurely() {
         if (getPlayerState() == PlayerUI.PlayerState.PLAYING || getPlayerState() == PlayerUI.PlayerState.PAUSED || getPlayerState() == PlayerUI.PlayerState.TRANSITIONING) {
             pause();
-            if (Util.gui_getokcancelconfirmationdialog(Root, "End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {stop(); closereferencefile(); return true;}
+            if (Util.gui_getokcancelconfirmationdialog(Root, "End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {return true;}
             else {play(Root.getPlayer()); return false;}
         } else {return true;}
     }
