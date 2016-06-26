@@ -34,7 +34,7 @@ import java.io.IOException;
 // TODO NullPointerException in Meditatable:181 < Meditatable:256
 
 // TODO Volume:
-//      Pre Ramp Is Too Loud
+//      Pre Ramp Is Setting To 100% Volume
 
 // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
 
