@@ -1,6 +1,8 @@
 package kujiin.util;
 
 import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.animation.Transition;
 import javafx.concurrent.Service;
 import javafx.scene.control.Tooltip;
@@ -36,6 +38,8 @@ public class Meditatable {
     protected Animation fade_ambience_resume;
     protected Animation fade_ambience_pause;
     protected Animation fade_ambience_stop;
+    protected Animation timeline_fadeout_timer;
+    protected Animation timeline_progresstonextmeditatable;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     public int secondselapsed;
@@ -222,7 +226,7 @@ public class Meditatable {
                     }
                 }
             };
-        fade_entrainment_resume.setOnFinished(event -> {thisession.setPlayerState(PlayerUI.PlayerState.PLAYING); toggleplayerbuttons(); volume_bindentrainment();});
+        fade_entrainment_resume.setOnFinished(event -> {thisession.setPlayerState(PlayerUI.PlayerState.PLAYING); timeline_progresstonextmeditatable.play(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();} toggleplayerbuttons(); volume_bindentrainment();});
         if (ambienceenabled) {
             fade_ambience_resume = new Transition() {
                 {setCycleDuration(new Duration(Options.DEFAULT_FADERESUMEANDPAUSEDURATION * 1000));}
@@ -265,7 +269,7 @@ public class Meditatable {
                     }
                 }
     };
-        fade_entrainment_pause.setOnFinished(event -> {entrainmentplayer.pause(); thisession.setPlayerState(PlayerUI.PlayerState.PAUSED); toggleplayerbuttons();});
+        fade_entrainment_pause.setOnFinished(event -> {entrainmentplayer.pause(); timeline_progresstonextmeditatable.pause(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();} thisession.setPlayerState(PlayerUI.PlayerState.PAUSED); toggleplayerbuttons();});
         if (ambienceenabled) {
             fade_ambience_pause = new Transition() {
                 {setCycleDuration(new Duration(Options.DEFAULT_FADERESUMEANDPAUSEDURATION * 1000));}
@@ -311,7 +315,7 @@ public class Meditatable {
                         }
                     }
             };
-            fade_entrainment_stop.setOnFinished(event -> {entrainmentplayer.stop(); entrainmentplayer.dispose(); thisession.setPlayerState(PlayerUI.PlayerState.STOPPED); toggleplayerbuttons();});
+            fade_entrainment_stop.setOnFinished(event -> {entrainmentplayer.stop(); entrainmentplayer.dispose(); timeline_progresstonextmeditatable.stop(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();} thisession.setPlayerState(PlayerUI.PlayerState.STOPPED); toggleplayerbuttons();});
             if (ambienceenabled) {
                 fade_ambience_stop = new Transition() {
                     {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000));}
@@ -348,6 +352,19 @@ public class Meditatable {
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
+        timeline_progresstonextmeditatable = new Timeline(new KeyFrame(new Duration(getdurationinmillis()), ae -> thisession.progresstonextcut()));
+        timeline_progresstonextmeditatable.play();
+        if (fade_entrainment_stop != null) {
+            timeline_fadeout_timer = new Timeline(new KeyFrame(new Duration(getdurationinmillis() - (thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000)), ae -> {
+                volume_unbindentrainment();
+                fade_entrainment_stop.play();
+                if (fade_ambience_stop != null) {
+                    volume_unbindambience();
+                    fade_ambience_stop.play();
+                }
+            }));
+            timeline_fadeout_timer.play();
+        }
         if (fade_entrainment_play != null) {
             if (fade_ambience_play.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.setPlayerState(PlayerUI.PlayerState.FADING_PLAY);
@@ -380,6 +397,8 @@ public class Meditatable {
             entrainmentplayer.setVolume(thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume());
             volume_bindentrainment();
             thisession.setPlayerState(PlayerUI.PlayerState.PLAYING);
+            timeline_progresstonextmeditatable.play();
+            if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();}
         }
         if (ambienceenabled) {
             volume_unbindambience();
@@ -408,6 +427,8 @@ public class Meditatable {
         } else {
             thisession.setPlayerState(PlayerUI.PlayerState.PAUSED);
             entrainmentplayer.pause();
+            timeline_progresstonextmeditatable.pause();
+            if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
             if (ambienceenabled) {
                 volume_unbindambience();
                 ambienceplayer.pause();
@@ -430,6 +451,8 @@ public class Meditatable {
             thisession.setPlayerState(PlayerUI.PlayerState.STOPPED);
             entrainmentplayer.stop();
             entrainmentplayer.dispose();
+            timeline_progresstonextmeditatable.stop();
+            if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
             if (ambienceenabled) {
                 volume_unbindambience();
                 ambienceplayer.stop();
@@ -439,16 +462,16 @@ public class Meditatable {
         toggleplayerbuttons();
     }
     public void tick() {
-        if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            if (secondselapsed <= thisession.Root.getOptions().getSessionOptions().getFadeinduration()) {
-                thisession.Root.getPlayer().StatusBar.setText("Fading Into " + name);
-            } else if ((getdurationinseconds() - secondselapsed) <= thisession.Root.getOptions().getSessionOptions().getFadeoutduration()) {
-                startfadeout();
-                thisession.Root.getPlayer().StatusBar.setText("Fading Out Of " + name);
-            } else {
-                thisession.Root.getPlayer().StatusBar.setText("Current Playing " + name);
-            }
-        }
+//        if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
+//            if (secondselapsed <= thisession.Root.getOptions().getSessionOptions().getFadeinduration()) {
+//                thisession.Root.getPlayer().StatusBar.setText("Fading Into " + name);
+//            } else if ((getdurationinseconds() - secondselapsed) <= thisession.Root.getOptions().getSessionOptions().getFadeoutduration()) {
+////                startfadeout();
+//                thisession.Root.getPlayer().StatusBar.setText("Fading Out Of " + name);
+//            } else {
+//                thisession.Root.getPlayer().StatusBar.setText("Current Playing " + name);
+//            }
+//        }
     }
     public void playnextentrainment() {
         try {
@@ -477,20 +500,10 @@ public class Meditatable {
             ambienceplayer.setOnPlaying(this::volume_bindambience);
         } catch (IndexOutOfBoundsException ignored) {ambienceplayer.dispose();}
     }
-    public void startfadeout() {
-        if (fade_entrainment_stop != null && fade_entrainment_stop.getStatus() != Animation.Status.RUNNING) {
-            volume_unbindentrainment();
-            fade_entrainment_stop.play();
-            if (ambienceenabled && fade_ambience_stop != null) {
-                volume_unbindambience();
-                fade_ambience_stop.play();
-            }
-        }
-    }
     public void cleanupPlayersandAnimations() {
         try {
-            getCurrentEntrainmentPlayer().dispose();
-            if (ambienceenabled) {getCurrentAmbiencePlayer().dispose();}
+            if (getCurrentEntrainmentPlayer() != null) {getCurrentEntrainmentPlayer().dispose();}
+            if (getCurrentAmbiencePlayer() != null && ambienceenabled) {getCurrentAmbiencePlayer().dispose();}
             if (fade_entrainment_play != null) {fade_entrainment_play.stop();}
             if (fade_entrainment_pause != null) {fade_entrainment_pause.stop();}
             if (fade_entrainment_resume != null) {fade_entrainment_resume.stop();}
@@ -499,6 +512,8 @@ public class Meditatable {
             if (fade_ambience_pause != null) {fade_ambience_pause.stop();}
             if (fade_ambience_resume != null) {fade_ambience_resume.stop();}
             if (fade_ambience_stop != null) {fade_ambience_stop.stop();}
+            if (timeline_progresstonextmeditatable != null) {timeline_progresstonextmeditatable.stop();}
+            if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
             thisession.closereferencefile();
             toggleplayerbuttons();
         } catch (Exception ignored) {}
@@ -517,6 +532,9 @@ public class Meditatable {
         thisession.Root.getPlayer().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
         thisession.Root.getPlayer().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
         thisession.Root.getPlayer().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
+        thisession.Root.getPlayer().ReferenceToggleButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
+        thisession.Root.getPlayer().ReferenceHTMLButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
+        thisession.Root.getPlayer().ReferenceTXTButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
         if (referenceenabled) {
             thisession.getDisplayReference().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
             thisession.getDisplayReference().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
@@ -526,6 +544,9 @@ public class Meditatable {
         String pausebuttontext;
         String stopbuttontext;
         String statusbartext;
+        String cutorelementname;
+        if (thisession.getCurrentcutorelement() != null) {cutorelementname = thisession.getCurrentcutorelement().name;}
+        else {cutorelementname = "Session";}
         switch (thisession.getPlayerState()) {
             case IDLE:
                 playbuttontext = "Start";
@@ -537,13 +558,13 @@ public class Meditatable {
                 playbuttontext = "Playing";
                 pausebuttontext = "Pause";
                 stopbuttontext = "Stop";
-                statusbartext = "Session Playing";
+                statusbartext = cutorelementname + " Playing";
                 break;
             case PAUSED:
                 playbuttontext = "Resume";
                 pausebuttontext = "Paused";
                 stopbuttontext = "Stop";
-                statusbartext = "Session Paused";
+                statusbartext = cutorelementname + " Paused";
                 break;
             case STOPPED:
                 playbuttontext = "Play";
@@ -555,31 +576,31 @@ public class Meditatable {
                 playbuttontext = "Transitioning";
                 pausebuttontext = "Transitioning";
                 stopbuttontext = "Transitioning";
-                statusbartext = "Session Transitioning, Please Wait";
+                statusbartext = "Transitioning...Please Wait";
                 break;
             case FADING_PLAY:
                 playbuttontext = "Starting";
                 pausebuttontext = "Starting";
                 stopbuttontext = "Starting";
-                statusbartext = "Session Starting";
+                statusbartext = "Fading In To " + cutorelementname ;
                 break;
             case FADING_RESUME:
                 playbuttontext = "Resuming";
                 pausebuttontext = "Resuming";
                 stopbuttontext = "Resuming";
-                statusbartext = "Session Resuming";
+                statusbartext = "Resuming " + cutorelementname ;
                 break;
             case FADING_PAUSE:
                 playbuttontext = "Pausing";
                 pausebuttontext = "Pausing";
                 stopbuttontext = "Pausing";
-                statusbartext = "Session Pausing";
+                statusbartext = "Pausing " + cutorelementname;
                 break;
             case FADING_STOP:
                 playbuttontext = "Stopping";
                 pausebuttontext = "Stopping";
                 stopbuttontext = "Stopping";
-                statusbartext = "Session Stopping";
+                statusbartext = "Stopping " + cutorelementname;
                 break;
             default:
                 playbuttontext = "";

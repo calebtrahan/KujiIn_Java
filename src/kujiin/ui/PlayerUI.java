@@ -1,14 +1,19 @@
 package kujiin.ui;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import kujiin.MainController;
 import kujiin.util.Meditatable;
 import kujiin.util.This_Session;
@@ -28,15 +33,13 @@ import java.io.IOException;
 // TODO Entrainment Volume Was Raised To 100% When Switching To TOH (And Also Broke Reference File)
 // TODO NullPointerException in Meditatable:181 < Meditatable:256
 
-// TODO !IMPORTANT Organize, Encapsulate And Fix This Player Binding/Unbinding Logic So It's Simple And Encapsulated
-
 // TODO Volume:
 //      Pre Ramp Is Too Loud
 
 // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
 
 // TODO Reference Turns Off After Each Cut Ending
-// TODO While Fading In/Out Display Reference Selecting/Deselecting
+// TODO Entrainment Slider Is Set To 1.0 On Both Player And Reference
 
 
 public class PlayerUI extends Stage {
@@ -64,32 +67,33 @@ public class PlayerUI extends Stage {
     public Label GoalProgressLabel;
     private This_Session Session;
     private MainController Root;
-    public boolean displaynormaltime;
+    public boolean displaynormaltime = true;
 
     public PlayerUI(MainController root) {
-        Root = root;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
-        fxmlLoader.setController(this);
         try {
+            Root = root;
+            Session = Root.getSession();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
+            fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             Root.getOptions();
             Root.getOptions().setStyle(this);
-            this.setResizable(false);
-            this.setOnCloseRequest(event -> {if (Session.endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}});
-        } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-        setTitle("Session Player");
-        Root = root;
-        Session = root.getSession();
-        EntrainmentVolume.setDisable(true);
-        EntrainmentVolumePercentage.setText("0%");
-        AmbienceVolume.setDisable(true);
-        AmbienceVolumePercentage.setText("0%");
-        ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
-        togglereference(null);
-        displaynormaltime = true;
-        CutTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
-        TotalTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
+            setTitle("Session Player");
+            reset();
+            setResizable(false);
+            CutTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
+            TotalTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
+            setOnCloseRequest(event -> {
+                if (Session.getPlayerState() == PlayerState.PLAYING || Session.getPlayerState() == PlayerState.STOPPED || Session.getPlayerState() == PlayerState.PAUSED || Session.getPlayerState() == PlayerState.IDLE) {
+                    if (Session.endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}
+                } else {
+                    Util.gui_showtimedmessageonlabel(StatusBar, "Cannot Close Player During Fade Animation", 400);
+                    new Timeline(new KeyFrame(Duration.millis(400), ae -> Session.getCurrentcutorelement().toggleplayerbuttons()));
+                    event.consume();
+                }
+            });
+        } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
 
 // Button Actions
@@ -149,6 +153,8 @@ public class PlayerUI extends Stage {
         TotalTotalLabel.setText("--:--");
         EntrainmentVolume.setDisable(true);
         EntrainmentVolumePercentage.setText("0%");
+        ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
+        togglereference(null);
         // TODO Reset Goal UI Here
         PlayButton.setText("Start");
         PauseButton.setDisable(true);
@@ -196,26 +202,24 @@ public class PlayerUI extends Stage {
                     AmbienceVolumePercentage.setText(Root.getPlayer().AmbienceVolumePercentage.getText());
                     EntrainmentVolumeSlider.setValue(Root.getPlayer().EntrainmentVolume.getValue());
                     EntrainmentVolumePercentage.setText(Root.getPlayer().EntrainmentVolumePercentage.getText());
-                    this.setOnCloseRequest(event -> {
-                        Root.getPlayer().ReferenceToggleButton.setSelected(false);
-                        Root.getPlayer().togglereference(null);
+                    setOnCloseRequest(event -> untoggleplayerreference());
+                    setFullScreenExitHint("Press F11 To Toggle Fullscreen, ESC To Hide Reference");
+                    addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                            switch (event.getCode()) {
+                                case ESCAPE:
+                                    Platform.runLater(this::close);
+                                    untoggleplayerreference();
+                                    break;
+                                case F11:
+                                    boolean fullscreen = this.isFullScreen();
+                                    fullscreenoption = ! fullscreen;
+                                    Root.getOptions().getSessionOptions().setReferencefullscreen(fullscreen);
+                                    setsizing();
+                                    if (! fullscreen) {setFullScreenExitHint("");}
+                                    break;
+                            }
                     });
-                    this.setFullScreenExitHint("Press F11 To Exit FullScreen, ESC To Close Reference File");
                 } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-                // TODO Find Out Why ESC Event Filter Is Crashing The Whole App
-//                this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-//                    if (Root.getSession().getPlayerState() == PlayerState.PLAYING) {
-//                        switch (event.getCode()) {
-//                            case ESCAPE:
-//                                close();
-//                                break;
-//                            case UP:
-//                                break;
-//                            case DOWN:
-//                                break;
-//                        }
-//                    }
-//                });
             }
         }
         public DisplayReference(MainController root, String htmlcontent) {
@@ -242,10 +246,11 @@ public class PlayerUI extends Stage {
             Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
             double height = primaryScreenBounds.getHeight();
             double width = primaryScreenBounds.getWidth();
-            if (! fullscreenoption) {height -= 200; width -= 200;}
+            if (! fullscreenoption) {height -= 100; width -= 100;}
             this.setFullScreen(fullscreenoption);
             this.setHeight(height);
             this.setWidth(width);
+            this.centerOnScreen();
             ContentPane.setFitToWidth(true);
             ContentPane.setFitToHeight(true);
             ContentPane.setStyle("-fx-background-color: #212526");
@@ -306,10 +311,15 @@ public class PlayerUI extends Stage {
                     return false;
             }
         }
+        public void untoggleplayerreference() {
+            Root.getPlayer().ReferenceToggleButton.setSelected(false);
+            Root.getPlayer().togglereference(null);
+        }
 
         public void play(ActionEvent actionEvent) {Root.getSession().play(Root.getPlayer());}
         public void pause(ActionEvent actionEvent) {Root.getSession().pause();}
         public void stop(ActionEvent actionEvent) {Root.getSession().stop();}
+
     }
     public static class ReferenceTypeDialog extends Stage {
         private MainController Root;
@@ -332,6 +342,8 @@ public class PlayerUI extends Stage {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
+                HTMLOption.setTooltip(new Tooltip("Will Display .html Formatted Text During Each Individual Cut/Element"));
+                TextOption.setTooltip(new Tooltip("Will Display Contents Of Plain Text File During Each Individual Cut/Element"));
                 this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Type Select");

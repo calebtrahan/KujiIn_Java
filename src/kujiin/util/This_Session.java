@@ -636,39 +636,37 @@ public class This_Session {
     }
     public void updateplayerui() {
         try {
-            if (playerState == PlayerUI.PlayerState.PLAYING) {
-                currentcutorelement.secondselapsed++;
-                totalsecondselapsed++;
-                Float currentprogress;
-                Float totalprogress;
-                if (currentcutorelement.secondselapsed != 0) {currentprogress = (float) currentcutorelement.secondselapsed / (float) currentcutorelement.getdurationinseconds();}
-                else {currentprogress = (float) 0.0;}
-                if (totalsecondselapsed != 0) {totalprogress = (float) totalsecondselapsed / (float) totalsecondsinsession;}
-                else {totalprogress = (float) 0.0;}
-                getPlayerUI().CurrentCutProgress.setProgress(currentprogress);
-                getPlayerUI().TotalProgress.setProgress(totalprogress);
-                currentprogress *= 100;
-                totalprogress *= 100;
-                getPlayerUI().CurrentCutTopLabel.setText(String.format("%s (%d", currentcutorelement.name, currentprogress.intValue()) + "%)");
-                getPlayerUI().TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
-                getPlayerUI().CutCurrentLabel.setText(currentcutorelement.getcurrenttimeformatted());
-                boolean displaynormaltime = getPlayerUI().displaynormaltime;
-                if (displaynormaltime) {getPlayerUI().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());}
-                else {getPlayerUI().CutTotalLabel.setText(Util.format_secondsleftforplayerdisplay(currentcutorelement.secondselapsed, currentcutorelement.getdurationinseconds()));}
-                getPlayerUI().TotalCurrentLabel.setText(Util.format_secondsforplayerdisplay(totalsecondselapsed));
-                if (displaynormaltime) {getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(getTotalsecondsinsession()));}
-                else {getPlayerUI().TotalTotalLabel.setText(Util.format_secondsleftforplayerdisplay(totalsecondselapsed, getTotalsecondsinsession()));}
-                if (getDisplayReference() != null && getDisplayReference().isShowing()) {
-                    getDisplayReference().CurrentProgress.setProgress(currentprogress / 100);
-                    getDisplayReference().CurrentPercentage.setText(currentprogress.intValue() + "%");
-                    getDisplayReference().TotalProgress.setProgress(totalprogress / 100);
-                    getDisplayReference().TotalPercentage.setText(totalprogress.intValue() + "%");
-                    getDisplayReference().CurrentName.setText(currentcutorelement.name);
-                }
-                Root.getProgressTracker().updaterootgoalsui();
-                Root.getProgressTracker().updateprogressui();
-                currentcutorelement.tick();
+            currentcutorelement.secondselapsed++;
+            totalsecondselapsed++;
+            Float currentprogress;
+            Float totalprogress;
+            if (currentcutorelement.secondselapsed != 0) {currentprogress = (float) currentcutorelement.secondselapsed / (float) currentcutorelement.getdurationinseconds();}
+            else {currentprogress = (float) 0.0;}
+            if (totalsecondselapsed != 0) {totalprogress = (float) totalsecondselapsed / (float) totalsecondsinsession;}
+            else {totalprogress = (float) 0.0;}
+            getPlayerUI().CurrentCutProgress.setProgress(currentprogress);
+            getPlayerUI().TotalProgress.setProgress(totalprogress);
+            currentprogress *= 100;
+            totalprogress *= 100;
+            getPlayerUI().CurrentCutTopLabel.setText(String.format("%s (%d", currentcutorelement.name, currentprogress.intValue()) + "%)");
+            getPlayerUI().TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
+            getPlayerUI().CutCurrentLabel.setText(currentcutorelement.getcurrenttimeformatted());
+            boolean displaynormaltime = getPlayerUI().displaynormaltime;
+            if (displaynormaltime) {getPlayerUI().CutTotalLabel.setText(currentcutorelement.gettotaltimeformatted());}
+            else {getPlayerUI().CutTotalLabel.setText(Util.format_secondsleftforplayerdisplay(currentcutorelement.secondselapsed, currentcutorelement.getdurationinseconds()));}
+            getPlayerUI().TotalCurrentLabel.setText(Util.format_secondsforplayerdisplay(totalsecondselapsed));
+            if (displaynormaltime) {getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(getTotalsecondsinsession()));}
+            else {getPlayerUI().TotalTotalLabel.setText(Util.format_secondsleftforplayerdisplay(totalsecondselapsed, getTotalsecondsinsession()));}
+            if (getDisplayReference() != null && getDisplayReference().isShowing()) {
+                getDisplayReference().CurrentProgress.setProgress(currentprogress / 100);
+                getDisplayReference().CurrentPercentage.setText(currentprogress.intValue() + "%");
+                getDisplayReference().TotalProgress.setProgress(totalprogress / 100);
+                getDisplayReference().TotalPercentage.setText(totalprogress.intValue() + "%");
+                getDisplayReference().CurrentName.setText(currentcutorelement.name);
             }
+            Root.getProgressTracker().updaterootgoalsui();
+            Root.getProgressTracker().updateprogressui();
+            currentcutorelement.tick();
         } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
     }
     public void progresstonextcut() {
