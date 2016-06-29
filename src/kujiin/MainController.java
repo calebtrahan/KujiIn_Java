@@ -1467,7 +1467,7 @@ public class MainController implements Initializable {
         @Override
         public void initialize(URL location, ResourceBundle resources) {
             DatePracticedTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-            SessionDurationTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+            SessionDurationTextField.setOnKeyPressed(Root.NONEDITABLETEXTFIELD);
         }
 
         public SessionDetails(MainController root, List<Meditatable> cutsorelementsinsession) {
@@ -1488,9 +1488,7 @@ public class MainController implements Initializable {
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
                 DatePracticedTextField.setText(Util.gettodaysdate());
-                DatePracticedTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
                 SessionDurationTextField.setText(Util.format_minstohrsandmins_long(totalsessiontime));
-                SessionDurationTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
         }
         public SessionDetails(MainController root, kujiin.xml.Session session) {
