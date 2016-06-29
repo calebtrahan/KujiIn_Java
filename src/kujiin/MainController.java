@@ -45,7 +45,6 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 // TODO Saving Preset Is Broke!
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
-// TODO MAYBE Create Fancy Pie Chart/Graph Displaying Individual Session Details (Connect From Session List And Also Display After Completed And Premature Endings)
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;
@@ -1232,11 +1231,15 @@ public class MainController implements Initializable {
             FadeInValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             Util.addscrolllistenerincrementdecrement(FadeInValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0, 1);
+            Util.addupdownarrowlistenerincrementdecrement(FadeInValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0, 1);
             Util.addscrolllistenerincrementdecrement(FadeOutValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0, 1);
+            Util.addupdownarrowlistenerincrementdecrement(FadeOutValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0, 1);
             EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             Util.addscrolllistenerincrementdecrement(EntrainmentVolumePercentage, 1, 100, 1.0, 0);
+            Util.addupdownarrowlistenerincrementdecrement(EntrainmentVolumePercentage, 1, 100, 1.0, 0);
             AmbienceVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             Util.addscrolllistenerincrementdecrement(AmbienceVolumePercentage, 1, 100, 1.0, 0);
+            Util.addupdownarrowlistenerincrementdecrement(AmbienceVolumePercentage, 1, 100, 1.0, 0);
             ProgramThemeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {selectnewtheme(); changedvalue();});
             AlertSwitch.setOnMouseClicked(event -> alertfiletoggle());
             AlertSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
@@ -1477,13 +1480,17 @@ public class MainController implements Initializable {
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
                 SessionNumbersAxis.setLabel("Minutes");
-                SessionCategoryAxis.setLabel("Cut/Element Name");
                 setTitle("Session Details");
                 XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
                 // TODO Find Max Minutes
-                for (Meditatable i : cutsorelementsinsession) {series.getData().add(new XYChart.Data<>(i.name, i.getdurationinminutes()));}
+                int totalsessiontime = 0;
+                for (Meditatable i : cutsorelementsinsession) {series.getData().add(new XYChart.Data<>(i.name, i.getdurationinminutes())); totalsessiontime += i.getdurationinminutes();}
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
+                DatePracticedTextField.setText(Util.gettodaysdate());
+                DatePracticedTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+                SessionDurationTextField.setText(Util.format_minstohrsandmins_long(totalsessiontime));
+                SessionDurationTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
         }
         public SessionDetails(MainController root, kujiin.xml.Session session) {
@@ -1498,6 +1505,7 @@ public class MainController implements Initializable {
                 SessionNumbersAxis.setLabel("Minutes");
                 setTitle("Session Details");
                 DatePracticedTextField.setText(session.getDate_Practiced());
+                DatePracticedTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
                 XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
                 List<Integer> values = new ArrayList<>();
                 for (int i = 0; i < 16; i++) {
@@ -1509,7 +1517,12 @@ public class MainController implements Initializable {
                 SessionBarChart.setLegendVisible(false);
                 SessionNumbersAxis.setUpperBound(Util.list_getmaxintegervalue(values));
                 SessionDurationTextField.setText(Util.format_minstohrsandmins_long(session.getTotal_Session_Duration()));
+                SessionDurationTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
             } catch (IOException | NullPointerException e) {new ExceptionDialog(Root, e).showAndWait();}
+        }
+
+        public void closeDialog(ActionEvent actionEvent) {
+            close();
         }
     }
     public static class AmbienceSong {

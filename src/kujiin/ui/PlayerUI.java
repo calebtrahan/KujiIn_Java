@@ -35,12 +35,9 @@ import java.io.IOException;
 
 // TODO Volume:
 //      Pre Ramp Is Setting To 100% Volume
-
-// TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
-
-// TODO Reference Turns Off After Each Cut Ending
 // TODO Entrainment Slider Is Set To 1.0 On Both Player And Reference
 
+// TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
 
 public class PlayerUI extends Stage {
     public Button PlayButton;
@@ -81,6 +78,12 @@ public class PlayerUI extends Stage {
             Root.getOptions().setStyle(this);
             setTitle("Session Player");
             reset();
+            boolean referenceoption = Root.getOptions().getSessionOptions().getReferenceoption();
+            ReferenceType referenceType = Root.getOptions().getSessionOptions().getReferencetype();
+            if (referenceoption && referenceType != null && Session.checkallreferencefilesforsession(referenceType, false)) {ReferenceToggleButton.setSelected(true);}
+            else {ReferenceToggleButton.setSelected(false);}
+            togglereference(null);
+            ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
             setResizable(false);
             CutTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
             TotalTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
@@ -123,6 +126,10 @@ public class PlayerUI extends Stage {
                     txtreferenceoptionselected(null);
                     break;
             }
+            if (! Session.checkallreferencefilesforsession(Root.getOptions().getSessionOptions().getReferencetype(), true)) {
+                ReferenceToggleButton.setSelected(false);
+                togglereference(null);
+            }
             if (Session.getPlayerState() == PlayerState.PLAYING) {
                 Session.displayreferencefile();
                 Session.togglevolumebinding();
@@ -155,8 +162,6 @@ public class PlayerUI extends Stage {
         EntrainmentVolumePercentage.setText("0%");
         AmbienceVolume.setDisable(true);
         AmbienceVolumePercentage.setText("0%");
-        ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
-        togglereference(null);
         // TODO Reset Goal UI Here
         PlayButton.setText("Start");
         PauseButton.setDisable(true);
@@ -184,47 +189,49 @@ public class PlayerUI extends Stage {
         private Boolean fullscreenoption;
         private Scene scene;
 
+        // TODO Doesn't Work:
+        //      Kyo, TOH, JIN
+        // DOES:
+        //      Presession, RIN, SHA KAI, RETSU, ZAI, ZEN, Postsession
         public DisplayReference(MainController root, Meditatable currentcutorelement) {
-            Root = root;
-            this.currentcutorelement = currentcutorelement;
-            referenceType = Root.getOptions().getSessionOptions().getReferencetype();
-            fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
-            if (isValid()) {
+            try {
+                Root = root;
+                this.currentcutorelement = currentcutorelement;
+                referenceType = Root.getOptions().getSessionOptions().getReferencetype();
+                fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
                 fxmlLoader.setController(this);
-                try {
-                    scene = new Scene(fxmlLoader.load());
-                    setScene(scene);
-                    Root.getOptions().setStyle(this);
-                    this.setResizable(false);
-                    setTitle(this.currentcutorelement.name + "'s Reference");
-                    setsizing();
-                    loadcontent();
-                    AmbienceVolumeSlider.setValue(Root.getPlayer().AmbienceVolume.getValue());
-                    AmbienceVolumePercentage.setText(Root.getPlayer().AmbienceVolumePercentage.getText());
-                    EntrainmentVolumeSlider.setValue(Root.getPlayer().EntrainmentVolume.getValue());
-                    EntrainmentVolumePercentage.setText(Root.getPlayer().EntrainmentVolumePercentage.getText());
-                    setOnCloseRequest(event -> untoggleplayerreference());
-                    if (Root.getSession().getCurrentindexofplayingelement() == 0) {
-                        setFullScreenExitHint("Press F11 To Toggle Fullscreen, ESC To Hide Reference");
-                    } else {setFullScreenExitHint("");}
-                    addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                            switch (event.getCode()) {
-                                case ESCAPE:
-                                    Platform.runLater(this::close);
-                                    untoggleplayerreference();
-                                    break;
-                                case F11:
-                                    boolean fullscreen = this.isFullScreen();
-                                    fullscreenoption = ! fullscreen;
-                                    Root.getOptions().getSessionOptions().setReferencefullscreen(fullscreenoption);
-                                    setsizing();
-                                    if (! fullscreen) {setFullScreenExitHint("");}
-                                    break;
-                            }
-                    });
-                } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-            }
+                scene = new Scene(fxmlLoader.load());
+                setScene(scene);
+                Root.getOptions().setStyle(this);
+//                this.setResizable(false);
+                setTitle(this.currentcutorelement.name + "'s Reference");
+                setsizing();
+                loadcontent();
+                AmbienceVolumeSlider.setValue(Root.getPlayer().AmbienceVolume.getValue());
+                AmbienceVolumePercentage.setText(Root.getPlayer().AmbienceVolumePercentage.getText());
+                EntrainmentVolumeSlider.setValue(Root.getPlayer().EntrainmentVolume.getValue());
+                EntrainmentVolumePercentage.setText(Root.getPlayer().EntrainmentVolumePercentage.getText());
+                setOnCloseRequest(event -> untoggleplayerreference());
+                if (Root.getSession().getCurrentindexofplayingelement() == 0) {
+                    setFullScreenExitHint("Press F11 To Toggle Fullscreen, ESC To Hide Reference");
+                } else {setFullScreenExitHint("");}
+                addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                        switch (event.getCode()) {
+                            case ESCAPE:
+                                Platform.runLater(this::close);
+                                untoggleplayerreference();
+                                break;
+                            case F11:
+                                boolean fullscreen = this.isFullScreen();
+                                fullscreenoption = ! fullscreen;
+                                Root.getOptions().getSessionOptions().setReferencefullscreen(fullscreenoption);
+                                setsizing();
+                                if (! fullscreen) {setFullScreenExitHint("");}
+                                break;
+                        }
+                });
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         }
         public DisplayReference(MainController root, String htmlcontent) {
             Root = root;
@@ -289,31 +296,7 @@ public class PlayerUI extends Stage {
                     default:
                         break;
                 }
-            }
-        }
-        public boolean isValid() {
-            if (referenceType == null) {
-                Util.gui_showinformationdialog(Root, "Cannot Display", "No Reference Type/Variation Selected", "Select A Type/Variation");
-                return false;
-            }
-            File referencefile = currentcutorelement.getReferenceFile();
-            if (! referencefile.exists()) {
-                Util.gui_showinformationdialog(Root, "Cannot Display", "Cannot Display Reference File", "Non-Existent Reference File");
-                return false;
-            }
-            String contents = Util.file_getcontents(referencefile);
-            if (contents == null) {
-                Util.gui_showinformationdialog(Root, "Cannot Display", "Cannot Display Empty Reference File", "Use The Reference Editor To Add New Reference Content");
-                return false;
-            }
-            switch (referenceType) {
-                case html:
-                    return contents.length() > 0 && Util.String_validhtml(contents);
-                case txt:
-                    return contents.length() > 0;
-                default:
-                    return false;
-            }
+            } else {System.out.println("Reference File Is Null");}
         }
         public void untoggleplayerreference() {
             Root.getPlayer().ReferenceToggleButton.setSelected(false);

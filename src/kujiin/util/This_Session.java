@@ -466,6 +466,15 @@ public class This_Session {
         }
         return wellformed;
     }
+    public boolean checkallreferencefilesforsession(PlayerUI.ReferenceType referenceType, boolean enableprompt) {
+        int invalidcutcount = 0;
+        for (Meditatable i : getallitemsinSession()) {
+            if (!i.referencefilevalid(referenceType)) invalidcutcount++;
+        }
+        if (invalidcutcount > 0 && enableprompt) {
+            return Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "There Are " + invalidcutcount + " Cuts/Elements With Empty/Invalid Reference Files", "Enable Reference Anyways?");
+        } else {return invalidcutcount == 0;}
+    }
     public boolean create() {
         if (setupcutsinsession()) {
             int cutcount = 0;

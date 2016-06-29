@@ -163,6 +163,56 @@ public class Util {
             toggleButton.setSelected(newvalue != 0);
         });
     }
+    public static void addupdownarrowlistenerincrementdecrement(TextField textField, double minvalue, double maxvalue, double increment, int decimalplaces) {
+        textField.setOnKeyPressed(event -> {
+            Double newvalue = new Double(textField.getText());
+            boolean validvalue;
+            switch (event.getCode()) {
+                case UP:
+                case PAGE_UP:
+                    newvalue += increment;
+                    validvalue = newvalue <= maxvalue;
+                    break;
+                case DOWN:
+                case PAGE_DOWN:
+                    newvalue -= increment;
+                    validvalue = newvalue >= minvalue;
+                    break;
+                default:
+                    validvalue = false;
+            }
+            if (validvalue) {
+                if (decimalplaces > 0) {textField.setText(Util.rounddouble(newvalue, decimalplaces).toString());}
+                else {textField.setText(String.valueOf(newvalue.intValue()));}
+            }
+        });
+    }
+    public static void addupdownarrowlistenerincrementdecrement(TextField textField, ToggleButton toggleButton,  double minvalue, double maxvalue, double increment, int decimalplaces) {
+        textField.setOnKeyPressed(event -> {
+            Double newvalue = new Double(textField.getText());
+            boolean validvalue;
+            switch (event.getCode()) {
+                case UP:
+                case PAGE_UP:
+                    newvalue += increment;
+                    validvalue = newvalue <= maxvalue;
+                    break;
+                case DOWN:
+                case PAGE_DOWN:
+                    newvalue -= increment;
+                    validvalue = newvalue >= minvalue;
+                    break;
+                default:
+                    validvalue = false;
+            }
+            if (validvalue) {
+                if (decimalplaces > 0) {textField.setText(Util.rounddouble(newvalue, decimalplaces).toString());}
+                else {textField.setText(String.valueOf(newvalue.intValue()));}
+            }
+            textField.setDisable(newvalue == 0);
+            toggleButton.setSelected(newvalue != 0);
+        });
+    }
 
 // Math Methods
     public static Double rounddouble(double number, int decimalplaces) {

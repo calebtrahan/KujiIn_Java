@@ -875,5 +875,20 @@ public class Meditatable {
                 return null;
         }
     }
+    public boolean referencefilevalid(PlayerUI.ReferenceType referenceType) {
+        if (referenceType == null) {return false;}
+        if (! getReferenceFile().exists()) {return false;}
+        String contents = Util.file_getcontents(getReferenceFile());
+        if (contents == null) {return false;}
+        switch (referenceType) {
+            case html:
+                boolean validhtml = Util.String_validhtml(contents);
+                return contents.length() > 0 && validhtml;
+            case txt:
+                return contents.length() > 0;
+            default:
+                return false;
+        }
+    }
 
 }
