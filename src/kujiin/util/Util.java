@@ -164,6 +164,17 @@ public class Util {
             toggleButton.setSelected(newvalue != 0);
         });
     }
+    public static void addscrolllistenerincrementdecrement(Spinner<Integer> spinner, int minvalue, int maxvalue, int increment, boolean roundtomultipleof5) {
+        spinner.setOnScroll(event -> {
+            int value = spinner.getValue();
+            boolean validvalue;
+            if (event.getDeltaY() < 0) {value -= increment; validvalue = value >= minvalue;} else {value += increment; validvalue = value <= maxvalue;}
+            if (validvalue) {
+                if (roundtomultipleof5) {spinner.getValueFactory().setValue(round_nearestmultipleof5(value).intValue());}
+                else {spinner.getValueFactory().setValue(value);}
+            }
+        });
+    }
     public static void addupdownarrowlistenerincrementdecrement(TextField textField, double minvalue, double maxvalue, double increment, int decimalplaces) {
         textField.setOnKeyPressed(event -> {
             Double newvalue = new Double(textField.getText());
@@ -214,10 +225,28 @@ public class Util {
             toggleButton.setSelected(newvalue != 0);
         });
     }
-    public static void addnoneditabletextfieldlistener(MainController Root, TextField textField) {
-        textField.setOnKeyTyped(event -> {
-            Util.gui_showinformationdialog(Root, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
-            event.consume();
+    public static void addupdownarrowlistenerincrementdecrement(Spinner<Integer> spinner, int minvalue, int maxvalue, double increment, boolean roundtomultipleof5) {
+        spinner.setOnKeyPressed(event -> {
+            int newvalue = spinner.getValue();
+            boolean validvalue;
+            switch (event.getCode()) {
+                case UP:
+                case PAGE_UP:
+                    newvalue += increment;
+                    validvalue = newvalue <= maxvalue;
+                    break;
+                case DOWN:
+                case PAGE_DOWN:
+                    newvalue -= increment;
+                    validvalue = newvalue >= minvalue;
+                    break;
+                default:
+                    validvalue = false;
+            }
+            if (validvalue) {
+                if (roundtomultipleof5) {spinner.getValueFactory().setValue(round_nearestmultipleof5(newvalue).intValue());}
+                else {spinner.getValueFactory().setValue(newvalue);}
+            }
         });
     }
 
@@ -686,7 +715,7 @@ public class Util {
     }
 
 // Math Methods
-    public static double round_nearestmultipleof5(double value) {
+    public static Double round_nearestmultipleof5(double value) {
         if (value % 5 == 0) {return value;}
         else if (value % 5 < 2.5) {return value - value % 5;}
         else {return value + (5 - value % 5);}

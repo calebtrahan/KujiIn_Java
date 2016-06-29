@@ -20,7 +20,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import kujiin.ui.CreatorAndExporterUI;
 import kujiin.ui.PlayerUI;
@@ -510,7 +509,8 @@ public class MainController implements Initializable {
             ObservableList<String> allnames = FXCollections.observableArrayList();
             allnames.addAll(kujiin.xml.Options.ALLNAMES);
             CutOrElementSelectionBox.setItems(allnames);
-            this.setOnCloseRequest(event -> close());
+            Actual_TotalDuration.setEditable(false);
+            Temp_TotalDuration.setEditable(false);
         }
 
         public AdvancedAmbienceEditor(MainController root, Ambiences ambiences) {
@@ -523,11 +523,8 @@ public class MainController implements Initializable {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
-                this.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                    @Override
-                    public void handle(WindowEvent event) {
+                this.setOnCloseRequest(event -> {
 
-                    }
                 });
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Advanced Ambience Editor");
@@ -1251,7 +1248,6 @@ public class MainController implements Initializable {
             FullscreenCheckbox.setOnAction(Root.CHECKBOXYESNOLISTENER);
             FullscreenCheckbox.setOnMouseClicked(event -> setFullscreenOption());
             AlertFileTextField.setEditable(false);
-            Util.addnoneditabletextfieldlistener(Root, AlertFileTextField);
         }
 
     // Alert File Methods
@@ -1481,9 +1477,9 @@ public class MainController implements Initializable {
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
                 DatePracticedTextField.setText(Util.gettodaysdate());
-                Util.addnoneditabletextfieldlistener(Root, DatePracticedTextField);
+                DatePracticedTextField.setEditable(false);
                 SessionDurationTextField.setText(Util.format_minstohrsandmins_long(totalsessiontime));
-                Util.addnoneditabletextfieldlistener(Root, SessionDurationTextField);
+                SessionDurationTextField.setEditable(false);
                 SessionBarChart.requestFocus();
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
         }
@@ -1499,7 +1495,7 @@ public class MainController implements Initializable {
                 SessionNumbersAxis.setLabel("Minutes");
                 setTitle("Session Details");
                 DatePracticedTextField.setText(session.getDate_Practiced());
-                Util.addnoneditabletextfieldlistener(Root, DatePracticedTextField);
+                DatePracticedTextField.setEditable(false);
                 XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
                 List<Integer> values = new ArrayList<>();
                 for (int i = 0; i < 16; i++) {
@@ -1515,7 +1511,7 @@ public class MainController implements Initializable {
                 SessionBarChart.setLegendVisible(false);
                 SessionNumbersAxis.setUpperBound(Util.list_getmaxintegervalue(values));
                 SessionDurationTextField.setText(Util.format_minstohrsandmins_long(session.getTotal_Session_Duration()));
-                Util.addnoneditabletextfieldlistener(Root, SessionDurationTextField);
+                SessionDurationTextField.setEditable(false);
                 SessionBarChart.requestFocus();
             } catch (IOException | NullPointerException e) {new ExceptionDialog(Root, e).showAndWait();}
         }

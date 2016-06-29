@@ -405,7 +405,8 @@ public class This_Session {
             if (postsessionmissinggoals) {notgoodtext.append("Postsession\n");}
             switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?", "Set Goal", "Continue Anyway", "Cancel Playback")) {
                 case YES:
-                    ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, notgoodongoals, Util.list_getmaxintegervalue(notgooddurations));
+                    // Was last parameter-> Util.list_getmaxintegervalue(notgooddurations)
+                    ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, notgoodongoals);
                     s.showAndWait();
                     if (s.isAccepted()) {
                         List<Integer> cutindexes = s.getSelectedCutIndexes();
@@ -859,4 +860,5 @@ public class This_Session {
     public boolean referencecurrentlyDisplayed() {
         return displayReference != null && displayReference.isShowing() && displayReference.EntrainmentVolumeSlider != null;
     }
+
 }

@@ -146,8 +146,8 @@ public class CreatorAndExporterUI {
         exporterState = ExporterState.NOT_EXPORTED;
         creatorState = CreatorState.NOT_CREATED;
         setuptextfields();
-        Util.addnoneditabletextfieldlistener(Root, TotalSessionTime);
-        Util.addnoneditabletextfieldlistener(Root, ApproximateEndTime);
+        TotalSessionTime.setEditable(false);
+        ApproximateEndTime.setEditable(false);
         exportservices = new ArrayList<>();
         updateuitimeline = new Timeline(new KeyFrame(Duration.millis(10000), ae -> updatecreatorui()));
         updateuitimeline.setCycleCount(Animation.INDEFINITE);

@@ -26,10 +26,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 // TODO Finish Making EditGoalsDialog (Also Add A Select A Different Cut Feature, And Make It So They Can Pass Cutindex Data Back And Forth)
 public class ProgressAndGoalsUI {
@@ -62,13 +59,13 @@ public class ProgressAndGoalsUI {
         NewGoalButton = root.newgoalButton;
         CurrentGoalsButton = root.viewcurrrentgoalsButton;
         PracticedHours = root.GoalPracticedHours;
-        Util.addnoneditabletextfieldlistener(Root, PracticedHours);
+        PracticedHours.setEditable(false);
         PracticedMinutes = root.GoalPracticedMinutes;
-        Util.addnoneditabletextfieldlistener(Root, PracticedMinutes);
+        PracticedMinutes.setEditable(false);
         GoalHours = root.GoalSetHours;
-        Util.addnoneditabletextfieldlistener(Root, GoalHours);
+        GoalHours.setEditable(false);
         GoalMinutes = root.GoalSetMinutes;
-        Util.addnoneditabletextfieldlistener(Root, GoalMinutes);
+        GoalMinutes.setEditable(false);
         GoalProgress = root.goalsprogressbar;
         CutSelectorComboBox = root.GoalCutComboBox;
         TopLabel = root.GoalTopLabel;
@@ -96,9 +93,9 @@ public class ProgressAndGoalsUI {
         getsessions.setOnFailed(event -> updateprogressui());
         getsessions.setOnSucceeded(event -> updateprogressui());
         getsessions.start();
-        Util.addnoneditabletextfieldlistener(Root, TotalTimePracticed);
-        Util.addnoneditabletextfieldlistener(Root, NumberOfSessionsPracticed);
-        Util.addnoneditabletextfieldlistener(Root, AverageSessionDuration);
+        TotalTimePracticed.setEditable(false);
+        NumberOfSessionsPracticed.setEditable(false);
+        AverageSessionDuration.setEditable(false);
         ObservableList<String> cutnames = FXCollections.observableArrayList(GOALCUTNAMES);
         CutSelectorComboBox.setItems(cutnames);
         CutSelectorComboBox.setOnAction(this::cutselectionchanged);
@@ -244,6 +241,16 @@ public class ProgressAndGoalsUI {
             }
         }
         return notgoodelementselementsorcuts;
+    }
+    public int getlowestgoalminutesforallmeditatables(List<Meditatable> meditatables) {
+        List<Integer> currentgoalhours = new ArrayList<>();
+        try {
+            for (Meditatable i : meditatables) {
+                List<kujiin.xml.Goals.Goal> currentGoals = Goals.sort(Goals.getallcutgoals(i.number, false));
+                currentgoalhours.add(currentGoals.get(currentGoals.size() - 1).getGoal_Hours().intValue());
+            }
+            return Collections.min(currentgoalhours);
+        } catch (Exception e) {return 0;}
     }
     public boolean checkifgoalsetandlongenough(int cut_index, int duration) {
         try {
@@ -720,6 +727,8 @@ public class ProgressAndGoalsUI {
             if (daystilldue >= 0) {
                 GoalDaysTillDue.setText(String.format("%s Days", daystilldue));
                 PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, daystilldue, daystilldue));
+                Util.addscrolllistenerincrementdecrement(PracticeDays, 1, daystilldue, 1, false);
+                Util.addupdownarrowlistenerincrementdecrement(PracticeDays, 1, daystilldue, 1, false);
                 calculate();
                 PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> {
                     calculate();
@@ -871,6 +880,10 @@ public class ProgressAndGoalsUI {
                 GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(hr, Integer.MAX_VALUE, hr));
                 GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, min));
             }
+            Util.addscrolllistenerincrementdecrement(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
+            Util.addupdownarrowlistenerincrementdecrement(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
+            Util.addscrolllistenerincrementdecrement(GoalMinutesSpinner, 0, 59, 5, true);
+            Util.addupdownarrowlistenerincrementdecrement(GoalMinutesSpinner, 0, 59, 5, true);
             if (cutindex != 11) TopLabel.setText("New Goal For " + GOALCUTNAMES[cutindex]);
             else TopLabel.setText("New Total Goal");
         }
@@ -939,36 +952,69 @@ public class ProgressAndGoalsUI {
         public ToggleButton Fire;
         public ToggleButton Water;
         public ToggleButton Void;
-        private ProgressAndGoalsUI progressAndGoalsUI;
+        public Button SelectAllCutsButton;
+        public Button SelectAllElementsButton;
+        public Button UnselectAllButton;
         private MainController Root;
         public Spinner<Integer> GoalHoursSpinner;
         public Spinner<Integer> GoalMinutesSpinner;
         public DatePicker GoalDatePicker;
         public Button CancelButton;
         public Button OKButton;
-        public Button CurrentGoalsButton;
         public Label TopLabel;
         private LocalDate goaldate;
         private Double goalhours;
+        private ArrayList<Meditatable> cutsorlementstosetgoalsfor;
+        private Integer lowestgoalminutes;
 
-        public SetANewGoalForMultipleCutsOrElements(MainController root, ArrayList<Meditatable> cutindexes, int expectedminutes) {
-            Root = root;
-            progressAndGoalsUI = Root.getProgressTracker();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetMultipleGoalsDialog.fxml"));
-            fxmlLoader.setController(this);
+        public SetANewGoalForMultipleCutsOrElements(MainController root, ArrayList<Meditatable> cutsorlementstosetgoalsfor) {
             try {
+                Root = root;
+                this.cutsorlementstosetgoalsfor = cutsorlementstosetgoalsfor;
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetMultipleGoalsDialog.fxml"));
+                fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
+                setTitle("Set A Goal For Multiple Cuts");
+                calculatelowestgoal();
+                Presession.setOnAction(event -> calculatelowestgoal());
+                RIN.setOnAction(event -> calculatelowestgoal());
+                KYO.setOnAction(event -> calculatelowestgoal());
+                TOH.setOnAction(event -> calculatelowestgoal());
+                SHA.setOnAction(event -> calculatelowestgoal());
+                KAI.setOnAction(event -> calculatelowestgoal());
+                JIN.setOnAction(event -> calculatelowestgoal());
+                RETSU.setOnAction(event -> calculatelowestgoal());
+                ZAI.setOnAction(event -> calculatelowestgoal());
+                ZEN.setOnAction(event -> calculatelowestgoal());
+                Earth.setOnAction(event -> calculatelowestgoal());
+                Air.setOnAction(event -> calculatelowestgoal());
+                Fire.setOnAction(event -> calculatelowestgoal());
+                Water.setOnAction(event -> calculatelowestgoal());
+                Void.setOnAction(event -> calculatelowestgoal());
+                Postsession.setOnAction(event -> calculatelowestgoal());
+                GoalHoursSpinner.setEditable(true);
+                GoalHoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> {
+                    int value = (newValue * 60) + GoalMinutesSpinner.getValue();
+                    if (newvaluehigherthanmin(value)) {GoalHoursSpinner.getValueFactory().setValue(newValue);}
+                    else {GoalHoursSpinner.getValueFactory().setValue(oldValue);}
+                });
+                Util.addscrolllistenerincrementdecrement(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
+                Util.addupdownarrowlistenerincrementdecrement(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
+                GoalMinutesSpinner.setEditable(true);
+                GoalMinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> {
+                    int value = (GoalHoursSpinner.getValue() * 60) + newValue;
+                    if (newvaluehigherthanmin(value)) {GoalMinutesSpinner.getValueFactory().setValue(newValue);}
+                    else {GoalMinutesSpinner.getValueFactory().setValue(oldValue);}
+                });
+                Util.addscrolllistenerincrementdecrement(GoalMinutesSpinner, 0, 59, 5, true);
+                Util.addupdownarrowlistenerincrementdecrement(GoalMinutesSpinner, 0, 59, 5, true);
+                GoalDatePicker.setValue(LocalDate.now());
+                for (Meditatable i : cutsorlementstosetgoalsfor) {
+                    System.out.println(i.name); select(i.number, true);}
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Set A Goal For Multiple Cuts");
-            GoalHoursSpinner.setEditable(true);
-            GoalMinutesSpinner.setEditable(true);
-            GoalDatePicker.setValue(LocalDate.now());
-            GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(expectedminutes / 60, Integer.MAX_VALUE, expectedminutes / 60));
-            GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, expectedminutes % 60));
-            for (Meditatable i : cutindexes) {select(i.number, true);}
         }
 
     // Getters And Setters
@@ -1001,11 +1047,11 @@ public class ProgressAndGoalsUI {
             if (index == 7) {RETSU.setSelected(value);}
             if (index == 8) {ZAI.setSelected(value);}
             if (index == 9) {ZEN.setSelected(value);}
-            if (index == 10) {ZEN.setSelected(value);}
-            if (index == 11) {ZEN.setSelected(value);}
-            if (index == 12) {ZEN.setSelected(value);}
-            if (index == 13) {ZEN.setSelected(value);}
-            if (index == 14) {ZEN.setSelected(value);}
+            if (index == 10) {Earth.setSelected(value);}
+            if (index == 11) {Air.setSelected(value);}
+            if (index == 12) {Fire.setSelected(value);}
+            if (index == 13) {Water.setSelected(value);}
+            if (index == 14) {Void.setSelected(value);}
             if (index == 15) {Postsession.setSelected(value);}
         }
         public boolean getselected(int index) {
@@ -1029,9 +1075,6 @@ public class ProgressAndGoalsUI {
         }
 
     // Button Actions
-        public void viewcurrentgoals(Event event) {
-            progressAndGoalsUI.opengoaleditor();
-        }
         public void Accept(Event event) {
             if (getSelectedCutIndexes().isEmpty()) {
                 Util.gui_showinformationdialog(Root, "Information", "Cannot Add Goal", "No Cuts Selected"); return;}
@@ -1053,6 +1096,35 @@ public class ProgressAndGoalsUI {
         }
         public void cancelgoalsetting(Event event) {
             this.close();
+        }
+        public void selectallcuts(ActionEvent actionEvent) {
+            for (int i = 1; i < 10; i++) {select(i, true);}
+            calculatelowestgoal();
+        }
+        public void selectallelements(ActionEvent actionEvent) {
+            for (int i = 10; i < 15; i++) {select(i, true);}
+            calculatelowestgoal();
+        }
+        public void unselectall(ActionEvent actionEvent) {
+            for (int i = 0; i < 16; i++) {
+                select(i, false);
+            }
+            calculatelowestgoal();
+        }
+
+    // Utility Methods
+        public void calculatelowestgoal() {
+            lowestgoalminutes = Root.getProgressTracker().getlowestgoalminutesforallmeditatables(cutsorlementstosetgoalsfor);
+            if (lowestgoalminutes > 0) {
+                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(lowestgoalminutes / 60, Integer.MAX_VALUE, lowestgoalminutes / 60));
+                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, lowestgoalminutes % 60));
+            } else {
+                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
+                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, lowestgoalminutes % 60));
+            }
+        }
+        public boolean newvaluehigherthanmin(int newvalue) {
+            return lowestgoalminutes == null || lowestgoalminutes == 0 || newvalue > lowestgoalminutes;
         }
 
     }

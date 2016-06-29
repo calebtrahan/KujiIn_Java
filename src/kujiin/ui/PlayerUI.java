@@ -29,9 +29,7 @@ import java.io.IOException;
 // TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
 // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
-
-// TODO Entrainment Volume Was Raised To 100% When Switching To TOH (And Also Broke Reference File)
-// TODO NullPointerException in Meditatable:181 < Meditatable:256
+// TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
 
 // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
 
@@ -185,10 +183,6 @@ public class PlayerUI extends Stage {
         private Boolean fullscreenoption;
         private Scene scene;
 
-        // TODO Doesn't Work:
-        //      Kyo, TOH, JIN
-        // DOES:
-        //      Presession, RIN, SHA KAI, RETSU, ZAI, ZEN, Postsession
         public DisplayReference(MainController root, Meditatable currentcutorelement) {
             try {
                 Root = root;
@@ -396,10 +390,10 @@ public class PlayerUI extends Stage {
                 Session thissession = currentsessions.sessioninformation_getspecificsession(currentsessions.sessioninformation_totalsessioncount() - 1);
                 int thisessionminutes = thissession.getTotal_Session_Duration();
                 SessionDuration.setText(Util.format_minstohrsandmins_abbreviated(thisessionminutes));
-                Util.addnoneditabletextfieldlistener(Root, SessionDuration);
+                SessionDuration.setEditable(false);
                 int totalsessionminutes = currentsessions.sessioninformation_getallsessiontotals(11, true);
                 TotalPracticeDuration.setText(Util.format_minstohrsandmins_abbreviated(totalsessionminutes));
-                Util.addnoneditabletextfieldlistener(Root, TotalPracticeDuration);
+                TotalPracticeDuration.setEditable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Completed");
         }
