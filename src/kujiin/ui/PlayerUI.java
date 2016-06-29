@@ -153,6 +153,8 @@ public class PlayerUI extends Stage {
         TotalTotalLabel.setText("--:--");
         EntrainmentVolume.setDisable(true);
         EntrainmentVolumePercentage.setText("0%");
+        AmbienceVolume.setDisable(true);
+        AmbienceVolumePercentage.setText("0%");
         ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
         togglereference(null);
         // TODO Reset Goal UI Here
@@ -203,7 +205,9 @@ public class PlayerUI extends Stage {
                     EntrainmentVolumeSlider.setValue(Root.getPlayer().EntrainmentVolume.getValue());
                     EntrainmentVolumePercentage.setText(Root.getPlayer().EntrainmentVolumePercentage.getText());
                     setOnCloseRequest(event -> untoggleplayerreference());
-                    setFullScreenExitHint("Press F11 To Toggle Fullscreen, ESC To Hide Reference");
+                    if (Root.getSession().getCurrentindexofplayingelement() == 0) {
+                        setFullScreenExitHint("Press F11 To Toggle Fullscreen, ESC To Hide Reference");
+                    } else {setFullScreenExitHint("");}
                     addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                             switch (event.getCode()) {
                                 case ESCAPE:
@@ -213,7 +217,7 @@ public class PlayerUI extends Stage {
                                 case F11:
                                     boolean fullscreen = this.isFullScreen();
                                     fullscreenoption = ! fullscreen;
-                                    Root.getOptions().getSessionOptions().setReferencefullscreen(fullscreen);
+                                    Root.getOptions().getSessionOptions().setReferencefullscreen(fullscreenoption);
                                     setsizing();
                                     if (! fullscreen) {setFullScreenExitHint("");}
                                     break;

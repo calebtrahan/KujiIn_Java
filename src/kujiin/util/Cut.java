@@ -4,8 +4,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
-import javafx.scene.media.MediaPlayer;
-import kujiin.ui.ProgressAndGoalsUI;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
@@ -72,13 +70,13 @@ public class Cut extends Meditatable {
     public boolean buildEntrainment() {
         if (duration == 0) {return false;}
         int adjustedduration = duration;
-        if (number == 3) {adjustedduration -= 2;}
+        if (number == 3 && duration >= 3) {adjustedduration -= 2;}
         int fivetimes = adjustedduration / 5;
         int singletimes = adjustedduration % 5;
         for (int i = 0; i < fivetimes; i++) {entrainment.created_add(entrainment.getFreqlong());}
         for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
         entrainment.shuffleCreated();
-        if (number == 3) {
+        if (number == 3 && duration >= 3) {
             int index = allcutsorelementstoplay.indexOf(this);
             Meditatable cutorelementbefore = null;
             Meditatable cutorelementafter = null;
@@ -86,11 +84,13 @@ public class Cut extends Meditatable {
             if (index != allcutsorelementstoplay.size() - 1) {cutorelementafter = allcutsorelementstoplay.get(index + 1);}
             if (cutorelementbefore != null && cutorelementbefore.name.equals("Presession")) {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoinqi.mp3")));}
             else {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohin.mp3")));}
-            if (cutorelementafter != null && cutorelementafter.name.equals("Postsession")) {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoutqi.mp3")));}
-            else {entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohout.mp3")));}
+            if (cutorelementafter != null && cutorelementafter.name.equals("Postsession")) {
+                entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoutqi.mp3")));
+            } else {
+                entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohout.mp3")));
+            }
             entrainment.created_add(0, entrainment.getRampinfile());
             entrainment.created_add(entrainment.getRampoutfile());
-
         }
         return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() > 0.0;
     }
@@ -105,10 +105,15 @@ public class Cut extends Meditatable {
     @Override
     public void tick() {
         super.tick();
-        if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            ProgressAndGoalsUI progressAndGoalsUI = thisession.Root.getProgressTracker();
-            progressAndGoalsUI.getSessions().sessioninformation_getspecificsession(progressAndGoalsUI.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
-        }
+        // TODO ERROR FIX
+        //java.lang.NullPointerException
+        //at kujiin.util.Cut.tick(Cut.java:108)
+        //at kujiin.util.This_Session.updateplayerui(This_Session.java:671)
+        //at kujiin.util.This_Session.lambda$play$7(This_Session.java:611)
+//        if (thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING) {
+//            ProgressAndGoalsUI progressAndGoalsUI = thisession.Root.getProgressTracker();
+            thisession.Root.getProgressTracker().getSessions().sessioninformation_getspecificsession(thisession.Root.getProgressTracker().getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
+//        }
     }
     @Override
     public void start() {

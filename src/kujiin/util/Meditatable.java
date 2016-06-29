@@ -180,7 +180,7 @@ public class Meditatable {
                     thisession.Root.getPlayer().EntrainmentVolume.setValue(entrainmentvolume);
                     Double value = entrainmentvolume * 100;
                     thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                    if (thisession.referencecurrentlyDisplayed()) {
                         thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
                         thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -198,7 +198,7 @@ public class Meditatable {
                         thisession.Root.getPlayer().AmbienceVolume.setValue(ambiencevolume);
                         Double value = ambiencevolume * 100;
                         thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
-                        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                        if (thisession.referencecurrentlyDisplayed()) {
                             thisession.getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
                             thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
                         }
@@ -220,7 +220,7 @@ public class Meditatable {
                     thisession.Root.getPlayer().EntrainmentVolume.setValue(entrainmentvolume);
                     Double value = entrainmentvolume * 100;
                     thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                    if (thisession.referencecurrentlyDisplayed()) {
                         thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
                         thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -240,7 +240,7 @@ public class Meditatable {
                     thisession.Root.getPlayer().AmbienceVolume.setValue(ambiencevolume);
                     Double value = ambiencevolume * 100;
                     thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                    if (thisession.referencecurrentlyDisplayed()) {
                         thisession.getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
                         thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -263,7 +263,7 @@ public class Meditatable {
                     thisession.Root.getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
                     Double value = fadeoutvolume * 100;
                     thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                    if (thisession.referencecurrentlyDisplayed()) {
                         thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
                         thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -285,7 +285,7 @@ public class Meditatable {
                     thisession.Root.getPlayer().AmbienceVolume.setValue(fadeoutvolume);
                     Double value = fadeoutvolume * 100;
                     thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                    if (thisession.referencecurrentlyDisplayed()) {
                         thisession.getDisplayReference().AmbienceVolumeSlider.setValue(fadeoutvolume);
                         thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -309,7 +309,7 @@ public class Meditatable {
                         thisession.Root.getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
                         Double value = fadeoutvolume * 100;
                         thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                        if (thisession.referencecurrentlyDisplayed()) {
                             thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
                             thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                         }
@@ -331,7 +331,7 @@ public class Meditatable {
                         thisession.Root.getPlayer().AmbienceVolume.setValue(fadeoutvolume);
                         Double value = fadeoutvolume * 100;
                         thisession.Root.getPlayer().AmbienceVolumePercentage.setText(value.intValue() + "%");
-                        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+                        if (thisession.referencecurrentlyDisplayed()) {
                             thisession.getDisplayReference().AmbienceVolumeSlider.setValue(fadeoutvolume);
                             thisession.getDisplayReference().AmbienceVolumePercentage.setText(value.intValue() + "%");
                         }
@@ -342,7 +342,6 @@ public class Meditatable {
         }
     }
     public void start() {
-        thisession.displayreferencefile();
         entrainmentplaycount = 0;
         ambienceplaycount = 0;
         setupfadeanimations();
@@ -365,6 +364,7 @@ public class Meditatable {
             }));
             timeline_fadeout_timer.play();
         }
+        thisession.displayreferencefile();
         if (fade_entrainment_play != null) {
             if (fade_ambience_play.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.setPlayerState(PlayerUI.PlayerState.FADING_PLAY);
@@ -514,13 +514,11 @@ public class Meditatable {
             if (fade_ambience_stop != null) {fade_ambience_stop.stop();}
             if (timeline_progresstonextmeditatable != null) {timeline_progresstonextmeditatable.stop();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
-            thisession.closereferencefile();
             toggleplayerbuttons();
         } catch (Exception ignored) {}
     }
     public void toggleplayerbuttons() {
         if (thisession.getPlayerState() == null) {return;}
-        boolean referenceenabled = thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing();
         boolean idle = thisession.getPlayerState() == PlayerUI.PlayerState.IDLE;
         boolean playing = thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING;
         boolean paused = thisession.getPlayerState() == PlayerUI.PlayerState.PAUSED;
@@ -535,7 +533,7 @@ public class Meditatable {
         thisession.Root.getPlayer().ReferenceToggleButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
         thisession.Root.getPlayer().ReferenceHTMLButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
         thisession.Root.getPlayer().ReferenceTXTButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
-        if (referenceenabled) {
+        if (thisession.referencecurrentlyDisplayed()) {
             thisession.getDisplayReference().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
             thisession.getDisplayReference().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
             thisession.getDisplayReference().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
@@ -613,7 +611,7 @@ public class Meditatable {
         thisession.Root.getPlayer().PauseButton.setText(pausebuttontext);
         thisession.Root.getPlayer().StopButton.setText(stopbuttontext);
         thisession.Root.getPlayer().StatusBar.setText(statusbartext);
-        if (referenceenabled) {
+        if (thisession.referencecurrentlyDisplayed()) {
             thisession.getDisplayReference().PlayButton.setText(playbuttontext);
             thisession.getDisplayReference().PauseButton.setText(pausebuttontext);
             thisession.getDisplayReference().StopButton.setText(stopbuttontext);
@@ -624,7 +622,7 @@ public class Meditatable {
         boolean enabled = thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING;
         thisession.Root.getPlayer().EntrainmentVolume.setDisable(! enabled);
         if (ambienceenabled) {thisession.Root.getPlayer().AmbienceVolume.setDisable(! enabled);}
-        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+        if (thisession.referencecurrentlyDisplayed()) {
             thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(! enabled);
             if (ambienceenabled) {thisession.getDisplayReference().AmbienceVolumeSlider.setDisable(! enabled);}
         }
@@ -651,7 +649,7 @@ public class Meditatable {
                 thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(percentage);
             }
         });
-        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+        if (thisession.referencecurrentlyDisplayed()) {
             thisession.getDisplayReference().EntrainmentVolumeSlider.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
             thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(false);
             thisession.getDisplayReference().EntrainmentVolumeSlider.setOnMouseDragged(event1 -> {
@@ -680,7 +678,7 @@ public class Meditatable {
     public void volume_unbindentrainment() {
         thisession.Root.getPlayer().EntrainmentVolume.valueProperty().unbind();
         thisession.Root.getPlayer().EntrainmentVolume.setDisable(true);
-        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+        if (thisession.referencecurrentlyDisplayed()) {
             thisession.getDisplayReference().EntrainmentVolumeSlider.valueProperty().unbind();
             thisession.getDisplayReference().EntrainmentVolumeSlider.setDisable(true);
         }
@@ -708,7 +706,7 @@ public class Meditatable {
                 thisession.Root.getPlayer().AmbienceVolumePercentage.setText(percentage);
             }
         });
-        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
+        if (thisession.referencecurrentlyDisplayed()) {
             thisession.getDisplayReference().AmbienceVolumeSlider.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
             thisession.getDisplayReference().AmbienceVolumeSlider.setDisable(false);
             thisession.getDisplayReference().AmbienceVolumeSlider.setOnMouseDragged(event1 -> {
@@ -737,13 +735,15 @@ public class Meditatable {
     public void volume_unbindambience() {
         thisession.Root.getPlayer().AmbienceVolume.valueProperty().unbind();
         thisession.Root.getPlayer().AmbienceVolume.setDisable(true);
-        if (thisession.getDisplayReference() != null && thisession.getDisplayReference().isShowing()) {
-            thisession.getDisplayReference().AmbienceVolumeSlider.valueProperty().unbind();
-            thisession.getDisplayReference().AmbienceVolumeSlider.setDisable(true);
-        }
+        try {
+            if (thisession.referencecurrentlyDisplayed()) {
+                thisession.getDisplayReference().AmbienceVolumeSlider.valueProperty().unbind();
+                thisession.getDisplayReference().AmbienceVolumeSlider.setDisable(true);
+            }
+        } catch (NullPointerException ignored) {}
     }
-    public void volume_rebindambience() {volume_unbindentrainment(); volume_bindentrainment();}
-    public void volume_rebindentrainment() {volume_unbindambience(); volume_bindambience();}
+    public void volume_rebindambience() {volume_unbindambience(); volume_bindambience();}
+    public void volume_rebindentrainment() {volume_unbindentrainment(); volume_bindentrainment();}
 
 // Export
     public Service<Boolean> getexportservice() {

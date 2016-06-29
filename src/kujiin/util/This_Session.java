@@ -109,6 +109,10 @@ public class This_Session {
     public Meditatable getCurrentcutorelement() {
         return currentcutorelement;
     }
+    public int getCurrentindexofplayingelement() {
+        try {return getallitemsinSession().indexOf(currentcutorelement);}
+        catch (NullPointerException | IndexOutOfBoundsException ignored) {return -1;}
+    }
     public void setItemsinsession(List<Meditatable> itemsinsession) {
         this.itemsinsession = itemsinsession;
     }
@@ -477,10 +481,8 @@ public class This_Session {
                     if (sortSessionItems.getorderedsessionitems() != null) {setItemsinsession(sortSessionItems.getorderedsessionitems());}
                 }
             }
-            for (Object i : getallitemsinSession()) {
-                if (i instanceof Cut) {if (! ((Cut) i).build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}}
-                if (i instanceof Element) {if (! ((Element) i).build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}}
-                if (i instanceof Qi_Gong) {if (! ((Qi_Gong) i).build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}}
+            for (Meditatable i : getallitemsinSession()) {
+                if (! i.build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}
             }
             checkgoals();
             return true;
@@ -657,17 +659,21 @@ public class This_Session {
             getPlayerUI().TotalCurrentLabel.setText(Util.format_secondsforplayerdisplay(totalsecondselapsed));
             if (displaynormaltime) {getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(getTotalsecondsinsession()));}
             else {getPlayerUI().TotalTotalLabel.setText(Util.format_secondsleftforplayerdisplay(totalsecondselapsed, getTotalsecondsinsession()));}
-            if (getDisplayReference() != null && getDisplayReference().isShowing()) {
-                getDisplayReference().CurrentProgress.setProgress(currentprogress / 100);
-                getDisplayReference().CurrentPercentage.setText(currentprogress.intValue() + "%");
-                getDisplayReference().TotalProgress.setProgress(totalprogress / 100);
-                getDisplayReference().TotalPercentage.setText(totalprogress.intValue() + "%");
-                getDisplayReference().CurrentName.setText(currentcutorelement.name);
-            }
+            try {
+                if (getDisplayReference() != null && getDisplayReference().isShowing()) {
+                    getDisplayReference().CurrentProgress.setProgress(currentprogress / 100);
+                    getDisplayReference().CurrentPercentage.setText(currentprogress.intValue() + "%");
+                    getDisplayReference().TotalProgress.setProgress(totalprogress / 100);
+                    getDisplayReference().TotalPercentage.setText(totalprogress.intValue() + "%");
+                    getDisplayReference().CurrentName.setText(currentcutorelement.name);
+                }
+            } catch (NullPointerException ignored) {}
             Root.getProgressTracker().updaterootgoalsui();
             Root.getProgressTracker().updateprogressui();
             currentcutorelement.tick();
-        } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+        } catch (Exception e) {e.printStackTrace();
+//            new MainController.ExceptionDialog(Root, e).show();
+        }
     }
     public void progresstonextcut() {
         try {
@@ -688,6 +694,7 @@ public class This_Session {
                     }
                     break;
                 case PLAYING:
+                    closereferencefile();
                     transition();
                     break;
             }
@@ -700,9 +707,9 @@ public class This_Session {
         setPlayerState(PlayerUI.PlayerState.STOPPED);
         sessions.deletenonvalidsessions();
         // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It Then Change Session Finsished Dialog To Showandwait
-        PlayerUI.SessionFinishedDialog sess = new PlayerUI.SessionFinishedDialog(Root);
-        sess.showAndWait();
-        sess.setOnHidden(event -> {
+        MainController.SessionDetails sessionDetails = new MainController.SessionDetails(Root, getallitemsinSession());
+        sessionDetails.show();
+        sessionDetails.setOnHidden(event -> {
             if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
                 Goals.Goal i = GoalsCompletedThisSession.get(0);
                 int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsUI.GOALCUTNAMES)).indexOf(i.getCutName());
@@ -712,6 +719,18 @@ public class This_Session {
                 new ProgressAndGoalsUI.MultipleGoalsCompletedDialog(Root, GoalsCompletedThisSession).showAndWait();
             }
         });
+//        PlayerUI.SessionFinishedDialog sess = new PlayerUI.SessionFinishedDialog(Root);
+//        sess.show();
+//        sess.setOnHidden(event -> {
+//            if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
+//                Goals.Goal i = GoalsCompletedThisSession.get(0);
+//                int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsUI.GOALCUTNAMES)).indexOf(i.getCutName());
+//                double currentpracticedhours = Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(cutindex, false), 2);
+//                new ProgressAndGoalsUI.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
+//            } else if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() > 1) {
+//                new ProgressAndGoalsUI.MultipleGoalsCompletedDialog(Root, GoalsCompletedThisSession).showAndWait();
+//            }
+//        });
         // TODO Prompt For Export
 //        if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            getsessionexporter();}
@@ -720,6 +739,7 @@ public class This_Session {
 //        for (Meditatable i : getAllcutsorelementstoplay()) {
 //            if (i.name.equals(name)) {break;}
 //        }
+        resetthissession();
     }
     public void resetthissession() {
         updateuitimeline = null;
@@ -818,10 +838,11 @@ public class This_Session {
         }
     }
     public void closereferencefile() {
-        if (displayReference != null && displayReference.isShowing()) {
+        if (referencecurrentlyDisplayed()) {
             displayReference.close();
-            displayReference = null;
         }
     }
-
+    public boolean referencecurrentlyDisplayed() {
+        return displayReference != null && displayReference.isShowing() && displayReference.EntrainmentVolumeSlider != null;
+    }
 }

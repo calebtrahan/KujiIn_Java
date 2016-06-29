@@ -139,29 +139,25 @@ public class Util {
         if (! val ) {if (!styleclass.contains("error")) {styleclass.add("error");}
         } else {styleclass.removeAll(Collections.singleton("error"));}
     }
-    public static void addscrolllistenerincrementdecrement(TextField textField, double minvalue, double maxvalue, double increment) {
+    public static void addscrolllistenerincrementdecrement(TextField textField, double minvalue, double maxvalue, double increment, int decimalplaces) {
         textField.setOnScroll(event -> {
             Double newvalue = new Double(textField.getText());
-            if (event.getDeltaY() < 0) {
-                newvalue -= increment;
-                if (newvalue >= minvalue) {textField.setText(newvalue.toString());}
-            }
-            else {
-                newvalue += increment;
-                if (newvalue <= maxvalue) {textField.setText(newvalue.toString());}
+            boolean validvalue;
+            if (event.getDeltaY() < 0) {newvalue -= increment; validvalue = newvalue >= minvalue;} else {newvalue += increment; validvalue = newvalue <= maxvalue;}
+            if (validvalue) {
+                if (decimalplaces > 0) {textField.setText(Util.rounddouble(newvalue, decimalplaces).toString());}
+                else {textField.setText(String.valueOf(newvalue.intValue()));}
             }
         });
     }
-    public static void addscrolllistenerincrementdecrement(TextField textField, ToggleButton toggleButton,  double minvalue, double maxvalue, double increment) {
+    public static void addscrolllistenerincrementdecrement(TextField textField, ToggleButton toggleButton,  double minvalue, double maxvalue, double increment, int decimalplaces) {
         textField.setOnScroll(event -> {
             Double newvalue = new Double(textField.getText());
-            if (event.getDeltaY() < 0) {
-                newvalue -= increment;
-                if (newvalue >= minvalue) {textField.setText(String.valueOf(newvalue.intValue()));}
-            }
-            else {
-                newvalue += increment;
-                if (newvalue <= maxvalue) {textField.setText(String.valueOf(newvalue.intValue()));}
+            boolean validvalue;
+            if (event.getDeltaY() < 0) {newvalue -= increment; validvalue = newvalue >= minvalue;} else {newvalue += increment; validvalue = newvalue <= maxvalue;}
+            if (validvalue) {
+                if (decimalplaces > 0) {textField.setText(Util.rounddouble(newvalue, decimalplaces).toString());}
+                else {textField.setText(String.valueOf(newvalue.intValue()));}
             }
             textField.setDisable(newvalue == 0);
             toggleButton.setSelected(newvalue != 0);

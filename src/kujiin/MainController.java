@@ -1231,12 +1231,12 @@ public class MainController implements Initializable {
             HelpDialogsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeInValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            Util.addscrolllistenerincrementdecrement(FadeInValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0);
-            Util.addscrolllistenerincrementdecrement(FadeOutValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0);
+            Util.addscrolllistenerincrementdecrement(FadeInValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0, 1);
+            Util.addscrolllistenerincrementdecrement(FadeOutValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0, 1);
             EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            Util.addscrolllistenerincrementdecrement(EntrainmentVolumePercentage, 1, 100, 1.0);
+            Util.addscrolllistenerincrementdecrement(EntrainmentVolumePercentage, 1, 100, 1.0, 0);
             AmbienceVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            Util.addscrolllistenerincrementdecrement(AmbienceVolumePercentage, 1, 100, 1.0);
+            Util.addscrolllistenerincrementdecrement(AmbienceVolumePercentage, 1, 100, 1.0, 0);
             ProgramThemeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {selectnewtheme(); changedvalue();});
             AlertSwitch.setOnMouseClicked(event -> alertfiletoggle());
             AlertSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
