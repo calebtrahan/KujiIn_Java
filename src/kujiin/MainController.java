@@ -15,7 +15,6 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
@@ -117,7 +116,7 @@ public class MainController implements Initializable {
     private Options Options;
 
 // Event Handlers
-    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Util.gui_showinformationdialog(this, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
+//    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Util.gui_showinformationdialog(this, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
     public final EventHandler<ActionEvent> CHECKBOXONOFFLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("ON");} else {a.setText("OFF");}};
     public final EventHandler<ActionEvent> CHECKBOXYESNOLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("YES");} else {a.setText("NO");}};
 
@@ -1252,7 +1251,7 @@ public class MainController implements Initializable {
             FullscreenCheckbox.setOnAction(Root.CHECKBOXYESNOLISTENER);
             FullscreenCheckbox.setOnMouseClicked(event -> setFullscreenOption());
             AlertFileTextField.setEditable(false);
-            AlertFileTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+            Util.addnoneditabletextfieldlistener(Root, AlertFileTextField);
         }
 
     // Alert File Methods
@@ -1455,7 +1454,7 @@ public class MainController implements Initializable {
             super.close();
         }
     }
-    public static class SessionDetails extends Stage implements Initializable {
+    public static class SessionDetails extends Stage {
         public MainController Root;
         public BarChart<String, java.lang.Number> SessionBarChart;
         public CategoryAxis SessionCategoryAxis;
@@ -1463,12 +1462,6 @@ public class MainController implements Initializable {
         public TextField DatePracticedTextField;
         public TextField SessionDurationTextField;
         public Button CloseButton;
-
-        @Override
-        public void initialize(URL location, ResourceBundle resources) {
-            DatePracticedTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
-            SessionDurationTextField.setOnKeyPressed(Root.NONEDITABLETEXTFIELD);
-        }
 
         public SessionDetails(MainController root, List<Meditatable> cutsorelementsinsession) {
             Root = root;
@@ -1484,16 +1477,19 @@ public class MainController implements Initializable {
                 XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
                 // TODO Find Max Minutes
                 int totalsessiontime = 0;
-                for (Meditatable i : cutsorelementsinsession) {series.getData().add(new XYChart.Data<>(i.name, i.getdurationinminutes())); totalsessiontime += i.getdurationinminutes();}
+                for (Meditatable i : cutsorelementsinsession) {series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getdurationinminutes())); totalsessiontime += i.getdurationinminutes();}
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
                 DatePracticedTextField.setText(Util.gettodaysdate());
+                Util.addnoneditabletextfieldlistener(Root, DatePracticedTextField);
                 SessionDurationTextField.setText(Util.format_minstohrsandmins_long(totalsessiontime));
+                Util.addnoneditabletextfieldlistener(Root, SessionDurationTextField);
+                SessionBarChart.requestFocus();
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
         }
         public SessionDetails(MainController root, kujiin.xml.Session session) {
-            Root = root;
             try {
+                Root = root;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -1503,19 +1499,24 @@ public class MainController implements Initializable {
                 SessionNumbersAxis.setLabel("Minutes");
                 setTitle("Session Details");
                 DatePracticedTextField.setText(session.getDate_Practiced());
-                DatePracticedTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+                Util.addnoneditabletextfieldlistener(Root, DatePracticedTextField);
                 XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
                 List<Integer> values = new ArrayList<>();
                 for (int i = 0; i < 16; i++) {
                     int duration = session.getcutduration(i);
                     values.add(duration);
-                    series.getData().add(new XYChart.Data<>(kujiin.xml.Options.ALLNAMES.get(i), duration));
+                    String name;
+                    if (i == 0) {name = "Pre";}
+                    else if (i == 15) {name = "Post";}
+                    else {name = kujiin.xml.Options.ALLNAMES.get(i);}
+                    series.getData().add(new XYChart.Data<>(name, duration));
                 }
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
                 SessionNumbersAxis.setUpperBound(Util.list_getmaxintegervalue(values));
                 SessionDurationTextField.setText(Util.format_minstohrsandmins_long(session.getTotal_Session_Duration()));
-                SessionDurationTextField.setOnKeyTyped(Root.NONEDITABLETEXTFIELD);
+                Util.addnoneditabletextfieldlistener(Root, SessionDurationTextField);
+                SessionBarChart.requestFocus();
             } catch (IOException | NullPointerException e) {new ExceptionDialog(Root, e).showAndWait();}
         }
 

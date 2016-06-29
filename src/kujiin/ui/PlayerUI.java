@@ -33,10 +33,6 @@ import java.io.IOException;
 // TODO Entrainment Volume Was Raised To 100% When Switching To TOH (And Also Broke Reference File)
 // TODO NullPointerException in Meditatable:181 < Meditatable:256
 
-// TODO Volume:
-//      Pre Ramp Is Setting To 100% Volume
-// TODO Entrainment Slider Is Set To 1.0 On Both Player And Reference
-
 // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
 
 public class PlayerUI extends Stage {
@@ -388,10 +384,10 @@ public class PlayerUI extends Stage {
         private MainController Root;
 
         public SessionFinishedDialog(MainController root) {
-            Root = root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionFinishedDialog.fxml"));
-            fxmlLoader.setController(this);
             try {
+                Root = root;
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionFinishedDialog.fxml"));
+                fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
@@ -400,10 +396,10 @@ public class PlayerUI extends Stage {
                 Session thissession = currentsessions.sessioninformation_getspecificsession(currentsessions.sessioninformation_totalsessioncount() - 1);
                 int thisessionminutes = thissession.getTotal_Session_Duration();
                 SessionDuration.setText(Util.format_minstohrsandmins_abbreviated(thisessionminutes));
-                SessionDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
+                Util.addnoneditabletextfieldlistener(Root, SessionDuration);
                 int totalsessionminutes = currentsessions.sessioninformation_getallsessiontotals(11, true);
                 TotalPracticeDuration.setText(Util.format_minstohrsandmins_abbreviated(totalsessionminutes));
-                TotalPracticeDuration.setOnKeyTyped(root.NONEDITABLETEXTFIELD);
+                Util.addnoneditabletextfieldlistener(Root, TotalPracticeDuration);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Completed");
         }

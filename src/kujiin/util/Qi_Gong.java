@@ -37,6 +37,13 @@ public class Qi_Gong extends Meditatable {
     }
 
 // GUI
+
+    @Override
+    public String getNameForChart() {
+        if (name.equals("Presession")) {return "Pre";}
+        else return "Post";
+    }
+
     public boolean hasValidValue() {
     return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
 }

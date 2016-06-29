@@ -647,8 +647,13 @@ public class This_Session {
     }
     public void updateplayerui() {
         try {
-            currentcutorelement.secondselapsed++;
+            try {
+                System.out.println(currentcutorelement.name + " (" + Util.format_secondsforplayerdisplay(currentcutorelement.secondselapsed) +
+                        ") -> Entrainment Volume: " + currentcutorelement.getCurrentEntrainmentPlayer().getVolume() +
+                " Slider Value: " + getPlayerUI().EntrainmentVolume.getValue());
+            } catch (NullPointerException ignored) {}
             totalsecondselapsed++;
+            currentcutorelement.secondselapsed++;
             Float currentprogress;
             Float totalprogress;
             if (currentcutorelement.secondselapsed != 0) {currentprogress = (float) currentcutorelement.secondselapsed / (float) currentcutorelement.getdurationinseconds();}

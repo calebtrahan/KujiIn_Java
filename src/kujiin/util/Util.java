@@ -139,6 +139,7 @@ public class Util {
         if (! val ) {if (!styleclass.contains("error")) {styleclass.add("error");}
         } else {styleclass.removeAll(Collections.singleton("error"));}
     }
+    // Listeners
     public static void addscrolllistenerincrementdecrement(TextField textField, double minvalue, double maxvalue, double increment, int decimalplaces) {
         textField.setOnScroll(event -> {
             Double newvalue = new Double(textField.getText());
@@ -211,6 +212,12 @@ public class Util {
             }
             textField.setDisable(newvalue == 0);
             toggleButton.setSelected(newvalue != 0);
+        });
+    }
+    public static void addnoneditabletextfieldlistener(MainController Root, TextField textField) {
+        textField.setOnKeyTyped(event -> {
+            Util.gui_showinformationdialog(Root, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
+            event.consume();
         });
     }
 

@@ -58,6 +58,7 @@ public class Meditatable {
     }
 
 // Getters And Setters
+    public String getNameForChart() {return name;}
     protected MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
     protected MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
     public void setDuration(int newduration) {duration = newduration;}
@@ -186,7 +187,7 @@ public class Meditatable {
                     }
                 }
             };
-            fade_entrainment_play.setOnFinished(event -> {thisession.setPlayerState(PlayerUI.PlayerState.PLAYING); toggleplayerbuttons(); volume_bindentrainment();});
+            fade_entrainment_play.setOnFinished(event -> {thisession.setPlayerState(PlayerUI.PlayerState.PLAYING); toggleplayerbuttons(); volume_bindentrainment(); setCurrententrainmentvolume(thisession.Root.getPlayer().EntrainmentVolume.getValue());});
             if (ambienceenabled) {
                 fade_ambience_play = new Transition() {
                     {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeinduration() * 1000));}
@@ -204,7 +205,7 @@ public class Meditatable {
                         }
                     }
                 };
-                fade_ambience_play.setOnFinished(event -> volume_bindambience());
+                fade_ambience_play.setOnFinished(event -> {volume_bindambience(); setCurrentambiencevolume(thisession.Root.getPlayer().AmbienceVolume.getValue());});
             }
         }
     // RESUME
@@ -461,18 +462,6 @@ public class Meditatable {
         }
         toggleplayerbuttons();
     }
-    public void tick() {
-//        if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-//            if (secondselapsed <= thisession.Root.getOptions().getSessionOptions().getFadeinduration()) {
-//                thisession.Root.getPlayer().StatusBar.setText("Fading Into " + name);
-//            } else if ((getdurationinseconds() - secondselapsed) <= thisession.Root.getOptions().getSessionOptions().getFadeoutduration()) {
-////                startfadeout();
-//                thisession.Root.getPlayer().StatusBar.setText("Fading Out Of " + name);
-//            } else {
-//                thisession.Root.getPlayer().StatusBar.setText("Current Playing " + name);
-//            }
-//        }
-    }
     public void playnextentrainment() {
         try {
             volume_unbindentrainment();
@@ -481,6 +470,8 @@ public class Meditatable {
             entrainmentplayer = new MediaPlayer(new Media(entrainment.created_get(entrainmentplaycount).getFile().toURI().toString()));
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
+            if (currententrainmentvolume != null && currententrainmentvolume > 0.0) {entrainmentplayer.setVolume(getCurrententrainmentvolume());}
+            else {entrainmentplayer.setVolume(thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume());}
             entrainmentplayer.play();
             entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
         } catch (IndexOutOfBoundsException ignored) {
@@ -496,6 +487,8 @@ public class Meditatable {
             ambienceplayer = new MediaPlayer(new Media(ambience.created_get(ambienceplaycount).getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
+            if (currentambiencevolume != null && currentambiencevolume > 0.0) {ambienceplayer.setVolume(getCurrententrainmentvolume());}
+            else {ambienceplayer.setVolume(thisession.Root.getOptions().getSessionOptions().getAmbiencevolume());}
             ambienceplayer.play();
             ambienceplayer.setOnPlaying(this::volume_bindambience);
         } catch (IndexOutOfBoundsException ignored) {ambienceplayer.dispose();}
@@ -744,6 +737,12 @@ public class Meditatable {
     }
     public void volume_rebindambience() {volume_unbindambience(); volume_bindambience();}
     public void volume_rebindentrainment() {volume_unbindentrainment(); volume_bindentrainment();}
+    public void tick() {
+//        try {
+//            entrainmentplayer.setVolume(currententrainmentvolume);
+//            if (ambienceenabled) ambienceplayer.setVolume(currentambiencevolume);
+//        } catch (NullPointerException ignored) {}
+    }
 
 // Export
     public Service<Boolean> getexportservice() {

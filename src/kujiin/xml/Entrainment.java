@@ -95,4 +95,5 @@ public class Entrainment {
 
     // Other Methods
     public void shuffleCreated() {if (CreatedEntrainment != null) Collections.shuffle(CreatedEntrainment);}
+
 }
