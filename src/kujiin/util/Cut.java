@@ -4,6 +4,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import kujiin.ui.PlayerUI;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
@@ -106,14 +107,9 @@ public class Cut extends Meditatable {
     public void tick() {
         super.tick();
         // TODO ERROR FIX
-        //java.lang.NullPointerException
-        //at kujiin.util.Cut.tick(Cut.java:108)
-        //at kujiin.util.This_Session.updateplayerui(This_Session.java:671)
-        //at kujiin.util.This_Session.lambda$play$7(This_Session.java:611)
-//        if (thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING) {
-//            ProgressAndGoalsUI progressAndGoalsUI = thisession.Root.getProgressTracker();
+        if (thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING) {
             thisession.Root.getProgressTracker().getSessions().sessioninformation_getspecificsession(thisession.Root.getProgressTracker().getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
-//        }
+        }
     }
     @Override
     public void start() {

@@ -287,6 +287,9 @@ public class ProgressAndGoalsUI {
             if (cutorelementindex == -1) {
                 NewGoalButton.setTooltip(new Tooltip("Select A Cut Or Element Above To Set A Goal"));
                 CurrentGoalsButton.setTooltip(new Tooltip("Select A Cut Or Element Above To See/Edit Current Goals"));
+            } else if (cutorelementindex == 16) {
+                NewGoalButton.setTooltip(new Tooltip("Set A New Total Goal"));
+                CurrentGoalsButton.setTooltip(new Tooltip("View/Edit Total Goals"));
             } else {
                 String cutorelementname = Options.ALLNAMES.get(cutorelementindex);
                 NewGoalButton.setTooltip(new Tooltip("Set A New Goal For " + cutorelementname));

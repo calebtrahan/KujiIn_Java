@@ -750,10 +750,6 @@ public class This_Session {
 //        if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            getsessionexporter();}
         Root.getProgressTracker().updaterootgoalsui();
-        // TODO Create Dialog That Shows How Long Session Was And What Was Practiced
-//        for (Meditatable i : getAllcutsorelementstoplay()) {
-//            if (i.name.equals(name)) {break;}
-//        }
         resetthissession();
     }
     public void resetthissession() {

@@ -677,7 +677,6 @@ public class Meditatable {
         }
     }
     public void volume_bindambience() {
-        // TODO Fix Reference && Player Sync Values And Percentages
         thisession.Root.getPlayer().AmbienceVolume.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
         thisession.Root.getPlayer().AmbienceVolume.setDisable(false);
         thisession.Root.getPlayer().AmbienceVolume.setOnMouseDragged(event1 -> {
