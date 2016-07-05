@@ -650,8 +650,8 @@ public class This_Session {
         try {
             try {
                 System.out.println(currentcutorelement.name + " (" + Util.format_secondsforplayerdisplay(currentcutorelement.secondselapsed) +
-                        ") -> Entrainment Volume: " + currentcutorelement.getCurrentEntrainmentPlayer().getVolume() +
-                " Slider Value: " + getPlayerUI().EntrainmentVolume.getValue());
+                        ") -> Entrainment Player Is : " + currentcutorelement.getCurrentEntrainmentPlayer().getStatus().toString() +
+                " And Ambience Player Is: " + currentcutorelement.getCurrentAmbiencePlayer().getStatus().toString());
             } catch (NullPointerException ignored) {}
             totalsecondselapsed++;
             currentcutorelement.secondselapsed++;

@@ -13,8 +13,6 @@ import javafx.concurrent.Service;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
@@ -22,6 +20,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.MainController;
 import kujiin.util.*;
+import kujiin.xml.Options;
 import kujiin.xml.Preset;
 
 import java.io.File;
@@ -94,52 +93,36 @@ public class CreatorAndExporterUI {
         ApproximateEndTime = root.ApproximateEndTime;
         Preset = new Preset(root);
         PreSwitch = root.PreSwitch;
-        PreSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         PreTime = root.PreTime;
         RinSwitch = root.RinSwitch;
-        RinSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         RinTime = root.RinTime;
         KyoSwitch = root.KyoSwitch;
-        KyoSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         KyoTime = root.KyoTime;
         TohSwitch = root.TohSwitch;
-        TohSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         TohTime = root.TohTime;
         ShaSwitch = root.ShaSwitch;
-        ShaSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         ShaTime = root.ShaTime;
         KaiSwitch = root.KaiSwitch;
-        KaiSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         KaiTime = root.KaiTime;
         JinSwitch = root.JinSwitch;
-        JinSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         JinTime = root.JinTime;
         RetsuSwitch = root.RetsuSwitch;
-        RetsuSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         RetsuTime = root.RetsuTime;
         ZaiSwitch = root.ZaiSwitch;
-        ZaiSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         ZaiTime = root.ZaiTime;
         ZenSwitch = root.ZenSwitch;
-        ZenSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         ZenTime = root.ZenTime;
         PostSwitch = root.PostSwitch;
-        PostSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         PostTime = root.PostTime;
         EarthSwitch = root.EarthSwitch;
-        EarthSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         EarthTime = root.EarthTime;
         AirSwitch = root.AirSwitch;
-        AirSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         AirTime = root.AirTime;
         FireSwitch = root.FireSwitch;
-        FireSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         FireTime = root.FireTime;
         WaterSwitch = root.WaterSwitch;
-        WaterSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         WaterTime = root.WaterTime;
         VoidSwitch = root.VoidSwitch;
-        VoidSwitch.setOnMouseEntered(event -> ((Node) event.getSource()).setCursor(Cursor.HAND));
         VoidTime = root.VoidTime;
         session = root.getSession();
         StatusBar = root.CreatorStatusBar;
@@ -168,21 +151,168 @@ public class CreatorAndExporterUI {
         this.creatorState = creatorState;
     }
 
+// GUI
+    public void setuptextfields() {
+    PreTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(0, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {PreTime.setText("0"); Root.getSession().setDuration(0, 0); updatecreatorui();}
+    });
+    RinTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(1, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {RinTime.setText("0"); updatecreatorui();}
+    });
+    KyoTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(2, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {KyoTime.setText("0"); updatecreatorui();}
+    });
+    TohTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(3, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {TohTime.setText("0"); updatecreatorui();}
+    });
+    ShaTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(4, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {ShaTime.setText("0"); updatecreatorui();}
+    });
+    KaiTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(5, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {KaiTime.setText("0"); updatecreatorui();}
+    });
+    JinTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(6, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {JinTime.setText("0"); updatecreatorui();}
+    });
+    RetsuTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(7, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {RetsuTime.setText("0"); updatecreatorui();}
+    });
+    ZaiTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(8, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {ZaiTime.setText("0"); updatecreatorui();}
+    });
+    ZenTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(9, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {ZenTime.setText("0"); updatecreatorui();}
+    });
+    PostTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(10, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {PostTime.setText("0"); updatecreatorui();}
+    });
+    EarthTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(11, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {EarthTime.setText("0"); updatecreatorui();}
+    });
+    AirTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(12, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {AirTime.setText("0"); updatecreatorui();}
+    });
+    FireTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(13, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {FireTime.setText("0"); updatecreatorui();}
+    });
+    WaterTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(14, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {WaterTime.setText("0"); updatecreatorui();}
+    });
+    VoidTime.textProperty().addListener((observable, oldValue, newValue) -> {
+        try {Root.getSession().setDuration(15, Integer.valueOf(newValue)); updatecreatorui();}
+        catch (NumberFormatException ignored) {VoidTime.setText("0"); updatecreatorui();}
+    });
+    Util.addscrolllistenerincrementdecrement(PreTime, PreSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(PreTime, PreSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(RinTime, RinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(RinTime, RinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(KyoTime, KyoSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(KyoTime, KyoSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(TohTime, TohSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(TohTime, TohSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(ShaTime, ShaSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(ShaTime, ShaSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(KaiTime, KaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(KaiTime, KaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(JinTime, JinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(JinTime, JinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(RetsuTime, RetsuSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(RetsuTime, RetsuSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(ZaiTime, ZaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(ZaiTime, ZaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(ZenTime, ZenSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(ZenTime, ZenSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(PostTime, PostSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(PostTime, PostSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(EarthTime, EarthSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(EarthTime, EarthSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(AirTime, AirSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(AirTime, AirSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(FireTime, FireSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(FireTime, FireSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(WaterTime, WaterSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(WaterTime, WaterSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addscrolllistenerincrementdecrement(VoidTime, VoidSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    Util.addupdownarrowlistenerincrementdecrement(VoidTime, VoidSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
+    TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
+    ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
+    AmbienceSwitch.setTooltip(new Tooltip("Check This After You Set All Values To Check For And Enable Ambience For This Session"));
+    ChangeAllValuesButton.setTooltip(new Tooltip("Change All Cut Values Simultaneously"));
+    LoadPresetButton.setTooltip(new Tooltip("Load A Saved Preset"));
+    SavePresetButton.setTooltip(new Tooltip("Save This Session As A Preset"));
+    ExportButton.setTooltip(new Tooltip("Export This Session To .mp3 For Use Without The Program"));
+}
+    public void updatecreatorui() {
+        if (textfieldsnotallzero()) {
+            Integer totalsessiontime = 0;
+            for (Integer i : session.getallsessionvalues()) {totalsessiontime += i;}
+            int rampduration = Root.getOptions().getSessionOptions().getRampduration();
+            totalsessiontime += rampduration * 2;
+            if (rampduration > 0) {TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + rampduration + "Mins. On Both Presession And Postsession"));}
+            else {TotalSessionTime.setTooltip(null);}
+            String text = Util.format_minstohrsandmins_short(totalsessiontime);
+            if (text.length() < 17) {TotalSessionTime.setText(text);}
+            else {TotalSessionTime.setText(Util.format_minstohrsandmins_abbreviated(totalsessiontime));}
+            ApproximateEndTime.setTooltip(new Tooltip("Time You Finish Will Vary Depending On When You Start Playback"));
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.MINUTE, totalsessiontime);
+            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+            ApproximateEndTime.setText(sdf.format(cal.getTime()));
+        } else {
+            TotalSessionTime.setText("");
+            ApproximateEndTime.setText("");
+        }
+        if (AmbienceSwitch.isSelected()) {
+            AmbienceSwitch.setSelected(false);
+            Util.gui_showtimedmessageonlabel(StatusBar, "Session Values Changed, Ambience Unselected", 5000);
+        }
+    }
+
 // Creation
+    public boolean textfieldsnotallzero() {
+        for (Integer i : session.getallsessionvalues()) {if (i > 0) {return true;}}
+        return  false;
+    }
+    public boolean longsession() {
+        for (Integer i : session.getallsessionvalues()) {
+            if (i >= Options.DEFAULT_LONG_MEDITATABLE_DURATION) {return true;}
+        }
+        return false;
+    }
     public void createsession() {
         // TODO Check Exporter Here
-            if (! gettextfieldtimes()) {
-                Util.gui_showerrordialog(Root, "Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session");
-                setCreatorState(CreatorState.NOT_CREATED);
-                return;
+        if (! textfieldsnotallzero()) {
+            Util.gui_showerrordialog(Root, "Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session");
+            setCreatorState(CreatorState.NOT_CREATED);
+            return;
+        }
+        if (longsession()) {
+            if (! Root.getOptions().getSessionOptions().getAlertfunction()) {
+
             }
-            boolean creationstate = session.create();
-            ExportButton.setDisable(! creationstate);
-            session.Root.PlayButton.setDisable(! creationstate);
-            if (creationstate) setCreatorState(CreatorState.CREATED);
-            else {setCreatorState(CreatorState.NOT_CREATED);}
-            if (creationstate) {updateuitimeline.stop();}
-            else {updateuitimeline.play();}
+        }
+        boolean creationstate = session.create();
+        ExportButton.setDisable(! creationstate);
+        session.Root.PlayButton.setDisable(! creationstate);
+        if (creationstate) setCreatorState(CreatorState.CREATED);
+        else {setCreatorState(CreatorState.NOT_CREATED);}
+        if (creationstate) {updateuitimeline.stop();}
+        else {updateuitimeline.play();}
     }
 
 // Export
@@ -270,142 +400,10 @@ public class CreatorAndExporterUI {
     }
 
 // Other Methods
-    public void setuptextfields() {
-        PreTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(0, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {PreTime.setText("0"); Root.getSession().setDuration(0, 0); updatecreatorui();}
-        });
-        RinTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(1, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {RinTime.setText("0"); updatecreatorui();}
-        });
-        KyoTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(2, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {KyoTime.setText("0"); updatecreatorui();}
-        });
-        TohTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(3, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {TohTime.setText("0"); updatecreatorui();}
-        });
-        ShaTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(4, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {ShaTime.setText("0"); updatecreatorui();}
-        });
-        KaiTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(5, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {KaiTime.setText("0"); updatecreatorui();}
-        });
-        JinTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(6, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {JinTime.setText("0"); updatecreatorui();}
-        });
-        RetsuTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(7, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {RetsuTime.setText("0"); updatecreatorui();}
-        });
-        ZaiTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(8, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {ZaiTime.setText("0"); updatecreatorui();}
-        });
-        ZenTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(9, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {ZenTime.setText("0"); updatecreatorui();}
-        });
-        PostTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(10, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {PostTime.setText("0"); updatecreatorui();}
-        });
-        EarthTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(11, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {EarthTime.setText("0"); updatecreatorui();}
-        });
-        AirTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(12, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {AirTime.setText("0"); updatecreatorui();}
-        });
-        FireTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(13, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {FireTime.setText("0"); updatecreatorui();}
-        });
-        WaterTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(14, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {WaterTime.setText("0"); updatecreatorui();}
-        });
-        VoidTime.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {Root.getSession().setDuration(15, Integer.valueOf(newValue)); updatecreatorui();}
-            catch (NumberFormatException ignored) {VoidTime.setText("0"); updatecreatorui();}
-        });
-        Util.addscrolllistenerincrementdecrement(PreTime, PreSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(PreTime, PreSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(RinTime, RinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(RinTime, RinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(KyoTime, KyoSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(KyoTime, KyoSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(TohTime, TohSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(TohTime, TohSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(ShaTime, ShaSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(ShaTime, ShaSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(KaiTime, KaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(KaiTime, KaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(JinTime, JinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(JinTime, JinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(RetsuTime, RetsuSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(RetsuTime, RetsuSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(ZaiTime, ZaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(ZaiTime, ZaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(ZenTime, ZenSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(ZenTime, ZenSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(PostTime, PostSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(PostTime, PostSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(EarthTime, EarthSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(EarthTime, EarthSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(AirTime, AirSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(AirTime, AirSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(FireTime, FireSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(FireTime, FireSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(WaterTime, WaterSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(WaterTime, WaterSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addscrolllistenerincrementdecrement(VoidTime, VoidSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        Util.addupdownarrowlistenerincrementdecrement(VoidTime, VoidSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-        TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
-        ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
-        AmbienceSwitch.setTooltip(new Tooltip("Check This After You Set All Values To Check For And Enable Ambience For This Session"));
-        ChangeAllValuesButton.setTooltip(new Tooltip("Change All Cut Values Simultaneously"));
-        LoadPresetButton.setTooltip(new Tooltip("Load A Saved Preset"));
-        SavePresetButton.setTooltip(new Tooltip("Save This Session As A Preset"));
-        ExportButton.setTooltip(new Tooltip("Export This Session To .mp3 For Use Without The Program"));
-    }
-    public void updatecreatorui() {
-        if (gettextfieldtimes()) {
-            Integer totalsessiontime = 0;
-            for (Integer i : session.getallsessionvalues()) {totalsessiontime += i;}
-            int rampduration = Root.getOptions().getSessionOptions().getRampduration();
-            totalsessiontime += rampduration * 2;
-            if (rampduration > 0) {TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + rampduration + "Mins. On Both Presession And Postsession"));}
-            else {TotalSessionTime.setTooltip(null);}
-            TotalSessionTime.setText(Util.format_minstohrsandmins_short(totalsessiontime));
-            ApproximateEndTime.setTooltip(new Tooltip("Time You Finish Will Vary Depending On When You Start Playback"));
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.MINUTE, totalsessiontime);
-            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
-            ApproximateEndTime.setText(sdf.format(cal.getTime()));
-        } else {
-            TotalSessionTime.setText("");
-            ApproximateEndTime.setText("");
-        }
-        if (AmbienceSwitch.isSelected()) {
-            AmbienceSwitch.setSelected(false);
-            Util.gui_showtimedmessageonlabel(StatusBar, "Session Values Changed, Ambience Unselected", 5000);
-        }
-    }
-    public boolean gettextfieldtimes() {
-        Boolean not_all_zeros = false;
-        for (Integer i : session.getallsessionvalues()) {if (i > 0) {not_all_zeros = true;}}
-        return  not_all_zeros;
-    }
+
     public void checkambience() {
         if (AmbienceSwitch.isSelected()) {
-            if (gettextfieldtimes()) {
+            if (textfieldsnotallzero()) {
                 session.checkambience(AmbienceSwitch);
             } else {
                 Util.gui_showinformationdialog(Root, "Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");

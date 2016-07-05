@@ -255,6 +255,50 @@ public class MainController implements Initializable {
     }
 
 // Dialogs
+    public static class ChangeAlertFile extends Stage {
+        public Button HelpButton;
+        public Button AcceptButton;
+        public Button CancelButton;
+        public CheckBox AlertFileToggleButton;
+        public TextField alertfileTextField;
+        public Button openFileButton;
+        public Button PreviewButton;
+        private MainController Root;
+
+        public ChangeAlertFile(MainController root) {
+            try {
+                Root = root;
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeAlertDialog.fxml"));
+                fxmlLoader.setController(this);
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(this);
+                setTitle("Reference Files Editor");
+                alertfiletoggled(null);
+            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
+        }
+
+    // Button Actions
+        public void accept(ActionEvent actionEvent) {
+
+        }
+        public void cancel(ActionEvent actionEvent) {
+
+        }
+        public void openandtestnewfile(ActionEvent actionEvent) {
+
+        }
+        public void preview(ActionEvent actionEvent) {
+
+        }
+
+        public void alertfiletoggled(ActionEvent actionEvent) {
+            PreviewButton.setDisable(! AlertFileToggleButton.isSelected());
+
+        }
+
+    // HELP TEXT The 'alert file' is a short audible warning that is played in between cuts to let you know it's time to move on to the next cut
+}
     public static class EditReferenceFiles extends Stage {
         public ChoiceBox<String> CutNamesChoiceBox;
         public TextArea MainTextArea;

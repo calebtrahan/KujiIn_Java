@@ -60,12 +60,13 @@ public class Options {
     public static final Double DEFAULT_FADERESUMEANDPAUSEDURATION = 2.0;
     public static final Boolean DEFAULT_ALERTFUNCTION_OPTION = true;
     public static final String DEFAULT_ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
-    public static final String DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "dark.css").toURI().toString();
+    public static final String DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "default.css").toURI().toString();
     public static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
     public static final Integer DEFAULT_RAMP_DURATION = 2;
     public static final PlayerUI.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = PlayerUI.ReferenceType.html;
     public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
     public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
+    public static final Integer DEFAULT_LONG_MEDITATABLE_DURATION = 10;
     private ProgramOptions ProgramOptions;
     private SessionOptions SessionOptions;
     private AppearanceOptions AppearanceOptions;
