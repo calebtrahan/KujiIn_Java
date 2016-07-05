@@ -360,6 +360,23 @@ public class Util {
         }
         return text.toString();
     }
+    public static String format_secstominsandseconds(double secs, int decimalplaces) {
+        double seconds;
+        double minutes;
+        if (secs > 60.0) {minutes = secs / 60.0;} else {minutes = 0.0;}
+        seconds = secs % 60.0;
+        StringBuilder text = new StringBuilder();
+        if (minutes > 0.0) {
+            text.append(minutes).append(" Minute");
+            if (minutes > 1.0) {text.append("s");}
+        }
+        if (seconds > 0.0) {
+            if (minutes > 0.0) {text.append(" ");}
+            text.append(rounddouble(seconds, decimalplaces)).append(" Second");
+            if (seconds > 0.0) {text.append("s");}
+        }
+        return text.toString();
+    }
     public static String format_secondsforplayerdisplay(int sec) {
         int hours = 0;
         int minutes = 0;
@@ -514,8 +531,7 @@ public class Util {
                 a.append(s);
             }
             return Double.parseDouble(a.toString());
-        } catch (IOException | NumberFormatException ignored) {return 0.0;}
-
+        } catch (Exception ignored) {return 0.0;}
     }
     public static boolean audio_checkduration(File audiofile, double expectedduration) {
         boolean durationOK;
@@ -564,8 +580,7 @@ public class Util {
         } catch (IOException | InterruptedException e) {return null;}
     }
     public static boolean audio_isValid(File file) {
-        return file.getName().endsWith(".mp3") || file.getName().endsWith(".aac") || file.getName().endsWith(".wav")
-                || file.getName().endsWith(".aif") || file.getName().endsWith(".aiff") || file.getName().endsWith("m4a");
+        return Arrays.asList(Util.SUPPORTEDAUDIOFORMATS).contains(file.getName().substring(file.getName().lastIndexOf(".") + 1));
     }
     public static String audio_getsupportedText() {
         StringBuilder s = new StringBuilder();

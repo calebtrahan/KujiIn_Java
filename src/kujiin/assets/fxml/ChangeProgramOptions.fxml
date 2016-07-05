@@ -72,17 +72,17 @@
                         </HBox>
                         <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="537.0">
                            <children>
-                              <CheckBox fx:id="AlertSwitch" mnemonicParsing="false" text="Alert File">
+                              <Label text="Alert File:">
                                  <HBox.margin>
                                     <Insets left="10.0" />
                                  </HBox.margin>
-                              </CheckBox>
-                              <TextField fx:id="AlertFileTextField" prefHeight="26.0" prefWidth="212.0" text="Please Select...">
+                              </Label>
+                              <TextField fx:id="AlertFileTextField" prefHeight="26.0" prefWidth="238.0" text="Please Select...">
                                  <HBox.margin>
                                     <Insets left="10.0" right="10.0" />
                                  </HBox.margin>
                               </TextField>
-                              <Button fx:id="AlertFileSelectButton" mnemonicParsing="false" onAction="#openandtestnewfile" text="Open File" />
+                              <Button fx:id="AlertFileEditButton" mnemonicParsing="false" onAction="#editalertfile" text="Edit" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="537.0">

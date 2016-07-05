@@ -303,7 +303,10 @@ public class CreatorAndExporterUI {
         }
         if (longsession()) {
             if (! Root.getOptions().getSessionOptions().getAlertfunction()) {
-
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Add Alert File", "I've Detected A Long Session. Long Sessions Can Make It Difficult To Hear " +
+                        "The Subtle Transitions In Between Session Parts", "Add Alert File In Between Session Parts?")) {
+                    new MainController.ChangeAlertFile(Root).showAndWait();
+                }
             }
         }
         boolean creationstate = session.create();

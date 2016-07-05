@@ -37,10 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
 
 public class MainController implements Initializable {
@@ -264,6 +261,10 @@ public class MainController implements Initializable {
         public Button openFileButton;
         public Button PreviewButton;
         private MainController Root;
+        private File alertfile;
+        private final static String NO_ALERT_FILE_SELECTED_TEXT = "No Alert File Selected";
+        private final static int SUGGESTED_ALERT_FILE_MAX_LENGTH = 10;
+        private final static int ABSOLUTE_ALERT_FILE_MAX_LENGTH = 30;
 
         public ChangeAlertFile(MainController root) {
             try {
@@ -273,32 +274,138 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
-                setTitle("Reference Files Editor");
+                setTitle("Alert File Editor");
+                alertfileTextField.setEditable(false);
+                AlertFileToggleButton.setSelected(Root.getOptions().getSessionOptions().getAlertfunction());
+                String alertfilelocation = Root.getOptions().getSessionOptions().getAlertfilelocation();
+                if (alertfilelocation != null) {alertfile = new File(Root.getOptions().getSessionOptions().getAlertfilelocation());}
                 alertfiletoggled(null);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
         }
 
+    // Getters And Setters
+
     // Button Actions
         public void accept(ActionEvent actionEvent) {
-
+            if (AlertFileToggleButton.isSelected() && alertfile == null) {
+                Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
+                return;
+            }
+            Root.getOptions().getSessionOptions().setAlertfunction(AlertFileToggleButton.isSelected());
+            if (alertfile != null) {Root.getOptions().getSessionOptions().setAlertfilelocation(alertfile.toURI().toString());}
+            else {Root.getOptions().getSessionOptions().setAlertfilelocation(null);}
+            Root.getOptions().marshall();
+            close();
         }
         public void cancel(ActionEvent actionEvent) {
-
+            close();
         }
         public void openandtestnewfile(ActionEvent actionEvent) {
-
+            File testfile = Util.filechooser_single(getScene(), "Select A New Alert File", null);
+            if (fileisgood(testfile)) {alertfile = testfile;}
+            alertfiletoggled(null);
         }
         public void preview(ActionEvent actionEvent) {
-
+            if (alertfile != null && alertfile.exists()) {
+                PreviewFile previewFile = new PreviewFile(Root, alertfile);
+                previewFile.showAndWait();
+            }
         }
-
         public void alertfiletoggled(ActionEvent actionEvent) {
-            PreviewButton.setDisable(! AlertFileToggleButton.isSelected());
-
+            if (AlertFileToggleButton.isSelected()) {AlertFileToggleButton.setText("ON");}
+            else {AlertFileToggleButton.setText("OFF");}
+            System.out.println("Disabling Preview Button: " + Boolean.toString(! AlertFileToggleButton.isSelected() && alertfile != null));
+            PreviewButton.setDisable(! AlertFileToggleButton.isSelected() || alertfile == null);
+            openFileButton.setDisable(! AlertFileToggleButton.isSelected());
+            alertfileTextField.setDisable(! AlertFileToggleButton.isSelected() && alertfile != null);
+            if (alertfile != null && alertfile.exists()) {
+                Double duration = Util.audio_getduration(alertfile);
+                String durationtext;
+                if (duration < SUGGESTED_ALERT_FILE_MAX_LENGTH) {durationtext = Util.format_secstominsandseconds(duration, 1);}
+                else {durationtext = Util.format_secstominsandseconds(duration.intValue());}
+                String text = String.format("%s (%s)", alertfile.getName(), durationtext);
+                alertfileTextField.setText(text);
+            } else {
+                if (alertfile != null) {alertfile = null; alertfiletoggled(null);}
+                alertfileTextField.setText(NO_ALERT_FILE_SELECTED_TEXT);
+            }
+        }
+        public void help(ActionEvent actionEvent) {
+            Util.gui_showinformationdialog(Root, "What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to transition to the next\npart of the session");
         }
 
-    // HELP TEXT The 'alert file' is a short audible warning that is played in between cuts to let you know it's time to move on to the next cut
-}
+    // Utility Methods
+        public boolean fileisgood(File testfile) {
+        // Test If Valid Extension
+        if (! Util.audio_isValid(testfile)) {
+                Util.gui_showinformationdialog(Root, "Information", "Invalid Audio Format", "Supported Audio Formats: " + Arrays.asList(Util.SUPPORTEDAUDIOFORMATS).toString());
+                return false;
+            }
+            Double duration = Util.audio_getduration(testfile);
+            if (duration == 0.0) {Util.gui_showinformationdialog(Root, "Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
+            else if (duration >= (SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
+                String confirmationtext = String.format("%s Is %s Which Is Longer Than The Suggested Maximum Duration %s", testfile.getName(),
+                        Util.format_secstominsandseconds(duration.intValue()), Util.format_secstominsandseconds(SUGGESTED_ALERT_FILE_MAX_LENGTH));
+                return Util.gui_getokcancelconfirmationdialog(Root, "Alert File Too Long", confirmationtext, "This May Break Session Immersion. Really Use This File As Your Alert File?");
+            } else if (duration >= ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
+                String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.format_secstominsandseconds(duration.intValue()), Util.format_secstominsandseconds(ABSOLUTE_ALERT_FILE_MAX_LENGTH));
+                Util.gui_showinformationdialog(Root, "Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
+                return false;
+            } else {return true;}
+        }
+
+//        public void alertfiletoggle() {
+//            if (AlertSwitch.isSelected()) {
+//                if (Options.getSessionOptions().getAlertfilelocation() == null) {
+//                    AlertFile = getnewalertfile();
+//                    checkalertfile();
+//                }
+//            } else {
+//                if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "This Will Disable The Audible Alert File Played In Between Cuts", "Really Disable This Feature?")) {
+//                    AlertFile = null;
+//                    checkalertfile();
+//                } else {
+//                    AlertSwitch.setSelected(true);
+//                }
+//            }
+//        }
+//        public File getnewalertfile() {
+//            File newfile = Util.filechooser_single(getScene(), "Select A New Alert File", null);
+//            if (newfile != null) {
+//                if (Util.audio_isValid(newfile)) {
+//                    double duration = Util.audio_getduration(newfile);
+//                    if (duration > 10000) {
+//                        if (!Util.gui_getokcancelconfirmationdialog(Root, "Validation", "Alert File Is longer Than 10 Seconds",
+//                                String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
+//                                        "Really Use It?", duration))) {newfile = null;}
+//                    }
+//                } else {
+//                    Util.gui_showinformationdialog(Root, "Information", newfile.getName() + " Isn't A Valid Audio File", "Supported Audio Formats: " + Util.audio_getsupportedText());
+//                    newfile = null;
+//                }
+//            }
+//            return newfile;
+//        }
+//        public boolean checkalertfile() {
+//            boolean good;
+//            if (AlertFile != null && Util.audio_isValid(AlertFile)) {
+//                good = true;
+//                Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());
+//                String audioduration = Util.format_secondsforplayerdisplay((int) Util.audio_getduration(AlertFile));
+//                AlertFileTextField.setText(String.format("%s (%s)", AlertFile.getName(), audioduration));
+//            } else {
+//                good = false;
+//                AlertFileTextField.setText("Alert Feature Disabled");
+//                Options.getSessionOptions().setAlertfilelocation(null);
+//            }
+//            Options.getSessionOptions().setAlertfunction(good);
+//            AlertFileEditButton.setDisable(! good);
+//            AlertFileTextField.setDisable(! good);
+//            AlertSwitch.setSelected(good);
+//            return good;
+//        }
+
+    }
     public static class EditReferenceFiles extends Stage {
         public ChoiceBox<String> CutNamesChoiceBox;
         public TextArea MainTextArea;
@@ -1166,7 +1273,7 @@ public class MainController implements Initializable {
         public CheckBox TooltipsCheckBox;
         public CheckBox HelpDialogsCheckBox;
         public TextField AlertFileTextField;
-        public Button AlertFileSelectButton;
+        public Button AlertFileEditButton;
         public TextField FadeInValue;
         public TextField FadeOutValue;
         public TextField EntrainmentVolumePercentage;
@@ -1178,14 +1285,12 @@ public class MainController implements Initializable {
         public Button DeleteAllGoalsButton;
         public Button DeleteAllSessionsProgressButton;
         public Button DefaultsButton;
-        public CheckBox AlertSwitch;
         public CheckBox ReferenceSwitch;
         public RadioButton ReferenceHTMLRadioButton;
         public RadioButton ReferenceTXTRadioButton;
         public CheckBox FullscreenCheckbox;
         public CheckBox RampSwitch;
         private kujiin.xml.Options Options;
-        private File AlertFile;
         private boolean valuechanged;
         private MainController Root;
         private PlayerUI.ReferenceType tempreferencetype;
@@ -1207,7 +1312,7 @@ public class MainController implements Initializable {
             doubleTextField(EntrainmentVolumePercentage, false);
             doubleTextField(AmbienceVolumePercentage, false);
             kujiin.xml.Options.STYLETHEMES.clear();
-
+            AlertFileTextField.setEditable(false);
         // Add Listeners
             setuplisteners();
             setuptooltips();
@@ -1222,10 +1327,7 @@ public class MainController implements Initializable {
             TooltipsCheckBox.setSelected(Root.getOptions().getProgramOptions().getTooltips());
             HelpDialogsCheckBox.setSelected(Root.getOptions().getProgramOptions().getHelpdialogs());
         // Session Options
-            AlertSwitch.setSelected(Root.getOptions().getSessionOptions().getAlertfunction());
-            try {AlertFile = new File(Options.getSessionOptions().getAlertfilelocation());}
-            catch (NullPointerException ignored) {AlertFile = null;}
-            checkalertfile();
+            alertfiletoggled();
         // Playback Options
             RampSwitch.setSelected(Options.getSessionOptions().getRampenabled());
             FadeInValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeinduration()));
@@ -1244,7 +1346,8 @@ public class MainController implements Initializable {
             TooltipsCheckBox.setTooltip(new Tooltip("Display Messages Like These When Hovering Over Program Controls"));
             if (Root.getOptions().getProgramOptions().getTooltips()) {
                 HelpDialogsCheckBox.setTooltip(new Tooltip(""));
-                AlertSwitch.setTooltip(new Tooltip("Enable A Sound File Played In Between Different Session Parts"));
+                AlertFileTextField.setTooltip(new Tooltip("Alert File Is A Sound File Played In Between Different Session Parts"));
+                AlertFileEditButton.setTooltip(new Tooltip("Edit Alert File"));
                 RampSwitch.setTooltip(new Tooltip("Enable A Ramp In Between Session Parts To Smooth Mental Transition"));
                 FadeInValue.setTooltip(new Tooltip("Seconds To Fade In Audio Into Session Part"));
                 FadeOutValue.setTooltip(new Tooltip("Seconds To Fade Out Audio Out Of Session Part"));
@@ -1254,7 +1357,8 @@ public class MainController implements Initializable {
                 DeleteAllSessionsProgressButton.setTooltip((new Tooltip("Delete ALL Sessions Past, Present And Completed (This CANNOT Be Undone)")));
             } else {
                 HelpDialogsCheckBox.setTooltip(null);
-                AlertSwitch.setTooltip(null);
+                AlertFileTextField.setTooltip(null);
+                AlertFileEditButton.setTooltip(null);
                 RampSwitch.setTooltip(null);
                 FadeInValue.setTooltip(null);
                 FadeOutValue.setTooltip(null);
@@ -1280,8 +1384,6 @@ public class MainController implements Initializable {
             Util.addscrolllistenerincrementdecrement(AmbienceVolumePercentage, 1, 100, 1.0, 0);
             Util.addupdownarrowlistenerincrementdecrement(AmbienceVolumePercentage, 1, 100, 1.0, 0);
             ProgramThemeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {selectnewtheme(); changedvalue();});
-            AlertSwitch.setOnMouseClicked(event -> alertfiletoggle());
-            AlertSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
             ReferenceSwitch.setOnMouseClicked(event -> referencetoggle());
             ReferenceSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
             RampSwitch.setOnMouseClicked(event -> ramptoggle());
@@ -1294,59 +1396,32 @@ public class MainController implements Initializable {
         }
 
     // Alert File Methods
-        public void alertfiletoggle() {
-            if (AlertSwitch.isSelected()) {
-                if (Options.getSessionOptions().getAlertfilelocation() == null) {
-                    AlertFile = getnewalertfile();
-                    checkalertfile();
+        public void editalertfile(ActionEvent actionEvent) {
+            ChangeAlertFile changeAlertFile = new ChangeAlertFile(Root);
+            changeAlertFile.showAndWait();
+            alertfiletoggled();
+        }
+        public void alertfiletoggled() {
+            boolean enabled = Root.getOptions().getSessionOptions().getAlertfunction();
+            if (enabled) {
+                if (Options.getSessionOptions().getAlertfilelocation() != null) {
+                    File alertfile = new File(Options.getSessionOptions().getAlertfilelocation());
+                    if (! alertfile.exists()) {Options.getSessionOptions().setAlertfilelocation(null); alertfiletoggled();}
+                    String duration = Util.format_secstominsandseconds(new Double(Util.audio_getduration(alertfile)).intValue() / 1000);
+                    String text = String.format("%s (%s)", alertfile.getName(), duration);
+                    AlertFileTextField.setText(text);
+                    AlertFileTextField.setDisable(false);
+                    AlertFileEditButton.setText("Edit");
+                } else {
+                    AlertFileTextField.setText("Alert File Disabled");
+                    AlertFileTextField.setDisable(true);
+                    AlertFileEditButton.setText("Add");
                 }
             } else {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "This Will Disable The Audible Alert File Played In Between Cuts", "Really Disable This Feature?")) {
-                    AlertFile = null;
-                    checkalertfile();
-                } else {
-                    AlertSwitch.setSelected(true);
-                }
+                AlertFileTextField.setText("Alert File Disabled");
+                AlertFileTextField.setDisable(true);
+                AlertFileEditButton.setText("Add");
             }
-        }
-        public File getnewalertfile() {
-            File newfile = Util.filechooser_single(getScene(), "Select A New Alert File", null);
-            if (newfile != null) {
-                if (Util.audio_isValid(newfile)) {
-                    double duration = Util.audio_getduration(newfile);
-                    if (duration > 10000) {
-                        if (!Util.gui_getokcancelconfirmationdialog(Root, "Validation", "Alert File Is longer Than 10 Seconds",
-                                String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
-                                        "Really Use It?", duration))) {newfile = null;}
-                    }
-                } else {
-                    Util.gui_showinformationdialog(Root, "Information", newfile.getName() + " Isn't A Valid Audio File", "Supported Audio Formats: " + Util.audio_getsupportedText());
-                    newfile = null;
-                }
-            }
-            return newfile;
-        }
-        public boolean checkalertfile() {
-            boolean good;
-            if (AlertFile != null && Util.audio_isValid(AlertFile)) {
-                good = true;
-                Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());
-                String audioduration = Util.format_secondsforplayerdisplay((int) Util.audio_getduration(AlertFile));
-                AlertFileTextField.setText(String.format("%s (%s)", AlertFile.getName(), audioduration));
-            } else {
-                good = false;
-                AlertFileTextField.setText("Alert Feature Disabled");
-                Options.getSessionOptions().setAlertfilelocation(null);
-            }
-            Options.getSessionOptions().setAlertfunction(good);
-            AlertFileSelectButton.setDisable(! good);
-            AlertFileTextField.setDisable(! good);
-            AlertSwitch.setSelected(good);
-            return good;
-        }
-        public void openandtestnewfile(ActionEvent actionEvent) {
-            AlertFile = getnewalertfile();
-            checkalertfile();
         }
 
     // Reference Methods
@@ -1385,17 +1460,19 @@ public class MainController implements Initializable {
             else {RampSwitch.setText("OFF");}
         }
 
-    // Button Actions
+    // Appearance Methods
         public void selectnewtheme() {
-            if (ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {
-                File cssfile = new File(kujiin.xml.Options.DIRECTORYSTYLES, ProgramThemeChoiceBox.getValue() + ".css");
-                if (cssfile.exists()) {
-                    Options.getAppearanceOptions().setThemefile(cssfile.toURI().toString());
-                    getScene().getStylesheets().clear();
-                    getScene().getStylesheets().add(Options.getAppearanceOptions().getThemefile());
-                }
+        if (ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {
+            File cssfile = new File(kujiin.xml.Options.DIRECTORYSTYLES, ProgramThemeChoiceBox.getValue() + ".css");
+            if (cssfile.exists()) {
+                Options.getAppearanceOptions().setThemefile(cssfile.toURI().toString());
+                getScene().getStylesheets().clear();
+                getScene().getStylesheets().add(Options.getAppearanceOptions().getThemefile());
             }
         }
+    }
+
+    // Button Actions
         public void apply(ActionEvent actionEvent) {
             try {
                 if (checkifvaluesValid()) {
@@ -1407,9 +1484,6 @@ public class MainController implements Initializable {
                     Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
                     Options.getSessionOptions().setReferencetype(tempreferencetype);
                     Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
-                    Options.getSessionOptions().setAlertfunction(AlertSwitch.isSelected());
-                    if (AlertFile != null) {Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());}
-                    else {Options.getSessionOptions().setAlertfilelocation(null);}
                     Options.marshall();
                     valuechanged = false;
                     ApplyButton.setDisable(true);
@@ -1423,6 +1497,8 @@ public class MainController implements Initializable {
         public void cancel(ActionEvent actionEvent) {
             close();
         }
+
+
         public void changedvalue() {
             boolean changedvalue = checkifvaluesChanges();
             ApplyButton.setDisable(! changedvalue);
@@ -1451,9 +1527,7 @@ public class MainController implements Initializable {
             boolean ambiencegood = ambiencevolume <= 100.0 && ambiencevolume > 0.0;
             Util.gui_validate(EntrainmentVolumePercentage, entrainmentgood);
             Util.gui_validate(AmbienceVolumePercentage, ambiencegood);
-            boolean alertfilegood = checkalertfile();
-            if (AlertSwitch.isSelected()) {Util.gui_validate(AlertFileTextField, alertfilegood);}
-            return entrainmentgood && ambiencegood && alertfilegood;
+            return entrainmentgood && ambiencegood;
         }
         public void resettodefaults(ActionEvent actionEvent) {
             Options.resettodefaults();
