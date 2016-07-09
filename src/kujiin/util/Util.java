@@ -147,8 +147,14 @@ public class Util {
                     if (value >= minvalue && value <= maxvalue) {textField.setText(value.toString());}
                     else {textField.setText(value.toString());}
                 }
-                else {textField.setText(oldValue);}
-            } catch (Exception e) {textField.setText(oldValue);}});
+                else {
+                    if (oldValue != null) {textField.setText(oldValue);}
+                    else {textField.setText("");}
+                }
+            } catch (Exception e) {
+                if (oldValue != null) {textField.setText(oldValue);}
+                else {textField.setText("");}
+            }});
         textField.setOnKeyPressed(event -> {
             Double newvalue = new Double(textField.getText());
             boolean validvalue;
@@ -183,8 +189,14 @@ public class Util {
                     if (value >= minvalue && value <= maxvalue) {textField.setText(value.toString());}
                     else {textField.setText(value.toString());}
                 }
-                else {textField.setText(oldValue);}
-            } catch (Exception e) {textField.setText(oldValue);}});
+                else {
+                    if (oldValue != null) {textField.setText(oldValue);}
+                    else {textField.setText("");}
+                }
+            } catch (Exception e) {
+                if (oldValue != null) {textField.setText(oldValue);}
+                else {textField.setText("");}
+            }});
         textField.setOnKeyPressed(event -> {
             Double newvalue = new Double(textField.getText());
             boolean validvalue;
@@ -222,8 +234,14 @@ public class Util {
                 if (value >= minvalue && value <= maxvalue) {textField.setText(value.toString());}
                 else {textField.setText(value.toString());}
                 textField.setText(rounddouble(Double.parseDouble(newValue), decimalplaces).toString());
-            }  else {textField.setText(oldValue);}}
-            catch (Exception e) {textField.setText(oldValue);}});
+            }  else {
+                if (oldValue != null) {textField.setText(oldValue);}
+                else {textField.setText("");}
+            }}
+            catch (Exception e) {
+                if (oldValue != null) {textField.setText(oldValue);}
+                else {textField.setText("");}
+            }});
         textField.setOnKeyPressed(event -> {
             Double newvalue = new Double(textField.getText());
             boolean validvalue;

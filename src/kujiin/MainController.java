@@ -177,11 +177,11 @@ public class MainController implements Initializable {
 
 // Top Menu Actions
     public void changesessionoptions(ActionEvent actionEvent) {
-    new ChangeProgramOptions(this).showAndWait();
-    Options.marshall();
-    getProgressTracker().updaterootgoalsui();
-    getProgressTracker().updateprogressui();
-}
+        new ChangeProgramOptions(this).showAndWait();
+        Options.marshall();
+        getProgressTracker().updaterootgoalsui();
+        getProgressTracker().updateprogressui();
+    }
     public void editprogramsambience(ActionEvent actionEvent) {
         getStage().setIconified(true);
         SimpleAmbienceEditor sae = new SimpleAmbienceEditor(this, getSession().getAmbiences());
@@ -1278,7 +1278,6 @@ public class MainController implements Initializable {
         public TextField EntrainmentVolumePercentage;
         public TextField AmbienceVolumePercentage;
         public ChoiceBox<String> ProgramThemeChoiceBox;
-        public Button ApplyButton;
         public Button AcceptButton;
         public Button CancelButton;
         public Button DeleteAllGoalsButton;
@@ -1298,7 +1297,6 @@ public class MainController implements Initializable {
         public ChangeProgramOptions(MainController root) {
             try {
                 Root = root;
-                // TODO Maybe Reformat Using IntelliJ Styling With Categories On Left Side And Actual Options On Right Pane
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));
                 fxmlLoader.setController(this);
                 Options = Root.getOptions();
@@ -1327,8 +1325,8 @@ public class MainController implements Initializable {
             RampSwitch.setSelected(Options.getSessionOptions().getRampenabled());
             FadeInValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeinduration()));
             FadeOutValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeoutduration()));
-            EntrainmentVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getEntrainmentvolume() * 100));
-            AmbienceVolumePercentage.setText(String.format("%.1f", Options.getSessionOptions().getAmbiencevolume() * 100));
+            EntrainmentVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getEntrainmentvolume() * 100).intValue()));
+            AmbienceVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getAmbiencevolume() * 100).intValue()));
         // Appearance Options
             try {
                 for (File i : kujiin.xml.Options.DIRECTORYSTYLES.listFiles()) {
@@ -1368,8 +1366,8 @@ public class MainController implements Initializable {
             HelpDialogsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeInValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            Util.custom_textfield_double(FadeInValue, 0.0, 60.0, 1, 5);
-            Util.custom_textfield_double(FadeOutValue, 0.0, 60.0, 1, 5);
+            Util.custom_textfield_double(FadeInValue, 0.0, 60.0, 1, 1);
+            Util.custom_textfield_double(FadeOutValue, 0.0, 60.0, 1, 1);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
             EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
@@ -1442,8 +1440,11 @@ public class MainController implements Initializable {
         }
 
     // Appearance Methods
+        public void addnewtheme(ActionEvent actionEvent) {
+
+        }
         public void selectnewtheme() {
-            // TODO Add In Default (Use IntelliJ Appearance Options As Model)
+        // TODO Add In Default (Use IntelliJ Appearance Options As Model)
         if (ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {
             File cssfile = new File(kujiin.xml.Options.DIRECTORYSTYLES, ProgramThemeChoiceBox.getValue() + ".css");
             if (cssfile.exists()) {
@@ -1455,7 +1456,7 @@ public class MainController implements Initializable {
     }
 
     // Button Actions
-        public void apply(ActionEvent actionEvent) {
+        public void accept(ActionEvent actionEvent) {
             try {
                 if (checkifvaluesValid()) {
                     Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
@@ -1468,23 +1469,18 @@ public class MainController implements Initializable {
                     Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
                     Options.marshall();
                     valuechanged = false;
-                    ApplyButton.setDisable(true);
                 }
             } catch (Exception e) {e.printStackTrace();}
-        }
-        public void accept(ActionEvent actionEvent) {
-            apply(null);
             close();
         }
         public void cancel(ActionEvent actionEvent) {
             close();
         }
 
-
         public void changedvalue() {
-            boolean changedvalue = checkifvaluesChanges();
-            ApplyButton.setDisable(! changedvalue);
-            valuechanged = changedvalue;
+            if (isShowing()) {
+                valuechanged = checkifvaluesChanges();
+            }
         }
         public boolean checkifvaluesChanges() {
             try {
@@ -1541,10 +1537,6 @@ public class MainController implements Initializable {
             Root.setOptions(Options);
             Root.getOptions().marshall();
             super.close();
-        }
-
-        public void addnewtheme(ActionEvent actionEvent) {
-
         }
     }
     public static class SessionDetails extends Stage {
