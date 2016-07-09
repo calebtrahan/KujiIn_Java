@@ -314,10 +314,9 @@ public class MainController implements Initializable {
         public void alertfiletoggled(ActionEvent actionEvent) {
             if (AlertFileToggleButton.isSelected()) {AlertFileToggleButton.setText("ON");}
             else {AlertFileToggleButton.setText("OFF");}
-            System.out.println("Disabling Preview Button: " + Boolean.toString(! AlertFileToggleButton.isSelected() && alertfile != null));
             PreviewButton.setDisable(! AlertFileToggleButton.isSelected() || alertfile == null);
             openFileButton.setDisable(! AlertFileToggleButton.isSelected());
-            alertfileTextField.setDisable(! AlertFileToggleButton.isSelected() && alertfile != null);
+            alertfileTextField.setDisable(! AlertFileToggleButton.isSelected() || alertfile == null);
             if (alertfile != null && alertfile.exists()) {
                 Double duration = Util.audio_getduration(alertfile);
                 String durationtext;
@@ -1290,35 +1289,31 @@ public class MainController implements Initializable {
         public RadioButton ReferenceTXTRadioButton;
         public CheckBox FullscreenCheckbox;
         public CheckBox RampSwitch;
+        public Button AddNewThemeButton;
         private kujiin.xml.Options Options;
         private boolean valuechanged;
         private MainController Root;
         private PlayerUI.ReferenceType tempreferencetype;
 
         public ChangeProgramOptions(MainController root) {
-            Root = root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));
-            fxmlLoader.setController(this);
-            Options = Root.getOptions();
             try {
+                Root = root;
+                // TODO Maybe Reformat Using IntelliJ Styling With Categories On Left Side And Actual Options On Right Pane
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));
+                fxmlLoader.setController(this);
+                Options = Root.getOptions();
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
-                this.setResizable(false);
+                setResizable(false);
+                setTitle("Preferences");
+                kujiin.xml.Options.STYLETHEMES.clear();
+                AlertFileTextField.setEditable(false);
+                setuplisteners();
+                setuptooltips();
+                populatefromxml();
+                referencetoggle();
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Preferences");
-            doubleTextField(FadeInValue, false);
-            doubleTextField(FadeOutValue, false);
-            doubleTextField(EntrainmentVolumePercentage, false);
-            doubleTextField(AmbienceVolumePercentage, false);
-            kujiin.xml.Options.STYLETHEMES.clear();
-            AlertFileTextField.setEditable(false);
-        // Add Listeners
-            setuplisteners();
-            setuptooltips();
-            populatefromxml();
-            referencetoggle();
-            ramptoggle();
         }
 
     // Setup Methods
@@ -1373,21 +1368,14 @@ public class MainController implements Initializable {
             HelpDialogsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeInValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            Util.addscrolllistenerincrementdecrement(FadeInValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0, 1);
-            Util.addupdownarrowlistenerincrementdecrement(FadeInValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0, 1);
-            Util.addscrolllistenerincrementdecrement(FadeOutValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0, 1);
-            Util.addupdownarrowlistenerincrementdecrement(FadeOutValue, 0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1.0, 1);
+            Util.custom_textfield_double(FadeInValue, 0.0, 60.0, 1, 5);
+            Util.custom_textfield_double(FadeOutValue, 0.0, 60.0, 1, 5);
+            Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
+            Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
             EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            Util.addscrolllistenerincrementdecrement(EntrainmentVolumePercentage, 1, 100, 1.0, 0);
-            Util.addupdownarrowlistenerincrementdecrement(EntrainmentVolumePercentage, 1, 100, 1.0, 0);
             AmbienceVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            Util.addscrolllistenerincrementdecrement(AmbienceVolumePercentage, 1, 100, 1.0, 0);
-            Util.addupdownarrowlistenerincrementdecrement(AmbienceVolumePercentage, 1, 100, 1.0, 0);
             ProgramThemeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {selectnewtheme(); changedvalue();});
             ReferenceSwitch.setOnMouseClicked(event -> referencetoggle());
-            ReferenceSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
-            RampSwitch.setOnMouseClicked(event -> ramptoggle());
-            RampSwitch.setOnAction(Root.CHECKBOXONOFFLISTENER);
             ReferenceHTMLRadioButton.setOnAction(event1 -> HTMLTypeSelected());
             ReferenceTXTRadioButton.setOnAction(event1 -> TXTTypeSelected());
             FullscreenCheckbox.setOnAction(Root.CHECKBOXYESNOLISTENER);
@@ -1453,15 +1441,9 @@ public class MainController implements Initializable {
             tempreferencetype = PlayerUI.ReferenceType.txt;
         }
 
-    // Ramp Methods
-        public void ramptoggle() {
-            boolean enabled = RampSwitch.isSelected();
-            if (enabled) {RampSwitch.setText("ON");}
-            else {RampSwitch.setText("OFF");}
-        }
-
     // Appearance Methods
         public void selectnewtheme() {
+            // TODO Add In Default (Use IntelliJ Appearance Options As Model)
         if (ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {
             File cssfile = new File(kujiin.xml.Options.DIRECTORYSTYLES, ProgramThemeChoiceBox.getValue() + ".css");
             if (cssfile.exists()) {
@@ -1551,12 +1533,6 @@ public class MainController implements Initializable {
         }
 
     // Dialog Methods
-        public void doubleTextField(TextField txtfield, boolean setvalueatzero) {
-            txtfield.textProperty().addListener((observable, oldValue, newValue) -> {
-                try {if (newValue.matches("\\d+\\.\\d+")) {Double.parseDouble(newValue);}  else {txtfield.setText(oldValue);}}
-                catch (Exception e) {txtfield.setText("");}});
-            if (setvalueatzero) {txtfield.setText("0.00");}
-        }
         @Override
         public void close() {
             if (valuechanged) {
@@ -1565,6 +1541,10 @@ public class MainController implements Initializable {
             Root.setOptions(Options);
             Root.getOptions().marshall();
             super.close();
+        }
+
+        public void addnewtheme(ActionEvent actionEvent) {
+
         }
     }
     public static class SessionDetails extends Stage {

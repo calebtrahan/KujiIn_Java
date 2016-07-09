@@ -1,6 +1,5 @@
 package kujiin.util;
 
-import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -13,10 +12,6 @@ import java.io.File;
 public class Cut extends Meditatable {
     private ToggleButton Switch;
     private TextField Value;
-    private ChangeListener<String> integertextfield = (observable, oldValue, newValue) -> {
-        try {if (newValue.matches("\\d*")) {Value.setText(Integer.toString(Integer.parseInt(newValue)));}  else {Value.setText(oldValue);}}
-        catch (Exception e) {Value.setText("");}
-    };
 
     public Cut(int number, String name, int duration, String briefsummary, This_Session thisession, ToggleButton aSwitch, TextField value) {
         super(number, name, duration, thisession);
@@ -24,6 +19,7 @@ public class Cut extends Meditatable {
 //        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, name + "1.mp3")));}
         Switch = aSwitch;
         Value = value;
+        Util.custom_textfield_integer(Value, Switch, 0, 600, 1);
         Switch.setTooltip(new Tooltip(briefsummary));
         Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
         Switch.setOnAction(event -> toggleswitch());
@@ -45,12 +41,10 @@ public class Cut extends Meditatable {
 }
     public void toggleswitch() {
         if (Switch.isSelected()) {
-            Value.textProperty().addListener(integertextfield);
             Value.setText("0");
             Value.setDisable(false);
             Value.setTooltip(new Tooltip("Practice Time For " + name + " (In Minutes)"));
         } else {
-            Value.textProperty().removeListener(integertextfield);
             Value.setText("0");
             Value.setDisable(true);
             Value.setTooltip(new Tooltip(name + " Is Disabled. Click " + name + " Button Above To Enable"));

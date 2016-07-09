@@ -139,43 +139,91 @@ public class Util {
         if (! val ) {if (!styleclass.contains("error")) {styleclass.add("error");}
         } else {styleclass.removeAll(Collections.singleton("error"));}
     }
-    // Listeners
-    public static void addscrolllistenerincrementdecrement(TextField textField, double minvalue, double maxvalue, double increment, int decimalplaces) {
+    public static void custom_textfield_integer(TextField textField, int minvalue, int maxvalue, int increment) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                if (newValue.matches("\\d*")) {
+                    Integer value = Integer.parseInt(newValue);
+                    if (value >= minvalue && value <= maxvalue) {textField.setText(value.toString());}
+                    else {textField.setText(value.toString());}
+                }
+                else {textField.setText(oldValue);}
+            } catch (Exception e) {textField.setText(oldValue);}});
+        textField.setOnKeyPressed(event -> {
+            Double newvalue = new Double(textField.getText());
+            boolean validvalue;
+            switch (event.getCode()) {
+                case UP:
+                case PAGE_UP:
+                    newvalue += increment;
+                    validvalue = newvalue <= maxvalue;
+                    break;
+                case DOWN:
+                case PAGE_DOWN:
+                    newvalue -= increment;
+                    validvalue = newvalue >= minvalue;
+                    break;
+                default:
+                    validvalue = false;
+            }
+            if (validvalue) {textField.setText(String.valueOf(newvalue.intValue()));}
+        });
         textField.setOnScroll(event -> {
             Double newvalue = new Double(textField.getText());
             boolean validvalue;
             if (event.getDeltaY() < 0) {newvalue -= increment; validvalue = newvalue >= minvalue;} else {newvalue += increment; validvalue = newvalue <= maxvalue;}
-            if (validvalue) {
-                if (decimalplaces > 0) {textField.setText(Util.rounddouble(newvalue, decimalplaces).toString());}
-                else {textField.setText(String.valueOf(newvalue.intValue()));}
-            }
+            if (validvalue) {textField.setText(String.valueOf(newvalue.intValue()));}
         });
     }
-    public static void addscrolllistenerincrementdecrement(TextField textField, ToggleButton toggleButton,  double minvalue, double maxvalue, double increment, int decimalplaces) {
+    public static void custom_textfield_integer(TextField textField, ToggleButton toggleButton, int minvalue, int maxvalue, int increment) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                if (newValue.matches("\\d*")) {
+                    Integer value = Integer.parseInt(newValue);
+                    if (value >= minvalue && value <= maxvalue) {textField.setText(value.toString());}
+                    else {textField.setText(value.toString());}
+                }
+                else {textField.setText(oldValue);}
+            } catch (Exception e) {textField.setText(oldValue);}});
+        textField.setOnKeyPressed(event -> {
+            Double newvalue = new Double(textField.getText());
+            boolean validvalue;
+            switch (event.getCode()) {
+                case UP:
+                case PAGE_UP:
+                    newvalue += increment;
+                    validvalue = newvalue <= maxvalue;
+                    break;
+                case DOWN:
+                case PAGE_DOWN:
+                    newvalue -= increment;
+                    validvalue = newvalue >= minvalue;
+                    break;
+                default:
+                    validvalue = false;
+            }
+            if (validvalue) {textField.setText(String.valueOf(newvalue.intValue()));}
+            textField.setDisable(newvalue == 0);
+            toggleButton.setSelected(newvalue != 0);
+        });
         textField.setOnScroll(event -> {
             Double newvalue = new Double(textField.getText());
             boolean validvalue;
             if (event.getDeltaY() < 0) {newvalue -= increment; validvalue = newvalue >= minvalue;} else {newvalue += increment; validvalue = newvalue <= maxvalue;}
-            if (validvalue) {
-                if (decimalplaces > 0) {textField.setText(Util.rounddouble(newvalue, decimalplaces).toString());}
-                else {textField.setText(String.valueOf(newvalue.intValue()));}
-            }
+            if (validvalue) {textField.setText(String.valueOf(newvalue.intValue()));}
             textField.setDisable(newvalue == 0);
             toggleButton.setSelected(newvalue != 0);
         });
     }
-    public static void addscrolllistenerincrementdecrement(Spinner<Integer> spinner, int minvalue, int maxvalue, int increment, boolean roundtomultipleof5) {
-        spinner.setOnScroll(event -> {
-            int value = spinner.getValue();
-            boolean validvalue;
-            if (event.getDeltaY() < 0) {value -= increment; validvalue = value >= minvalue;} else {value += increment; validvalue = value <= maxvalue;}
-            if (validvalue) {
-                if (roundtomultipleof5) {spinner.getValueFactory().setValue(round_nearestmultipleof5(value).intValue());}
-                else {spinner.getValueFactory().setValue(value);}
-            }
-        });
-    }
-    public static void addupdownarrowlistenerincrementdecrement(TextField textField, double minvalue, double maxvalue, double increment, int decimalplaces) {
+    public static void custom_textfield_double(TextField textField, double minvalue, double maxvalue, int decimalplaces, double increment) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {if (newValue.matches("\\d+\\.\\d+")) {
+                Double value = Double.parseDouble(newValue);
+                if (value >= minvalue && value <= maxvalue) {textField.setText(value.toString());}
+                else {textField.setText(value.toString());}
+                textField.setText(rounddouble(Double.parseDouble(newValue), decimalplaces).toString());
+            }  else {textField.setText(oldValue);}}
+            catch (Exception e) {textField.setText(oldValue);}});
         textField.setOnKeyPressed(event -> {
             Double newvalue = new Double(textField.getText());
             boolean validvalue;
@@ -198,34 +246,17 @@ public class Util {
                 else {textField.setText(String.valueOf(newvalue.intValue()));}
             }
         });
-    }
-    public static void addupdownarrowlistenerincrementdecrement(TextField textField, ToggleButton toggleButton,  double minvalue, double maxvalue, double increment, int decimalplaces) {
-        textField.setOnKeyPressed(event -> {
+        textField.setOnScroll(event -> {
             Double newvalue = new Double(textField.getText());
             boolean validvalue;
-            switch (event.getCode()) {
-                case UP:
-                case PAGE_UP:
-                    newvalue += increment;
-                    validvalue = newvalue <= maxvalue;
-                    break;
-                case DOWN:
-                case PAGE_DOWN:
-                    newvalue -= increment;
-                    validvalue = newvalue >= minvalue;
-                    break;
-                default:
-                    validvalue = false;
-            }
+            if (event.getDeltaY() < 0) {newvalue -= increment; validvalue = newvalue >= minvalue;} else {newvalue += increment; validvalue = newvalue <= maxvalue;}
             if (validvalue) {
                 if (decimalplaces > 0) {textField.setText(Util.rounddouble(newvalue, decimalplaces).toString());}
                 else {textField.setText(String.valueOf(newvalue.intValue()));}
             }
-            textField.setDisable(newvalue == 0);
-            toggleButton.setSelected(newvalue != 0);
         });
     }
-    public static void addupdownarrowlistenerincrementdecrement(Spinner<Integer> spinner, int minvalue, int maxvalue, double increment, boolean roundtomultipleof5) {
+    public static void custom_spinner_integer(Spinner<Integer> spinner, int minvalue, int maxvalue, double increment, boolean roundtomultipleof5) {
         spinner.setOnKeyPressed(event -> {
             int newvalue = spinner.getValue();
             boolean validvalue;
@@ -246,6 +277,15 @@ public class Util {
             if (validvalue) {
                 if (roundtomultipleof5) {spinner.getValueFactory().setValue(round_nearestmultipleof5(newvalue).intValue());}
                 else {spinner.getValueFactory().setValue(newvalue);}
+            }
+        });
+        spinner.setOnScroll(event -> {
+            int value = spinner.getValue();
+            boolean validvalue;
+            if (event.getDeltaY() < 0) {value -= increment; validvalue = value >= minvalue;} else {value += increment; validvalue = value <= maxvalue;}
+            if (validvalue) {
+                if (roundtomultipleof5) {spinner.getValueFactory().setValue(round_nearestmultipleof5(value).intValue());}
+                else {spinner.getValueFactory().setValue(value);}
             }
         });
     }

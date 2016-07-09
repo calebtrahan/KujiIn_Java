@@ -217,38 +217,6 @@ public class CreatorAndExporterUI {
         try {Root.getSession().setDuration(15, Integer.valueOf(newValue)); updatecreatorui();}
         catch (NumberFormatException ignored) {VoidTime.setText("0"); updatecreatorui();}
     });
-    Util.addscrolllistenerincrementdecrement(PreTime, PreSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(PreTime, PreSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(RinTime, RinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(RinTime, RinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(KyoTime, KyoSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(KyoTime, KyoSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(TohTime, TohSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(TohTime, TohSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(ShaTime, ShaSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(ShaTime, ShaSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(KaiTime, KaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(KaiTime, KaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(JinTime, JinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(JinTime, JinSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(RetsuTime, RetsuSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(RetsuTime, RetsuSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(ZaiTime, ZaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(ZaiTime, ZaiSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(ZenTime, ZenSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(ZenTime, ZenSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(PostTime, PostSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(PostTime, PostSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(EarthTime, EarthSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(EarthTime, EarthSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(AirTime, AirSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(AirTime, AirSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(FireTime, FireSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(FireTime, FireSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(WaterTime, WaterSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(WaterTime, WaterSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addscrolllistenerincrementdecrement(VoidTime, VoidSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
-    Util.addupdownarrowlistenerincrementdecrement(VoidTime, VoidSwitch, 0, Double.POSITIVE_INFINITY, 1, 0);
     TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
     ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
     AmbienceSwitch.setTooltip(new Tooltip("Check This After You Set All Values To Check For And Enable Ambience For This Session"));
@@ -513,8 +481,7 @@ public class CreatorAndExporterUI {
                 setTitle(toptext);
                 setAccepted(false);
                 MinutesTextField.setText("0");
-                Util.addscrolllistenerincrementdecrement(MinutesTextField, 0, Double.POSITIVE_INFINITY, 1, 0);
-                Util.addupdownarrowlistenerincrementdecrement(MinutesTextField, 0, Double.POSITIVE_INFINITY, 1, 0);
+                Util.custom_textfield_integer(MinutesTextField, 0, 600, 1);
                 MinutesTextField.textProperty().addListener((observable, oldValue, newValue) -> {
                     try {if (newValue.matches("\\d*")) {
                         MinutesTextField.setText(Integer.toString(Integer.parseInt(newValue)));}  else {

@@ -730,8 +730,7 @@ public class ProgressAndGoalsUI {
             if (daystilldue >= 0) {
                 GoalDaysTillDue.setText(String.format("%s Days", daystilldue));
                 PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, daystilldue, daystilldue));
-                Util.addscrolllistenerincrementdecrement(PracticeDays, 1, daystilldue, 1, false);
-                Util.addupdownarrowlistenerincrementdecrement(PracticeDays, 1, daystilldue, 1, false);
+                Util.custom_spinner_integer(PracticeDays, 1, daystilldue, 1, false);
                 calculate();
                 PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> {
                     calculate();
@@ -883,10 +882,8 @@ public class ProgressAndGoalsUI {
                 GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(hr, Integer.MAX_VALUE, hr));
                 GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, min));
             }
-            Util.addscrolllistenerincrementdecrement(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
-            Util.addupdownarrowlistenerincrementdecrement(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
-            Util.addscrolllistenerincrementdecrement(GoalMinutesSpinner, 0, 59, 5, true);
-            Util.addupdownarrowlistenerincrementdecrement(GoalMinutesSpinner, 0, 59, 5, true);
+            Util.custom_spinner_integer(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
+            Util.custom_spinner_integer(GoalMinutesSpinner, 0, 59, 1, true);
             if (cutindex != 11) TopLabel.setText("New Goal For " + GOALCUTNAMES[cutindex]);
             else TopLabel.setText("New Total Goal");
         }
@@ -1004,16 +1001,14 @@ public class ProgressAndGoalsUI {
                     if (newvaluehigherthanmin(value)) {GoalHoursSpinner.getValueFactory().setValue(newValue);}
                     else {GoalHoursSpinner.getValueFactory().setValue(oldValue);}
                 });
-                Util.addscrolllistenerincrementdecrement(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
-                Util.addupdownarrowlistenerincrementdecrement(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
+                Util.custom_spinner_integer(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
+                Util.custom_spinner_integer(GoalMinutesSpinner, 0, 59, 1, true);
                 GoalMinutesSpinner.setEditable(true);
                 GoalMinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> {
                     int value = (GoalHoursSpinner.getValue() * 60) + newValue;
                     if (newvaluehigherthanmin(value)) {GoalMinutesSpinner.getValueFactory().setValue(newValue);}
                     else {GoalMinutesSpinner.getValueFactory().setValue(oldValue);}
                 });
-                Util.addscrolllistenerincrementdecrement(GoalMinutesSpinner, 0, 59, 5, true);
-                Util.addupdownarrowlistenerincrementdecrement(GoalMinutesSpinner, 0, 59, 5, true);
                 GoalDatePicker.setValue(LocalDate.now());
                 for (Meditatable i : cutsorlementstosetgoalsfor) {
                     System.out.println(i.name); select(i.number, true);}

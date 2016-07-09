@@ -21,7 +21,7 @@
       </HBox>
       <HBox alignment="CENTER" layoutX="12.0" layoutY="46.0" prefHeight="30.0" prefWidth="423.0">
          <children>
-            <CheckBox fx:id="AlertFileToggleButton" mnemonicParsing="false" onAction="#alertfiletoggled" text="OFF">
+            <CheckBox fx:id="AlertFileToggleButton" minWidth="50.0" mnemonicParsing="false" onAction="#alertfiletoggled" text="OFF">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font>
