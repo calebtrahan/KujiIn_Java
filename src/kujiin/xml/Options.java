@@ -18,6 +18,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static javafx.application.Application.STYLESHEET_CASPIAN;
+import static javafx.application.Application.STYLESHEET_MODENA;
+
 @XmlRootElement(name = "Options")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Options {
@@ -47,7 +50,6 @@ public class Options {
     public static final ArrayList<String> ALLNAMES = new ArrayList<>(
             Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Earth", "Air", "Fire", "Water", "Void", "Postsession")
     );
-    public static ArrayList<String> STYLETHEMES = new ArrayList<>();
 /// Default Option Values
     public static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
     public static final Boolean DEFAULT_HELP_DIALOGS_OPTION = true;
@@ -60,17 +62,21 @@ public class Options {
     public static final Double DEFAULT_FADERESUMEANDPAUSEDURATION = 2.0;
     public static final Boolean DEFAULT_ALERTFUNCTION_OPTION = true;
     public static final String DEFAULT_ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
-    public static final String DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "default.css").toURI().toString();
+    public static final File DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "default.css");
+    public static final File REFERENCE_THEMEFILE = new File(DIRECTORYSTYLES, "referencefile.css");
     public static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
     public static final Integer DEFAULT_RAMP_DURATION = 2;
     public static final PlayerUI.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = PlayerUI.ReferenceType.html;
     public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
     public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
     public static final Integer DEFAULT_LONG_MEDITATABLE_DURATION = 10;
+// Files
     private ProgramOptions ProgramOptions;
     private SessionOptions SessionOptions;
     private AppearanceOptions AppearanceOptions;
     private MainController Root;
+    public ArrayList<String> STYLE_THEMES_NAMES = new ArrayList<>(Arrays.asList("Default (Light)", "Default (Legacy)"));
+    public ArrayList<String> STYLE_THEMES_ACTUAL = new ArrayList<>(Arrays.asList(STYLESHEET_MODENA, STYLESHEET_CASPIAN));
 
     public Options() {}
     public Options(MainController root) {
@@ -107,6 +113,7 @@ public class Options {
                 setProgramOptions(options.getProgramOptions());
                 setSessionOptions(options.getSessionOptions());
                 setAppearanceOptions(options.getAppearanceOptions());
+                populatethemefiles();
             } catch (JAXBException ignored) {
                 Platform.runLater(() -> Util.gui_showinformationdialog(Root, "Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
@@ -145,7 +152,7 @@ public class Options {
         sessionOptions.setReferencefullscreen(DEFAULT_REFERENCE_FULLSCREEN_OPTION);
         setSessionOptions(sessionOptions);
         kujiin.xml.Options.AppearanceOptions appearanceOptions = new AppearanceOptions();
-        appearanceOptions.setThemefile(DEFAULT_THEMEFILE);
+        appearanceOptions.setThemefile(DEFAULT_THEMEFILE.toURI().toString());
         setAppearanceOptions(appearanceOptions);
         marshall();
     }
@@ -154,6 +161,24 @@ public class Options {
         stage.getIcons().add(new Image(new File(Options.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString()));
         String themefile = getAppearanceOptions().getThemefile();
         if (themefile != null) {stage.getScene().getStylesheets().add(themefile);}
+    }
+    public void populatethemefiles() {
+        if (DEFAULT_THEMEFILE.exists() && ! STYLE_THEMES_ACTUAL.contains(DEFAULT_THEMEFILE.toURI().toString())) {
+            STYLE_THEMES_NAMES.add(0, "Default (Dark)");
+            STYLE_THEMES_ACTUAL.add(0, DEFAULT_THEMEFILE.toURI().toString());
+        }
+        try {
+            for (File i : DIRECTORYSTYLES.listFiles()) {
+                if (! i.equals(DEFAULT_THEMEFILE) && i.getName().endsWith(".css") && ! STYLE_THEMES_ACTUAL.contains(i.toURI().toString())
+                        && ! i.equals(REFERENCE_THEMEFILE)) {
+                    STYLE_THEMES_NAMES.add(i.getName().substring(0, i.getName().length() - 4));
+                    STYLE_THEMES_ACTUAL.add(i.toURI().toString());
+                }
+            }
+        } catch (NullPointerException ignored) {}
+    }
+    public void addthemefile(String name, String file_location) {
+
     }
 
 // Subclasses
@@ -274,5 +299,7 @@ public class Options {
         public void setThemefile(String themefile) {
             this.themefile = themefile;
         }
+
+
     }
 }

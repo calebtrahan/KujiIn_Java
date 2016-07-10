@@ -1290,7 +1290,6 @@ public class MainController implements Initializable {
         public CheckBox RampSwitch;
         public Button AddNewThemeButton;
         private kujiin.xml.Options Options;
-        private boolean valuechanged;
         private MainController Root;
         private PlayerUI.ReferenceType tempreferencetype;
 
@@ -1305,12 +1304,20 @@ public class MainController implements Initializable {
                 Root.getOptions().setStyle(this);
                 setResizable(false);
                 setTitle("Preferences");
-                kujiin.xml.Options.STYLETHEMES.clear();
                 AlertFileTextField.setEditable(false);
                 setuplisteners();
                 setuptooltips();
                 populatefromxml();
                 referencetoggle();
+                setOnCloseRequest(event -> {
+                    if (valuesdifferentthanxml()) {
+                        switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Unsaved Changes", "You Have Unsaved Changes", "Save Changes Before Exiting?")) {
+                            case YES: save(); break;
+                            case NO: break;
+                            case CANCEL: event.consume(); break;
+                        }
+                    }
+                });
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
         }
 
@@ -1328,12 +1335,7 @@ public class MainController implements Initializable {
             EntrainmentVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getEntrainmentvolume() * 100).intValue()));
             AmbienceVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getAmbiencevolume() * 100).intValue()));
         // Appearance Options
-            try {
-                for (File i : kujiin.xml.Options.DIRECTORYSTYLES.listFiles()) {
-                    if (i.getName().endsWith(".css")) {kujiin.xml.Options.STYLETHEMES.add(i.getName().substring(0, i.getName().length() - 4));}
-                }
-                if (kujiin.xml.Options.STYLETHEMES.size() != 0) {ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(kujiin.xml.Options.STYLETHEMES));}
-            } catch (NullPointerException e) {ProgramThemeChoiceBox.getItems().clear(); ProgramThemeChoiceBox.setDisable(true);}
+            ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(Root.getOptions().STYLE_THEMES_NAMES));
         }
         public void setuptooltips() {
             TooltipsCheckBox.setTooltip(new Tooltip("Display Messages Like These When Hovering Over Program Controls"));
@@ -1362,20 +1364,14 @@ public class MainController implements Initializable {
             }
         }
         public void setuplisteners() {
-            TooltipsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {setuptooltips(); changedvalue();});
-            HelpDialogsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            FadeInValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            FadeOutValue.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
             Util.custom_textfield_double(FadeInValue, 0.0, 60.0, 1, 1);
             Util.custom_textfield_double(FadeOutValue, 0.0, 60.0, 1, 1);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
-            EntrainmentVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            AmbienceVolumePercentage.textProperty().addListener((observable, oldValue, newValue) -> {changedvalue();});
-            ProgramThemeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {selectnewtheme(); changedvalue();});
             ReferenceSwitch.setOnMouseClicked(event -> referencetoggle());
             ReferenceHTMLRadioButton.setOnAction(event1 -> HTMLTypeSelected());
             ReferenceTXTRadioButton.setOnAction(event1 -> TXTTypeSelected());
+            ProgramThemeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {selectnewtheme();});
             FullscreenCheckbox.setOnAction(Root.CHECKBOXYESNOLISTENER);
             FullscreenCheckbox.setOnMouseClicked(event -> setFullscreenOption());
             AlertFileTextField.setEditable(false);
@@ -1444,56 +1440,43 @@ public class MainController implements Initializable {
 
         }
         public void selectnewtheme() {
-        // TODO Add In Default (Use IntelliJ Appearance Options As Model)
-        if (ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {
-            File cssfile = new File(kujiin.xml.Options.DIRECTORYSTYLES, ProgramThemeChoiceBox.getValue() + ".css");
-            if (cssfile.exists()) {
-                Options.getAppearanceOptions().setThemefile(cssfile.toURI().toString());
+            // TODO Add In Default (Use IntelliJ Appearance Options As Model)
+            int index = ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                Options.getAppearanceOptions().setThemefile(Root.getOptions().STYLE_THEMES_ACTUAL.get(index));
                 getScene().getStylesheets().clear();
                 getScene().getStylesheets().add(Options.getAppearanceOptions().getThemefile());
             }
         }
-    }
 
     // Button Actions
-        public void accept(ActionEvent actionEvent) {
-            try {
-                if (checkifvaluesValid()) {
-                    Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
-                    Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
-                    Options.getSessionOptions().setRampenabled(RampSwitch.isSelected());
-                    Options.getSessionOptions().setFadeoutduration(new Double(FadeInValue.getText()));
-                    Options.getSessionOptions().setFadeinduration(new Double(FadeOutValue.getText()));
-                    Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
-                    Options.getSessionOptions().setReferencetype(tempreferencetype);
-                    Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
-                    Options.marshall();
-                    valuechanged = false;
-                }
-            } catch (Exception e) {e.printStackTrace();}
-            close();
-        }
-        public void cancel(ActionEvent actionEvent) {
-            close();
-        }
-
-        public void changedvalue() {
-            if (isShowing()) {
-                valuechanged = checkifvaluesChanges();
+        public void save() {
+            if (checkifvaluesValid()) {
+                Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
+                Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
+                Options.getSessionOptions().setRampenabled(RampSwitch.isSelected());
+                Options.getSessionOptions().setFadeoutduration(new Double(FadeInValue.getText()));
+                Options.getSessionOptions().setFadeinduration(new Double(FadeOutValue.getText()));
+                Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
+                Options.getSessionOptions().setReferencetype(tempreferencetype);
+                Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
+                Options.marshall();
             }
         }
-        public boolean checkifvaluesChanges() {
+        public void accept(ActionEvent actionEvent) {save(); close();}
+        public void cancel(ActionEvent actionEvent) {close();}
+        public boolean valuesdifferentthanxml() {
             try {
                 if (Options.getProgramOptions().getTooltips() != TooltipsCheckBox.isSelected()) {return true;}
                 if (Options.getProgramOptions().getHelpdialogs() != HelpDialogsCheckBox.isSelected()) {return true;}
-                if (! Objects.equals(Options.getSessionOptions().getEntrainmentvolume(), new Double(EntrainmentVolumePercentage.getText()))) {return true;}
-                if (! Objects.equals(Options.getSessionOptions().getAmbiencevolume(), new Double(AmbienceVolumePercentage.getText()))) {return true;}
+                if (! Objects.equals(Options.getSessionOptions().getEntrainmentvolume() * 100, new Double(EntrainmentVolumePercentage.getText()))) {return true;}
+                if (! Objects.equals(Options.getSessionOptions().getAmbiencevolume() * 100, new Double(AmbienceVolumePercentage.getText()))) {return true;}
                 if (! Objects.equals(Options.getSessionOptions().getFadeinduration(), new Double(FadeInValue.getText()))) {return true;}
                 if (! Objects.equals(Options.getSessionOptions().getFadeoutduration(), new Double(FadeOutValue.getText()))) {return true;}
                 if (Options.getSessionOptions().getRampenabled() != RampSwitch.isSelected()) {return true;}
                 if (Options.getSessionOptions().getReferenceoption() != ReferenceSwitch.isSelected()) {return true;}
                 if (Options.getSessionOptions().getReferencetype() != tempreferencetype) {return true;}
-                if (Options.getSessionOptions().getReferenceoption() && Options.getSessionOptions().getReferencefullscreen() != ReferenceSwitch.isSelected()) {return true;}
+                if (Options.getSessionOptions().getReferenceoption() != ReferenceSwitch.isSelected() && Options.getSessionOptions().getReferencefullscreen() != ReferenceSwitch.isSelected()) {return true;}
                 // TODO Check Appearance Options Here
                 return false;
             } catch (NumberFormatException | NullPointerException ignored) {return false;}
@@ -1508,8 +1491,10 @@ public class MainController implements Initializable {
             return entrainmentgood && ambiencegood;
         }
         public void resettodefaults(ActionEvent actionEvent) {
-            Options.resettodefaults();
-            valuechanged = true;
+            if (Util.gui_getokcancelconfirmationdialog(Root, "Reset To Defaults", "Reset All Values To Defaults?", "You Will Lose Any Unsaved Changes")) {
+                Options.resettodefaults();
+                populatefromxml();
+            }
         }
         public void deleteallsessions(ActionEvent actionEvent) {
             if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
@@ -1528,16 +1513,6 @@ public class MainController implements Initializable {
             }
         }
 
-    // Dialog Methods
-        @Override
-        public void close() {
-            if (valuechanged) {
-                if (! Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "You Have Unsaved Changes", "Exit Without Saving?")) {return;}
-            }
-            Root.setOptions(Options);
-            Root.getOptions().marshall();
-            super.close();
-        }
     }
     public static class SessionDetails extends Stage {
         public MainController Root;
