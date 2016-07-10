@@ -1336,6 +1336,10 @@ public class MainController implements Initializable {
             AmbienceVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getAmbiencevolume() * 100).intValue()));
         // Appearance Options
             ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(Root.getOptions().STYLE_THEMES_NAMES));
+            try {
+                int index = Root.getOptions().STYLE_THEMES_ACTUAL.indexOf(Root.getOptions().getAppearanceOptions().getThemefile());
+                ProgramThemeChoiceBox.getSelectionModel().select(index);
+            } catch (Exception ignored) {}
         }
         public void setuptooltips() {
             TooltipsCheckBox.setTooltip(new Tooltip("Display Messages Like These When Hovering Over Program Controls"));
@@ -1440,7 +1444,6 @@ public class MainController implements Initializable {
 
         }
         public void selectnewtheme() {
-            // TODO Add In Default (Use IntelliJ Appearance Options As Model)
             int index = ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 Options.getAppearanceOptions().setThemefile(Root.getOptions().STYLE_THEMES_ACTUAL.get(index));

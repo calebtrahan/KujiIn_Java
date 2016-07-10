@@ -100,7 +100,6 @@ public class Cut extends Meditatable {
     @Override
     public void tick() {
         super.tick();
-        // TODO ERROR FIX
         if (thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING) {
             thisession.Root.getProgressTracker().getSessions().sessioninformation_getspecificsession(thisession.Root.getProgressTracker().getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
         }

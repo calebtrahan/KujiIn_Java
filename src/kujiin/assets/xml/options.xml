@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Options>
     <appearanceOptions>
-        <themefile>CASPIAN</themefile>
+        <themefile>file:/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/styles/default.css</themefile>
     </appearanceOptions>
     <programOptions>
         <helpdialogs>true</helpdialogs>
@@ -10,7 +10,7 @@
     <sessionOptions>
         <alertfunction>false</alertfunction>
         <ambiencevolume>1.0</ambiencevolume>
-        <entrainmentvolume>0.6</entrainmentvolume>
+        <entrainmentvolume>0.55</entrainmentvolume>
         <fadeinduration>10.0</fadeinduration>
         <fadeoutduration>10.0</fadeoutduration>
         <rampduration>2</rampduration>

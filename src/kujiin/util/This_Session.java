@@ -648,11 +648,12 @@ public class This_Session {
     }
     public void updateplayerui() {
         try {
-            try {
-                System.out.println(currentcutorelement.name + " (" + Util.format_secondsforplayerdisplay(currentcutorelement.secondselapsed) +
-                        ") -> Entrainment Player Is : " + currentcutorelement.getCurrentEntrainmentPlayer().getStatus().toString() +
-                " And Ambience Player Is: " + currentcutorelement.getCurrentAmbiencePlayer().getStatus().toString());
-            } catch (NullPointerException ignored) {}
+//            try {
+                // TODO Debug Entrainment Player Being Off And On Here
+//                System.out.println(currentcutorelement.name + " (" + Util.format_secondsforplayerdisplay(currentcutorelement.secondselapsed) +
+//                        ") -> Entrainment Player Is : " + currentcutorelement.getCurrentEntrainmentPlayer().getStatus().toString() +
+//                " And Ambience Player Is: " + currentcutorelement.getCurrentAmbiencePlayer().getStatus().toString());
+//            } catch (NullPointerException ignored) {}
             totalsecondselapsed++;
             currentcutorelement.secondselapsed++;
             Float currentprogress;
