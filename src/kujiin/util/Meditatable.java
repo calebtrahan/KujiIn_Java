@@ -5,19 +5,27 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
 import javafx.concurrent.Service;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.ui.PlayerUI;
+import kujiin.ui.ProgressAndGoalsUI;
 import kujiin.xml.*;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class Meditatable {
+// GUI Fields
+    protected ToggleButton Switch;
+    protected TextField Value;
+// Data Fields
     public int number;
     public String name;
     protected int duration;
@@ -45,19 +53,61 @@ public class Meditatable {
     public int secondselapsed;
     protected List<Cut> cutstoplay;
     protected List<Element> elementstoplay;
-    protected List<Meditatable> allcutsorelementstoplay;
+    protected List<Meditatable> allmeditatablestoplay;
+// Goal Fields
     protected Goals GoalsController;
+    protected List<kujiin.xml.Goals.Goal> Goals;
 
-    public Meditatable(int number, String name, int duration, This_Session thissession) {
+    public Meditatable(int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
         this.duration = duration;
         this.thisession = thissession;
+        if (aSwitch != null && value != null) {
+            Switch = aSwitch;
+            Value = value;
+            Util.custom_textfield_integer(Value, Switch, 0, 600, 1);
+            if (briefsummary != null) {Switch.setTooltip(new Tooltip(briefsummary));}
+            Switch.setOnAction(event -> toggleswitch());
+            toggleswitch();
+        }
         entrainment = thissession.getEntrainments().getcutorelementsEntrainment(number);
         ambience = thissession.getAmbiences().getcutorelementsAmbience(number);
+        //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
+//        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
+//        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
+//        tempambiencetextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Amb.txt");
+//        tempambiencefile = new File(Options.DIRECTORYTEMP, "Ambience/" + name + "Temp.mp3");
+//        finalambiencefile = new File(Options.DIRECTORYTEMP, "Ambience/" + name + ".mp3");
+//        setFinalexportfile(new File(Options.DIRECTORYTEMP, name + ".mp3"));
     }
 
-// Getters And Setters
+// GUI Methods
+    public void toggleswitch() {
+    if (Switch.isSelected()) {
+        Value.setText("0");
+        Value.setDisable(false);
+        Value.setTooltip(new Tooltip("Practice Time For " + name + " (In Minutes)"));
+    } else {
+        Value.setText("0");
+        Value.setDisable(true);
+        Value.setTooltip(new Tooltip(name + " Is Disabled. Click " + name + " Button Above To Enable"));
+    }
+}
+    public void changevalue(int newvalue) {
+        if (newvalue == 0) {Switch.setSelected(false);}
+        else {
+            Switch.setSelected(true);
+            Value.setDisable(false);
+            Value.setText(Integer.toString(newvalue));
+            setDuration(newvalue);
+        }
+    }
+    public boolean hasValidValue() {
+        return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
+    }
+
+    // Getters And Setters
     public String getNameForChart() {return name;}
     protected MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
     protected MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
@@ -67,19 +117,19 @@ public class Meditatable {
     }
     public void setCutstoplay(ArrayList<Cut> cutstoplay) {this.cutstoplay = cutstoplay;}
     public void setElementstoplay(ArrayList<Element> elementstoplay) {this.elementstoplay = elementstoplay;}
-    public void setAllcutsorelementstoplay(List<Meditatable> allcutsorelementstoplay) {
-        this.allcutsorelementstoplay = allcutsorelementstoplay;
+    public void setAllmeditatablestoplay(List<Meditatable> allmeditatablestoplay) {
+        this.allmeditatablestoplay = allmeditatablestoplay;
         sortElementsAndCuts();
     }
-    public List<Meditatable> getAllcutsorelementstoplay() {
-        return allcutsorelementstoplay;
+    public List<Meditatable> getAllmeditatablestoplay() {
+        return allmeditatablestoplay;
     }
     public Ambience getAmbience() {return ambience;}
     public Entrainment getEntrainment() {return entrainment;}
     public void sortElementsAndCuts() {
         ArrayList<Cut> cutlist = new ArrayList<>();
         ArrayList<Element> elementlist = new ArrayList<>();
-        for (Object i : allcutsorelementstoplay) {
+        for (Object i : allmeditatablestoplay) {
             if (i instanceof Cut) {cutlist.add((Cut) i);}
             if (i instanceof Element) {elementlist.add((Element) i);}
         }
@@ -111,7 +161,7 @@ public class Meditatable {
 // Creation
     public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {
         setAmbienceenabled(ambienceenabled);
-        setAllcutsorelementstoplay(allcutandelementitems);
+        setAllmeditatablestoplay(allcutandelementitems);
         if (ambienceenabled) {return buildEntrainment() && buildAmbience();}
         else {return buildEntrainment();}
     }
@@ -165,6 +215,8 @@ public class Meditatable {
     public void resetCreation() {
         entrainment.created_clear();
         ambience.created_clear();
+        Switch.setSelected(false);
+        toggleswitch();
     }
 
 // Playback
@@ -385,6 +437,7 @@ public class Meditatable {
             else {ambienceplayer.setVolume(thisession.Root.getOptions().getSessionOptions().getAmbiencevolume()); volume_bindambience();}
         }
         toggleplayerbuttons();
+        thisession.Root.getProgressTracker().selectmeditatable(number);
     }
     public void resume() {
         volume_unbindentrainment();
@@ -741,6 +794,10 @@ public class Meditatable {
 //            entrainmentplayer.setVolume(currententrainmentvolume);
 //            if (ambienceenabled) ambienceplayer.setVolume(currentambiencevolume);
 //        } catch (NullPointerException ignored) {}
+        if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            ProgressAndGoalsUI progressAndGoalsUI = thisession.Root.getProgressTracker();
+            progressAndGoalsUI.getSessions().sessioninformation_getspecificsession(progressAndGoalsUI.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
+        }
     }
 
 // Export
@@ -820,21 +877,57 @@ public class Meditatable {
         return null;
     }
 
-// Tracking & Goals
-    public void setCurrentGoal() {
+// Goals
+    // TODO !IMPORTANT Merge Progress Tracker Into Meditable Class
+    public void addGoal(kujiin.xml.Goals.Goal newgoal) throws JAXBException {GoalsController.add(number, newgoal);
+    }
+    public void deleteGoal(kujiin.xml.Goals.Goal currentgoal) {
+        GoalsController.delete(number, currentgoal);
+    }
+    public kujiin.xml.Goals.Goal getCurrentGoal() throws NullPointerException {
+        GoalsController.sortMeditatableGoals(number);
+        return GoalsController.getallcutgoals(number, false).get(0);
+    }
+    public List<kujiin.xml.Goals.Goal> getAllGoals(boolean includecompleted) {return GoalsController.getallcutgoals(number, includecompleted);}
+    public List<kujiin.xml.Goals.Goal> getCompletedGoals() {return GoalsController.getcompletedgoals(number);}
 
+// Session Tracking
+    public double getAveragePracticeTime() {
+        return thisession.Root.getProgressTracker().getSessions().sessioninformation_getaveragepracticetime(number);
     }
-    public Goals.Goal getCurrentGoal() {
-        return null;
+    public int getTotalMinutesPracticed() {
+        return thisession.Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(number);
     }
+    public int getNumberOfSessionsPracticed() {
+        return thisession.Root.getProgressTracker().getSessions().sessioninformation_getsessioncount(number);
+    }
+
+// Goals Tracking
     public void setGoals(List<Goals.Goal> goalslist) {
-
+        GoalsController.update(goalslist, number);
     }
     public List<Goals.Goal> getGoals(boolean includecompleted) {
         return getGoalsController().getallcutgoals(number, includecompleted);
     }
     public void checkCurrentGoal(double currrentpracticedhours) {
 
+    }
+    public int getcurrentgoalcount() {return GoalsController.getcurrentgoalcount(number);}
+    public int getcompletedgoalcount() {return GoalsController.getcompletedgoalcount(number);}
+    public void transition_goalscheck() {
+        List<Goals.Goal> completedgoals = completecutgoals();
+        if (completedgoals.size() > 0) {thisession.GoalsCompletedThisSession.addAll(completedgoals);}
+    }
+    public List<kujiin.xml.Goals.Goal> completecutgoals() {
+        return GoalsController.completecutgoals(number, getTotalMinutesPracticed());
+    }
+    public boolean goalsarelongenough() {
+        try {
+            return (getTotalMinutesPracticed() + 60) + getdurationinminutes() >= getCurrentGoal().getGoal_Hours();
+        } catch (NullPointerException e) {return true;}
+    }
+    public void sortgoals() {
+        GoalsController.sortMeditatableGoals(number);
     }
 
 // Session Information Getters

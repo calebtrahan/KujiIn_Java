@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 // TODO If Ramp Disabled (And No Pre/PostSession Set) Ask User If They Want TO Add A Ramp Into 1st Practiced Cut (2/3/5) Min, Then Update UI And Create Session
 // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
 
+// TODO Redesign Goals Completed Dialog Using Bar Charts/Graphs
+
+
 public class This_Session {
     private Qi_Gong Presession;
     private Cut Rin;
@@ -45,6 +48,7 @@ public class This_Session {
     private Element Fire;
     private Element Water;
     private Element Void;
+    private Meditatable Total;
     private PlayerUI.PlayerState playerState;
     private Meditatable currentcutorelement;
     private Timeline updateuitimeline;
@@ -62,7 +66,7 @@ public class This_Session {
 
     public This_Session(MainController mainController) {
         Root = mainController;
-        this.sessions = Root.getProgressTracker().getSessions();
+        sessions = Root.getProgressTracker().getSessions();
         setPlayerState(PlayerUI.PlayerState.IDLE);
         entrainments = new Entrainments(Root);
         entrainments.unmarshall();
@@ -84,6 +88,7 @@ public class This_Session {
         Water = new Element(13, "Water", 0, "", this, Root.WaterSwitch, Root.WaterTime);
         Void = new Element(14, "Void", 0, "", this, Root.VoidSwitch, Root.VoidTime);
         Postsession = new Qi_Gong(15, "Postsession", 0, "Gather Qi After The Session Ends", this, Root.PostSwitch, Root.PostTime);
+        Total = new Total(16, "Total", 0, "", this, null, null);
     }
 
 // Getters And Setters
@@ -91,7 +96,7 @@ public class This_Session {
     public PlayerUI.PlayerState getPlayerState() {return playerState;}
     public boolean isValid() {
         int totaltime = 0;
-        for (Object i : getallCutsAndElements()) {totaltime += ((Meditatable) i).getdurationinminutes();}
+        for (Object i : getAllMeditatables()) {totaltime += ((Meditatable) i).getdurationinminutes();}
         return totaltime > 0;
     }
     public PlayerUI getPlayerUI() {
@@ -100,7 +105,15 @@ public class This_Session {
     public void setPlayerUI(PlayerUI playerUI) {
         this.playerUI = playerUI;
     }
-    public ArrayList<Meditatable> getallCutsAndElements() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
+    public ArrayList<Meditatable> getAllMeditatables() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
+    public ArrayList<String> getAllMeditatablesNames() {
+        ArrayList<String> allmeditatablesnames = getAllMeditatables().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
+        return allmeditatablesnames;
+    }
+    public ArrayList<Meditatable> getAllMeditatablesincludingTotalforTracking() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession, Total));}
+    public ArrayList<String> getAllMeditablesincludingTotalNames() {
+        return getAllMeditatablesincludingTotalforTracking().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
+    }
     public ArrayList<Cut> getallCuts()  {return new ArrayList<>(Arrays.asList(Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen));}
     public ArrayList<Element> getallElements() {return new ArrayList<>(Arrays.asList(Earth, Air, Fire, Water, Void));}
     public List<Meditatable> getallitemsinSession() {
@@ -273,7 +286,7 @@ public class This_Session {
 
 // Creation Methods
     public boolean sessionvaluesok() {
-        for (Object i : getallCutsAndElements()) {
+        for (Object i : getAllMeditatables()) {
             Meditatable cutorelement = (Meditatable) i;
             if (cutorelement.getdurationinminutes() > 0) {return true;}
         }
@@ -290,7 +303,7 @@ public class This_Session {
                         @Override
                         protected Void call() throws Exception {
                             try {
-                                for (Meditatable i : getallCutsAndElements()) {
+                                for (Meditatable i : getAllMeditatables()) {
                                     updateMessage(String.format("Currently Checking %s...", i.name));
                                     if (! i.getAmbience().hasAnyAmbience()) {cutsorelementswithnoambience.add(i);}
                                     else if (! i.getAmbience().hasEnoughAmbience(i.getdurationinseconds())) {cutsorelementswithreducedambience.add(i);}
@@ -372,7 +385,7 @@ public class This_Session {
     }
     public Util.AnswerType checkcutsinorder() {
         int workingcutcount = 0;
-        for (Meditatable i : getallCutsAndElements()) {if (i instanceof Cut) {if (i.getdurationinminutes() > 0) workingcutcount++;}}
+        for (Meditatable i : getAllMeditatables()) {if (i instanceof Cut) {if (i.getdurationinminutes() > 0) workingcutcount++;}}
         if (workingcutcount < getallCuts().size()) {
             CreatorAndExporterUI.CutsMissingDialog cutsMissingDialog = new CreatorAndExporterUI.CutsMissingDialog(Root, getallCuts());
             cutsMissingDialog.showAndWait();
@@ -382,14 +395,14 @@ public class This_Session {
         } else {return Util.AnswerType.YES;}
     }
     public Util.AnswerType checkgoals() {
-        ArrayList<Meditatable> notgoodongoals = Root.getProgressTracker().precreationgoalchecks(getallitemsinSession());
+        ArrayList<Meditatable> meditatableswithoutlongenoughgoals = Root.getProgressTracker().getmeditatableswithoutlongenoughgoals(getallitemsinSession());
         List<Integer>  notgooddurations = new ArrayList<>();
-        if (! notgoodongoals.isEmpty()) {
+        if (! meditatableswithoutlongenoughgoals.isEmpty()) {
             boolean presessionmissinggoals = false;
             int cutcount = 0;
             int elementcount = 0;
             boolean postsessionmissinggoals = false;
-            for (Meditatable i : notgoodongoals) {
+            for (Meditatable i : meditatableswithoutlongenoughgoals) {
                 if (i instanceof Cut) {cutcount++;}
                 if (i instanceof Element) {elementcount++;}
                 else {
@@ -406,7 +419,7 @@ public class This_Session {
             switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?", "Set Goal", "Continue Anyway", "Cancel Playback")) {
                 case YES:
                     // Was last parameter-> Util.list_getmaxintegervalue(notgooddurations)
-                    ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, notgoodongoals);
+                    ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, meditatableswithoutlongenoughgoals);
                     s.showAndWait();
                     if (s.isAccepted()) {
                         List<Integer> cutindexes = s.getSelectedCutIndexes();
@@ -416,10 +429,11 @@ public class This_Session {
                         // TODO Only Add Goals If They Are Higher (And A Later Date) Than All Other Goals For That Cut/Element
                         for (Integer i : cutindexes) {
                             try {
-                                Root.getProgressTracker().getGoal().add(i, new Goals.Goal(goaldate, goalhours, ProgressAndGoalsUI.GOALCUTNAMES[i]));
+                                Meditatable x = getAllMeditatablesincludingTotalforTracking().get(i);
+                                x.addGoal(new Goals.Goal(goaldate, goalhours, x.name));
                             } catch (JAXBException ignored) {
                                 goalssetsuccessfully = false;
-                                Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + ProgressAndGoalsUI.GOALCUTNAMES[i], "Check File Permissions");
+                                Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + getAllMeditatablesincludingTotalforTracking().get(i).name, "Check File Permissions");
                             }
                         }
                         if (goalssetsuccessfully) {
@@ -499,7 +513,7 @@ public class This_Session {
         } else {return false;}
     }
     public void resetcreateditems() {
-        for (Object i : getallCutsAndElements()) {
+        for (Object i : getAllMeditatables()) {
             if (i instanceof Element) {((Element) i).resetCreation();}
             if (i instanceof Cut) {((Cut) i).resetCreation();}
             if (i instanceof  Qi_Gong) {((Qi_Gong) i).resetCreation();}
@@ -684,8 +698,8 @@ public class This_Session {
                     getDisplayReference().CurrentName.setText(currentcutorelement.name);
                 }
             } catch (NullPointerException ignored) {}
-            Root.getProgressTracker().updaterootgoalsui();
-            Root.getProgressTracker().updateprogressui();
+            Root.getProgressTracker().updategoalsui();
+            Root.getProgressTracker().updatesessionsprogressui();
             currentcutorelement.tick();
         } catch (Exception e) {e.printStackTrace();
 //            new MainController.ExceptionDialog(Root, e).show();
@@ -696,9 +710,7 @@ public class This_Session {
             switch (playerState) {
                 case TRANSITIONING:
                     try {
-                        List<Goals.Goal> completedgoals = Root.getProgressTracker().getGoal().completecutgoals(currentcutorelement.number,
-                                Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(currentcutorelement.number, false), 2));
-                        if (completedgoals.size() > 0) {GoalsCompletedThisSession.addAll(completedgoals);}
+                        currentcutorelement.transition_goalscheck();
                         currentcutorelement.cleanupPlayersandAnimations();
                         cutorelementcount++;
                         currentcutorelement = getallitemsinSession().get(cutorelementcount);
@@ -728,8 +740,9 @@ public class This_Session {
         sessionDetails.setOnHidden(event -> {
             if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
                 Goals.Goal i = GoalsCompletedThisSession.get(0);
-                int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsUI.GOALCUTNAMES)).indexOf(i.getCutName());
-                double currentpracticedhours = Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(cutindex, false), 2);
+                int index = getAllMeditablesincludingTotalNames().indexOf(i.getCutName());
+                Meditatable x = getAllMeditatablesincludingTotalforTracking().get(index);
+                double currentpracticedhours = Util.convert_minstodecimalhours(x.getTotalMinutesPracticed(), 2);
                 new ProgressAndGoalsUI.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
             } else if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() > 1) {
                 new ProgressAndGoalsUI.MultipleGoalsCompletedDialog(Root, GoalsCompletedThisSession).showAndWait();
@@ -750,7 +763,7 @@ public class This_Session {
         // TODO Prompt For Export
 //        if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            getsessionexporter();}
-        Root.getProgressTracker().updaterootgoalsui();
+        Root.getProgressTracker().updategoalsui();
         resetthissession();
     }
     public void resetthissession() {
@@ -765,7 +778,7 @@ public class This_Session {
         Session currentsession = sessions.sessioninformation_getspecificsession(sessions.sessioninformation_totalsessioncount() - 1);
         currentsession.updatecutduration(currentcutorelement.number, currentcutorelement.getdurationinminutes());
         sessions.marshall();
-        Root.getProgressTracker().updaterootgoalsui();
+        Root.getProgressTracker().updategoalsui();
         currentcutorelement.stop();
         if (currentcutorelement.name.equals("Postsession")) {setPlayerState(PlayerUI.PlayerState.TRANSITIONING); progresstonextcut();}
         else {

@@ -10,55 +10,15 @@ import kujiin.xml.SoundFile;
 import java.io.File;
 
 public class Cut extends Meditatable {
-    private ToggleButton Switch;
-    private TextField Value;
 
     public Cut(int number, String name, int duration, String briefsummary, This_Session thisession, ToggleButton aSwitch, TextField value) {
-        super(number, name, duration, thisession);
-//        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, name + "5.mp3")));}
-//        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, name + "1.mp3")));}
-        Switch = aSwitch;
-        Value = value;
-        Util.custom_textfield_integer(Value, Switch, 0, 600, 1);
-        Switch.setTooltip(new Tooltip(briefsummary));
-        Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
-        Switch.setOnAction(event -> toggleswitch());
-        toggleswitch();
+        super(number, name, duration, briefsummary, thisession, aSwitch, value);
         if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + super.name + "1.mp3"))); entrainment.calculateshortfreqduration();}
         if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + super.name + "5.mp3"))); entrainment.calculatelongfreqduration();}
-//        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
-//        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
-//        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
-//        tempambiencetextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Amb.txt");
-//        tempambiencefile = new File(Options.DIRECTORYTEMP, "Ambience/" + name + "Temp.mp3");
-//        finalambiencefile = new File(Options.DIRECTORYTEMP, "Ambience/" + name + ".mp3");
-//        setFinalexportfile(new File(Options.DIRECTORYTEMP, name + ".mp3"));
+        super.Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
     }
 
 // GUI
-    public boolean hasValidValue() {
-    return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
-}
-    public void toggleswitch() {
-        if (Switch.isSelected()) {
-            Value.setText("0");
-            Value.setDisable(false);
-            Value.setTooltip(new Tooltip("Practice Time For " + name + " (In Minutes)"));
-        } else {
-            Value.setText("0");
-            Value.setDisable(true);
-            Value.setTooltip(new Tooltip(name + " Is Disabled. Click " + name + " Button Above To Enable"));
-        }
-    }
-    public void changevalue(int newvalue) {
-        if (newvalue == 0) {Switch.setSelected(false);}
-        else {
-            Switch.setSelected(true);
-            Value.setDisable(false);
-            Value.setText(Integer.toString(newvalue));
-            setDuration(newvalue);
-        }
-    }
 
 // Creation
     @Override
@@ -72,11 +32,11 @@ public class Cut extends Meditatable {
         for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
         entrainment.shuffleCreated();
         if (number == 3 && duration >= 3) {
-            int index = allcutsorelementstoplay.indexOf(this);
+            int index = allmeditatablestoplay.indexOf(this);
             Meditatable cutorelementbefore = null;
             Meditatable cutorelementafter = null;
-            if (index != 0) {cutorelementbefore = allcutsorelementstoplay.get(index - 1);}
-            if (index != allcutsorelementstoplay.size() - 1) {cutorelementafter = allcutsorelementstoplay.get(index + 1);}
+            if (index != 0) {cutorelementbefore = allmeditatablestoplay.get(index - 1);}
+            if (index != allmeditatablestoplay.size() - 1) {cutorelementafter = allmeditatablestoplay.get(index + 1);}
             if (cutorelementbefore != null && cutorelementbefore.name.equals("Presession")) {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoinqi.mp3")));}
             else {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohin.mp3")));}
             if (cutorelementafter != null && cutorelementafter.name.equals("Postsession")) {
@@ -89,12 +49,6 @@ public class Cut extends Meditatable {
         }
         return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() > 0.0;
     }
-    @Override
-    public void resetCreation() {
-        super.resetCreation();
-        Switch.setSelected(false);
-        toggleswitch();
-    }
 
 // Playback
     @Override
@@ -103,11 +57,6 @@ public class Cut extends Meditatable {
         if (thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING) {
             thisession.Root.getProgressTracker().getSessions().sessioninformation_getspecificsession(thisession.Root.getProgressTracker().getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
         }
-    }
-    @Override
-    public void start() {
-        super.start();
-        thisession.Root.getProgressTracker().selectcut(number);
     }
     @Override
     public void playnextentrainment() {

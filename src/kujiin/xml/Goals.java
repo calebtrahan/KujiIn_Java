@@ -175,7 +175,6 @@ public class Goals {
     }
     public void marshall() {
         try {
-            sortallcompletedgoals();
             JAXBContext context = JAXBContext.newInstance(Goals.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -185,13 +184,12 @@ public class Goals {
         }
     }
     public void add(int cutorelementindex, Goal newgoal) throws JAXBException {
-        List<Goal> newgoals = getallcutgoals(cutorelementindex, true);
         System.out.println("Old Goals:");
-        for (Goal i : newgoals) {
+        for (Goal i : getallcutgoals(cutorelementindex, true)) {
             System.out.println(i.toString());
         }
-        newgoals.add(newgoal);
-        update(sort(newgoals), cutorelementindex);
+        getallcutgoals(cutorelementindex, true).add(newgoal);
+        update(sort(getallcutgoals(cutorelementindex, true)), cutorelementindex);
         System.out.println("New Goals:");
         for (Goal i : getallcutgoals(cutorelementindex, true)) {
             System.out.println(i.toString());
@@ -215,6 +213,9 @@ public class Goals {
             for (Goal i : goallist) {i.setID(count); count++;}
             return goallist;
         } catch (Exception ignored) {return null;}
+    }
+    public void sortMeditatableGoals(int cutorelementindex) {
+        sort(getallcutgoals(cutorelementindex, true));
     }
     public void update(List<Goal> cutgoallist, int cutorelementindex) {
         if (cutorelementindex == 0) setPresessionGoals(cutgoallist);
@@ -275,6 +276,13 @@ public class Goals {
             return newgoallist;
         } catch (NullPointerException e) {return new ArrayList<>();}
     }
+    public int getcurrentgoalcount(int cutorelementindex) {
+        int currentgoalcount = 0;
+        for (Goal i : getallcutgoals(cutorelementindex, true)) {
+            if (! i.getCompleted()) currentgoalcount++;
+        }
+        return currentgoalcount;
+    }
     public int getcompletedgoalcount(int cutorelementindex) {
         int completedgoalcount = 0;
         for (Goal i : getallcutgoals(cutorelementindex, true)) {
@@ -282,6 +290,14 @@ public class Goals {
         }
         return completedgoalcount;
     }
+    public List<Goal> getcompletedgoals(int meditatableindex) {
+        List<Goal> completedgoals = new ArrayList<>();
+        for (Goal i : getallcutgoals(meditatableindex, true)) {
+            if (i.getCompleted()) {completedgoals.add(i);}
+        }
+        return sort(completedgoals);
+    }
+
 //    public List<Goal> getgoalscompletedondate(int cutindex, LocalDate localDate) {
 //       List<Goal> goalscompletedondate = new ArrayList<>();
 //        for (Goal i : getallcutgoals(cutindex, false)) {
@@ -290,12 +306,6 @@ public class Goals {
 //    }
 
 // Goal Completion Methods
-    public void sortallcompletedgoals() {
-        for (int i = 0; i <= 10; i++) {
-            double currentpracticedhours = Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(i, false);
-            sortcompletedgoals(i, currentpracticedhours);
-        }
-    }
     public void sortcompletedgoals(int cutorelementindex, double currentpracticedhours) {
         for (Goal i : getallcutgoals(cutorelementindex, true)) {
             boolean completed = currentpracticedhours >= i.getGoal_Hours();

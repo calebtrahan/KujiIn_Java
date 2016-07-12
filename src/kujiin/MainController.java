@@ -119,10 +119,10 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setOptions(new Options(this));
         getOptions().unmarshall();
-        setProgressTracker(new ProgressAndGoalsUI(this));
-        setSession(new This_Session(this));
         setCreatorAndExporter(new CreatorAndExporterUI(this));
-        CreatorStatusBar.setText("");
+        setSession(new This_Session(this));
+        setProgressTracker(new ProgressAndGoalsUI(this));
+
     }
     public boolean cleanup() {
         getSession().getAmbiences().marshall();
@@ -179,8 +179,8 @@ public class MainController implements Initializable {
     public void changesessionoptions(ActionEvent actionEvent) {
         new ChangeProgramOptions(this).showAndWait();
         Options.marshall();
-        getProgressTracker().updaterootgoalsui();
-        getProgressTracker().updateprogressui();
+        getProgressTracker().updategoalsui();
+        getProgressTracker().updatesessionsprogressui();
     }
     public void editprogramsambience(ActionEvent actionEvent) {
         getStage().setIconified(true);
@@ -207,7 +207,7 @@ public class MainController implements Initializable {
 
 // Total Progress And Goals UI
     public void updatetotalprogresswidget(ActionEvent actionEvent) {
-        ProgressTracker.updateprogressui();}
+        ProgressTracker.updatesessionsprogressui();}
     public void displaylistofsessions(Event event) {
         ProgressTracker.displaysessionlist();
     }

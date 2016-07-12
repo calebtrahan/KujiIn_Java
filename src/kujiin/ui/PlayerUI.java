@@ -391,8 +391,8 @@ public class PlayerUI extends Stage {
                 int thisessionminutes = thissession.getTotal_Session_Duration();
                 SessionDuration.setText(Util.format_minstohrsandmins_abbreviated(thisessionminutes));
                 SessionDuration.setEditable(false);
-                int totalsessionminutes = currentsessions.sessioninformation_getallsessiontotals(11, true);
-                TotalPracticeDuration.setText(Util.format_minstohrsandmins_abbreviated(totalsessionminutes));
+//                int totalsessionminutes = currentsessions.sessioninformation_getallsessiontotals(11, true);
+//                TotalPracticeDuration.setText(Util.format_minstohrsandmins_abbreviated(totalsessionminutes));
                 TotalPracticeDuration.setEditable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Session Completed");

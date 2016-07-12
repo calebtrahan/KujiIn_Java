@@ -458,7 +458,6 @@ public class Util {
             return String.format("-" + "%02d:%02d", minutes, secondsleft);
         }
     }
-
 // Date Methods
     public static String gettodaysdate() {
         Calendar currentDate = Calendar.getInstance();
