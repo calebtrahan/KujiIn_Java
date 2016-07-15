@@ -119,6 +119,9 @@ public class MainController implements Initializable {
         setSession(new This_Session(this));
         setProgressTracker(new ProgressAndGoalsUI(this));
         getSession().setSessions();
+        for (Meditatable i : getSession().getAllMeditatablesincludingTotalforTracking()) {
+            i.setGoalsController(getProgressTracker().getGoal());
+        }
     }
     public boolean cleanup() {
         getSession().getAmbiences().marshall();

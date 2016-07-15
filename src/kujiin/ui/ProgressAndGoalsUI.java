@@ -223,7 +223,7 @@ public class ProgressAndGoalsUI {
                 progress = Util.convert_minstodecimalhours(practicedminutes, 2) / (goalminutes / 60);
                 message = new Tooltip(String.format("Currently Practiced: %s -> Goal: %s", Util.format_minstohrsandmins_long(practicedminutes), Util.format_minstohrsandmins_long(goalminutes.intValue())));
                 percentage = new Double(progress * 100).intValue() + "%";
-            } catch (NullPointerException | ArrayIndexOutOfBoundsException ignored) {
+            } catch (NullPointerException | IndexOutOfBoundsException ignored) {
                 progress = 0.0;
                 if (practicedminutes == 0) {message = new Tooltip("No Goal Set And No Practiced Time");
                 } else {message = new Tooltip(String.format("No Goal Set (Practiced %s)", Util.format_minstohrsandmins_long(practicedminutes)));}
@@ -811,13 +811,7 @@ public class ProgressAndGoalsUI {
                 Util.gui_showinformationdialog(Root, "Cannot Set Goal", "Goal Time Must Be Higher Than Practiced Time " + Util.format_minstohrsandmins_long(practicedminutes), "Cannot Set Goal");
                 return;
             }
-            if (thisminutes > goalminutes) {
-                Util.gui_showinformationdialog(Root, "Cannot Set Goal", "Goal Time Must Be Higher Than Practiced Time " + Util.format_minstohrsandmins_long(practicedminutes), "Cannot Set Goal");
-                return;
-            }
-            int hours = GoalHoursSpinner.getValue();
-            int minutes = GoalMinutesSpinner.getValue();
-            double newhours = Util.convert_hrsandminstodecimalhours(hours, minutes);
+            double newhours = Util.convert_hrsandminstodecimalhours(GoalHoursSpinner.getValue(), GoalMinutesSpinner.getValue());
             try {
                 selectedmeditatable.addGoal(new Goals.Goal(newhours, selectedmeditatable));
                 StatusBar.setText("Success! Goal Of " + newhours + " hrs Added As " + selectedmeditatable.name + "'s Current Goal");
@@ -864,7 +858,7 @@ public class ProgressAndGoalsUI {
                 if (value < practicedminutes) {
                     GoalHoursSpinner.getValueFactory().setValue(practicedminutes / 60);
                     GoalMinutesSpinner.getValueFactory().setValue(practicedminutes % 60);
-                    StatusBar.setText("Cannot Set Goal Lower Than Practiced Hours");
+                    Util.gui_showtimedmessageonlabel(StatusBar, "Cannot Set Goal Lower Than Practiced Hours", 2000);
                 }
             } catch (NullPointerException ignored) {}
         }

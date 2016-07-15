@@ -886,9 +886,10 @@ public class Meditatable {
     public kujiin.xml.Goals.Goal getCurrentGoal() throws NullPointerException {
         try {
             GoalsController.sortMeditatableGoals(number);
-        } catch (Exception e) {System.out.println("Tried Getting Current Goal For " + name + " :" +e.getMessage()); return null;}
-        return GoalsController.getallcutgoals(number, false).get(0);
-
+            return GoalsController.getallcutgoals(number, false).get(0);
+        }
+        catch (NullPointerException e) {System.out.println("Tried Getting Current Goal For " + name + " :" +e.getMessage()); return null;}
+        catch (IndexOutOfBoundsException ignored) {return null;}
     }
     public List<kujiin.xml.Goals.Goal> getAllGoals(boolean includecompleted) {return GoalsController.getallcutgoals(number, includecompleted);}
     public List<kujiin.xml.Goals.Goal> getCompletedGoals() {return GoalsController.getcompletedgoals(number);}
