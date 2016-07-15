@@ -88,10 +88,6 @@ public class Element extends Meditatable {
     public List<Goals.Goal> getGoals(boolean includecompleted) {
         return GoalsController.getallcutgoals(number, includecompleted);
     }
-    @Override
-    public void checkCurrentGoal(double currrentpracticedhours) {
-
-    }
 
 // Export
 

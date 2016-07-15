@@ -879,14 +879,16 @@ public class Meditatable {
 
 // Goals
     // TODO !IMPORTANT Merge Progress Tracker Into Meditable Class
-    public void addGoal(kujiin.xml.Goals.Goal newgoal) throws JAXBException {GoalsController.add(number, newgoal);
-    }
+    public void addGoal(kujiin.xml.Goals.Goal newgoal) throws JAXBException {GoalsController.add(number, newgoal);}
     public void deleteGoal(kujiin.xml.Goals.Goal currentgoal) {
         GoalsController.delete(number, currentgoal);
     }
     public kujiin.xml.Goals.Goal getCurrentGoal() throws NullPointerException {
-        GoalsController.sortMeditatableGoals(number);
+        try {
+            GoalsController.sortMeditatableGoals(number);
+        } catch (Exception e) {System.out.println("Tried Getting Current Goal For " + name + " :" +e.getMessage()); return null;}
         return GoalsController.getallcutgoals(number, false).get(0);
+
     }
     public List<kujiin.xml.Goals.Goal> getAllGoals(boolean includecompleted) {return GoalsController.getallcutgoals(number, includecompleted);}
     public List<kujiin.xml.Goals.Goal> getCompletedGoals() {return GoalsController.getcompletedgoals(number);}
@@ -903,28 +905,32 @@ public class Meditatable {
     }
 
 // Goals Tracking
+    // Getters And Setters
     public void setGoals(List<Goals.Goal> goalslist) {
         GoalsController.update(goalslist, number);
     }
     public List<Goals.Goal> getGoals(boolean includecompleted) {
         return getGoalsController().getallcutgoals(number, includecompleted);
     }
-    public void checkCurrentGoal(double currrentpracticedhours) {
-
+    // Validation
+    public boolean goalsarelongenough() {
+        try {
+            return (getTotalMinutesPracticed() + 60) + getdurationinminutes() >= getCurrentGoal().getGoal_Hours();
+        } catch (NullPointerException e) {return true;}
     }
+    public boolean currentgoalset() {
+        return getCurrentGoal() != null;
+    }
+    // Information
     public int getcurrentgoalcount() {return GoalsController.getcurrentgoalcount(number);}
     public int getcompletedgoalcount() {return GoalsController.getcompletedgoalcount(number);}
+    // Utility
     public void transition_goalscheck() {
         List<Goals.Goal> completedgoals = completecutgoals();
         if (completedgoals.size() > 0) {thisession.GoalsCompletedThisSession.addAll(completedgoals);}
     }
     public List<kujiin.xml.Goals.Goal> completecutgoals() {
         return GoalsController.completecutgoals(number, getTotalMinutesPracticed());
-    }
-    public boolean goalsarelongenough() {
-        try {
-            return (getTotalMinutesPracticed() + 60) + getdurationinminutes() >= getCurrentGoal().getGoal_Hours();
-        } catch (NullPointerException e) {return true;}
     }
     public void sortgoals() {
         GoalsController.sortMeditatableGoals(number);

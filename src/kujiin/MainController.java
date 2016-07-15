@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -74,11 +73,7 @@ public class MainController implements Initializable {
     public Label GoalTopLabel;
     public Label LengthLabel;
     public Label CompletionLabel;
-    public TextField GoalPracticedMinutes;
-    public TextField GoalSetHours;
-    public TextField GoalSetMinutes;
     public Label GoalStatusBar;
-    public TextField GoalPracticedHours;
     public ToggleButton RinSwitch;
     public ToggleButton KyoSwitch;
     public ToggleButton TohSwitch;
@@ -102,6 +97,7 @@ public class MainController implements Initializable {
     public ToggleButton PostSwitch;
     public Button ChangeAllElementsButton;
     public Button ResetCreatorButton;
+    public Label GoalProgressPercentageLabel;
     private Scene Scene;
     private Stage Stage;
     private This_Session Session;
@@ -112,8 +108,8 @@ public class MainController implements Initializable {
 
 // Event Handlers
 //    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Util.gui_showinformationdialog(this, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
-    public final EventHandler<ActionEvent> CHECKBOXONOFFLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("ON");} else {a.setText("OFF");}};
-    public final EventHandler<ActionEvent> CHECKBOXYESNOLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("YES");} else {a.setText("NO");}};
+//    public final EventHandler<ActionEvent> CHECKBOXONOFFLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("ON");} else {a.setText("OFF");}};
+//    public final EventHandler<ActionEvent> CHECKBOXYESNOLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("YES");} else {a.setText("NO");}};
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -122,7 +118,7 @@ public class MainController implements Initializable {
         setCreatorAndExporter(new CreatorAndExporterUI(this));
         setSession(new This_Session(this));
         setProgressTracker(new ProgressAndGoalsUI(this));
-
+        getSession().setSessions();
     }
     public boolean cleanup() {
         getSession().getAmbiences().marshall();
@@ -219,7 +215,10 @@ public class MainController implements Initializable {
         ProgressTracker.opengoaleditor();}
 
 // Creator And Exporter UI
-    public void loadpreset(ActionEvent actionEvent) {CreatorAndExporter.loadpreset();}
+    public void loadpreset(ActionEvent actionEvent) {
+        new ProgressAndGoalsUI.GoalOverView(this).showAndWait();
+//        CreatorAndExporter.loadpreset();
+    }
     public void savepreset(ActionEvent actionEvent) {CreatorAndExporter.savepreset();}
     public void toggleexporter(ActionEvent actionEvent) {
         getCreatorAndExporter().toggleexport();
@@ -1376,7 +1375,6 @@ public class MainController implements Initializable {
             ReferenceHTMLRadioButton.setOnAction(event1 -> HTMLTypeSelected());
             ReferenceTXTRadioButton.setOnAction(event1 -> TXTTypeSelected());
             ProgramThemeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {selectnewtheme();});
-            FullscreenCheckbox.setOnAction(Root.CHECKBOXYESNOLISTENER);
             FullscreenCheckbox.setOnMouseClicked(event -> setFullscreenOption());
             AlertFileTextField.setEditable(false);
         }
@@ -1413,7 +1411,6 @@ public class MainController implements Initializable {
     // Reference Methods
         public void referencetoggle() {
             boolean enabled = ReferenceSwitch.isSelected();
-            if (enabled) {ReferenceSwitch.setText("ON");}
             ReferenceHTMLRadioButton.setDisable(! enabled);
             ReferenceTXTRadioButton.setDisable(! enabled);
             FullscreenCheckbox.setDisable(! enabled);

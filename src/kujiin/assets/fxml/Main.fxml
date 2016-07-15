@@ -30,7 +30,7 @@
           </Menu>
         </menus>
       </MenuBar>
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="607.0" layoutY="37.0" prefHeight="29.0" prefWidth="316.0" text="Progress &amp; Goals Tracker" textAlignment="CENTER">
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="607.0" layoutY="37.0" prefHeight="29.0" prefWidth="316.0" text="Progress Tracker" textAlignment="CENTER">
          <font>
             <Font name="System Bold" size="19.0" />
          </font>
@@ -374,110 +374,24 @@
             </HBox>
          </children>
       </VBox>
-      <VBox layoutX="607.0" layoutY="181.0" prefHeight="115.0" prefWidth="316.0">
+      <VBox alignment="TOP_CENTER" layoutX="607.0" layoutY="186.0" prefHeight="109.0" prefWidth="316.0">
          <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="23.0" prefWidth="348.0">
-               <children>
-                  <Label alignment="CENTER" prefHeight="16.0" prefWidth="92.0" text="Practiced">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="GoalTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="135.0" textAlignment="CENTER">
-                     <font>
-                        <Font size="15.0" />
-                     </font>
-                  </Label>
-                  <Label alignment="CENTER" prefHeight="16.0" prefWidth="98.0" text="Goal">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Label>
-               </children>
+            <Label fx:id="GoalTopLabel" alignment="CENTER" prefHeight="11.0" prefWidth="316.0" text="Current Goal Progress">
+               <font>
+                  <Font size="15.0" />
+               </font>
                <VBox.margin>
-                  <Insets bottom="5.0" top="15.0" />
+                  <Insets bottom="6.0" />
                </VBox.margin>
-            </HBox>
-            <HBox prefHeight="59.0" prefWidth="366.0">
+            </Label>
+            <ProgressBar fx:id="goalsprogressbar" prefHeight="27.0" prefWidth="316.0" progress="0.59">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </ProgressBar>
+            <HBox alignment="CENTER_RIGHT" prefHeight="28.0" prefWidth="316.0">
                <children>
-                  <VBox alignment="CENTER" prefHeight="49.0" prefWidth="58.0">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="45.0" text="Hrs">
-                           <VBox.margin>
-                              <Insets bottom="5.0" />
-                           </VBox.margin></Label>
-                        <TextField fx:id="GoalPracticedHours" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="58.0" text="1043">
-                           <cursor>
-                              <Cursor fx:constant="DEFAULT" />
-                           </cursor></TextField>
-                     </children>
-                  </VBox>
-                  <VBox alignment="CENTER" prefHeight="49.0" prefWidth="45.0">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="39.0" text="Mins">
-                           <VBox.margin>
-                              <Insets bottom="5.0" />
-                           </VBox.margin></Label>
-                        <TextField fx:id="GoalPracticedMinutes" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="45.0" text="59">
-                           <VBox.margin>
-                              <Insets left="5.0" />
-                           </VBox.margin>
-                           <cursor>
-                              <Cursor fx:constant="DEFAULT" />
-                           </cursor>
-                        </TextField>
-                     </children>
-                  </VBox>
-                  <VBox alignment="CENTER" prefHeight="49.0" prefWidth="133.0">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="172.0" text="   Progress">
-                           <VBox.margin>
-                              <Insets bottom="5.0" />
-                           </VBox.margin></Label>
-                        <ProgressBar fx:id="goalsprogressbar" prefHeight="23.0" prefWidth="150.0" progress="0.0" />
-                     </children>
-                     <HBox.margin>
-                        <Insets left="5.0" right="5.0" />
-                     </HBox.margin>
-                  </VBox>
-                  <VBox alignment="CENTER" prefHeight="49.0" prefWidth="58.0">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="16.0" prefWidth="29.0" text="Hrs">
-                           <VBox.margin>
-                              <Insets bottom="5.0" />
-                           </VBox.margin></Label>
-                        <TextField fx:id="GoalSetHours" alignment="CENTER" editable="false" prefWidth="32.0" text="9999">
-                           <VBox.margin>
-                              <Insets right="5.0" />
-                           </VBox.margin>
-                           <cursor>
-                              <Cursor fx:constant="DEFAULT" />
-                           </cursor>
-                        </TextField>
-                     </children>
-                  </VBox>
-                  <VBox alignment="CENTER" prefHeight="70.0" prefWidth="45.0">
-                     <children>
-                        <Label alignment="CENTER" text="Mins">
-                           <VBox.margin>
-                              <Insets bottom="5.0" />
-                           </VBox.margin></Label>
-                        <TextField fx:id="GoalSetMinutes" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="46.0" text="59">
-                           <cursor>
-                              <Cursor fx:constant="DEFAULT" />
-                           </cursor></TextField>
-                     </children>
-                  </VBox>
-               </children>
-            </HBox>
-            <HBox alignment="CENTER_RIGHT" prefHeight="70.0" prefWidth="316.0">
-               <children>
-                  <Label fx:id="GoalStatusBar" prefHeight="22.0" prefWidth="157.0" textAlignment="CENTER" wrapText="true">
-                     <font>
-                        <Font size="10.0" />
-                     </font>
-                  </Label>
-                  <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="156.0">
+                  <HBox alignment="CENTER_RIGHT" prefHeight="28.0" prefWidth="349.0">
                      <children>
                         <Button fx:id="newgoalButton" mnemonicParsing="false" onMousePressed="#setnewgoal" text="New Goal">
                            <font>
@@ -492,8 +406,17 @@
                      </children>
                   </HBox>
                </children>
+               <VBox.margin>
+                  <Insets top="4.0" />
+               </VBox.margin>
             </HBox>
+            <Label fx:id="GoalStatusBar" prefHeight="22.0" prefWidth="326.0" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
          </children>
       </VBox>
+      <Label fx:id="GoalProgressPercentageLabel" alignment="CENTER" layoutX="609.0" layoutY="214.0" prefHeight="16.0" prefWidth="316.0" text="100%" />
    </children>
 </AnchorPane>

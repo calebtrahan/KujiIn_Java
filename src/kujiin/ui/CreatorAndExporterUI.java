@@ -134,7 +134,8 @@ public class CreatorAndExporterUI {
         exportservices = new ArrayList<>();
         updateuitimeline = new Timeline(new KeyFrame(Duration.millis(10000), ae -> updatecreatorui()));
         updateuitimeline.setCycleCount(Animation.INDEFINITE);
-        updatecreatorui();
+        updateuitimeline.play();
+//        updatecreatorui();
     }
 
 // Getters And Setters
@@ -253,8 +254,10 @@ public class CreatorAndExporterUI {
 
 // Creation
     public boolean textfieldsnotallzero() {
-        for (Integer i : session.getallsessionvalues()) {if (i > 0) {return true;}}
-        return  false;
+        try {
+            for (Integer i : session.getallsessionvalues()) {if (i > 0) {return true;}}
+            return  false;
+        } catch (NullPointerException ignored) {return false;}
     }
     public boolean longsession() {
         for (Integer i : session.getallsessionvalues()) {

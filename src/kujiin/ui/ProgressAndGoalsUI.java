@@ -8,6 +8,10 @@ import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import kujiin.MainController;
@@ -34,6 +38,8 @@ import java.util.stream.Collectors;
 // TODO Finish Making EditGoalsDialog (Also Add A Select A Different Cut Feature, And Make It So They Can Pass Cutindex Data Back And Forth)
 // TODO !IMPORTANT Fix Goal Multiple Goal Setter (Minutes Was Stuck At 30)
 
+// TODO Simplify Goal Widget On Player And Root. Put Detailed Progress In A Tooltip On The Progress Bar
+
 public class ProgressAndGoalsUI {
 //    public static String[] GOALCUTNAMES = {"Presession", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Earth", "Air", "Fire", "Water", "Void", "Postsession", "Total"};
 //    public static int CUTORELEMENTCOUNT = GOALCUTNAMES.length;
@@ -46,14 +52,11 @@ public class ProgressAndGoalsUI {
     private TextField AverageSessionDuration;
     private CheckBox PreAndPostOption;
     private Button SessionListButton;
+    private Label GoalProgressPercentageLabel;
 // Goals Fields
     private Goals Goals;
     private Button NewGoalButton;
     private Button CurrentGoalsButton;
-    private TextField PracticedHours;
-    private TextField PracticedMinutes;
-    private TextField GoalHours;
-    private TextField GoalMinutes;
     private ProgressBar GoalProgress;
     private Label TopLabel;
     private Label StatusBar;
@@ -63,14 +66,6 @@ public class ProgressAndGoalsUI {
         Root = root;
         NewGoalButton = root.newgoalButton;
         CurrentGoalsButton = root.viewcurrrentgoalsButton;
-        PracticedHours = root.GoalPracticedHours;
-        PracticedHours.setEditable(false);
-        PracticedMinutes = root.GoalPracticedMinutes;
-        PracticedMinutes.setEditable(false);
-        GoalHours = root.GoalSetHours;
-        GoalHours.setEditable(false);
-        GoalMinutes = root.GoalSetMinutes;
-        GoalMinutes.setEditable(false);
         GoalProgress = root.goalsprogressbar;
         CutSelectorComboBox = root.GoalCutComboBox;
         TopLabel = root.GoalTopLabel;
@@ -80,6 +75,7 @@ public class ProgressAndGoalsUI {
         AverageSessionDuration = root.AverageSessionDuration;
         PreAndPostOption = root.PrePostSwitch;
         SessionListButton = root.ListOfSessionsButton;
+        GoalProgressPercentageLabel = root.GoalProgressPercentageLabel;
         Sessions = new Sessions(Root);
         Goals = new Goals(Root);
         Sessions.unmarshall();
@@ -106,7 +102,7 @@ public class ProgressAndGoalsUI {
             int index = CutSelectorComboBox.getSelectionModel().getSelectedIndex();
             try {
                 // Meditatable
-                SelectedMeditatable = Root.getSession().getAllMeditatables().get(index);
+                SelectedMeditatable = Root.getSession().getAllMeditatablesincludingTotalforTracking().get(index);
                 PreAndPostOption.setDisable(true);
             } catch (IndexOutOfBoundsException ignored) {
                 // Total Progres
@@ -115,7 +111,9 @@ public class ProgressAndGoalsUI {
             }
             updatesessionsprogressui();
             updategoalsui();
-        } catch (NullPointerException ignored) {resetallvalues();}
+        } catch (NullPointerException ignored) {
+            resetallvalues();
+        }
     }
     public void displaydetailedcutprogress() {
         if (Sessions.getSession() != null) {new DisplayCutTotalsDialog(Root, Sessions.getSession());}
@@ -128,14 +126,8 @@ public class ProgressAndGoalsUI {
         } else {new DisplaySessionListDialog(Root, Sessions.getSession()).showAndWait();}
     }
     public void setnewgoal() {
-        if (SelectedMeditatable != null) {Util.gui_showinformationdialog(Root, "Information","No Cut Selected", "Select A Cut To Add A Goal To"); return;}
-        SetANewGoalForSingleCut setANewGoalForSingleCutDialog = new SetANewGoalForSingleCut(Root, SelectedMeditatable);
-        setANewGoalForSingleCutDialog.showAndWait();
-        if (setANewGoalForSingleCutDialog.isAccepted()) {
-            try {
-                SelectedMeditatable.addGoal(new Goals.Goal(setANewGoalForSingleCutDialog.getGoaldate(), setANewGoalForSingleCutDialog.getGoalhours(), SelectedMeditatable.name));
-            } catch (JAXBException ignored) {Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal", "Check File Permissions");}
-        }
+        if (SelectedMeditatable == null) {Util.gui_showinformationdialog(Root, "Information","No Cut Selected", "Select A Cut To Add A Goal To"); return;}
+        new SetANewGoalForSingleCut(Root, SelectedMeditatable).showAndWait();
         updategoalsui();
     }
     public void opengoaleditor() {
@@ -204,40 +196,43 @@ public class ProgressAndGoalsUI {
     public void updategoalsui() {
         NewGoalButton.setDisable(SelectedMeditatable == null);
         CurrentGoalsButton.setDisable(SelectedMeditatable == null);
-        PracticedHours.setDisable(SelectedMeditatable == null);
-        PracticedMinutes.setDisable(SelectedMeditatable == null);
-        GoalHours.setDisable(SelectedMeditatable == null);
-        GoalMinutes.setDisable(SelectedMeditatable == null);
+//        PracticedHours.setDisable(SelectedMeditatable == null);
+//        PracticedMinutes.setDisable(SelectedMeditatable == null);
+//        GoalHours.setDisable(SelectedMeditatable == null);
+//        GoalMinutes.setDisable(SelectedMeditatable == null);
         GoalProgress.setDisable(SelectedMeditatable == null);
         TopLabel.setDisable(SelectedMeditatable == null);
         if (SelectedMeditatable == null) {
             NewGoalButton.setTooltip(new Tooltip("Select A Cut Or Element Above To Set A Goal"));
             CurrentGoalsButton.setTooltip(new Tooltip("Select A Cut Or Element Above To See/Edit Current Goals"));
-            PracticedHours.setText("");
-            PracticedMinutes.setText("");
-            GoalHours.setText("");
-            GoalMinutes.setText("");
+            GoalProgress.setTooltip(new Tooltip("Select A Cut Or Element Above To Set A Goal"));
             GoalProgress.setProgress(0.0);
+            GoalProgressPercentageLabel.setText("0%");
         } else {
             NewGoalButton.setTooltip(new Tooltip("Set A New " + SelectedMeditatable.name + " Goal"));
             CurrentGoalsButton.setTooltip(new Tooltip("View/Edit " + SelectedMeditatable.name + " Goals"));
             TopLabel.setText(SelectedMeditatable.name);
         // Set Practiced
             int practicedminutes = SelectedMeditatable.getTotalMinutesPracticed();
-            PracticedHours.setText(Integer.toString(practicedminutes / 60));
-            PracticedMinutes.setText(Integer.toString(practicedminutes % 60));
         // Set Goal
+            Tooltip message;
+            Double progress;
+            String percentage;
             try {
                 Double goalminutes = SelectedMeditatable.getCurrentGoal().getGoal_Hours() * 60;
-                Double progress = Util.convert_minstodecimalhours(practicedminutes, 2) / (goalminutes / 60);
-                GoalHours.setText(Integer.toString( goalminutes.intValue() / 60));
-                GoalMinutes.setText(Integer.toString(goalminutes.intValue() % 60));
-                GoalProgress.setProgress(progress);
+                progress = Util.convert_minstodecimalhours(practicedminutes, 2) / (goalminutes / 60);
+                message = new Tooltip(String.format("Currently Practiced: %s -> Goal: %s", Util.format_minstohrsandmins_long(practicedminutes), Util.format_minstohrsandmins_long(goalminutes.intValue())));
+                percentage = new Double(progress * 100).intValue() + "%";
             } catch (NullPointerException | ArrayIndexOutOfBoundsException ignored) {
-                GoalHours.setText("?");
-                GoalMinutes.setText("?");
-                GoalProgress.setProgress(0.0);
+                progress = 0.0;
+                if (practicedminutes == 0) {message = new Tooltip("No Goal Set And No Practiced Time");
+                } else {message = new Tooltip(String.format("No Goal Set (Practiced %s)", Util.format_minstohrsandmins_long(practicedminutes)));}
+                percentage = "0%";
             }
+            GoalProgress.setProgress(progress);
+            GoalProgress.setTooltip(message);
+            GoalProgressPercentageLabel.setText(percentage);
+            GoalProgressPercentageLabel.setTooltip(message);
             // Can Set Completed Goals Here
         }
         PlayerUI playerUI = Root.getPlayer();
@@ -270,10 +265,10 @@ public class ProgressAndGoalsUI {
         resetsessionsui();
     }
     public void resetgoalsui() {
-        PracticedHours.setText("");
-        PracticedMinutes.setText("");
-        GoalHours.setText("");
-        GoalMinutes.setText("");
+//        PracticedHours.setText("");
+//        PracticedMinutes.setText("");
+//        GoalHours.setText("");
+//        GoalMinutes.setText("");
         GoalProgress.setProgress(0.0);
     }
     public void resetsessionsui() {
@@ -771,23 +766,23 @@ public class ProgressAndGoalsUI {
         }
     }
     public static class SetANewGoalForSingleCut extends Stage {
+        public Label StatusBar;
+        public ChoiceBox<String> MeditatableChoiceBox;
         private ProgressAndGoalsUI progressAndGoalsUI;
         public Spinner<Integer> GoalHoursSpinner;
         public Spinner<Integer> GoalMinutesSpinner;
-        public DatePicker GoalDatePicker;
         public Button CancelButton;
-        public Button OKButton;
+        public Button SetGoalButton;
         public Button CurrentGoalsButton;
-        public Label TopLabel;
-        private LocalDate goaldate;
-        private Double goalhours;
         private MainController Root;
         private int practicedminutes;
         private int goalminutes;
+        private Meditatable selectedmeditatable;
 
         public SetANewGoalForSingleCut(MainController root, Meditatable selectedMeditatable) {
             Root = root;
             progressAndGoalsUI = Root.getProgressTracker();
+            selectedmeditatable = selectedMeditatable;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetNewGoalDialog.fxml"));
             fxmlLoader.setController(this);
             try {
@@ -799,70 +794,80 @@ public class ProgressAndGoalsUI {
             setTitle("Set A New Goal");
             GoalHoursSpinner.setEditable(true);
             GoalMinutesSpinner.setEditable(true);
-            GoalDatePicker.setValue(LocalDate.now());
-            try {
-                goalminutes = Util.convertdecimalhourstominutes(selectedMeditatable.getCurrentGoal().getGoal_Hours());
-                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(goalminutes / 60, Integer.MAX_VALUE, goalminutes / 60));
-                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, goalminutes % 60));
-            } catch (NullPointerException ignored) {
-                practicedminutes = selectedMeditatable.getTotalMinutesPracticed();
-                goalminutes = 0;
-                int hr = practicedminutes / 60;
-                int min = practicedminutes % 60;
-                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(hr, Integer.MAX_VALUE, hr));
-                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, min));
-            }
+            MeditatableChoiceBox.getItems().addAll(FXCollections.observableArrayList(Root.getSession().getAllMeditablesincludingTotalNames()));
+            MeditatableChoiceBox.setOnAction(event -> meditatableselected());
+            GoalHoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
+            GoalMinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
+            MeditatableChoiceBox.getSelectionModel().select(selectedmeditatable.number);
+            meditatableselected();
             Util.custom_spinner_integer(GoalHoursSpinner, 0, Integer.MAX_VALUE, 1, false);
-            Util.custom_spinner_integer(GoalMinutesSpinner, 0, 59, 1, true);
-            TopLabel.setText("New " + selectedMeditatable.name + " Goal");
+            Util.custom_spinner_integer(GoalMinutesSpinner, 0, 59, 1, false);
         }
-
-        // Getters And Setters
-        public LocalDate getGoaldate() {
-            return goaldate;
-        }
-        public void setGoaldate(LocalDate goaldate) {
-            this.goaldate = goaldate;
-        }
-        public Double getGoalhours() {
-            return goalhours;
-        }
-        public void setGoalhours(Double goalhours) {
-            this.goalhours = goalhours;
-        }
-        public boolean isAccepted() {return getGoalhours() != null && getGoaldate() != null;}
 
         // Button Actions
-        public void cancelgoalsetting(Event event) {this.close();}
-        public void Accept(Event event) {
+        public void setGoal(Event event) {
             int thisminutes = (GoalHoursSpinner.getValue() * 60) + GoalMinutesSpinner.getValue();
             if (thisminutes <= practicedminutes) {
                 Util.gui_showinformationdialog(Root, "Cannot Set Goal", "Goal Time Must Be Higher Than Practiced Time " + Util.format_minstohrsandmins_long(practicedminutes), "Cannot Set Goal");
-                setGoalhours(null);
-                setGoaldate(null);
                 return;
             }
             if (thisminutes > goalminutes) {
                 Util.gui_showinformationdialog(Root, "Cannot Set Goal", "Goal Time Must Be Higher Than Practiced Time " + Util.format_minstohrsandmins_long(practicedminutes), "Cannot Set Goal");
-                setGoalhours(null);
-                setGoaldate(null);
-                return;
-            }
-            if (! GoalDatePicker.getValue().isAfter(LocalDate.now())) {
-                Util.gui_showinformationdialog(Root, "Cannot Set Goal",  "Due Date Must Be After Today", "Cannot Set Goal");
-                setGoalhours(null);
-                setGoaldate(null);
                 return;
             }
             int hours = GoalHoursSpinner.getValue();
             int minutes = GoalMinutesSpinner.getValue();
             double newhours = Util.convert_hrsandminstodecimalhours(hours, minutes);
-            setGoalhours(newhours);
-            setGoaldate(GoalDatePicker.getValue());
-            super.close();
+            try {
+                selectedmeditatable.addGoal(new Goals.Goal(newhours, selectedmeditatable));
+                StatusBar.setText("Success! Goal Of " + newhours + " hrs Added As " + selectedmeditatable.name + "'s Current Goal");
+            } catch (JAXBException ignored) {Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal", "Check File Permissions");}
         }
         public void viewcurrentgoals(Event event) {
-            progressAndGoalsUI.opengoaleditor();}
+            progressAndGoalsUI.opengoaleditor();
+        }
+
+        // Other Methods
+        public void meditatableselected() {
+            try {
+                selectedmeditatable = Root.getSession().getAllMeditatablesincludingTotalforTracking().get(MeditatableChoiceBox.getSelectionModel().getSelectedIndex());
+                GoalHoursSpinner.setDisable(false);
+                GoalMinutesSpinner.setDisable(false);
+            } catch (Exception ignored) {
+                try {GoalHoursSpinner.getValueFactory().setValue(0);} catch (NullPointerException e) {}
+                GoalHoursSpinner.setDisable(true);
+                try {GoalMinutesSpinner.getValueFactory().setValue(0);} catch (NullPointerException e) {}
+                GoalMinutesSpinner.setDisable(true);
+                return;
+            }
+            if (! selectedmeditatable.currentgoalset()) {
+                practicedminutes = selectedmeditatable.getTotalMinutesPracticed();
+                goalminutes = practicedminutes;
+                int hr = practicedminutes / 60;
+                int min = practicedminutes % 60;
+                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(hr, Integer.MAX_VALUE, hr));
+                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, min));
+                StatusBar.setText("");
+            } else {
+                goalminutes = Util.convertdecimalhourstominutes(selectedmeditatable.getCurrentGoal().getGoal_Hours());
+                GoalHoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(goalminutes / 60, Integer.MAX_VALUE, goalminutes / 60));
+                GoalMinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, goalminutes % 60));
+                StatusBar.setText("Cannot Set A New Goal Until Current Goal Is Completed");
+            }
+            SetGoalButton.setDisable(selectedmeditatable.currentgoalset());
+            GoalMinutesSpinner.setDisable(selectedmeditatable.currentgoalset());
+            GoalHoursSpinner.setDisable(selectedmeditatable.currentgoalset());
+        }
+        public void checkvalue() {
+            try {
+                int value = (GoalHoursSpinner.getValue() * 60) + GoalMinutesSpinner.getValue();
+                if (value < practicedminutes) {
+                    GoalHoursSpinner.getValueFactory().setValue(practicedminutes / 60);
+                    GoalMinutesSpinner.getValueFactory().setValue(practicedminutes % 60);
+                    StatusBar.setText("Cannot Set Goal Lower Than Practiced Hours");
+                }
+            } catch (NullPointerException ignored) {}
+        }
     }
     public static class SetANewGoalForMultipleCutsOrElements extends Stage {
         public ToggleButton Presession;
@@ -1073,7 +1078,7 @@ public class ProgressAndGoalsUI {
                 this.setResizable(false);
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
             setTitle("Goal Achieved");
-            TopLabel.setText(currentGoal.getCutName() + " Goal Achieved");
+            TopLabel.setText(currentGoal.getMeditatableName() + " Goal Achieved");
             GoalHours.setText(currentGoal.getGoal_Hours().toString());
             CurrentHoursLabel.setText("Practiced Hours: " + currentpracticedhours.toString());
             CloseButton.setOnAction(event -> close());
@@ -1115,7 +1120,7 @@ public class ProgressAndGoalsUI {
             TopLabel.setText("You Completed " + completedgoals.size() + " Goals This Session");
             ObservableList<CompletedGoalsAtEndOfSessionBinding> newcompletedgoals = FXCollections.observableArrayList();
             for (kujiin.xml.Goals.Goal i : completedgoals) {
-                String cutname = i.getCutName();
+                String cutname = i.getMeditatableName();
                 Meditatable x = Root.getSession().getAllMeditatablesincludingTotalforTracking().get(Root.getSession().getAllMeditablesincludingTotalNames().indexOf(cutname));
                 String practicedhours = Double.toString(Util.convert_minstodecimalhours(x.getTotalMinutesPracticed(), 2));
                 String goalhours = i.getGoal_Hours().toString();
@@ -1203,6 +1208,50 @@ public class ProgressAndGoalsUI {
         public void cancel(ActionEvent actionEvent) {
             close();
         }
+    }
+    public static class GoalOverView extends Stage {
+        public StackedBarChart<String, Number> GoalBarChart;
+        public CategoryAxis CategoryAxis;
+        public NumberAxis NumberAxis;
+        public Button AddGoalButton;
+        public Button EditGoalsButton;
+        public Button CloseButton;
+
+        // TODO Set A Limiter So Only 1 Goal Active At A Time. Cannot Set New Goal For (Meditatable) Until Current Goal Is Exceeded
+        // TODO Stacked Bar Chart
+            // Series: Current Practiced Time
+            // Series: Current Goal
+        public GoalOverView(MainController Root) {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalsOverview.fxml"));
+                fxmlLoader.setController(this);
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(this);
+                this.setResizable(false);
+                setTitle("Goal Overview");
+                XYChart.Series<String, java.lang.Number> currentpracticedseries = new XYChart.Series<>();
+                XYChart.Series<String, java.lang.Number> currentgoalseries = new XYChart.Series<>();
+                currentpracticedseries.setName("Current Practiced Hours");
+                currentgoalseries.setName("Current Goal Hours");
+                for (Meditatable i : Root.getSession().getAllMeditatables()) {
+                    if (i.getTotalMinutesPracticed() > 0) {currentpracticedseries.getData().add(new XYChart.Data<>(i.getNameForChart(), Util.convert_hrsandminstodecimalhours(0, i.getTotalMinutesPracticed())));}
+                    else {currentpracticedseries.getData().add(new XYChart.Data<>(i.getNameForChart(), 0));}
+                    try {currentgoalseries.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getCurrentGoal().getGoal_Hours()));}
+                    catch (NullPointerException ignored) {currentgoalseries.getData().add(new XYChart.Data<>(i.getNameForChart(), 0));}
+                }
+                GoalBarChart.getData().add(currentpracticedseries);
+                GoalBarChart.getData().add(currentgoalseries);
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+        }
+
+        public void addgoal(ActionEvent actionEvent) {
+
+        }
+        public void editgoals(ActionEvent actionEvent) {
+
+        }
+
     }
 
 }

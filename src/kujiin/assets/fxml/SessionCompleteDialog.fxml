@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="431.0" prefWidth="733.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <VBox layoutX="13.0" layoutY="14.0" prefHeight="385.0" prefWidth="714.0">
+            <children>
+                <Label alignment="CENTER" prefHeight="20.0" prefWidth="726.0" text="Session Complete" textAlignment="CENTER">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+                <BarChart fx:id="SessionBarChart" prefHeight="280.0" prefWidth="714.0">
+                    <xAxis>
+                        <CategoryAxis fx:id="SessionCategoryAxis" prefHeight="33.0" prefWidth="666.0" side="BOTTOM" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis fx:id="SessionNumbersAxis" minorTickCount="0" side="LEFT" tickLength="0.0" tickUnit="1.0" upperBound="3.0" />
+                    </yAxis>
+                </BarChart>
+            <HBox alignment="CENTER" prefHeight="79.0" prefWidth="714.0">
+               <children>
+                      <HBox alignment="CENTER_LEFT" prefHeight="66.0" prefWidth="714.0">
+                          <children>
+                        <VBox prefHeight="110.0" prefWidth="350.0">
+                           <children>
+                              <HBox prefHeight="26.0" prefWidth="355.0">
+                                 <children>
+                                          <Label alignment="CENTER_RIGHT" text="Total Session Duration:" />
+                                          <TextField fx:id="SessionDurationTextField" alignment="CENTER" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER" prefHeight="79.0" prefWidth="365.0">
+                           <children>
+                              <Label fx:id="GoalsCompletedTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="244.0" text="\%d Goals Completed">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <ListView fx:id="GoalsCompletedListView" prefHeight="87.0" prefWidth="236.0" />
+                           </children>
+                        </VBox>
+                          </children>
+                      </HBox>
+               </children>
+            </HBox>
+            </children>
+        </VBox>
+        <Button fx:id="CloseButton" layoutX="675.0" layoutY="399.0" mnemonicParsing="false" onAction="#closeDialog" text="Close" />
+    </children>
+</AnchorPane>

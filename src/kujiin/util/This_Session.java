@@ -16,9 +16,7 @@ import kujiin.ui.PlayerUI;
 import kujiin.ui.ProgressAndGoalsUI;
 import kujiin.xml.*;
 
-import javax.xml.bind.JAXBException;
 import java.io.File;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,7 +64,6 @@ public class This_Session {
 
     public This_Session(MainController mainController) {
         Root = mainController;
-        sessions = Root.getProgressTracker().getSessions();
         setPlayerState(PlayerUI.PlayerState.IDLE);
         entrainments = new Entrainments(Root);
         entrainments.unmarshall();
@@ -98,6 +95,9 @@ public class This_Session {
         int totaltime = 0;
         for (Object i : getAllMeditatables()) {totaltime += ((Meditatable) i).getdurationinminutes();}
         return totaltime > 0;
+    }
+    public void setSessions() {
+        sessions = Root.getProgressTracker().getSessions();
     }
     public PlayerUI getPlayerUI() {
         return playerUI;
@@ -419,7 +419,7 @@ public class This_Session {
             switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?", "Set Goal", "Continue Anyway", "Cancel Playback")) {
                 case YES:
                     // Was last parameter-> Util.list_getmaxintegervalue(notgooddurations)
-                    ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, meditatableswithoutlongenoughgoals);
+                    /*ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, meditatableswithoutlongenoughgoals);
                     s.showAndWait();
                     if (s.isAccepted()) {
                         List<Integer> cutindexes = s.getSelectedCutIndexes();
@@ -430,7 +430,7 @@ public class This_Session {
                         for (Integer i : cutindexes) {
                             try {
                                 Meditatable x = getAllMeditatablesincludingTotalforTracking().get(i);
-                                x.addGoal(new Goals.Goal(goaldate, goalhours, x.name));
+                                x.addGoal(new Goals.Goal(goalhours, x.name));
                             } catch (JAXBException ignored) {
                                 goalssetsuccessfully = false;
                                 Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + getAllMeditatablesincludingTotalforTracking().get(i).name, "Check File Permissions");
@@ -440,7 +440,7 @@ public class This_Session {
                             Util.gui_showinformationdialog(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
                         }
                     }
-                    break;
+                    break;*/
                 case NO:
                     break;
                 case CANCEL:
@@ -740,7 +740,7 @@ public class This_Session {
         sessionDetails.setOnHidden(event -> {
             if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
                 Goals.Goal i = GoalsCompletedThisSession.get(0);
-                int index = getAllMeditablesincludingTotalNames().indexOf(i.getCutName());
+                int index = getAllMeditablesincludingTotalNames().indexOf(i.getMeditatableName());
                 Meditatable x = getAllMeditatablesincludingTotalforTracking().get(index);
                 double currentpracticedhours = Util.convert_minstodecimalhours(x.getTotalMinutesPracticed(), 2);
                 new ProgressAndGoalsUI.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
@@ -753,7 +753,7 @@ public class This_Session {
 //        sess.setOnHidden(event -> {
 //            if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() == 1) {
 //                Goals.Goal i = GoalsCompletedThisSession.get(0);
-//                int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsUI.GOALCUTNAMES)).indexOf(i.getCutName());
+//                int cutindex = new ArrayList<>(Arrays.asList(ProgressAndGoalsUI.GOALCUTNAMES)).indexOf(i.getMeditatableName());
 //                double currentpracticedhours = Util.convert_minstodecimalhours(Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(cutindex, false), 2);
 //                new ProgressAndGoalsUI.SingleGoalCompletedDialog(Root, i, currentpracticedhours);
 //            } else if (GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() > 1) {

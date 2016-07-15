@@ -307,6 +307,10 @@ public class Util {
             }
         });
     }
+    public static void custom_label_withautoclear(Label label, int millistillclear) {
+        label.textProperty().addListener((observable, oldValue, newValue) -> new Timeline(new KeyFrame(Duration.millis(millistillclear), ae -> label.setText(""))).play());
+
+    }
 
 // Math Methods
     public static Double rounddouble(double number, int decimalplaces) {

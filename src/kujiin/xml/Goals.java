@@ -2,6 +2,7 @@ package kujiin.xml;
 
 import kujiin.MainController;
 import kujiin.lib.BeanComparator;
+import kujiin.util.Meditatable;
 import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
@@ -273,6 +274,7 @@ public class Goals {
                     if (i.getCompleted() == null || ! i.getCompleted()) {newgoallist.add(i);}
                 }
             }
+            System.out.println(newgoallist);
             return newgoallist;
         } catch (NullPointerException e) {return new ArrayList<>();}
     }
@@ -330,7 +332,7 @@ public class Goals {
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class Goal {
         private Integer ID;
-        private String CutName;
+        private String MeditatableName;
         private String Date_Set;
         private String Date_Due;
         private String Date_Completed;
@@ -339,13 +341,12 @@ public class Goals {
 
         public Goal() {}
 
-        public Goal(LocalDate duedate, Double goalhours, String cutname) {
-            setDate_Due(Util.convert_localdatetostring(duedate));
+        public Goal(Double goalhours, Meditatable meditatable) {
             setGoal_Hours(goalhours);
             setDate_Set(Util.convert_localdatetostring(LocalDate.now()));
-            setCutName(cutname);
+            setMeditatableName(meditatable.name);
             setCompleted(false);
-            setDate_Completed("Not Completed");
+            setDate_Completed(null);
         }
 
         // Getters And Setters
@@ -369,11 +370,11 @@ public class Goals {
         public void setCompleted(Boolean completed) {
             Completed = completed;
         }
-        public String getCutName() {
-            return CutName;
+        public String getMeditatableName() {
+            return MeditatableName;
         }
-        public void setCutName(String cutName) {
-            CutName = cutName;
+        public void setMeditatableName(String meditatableName) {
+            MeditatableName = meditatableName;
         }
 
         // Other Methods
