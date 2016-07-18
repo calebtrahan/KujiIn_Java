@@ -108,7 +108,7 @@
                   <Font name="System Bold" size="17.0" />
                </font>
             </Label>
-            <ChoiceBox fx:id="CutOrElementSelectionBox" prefHeight="26.0" prefWidth="160.0" />
+            <ChoiceBox fx:id="MeditatableSelectionBox" prefHeight="26.0" prefWidth="160.0" />
          </children>
       </HBox>
       <HBox alignment="CENTER_RIGHT" layoutX="388.0" layoutY="455.0" prefHeight="26.0" prefWidth="322.0">

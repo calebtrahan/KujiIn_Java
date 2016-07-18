@@ -39,17 +39,17 @@ public class Qi_Gong extends Meditatable {
         entrainment.shuffleCreated();
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
             int index = allmeditatablestoplay.indexOf(this);
-            Meditatable cutorelementbefore = null;
-            Meditatable cutorelementafter = null;
-            if (index != 0) {cutorelementbefore = allmeditatablestoplay.get(index - 1);}
-            if (index != allmeditatablestoplay.size() - 1) {cutorelementafter = allmeditatablestoplay.get(index + 1);}
-            if (name.equals("Presession") && cutorelementafter != null) {
-                String rampupfirstname = "qiin" + cutorelementafter.name.toLowerCase() + ".mp3";
+            Meditatable meditatablebefore = null;
+            Meditatable meditatableafter = null;
+            if (index != 0) {meditatablebefore = allmeditatablestoplay.get(index - 1);}
+            if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
+            if (name.equals("Presession") && meditatableafter != null) {
+                String rampupfirstname = "qiin" + meditatableafter.name.toLowerCase() + ".mp3";
                 entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampupfirstname)));
                 entrainment.created_add(entrainment.getRampinfile());
             }
-            if (name.equals("Postsession") && cutorelementbefore != null) {
-                String rampdowntopost = "qiout" + cutorelementbefore.name.toLowerCase() + ".mp3";
+            if (name.equals("Postsession") && meditatablebefore != null) {
+                String rampdowntopost = "qiout" + meditatablebefore.name.toLowerCase() + ".mp3";
                 entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampdowntopost)));
                 entrainment.created_add(0, entrainment.getRampoutfile());
             }

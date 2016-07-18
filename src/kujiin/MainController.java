@@ -26,10 +26,7 @@ import kujiin.ui.ProgressAndGoalsUI;
 import kujiin.util.Meditatable;
 import kujiin.util.This_Session;
 import kujiin.util.Util;
-import kujiin.xml.Ambience;
-import kujiin.xml.Ambiences;
-import kujiin.xml.Options;
-import kujiin.xml.SoundFile;
+import kujiin.xml.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -122,6 +119,7 @@ public class MainController implements Initializable {
         for (Meditatable i : getSession().getAllMeditatablesincludingTotalforTracking()) {
             i.setGoalsController(getProgressTracker().getGoal());
         }
+        getCreatorAndExporter().setSession(getSession());
     }
     public boolean cleanup() {
         getSession().getAmbiences().marshall();
@@ -197,7 +195,13 @@ public class MainController implements Initializable {
         Util.menu_howtouse(this);
     }
     public void aboutthisprogram(ActionEvent actionEvent) {
-        Util.menu_aboutthisprogram();}
+        List<Integer> numbers = new ArrayList<>();
+        numbers.addAll(Arrays.asList(0, 1, 2, 3, 4, 5));
+        System.out.println(numbers);
+        numbers.set(2, 10);
+        System.out.println(numbers);
+//        Util.menu_aboutthisprogram();
+    }
     public void contactme(ActionEvent actionEvent) {
         Util.menu_contactme();}
     public void close(ActionEvent actionEvent) {
@@ -417,7 +421,7 @@ public class MainController implements Initializable {
         public RadioButton HTMLVariation;
         public RadioButton TEXTVariation;
         private File selectedfile;
-        private String selectedcutorelement;
+        private String selectedmeditatable;
         private MainController Root;
         private PlayerUI.ReferenceType referenceType;
         private ArrayList<Integer> userselectedindexes;
@@ -432,10 +436,10 @@ public class MainController implements Initializable {
                 Root.getOptions().setStyle(this);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Reference Files Editor");
-            ObservableList<String> cutorelementnames = FXCollections.observableArrayList();
-            cutorelementnames.addAll(kujiin.xml.Options.ALLNAMES);
+            ObservableList<String> meditatablenames = FXCollections.observableArrayList();
+            meditatablenames.addAll(kujiin.xml.Options.ALLNAMES);
             userselectedindexes = new ArrayList<>();
-            CutNamesChoiceBox.setItems(cutorelementnames);
+            CutNamesChoiceBox.setItems(meditatablenames);
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
             CutNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {if (oldValue != null) userselectedindexes.add(oldValue.intValue());});
             HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
@@ -474,7 +478,7 @@ public class MainController implements Initializable {
                 return ! MainTextArea.getText().equals(Util.file_getcontents(selectedfile));
             } catch (Exception e) {return false;}
         }
-        public void newcutorelementselected(ActionEvent actionEvent) {
+        public void newmeditatableselected(ActionEvent actionEvent) {
             HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             TEXTVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             if (userselectedindexes.size() > 0 && selectedfile != null && unsavedchanges()) {
@@ -493,7 +497,7 @@ public class MainController implements Initializable {
             loadselectedfile();
         }
         private void textchanged() {
-            if (getReferenceType() != null && selectedcutorelement != null && selectedfile != null) {
+            if (getReferenceType() != null && selectedmeditatable != null && selectedfile != null) {
                 boolean hasvalidtext = MainTextArea.getText() != null && MainTextArea.getText().length() > 0;
                 PreviewButton.setDisable(! hasvalidtext || getReferenceType() == PlayerUI.ReferenceType.txt);
                 SaveButton.setDisable(MainTextArea.getText() == null || Util.file_getcontents(selectedfile).equals(MainTextArea.getText().toCharArray()));
@@ -517,13 +521,13 @@ public class MainController implements Initializable {
     // Other Methods
         public void saveselectedfile(ActionEvent actionEvent) {
             if (Util.file_writecontents(selectedfile, MainTextArea.getText())) {
-                String text = selectedcutorelement + "'s Reference File (" + getReferenceType().toString() + " Variation) Has Been Saved";
+                String text = selectedmeditatable + "'s Reference File (" + getReferenceType().toString() + " Variation) Has Been Saved";
                 Util.gui_showinformationdialog(Root, "Changes Saved", text, "");
             } else {Util.gui_showerrordialog(Root, "Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
         }
         public void loadselectedfile() {
             if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
-                selectedcutorelement = CutNamesChoiceBox.getSelectionModel().getSelectedItem();
+                selectedmeditatable = CutNamesChoiceBox.getSelectionModel().getSelectedItem();
                 selectnewfile();
                 String contents = Util.file_getcontents(selectedfile);
                 MainTextArea.setText(contents);
@@ -538,14 +542,14 @@ public class MainController implements Initializable {
             }
         }
         public void selectnewfile() {
-            if (getReferenceType() == null || selectedcutorelement == null) {selectedfile = null; return;}
+            if (getReferenceType() == null || selectedmeditatable == null) {selectedfile = null; return;}
             switch (getReferenceType()) {
                 case html:
-                    selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html"), selectedcutorelement + ".html");
+                    selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html"), selectedmeditatable + ".html");
                     if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root, e);}}
                     break;
                 case txt:
-                    selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt"), selectedcutorelement + ".txt");
+                    selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt"), selectedmeditatable + ".txt");
                     if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root, e);}}
                     break;
             }
@@ -614,7 +618,7 @@ public class MainController implements Initializable {
     public static class AdvancedAmbienceEditor extends Stage implements Initializable {
         public Button RightArrow;
         public Button LeftArrow;
-        public ChoiceBox<String> CutOrElementSelectionBox;
+        public ChoiceBox<String> MeditatableSelectionBox;
         public TableView<AmbienceSong> Actual_Table;
         public TableColumn<AmbienceSong, String> Actual_NameColumn;
         public TableColumn<AmbienceSong, String> Actual_DurationColumn;
@@ -640,7 +644,7 @@ public class MainController implements Initializable {
         private AmbienceSong selected_actual_ambiencesong;
         private double temptotalduration;
         private double actualtotalduration;
-        private String selectedcutorelementname;
+        private String selectedmeditatablename;
         private File tempdirectory;
         private MainController Root;
         private PreviewFile previewdialog;
@@ -659,7 +663,7 @@ public class MainController implements Initializable {
                     (observable, oldValue, newValue) -> actualselectionchanged(newValue));
             ObservableList<String> allnames = FXCollections.observableArrayList();
             allnames.addAll(kujiin.xml.Options.ALLNAMES);
-            CutOrElementSelectionBox.setItems(allnames);
+            MeditatableSelectionBox.setItems(allnames);
             Actual_TotalDuration.setEditable(false);
             Temp_TotalDuration.setEditable(false);
         }
@@ -679,7 +683,7 @@ public class MainController implements Initializable {
                 });
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Advanced Ambience Editor");
-            CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
+            MeditatableSelectionBox.setOnAction(event -> selectandloadcut());
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
         public AdvancedAmbienceEditor(MainController root, Ambiences ambiences, String cutname) {
@@ -694,8 +698,8 @@ public class MainController implements Initializable {
                 this.setResizable(false);
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
             setTitle("Advanced Ambience Editor");
-            CutOrElementSelectionBox.setOnAction(event -> selectandloadcut());
-            CutOrElementSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
+            MeditatableSelectionBox.setOnAction(event -> selectandloadcut());
+            MeditatableSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
 
@@ -703,7 +707,7 @@ public class MainController implements Initializable {
         // TODO Add Check Duplicates Before Moving Over (Or Ask Allow Duplicates?)
         public void rightarrowpressed(ActionEvent actionEvent) {
             // Transfer To Current Cut (use Task)
-            if (selected_temp_ambiencesong != null && selectedcutorelementname != null) {
+            if (selected_temp_ambiencesong != null && selectedmeditatablename != null) {
                 if (! Actual_Table.getItems().contains(selected_temp_ambiencesong)) {
                     int tempindex = Temp_Table.getItems().indexOf(selected_actual_ambiencesong);
                     actual_ambiencesonglist.add(temp_ambiencesonglist.get(tempindex));
@@ -719,7 +723,7 @@ public class MainController implements Initializable {
             }
         }
         public void leftarrowpressed(ActionEvent actionEvent) {
-            if (selected_actual_ambiencesong != null && selectedcutorelementname != null) {
+            if (selected_actual_ambiencesong != null && selectedmeditatablename != null) {
                 if (! Temp_Table.getItems().contains(selected_actual_ambiencesong)) {
                     int actualindex = Actual_Table.getItems().indexOf(selected_actual_ambiencesong);
                     temp_ambiencesonglist.add(actual_ambiencesonglist.get(actualindex));
@@ -773,15 +777,15 @@ public class MainController implements Initializable {
 
     // Table Methods
         public void selectandloadcut() {
-            int index = CutOrElementSelectionBox.getSelectionModel().getSelectedIndex();
+            int index = MeditatableSelectionBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
-                selectedambience = ambiences.getcutorelementsAmbience(index);
+                selectedambience = ambiences.getmeditatableAmbience(index);
                 if (actual_ambiencesonglist == null) {actual_ambiencesonglist = FXCollections.observableArrayList();}
                 else {actual_ambiencesonglist.clear();}
                 if (actual_soundfilelist == null) {actual_soundfilelist = new ArrayList<>();}
                 else {actual_soundfilelist.clear();}
                 Actual_Table.getItems().clear();
-                selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
+                selectedmeditatablename = kujiin.xml.Options.ALLNAMES.get(index);
                 if (populateactualambiencetable()) {
                     Actual_Table.setItems(actual_ambiencesonglist);
                 }
@@ -841,7 +845,7 @@ public class MainController implements Initializable {
         }
         private boolean populateactualambiencetable() {
             actual_ambiencesonglist.clear();
-            if (selectedcutorelementname != null) {
+            if (selectedmeditatablename != null) {
                 try {
                     if (selectedambience.getAmbience() == null) {return false;}
                     for (SoundFile i : selectedambience.getAmbience()) {
@@ -851,7 +855,7 @@ public class MainController implements Initializable {
                     return true;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Util.gui_showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
+                    Util.gui_showinformationdialog(Root, "Information", selectedmeditatablename + " Has No Ambience", "Please Add Ambience To " + selectedmeditatablename);
                     return false;
                 }
             } else {
@@ -862,7 +866,7 @@ public class MainController implements Initializable {
 
     // Dialog Methods
         public boolean unsavedchanges() {
-            if (CutOrElementSelectionBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
+            if (MeditatableSelectionBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
             try {
                 if (actual_soundfilelist.size() != selectedambience.getAmbience().size()) {return true;}
                 List<SoundFile> ambiencelist = selectedambience.getAmbience();
@@ -873,32 +877,32 @@ public class MainController implements Initializable {
             } catch (NullPointerException ignored) {return false;}
         }
         public void save(ActionEvent actionEvent) {
-            int index = CutOrElementSelectionBox.getSelectionModel().getSelectedIndex();
+            int index = MeditatableSelectionBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 for (SoundFile i : actual_soundfilelist) {
                     if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
                 }
-                ambiences.setcutorelementsAmbience(index, selectedambience);
+                ambiences.setmeditatableAmbience(index, selectedambience);
                 ambiences.marshall();
-                Util.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedcutorelementname, "");
+                Util.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedmeditatablename, "");
             } else {
                 Util.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closebuttonpressed(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Closing?")) {save(null);}
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedmeditatablename, "Save Changes Before Closing?")) {save(null);}
                 else {return;}
             }
             close();
         }
         public void switchtosimple(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Switching To Simple Mode?")) {save(null);}
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedmeditatablename, "Save Changes Before Switching To Simple Mode?")) {save(null);}
             }
             this.close();
             deletetempambiencefromdirectory();
-            if (selected_temp_ambiencesong != null && kujiin.xml.Options.ALLNAMES.contains(selectedcutorelementname)) {
-                new SimpleAmbienceEditor(Root, Root.getSession().getAmbiences(), selectedcutorelementname).show();
+            if (selected_temp_ambiencesong != null && kujiin.xml.Options.ALLNAMES.contains(selectedmeditatablename)) {
+                new SimpleAmbienceEditor(Root, Root.getSession().getAmbiences(), selectedmeditatablename).show();
             } else {new SimpleAmbienceEditor(Root, Root.getSession().getAmbiences()).show();}
         }
     }
@@ -906,7 +910,7 @@ public class MainController implements Initializable {
         public TableView<AmbienceSong> AmbienceTable;
         public TableColumn<AmbienceSong, String> NameColumn;
         public TableColumn<AmbienceSong, String> DurationColumn;
-        public ChoiceBox<String> CutOrElementChoiceBox;
+        public ChoiceBox<String> MeditatableChoiceBox;
         public Button SaveButton;
         public Button CloseButton;
         public Button AddButton;
@@ -918,7 +922,7 @@ public class MainController implements Initializable {
         private ObservableList<AmbienceSong> AmbienceList;
         private ArrayList<SoundFile> SoundList;
         private AmbienceSong selectedambiencesong;
-        private String selectedcutorelementname;
+        private String selectedmeditatable;
         private PreviewFile previewdialog;
         private Ambiences ambiences;
         private Ambience selectedambience;
@@ -932,7 +936,7 @@ public class MainController implements Initializable {
                     (observable, oldValue, newValue) -> tableselectionchanged(newValue));
             ObservableList<String> allnames = FXCollections.observableArrayList();
             allnames.addAll(kujiin.xml.Options.ALLNAMES);
-            CutOrElementChoiceBox.setItems(allnames);
+            MeditatableChoiceBox.setItems(allnames);
         }
 
         public SimpleAmbienceEditor(MainController root, Ambiences ambiences) {
@@ -947,7 +951,7 @@ public class MainController implements Initializable {
                 this.setResizable(false);
                 setTitle("Simple Ambience Editor");
             } catch (IOException ignored) {}
-            CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
+            MeditatableChoiceBox.setOnAction(event -> selectandloadcut());
             NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
         }
         public SimpleAmbienceEditor(MainController root, Ambiences ambiences, String cutorelementname) {
@@ -964,25 +968,25 @@ public class MainController implements Initializable {
             } catch (IOException ignored) {}
             setOnShowing(event -> {
                 if (kujiin.xml.Options.ALLNAMES.contains(cutorelementname)) {
-                    CutOrElementChoiceBox.getSelectionModel().select(cutorelementname);
+                    MeditatableChoiceBox.getSelectionModel().select(cutorelementname);
                     selectandloadcut();
                 }
             });
-            CutOrElementChoiceBox.setOnAction(event -> selectandloadcut());
+            MeditatableChoiceBox.setOnAction(event -> selectandloadcut());
         }
 
     // Table Methods
         public void tableselectionchanged(AmbienceSong ambienceSong) {selectedambiencesong = ambienceSong;}
         public void selectandloadcut() {
-            int index = CutOrElementChoiceBox.getSelectionModel().getSelectedIndex();
+            int index = MeditatableChoiceBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
-                selectedambience = ambiences.getcutorelementsAmbience(index);
+                selectedambience = ambiences.getmeditatableAmbience(index);
                 if (AmbienceList == null) {AmbienceList = FXCollections.observableArrayList();}
                 else {AmbienceList.clear();}
                 if (SoundList == null) {SoundList = new ArrayList<>();}
                 else {SoundList.clear();}
                 AmbienceTable.getItems().clear();
-                selectedcutorelementname = kujiin.xml.Options.ALLNAMES.get(index);
+                selectedmeditatable = kujiin.xml.Options.ALLNAMES.get(index);
                 if (populateactualambiencetable()) {
                     AmbienceTable.setItems(AmbienceList);
                 }
@@ -1059,7 +1063,7 @@ public class MainController implements Initializable {
         }
         public boolean populateactualambiencetable() {
             AmbienceList.clear();
-            if (selectedcutorelementname != null) {
+            if (selectedmeditatable != null) {
                 try {
                     if (selectedambience.getAmbience() == null) {return false;}
                     for (SoundFile i : selectedambience.getAmbience()) {
@@ -1069,7 +1073,7 @@ public class MainController implements Initializable {
                     return true;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Util.gui_showinformationdialog(Root, "Information", selectedcutorelementname + " Has No Ambience", "Please Add Ambience To " + selectedcutorelementname);
+                    Util.gui_showinformationdialog(Root, "Information", selectedmeditatable + " Has No Ambience", "Please Add Ambience To " + selectedmeditatable);
                     return false;
                 }
             } else {
@@ -1085,7 +1089,7 @@ public class MainController implements Initializable {
             TotalDuration.setText(Util.format_minstohrsandmins_long((int) ((totalselectedduration / 1000) / 60)));
         }
         public boolean unsavedchanges() {
-            if (CutOrElementChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
+            if (MeditatableChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
             try {
                 if (SoundList.size() != selectedambience.getAmbience().size()) {return true;}
                 List<SoundFile> ambiencelist = selectedambience.getAmbience();
@@ -1099,28 +1103,28 @@ public class MainController implements Initializable {
     // Dialog Methods
         public void advancedmode(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Switching To Advanced Mode?")) {save(null);}
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Switching To Advanced Mode?")) {save(null);}
             }
             this.close();
-            if (selectedcutorelementname != null && kujiin.xml.Options.ALLNAMES.contains(selectedcutorelementname)) {
-                new AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences(), selectedcutorelementname).show();
+            if (selectedmeditatable != null && kujiin.xml.Options.ALLNAMES.contains(selectedmeditatable)) {
+                new AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences(), selectedmeditatable).show();
             } else {new AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences()).show();}
         }
         public void save(ActionEvent actionEvent) {
-            int index = CutOrElementChoiceBox.getSelectionModel().getSelectedIndex();
+            int index = MeditatableChoiceBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 for (SoundFile i : SoundList) {
                     if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
                 }
-                ambiences.setcutorelementsAmbience(index, selectedambience);
+                ambiences.setmeditatableAmbience(index, selectedambience);
                 ambiences.marshall();
-                Util.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedcutorelementname, "");
+                Util.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedmeditatable, "");
             } else {
                 Util.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closedialog(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedcutorelementname, "Save Changes Before Closing?")) {save(null);}
+                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Closing?")) {save(null);}
                 else {return;}
             }
             close();
@@ -1525,11 +1529,13 @@ public class MainController implements Initializable {
         public TextField DatePracticedTextField;
         public TextField SessionDurationTextField;
         public Button CloseButton;
+        public Label GoalsCompletedTopLabel;
+        public ListView<String> GoalsCompletedListView;
 
-        public SessionDetails(MainController root, List<Meditatable> cutsorelementsinsession) {
+        public SessionDetails(MainController root, List<Meditatable> meditatablesinsession) {
             Root = root;
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionCompleteDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
@@ -1538,9 +1544,20 @@ public class MainController implements Initializable {
                 SessionNumbersAxis.setLabel("Minutes");
                 setTitle("Session Details");
                 XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
-                // TODO Find Max Minutes
                 int totalsessiontime = 0;
-                for (Meditatable i : cutsorelementsinsession) {series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getdurationinminutes())); totalsessiontime += i.getdurationinminutes();}
+                ObservableList<String> completedgoalsitems = FXCollections.observableArrayList();
+                for (Meditatable i : meditatablesinsession) {
+                    series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getdurationinminutes()));
+                    totalsessiontime += i.getdurationinminutes();
+                    for (Goals.Goal x : i.getGoalsCompletedThisSession()) {
+                        completedgoalsitems.add(String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getdurationindecimalhours()));
+                    }
+                }
+                if (completedgoalsitems.size() > 0) {
+                    GoalsCompletedTopLabel.setText(completedgoalsitems.size() + " Goals Completed This Session");
+                    GoalsCompletedListView.setItems(completedgoalsitems);
+                }
+                else {GoalsCompletedTopLabel.setText("No Goals Completed This Session");}
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
                 DatePracticedTextField.setText(Util.gettodaysdate());

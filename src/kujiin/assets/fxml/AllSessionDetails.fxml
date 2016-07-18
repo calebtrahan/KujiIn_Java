@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="588.0" prefWidth="928.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox prefHeight="588.0" prefWidth="928.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <TabPane tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Session Totals">
+                  <content>
+                    <AnchorPane>
+                           <children>
+                              <TabPane prefHeight="555.0" prefWidth="928.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <tabs>
+                                  <Tab text="Total Progress">
+                                    <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                             <children>
+                                                <VBox prefHeight="555.0" prefWidth="928.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <children>
+                                                      <HBox VBox.vgrow="ALWAYS">
+                                                         <children>
+                                                            <BarChart fx:id="SessionTotalsBarGraph" legendVisible="false" prefHeight="150.0" prefWidth="691.0" title="Total Progress">
+                                                              <xAxis>
+                                                                <CategoryAxis fx:id="CategoryAxis" prefHeight="25.0" prefWidth="829.0" side="BOTTOM" />
+                                                              </xAxis>
+                                                              <yAxis>
+                                                                <NumberAxis fx:id="NumbersAxis" side="LEFT" />
+                                                              </yAxis>
+                                                            </BarChart>
+                                                            <TableView fx:id="TotalProgressTableView" prefHeight="520.0" prefWidth="276.0">
+                                                              <columns>
+                                                                <TableColumn fx:id="NameColumn" prefWidth="75.0" text="Name" />
+                                                                <TableColumn fx:id="CurrentPracticeTimeColumn" prefWidth="161.0" text="Current Practice Time" />
+                                                              </columns>
+                                                               <HBox.margin>
+                                                                  <Insets right="5.0" />
+                                                               </HBox.margin>
+                                                            </TableView>
+                                                         </children>
+                                                      </HBox>
+                                                      <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="928.0">
+                                                         <children>
+                                                            <Button mnemonicParsing="false" onAction="#close" text="Close">
+                                                               <HBox.margin>
+                                                                  <Insets right="5.0" />
+                                                               </HBox.margin>
+                                                            </Button>
+                                                         </children>
+                                                         <VBox.margin>
+                                                            <Insets bottom="5.0" />
+                                                         </VBox.margin>
+                                                      </HBox>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </AnchorPane>
+                                    </content>
+                                  </Tab>
+                                  <Tab text="Balance">
+                                    <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                             <children>
+                                                <PieChart fx:id="SessionBalancePieChart" layoutY="1.0" prefHeight="555.0" prefWidth="895.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                             </children>
+                                          </AnchorPane>
+                                    </content>
+                                  </Tab>
+                                </tabs>
+                              </TabPane>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Detailed Session List">
+                  <content>
+                    <AnchorPane>
+                           <children>
+                              <VBox layoutX="178.0" layoutY="190.0" prefHeight="799.0" prefWidth="1170.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <HBox>
+                                       <children>
+                                          <Accordion HBox.hgrow="ALWAYS">
+                                            <panes>
+                                              <TitledPane text="Filter">
+                                                <content>
+                                                  <AnchorPane minHeight="130.0" minWidth="0.0" prefHeight="130.0" prefWidth="886.0">
+                                                         <children>
+                                                            <HBox alignment="CENTER" layoutX="79.0" layoutY="-7.0" minHeight="120.0" prefHeight="133.0" prefWidth="886.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                               <children>
+                                                                  <VBox alignment="TOP_CENTER" prefHeight="96.0" prefWidth="160.0">
+                                                                     <children>
+                                                                        <CheckBox fx:id="FilterByDateSwitch" mnemonicParsing="false" onAction="#filterbydateselected" text="Filter By Date" />
+                                                                        <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="176.0">
+                                                                           <children>
+                                                                              <Label alignment="CENTER" prefWidth="32.0" text="From">
+                                                                                 <HBox.margin>
+                                                                                    <Insets right="5.0" />
+                                                                                 </HBox.margin>
+                                                                              </Label>
+                                                                              <DatePicker fx:id="Filter_DateRange_From" onAction="#populatetable" prefHeight="26.0" prefWidth="115.0" />
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="135.0">
+                                                                           <children>
+                                                                              <Label alignment="CENTER" prefWidth="32.0" text="To">
+                                                                                 <HBox.margin>
+                                                                                    <Insets right="5.0" />
+                                                                                 </HBox.margin>
+                                                                              </Label>
+                                                                              <DatePicker fx:id="Filter_DateRange_To" onAction="#populatetable" prefHeight="26.0" prefWidth="115.0" />
+                                                                           </children>
+                                                                        </HBox>
+                                                                     </children>
+                                                                  </VBox>
+                                                                  <VBox alignment="TOP_CENTER" prefHeight="96.0" prefWidth="496.0">
+                                                                     <children>
+                                                                        <CheckBox fx:id="FilterBySelectedSwitch" mnemonicParsing="false" onAction="#populatetable" text="Filter By Selected Meditatable(s) / Duration Practiced">
+                                                                           <VBox.margin>
+                                                                              <Insets bottom="2.0" />
+                                                                           </VBox.margin>
+                                                                        </CheckBox>
+                                                                        <TabPane prefHeight="65.0" prefWidth="496.0" tabClosingPolicy="UNAVAILABLE">
+                                                                          <tabs>
+                                                                            <Tab text="Qi-Gong">
+                                                                              <content>
+                                                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                                                       <children>
+                                                                                          <HBox alignment="CENTER" layoutX="68.0" layoutY="24.0" prefHeight="47.0" prefWidth="496.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                                             <children>
+                                                                                                <CheckBox fx:id="Filter_PresessionCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Presession">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_PostsessionCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Postsession" />
+                                                                                             </children>
+                                                                                          </HBox>
+                                                                                       </children>
+                                                                                    </AnchorPane>
+                                                                              </content>
+                                                                            </Tab>
+                                                                            <Tab text="Cuts">
+                                                                              <content>
+                                                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                                                       <children>
+                                                                                          <HBox alignment="CENTER" layoutX="-9.0" layoutY="-50.0" prefHeight="47.0" prefWidth="496.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                                             <children>
+                                                                                                <CheckBox fx:id="Filter_RinCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Rin">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_KyoCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Kyo">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_TohCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Toh">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_ShaCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Sha">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_KaiCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Kai">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_JinCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Jin">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_RetsuCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Retsu">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_ZaiCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Zai">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_ZenCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Zen">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                             </children>
+                                                                                             <opaqueInsets>
+                                                                                                <Insets />
+                                                                                             </opaqueInsets>
+                                                                                          </HBox>
+                                                                                       </children>
+                                                                                    </AnchorPane>
+                                                                              </content>
+                                                                            </Tab>
+                                                                              <Tab text="Elements">
+                                                                                 <content>
+                                                                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                                                       <children>
+                                                                                          <HBox alignment="CENTER" layoutX="14.0" layoutY="-36.0" prefHeight="47.0" prefWidth="496.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                                             <children>
+                                                                                                <CheckBox fx:id="Filter_EarthCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Earth">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_AirCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Air">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_FireCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Fire">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_WaterCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Water">
+                                                                                                   <HBox.margin>
+                                                                                                      <Insets right="5.0" />
+                                                                                                   </HBox.margin>
+                                                                                                </CheckBox>
+                                                                                                <CheckBox fx:id="Filter_VoidCheckbox" mnemonicParsing="false" onAction="#populatetable" selected="true" text="Void" />
+                                                                                             </children>
+                                                                                          </HBox>
+                                                                                       </children>
+                                                                                    </AnchorPane>
+                                                                                 </content>
+                                                                              </Tab>
+                                                                          </tabs>
+                                                                        </TabPane>
+                                                                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="496.0">
+                                                                           <children>
+                                                                              <CheckBox fx:id="Filter_DurationThresholdCheckbox" mnemonicParsing="false" onAction="#populatetable" text="Duration Threshold">
+                                                                                 <HBox.margin>
+                                                                                    <Insets left="10.0" right="5.0" />
+                                                                                 </HBox.margin>
+                                                                              </CheckBox>
+                                                                              <TextField fx:id="Filter_ThresholdMinutesTextField" alignment="CENTER" onAction="#populatetable" prefHeight="26.0" prefWidth="49.0" text="0">
+                                                                                 <HBox.margin>
+                                                                                    <Insets right="2.0" />
+                                                                                 </HBox.margin>
+                                                                              </TextField>
+                                                                              <Label text="minutes" />
+                                                                           </children>
+                                                                        </HBox>
+                                                                     </children>
+                                                                  </VBox>
+                                                               </children>
+                                                            </HBox>
+                                                         </children>
+                                                      </AnchorPane>
+                                                </content>
+                                              </TitledPane>
+                                            </panes>
+                                          </Accordion>
+                                       </children>
+                                    </HBox>
+                                    <TableView fx:id="sessionsTableView" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                                      <columns>
+                                        <TableColumn fx:id="DateColumn" maxWidth="-1.0" minWidth="55.0" prefWidth="-1.0" text="Date" />
+                                          <TableColumn fx:id="PreColumn" minWidth="55.0" prefWidth="-1.0" text="Pre" />
+                                        <TableColumn fx:id="RinColumn" minWidth="55.0" prefWidth="-1.0" text="Rin" />
+                                          <TableColumn fx:id="KyoColumn" minWidth="55.0" prefWidth="-1.0" text="Kyo" />
+                                          <TableColumn fx:id="TohColumn" minWidth="55.0" prefWidth="-1.0" text="Toh" />
+                                          <TableColumn fx:id="ShaColumn" minWidth="55.0" prefWidth="-1.0" text="Sha" />
+                                          <TableColumn fx:id="KaiColumn" minWidth="55.0" prefWidth="-1.0" text="Kai" />
+                                          <TableColumn fx:id="JinColumn" minWidth="55.0" prefWidth="-1.0" text="Jin" />
+                                          <TableColumn fx:id="RetsuColumn" minWidth="55.0" prefWidth="-1.0" text="Retsu" />
+                                          <TableColumn fx:id="ZaiColumn" minWidth="55.0" prefWidth="-1.0" text="Zai" />
+                                          <TableColumn fx:id="ZenColumn" minWidth="55.0" prefWidth="-1.0" text="Zen" />
+                                          <TableColumn fx:id="EarthColumn" minWidth="55.0" prefWidth="-1.0" text="Earth" />
+                                          <TableColumn fx:id="AirColumn" minWidth="55.0" prefWidth="-1.0" text="Air" />
+                                          <TableColumn fx:id="FireColumn" minWidth="55.0" prefWidth="-1.0" text="Fire" />
+                                          <TableColumn fx:id="WaterColumn" minWidth="55.0" prefWidth="-1.0" text="Water" />
+                                          <TableColumn fx:id="VoidColumn" minWidth="55.0" prefWidth="-1.0" text="Void" />
+                                          <TableColumn fx:id="PostColumn" minWidth="55.0" prefWidth="-1.0" text="Post" />
+                                          <TableColumn fx:id="TotalColumn" minWidth="55.0" prefWidth="-1.0" text="Total" />
+                                      </columns>
+                                    </TableView>
+                                    <HBox prefHeight="20.0" prefWidth="928.0">
+                                       <children>
+                                          <Button fx:id="ViewDetailsButton" mnemonicParsing="false" onAction="#viewsessiondetails" text="Session Details">
+                                             <HBox.margin>
+                                                <Insets left="5.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_RIGHT" prefHeight="26.0" prefWidth="488.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" onAction="#close" text="Close">
+                                             <HBox.margin>
+                                                <Insets right="5.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                  <Tab text="Goals">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TabPane layoutX="139.0" layoutY="161.0" prefHeight="555.0" prefWidth="928.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <tabs>
+                                  <Tab text="Current Goals">
+                                    <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                             <children>
+                                                <HBox layoutX="62.0" layoutY="56.0" prefHeight="555.0" prefWidth="895.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <children>
+                                                      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                                         <children>
+                                                            <Label text="Name" />
+                                                         </children>
+                                                      </VBox>
+                                                      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                                         <children>
+                                                            <Label text="Practice TIme" />
+                                                         </children>
+                                                      </VBox>
+                                                      <VBox alignment="CENTER" prefHeight="306.0" prefWidth="423.0">
+                                                         <children>
+                                                            <ProgressBar prefWidth="200.0" progress="0.0" />
+                                                         </children>
+                                                      </VBox>
+                                                      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                                         <children>
+                                                            <Label text="100%" />
+                                                         </children>
+                                                      </VBox>
+                                                      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                                         <children>
+                                                            <Button mnemonicParsing="false" text="Set" />
+                                                         </children>
+                                                      </VBox>
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </AnchorPane>
+                                    </content>
+                                  </Tab>
+                                  <Tab text="Completed Goals">
+                                    <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                    </content>
+                                  </Tab>
+                                </tabs>
+                              </TabPane>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

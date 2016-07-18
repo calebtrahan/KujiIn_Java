@@ -167,7 +167,7 @@ public class Entrainments {
             for (int i = 0; i < AllEntrainment.size(); i++) {
                 Entrainment selectedentrainment = AllEntrainment.get(i);
                 selectedentrainment = new Entrainment();
-                setcutorelementsEntrainment(i, selectedentrainment);
+                setmeditatableEntrainment(i, selectedentrainment);
             }
         }
     }
@@ -184,7 +184,7 @@ public class Entrainments {
     }
 
 // Other Methods
-    public Entrainment getcutorelementsEntrainment(int index) {
+    public Entrainment getmeditatableEntrainment(int index) {
         switch (index) {
             case 0:
                 return getPresession();
@@ -222,7 +222,7 @@ public class Entrainments {
                 return null;
         }
     }
-    public void setcutorelementsEntrainment(int index, Entrainment entrainment) {
+    public void setmeditatableEntrainment(int index, Entrainment entrainment) {
         switch (index) {
             case 0:
                 setPresession(entrainment);

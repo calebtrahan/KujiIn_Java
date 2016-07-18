@@ -2,7 +2,6 @@ package kujiin.ui;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -55,7 +54,7 @@ public class PlayerUI extends Stage {
     public Label GoalTopLabel;
     public ProgressBar GoalProgressBar;
     public ToggleButton ReferenceToggleButton;
-    public Label GoalProgressLabel;
+    public Label GoalPercentageLabel;
     private This_Session Session;
     private MainController Root;
     public boolean displaynormaltime = true;
@@ -86,7 +85,7 @@ public class PlayerUI extends Stage {
                     if (Session.endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}
                 } else {
                     Util.gui_showtimedmessageonlabel(StatusBar, "Cannot Close Player During Fade Animation", 400);
-                    new Timeline(new KeyFrame(Duration.millis(400), ae -> Session.getCurrentcutorelement().toggleplayerbuttons()));
+                    new Timeline(new KeyFrame(Duration.millis(400), ae -> Session.getCurrentmeditatable().toggleplayerbuttons()));
                     event.consume();
                 }
             });
@@ -178,15 +177,15 @@ public class PlayerUI extends Stage {
         public Label CurrentPercentage;
         public Label TotalPercentage;
         private MainController Root;
-        private Meditatable currentcutorelement;
+        private Meditatable currentmeditatable;
         private ReferenceType referenceType;
         private Boolean fullscreenoption;
         private Scene scene;
 
-        public DisplayReference(MainController root, Meditatable currentcutorelement) {
+        public DisplayReference(MainController root, Meditatable currentmeditatable) {
             try {
                 Root = root;
-                this.currentcutorelement = currentcutorelement;
+                this.currentmeditatable = currentmeditatable;
                 referenceType = Root.getOptions().getSessionOptions().getReferencetype();
                 fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
@@ -195,7 +194,7 @@ public class PlayerUI extends Stage {
                 setScene(scene);
                 Root.getOptions().setStyle(this);
 //                this.setResizable(false);
-                setTitle(this.currentcutorelement.name + "'s Reference");
+                setTitle(this.currentmeditatable.name + "'s Reference");
                 setsizing();
                 loadcontent();
                 AmbienceVolumeSlider.setValue(Root.getPlayer().AmbienceVolume.getValue());
@@ -209,16 +208,19 @@ public class PlayerUI extends Stage {
                 addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                         switch (event.getCode()) {
                             case ESCAPE:
-                                Platform.runLater(this::close);
-                                untoggleplayerreference();
-                                break;
+                                // TODO Closing Reference Display On Escape Is Crashing The Whole App
+//                                hide();
+//                                untoggleplayerreference();
+//                                break;
                             case F11:
-                                boolean fullscreen = this.isFullScreen();
-                                fullscreenoption = ! fullscreen;
-                                Root.getOptions().getSessionOptions().setReferencefullscreen(fullscreenoption);
-                                setsizing();
-                                if (! fullscreen) {setFullScreenExitHint("");}
-                                break;
+                                if (Root.getSession().getPlayerState() == PlayerState.PLAYING) {
+                                    boolean fullscreen = this.isFullScreen();
+                                    fullscreenoption = !fullscreen;
+                                    Root.getOptions().getSessionOptions().setReferencefullscreen(fullscreenoption);
+                                    setsizing();
+                                    if (!fullscreen) {setFullScreenExitHint("");}
+                                    break;
+                                }
                         }
                 });
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
@@ -257,7 +259,7 @@ public class PlayerUI extends Stage {
             ContentPane.setStyle("-fx-background-color: #212526");
         }
         public void loadcontent() {
-            File referencefile = currentcutorelement.getReferenceFile();
+            File referencefile = currentmeditatable.getReferenceFile();
             if (referencefile != null) {
                 switch (referenceType) {
                     case txt:

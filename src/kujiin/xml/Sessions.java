@@ -1,6 +1,8 @@
 package kujiin.xml;
 
 import kujiin.MainController;
+import kujiin.util.Meditatable;
+import kujiin.util.Qi_Gong;
 import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
@@ -92,42 +94,33 @@ public class Sessions {
     }
 
 // Session Information Getters
-    public int sessioninformation_getindividualsessiontotals(int index, Boolean includepreandpost) {
-//        try {
-//            int totalminutes = 0;
-//            kujiin.xml.Session thissession = sessioninformation_getspecificsession(sessioninformation_totalsessioncount() - 1);
-//            if (index == 0) {
-//                // Pre And Post
-//                totalminutes += thissession.getcutduration(0);
-//                totalminutes += thissession.getcutduration(10);
-//            } else if (index == ProgressAndGoalsUI.GOALCUTNAMES.length - 1) {
-//                // TOTAL!
-//                if (includepreandpost) {for (int x = 0; x< ProgressAndGoalsUI.GOALCUTNAMES.length - 1; x++) {totalminutes += thissession.getcutduration(x);}}
-//                else {for (int x = 1; x< ProgressAndGoalsUI.GOALCUTNAMES.length - 2; x++) {totalminutes += thissession.getcutduration(x);}}
-//            } else {
-//                // Indidivual Cut
-//                totalminutes += thissession.getcutduration(index);
-//            }
-//            return totalminutes;
-//        } catch (NullPointerException ignored) {return 0;}
-        return 0;
-    }
-    public int sessioninformation_getallsessiontotals(int index) {
+    public int sessioninformation_getallsessiontotals(int index, boolean includepreandpost) {
         try {
             int totalminutes = 0;
             for (kujiin.xml.Session i : getSession()) {totalminutes += i.getcutduration(index);}
+            if (includepreandpost) {
+                for (Meditatable i : Root.getSession().getAllMeditatablesincludingTotalforTracking()) {
+                    if (i instanceof Qi_Gong) {
+                        for (kujiin.xml.Session x : getSession()) {totalminutes += x.getcutduration(i.number);}
+                    }
+                }
+            }
             return totalminutes;
         } catch (NullPointerException ignored) {return 0;}
     }
-    public int sessioninformation_getaveragepracticetime(int index) {
-        try {return sessioninformation_getallsessiontotals(index) / getSession().size();}
+    public int sessioninformation_getaveragepracticetime(int index, boolean includepreandpost) {
+        try {
+            return sessioninformation_getallsessiontotals(index, includepreandpost) / sessioninformation_getsessioncount(index, includepreandpost);}
         catch (NullPointerException | ArithmeticException ignored) {return 0;}
     }
-    public int sessioninformation_getsessioncount(int index) {
+    public int sessioninformation_getsessioncount(int index, boolean includepreandpost) {
         try {
             int sessioncount = 0;
             for (kujiin.xml.Session i : getSession()) {
-                if (i.getcutduration(index) != 0) {sessioncount++;}
+                if (i.getcutduration(index) != 0) {sessioncount++; continue;}
+                if (includepreandpost) {
+                    if (i.getcutduration(0) != 0 || i.getcutduration(15) != 0) {sessioncount++;}
+                }
             }
             return sessioncount;
         } catch (NullPointerException ignored) {return 0;}

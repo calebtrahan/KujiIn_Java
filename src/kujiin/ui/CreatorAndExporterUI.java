@@ -124,7 +124,6 @@ public class CreatorAndExporterUI {
         WaterTime = root.WaterTime;
         VoidSwitch = root.VoidSwitch;
         VoidTime = root.VoidTime;
-        session = root.getSession();
         StatusBar = root.CreatorStatusBar;
         exporterState = ExporterState.NOT_EXPORTED;
         creatorState = CreatorState.NOT_CREATED;
@@ -151,7 +150,8 @@ public class CreatorAndExporterUI {
     public void setCreatorState(CreatorState creatorState) {
         this.creatorState = creatorState;
     }
-
+    public void setSession(This_Session session) {this.session = session;}
+    
 // GUI
     public void setuptextfields() {
     PreTime.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -391,7 +391,7 @@ public class CreatorAndExporterUI {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(Root, "Change All Cut Values To: ");
         changevaluesdialog.showAndWait();
         if (changevaluesdialog.getAccepted()) {
-            Integer min = changevaluesdialog.getminutes();
+            Integer min = changevaluesdialog.getMinutes();
             for (Cut i : session.getallCuts()) {i.changevalue(min);}
             if (changevaluesdialog.getincludepresession()) {session.getPresession().changevalue(min);}
             if (changevaluesdialog.getincludepostsession()) {session.getPostsession().changevalue(min);}
@@ -401,7 +401,7 @@ public class CreatorAndExporterUI {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(Root, "Change All Element Values To: ");
         changevaluesdialog.showAndWait();
         if (changevaluesdialog.getAccepted()) {
-            Integer min = changevaluesdialog.getminutes();
+            Integer min = changevaluesdialog.getMinutes();
             for (Element i : session.getallElements()) {i.changevalue(min);}
             if (changevaluesdialog.getincludepresession()) {session.getPresession().changevalue(min);}
             if (changevaluesdialog.getincludepostsession()) {session.getPostsession().changevalue(min);}
@@ -471,6 +471,7 @@ public class CreatorAndExporterUI {
         public CheckBox PostsessionCheckBox;
         private Boolean accepted;
         private MainController Root;
+        private int minutes;
 
         public ChangeAllValuesDialog(MainController root, String toptext) {
             try {
@@ -486,10 +487,8 @@ public class CreatorAndExporterUI {
                 MinutesTextField.setText("0");
                 Util.custom_textfield_integer(MinutesTextField, 0, 600, 1);
                 MinutesTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-                    try {if (newValue.matches("\\d*")) {
-                        MinutesTextField.setText(Integer.toString(Integer.parseInt(newValue)));}  else {
-                        MinutesTextField.setText(oldValue);}}
-                    catch (Exception e) {MinutesTextField.setText("");}
+                    try {setMinutes(Integer.parseInt(MinutesTextField.getText()));}
+                    catch (NumberFormatException ignored) {setMinutes(0);}
                 });
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         }
@@ -501,18 +500,19 @@ public class CreatorAndExporterUI {
         public void setAccepted(Boolean accepted) {
             this.accepted = accepted;
         }
+        public int getMinutes() {
+            return minutes;
+        }
+        public void setMinutes(int minutes) {
+            this.minutes = minutes;
+        }
 
     // Button Actions
         public void acceptbuttonpressed(Event event) {setAccepted(true); this.close();}
-        public void cancelbuttonpressed(Event event) {this.close();}
+        public void cancelbuttonpressed(Event event) {setAccepted(false); this.close();}
         public boolean getincludepresession() {return PresessionCheckbox.isSelected();}
         public boolean getincludepostsession() {return PostsessionCheckBox.isSelected();}
-        public Integer getminutes() {
-            try {return Integer.parseInt(MinutesTextField.getText());}
-            catch (NumberFormatException e) {return 0;}
-        }
-
-    }
+}
     public static class ExportingSessionDialog extends Stage {
         public Button CancelButton;
         public ProgressBar TotalProgress;

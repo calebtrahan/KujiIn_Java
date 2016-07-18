@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="434.0" prefWidth="597.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TabPane layoutX="185.0" layoutY="116.0" prefHeight="434.0" prefWidth="597.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <tabs>
+          <Tab text="Current Goals">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="622.0">
+                     <children>
+                        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label fx:id="Presession_Name" text="Presession" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label fx:id="Rin_Name" text="Rin" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label fx:id="Kyo_Name" text="Kyo" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label fx:id="Toh_Name" text="Toh" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Sha" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Kai" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Jin" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Retsu" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Zai" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Zen" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Name" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Name" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Name" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Name" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Name" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="400.0" prefWidth="567.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="70.0">
+                                       <children>
+                                          <Label text="Name" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="103.0">
+                                       <children>
+                                          <Label text="Practice TIme" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="212.0">
+                                       <children>
+                                          <ProgressBar prefWidth="200.0" progress="0.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <Label text="Goal Hours" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="57.0">
+                                       <children>
+                                          <Label text="100%" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="400.0" prefWidth="54.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Set" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="CompletedGoals">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>

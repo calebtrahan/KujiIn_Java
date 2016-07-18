@@ -14,7 +14,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Label>
-                  <ChoiceBox fx:id="CutNamesChoiceBox" onAction="#newcutorelementselected" prefHeight="26.0" prefWidth="150.0">
+                  <ChoiceBox fx:id="CutNamesChoiceBox" onAction="#newmeditatableselected" prefHeight="26.0" prefWidth="150.0">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="547.0" prefWidth="762.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="388.0" prefWidth="731.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox layoutX="13.0" layoutY="14.0" prefHeight="343.0" prefWidth="714.0">
+      <VBox layoutX="13.0" layoutY="14.0" prefHeight="343.0" prefWidth="705.0">
          <children>
             <Label alignment="CENTER" prefHeight="20.0" prefWidth="726.0" text="Session Details" textAlignment="CENTER">
                <font>
@@ -23,24 +24,35 @@
                 <NumberAxis fx:id="SessionNumbersAxis" minorTickCount="0" side="LEFT" tickLength="0.0" tickUnit="1.0" upperBound="3.0" />
               </yAxis>
             </BarChart>
-         </children>
-      </VBox>
-      <VBox layoutX="381.0" layoutY="375.0" prefHeight="75.0" prefWidth="307.0">
-         <children>
-            <HBox alignment="CENTER_LEFT" prefHeight="35.0" prefWidth="257.0">
+            <HBox alignment="CENTER" prefHeight="36.0" prefWidth="714.0">
                <children>
-                  <Label alignment="CENTER_RIGHT" minWidth="136.0" text="Date Practiced:" />
-                  <TextField fx:id="DatePracticedTextField" alignment="CENTER" />
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" text="Date Practiced:">
+                           <HBox.margin>
+                              <Insets right="3.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="DatePracticedTextField" alignment="CENTER" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" text="Total Session Duration:">
+                           <HBox.margin>
+                              <Insets right="3.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="SessionDurationTextField" alignment="CENTER" />
+                     </children>
+                     <HBox.margin>
+                        <Insets left="20.0" />
+                     </HBox.margin>
+                  </HBox>
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" prefHeight="35.0" prefWidth="338.0">
-               <children>
-                  <Label alignment="CENTER_RIGHT" text="Total Session Duration:" />
-                  <TextField fx:id="SessionDurationTextField" alignment="CENTER" />
-               </children>
-            </HBox>
          </children>
       </VBox>
-      <Button fx:id="CloseButton" layoutX="628.0" layoutY="495.0" mnemonicParsing="false" onAction="#closeDialog" text="Close" />
+      <Button fx:id="CloseButton" layoutX="666.0" layoutY="357.0" mnemonicParsing="false" onAction="#closeDialog" text="Close" />
    </children>
 </AnchorPane>

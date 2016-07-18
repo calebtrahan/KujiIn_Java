@@ -15,8 +15,8 @@ import kujiin.ui.PlayerUI;
 import kujiin.ui.ProgressAndGoalsUI;
 import kujiin.xml.*;
 
-import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -54,6 +54,7 @@ public class Meditatable {
     protected List<Cut> cutstoplay;
     protected List<Element> elementstoplay;
     protected List<Meditatable> allmeditatablestoplay;
+    protected List<kujiin.xml.Goals.Goal> goalscompletedthissession;
 // Goal Fields
     protected Goals GoalsController;
     protected List<kujiin.xml.Goals.Goal> Goals;
@@ -67,12 +68,17 @@ public class Meditatable {
             Switch = aSwitch;
             Value = value;
             Util.custom_textfield_integer(Value, Switch, 0, 600, 1);
+            Value.textProperty().addListener((observable, oldValue, newValue) -> {
+                try {
+                    setDuration(Integer.parseInt(Value.getText()));
+                } catch (NumberFormatException ignored) {setDuration(0);}
+            });
             if (briefsummary != null) {Switch.setTooltip(new Tooltip(briefsummary));}
             Switch.setOnAction(event -> toggleswitch());
             toggleswitch();
         }
-        entrainment = thissession.getEntrainments().getcutorelementsEntrainment(number);
-        ambience = thissession.getAmbiences().getcutorelementsAmbience(number);
+        entrainment = thissession.getEntrainments().getmeditatableEntrainment(number);
+        ambience = thissession.getAmbiences().getmeditatableAmbience(number);
         //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
 //        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
@@ -107,7 +113,7 @@ public class Meditatable {
         return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
     }
 
-    // Getters And Setters
+// Getters And Setters
     public String getNameForChart() {return name;}
     protected MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
     protected MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
@@ -157,6 +163,20 @@ public class Meditatable {
     public void setCurrentambiencevolume(Double currentambiencevolume) {
         this.currentambiencevolume = currentambiencevolume;
     }
+    // Duration
+    public Duration getdurationasobject() {return new Duration(getdurationinmillis());}
+    public int getdurationinmillis() {return getdurationinseconds() * 1000;}
+    public int getdurationinseconds() {
+        return duration * 60;
+    }
+    public int getdurationinminutes() {
+        return duration;
+    }
+    public Double getdurationindecimalhours() {return Util.convert_minstodecimalhours(getdurationinminutes(), 2);}
+    public String getcurrenttimeformatted() {
+        return Util.format_secondsforplayerdisplay(secondselapsed);
+    }
+    public String gettotaltimeformatted() {return Util.format_secondsforplayerdisplay(getdurationinseconds());}
 
 // Creation
     public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {
@@ -438,6 +458,7 @@ public class Meditatable {
         }
         toggleplayerbuttons();
         thisession.Root.getProgressTracker().selectmeditatable(number);
+        goalscompletedthissession = new ArrayList<>();
     }
     public void resume() {
         volume_unbindentrainment();
@@ -588,9 +609,9 @@ public class Meditatable {
         String pausebuttontext;
         String stopbuttontext;
         String statusbartext;
-        String cutorelementname;
-        if (thisession.getCurrentcutorelement() != null) {cutorelementname = thisession.getCurrentcutorelement().name;}
-        else {cutorelementname = "Session";}
+        String meditatablename;
+        if (thisession.getCurrentmeditatable() != null) {meditatablename = thisession.getCurrentmeditatable().name;}
+        else {meditatablename = "Session";}
         switch (thisession.getPlayerState()) {
             case IDLE:
                 playbuttontext = "Start";
@@ -602,13 +623,13 @@ public class Meditatable {
                 playbuttontext = "Playing";
                 pausebuttontext = "Pause";
                 stopbuttontext = "Stop";
-                statusbartext = cutorelementname + " Playing";
+                statusbartext = meditatablename + " Playing";
                 break;
             case PAUSED:
                 playbuttontext = "Resume";
                 pausebuttontext = "Paused";
                 stopbuttontext = "Stop";
-                statusbartext = cutorelementname + " Paused";
+                statusbartext = meditatablename + " Paused";
                 break;
             case STOPPED:
                 playbuttontext = "Play";
@@ -626,25 +647,25 @@ public class Meditatable {
                 playbuttontext = "Starting";
                 pausebuttontext = "Starting";
                 stopbuttontext = "Starting";
-                statusbartext = "Fading In To " + cutorelementname ;
+                statusbartext = "Fading In To " + meditatablename ;
                 break;
             case FADING_RESUME:
                 playbuttontext = "Resuming";
                 pausebuttontext = "Resuming";
                 stopbuttontext = "Resuming";
-                statusbartext = "Resuming " + cutorelementname ;
+                statusbartext = "Resuming " + meditatablename ;
                 break;
             case FADING_PAUSE:
                 playbuttontext = "Pausing";
                 pausebuttontext = "Pausing";
                 stopbuttontext = "Pausing";
-                statusbartext = "Pausing " + cutorelementname;
+                statusbartext = "Pausing " + meditatablename;
                 break;
             case FADING_STOP:
                 playbuttontext = "Stopping";
                 pausebuttontext = "Stopping";
                 stopbuttontext = "Stopping";
-                statusbartext = "Stopping " + cutorelementname;
+                statusbartext = "Stopping " + meditatablename;
                 break;
             default:
                 playbuttontext = "";
@@ -799,6 +820,9 @@ public class Meditatable {
             progressAndGoalsUI.getSessions().sessioninformation_getspecificsession(progressAndGoalsUI.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
         }
     }
+    // Error Handling
+    protected void entrainmenterror() {}
+    protected void ambienceerror() {}
 
 // Export
     public Service<Boolean> getexportservice() {
@@ -878,83 +902,65 @@ public class Meditatable {
     }
 
 // Goals
-    // TODO !IMPORTANT Merge Progress Tracker Into Meditable Class
-    public void addGoal(kujiin.xml.Goals.Goal newgoal) throws JAXBException {GoalsController.add(number, newgoal);}
+    // Add
+    public void addGoal(kujiin.xml.Goals.Goal newgoal) {
+        System.out.println("Called Add Goal In Meditatable Logic");
+        GoalsController.add(number, newgoal);
+    }
+    // Update
+    public void updateGoals(List<kujiin.xml.Goals.Goal> goalslist) {
+        GoalsController.update(goalslist, number);
+    }
+    // Delete
     public void deleteGoal(kujiin.xml.Goals.Goal currentgoal) {
         GoalsController.delete(number, currentgoal);
     }
-    public kujiin.xml.Goals.Goal getCurrentGoal() throws NullPointerException {
-        try {
-            GoalsController.sortMeditatableGoals(number);
-            return GoalsController.getallcutgoals(number, false).get(0);
-        }
-        catch (NullPointerException e) {System.out.println("Tried Getting Current Goal For " + name + " :" +e.getMessage()); return null;}
-        catch (IndexOutOfBoundsException ignored) {return null;}
+    public void deleteGoal(int goalindex) {
+        GoalsController.delete(number, goalindex);
     }
-    public List<kujiin.xml.Goals.Goal> getAllGoals(boolean includecompleted) {return GoalsController.getallcutgoals(number, includecompleted);}
-    public List<kujiin.xml.Goals.Goal> getCompletedGoals() {return GoalsController.getcompletedgoals(number);}
-
-// Session Tracking
-    public double getAveragePracticeTime() {
-        return thisession.Root.getProgressTracker().getSessions().sessioninformation_getaveragepracticetime(number);
+    // Getters
+    public kujiin.xml.Goals.Goal getCurrentGoal() {
+        return GoalsController.getCurrentGoal(number);
     }
-    public int getTotalMinutesPracticed() {
-        return thisession.Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(number);
-    }
-    public int getNumberOfSessionsPracticed() {
-        return thisession.Root.getProgressTracker().getSessions().sessioninformation_getsessioncount(number);
-    }
-
-// Goals Tracking
-    // Getters And Setters
-    public void setGoals(List<Goals.Goal> goalslist) {
-        GoalsController.update(goalslist, number);
-    }
-    public List<Goals.Goal> getGoals(boolean includecompleted) {
-        return getGoalsController().getallcutgoals(number, includecompleted);
-    }
+    public List<kujiin.xml.Goals.Goal> getAllGoals() {return GoalsController.getAllGoals(number);}
+    public List<kujiin.xml.Goals.Goal> getCompletedGoals() {return GoalsController.getCompletedGoals(number);}
+    public int getcompletedgoalcount() {return GoalsController.count_completedgoals(number);}
     // Validation
     public boolean goalsarelongenough() {
         try {
-            return (getTotalMinutesPracticed() + 60) + getdurationinminutes() >= getCurrentGoal().getGoal_Hours();
+            return (getTotalMinutesPracticed(false) + 60) + getdurationinminutes() >= getCurrentGoal().getGoal_Hours();
         } catch (NullPointerException e) {return true;}
     }
-    public boolean currentgoalset() {
-        return getCurrentGoal() != null;
-    }
-    // Information
-    public int getcurrentgoalcount() {return GoalsController.getcurrentgoalcount(number);}
-    public int getcompletedgoalcount() {return GoalsController.getcompletedgoalcount(number);}
     // Utility
     public void transition_goalscheck() {
-        List<Goals.Goal> completedgoals = completecutgoals();
-        if (completedgoals.size() > 0) {thisession.GoalsCompletedThisSession.addAll(completedgoals);}
+        goalscompletedthissession = completegoalsandgetcompleted();
+        if (goalscompletedthissession.size() > 0) {
+            thisession.MeditatableswithGoalsCompletedThisSession.add(this);
+        }
     }
-    public List<kujiin.xml.Goals.Goal> completecutgoals() {
-        return GoalsController.completecutgoals(number, getTotalMinutesPracticed());
+    public void completecutgoals() {
+        GoalsController.completegoals(number, getdurationindecimalhours());
     }
-    public void sortgoals() {
-        GoalsController.sortMeditatableGoals(number);
+    public List<kujiin.xml.Goals.Goal> completegoalsandgetcompleted() {
+        return GoalsController.completegoalsandgetcompleted(number, getdurationindecimalhours());
+    }
+    public List<kujiin.xml.Goals.Goal> getGoalsCompletedThisSession() {
+        return GoalsController.getgoalsCompletedOn(number, LocalDate.now());
+    }
+    public List<kujiin.xml.Goals.Goal> getGoalsCompletedOn(LocalDate localDate) {
+        return GoalsController.getgoalsCompletedOn(number, localDate);
     }
 
-// Session Information Getters
-    public Duration getdurationasobject() {return new Duration(getdurationinmillis());}
-    public int getdurationinmillis() {return getdurationinseconds() * 1000;}
-    public int getdurationinseconds() {
-        return duration * 60;
+// Session Tracking
+    public double getAveragePracticeTime(boolean includepreandpost) {
+        return thisession.Root.getProgressTracker().getSessions().sessioninformation_getaveragepracticetime(number, includepreandpost);
     }
-    public int getdurationinminutes() {
-        return duration;
+    public int getTotalMinutesPracticed(boolean includepreandpost) {
+        return thisession.Root.getProgressTracker().getSessions().sessioninformation_getallsessiontotals(number, includepreandpost);
     }
-    public Double getdurationindecimalhours() {return Util.convert_minstodecimalhours(getdurationinminutes(), 2);}
-    public String getcurrenttimeformatted() {
-        return Util.format_secondsforplayerdisplay(secondselapsed);
+    public int getNumberOfSessionsPracticed(boolean includepreandpost) {
+        return thisession.Root.getProgressTracker().getSessions().sessioninformation_getsessioncount(number, includepreandpost);
     }
-    public String gettotaltimeformatted() {return Util.format_secondsforplayerdisplay(getdurationinseconds());}
-
-// Error Handling
-    protected void entrainmenterror() {}
-    protected void ambienceerror() {}
 
 // Reference Files
     public File getReferenceFile() {

@@ -12,13 +12,15 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 @XmlRootElement(name = "Goals")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Goals {
     private List<Goal> PresessionGoals;
     private List<Goal> RinGoals;
@@ -37,113 +39,13 @@ public class Goals {
     private List<Goal> VoidGoals;
     private List<Goal> PostsessionGoals;
     private List<Goal> TotalGoals;
+    @XmlTransient
     private MainController Root;
 
     public Goals() {}
     public Goals(MainController root) {
         Root = root;
     }
-
-// Getters And Setters
-    public List<Goal> getPresessionGoals() {
-        return PresessionGoals;
-    }
-    public void setPresessionGoals(List<Goal> presessionGoals) {
-        PresessionGoals = presessionGoals;
-    }
-    public List<Goal> getRinGoals() {
-    return RinGoals;
-}
-    public void setRinGoals(List<Goal> rinGoals) {
-        RinGoals = rinGoals;
-    }
-    public List<Goal> getKyoGoals() {
-        return KyoGoals;
-    }
-    public void setKyoGoals(List<Goal> kyoGoals) {
-        KyoGoals = kyoGoals;
-    }
-    public List<Goal> getTohGoals() {
-        return TohGoals;
-    }
-    public void setTohGoals(List<Goal> tohGoals) {
-        TohGoals = tohGoals;
-    }
-    public List<Goal> getShaGoals() {
-        return ShaGoals;
-    }
-    public void setShaGoals(List<Goal> shaGoals) {
-        ShaGoals = shaGoals;
-    }
-    public List<Goal> getKaiGoals() {
-        return KaiGoals;
-    }
-    public void setKaiGoals(List<Goal> kaiGoals) {
-        KaiGoals = kaiGoals;
-    }
-    public List<Goal> getJinGoals() {
-        return JinGoals;
-    }
-    public void setJinGoals(List<Goal> jinGoals) {
-        JinGoals = jinGoals;
-    }
-    public List<Goal> getRetsuGoals() {
-        return RetsuGoals;
-    }
-    public void setRetsuGoals(List<Goal> retsuGoals) {
-        RetsuGoals = retsuGoals;
-    }
-    public List<Goal> getZaiGoals() {
-        return ZaiGoals;
-    }
-    public void setZaiGoals(List<Goal> zaiGoals) {
-        ZaiGoals = zaiGoals;
-    }
-    public List<Goal> getZenGoals() {
-        return ZenGoals;
-    }
-    public void setZenGoals(List<Goal> zenGoals) {
-        ZenGoals = zenGoals;
-    }
-    public List<Goal> getEarthGoals() {
-        return EarthGoals;
-    }
-    public void setEarthGoals(List<Goal> earthGoals) {
-        EarthGoals = earthGoals;
-    }
-    public List<Goal> getAirGoals() {
-        return AirGoals;
-    }
-    public void setAirGoals(List<Goal> airGoals) {
-        AirGoals = airGoals;
-    }
-    public List<Goal> getFireGoals() {
-        return FireGoals;
-    }
-    public void setFireGoals(List<Goal> fireGoals) {
-        FireGoals = fireGoals;
-    }
-    public List<Goal> getWaterGoals() {
-        return WaterGoals;
-    }
-    public void setWaterGoals(List<Goal> waterGoals) {
-        WaterGoals = waterGoals;
-    }
-    public List<Goal> getVoidGoals() {
-        return VoidGoals;
-    }
-    public void setVoidGoals(List<Goal> voidGoals) {
-        VoidGoals = voidGoals;
-    }
-    public List<Goal> getPostsessionGoals() {
-        return PostsessionGoals;
-    }
-    public void setPostsessionGoals(List<Goal> postsessionGoals) {
-        PostsessionGoals = postsessionGoals;
-    }
-    public List<Goal> getTotalGoals() {return TotalGoals;}
-    public void setTotalGoals(List<Goal> totalGoals) {
-        TotalGoals = totalGoals;}
 
 // XML Processing
     public void unmarshall() {
@@ -152,23 +54,23 @@ public class Goals {
                 JAXBContext context = JAXBContext.newInstance(Goals.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
                 Goals currentGoals = (Goals) createMarshaller.unmarshal(Options.GOALSXMLFILE);
-                setPresessionGoals(currentGoals.getPresessionGoals());
-                setRinGoals(currentGoals.getRinGoals());
-                setKyoGoals(currentGoals.getKyoGoals());
-                setTohGoals(currentGoals.getTohGoals());
-                setShaGoals(currentGoals.getShaGoals());
-                setKaiGoals(currentGoals.getKaiGoals());
-                setJinGoals(currentGoals.getJinGoals());
-                setRetsuGoals(currentGoals.getRetsuGoals());
-                setZaiGoals(currentGoals.getZaiGoals());
-                setZenGoals(currentGoals.getZenGoals());
-                setEarthGoals(currentGoals.getEarthGoals());
-                setAirGoals(currentGoals.getAirGoals());
-                setFireGoals(currentGoals.getFireGoals());
-                setWaterGoals(currentGoals.getWaterGoals());
-                setVoidGoals(currentGoals.getVoidGoals());
-                setPostsessionGoals(currentGoals.getPostsessionGoals());
-                setTotalGoals(currentGoals.getTotalGoals());
+                PresessionGoals = currentGoals.PresessionGoals;
+                RinGoals = currentGoals.RinGoals;
+                KyoGoals = currentGoals.KyoGoals;
+                TohGoals = currentGoals.TohGoals;
+                ShaGoals = currentGoals.ShaGoals;
+                KaiGoals = currentGoals.KaiGoals;
+                JinGoals = currentGoals.JinGoals;
+                RetsuGoals = currentGoals.RetsuGoals;
+                ZaiGoals = currentGoals.ZaiGoals;
+                ZenGoals = currentGoals.ZenGoals;
+                EarthGoals = currentGoals.EarthGoals;
+                AirGoals = currentGoals.AirGoals;
+                FireGoals = currentGoals.FireGoals;
+                WaterGoals = currentGoals.WaterGoals;
+                VoidGoals = currentGoals.VoidGoals;
+                PostsessionGoals = currentGoals.PostsessionGoals;
+                TotalGoals = currentGoals.TotalGoals;
             } catch (JAXBException e) {
                 Util.gui_showinformationdialog(Root, "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
             }
@@ -184,155 +86,185 @@ public class Goals {
             Util.gui_showinformationdialog(Root, "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
         }
     }
-    public void add(int cutorelementindex, Goal newgoal) throws JAXBException {
-        System.out.println("Old Goals:");
-        for (Goal i : getallcutgoals(cutorelementindex, true)) {
-            System.out.println(i.toString());
-        }
-        getallcutgoals(cutorelementindex, true).add(newgoal);
-        update(sort(getallcutgoals(cutorelementindex, true)), cutorelementindex);
-        System.out.println("New Goals:");
-        for (Goal i : getallcutgoals(cutorelementindex, true)) {
-            System.out.println(i.toString());
-        }
-        marshall();
-    }
-    public boolean delete(int cutorelementindex, Goal currentGoal) {
+    // Add
+    public boolean add(int meditatableindex, Goal newgoal) {
         try {
-            List<Goal> cutgoallist = getallcutgoals(cutorelementindex, true);
-            cutgoallist.remove(currentGoal);
-            update(sort(cutgoallist), cutorelementindex);
+            List<Goal> allgoals = getAllGoals(meditatableindex);
+            if (allgoals == null) {allgoals = new ArrayList<>();}
+            allgoals.add(newgoal);
+            update(allgoals, meditatableindex);
+            sort(meditatableindex);
+            marshall();
+            return true;
+        } catch (Exception ignored) {return false;}
+    }
+    // Deletennnn
+    public boolean delete(int meditatableindex, Goal currentGoal) {
+        try {
+            getAllGoals(meditatableindex).remove(currentGoal);
+            sort(meditatableindex);
             marshall();
             return true;
         } catch (Exception e) {return false;}
     }
-    public List<Goal> sort(List<Goal> goallist) {
+    public boolean delete(int meditatableindex, int goalindex) {
         try {
-            BeanComparator bc = new BeanComparator(Goal.class, "getGoal_Hours");
-            Collections.sort(goallist, bc);
-            int count = 1;
-            for (Goal i : goallist) {i.setID(count); count++;}
-            return goallist;
-        } catch (Exception ignored) {return null;}
+            getAllGoals(meditatableindex).remove(goalindex);
+            sort(meditatableindex);
+            marshall();
+            return true;
+        } catch (Exception e) {return false;}
     }
-    public void sortMeditatableGoals(int cutorelementindex) {
-        sort(getallcutgoals(cutorelementindex, true));
+    // Query
+    public List<List<Goal>> getallMeditatableGoalLists() {
+        return new ArrayList<>(Arrays.asList(PresessionGoals, RinGoals, KyoGoals, TohGoals, ShaGoals, KaiGoals, JinGoals, RetsuGoals, ZaiGoals, ZenGoals,
+                EarthGoals, AirGoals, FireGoals, WaterGoals, VoidGoals, PostsessionGoals));
     }
-    public void update(List<Goal> cutgoallist, int cutorelementindex) {
-        if (cutorelementindex == 0) setPresessionGoals(cutgoallist);
-        if (cutorelementindex == 1) setRinGoals(cutgoallist);
-        if (cutorelementindex == 2) setKyoGoals(cutgoallist);
-        if (cutorelementindex == 3) setTohGoals(cutgoallist);
-        if (cutorelementindex == 4) setShaGoals(cutgoallist);
-        if (cutorelementindex == 5) setKaiGoals(cutgoallist);
-        if (cutorelementindex == 6) setJinGoals(cutgoallist);
-        if (cutorelementindex == 7) setRetsuGoals(cutgoallist);
-        if (cutorelementindex == 8) setZaiGoals(cutgoallist);
-        if (cutorelementindex == 9) setZenGoals(cutgoallist);
-        if (cutorelementindex == 10) setPostsessionGoals(cutgoallist);
-        if (cutorelementindex == 11) setTotalGoals(cutgoallist);
+    public List<Goal> getMeditatableGoalList(int meditatableindex) {
+        switch (meditatableindex) {
+            case 0: return PresessionGoals;
+            case 1: return RinGoals;
+            case 2: return KyoGoals;
+            case 3: return TohGoals;
+            case 4: return ShaGoals;
+            case 5: return KaiGoals;
+            case 6: return JinGoals;
+            case 7: return RetsuGoals;
+            case 8: return ZaiGoals;
+            case 9: return ZenGoals;
+            case 10: return EarthGoals;
+            case 11: return AirGoals;
+            case 12: return FireGoals;
+            case 13: return WaterGoals;
+            case 14: return VoidGoals;
+            case 15: return PostsessionGoals;
+            case 16: return TotalGoals;
+            default: return null;
+        }
     }
-
-// Goal Getters
-    public boolean goalsexist(int cutorelementindex, boolean includecompleted) {
-        return getallcutgoals(cutorelementindex, includecompleted) != null && ! getallcutgoals(cutorelementindex, true).isEmpty();
+    public void setMeditatableGoalList(int meditatableindex, List<Goal> goallist) {
+        switch (meditatableindex) {
+            case 0: PresessionGoals = goallist; return;
+            case 1: RinGoals = goallist; return;
+            case 2: KyoGoals = goallist; return;
+            case 3: TohGoals = goallist; return;
+            case 4: ShaGoals = goallist; return;
+            case 5: KaiGoals = goallist; return;
+            case 6: JinGoals = goallist; return;
+            case 7: RetsuGoals = goallist; return;
+            case 8: ZaiGoals = goallist; return;
+            case 9: ZenGoals = goallist; return;
+            case 10: EarthGoals = goallist; return;
+            case 11: AirGoals = goallist; return;
+            case 12: FireGoals = goallist; return;
+            case 13: WaterGoals = goallist; return;
+            case 14: VoidGoals = goallist; return;
+            case 15: PostsessionGoals = goallist; return;
+            case 16: TotalGoals = goallist;
+        }
     }
-    public Goal getcurrentgoal(int cutorelementindex) {
-        try {return getallcutgoals(cutorelementindex, false).get(0);}
-        catch (NullPointerException | IndexOutOfBoundsException ignored) {return null;}
-    }
-    public Goal getgoal(int cutorelementindex, Integer goalindex, boolean includecompleted) {
-        try {return getallcutgoals(cutorelementindex, includecompleted).get(goalindex);}
+    public Goal getCurrentGoal(int meditatableindex) {
+        try {return getallMeditatableGoalLists().get(meditatableindex).get(getAllGoals(meditatableindex).size() - 1);}
         catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}
     }
-    public List<Goal> getallcutgoals(int cutorelementindex, boolean includecompleted) {
-        if (cutorelementindex == 0) return filtergoals(PresessionGoals, includecompleted);
-        if (cutorelementindex == 1) return filtergoals(RinGoals, includecompleted);
-        if (cutorelementindex == 2) return filtergoals(KyoGoals, includecompleted);
-        if (cutorelementindex == 3) return filtergoals(TohGoals, includecompleted);
-        if (cutorelementindex == 4) return filtergoals(ShaGoals, includecompleted);
-        if (cutorelementindex == 5) return filtergoals(KaiGoals, includecompleted);
-        if (cutorelementindex == 6) return filtergoals(JinGoals, includecompleted);
-        if (cutorelementindex == 7) return filtergoals(RetsuGoals, includecompleted);
-        if (cutorelementindex == 8) return filtergoals(ZaiGoals, includecompleted);
-        if (cutorelementindex == 9) return filtergoals(ZenGoals, includecompleted);
-        if (cutorelementindex == 10) return filtergoals(EarthGoals, includecompleted);
-        if (cutorelementindex == 11) return filtergoals(AirGoals, includecompleted);
-        if (cutorelementindex == 12) return filtergoals(FireGoals, includecompleted);
-        if (cutorelementindex == 13) return filtergoals(WaterGoals, includecompleted);
-        if (cutorelementindex == 14) return filtergoals(VoidGoals, includecompleted);
-        if (cutorelementindex == 15) return filtergoals(PostsessionGoals, includecompleted);
-        if (cutorelementindex == 16) return filtergoals(TotalGoals, includecompleted);
-        else return null;
+    public List<Goal> getAllGoals(int meditatableindex) {
+        return getallMeditatableGoalLists().get(meditatableindex);
     }
-    public List<Goal> filtergoals(List<Goal> cutgoals, boolean includecompleted) {
+    public List<Goal> getCompletedGoals(int meditatableindex) {
         try {
             List<Goal> newgoallist = new ArrayList<>();
-            for (Goal i : cutgoals) {
-                if (includecompleted) {newgoallist.add(i);}
-                else {
-                    if (i.getCompleted() == null || ! i.getCompleted()) {newgoallist.add(i);}
-                }
+            for (Goal i : getallMeditatableGoalLists().get(meditatableindex)) {
+                if (i.getCompleted() != null && i.getCompleted()) {newgoallist.add(i);}
             }
-            System.out.println(newgoallist);
             return newgoallist;
         } catch (NullPointerException e) {return new ArrayList<>();}
     }
-    public int getcurrentgoalcount(int cutorelementindex) {
-        int currentgoalcount = 0;
-        for (Goal i : getallcutgoals(cutorelementindex, true)) {
-            if (! i.getCompleted()) currentgoalcount++;
-        }
-        return currentgoalcount;
+    public int count_completedgoals(int meditatableindex) {return getCompletedGoals(meditatableindex).size();}
+    public int count_allgoals(int meditatableindex) {return getallMeditatableGoalLists().get(meditatableindex).size();}
+    public List<Goal> getgoalsCompletedOn(int meditatableindex, LocalDate localDate) {
+        try {
+            List<Goal> goalslist = new ArrayList<>();
+            for (Goal i : getAllGoals(meditatableindex)) {
+                if (i.getDate_Completed() == null || ! i.getCompleted()) {continue;}
+                if (Util.convert_stringtolocaldate(i.getDate_Completed()).equals(localDate)) {goalslist.add(i);}
+            }
+            return goalslist;
+        } catch (Exception ignored) {return new ArrayList<Goal>();}
     }
-    public int getcompletedgoalcount(int cutorelementindex) {
-        int completedgoalcount = 0;
-        for (Goal i : getallcutgoals(cutorelementindex, true)) {
-            if (i.getCompleted()) completedgoalcount++;
+    // Sort
+    public void sort(int meditatableindex) {
+        List<Goal> goallist = getallMeditatableGoalLists().get(meditatableindex);
+        if (goallist != null && ! goallist.isEmpty()) {
+            try {
+                BeanComparator bc = new BeanComparator(Goal.class, "getGoal_Hours");
+                Collections.sort(goallist, bc);
+                int count = 1;
+                for (Goal i : goallist) {
+                    i.setID(count);
+                    count++;
+                }
+                update(goallist, meditatableindex);
+            } catch (Exception ignored) {}
         }
-        return completedgoalcount;
     }
-    public List<Goal> getcompletedgoals(int meditatableindex) {
-        List<Goal> completedgoals = new ArrayList<>();
-        for (Goal i : getallcutgoals(meditatableindex, true)) {
-            if (i.getCompleted()) {completedgoals.add(i);}
-        }
-        return sort(completedgoals);
+    public void update(List<Goal> cutgoallist, int meditatableindex) {
+        setMeditatableGoalList(meditatableindex, cutgoallist);
+    }
+    // Playback Utility
+    public void completegoals(int meditatableindex, double currentpracticedhours) {
+        try {
+            List<Goal> newgoallist = getallMeditatableGoalLists().get(meditatableindex);
+            for (Goal i : getallMeditatableGoalLists().get(meditatableindex)) {
+                boolean completed = currentpracticedhours >= i.getGoal_Hours();
+                boolean notcompletedbefore = i.getCompleted() != null && ! i.getCompleted();
+                if (completed && notcompletedbefore) {
+                    i.setCompleted(true);
+                    i.setDate_Completed(Util.gettodaysdate());
+                }
+                newgoallist.add(i);
+            }
+            update(newgoallist, meditatableindex);
+        } catch (Exception ignored) {}
+    }
+    public List<Goal> completegoalsandgetcompleted(int meditatableindex, double currentpracticedhours) {
+        try {
+            List<Goal> newgoallist = getallMeditatableGoalLists().get(meditatableindex);
+            for (Goal i : getallMeditatableGoalLists().get(meditatableindex)) {
+                boolean completed = currentpracticedhours >= i.getGoal_Hours();
+                boolean notcompletedbefore = i.getCompleted() != null && ! i.getCompleted();
+                if (completed && notcompletedbefore) {
+                    i.setCompleted(true);
+                    i.setDate_Completed(Util.gettodaysdate());
+                }
+                newgoallist.add(i);
+            }
+            update(newgoallist, meditatableindex);
+            return newgoallist;
+        } catch (Exception ignored) {return new ArrayList<Goal>();}
     }
 
 //    public List<Goal> getgoalscompletedondate(int cutindex, LocalDate localDate) {
 //       List<Goal> goalscompletedondate = new ArrayList<>();
-//        for (Goal i : getallcutgoals(cutindex, false)) {
+//        for (Goal i : getallmeditatablegoals(cutindex, false)) {
 //            LocalDate date = Util.convert_stringtolocaldate(i.getDate_Completed())
 //        }
 //    }
-
-// Goal Completion Methods
-    public void sortcompletedgoals(int cutorelementindex, double currentpracticedhours) {
-        for (Goal i : getallcutgoals(cutorelementindex, true)) {
-            boolean completed = currentpracticedhours >= i.getGoal_Hours();
-            i.setCompleted(completed);
-            if (completed && ! i.getCompleted()) {i.setDate_Completed(Util.gettodaysdate());}
-        }
-    }
-    public List<Goal> completecutgoals(int cutorelementindex, double currentpracticedhours) {
-        List<Goal> completedthisession = new ArrayList<>();
-        for (Goal i : getallcutgoals(cutorelementindex, true)) {
-            boolean completed = currentpracticedhours >= i.getGoal_Hours();
-            boolean notcompletedbefore = ! i.getCompleted();
-            if (completed && notcompletedbefore) {
-                i.setCompleted(true);
-                i.setDate_Completed(Util.gettodaysdate());
-                completedthisession.add(i);
-            }
-        }
-        return completedthisession;
-    }
+// Goal Getters
+//    public boolean goalsexist(int cutorelementindex, boolean includecompleted) {
+//        return getallmeditatablegoals(cutorelementindex, includecompleted) != null && ! getallmeditatablegoals(cutorelementindex, true).isEmpty();
+//    }
+//    public Goal getcurrentgoal(int cutorelementindex) {
+//        try {return getallmeditatablegoals(cutorelementindex, false).get(0);}
+//        catch (NullPointerException | IndexOutOfBoundsException ignored) {return null;}
+//    }
+//    public Goal getgoal(int cutorelementindex, Integer goalindex, boolean includecompleted) {
+//        try {return getallmeditatablegoals(cutorelementindex, includecompleted).get(goalindex);}
+//        catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}
+//    }
 
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class Goal {
         private Integer ID;
-        private String MeditatableName;
         private String Date_Set;
         private String Date_Due;
         private String Date_Completed;
@@ -344,7 +276,6 @@ public class Goals {
         public Goal(Double goalhours, Meditatable meditatable) {
             setGoal_Hours(goalhours);
             setDate_Set(Util.convert_localdatetostring(LocalDate.now()));
-            setMeditatableName(meditatable.name);
             setCompleted(false);
             setDate_Completed(null);
         }
@@ -369,12 +300,6 @@ public class Goals {
         }
         public void setCompleted(Boolean completed) {
             Completed = completed;
-        }
-        public String getMeditatableName() {
-            return MeditatableName;
-        }
-        public void setMeditatableName(String meditatableName) {
-            MeditatableName = meditatableName;
         }
 
         // Other Methods

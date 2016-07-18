@@ -322,7 +322,6 @@ public class Util {
 // Time Methods
     // Object Convert
     public static double convert_hrsandminstodecimalhours(int hours, int minutes) {
-        System.out.println("Minutes Is " + minutes);
         double newval;
         if (minutes != 0) {
             newval = hours + ((double) minutes / 60.0);
@@ -389,6 +388,7 @@ public class Util {
         }
     }
     public static String format_minstohrsandmins_long(int mins) {
+        if (mins == 0) {return "0 Minutes";}
         int hours = mins / 60;
         int minutes = mins % 60;
         StringBuilder stringbuilder = new StringBuilder();

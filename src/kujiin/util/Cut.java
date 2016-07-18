@@ -33,13 +33,13 @@ public class Cut extends Meditatable {
         entrainment.shuffleCreated();
         if (number == 3 && duration >= 3) {
             int index = allmeditatablestoplay.indexOf(this);
-            Meditatable cutorelementbefore = null;
-            Meditatable cutorelementafter = null;
-            if (index != 0) {cutorelementbefore = allmeditatablestoplay.get(index - 1);}
-            if (index != allmeditatablestoplay.size() - 1) {cutorelementafter = allmeditatablestoplay.get(index + 1);}
-            if (cutorelementbefore != null && cutorelementbefore.name.equals("Presession")) {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoinqi.mp3")));}
+            Meditatable meditatablebefore = null;
+            Meditatable meditatableafter = null;
+            if (index != 0) {meditatablebefore = allmeditatablestoplay.get(index - 1);}
+            if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
+            if (meditatablebefore != null && meditatablebefore.name.equals("Presession")) {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoinqi.mp3")));}
             else {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohin.mp3")));}
-            if (cutorelementafter != null && cutorelementafter.name.equals("Postsession")) {
+            if (meditatableafter != null && meditatableafter.name.equals("Postsession")) {
                 entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoutqi.mp3")));
             } else {
                 entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohout.mp3")));

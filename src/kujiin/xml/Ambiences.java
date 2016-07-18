@@ -167,7 +167,7 @@ public class Ambiences {
             for (int i = 0; i < AllAmbiences.size(); i++) {
                 Ambience selectedambience = AllAmbiences.get(i);
                 selectedambience = new Ambience();
-                setcutorelementsAmbience(i, selectedambience);
+                setmeditatableAmbience(i, selectedambience);
             }
         }
     }
@@ -183,7 +183,7 @@ public class Ambiences {
     }
 
 // Other Methods
-    public Ambience getcutorelementsAmbience(int index) {
+    public Ambience getmeditatableAmbience(int index) {
         switch (index) {
             case 0:
                 return Presession;
@@ -221,7 +221,7 @@ public class Ambiences {
                 return null;
         }
     }
-    public void setcutorelementsAmbience(int index, Ambience ambience) {
+    public void setmeditatableAmbience(int index, Ambience ambience) {
         switch (index) {
             case 0:
                 Presession = ambience;

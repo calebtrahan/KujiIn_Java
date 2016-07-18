@@ -292,7 +292,10 @@
          <children>
             <VBox alignment="CENTER" prefHeight="49.0" prefWidth="121.0">
                <children>
-                  <Label fx:id="CompletionLabel" text="Completion Time" />
+                  <Label fx:id="CompletionLabel" text="Completion Time">
+                     <VBox.margin>
+                        <Insets bottom="2.0" />
+                     </VBox.margin></Label>
                   <TextField fx:id="ApproximateEndTime" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="98.0">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
@@ -301,7 +304,10 @@
             </VBox>
             <VBox alignment="CENTER" prefHeight="49.0" prefWidth="121.0">
                <children>
-                  <Label fx:id="LengthLabel" text="Session Length" />
+                  <Label fx:id="LengthLabel" text="Session Length">
+                     <VBox.margin>
+                        <Insets bottom="2.0" />
+                     </VBox.margin></Label>
                   <TextField fx:id="TotalSessionTime" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="121.0">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />

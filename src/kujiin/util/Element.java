@@ -3,12 +3,10 @@ package kujiin.util;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
-import kujiin.xml.Goals;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
 import java.io.File;
-import java.util.List;
 
 // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
 // TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
@@ -52,20 +50,20 @@ public class Element extends Meditatable {
     @Override
     public boolean buildEntrainment() {
         int index = allmeditatablestoplay.indexOf(this);
-        Meditatable cutorelementbefore = null;
-        Meditatable cutorelementafter = null;
-        if (index != 0) {cutorelementbefore = allmeditatablestoplay.get(index - 1);}
-        if (index != allmeditatablestoplay.size() - 1) {cutorelementafter = allmeditatablestoplay.get(index + 1);}
+        Meditatable meditatablebefore = null;
+        Meditatable meditatableafter = null;
+        if (index != 0) {meditatablebefore = allmeditatablestoplay.get(index - 1);}
+        if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
         int durationinminutes = getdurationinminutes();
         SoundFile rampinfile = null;
         SoundFile rampoutfile = null;
-        if (cutorelementbefore != null || cutorelementafter != null) {
-            if (cutorelementbefore != null) {
-               rampinfile = new SoundFile(new File(Options.DIRECTORYRAMP, "elementin" + cutorelementbefore.name.toLowerCase() + ".mp3"));
+        if (meditatablebefore != null || meditatableafter != null) {
+            if (meditatablebefore != null) {
+               rampinfile = new SoundFile(new File(Options.DIRECTORYRAMP, "elementin" + meditatablebefore.name.toLowerCase() + ".mp3"));
                 durationinminutes -= 1;
             }
-            if (cutorelementafter != null) {
-                rampoutfile = new SoundFile(new File(Options.DIRECTORYRAMP, "elementout" + cutorelementafter.name.toLowerCase() + ".mp3"));
+            if (meditatableafter != null) {
+                rampoutfile = new SoundFile(new File(Options.DIRECTORYRAMP, "elementout" + meditatableafter.name.toLowerCase() + ".mp3"));
                 durationinminutes -= 1;
             }
         }
@@ -80,14 +78,6 @@ public class Element extends Meditatable {
     }
 
 // Goals
-    @Override
-    public void setGoals(List<Goals.Goal> goalslist) {
-        GoalsController.update(goalslist, number);
-    }
-    @Override
-    public List<Goals.Goal> getGoals(boolean includecompleted) {
-        return GoalsController.getallcutgoals(number, includecompleted);
-    }
 
 // Export
 
