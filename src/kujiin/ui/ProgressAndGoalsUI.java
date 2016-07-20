@@ -81,7 +81,7 @@ public class ProgressAndGoalsUI {
 
 // Getters And Setters
     public Sessions getSessions() {return Sessions;}
-    public Goals getGoal() {
+    public Goals getGoal()        {
         return Goals;
     }
 
@@ -235,17 +235,12 @@ public class ProgressAndGoalsUI {
 
 // Other Methods
     public void selectmeditatable(int cutindex) {
-    CutSelectorComboBox.getSelectionModel().select(cutindex);
-}
-    public void selectmeditatable(Meditatable meditatable) {
-        CutSelectorComboBox.getSelectionModel().select(meditatable.number);
+        CutSelectorComboBox.getSelectionModel().select(cutindex);
     }
+    public void selectmeditatable(Meditatable meditatable) {CutSelectorComboBox.getSelectionModel().select(meditatable.number);}
 
-    public void resetallvalues() {
-        resetgoalsui();
-        resetsessionsui();
-    }
-    public void resetgoalsui() {
+    public void resetallvalues()  {resetgoalsui(); resetsessionsui();}
+    public void resetgoalsui()    {
 //        PracticedHours.setText("");
 //        PracticedMinutes.setText("");
 //        GoalHours.setText("");
@@ -256,9 +251,8 @@ public class ProgressAndGoalsUI {
         TotalTimePracticed.setText("No Sessions");
         NumberOfSessionsPracticed.setText("No Sessions");
         AverageSessionDuration.setText("No Sessions");
-
     }
-    public boolean cleanup() {
+    public boolean cleanup()      {
         Goals.marshall();
         Sessions.marshall();
         return true;
@@ -303,8 +297,6 @@ public class ProgressAndGoalsUI {
 //            }
 //            progresstable.getItems().addAll(allrows);
 //        }
-
-
     }
     public static class EditGoalsDialog extends Stage {
         public TableView<CurrentGoalBinding> CurrentGoalTable;
@@ -1350,5 +1342,5 @@ public class ProgressAndGoalsUI {
             }
         }
     }
-
+    
 }

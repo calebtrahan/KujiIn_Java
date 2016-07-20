@@ -439,7 +439,7 @@ public class Meditatable {
         }
         thisession.displayreferencefile();
         if (fade_entrainment_play != null) {
-            if (fade_ambience_play.getStatus() == Animation.Status.RUNNING) {return;}
+            if (fade_entrainment_play.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.setPlayerState(PlayerUI.PlayerState.FADING_PLAY);
             fade_entrainment_play.play();
         } else {
