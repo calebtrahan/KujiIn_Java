@@ -49,11 +49,11 @@ public class Element extends Meditatable {
 // Creation
     @Override
     public boolean buildEntrainment() {
-        int index = allmeditatablestoplay.indexOf(this);
+        int index = getAllmeditatablestoplay().indexOf(this);
         Meditatable meditatablebefore = null;
         Meditatable meditatableafter = null;
-        if (index != 0) {meditatablebefore = allmeditatablestoplay.get(index - 1);}
-        if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
+        if (index != 0) {meditatablebefore = getAllmeditatablestoplay().get(index - 1);}
+        if (index != getAllmeditatablestoplay().size() - 1) {meditatableafter = getAllmeditatablestoplay().get(index + 1);}
         int durationinminutes = getdurationinminutes();
         SoundFile rampinfile = null;
         SoundFile rampoutfile = null;

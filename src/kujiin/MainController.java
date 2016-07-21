@@ -214,8 +214,6 @@ public class MainController implements Initializable {
     public void displaylistofsessions(Event event) {
         ProgressTracker.displaysessionlist();
     }
-    public void showcutprogress(Event event) {
-        ProgressTracker.displaydetailedcutprogress();}
     public void setnewgoal(Event event) {
         ProgressTracker.setnewgoal();}
     public void viewcurrentgoals(Event event) {
@@ -1560,8 +1558,6 @@ public class MainController implements Initializable {
                 else {GoalsCompletedTopLabel.setText("No Goals Completed This Session");}
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
-                DatePracticedTextField.setText(Util.gettodaysdate());
-                DatePracticedTextField.setEditable(false);
                 SessionDurationTextField.setText(Util.format_minstohrsandmins_long(totalsessiontime));
                 SessionDurationTextField.setEditable(false);
                 SessionBarChart.requestFocus();

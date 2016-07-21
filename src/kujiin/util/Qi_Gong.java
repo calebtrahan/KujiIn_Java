@@ -38,11 +38,11 @@ public class Qi_Gong extends Meditatable {
         for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
         entrainment.shuffleCreated();
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            int index = allmeditatablestoplay.indexOf(this);
+            int index = getAllmeditatablestoplay().indexOf(this);
             Meditatable meditatablebefore = null;
             Meditatable meditatableafter = null;
-            if (index != 0) {meditatablebefore = allmeditatablestoplay.get(index - 1);}
-            if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
+            if (index != 0) {meditatablebefore = getAllmeditatablestoplay().get(index - 1);}
+            if (index != getAllmeditatablestoplay().size() - 1) {meditatableafter = getAllmeditatablestoplay().get(index + 1);}
             if (name.equals("Presession") && meditatableafter != null) {
                 String rampupfirstname = "qiin" + meditatableafter.name.toLowerCase() + ".mp3";
                 entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampupfirstname)));

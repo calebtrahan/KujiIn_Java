@@ -374,7 +374,6 @@ public class CreatorAndExporterUI {
     }
 
 // Other Methods
-
     public void checkambience() {
         if (AmbienceSwitch.isSelected()) {
             if (textfieldsnotallzero()) {

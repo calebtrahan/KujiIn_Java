@@ -491,19 +491,20 @@ public class This_Session {
     }
     public boolean create() {
         if (setupcutsinsession()) {
-            int cutcount = 0;
-            int elementcount = 0;
-            for (Meditatable i : getallitemsinSession()) {if (i instanceof Element) elementcount++;}
-            for (Meditatable i : getallitemsinSession()) {if (i instanceof Cut) cutcount++;}
-            if (cutcount > 0) {if (checkcutsinorder() == Util.AnswerType.CANCEL) return false;}
-            if (elementcount > 0 || cutcount > 0) {
-                if (cutcount > 0 && ! wellformedsessionquickcheck()) {
-                    CreatorAndExporterUI.SortSessionItems sortSessionItems = new CreatorAndExporterUI.SortSessionItems(Root, getallitemsinSession());
-                    sortSessionItems.showAndWait();
-                    if (sortSessionItems.getResult() != null && sortSessionItems.getResult() == Util.AnswerType.CANCEL) {return false;}
-                    if (sortSessionItems.getorderedsessionitems() != null) {setItemsinsession(sortSessionItems.getorderedsessionitems());}
-                }
-            }
+            // TODO Renable Breaks Ambience When Reordering Cuts
+//            int cutcount = 0;
+//            int elementcount = 0;
+//            for (Meditatable i : getallitemsinSession()) {if (i instanceof Element) elementcount++;}
+//            for (Meditatable i : getallitemsinSession()) {if (i instanceof Cut) cutcount++;}
+//            if (cutcount > 0) {if (checkcutsinorder() == Util.AnswerType.CANCEL) return false;}
+//            if (elementcount > 0 || cutcount > 0) {
+//                if (cutcount > 0 && ! wellformedsessionquickcheck()) {
+//                    CreatorAndExporterUI.SortSessionItems sortSessionItems = new CreatorAndExporterUI.SortSessionItems(Root, getallitemsinSession());
+//                    sortSessionItems.showAndWait();
+//                    if (sortSessionItems.getResult() != null && sortSessionItems.getResult() == Util.AnswerType.CANCEL) {return false;}
+//                    if (sortSessionItems.getorderedsessionitems() != null) {setItemsinsession(sortSessionItems.getorderedsessionitems());}
+//                }
+//            }
             for (Meditatable i : getallitemsinSession()) {
                 if (! i.build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}
             }

@@ -135,7 +135,7 @@ public class Meditatable {
     public void sortElementsAndCuts() {
         ArrayList<Cut> cutlist = new ArrayList<>();
         ArrayList<Element> elementlist = new ArrayList<>();
-        for (Object i : allmeditatablestoplay) {
+        for (Object i : getAllmeditatablestoplay()) {
             if (i instanceof Cut) {cutlist.add((Cut) i);}
             if (i instanceof Element) {elementlist.add((Element) i);}
         }

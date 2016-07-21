@@ -32,11 +32,11 @@ public class Cut extends Meditatable {
         for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
         entrainment.shuffleCreated();
         if (number == 3 && duration >= 3) {
-            int index = allmeditatablestoplay.indexOf(this);
+            int index = getAllmeditatablestoplay().indexOf(this);
             Meditatable meditatablebefore = null;
             Meditatable meditatableafter = null;
-            if (index != 0) {meditatablebefore = allmeditatablestoplay.get(index - 1);}
-            if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
+            if (index != 0) {meditatablebefore = getAllmeditatablestoplay().get(index - 1);}
+            if (index != getAllmeditatablestoplay().size() - 1) {meditatableafter = getAllmeditatablestoplay().get(index + 1);}
             if (meditatablebefore != null && meditatablebefore.name.equals("Presession")) {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoinqi.mp3")));}
             else {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohin.mp3")));}
             if (meditatableafter != null && meditatableafter.name.equals("Postsession")) {

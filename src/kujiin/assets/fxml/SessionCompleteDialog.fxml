@@ -28,19 +28,33 @@
                <children>
                       <HBox alignment="CENTER_LEFT" prefHeight="66.0" prefWidth="714.0">
                           <children>
-                        <VBox prefHeight="110.0" prefWidth="350.0">
+                        <VBox alignment="TOP_CENTER" prefHeight="110.0" prefWidth="350.0">
                            <children>
-                              <HBox prefHeight="26.0" prefWidth="355.0">
+                              <Label alignment="TOP_CENTER" text="Session Details">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <HBox alignment="CENTER" prefHeight="26.0" prefWidth="355.0">
                                  <children>
-                                          <Label alignment="CENTER_RIGHT" text="Total Session Duration:" />
+                                          <Label alignment="CENTER_RIGHT" text="Total Session Duration:">
+                                       <HBox.margin>
+                                          <Insets right="5.0" />
+                                       </HBox.margin></Label>
                                           <TextField fx:id="SessionDurationTextField" alignment="CENTER" />
                                  </children>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
                               </HBox>
                            </children>
                         </VBox>
                         <VBox alignment="CENTER" prefHeight="79.0" prefWidth="365.0">
                            <children>
-                              <Label fx:id="GoalsCompletedTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="244.0" text="\%d Goals Completed">
+                              <Label fx:id="GoalsCompletedTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="244.0">
                                  <font>
                                     <Font size="15.0" />
                                  </font>
