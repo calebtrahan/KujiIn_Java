@@ -71,6 +71,7 @@ public class Meditatable {
             Value.textProperty().addListener((observable, oldValue, newValue) -> {
                 try {
                     setDuration(Integer.parseInt(Value.getText()));
+                    thissession.getRoot().getCreatorAndExporter().updatecreatorui();
                 } catch (NumberFormatException ignored) {setDuration(0);}
             });
             if (briefsummary != null) {Switch.setTooltip(new Tooltip(briefsummary));}
@@ -112,7 +113,10 @@ public class Meditatable {
     public boolean hasValidValue() {
         return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
     }
-
+    public void setDisable(boolean disabled) {
+        Switch.setDisable(disabled);
+        Value.setDisable(disabled);
+    }
 // Getters And Setters
     public String getNameForChart() {return name;}
     protected MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}

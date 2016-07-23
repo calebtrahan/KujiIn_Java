@@ -88,6 +88,7 @@ public class This_Session {
     }
 
 // Getters And Setters
+    public MainController getRoot() {return Root;}
     public void setPlayerState(PlayerUI.PlayerState playerState) {this.playerState = playerState;}
     public PlayerUI.PlayerState getPlayerState() {return playerState;}
     public boolean isValid() {
@@ -127,20 +128,6 @@ public class This_Session {
     }
     public void setItemsinsession(List<Meditatable> itemsinsession) {
         this.itemsinsession = itemsinsession;
-    }
-    public ArrayList<Cut> getCutsinSession() {
-        ArrayList<Cut> cutinsession = new ArrayList<>();
-        for (Object i : itemsinsession) {
-            if (i instanceof Cut) {cutinsession.add((Cut) i);}
-        }
-        return cutinsession;
-    }
-    public ArrayList<Element> getElementsinSession() {
-        ArrayList<Element> elementsinsession = new ArrayList<>();
-        for (Object i : itemsinsession) {
-            if (i instanceof Element) {elementsinsession.add((Element) i);}
-        }
-        return elementsinsession;
     }
     public Entrainments getEntrainments() {
         return entrainments;
@@ -284,15 +271,168 @@ public class This_Session {
     }
 
 // Creation Methods
-    public boolean sessionvaluesok() {
-        for (Meditatable i : getAllMeditatables()) {
-            Meditatable meditatable = i;
-            if (meditatable.getdurationinminutes() > 0) {return true;}
+    public boolean createsession() {
+    if (sessionhasvalidvalues()) {
+        populateitemsinsession();
+        switch (checksessionwellformed()) {
+            case YES:
+                break;
+            case NO:
+                break;
+            case CANCEL:
+                return false;
         }
-        return false;
+        for (Meditatable i : getallitemsinSession()) {
+            if (! i.build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}
+        }
+        switch (checkgoals()) {
+            case YES:
+                break;
+            case NO:
+                break;
+            case CANCEL:
+                break;
+        }
+        return true;
+    } else {return false;}
+}
+    // Get Session Values
+    public List<Cut> getCutsInSession() {return getallitemsinSession().stream().filter(i -> i instanceof Cut).map(i -> (Cut) i).collect(Collectors.toCollection(ArrayList::new));}
+    public List<Element> getElementsInSession() {return getallitemsinSession().stream().filter(i -> i instanceof Element).map(i -> (Element) i).collect(Collectors.toCollection(ArrayList::new));}
+    // Session Values Validation
+    public void populateitemsinsession() {
+        itemsinsession = new ArrayList<>();
+        for (Meditatable i : getAllMeditatables()) {
+            if (i instanceof Qi_Gong) {
+                if (i.getdurationinminutes() > 0 || Root.getOptions().getSessionOptions().getRampenabled()) {itemsinsession.add(i);}
+            }
+            else if (i.getdurationinminutes() > 0) {itemsinsession.add(i);}
+        }
     }
+    public boolean sessionhasvalidvalues() {
+    boolean sessionhasvalidvalues = false;
+    for (Meditatable i : getAllMeditatables()) {if (i.getdurationinminutes() > 0) {sessionhasvalidvalues = true;}}
+    return sessionhasvalidvalues;
+}
+    // Well Formed Session Validation
+    public boolean firstcutconnectedtorin(List<Cut> cutsinsession) {
+        try {
+            return cutsinsession.get(0).number == 1;
+        } catch (Exception e) {return false;}
+    }
+    public boolean firstandlastcutsconnect(List<Cut> cutsinsession) {
+        if (cutsinsession.size() == 1) {return true;}
+        try {
+            int count = cutsinsession.get(0).number;
+            for (Cut i : cutsinsession) {
+                if (i.number != count) {return false;}
+                count++;
+            }
+            return true;
+        } catch (NullPointerException | IndexOutOfBoundsException ignored) {return false;}
+    }
+    public Util.AnswerType checksessionwellformed() {
+        List<Cut> cutsinsession = getCutsInSession();
+        List<Element> elementsinsession = getElementsInSession();
+        if (cutsinsession != null && cutsinsession.size() > 0) {
+            boolean rinnotstartpoint = firstcutconnectedtorin(cutsinsession);
+            if (! rinnotstartpoint) {rinnotstartpoint = ! Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Cuts In Session Not Connected To RIN, And May Lack The Energy They Need To Get Results",
+                    "Connect " + cutsinsession.get(0).name + " Back To RIN?");}
+            if (! rinnotstartpoint || ! firstandlastcutsconnect(cutsinsession)) {
+                CreatorAndExporterUI.CutsMissingDialog cutsMissingDialog = new CreatorAndExporterUI.CutsMissingDialog(Root, cutsinsession);
+                cutsMissingDialog.showAndWait();
+                switch (cutsMissingDialog.getResult()) {
+                    case YES:
+                        populateitemsinsession();
+                        cutsinsession = getCutsInSession();
+                        break;
+                    case NO:
+                        break;
+                    case CANCEL:
+                        return Util.AnswerType.CANCEL;
+                    default:
+                        break;
+                }
+            }
+        }
+        if (cutsinsession != null && elementsinsession != null && cutsinsession.size() > 0 && elementsinsession.size() > 0) {
+            CreatorAndExporterUI.SortSessionItems sortSessionItems = new CreatorAndExporterUI.SortSessionItems(Root, getallitemsinSession());
+            sortSessionItems.showAndWait();
+            switch (sortSessionItems.getResult()) {
+                case YES:
+                    setItemsinsession(sortSessionItems.getorderedsessionitems());
+                    break;
+                case NO:
+                    break;
+                case CANCEL:
+                    return Util.AnswerType.CANCEL;
+                default:
+                    break;
+            }
+            // Sort Session Parts
+        }
+        return Util.AnswerType.YES;
+    }
+    // Goals Validation
+    public Util.AnswerType checkgoals() {
+        ArrayList<Meditatable> meditatableswithoutlongenoughgoals = Root.getProgressTracker().getmeditatableswithoutlongenoughgoals(getallitemsinSession());
+        List<Integer>  notgooddurations = new ArrayList<>();
+        if (! meditatableswithoutlongenoughgoals.isEmpty()) {
+            boolean presessionmissinggoals = false;
+            int cutcount = 0;
+            int elementcount = 0;
+            boolean postsessionmissinggoals = false;
+            for (Meditatable i : meditatableswithoutlongenoughgoals) {
+                if (i instanceof Cut) {cutcount++;}
+                if (i instanceof Element) {elementcount++;}
+                else {
+                    if (i.name.equals("Presession")) {presessionmissinggoals = true;}
+                    if (i.name.equals("Postsession")) {postsessionmissinggoals = true;}
+                }
+                notgooddurations.add(i.getdurationinminutes());
+            }
+            StringBuilder notgoodtext = new StringBuilder();
+            if (presessionmissinggoals) {notgoodtext.append("Presession\n");}
+            if (cutcount > 0) {notgoodtext.append(cutcount).append(" Cut(s)\n");}
+            if (elementcount > 0) {notgoodtext.append(elementcount).append(" Element(s)\n");}
+            if (postsessionmissinggoals) {notgoodtext.append("Postsession\n");}
+            switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?", "Set Goal", "Continue Anyway", "Cancel Playback")) {
+                case YES:
+                    // TODO Make A Goal Set Dialog Before Playback Here
+                    // Was last parameter-> Util.list_getmaxintegervalue(notgooddurations)
+                    /*ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, meditatableswithoutlongenoughgoals);
+                    s.showAndWait();
+                    if (s.isAccepted()) {
+                        List<Integer> cutindexes = s.getSelectedCutIndexes();
+                        Double goalhours = s.getGoalhours();
+                        LocalDate goaldate = s.getGoaldate();
+                        boolean goalssetsuccessfully = true;
+                        for (Integer i : cutindexes) {
+                            try {
+                                Meditatable x = getAllMeditatablesincludingTotalforTracking().get(i);
+                                x.addGoal(new Goals.Goal(goalhours, x.name));
+                            } catch (JAXBException ignored) {
+                                goalssetsuccessfully = false;
+                                Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + getAllMeditatablesincludingTotalforTracking().get(i).name, "Check File Permissions");
+                            }
+                        }
+                        if (goalssetsuccessfully) {
+                            Util.gui_showinformationdialog(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
+                        }
+                    }
+                    break;*/
+                    break;
+                case NO:
+                    break;
+                case CANCEL:
+                    return Util.AnswerType.CANCEL;
+            }
+            return Util.AnswerType.YES;
+        } else {return Util.AnswerType.YES;}
+    }
+    // Ambience Validation
     public void checkambience(CheckBox ambiencecheckbox) {
-        if (sessionvaluesok()) {
+        if (sessionhasvalidvalues()) {
             ArrayList<Meditatable> cutsorelementswithnoambience = new ArrayList<>();
             ArrayList<Meditatable> cutsorelementswithreducedambience = new ArrayList<>();
             Service<Void> ambiencecheckerservice = new Service<Void>() {
@@ -382,104 +522,7 @@ public class This_Session {
         } else {
             Util.gui_showinformationdialog(Root, "Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
-    public Util.AnswerType checkcutsinorder() {
-        int workingcutcount = 0;
-        for (Meditatable i : getAllMeditatables()) {if (i instanceof Cut) {if (i.getdurationinminutes() > 0) workingcutcount++;}}
-        if (workingcutcount < getallCuts().size()) {
-            CreatorAndExporterUI.CutsMissingDialog cutsMissingDialog = new CreatorAndExporterUI.CutsMissingDialog(Root, getallCuts());
-            cutsMissingDialog.showAndWait();
-            itemsinsession.clear();
-            setupcutsinsession();
-            return cutsMissingDialog.getResult();
-        } else {return Util.AnswerType.YES;}
-    }
-    public Util.AnswerType checkgoals() {
-        ArrayList<Meditatable> meditatableswithoutlongenoughgoals = Root.getProgressTracker().getmeditatableswithoutlongenoughgoals(getallitemsinSession());
-        List<Integer>  notgooddurations = new ArrayList<>();
-        if (! meditatableswithoutlongenoughgoals.isEmpty()) {
-            boolean presessionmissinggoals = false;
-            int cutcount = 0;
-            int elementcount = 0;
-            boolean postsessionmissinggoals = false;
-            for (Meditatable i : meditatableswithoutlongenoughgoals) {
-                if (i instanceof Cut) {cutcount++;}
-                if (i instanceof Element) {elementcount++;}
-                else {
-                    if (i.name.equals("Presession")) {presessionmissinggoals = true;}
-                    if (i.name.equals("Postsession")) {postsessionmissinggoals = true;}
-                }
-                notgooddurations.add(i.getdurationinminutes());
-            }
-            StringBuilder notgoodtext = new StringBuilder();
-            if (presessionmissinggoals) {notgoodtext.append("Presession\n");}
-            if (cutcount > 0) {notgoodtext.append(cutcount).append(" Cut(s)\n");}
-            if (elementcount > 0) {notgoodtext.append(elementcount).append(" Element(s)\n");}
-            if (postsessionmissinggoals) {notgoodtext.append("Postsession\n");}
-            switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?", "Set Goal", "Continue Anyway", "Cancel Playback")) {
-                case YES:
-                    // Was last parameter-> Util.list_getmaxintegervalue(notgooddurations)
-                    /*ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, meditatableswithoutlongenoughgoals);
-                    s.showAndWait();
-                    if (s.isAccepted()) {
-                        List<Integer> cutindexes = s.getSelectedCutIndexes();
-                        Double goalhours = s.getGoalhours();
-                        LocalDate goaldate = s.getGoaldate();
-                        boolean goalssetsuccessfully = true;
-                        // TODO Only Add Goals If They Are Higher (And A Later Date) Than All Other Goals For That Cut/Element
-                        for (Integer i : cutindexes) {
-                            try {
-                                Meditatable x = getAllMeditatablesincludingTotalforTracking().get(i);
-                                x.addGoal(new Goals.Goal(goalhours, x.name));
-                            } catch (JAXBException ignored) {
-                                goalssetsuccessfully = false;
-                                Util.gui_showerrordialog(Root, "Error", "Couldn't Add Goal For " + getAllMeditatablesincludingTotalforTracking().get(i).name, "Check File Permissions");
-                            }
-                        }
-                        if (goalssetsuccessfully) {
-                            Util.gui_showinformationdialog(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
-                        }
-                    }
-                    break;*/
-                case NO:
-                    break;
-                case CANCEL:
-                    // TODO Find A Way To Cancel Playback And Creation Here
-                    break;
-            }
-        }
-        return null;
-    }
-    public boolean setupcutsinsession() {
-        itemsinsession = new ArrayList<>();
-        if (Presession.getdurationinminutes() != 0 || Root.getOptions().getSessionOptions().getRampenabled()) {itemsinsession.add(Presession);}
-        if (Rin.getdurationinminutes() != 0) {itemsinsession.add(Rin);}
-        if (Kyo.getdurationinminutes() != 0) {itemsinsession.add(Kyo);}
-        if (Toh.getdurationinminutes() != 0) {itemsinsession.add(Toh);}
-        if (Sha.getdurationinminutes() != 0) {itemsinsession.add(Sha);}
-        if (Kai.getdurationinminutes() != 0) {itemsinsession.add(Kai);}
-        if (Jin.getdurationinminutes() != 0) {itemsinsession.add(Jin);}
-        if (Retsu.getdurationinminutes() != 0) {itemsinsession.add(Retsu);}
-        if (Zai.getdurationinminutes() != 0) {itemsinsession.add(Zai);}
-        if (Zen.getdurationinminutes() != 0) {itemsinsession.add(Zen);}
-        if (Earth.getdurationinminutes() != 0) {itemsinsession.add(Earth);}
-        if (Air.getdurationinminutes() != 0) {itemsinsession.add(Air);}
-        if (Fire.getdurationinminutes() != 0) {itemsinsession.add(Fire);}
-        if (Water.getdurationinminutes() != 0) {itemsinsession.add(Water);}
-        if (Void.getdurationinminutes() != 0) {itemsinsession.add(Void);}
-        if (Postsession.getdurationinminutes() != 0 || Root.getOptions().getSessionOptions().getRampenabled()) {itemsinsession.add(Postsession);}
-        setItemsinsession(itemsinsession);
-        return getallitemsinSession().size() > 0;
-    }
-    public boolean wellformedsessionquickcheck() {
-        boolean wellformed = true;
-        ArrayList<Cut> cutsinsession = getallitemsinSession().stream().filter(i -> i instanceof Cut).map(i -> (Cut) i).collect(Collectors.toCollection(ArrayList::new));
-        int cutcount = 1;
-        for (Cut i : cutsinsession) {
-            if (i.number != cutcount) {wellformed = false;}
-            cutcount++;
-        }
-        return wellformed;
-    }
+    // Reference Files Validation
     public boolean checkallreferencefilesforsession(PlayerUI.ReferenceType referenceType, boolean enableprompt) {
         int invalidcutcount = 0;
         for (Meditatable i : getallitemsinSession()) {
@@ -489,35 +532,9 @@ public class This_Session {
             return Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "There Are " + invalidcutcount + " Cuts/Elements With Empty/Invalid Reference Files", "Enable Reference Anyways?");
         } else {return invalidcutcount == 0;}
     }
-    public boolean create() {
-        if (setupcutsinsession()) {
-            // TODO Renable Breaks Ambience When Reordering Cuts
-//            int cutcount = 0;
-//            int elementcount = 0;
-//            for (Meditatable i : getallitemsinSession()) {if (i instanceof Element) elementcount++;}
-//            for (Meditatable i : getallitemsinSession()) {if (i instanceof Cut) cutcount++;}
-//            if (cutcount > 0) {if (checkcutsinorder() == Util.AnswerType.CANCEL) return false;}
-//            if (elementcount > 0 || cutcount > 0) {
-//                if (cutcount > 0 && ! wellformedsessionquickcheck()) {
-//                    CreatorAndExporterUI.SortSessionItems sortSessionItems = new CreatorAndExporterUI.SortSessionItems(Root, getallitemsinSession());
-//                    sortSessionItems.showAndWait();
-//                    if (sortSessionItems.getResult() != null && sortSessionItems.getResult() == Util.AnswerType.CANCEL) {return false;}
-//                    if (sortSessionItems.getorderedsessionitems() != null) {setItemsinsession(sortSessionItems.getorderedsessionitems());}
-//                }
-//            }
-            for (Meditatable i : getallitemsinSession()) {
-                if (! i.build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}
-            }
-            checkgoals();
-            return true;
-        } else {return false;}
-    }
+    // Reset
     public void resetcreateditems() {
-        for (Object i : getAllMeditatables()) {
-            if (i instanceof Element) {((Element) i).resetCreation();}
-            if (i instanceof Cut) {((Cut) i).resetCreation();}
-            if (i instanceof  Qi_Gong) {((Qi_Gong) i).resetCreation();}
-        }
+        getAllMeditatables().forEach(Meditatable::resetCreation);
     }
 
 // Export
