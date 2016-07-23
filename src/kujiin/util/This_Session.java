@@ -680,12 +680,6 @@ public class This_Session {
     }
     public void updateplayerui() {
         try {
-//            try {
-                // TODO Debug Entrainment Player Being Off And On Here
-//                System.out.println(currentmeditatable.name + " (" + Util.format_secondsforplayerdisplay(currentmeditatable.secondselapsed) +
-//                        ") -> Entrainment Player Is : " + currentmeditatable.getCurrentEntrainmentPlayer().getStatus().toString() +
-//                " And Ambience Player Is: " + currentmeditatable.getCurrentAmbiencePlayer().getStatus().toString());
-//            } catch (NullPointerException ignored) {}
             totalsecondselapsed++;
             currentmeditatable.secondselapsed++;
             Float currentprogress;

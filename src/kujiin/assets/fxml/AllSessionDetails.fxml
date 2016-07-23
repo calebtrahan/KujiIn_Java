@@ -271,8 +271,8 @@
                                     </HBox>
                                     <TableView fx:id="sessionsTableView" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                                       <columns>
-                                        <TableColumn fx:id="DateColumn" maxWidth="-1.0" minWidth="55.0" prefWidth="-1.0" text="Date" />
-                                          <TableColumn fx:id="PreColumn" minWidth="55.0" prefWidth="-1.0" text="Pre" />
+                                        <TableColumn fx:id="DateColumn" maxWidth="-1.0" minWidth="80.0" prefWidth="-1.0" text="Date" />
+                                          <TableColumn fx:id="PreColumn" minWidth="30.0" prefWidth="56.0" text="Pre" />
                                         <TableColumn fx:id="RinColumn" minWidth="55.0" prefWidth="-1.0" text="Rin" />
                                           <TableColumn fx:id="KyoColumn" minWidth="55.0" prefWidth="-1.0" text="Kyo" />
                                           <TableColumn fx:id="TohColumn" minWidth="55.0" prefWidth="-1.0" text="Toh" />
@@ -288,7 +288,7 @@
                                           <TableColumn fx:id="WaterColumn" minWidth="55.0" prefWidth="-1.0" text="Water" />
                                           <TableColumn fx:id="VoidColumn" minWidth="55.0" prefWidth="-1.0" text="Void" />
                                           <TableColumn fx:id="PostColumn" minWidth="55.0" prefWidth="-1.0" text="Post" />
-                                          <TableColumn fx:id="TotalColumn" minWidth="55.0" prefWidth="-1.0" text="Total" />
+                                          <TableColumn fx:id="TotalColumn" maxWidth="-1.0" minWidth="100.0" prefWidth="-1.0" text="Total" />
                                       </columns>
                                     </TableView>
                                     <HBox prefHeight="20.0" prefWidth="928.0">
@@ -318,60 +318,6 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                  <Tab text="Goals">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <TabPane layoutX="139.0" layoutY="161.0" prefHeight="555.0" prefWidth="928.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                <tabs>
-                                  <Tab text="Current Goals">
-                                    <content>
-                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                             <children>
-                                                <HBox layoutX="62.0" layoutY="56.0" prefHeight="555.0" prefWidth="895.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                   <children>
-                                                      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                                                         <children>
-                                                            <Label text="Name" />
-                                                         </children>
-                                                      </VBox>
-                                                      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                                                         <children>
-                                                            <Label text="Practice TIme" />
-                                                         </children>
-                                                      </VBox>
-                                                      <VBox alignment="CENTER" prefHeight="306.0" prefWidth="423.0">
-                                                         <children>
-                                                            <ProgressBar prefWidth="200.0" progress="0.0" />
-                                                         </children>
-                                                      </VBox>
-                                                      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                                                         <children>
-                                                            <Label text="100%" />
-                                                         </children>
-                                                      </VBox>
-                                                      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                                                         <children>
-                                                            <Button mnemonicParsing="false" text="Set" />
-                                                         </children>
-                                                      </VBox>
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </AnchorPane>
-                                    </content>
-                                  </Tab>
-                                  <Tab text="Completed Goals">
-                                    <content>
-                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                                    </content>
-                                  </Tab>
-                                </tabs>
-                              </TabPane>
-                           </children>
-                        </AnchorPane>
-                    </content>
-                  </Tab>
               </tabs>
             </TabPane>
          </children>
