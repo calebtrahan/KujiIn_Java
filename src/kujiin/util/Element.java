@@ -54,7 +54,7 @@ public class Element extends Meditatable {
         Meditatable meditatableafter = null;
         if (index != 0) {meditatablebefore = getAllmeditatablestoplay().get(index - 1);}
         if (index != getAllmeditatablestoplay().size() - 1) {meditatableafter = getAllmeditatablestoplay().get(index + 1);}
-        int durationinminutes = getdurationinminutes();
+        double durationinminutes = getduration().toMinutes();
         SoundFile rampinfile = null;
         SoundFile rampoutfile = null;
         if (meditatablebefore != null || meditatableafter != null) {
@@ -74,7 +74,7 @@ public class Element extends Meditatable {
         entrainment.shuffleCreated();
         if (rampinfile != null) {entrainment.created_add(0, rampinfile);}
         if (rampoutfile != null) {entrainment.created_add(rampoutfile);}
-        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() / 1000 >= getdurationinseconds();
+        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().greaterThanOrEqualTo(getduration());
     }
 
 // Goals

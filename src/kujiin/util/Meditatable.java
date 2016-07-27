@@ -28,7 +28,7 @@ public class Meditatable {
 // Data Fields
     public int number;
     public String name;
-    protected int duration;
+    protected Duration duration;
     protected This_Session thisession;
     protected Ambience ambience;
     protected Entrainment entrainment;
@@ -50,7 +50,7 @@ public class Meditatable {
     protected Animation timeline_progresstonextmeditatable;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
-    public int secondselapsed;
+    public Duration elapsedtime;
     protected List<Cut> cutstoplay;
     protected List<Element> elementstoplay;
     protected List<Meditatable> allmeditatablestoplay;
@@ -62,7 +62,7 @@ public class Meditatable {
     public Meditatable(int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
-        this.duration = duration;
+        this.duration = new Duration((duration * 60) * 1000);
         this.thisession = thissession;
         if (aSwitch != null && value != null) {
             Switch = aSwitch;
@@ -121,7 +121,7 @@ public class Meditatable {
     public String getNameForChart() {return name;}
     protected MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
     protected MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
-    public void setDuration(int newduration) {duration = newduration;}
+    public void setDuration(double newduration) {duration = new Duration((newduration * 60) * 1000);}
     public void setAmbienceenabled(boolean ambienceenabled) {
         this.ambienceenabled = ambienceenabled;
     }
@@ -168,19 +168,8 @@ public class Meditatable {
         this.currentambiencevolume = currentambiencevolume;
     }
     // Duration
-    public Duration getdurationasobject() {return new Duration(getdurationinmillis());}
-    public int getdurationinmillis() {return getdurationinseconds() * 1000;}
-    public int getdurationinseconds() {
-        return duration * 60;
-    }
-    public int getdurationinminutes() {
-        return duration;
-    }
-    public Double getdurationindecimalhours() {return Util.convert_minstodecimalhours(getdurationinminutes(), 2);}
-    public String getcurrenttimeformatted() {
-        return Util.formatdurationtoStringDecimalWithColons(new Duration(secondselapsed * 1000));
-    }
-    public String gettotaltimeformatted() {return Util.formatdurationtoStringDecimalWithColons(new Duration(getdurationinseconds() * 1000));}
+    public Duration getduration() {return duration;}
+    public Duration getelapsedtime() {return elapsedtime;}
 
 // Creation
     public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {
@@ -195,46 +184,46 @@ public class Meditatable {
     }
     public boolean buildAmbience() {
         ambience.created_clear();
-        double currentdurationinmillis = 0.0;
-        if (ambience.hasEnoughAmbience(getdurationinmillis())) {
+        Duration currentambienceduration = new Duration(0);
+        if (ambience.hasEnoughAmbience(getduration())) {
             for (SoundFile i : ambience.getAmbience()) {
-                if (ambience.gettotalCreatedDuration() < getdurationinmillis()) {
+                if (ambience.gettotalCreatedDuration().lessThan(getduration())) {
                     ambience.created_add(i);
-                    currentdurationinmillis += i.getDuration();
+                    currentambienceduration.add(new Duration(i.getDuration()));
                 } else {break;}
             }
         } else {
             Random randint = new Random();
-            while (currentdurationinmillis < getdurationinmillis()) {
+            while (currentambienceduration.lessThan(getduration())) {
                 List<SoundFile> createdambience = ambience.created_getAll();
                 SoundFile selectedsoundfile = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
                 if (createdambience.size() < 2) {
                     ambience.created_add(selectedsoundfile);
-                    currentdurationinmillis += selectedsoundfile.getDuration();
+                    currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
                 } else if (createdambience.size() == 2) {
                     if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1))) {
                         ambience.created_add(selectedsoundfile);
-                        currentdurationinmillis += selectedsoundfile.getDuration();
+                        currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
                     }
                 } else if (createdambience.size() == 3) {
                     if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2))) {
                         ambience.created_add(selectedsoundfile);
-                        currentdurationinmillis += selectedsoundfile.getDuration();
+                        currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
                     }
                 } else if (createdambience.size() <= 5) {
                     if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3))) {
                         ambience.created_add(selectedsoundfile);
-                        currentdurationinmillis += selectedsoundfile.getDuration();
+                        currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
                     }
                 } else if (createdambience.size() > 5) {
                     if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 4))) {
                         ambience.created_add(selectedsoundfile);
-                        currentdurationinmillis += selectedsoundfile.getDuration();
+                        currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
                     }
                 }
             }
         }
-        return ambience.created_getAll().size() > 0;
+        return ambience.created_getAll().size() > 0 && currentambienceduration.greaterThanOrEqualTo(getduration());
     }
     public void resetCreation() {
         entrainment.created_clear();
@@ -428,10 +417,10 @@ public class Meditatable {
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
-        timeline_progresstonextmeditatable = new Timeline(new KeyFrame(new Duration(getdurationinmillis()), ae -> thisession.progresstonextcut()));
+        timeline_progresstonextmeditatable = new Timeline(new KeyFrame(getduration(), ae -> thisession.progresstonextcut()));
         timeline_progresstonextmeditatable.play();
         if (fade_entrainment_stop != null) {
-            timeline_fadeout_timer = new Timeline(new KeyFrame(new Duration(getdurationinmillis() - (thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000)), ae -> {
+            timeline_fadeout_timer = new Timeline(new KeyFrame(getduration().subtract(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000)), ae -> {
                 volume_unbindentrainment();
                 fade_entrainment_stop.play();
                 if (fade_ambience_stop != null) {
@@ -821,7 +810,7 @@ public class Meditatable {
 //        } catch (NullPointerException ignored) {}
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             ProgressAndGoalsUI progressAndGoalsUI = thisession.Root.getProgressTracker();
-            progressAndGoalsUI.getSessions().sessioninformation_getspecificsession(progressAndGoalsUI.getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
+            progressAndGoalsUI.getSessions().sessioninformation_getspecificsession(progressAndGoalsUI.getSessions().getSession().size() - 1).updatecutduration(number, new Double(elapsedtime.toMinutes()).intValue());
         }
     }
     // Error Handling
@@ -932,7 +921,7 @@ public class Meditatable {
     // Validation
     public boolean goalsarelongenough() {
         try {
-            return (getTotalMinutesPracticed(false) + 60) + getdurationinminutes() >= getCurrentGoal().getGoal_Hours();
+            return (getTotalMinutesPracticed(false) / 60) + getduration().toHours() >= getCurrentGoal().getGoal_Hours();
         } catch (NullPointerException e) {return true;}
     }
     // Utility
@@ -943,10 +932,10 @@ public class Meditatable {
         }
     }
     public void completecutgoals() {
-        GoalsController.completegoals(number, getdurationindecimalhours());
+        GoalsController.completegoals(number, getduration());
     }
     public List<kujiin.xml.Goals.Goal> completegoalsandgetcompleted() {
-        return GoalsController.completegoalsandgetcompleted(number, getdurationindecimalhours());
+        return GoalsController.completegoalsandgetcompleted(number, getduration());
     }
     public List<kujiin.xml.Goals.Goal> getGoalsCompletedThisSession() {
         return GoalsController.getgoalsCompletedOn(number, LocalDate.now());

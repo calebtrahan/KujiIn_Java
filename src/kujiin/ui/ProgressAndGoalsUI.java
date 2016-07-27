@@ -170,13 +170,7 @@ public class ProgressAndGoalsUI {
 
 // Goal Specific Methods
     public ArrayList<Meditatable> getmeditatableswithoutlongenoughgoals(List<Meditatable> cutsandelementsinsession) {
-        ArrayList<Meditatable> notgoodelementselementsorcuts = new ArrayList<>();
-        for (Meditatable i : cutsandelementsinsession) {
-            if (i.getdurationinminutes() != 0 && ! i.goalsarelongenough()) {
-                notgoodelementselementsorcuts.add(i);
-            }
-        }
-        return notgoodelementselementsorcuts;
+        return cutsandelementsinsession.stream().filter(i -> i.getduration().greaterThan(Duration.ZERO) && !i.goalsarelongenough()).collect(Collectors.toCollection(ArrayList::new));
     }
     public int getlowestgoalminutesforallmeditatables(List<Meditatable> meditatables) {
         List<Integer> currentgoalhours = new ArrayList<>();
@@ -494,7 +488,7 @@ public class ProgressAndGoalsUI {
             Double days = (double) PracticeDays.getValue();
             Float hourstopractice = hoursleft.floatValue() / days.floatValue();
             int minsaday = Util.convert_decimalhourstominutes(hourstopractice.doubleValue());
-            PracticeTimeADay.setText(Util.formatdurationtoStringSpelledOut(new Duration(minsaday * 1000), PracticeTimeADay.getLayoutBounds().getWidth()));
+            PracticeTimeADay.setText(Util.formatdurationtoStringSpelledOut(new Duration((minsaday * 60) * 1000), PracticeTimeADay.getLayoutBounds().getWidth()));
         }
     }
     public static class AllSessionsDetails extends Stage {

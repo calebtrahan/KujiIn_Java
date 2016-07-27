@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 // TODO Get FFMPEG Working To Mix Audio Files Together
     // Not Supported Stream?
@@ -301,7 +300,7 @@ public class CreatorAndExporterUI {
     }
 
 // Presets
-    public void changevaluestopreset(ArrayList<Integer> presetvalues) {
+    public void changevaluestopreset(ArrayList<Double> presetvalues) {
         try {
             for (int i = 0; i < Root.getSession().getAllMeditatables().size(); i++) {
                  Root.getSession().getAllMeditatables().get(i).setDuration(presetvalues.get(i));
@@ -309,9 +308,6 @@ public class CreatorAndExporterUI {
         } catch (ArrayIndexOutOfBoundsException ignored) {
             Util.gui_showerrordialog(Root, "Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
         }
-    }
-    public ArrayList<Integer> getcreatorvalues() {
-        return Root.getSession().getAllMeditatables().stream().map(Meditatable::getdurationinminutes).collect(Collectors.toCollection(ArrayList::new));
     }
     public void loadpreset() {
         File presetfile = Preset.openpreset();
@@ -321,7 +317,9 @@ public class CreatorAndExporterUI {
     }
     public void savepreset() {
         // TODO Saving Preset Is Broke!
-        Preset.setpresettimes(getcreatorvalues());
+        ArrayList<Double> creatorvalues = new ArrayList<>();
+        for (Meditatable i : Root.getSession().getAllMeditatables()) {creatorvalues.add(i.getduration().toMinutes());}
+        Preset.setpresettimes(creatorvalues);
         if (! Preset.validpreset()) {Util.gui_showinformationdialog(Root, "Information", "Cannot Save Preset", "All Values Are 0"); return;}
         if (Preset.savepreset()) {Util.gui_showtimedmessageonlabel(StatusBar, "Preset Successfully Saved", 4000);}
         else {Util.gui_showerrordialog(Root, "Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
@@ -437,7 +435,7 @@ public class CreatorAndExporterUI {
         public int getlastworkingcutindex() {
             int lastcutindex = 0;
             for (Cut i : allcuts) {
-                if (i.getdurationinminutes() > 0) {lastcutindex = i.number;}
+                if (i.getduration().greaterThan(Duration.ZERO)) {lastcutindex = i.number;}
             }
             return lastcutindex;
         }
@@ -448,8 +446,8 @@ public class CreatorAndExporterUI {
                 StringBuilder currentcuttext = new StringBuilder();
                 Cut selectedcut = allcuts.get(i);
                 currentcuttext.append(selectedcut.number).append(". ").append(selectedcut.name);
-                if (selectedcut.getdurationinminutes() > 0) {
-                    currentcuttext.append(" (").append(Util.formatdurationtoStringSpelledOut(new Duration(selectedcut.getdurationinmillis() * 1000), SessionListView.getLayoutBounds().getWidth() - (currentcuttext.length() + 1)));
+                if (selectedcut.getduration().greaterThan(Duration.ZERO)) {
+                    currentcuttext.append(" (").append(Util.formatdurationtoStringSpelledOut(selectedcut.getduration(), SessionListView.getLayoutBounds().getWidth() - (currentcuttext.length() + 1)));
                     currentcuttext.append(")");
                 } else {
                     if (missingcuts == null) {missingcuts = new ArrayList<>();}
@@ -468,7 +466,7 @@ public class CreatorAndExporterUI {
                 cutdurationdialog.showAndWait();
                 for (Cut i : missingcuts) {
                     if (cutdurationdialog.getDuration() != 0) {
-                        Root.getSession().setDuration(i.number, cutdurationdialog.getDuration());
+                        i.setDuration(cutdurationdialog.getDuration());
                     }
                 }
             }
@@ -597,7 +595,7 @@ public class CreatorAndExporterUI {
             tableitems.clear();
             int count = 1;
             for (Meditatable i : sessionitems) {
-                tableitems.add(new SessionItem(count, i.name, Util.formatdurationtoStringDecimalWithColons(new Duration(i.getdurationinmillis()))));
+                tableitems.add(new SessionItem(count, i.name, Util.formatdurationtoStringDecimalWithColons(i.getduration())));
                 count++;
             }
             SessionItemsTable.setItems(tableitems);

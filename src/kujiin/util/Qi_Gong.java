@@ -32,8 +32,8 @@ public class Qi_Gong extends Meditatable {
 // Creation
     @Override
     public boolean buildEntrainment() {
-        int fivetimes = duration / 5;
-        int singletimes = duration % 5;
+        int fivetimes = new Double(getduration().toMinutes() / 5).intValue();
+        int singletimes = new Double(getduration().toMinutes() % 5).intValue();
         for (int i = 0; i < fivetimes; i++) {entrainment.created_add(entrainment.getFreqlong());}
         for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
         entrainment.shuffleCreated();
@@ -54,44 +54,19 @@ public class Qi_Gong extends Meditatable {
                 entrainment.created_add(0, entrainment.getRampoutfile());
             }
         }
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            return entrainment.created_getAll().size() > 0;
-        } else {
-            return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() > 0.0;
-        }
+        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().greaterThanOrEqualTo(getduration());
     }
 
 // Playback
     // Playback Getters
     @Override
-    public Duration getdurationasobject() {
-        double dur = super.getdurationasobject().toSeconds();
+    public Duration getduration() {
+        double dur = super.getduration().toSeconds();
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
             dur += thisession.Root.getOptions().getSessionOptions().getRampduration() * 60;
         }
         return new Duration(dur * 1000);
     }
-    @Override
-    public int getdurationinseconds() {
-        int seconds = super.getdurationinseconds();
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            seconds += thisession.Root.getOptions().getSessionOptions().getRampduration() * 60;
-        }
-        return seconds;
-    }
-    @Override
-    public int getdurationinminutes() {
-        int minutes = super.getdurationinminutes();
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            minutes += thisession.Root.getOptions().getSessionOptions().getRampduration();
-        }
-        return minutes;
-    }
-    @Override
-    public Double getdurationindecimalhours() {
-        return Util.convert_minstodecimalhours(this.getdurationinminutes(), 2);
-    }
-    @Override
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists

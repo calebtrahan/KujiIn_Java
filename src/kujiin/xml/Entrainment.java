@@ -2,6 +2,7 @@ package kujiin.xml;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -69,12 +70,10 @@ public class Entrainment {
     public void created_clear() {if (CreatedEntrainment != null) CreatedEntrainment.clear();}
 
     // Information Methods
-    public Double gettotalCreatedDuration() {
-        Double duration = 0.0;
+    public Duration gettotalCreatedDuration() {
+        Duration duration = Duration.ZERO;
         for (SoundFile i : CreatedEntrainment) {
-            if (i.getDuration() != null) {
-                duration += i.getDuration();
-            }
+            if (i.getDuration() != null) {duration.add(new Duration(i.getDuration()));}
         }
         return duration;
     }

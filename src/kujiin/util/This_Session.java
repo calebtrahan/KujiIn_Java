@@ -50,8 +50,8 @@ public class This_Session {
     private Meditatable currentmeditatable;
     private Timeline updateuitimeline;
     private Sessions sessions;
-    private int totalsecondselapsed;
-    private int totalsecondsinsession;
+    private Duration totalsessiondurationelapsed;
+    private Duration totalsessionduration;
     private int meditatablecount;
     private PlayerUI.DisplayReference displayReference;
     public MainController Root;
@@ -92,9 +92,9 @@ public class This_Session {
     public void setPlayerState(PlayerUI.PlayerState playerState) {this.playerState = playerState;}
     public PlayerUI.PlayerState getPlayerState() {return playerState;}
     public boolean isValid() {
-        int totaltime = 0;
-        for (Object i : getAllMeditatables()) {totaltime += ((Meditatable) i).getdurationinminutes();}
-        return totaltime > 0;
+        Duration totaltime = Duration.ZERO;
+        for (Meditatable i : getAllMeditatables()) {totaltime.add(i.getduration());}
+        return totaltime.greaterThan(Duration.ZERO);
     }
     public void setSessions() {
         sessions = Root.getProgressTracker().getSessions();
@@ -146,18 +146,6 @@ public class This_Session {
     }
     public void setDisplayReference(PlayerUI.DisplayReference displayReference) {
         this.displayReference = displayReference;
-    }
-    public int getTotalsecondselapsed() {
-        return totalsecondselapsed;
-    }
-    public void setTotalsecondselapsed(int totalsecondselapsed) {
-        this.totalsecondselapsed = totalsecondselapsed;
-    }
-    public int getTotalsecondsinsession() {
-        return totalsecondsinsession;
-    }
-    public void setTotalsecondsinsession(int totalsecondsinsession) {
-        this.totalsecondsinsession = totalsecondsinsession;
     }
 
 // Cut And Element Getters
@@ -211,55 +199,8 @@ public class This_Session {
     }
 
 // GUI
-    public void setDuration(int elementorcutindex, int duration) {
-        if (elementorcutindex == 0) {Presession.setDuration(duration);}
-        if (elementorcutindex == 1) {Rin.setDuration(duration);}
-        if (elementorcutindex == 2) {Kyo.setDuration(duration);}
-        if (elementorcutindex == 3) {Toh.setDuration(duration);}
-        if (elementorcutindex == 4) {Sha.setDuration(duration);}
-        if (elementorcutindex == 5) {Kai.setDuration(duration);}
-        if (elementorcutindex == 6) {Jin.setDuration(duration);}
-        if (elementorcutindex == 7) {Retsu.setDuration(duration);}
-        if (elementorcutindex == 8) {Zai.setDuration(duration);}
-        if (elementorcutindex == 9) {Zen.setDuration(duration);}
-        if (elementorcutindex == 10) {Postsession.setDuration(duration);}
-        if (elementorcutindex == 11) {Earth.setDuration(duration);}
-        if (elementorcutindex == 12) {Air.setDuration(duration);}
-        if (elementorcutindex == 13) {Fire.setDuration(duration);}
-        if (elementorcutindex == 14) {Water.setDuration(duration);}
-        if (elementorcutindex == 15) {Void.setDuration(duration);}
-    }
-    public int getDuration(int elementorcutindex) {
-        if (elementorcutindex == 0) {
-            int value = Presession.getdurationinminutes();
-            if (Root.getOptions().getSessionOptions().getRampenabled()) {value -= Root.getOptions().getSessionOptions().getRampduration();}
-            return value;
-        }
-        if (elementorcutindex == 1) {return Rin.getdurationinminutes();}
-        if (elementorcutindex == 2) {return Kyo.getdurationinminutes();}
-        if (elementorcutindex == 3) {return Toh.getdurationinminutes();}
-        if (elementorcutindex == 4) {return Sha.getdurationinminutes();}
-        if (elementorcutindex == 5) {return Kai.getdurationinminutes();}
-        if (elementorcutindex == 6) {return Jin.getdurationinminutes();}
-        if (elementorcutindex == 7) {return Retsu.getdurationinminutes();}
-        if (elementorcutindex == 8) {return Zai.getdurationinminutes();}
-        if (elementorcutindex == 9) {return Zen.getdurationinminutes();}
-        if (elementorcutindex == 10) {return Earth.getdurationinminutes();}
-        if (elementorcutindex == 11) {return Air.getdurationinminutes();}
-        if (elementorcutindex == 12) {return Fire.getdurationinminutes();}
-        if (elementorcutindex == 13) {return Water.getdurationinminutes();}
-        if (elementorcutindex == 14) {return Void.getdurationinminutes();}
-        if (elementorcutindex == 15) {
-            int value = Postsession.getdurationinminutes();
-            if (Root.getOptions().getSessionOptions().getRampenabled()) {value -= Root.getOptions().getSessionOptions().getRampduration();}
-            return value;
-        }
-        return 0;
-    }
-
     public ArrayList<Integer> getallsessionvalues() {
-        ArrayList<Integer> values = new ArrayList<>();
-        for (int i=0; i<=15; i++) {values.add(getDuration(i));}
+        ArrayList<Integer> values = getAllMeditatables().stream().map(i -> new Double(i.getduration().toMinutes()).intValue()).collect(Collectors.toCollection(ArrayList::new));
         return values;
     }
     public ArrayList<Integer> getcutsessionvalues(boolean includepreandpost) {
@@ -304,16 +245,16 @@ public class This_Session {
         itemsinsession = new ArrayList<>();
         for (Meditatable i : getAllMeditatables()) {
             if (i instanceof Qi_Gong) {
-                if (i.getdurationinminutes() > 0 || Root.getOptions().getSessionOptions().getRampenabled()) {itemsinsession.add(i);}
+                if (i.getduration().greaterThan(Duration.ZERO) || Root.getOptions().getSessionOptions().getRampenabled()) {itemsinsession.add(i);}
             }
-            else if (i.getdurationinminutes() > 0) {itemsinsession.add(i);}
+            else if (i.getduration().greaterThan(Duration.ZERO)) {itemsinsession.add(i);}
         }
     }
     public boolean sessionhasvalidvalues() {
-    boolean sessionhasvalidvalues = false;
-    for (Meditatable i : getAllMeditatables()) {if (i.getdurationinminutes() > 0) {sessionhasvalidvalues = true;}}
-    return sessionhasvalidvalues;
-}
+        boolean sessionhasvalidvalues = false;
+        for (Meditatable i : getAllMeditatables()) {if (i.getduration().greaterThan(Duration.ZERO)) {sessionhasvalidvalues = true;}}
+        return sessionhasvalidvalues;
+    }
     // Well Formed Session Validation
     public boolean firstcutconnectedtorin(List<Cut> cutsinsession) {
         try {
@@ -389,7 +330,7 @@ public class This_Session {
                     if (i.name.equals("Presession")) {presessionmissinggoals = true;}
                     if (i.name.equals("Postsession")) {postsessionmissinggoals = true;}
                 }
-                notgooddurations.add(i.getdurationinminutes());
+                notgooddurations.add(new Double(i.getduration().toMinutes()).intValue());
             }
             StringBuilder notgoodtext = new StringBuilder();
             if (presessionmissinggoals) {notgoodtext.append("Presession\n");}
@@ -445,7 +386,7 @@ public class This_Session {
                                 for (Meditatable i : getAllMeditatables()) {
                                     updateMessage(String.format("Currently Checking %s...", i.name));
                                     if (! i.getAmbience().hasAnyAmbience()) {cutsorelementswithnoambience.add(i);}
-                                    else if (! i.getAmbience().hasEnoughAmbience(i.getdurationinseconds())) {cutsorelementswithreducedambience.add(i);}
+                                    else if (! i.getAmbience().hasEnoughAmbience(i.getduration())) {cutsorelementswithreducedambience.add(i);}
                                 }
                                 updateMessage("Done Checking Ambience");
                                 return null;
@@ -493,8 +434,8 @@ public class This_Session {
                         for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
                             a.append("\n");
                             Meditatable thismeditatable = cutsorelementswithreducedambience.get(i);
-                            String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(new Duration(thismeditatable.getAmbience().gettotalActualDuration() * 1000), null);
-                            String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(new Duration(thismeditatable.getdurationinmillis()), null);
+                            String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(thismeditatable.getAmbience().gettotalActualDuration(), null);
+                            String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(thismeditatable.getduration(), null);
                             a.append(count).append(". ").append(thismeditatable.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }
@@ -648,10 +589,10 @@ public class This_Session {
             case STOPPED:
                 MeditatableswithGoalsCompletedThisSession = new ArrayList<>();
                 setPlayerUI(playerUI);
-                totalsecondselapsed = 0;
-                totalsecondsinsession = 0;
-                for (Meditatable i : itemsinsession) {totalsecondsinsession += i.getdurationinseconds();}
-                getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(totalsecondsinsession * 1000)));
+                totalsessiondurationelapsed = Duration.ZERO;
+                totalsessionduration = Duration.ZERO;
+                for (Meditatable i : itemsinsession) {totalsessionduration.add(i.getduration());}
+                getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
                 updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 updateuitimeline.play();
@@ -680,13 +621,13 @@ public class This_Session {
     }
     public void updateplayerui() {
         try {
-            totalsecondselapsed++;
-            currentmeditatable.secondselapsed++;
+            totalsessiondurationelapsed.add(Duration.seconds(1.0));
+            currentmeditatable.elapsedtime.add(Duration.seconds(1.0));
             Float currentprogress;
             Float totalprogress;
-            if (currentmeditatable.secondselapsed != 0) {currentprogress = (float) currentmeditatable.secondselapsed / (float) currentmeditatable.getdurationinseconds();}
+            if (currentmeditatable.elapsedtime.greaterThan(Duration.ZERO)) {currentprogress = (float) currentmeditatable.elapsedtime.toMillis() / (float) currentmeditatable.getduration().toMillis();}
             else {currentprogress = (float) 0.0;}
-            if (totalsecondselapsed != 0) {totalprogress = (float) totalsecondselapsed / (float) totalsecondsinsession;}
+            if (totalsessiondurationelapsed.greaterThan(Duration.ZERO)) {totalprogress = (float) totalsessiondurationelapsed.toMillis() / (float) totalsessionduration.toMillis();}
             else {totalprogress = (float) 0.0;}
             getPlayerUI().CurrentCutProgress.setProgress(currentprogress);
             getPlayerUI().TotalProgress.setProgress(totalprogress);
@@ -694,13 +635,13 @@ public class This_Session {
             totalprogress *= 100;
             getPlayerUI().CurrentCutTopLabel.setText(String.format("%s (%d", currentmeditatable.name, currentprogress.intValue()) + "%)");
             getPlayerUI().TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
-            getPlayerUI().CutCurrentLabel.setText(currentmeditatable.getcurrenttimeformatted());
+            getPlayerUI().CutCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getelapsedtime()));
             boolean displaynormaltime = getPlayerUI().displaynormaltime;
-            if (displaynormaltime) {getPlayerUI().CutTotalLabel.setText(currentmeditatable.gettotaltimeformatted());}
-            else {getPlayerUI().CutTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(new Duration((currentmeditatable.getdurationinseconds() - currentmeditatable.secondselapsed) * 1000)));}
-            getPlayerUI().TotalCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(totalsecondselapsed * 1000)));
-            if (displaynormaltime) {getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(getTotalsecondsinsession() * 1000)));}
-            else {getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(new Duration((getTotalsecondsinsession() - totalsecondselapsed) * 1000)));}
+            if (displaynormaltime) {getPlayerUI().CutTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getduration()));}
+            else {getPlayerUI().CutTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getduration().subtract(currentmeditatable.elapsedtime)));}
+            getPlayerUI().TotalCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessiondurationelapsed));
+            if (displaynormaltime) {getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));}
+            else {getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration.subtract(totalsessiondurationelapsed)));}
             try {
                 if (getDisplayReference() != null && getDisplayReference().isShowing()) {
                     getDisplayReference().CurrentProgress.setProgress(currentprogress / 100);
@@ -759,13 +700,13 @@ public class This_Session {
         updateuitimeline = null;
         sessions.deletenonvalidsessions();
         meditatablecount = 0;
-        totalsecondselapsed = 0;
-        totalsecondsinsession = 0;
+        totalsessiondurationelapsed = Duration.ZERO;
+        totalsessionduration = Duration.ZERO;
         getPlayerUI().reset();
     }
     public void transition() {
         Session currentsession = sessions.sessioninformation_getspecificsession(sessions.sessioninformation_totalsessioncount() - 1);
-        currentsession.updatecutduration(currentmeditatable.number, currentmeditatable.getdurationinminutes());
+        currentsession.updatecutduration(currentmeditatable.number, new Double(currentmeditatable.getduration().toMinutes()).intValue());
         sessions.marshall();
         Root.getProgressTracker().updategoalsui();
         currentmeditatable.stop();

@@ -1,5 +1,6 @@
 package kujiin.xml;
 
+import javafx.util.Duration;
 import kujiin.MainController;
 import kujiin.lib.BeanComparator;
 import kujiin.util.Meditatable;
@@ -211,11 +212,11 @@ public class Goals {
         setMeditatableGoalList(meditatableindex, cutgoallist);
     }
     // Playback Utility
-    public void completegoals(int meditatableindex, double currentpracticedhours) {
+    public void completegoals(int meditatableindex, Duration currentpracticedhours) {
         try {
             List<Goal> newgoallist = getallMeditatableGoalLists().get(meditatableindex);
             for (Goal i : getallMeditatableGoalLists().get(meditatableindex)) {
-                boolean completed = currentpracticedhours >= i.getGoal_Hours();
+                boolean completed = currentpracticedhours.greaterThanOrEqualTo(Duration.hours(i.getGoal_Hours()));
                 boolean notcompletedbefore = i.getCompleted() != null && ! i.getCompleted();
                 if (completed && notcompletedbefore) {
                     i.setCompleted(true);
@@ -226,11 +227,11 @@ public class Goals {
             update(newgoallist, meditatableindex);
         } catch (Exception ignored) {}
     }
-    public List<Goal> completegoalsandgetcompleted(int meditatableindex, double currentpracticedhours) {
+    public List<Goal> completegoalsandgetcompleted(int meditatableindex, Duration currentpracticedhours) {
         try {
             List<Goal> newgoallist = getallMeditatableGoalLists().get(meditatableindex);
             for (Goal i : getallMeditatableGoalLists().get(meditatableindex)) {
-                boolean completed = currentpracticedhours >= i.getGoal_Hours();
+                boolean completed = currentpracticedhours.greaterThanOrEqualTo(Duration.hours(i.getGoal_Hours()));
                 boolean notcompletedbefore = i.getCompleted() != null && ! i.getCompleted();
                 if (completed && notcompletedbefore) {
                     i.setCompleted(true);

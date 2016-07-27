@@ -2,6 +2,7 @@ package kujiin.xml;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 import kujiin.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -103,8 +104,8 @@ public class Ambience {
 
     // Validation Methods
     public boolean hasAnyAmbience() {return Ambience != null && Ambience.size() > 0;}
-    public boolean hasEnoughAmbience(int milliseconds) {
-        return gettotalActualDuration() >= milliseconds;
+    public boolean hasEnoughAmbience(Duration duration) {
+        return gettotalActualDuration().greaterThanOrEqualTo(duration);
     }
     public boolean ambienceexistsinActual(SoundFile soundFile) {
         try {
@@ -119,15 +120,17 @@ public class Ambience {
     public boolean ambienceexistsinCreated(SoundFile soundFile) {return CreatedAmbience.contains(soundFile);}
 
     // Information Methods
-    public Double gettotalActualDuration() {
-        Double duration = 0.0;
-        for (SoundFile i : Ambience) {duration += i.getDuration();}
+    public Duration gettotalActualDuration() {
+        Duration duration = new Duration(0);
+        if (Ambience != null) {
+            for (SoundFile i : Ambience) {duration.add(new Duration(i.getDuration()));}
+        }
         return duration;
     }
-    public Double gettotalCreatedDuration() {
-        Double duration = 0.0;
+    public Duration gettotalCreatedDuration() {
+        Duration duration = new Duration(0);
         if (CreatedAmbience != null) {
-            for (SoundFile i : CreatedAmbience) {duration += i.getDuration();}
+            for (SoundFile i : CreatedAmbience) {duration.add(new Duration(i.getDuration()));}
         }
         return duration;
     }

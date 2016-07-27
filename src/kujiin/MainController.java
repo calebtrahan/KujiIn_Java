@@ -1538,13 +1538,13 @@ public class MainController implements Initializable {
                 SessionNumbersAxis.setLabel("Minutes");
                 setTitle("Session Details");
                 XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
-                int totalsessiontime = 0;
+                Duration totalsessionduration = new Duration(0);
                 ObservableList<String> completedgoalsitems = FXCollections.observableArrayList();
                 for (Meditatable i : meditatablesinsession) {
-                    series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getdurationinminutes()));
-                    totalsessiontime += i.getdurationinminutes();
+                    series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getduration().toMinutes()));
+                    totalsessionduration.add(i.getduration());
                     for (Goals.Goal x : i.getGoalsCompletedThisSession()) {
-                        completedgoalsitems.add(String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getdurationindecimalhours()));
+                        completedgoalsitems.add(String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getduration().toHours()));
                     }
                 }
                 if (completedgoalsitems.size() > 0) {
@@ -1554,7 +1554,7 @@ public class MainController implements Initializable {
                 else {GoalsCompletedTopLabel.setText("No Goals Completed This Session");}
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
-                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((totalsessiontime * 60) * 1000), SessionDurationTextField.getLayoutBounds().getWidth()));
+                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(totalsessionduration, SessionDurationTextField.getLayoutBounds().getWidth()));
                 SessionDurationTextField.setEditable(false);
                 SessionBarChart.requestFocus();
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}

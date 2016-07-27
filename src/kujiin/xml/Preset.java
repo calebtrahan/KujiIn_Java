@@ -10,131 +10,36 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 @XmlRootElement(name = "Preset")
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Preset {
-    private Integer PreTime;
-    private Integer RinTime;
-    private Integer KyoTime;
-    private Integer TohTime;
-    private Integer ShaTime;
-    private Integer KaiTime;
-    private Integer JinTime;
-    private Integer RetsuTime;
-    private Integer ZaiTime;
-    private Integer ZenTime;
-    private Integer EarthTime;
-    private Integer AirTime;
-    private Integer FireTime;
-    private Integer WaterTime;
-    private Integer VoidTime;
-    private Integer PostTime;
+    private Double PreTime;
+    private Double RinTime;
+    private Double KyoTime;
+    private Double TohTime;
+    private Double ShaTime;
+    private Double KaiTime;
+    private Double JinTime;
+    private Double RetsuTime;
+    private Double ZaiTime;
+    private Double ZenTime;
+    private Double EarthTime;
+    private Double AirTime;
+    private Double FireTime;
+    private Double WaterTime;
+    private Double VoidTime;
+    private Double PostTime;
+    @XmlTransient
     private MainController Root;
 
     public Preset() {}
     public Preset(MainController root) {
         Root = root;
-    }
-
-    public Integer getPreTime() {
-        return PreTime;
-    }
-    public void setPreTime(Integer preTime) {
-        PreTime = preTime;
-    }
-    public Integer getRinTime() {
-        return RinTime;
-    }
-    public void setRinTime(Integer rinTime) {
-        RinTime = rinTime;
-    }
-    public Integer getKyoTime() {
-        return KyoTime;
-    }
-    public void setKyoTime(Integer kyoTime) {
-        KyoTime = kyoTime;
-    }
-    public Integer getTohTime() {
-        return TohTime;
-    }
-    public void setTohTime(Integer tohTime) {
-        TohTime = tohTime;
-    }
-    public Integer getShaTime() {
-        return ShaTime;
-    }
-    public void setShaTime(Integer shaTime) {
-        ShaTime = shaTime;
-    }
-    public Integer getKaiTime() {
-        return KaiTime;
-    }
-    public void setKaiTime(Integer kaiTime) {
-        KaiTime = kaiTime;
-    }
-    public Integer getJinTime() {
-        return JinTime;
-    }
-    public void setJinTime(Integer jinTime) {
-        JinTime = jinTime;
-    }
-    public Integer getRetsuTime() {
-        return RetsuTime;
-    }
-    public void setRetsuTime(Integer retsuTime) {
-        RetsuTime = retsuTime;
-    }
-    public Integer getZaiTime() {
-        return ZaiTime;
-    }
-    public void setZaiTime(Integer zaiTime) {
-        ZaiTime = zaiTime;
-    }
-    public Integer getZenTime() {
-        return ZenTime;
-    }
-    public void setZenTime(Integer zenTime) {
-        ZenTime = zenTime;
-    }
-    public Integer getPostTime() {
-        return PostTime;
-    }
-    public void setPostTime(Integer postTime) {
-        PostTime = postTime;
-    }
-    public Integer getEarthTime() {
-        return EarthTime;
-    }
-    public void setEarthTime(Integer earthTime) {
-        EarthTime = earthTime;
-    }
-    public Integer getAirTime() {
-        return AirTime;
-    }
-    public void setAirTime(Integer airTime) {
-        AirTime = airTime;
-    }
-    public Integer getFireTime() {
-        return FireTime;
-    }
-    public void setFireTime(Integer fireTime) {
-        FireTime = fireTime;
-    }
-    public Integer getWaterTime() {
-        return WaterTime;
-    }
-    public void setWaterTime(Integer waterTime) {
-        WaterTime = waterTime;
-    }
-    public Integer getVoidTime() {
-        return VoidTime;
-    }
-    public void setVoidTime(Integer voidTime) {
-        VoidTime = voidTime;
     }
 
 // XML Processing
@@ -147,22 +52,22 @@ public class Preset {
         JAXBContext context = JAXBContext.newInstance(Preset.class);
         Unmarshaller createMarshaller = context.createUnmarshaller();
         Preset loadedsession = (Preset) createMarshaller.unmarshal(presetfile);
-        setPreTime(loadedsession.getPreTime());
-        setRinTime(loadedsession.getRinTime());
-        setKyoTime(loadedsession.getKyoTime());
-        setTohTime(loadedsession.getTohTime());
-        setShaTime(loadedsession.getShaTime());
-        setKaiTime(loadedsession.getKaiTime());
-        setJinTime(loadedsession.getJinTime());
-        setRetsuTime(loadedsession.getRetsuTime());
-        setZaiTime(loadedsession.getZaiTime());
-        setZenTime(loadedsession.getZenTime());
-        setEarthTime(loadedsession.getEarthTime());
-        setAirTime(loadedsession.getAirTime());
-        setFireTime(loadedsession.getFireTime());
-        setWaterTime(loadedsession.getWaterTime());
-        setVoidTime(loadedsession.getVoidTime());
-        setPostTime(loadedsession.getPostTime());
+        PreTime = loadedsession.PreTime;
+        RinTime = loadedsession.PreTime;
+        KyoTime = loadedsession.PreTime;
+        TohTime = loadedsession.PreTime;
+        ShaTime = loadedsession.PreTime;
+        KaiTime = loadedsession.PreTime;
+        JinTime = loadedsession.PreTime;
+        RetsuTime = loadedsession.PreTime;
+        ZaiTime = loadedsession.PreTime;
+        ZenTime = loadedsession.PreTime;
+        EarthTime = loadedsession.PreTime;
+        AirTime = loadedsession.PreTime;
+        FireTime = loadedsession.PreTime;
+        WaterTime = loadedsession.PreTime;
+        VoidTime = loadedsession.PreTime;
+        PostTime = loadedsession.PreTime;
     }
 
 // Methods
@@ -182,34 +87,31 @@ public class Preset {
             catch (JAXBException ignored) {return null;}
         } else {return presetfile;}
     }
-    public ArrayList<Integer> getpresettimes() {
-        return new ArrayList<>(Arrays.asList(
-                getPreTime(), getRinTime(), getKyoTime(), getTohTime(), getShaTime(), getKaiTime(),
-                getJinTime(), getRetsuTime(), getZaiTime(), getZenTime(), getEarthTime(), getAirTime(),
-                getFireTime(), getWaterTime(), getVoidTime(), getPostTime()));
+    public ArrayList<Double> getpresettimes() {
+        return new ArrayList<>(Arrays.asList(PreTime, RinTime, KyoTime, TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, EarthTime, AirTime, FireTime, WaterTime, VoidTime, PostTime));
     }
-    public void setpresettimes(ArrayList<Integer> creatorvalues) {
+    public void setpresettimes(ArrayList<Double> creatorvalues) {
         try {
-            setPreTime(creatorvalues.get(0));
-            setRinTime(creatorvalues.get(1));
-            setKyoTime(creatorvalues.get(2));
-            setTohTime(creatorvalues.get(3));
-            setShaTime(creatorvalues.get(4));
-            setKaiTime(creatorvalues.get(5));
-            setJinTime(creatorvalues.get(6));
-            setRetsuTime(creatorvalues.get(7));
-            setZaiTime(creatorvalues.get(8));
-            setZenTime(creatorvalues.get(9));
-            setEarthTime(creatorvalues.get(10));
-            setAirTime(creatorvalues.get(11));
-            setFireTime(creatorvalues.get(12));
-            setWaterTime(creatorvalues.get(13));
-            setVoidTime(creatorvalues.get(14));
-            setPostTime(creatorvalues.get(15));
+            PreTime = (creatorvalues.get(0));
+            RinTime = (creatorvalues.get(1));
+            KyoTime = (creatorvalues.get(2));
+            TohTime = (creatorvalues.get(3));
+            ShaTime = (creatorvalues.get(4));
+            KaiTime = (creatorvalues.get(5));
+            JinTime = (creatorvalues.get(6));
+            RetsuTime = (creatorvalues.get(7));
+            ZaiTime = (creatorvalues.get(8));
+            ZenTime = (creatorvalues.get(9));
+            EarthTime = (creatorvalues.get(10));
+            AirTime = (creatorvalues.get(11));
+            FireTime = (creatorvalues.get(12));
+            WaterTime = (creatorvalues.get(13));
+            VoidTime = (creatorvalues.get(14));
+            PostTime = (creatorvalues.get(15));
         } catch (ArrayIndexOutOfBoundsException ignored) {}
     }
     public boolean validpreset() {
-        for (Integer i : getpresettimes()) {if (i == null) {return false;}}
+        for (Double i : getpresettimes()) {if (i == null) {return false;}}
         return true;
     }
 

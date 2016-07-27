@@ -3,6 +3,7 @@ package kujiin.util;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.util.Duration;
 import kujiin.ui.PlayerUI;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
@@ -23,15 +24,15 @@ public class Cut extends Meditatable {
 // Creation
     @Override
     public boolean buildEntrainment() {
-        if (duration == 0) {return false;}
-        int adjustedduration = duration;
-        if (number == 3 && duration >= 3) {adjustedduration -= 2;}
-        int fivetimes = adjustedduration / 5;
-        int singletimes = adjustedduration % 5;
+        if (duration.equals(Duration.ZERO)) {return false;}
+        Duration adjustedduration = duration;
+        if (number == 3 && duration.greaterThanOrEqualTo(Duration.minutes(3))) {adjustedduration.subtract(Duration.minutes(2));}
+        int fivetimes = new Double(adjustedduration.toMinutes() / 5).intValue();
+        int singletimes = new Double(adjustedduration.toMinutes() % 5).intValue();
         for (int i = 0; i < fivetimes; i++) {entrainment.created_add(entrainment.getFreqlong());}
         for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
         entrainment.shuffleCreated();
-        if (number == 3 && duration >= 3) {
+        if (number == 3 && duration.greaterThanOrEqualTo(Duration.minutes(3))) {
             int index = getAllmeditatablestoplay().indexOf(this);
             Meditatable meditatablebefore = null;
             Meditatable meditatableafter = null;
@@ -47,7 +48,7 @@ public class Cut extends Meditatable {
             entrainment.created_add(0, entrainment.getRampinfile());
             entrainment.created_add(entrainment.getRampoutfile());
         }
-        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration() > 0.0;
+        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().greaterThanOrEqualTo(getduration());
     }
 
 // Playback
@@ -55,7 +56,7 @@ public class Cut extends Meditatable {
     public void tick() {
         super.tick();
         if (thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING) {
-            thisession.Root.getProgressTracker().getSessions().sessioninformation_getspecificsession(thisession.Root.getProgressTracker().getSessions().getSession().size() - 1).updatecutduration(number, secondselapsed / 60);
+            thisession.Root.getProgressTracker().getSessions().sessioninformation_getspecificsession(thisession.Root.getProgressTracker().getSessions().getSession().size() - 1).updatecutduration(number, new Double(elapsedtime.toMinutes()).intValue());
         }
     }
     @Override
