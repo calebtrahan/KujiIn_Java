@@ -112,9 +112,7 @@ public class CreatorAndExporterUI {
             totalsessiontime += rampduration * 2;
             if (rampduration > 0) {TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + rampduration + "Mins. On Both Presession And Postsession"));}
             else {TotalSessionTime.setTooltip(null);}
-            String text = Util.format_minstohrsandmins_short(totalsessiontime);
-            if (text.length() < 17) {TotalSessionTime.setText(text);}
-            else {TotalSessionTime.setText(Util.format_minstohrsandmins_abbreviated(totalsessiontime));}
+            TotalSessionTime.setText(Util.formatdurationtoStringSpelledOut(new Duration(totalsessiontime * 1000), TotalSessionTime.getLength()));
             ApproximateEndTime.setTooltip(new Tooltip("Time You Finish Will Vary Depending On When You Start Playback"));
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, totalsessiontime);
@@ -451,7 +449,8 @@ public class CreatorAndExporterUI {
                 Cut selectedcut = allcuts.get(i);
                 currentcuttext.append(selectedcut.number).append(". ").append(selectedcut.name);
                 if (selectedcut.getdurationinminutes() > 0) {
-                    currentcuttext.append(" (").append(Util.format_minstohrsandmins_short(selectedcut.getdurationinminutes())).append(")");
+                    currentcuttext.append(" (").append(Util.formatdurationtoStringSpelledOut(new Duration(selectedcut.getdurationinmillis() * 1000), new Double(SessionListView.getLayoutBounds().getWidth()).intValue() - (currentcuttext.length() + 1)));
+                    currentcuttext.append(")");
                 } else {
                     if (missingcuts == null) {missingcuts = new ArrayList<>();}
                     missingcuts.add(selectedcut);
@@ -597,9 +596,8 @@ public class CreatorAndExporterUI {
             SessionItemsTable.getItems().clear();
             tableitems.clear();
             int count = 1;
-            for (Object i : sessionitems) {
-                Meditatable item = (Meditatable) i;
-                tableitems.add(new SessionItem(count, item.name, Util.format_minstohrsandmins_abbreviated(item.getdurationinminutes())));
+            for (Meditatable i : sessionitems) {
+                tableitems.add(new SessionItem(count, i.name, Util.formatdurationtoStringDecimalWithColons(new Duration(i.getdurationinmillis()))));
                 count++;
             }
             SessionItemsTable.setItems(tableitems);

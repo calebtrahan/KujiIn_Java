@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="133.0" prefWidth="324.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="CENTER" layoutX="225.0" layoutY="110.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label fx:id="TopLabel" text="Set A New Goal For Postsession">
+               <font>
+                  <Font size="16.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Label>
+            <HBox alignment="CENTER" prefHeight="59.0" prefWidth="324.0">
+               <children>
+                  <Spinner fx:id="HoursSpinner" prefHeight="26.0" prefWidth="80.0">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </Spinner>
+                  <Label text="Hours">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Spinner fx:id="MinutesSpinner" prefHeight="26.0" prefWidth="80.0">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </Spinner>
+                  <Label text="Mins" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="41.0" prefWidth="324.0">
+               <children>
+                  <Label text="Decimal Hours">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="DecimalHoursTextField" editable="false" prefHeight="26.0" prefWidth="60.0">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="55.0" prefWidth="324.0">
+               <children>
+                  <Label fx:id="StatusBar" prefHeight="16.0" prefWidth="195.0" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#accept" text="Accept" />
+                  <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#close" text="Cancel">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

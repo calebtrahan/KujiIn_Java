@@ -178,9 +178,9 @@ public class Meditatable {
     }
     public Double getdurationindecimalhours() {return Util.convert_minstodecimalhours(getdurationinminutes(), 2);}
     public String getcurrenttimeformatted() {
-        return Util.format_secondsforplayerdisplay(secondselapsed);
+        return Util.formatdurationtoStringDecimalWithColons(new Duration(secondselapsed * 1000));
     }
-    public String gettotaltimeformatted() {return Util.format_secondsforplayerdisplay(getdurationinseconds());}
+    public String gettotaltimeformatted() {return Util.formatdurationtoStringDecimalWithColons(new Duration(getdurationinseconds() * 1000));}
 
 // Creation
     public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {

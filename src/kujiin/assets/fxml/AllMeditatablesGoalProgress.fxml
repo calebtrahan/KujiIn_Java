@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="533.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox prefHeight="400.0" prefWidth="474.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <TableView fx:id="GoalsTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+              <columns>
+                <TableColumn fx:id="NameColumn" prefWidth="75.0" text="Name" />
+                <TableColumn fx:id="PracticedTimeColumn" prefWidth="119.0" text="Practiced Time" />
+                  <TableColumn fx:id="CurrentGoalColumn" prefWidth="98.0" text="Current Goal" />
+                  <TableColumn fx:id="PercentCompletedColumn" prefWidth="98.0" text="\% Completed" />
+                  <TableColumn fx:id="NumberGoalsCompletedColumn" prefWidth="134.0" text="# Goals Completed" />
+              </columns>
+               <VBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </VBox.margin>
+            </TableView>
+            <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="600.0">
+               <children>
+                  <Button fx:id="SetCurrentGoalButton" mnemonicParsing="false" text="Set Current Goal" onAction="#setcurrentgoal"/>
+                  <Button fx:id="ViewCompletedGoalsButton" mnemonicParsing="false" text="View Completed Goals" onAction="#viewcompletedgoals"/>
+                  <Button fx:id="CloseButton" mnemonicParsing="false" text="Close" onAction="#close">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

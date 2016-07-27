@@ -309,7 +309,6 @@ public class Util {
     }
     public static void custom_label_withautoclear(Label label, int millistillclear) {
         label.textProperty().addListener((observable, oldValue, newValue) -> new Timeline(new KeyFrame(Duration.millis(millistillclear), ae -> label.setText(""))).play());
-
     }
 
 // Math Methods
@@ -347,121 +346,61 @@ public class Util {
         return minutes.intValue();
     }
     // String Time Formatting
-    public static String format_minstohrsandmins_abbreviated(int mins) {
-        int hours = mins / 60;
-        int minutes = mins % 60;
-        StringBuilder stringbuilder = new StringBuilder();
-        if (hours > 0) {
-            stringbuilder.append(hours);
-            stringbuilder.append(" Hr");
-            if (hours > 1) {stringbuilder.append("s");}
-            if (minutes > 0) {stringbuilder.append(" ");}
-        }
-        stringbuilder.append(minutes);
-        stringbuilder.append(" Min");
-        if (minutes > 1) {stringbuilder.append("s");}
-        return stringbuilder.toString();
+    public static String formatdurationtoStringDecimalWithColons(Duration duration) {
+        int seconds = new Double(duration.toSeconds()).intValue();
+        int hours = 0;
+        int minutes = 0;
+        if (seconds >= 3600) {hours = seconds / 3600; seconds -= hours * 3600;}
+        if (seconds >= 60) {minutes = seconds / 60; seconds -= minutes * 60;}
+        StringBuilder abbreviatedtext = new StringBuilder();
+        if (hours > 0) {abbreviatedtext.append(String.format("%02d", hours));}
+        if (minutes > 0) {abbreviatedtext.append(String.format("%02d", minutes));}
+        if (seconds > 0) {abbreviatedtext.append(String.format("%02d", seconds));}
+        return abbreviatedtext.toString();
     }
-    public static String format_minstohrsandmins_short(int min) {
-        if (min > 0) {
-            int hours = min / 60;
-            int minutes = min % 60;
-            StringBuilder text = new StringBuilder();
-            if (hours > 0) {
-                text.append(hours).append(" Hour");
-                if (hours > 1) {
-                    text.append("s");
-                }
-            }
+    public static String formatdurationtoStringSpelledOut(Duration duration, Integer maxcharlength) {
+        int seconds = new Double(duration.toSeconds()).intValue();
+        int hours = 0;
+        int minutes = 0;
+        if (seconds >= 3600) {hours = seconds / 3600; seconds -= hours * 3600;}
+        if (seconds >= 60) {minutes = seconds / 60; seconds -= minutes * 60;}
+            // Long
+        if (hours == 0 && minutes == 0 && seconds == 0) {return "0 Minutes";}
+        StringBuilder longtext = new StringBuilder();
+        if (hours > 0) {longtext.append(hours).append("Hour"); if (hours > 1) {longtext.append("s");} if (minutes > 0) {longtext.append(" ");}}
+        if (minutes > 0) {
+            longtext.append(minutes);
+            longtext.append(" Minute");
+            if (minutes > 1) {longtext.append("s");}
+        }
+        if (maxcharlength == null || longtext.toString().length() <= maxcharlength) {return longtext.toString();}
+        else {
+            // Short
+            StringBuilder shorttext = new StringBuilder();
+            if (hours > 0) {shorttext.append(hours).append("Hr"); if (hours > 1) {shorttext.append("s");} if (minutes > 0) {shorttext.append(" ");}}
             if (minutes > 0) {
-                if (hours > 0) {
-                    text.append(" ");
-                }
-                text.append(minutes).append(" Minute");
-                if (minutes > 1) {
-                    text.append("s");
-                }
+                shorttext.append(minutes);
+                shorttext.append(" Min");
+                if (minutes > 1) {shorttext.append("s");}
             }
-            return text.toString();
-        } else {
-            return "0 Minutes";
+            if (shorttext.toString().length() <= maxcharlength) {return shorttext.toString();}
+            else {
+                StringBuilder reallyshorttext = new StringBuilder();
+                if (hours > 0) {
+                    reallyshorttext.append(hours);
+                    reallyshorttext.append("H");
+                    if (minutes > 0) {reallyshorttext.append(" ");}
+                }
+                if (minutes > 0) {
+                    reallyshorttext.append(minutes);
+                    reallyshorttext.append(" M");
+                }
+                if (reallyshorttext.toString().length() <= maxcharlength) {return reallyshorttext.toString();}
+                else {return formatdurationtoStringDecimalWithColons(duration);}
+            }
         }
     }
-    public static String format_minstohrsandmins_long(int mins) {
-        if (mins == 0) {return "0 Minutes";}
-        int hours = mins / 60;
-        int minutes = mins % 60;
-        StringBuilder stringbuilder = new StringBuilder();
-        if (hours > 0) {
-            stringbuilder.append(hours);
-            stringbuilder.append(" Hour");
-            if (hours > 1) {stringbuilder.append("s");}
-            if (minutes > 0) {stringbuilder.append(" ");}
-        }
-        if (minutes > 0) {
-            stringbuilder.append(minutes);
-            stringbuilder.append(" Minute");
-            if (minutes > 1) {stringbuilder.append("s");}
-        }
-        return stringbuilder.toString();
-    }
-    public static String format_secstominsandseconds(int secs) {
-        int seconds;
-        int minutes;
-        if (secs > 60) {minutes = secs / 60;} else {minutes = 0;}
-        seconds = secs % 60;
-        StringBuilder text = new StringBuilder();
-        if (minutes > 0) {
-            text.append(minutes).append(" Minute");
-            if (minutes > 1) {text.append("s");}
-        }
-        if (seconds > 0) {
-            if (minutes > 0) {text.append(" ");}
-            text.append(seconds).append(" Second");
-            if (seconds > 0) {text.append("s");}
-        }
-        return text.toString();
-    }
-    public static String format_secstominsandseconds(double secs, int decimalplaces) {
-        double seconds;
-        double minutes;
-        if (secs > 60.0) {minutes = secs / 60.0;} else {minutes = 0.0;}
-        seconds = secs % 60.0;
-        StringBuilder text = new StringBuilder();
-        if (minutes > 0.0) {
-            text.append(minutes).append(" Minute");
-            if (minutes > 1.0) {text.append("s");}
-        }
-        if (seconds > 0.0) {
-            if (minutes > 0.0) {text.append(" ");}
-            text.append(rounddouble(seconds, decimalplaces)).append(" Second");
-            if (seconds > 0.0) {text.append("s");}
-        }
-        return text.toString();
-    }
-    public static String format_secondsforplayerdisplay(int sec) {
-        int hours = 0;
-        int minutes = 0;
-        if (sec >= 3600) {hours = sec / 3600; sec -= hours * 3600;}
-        if (sec >= 60) {minutes = sec / 60; sec -= minutes * 60;}
-        if (hours > 0) {
-            return String.format("%02d:%02d:%02d", hours, minutes, sec);
-        } else {
-            return String.format("%02d:%02d", minutes, sec);
-        }
-    }
-    public static String format_secondsleftforplayerdisplay(int elapsedseconds, int totalseconds) {
-        int secondsleft = totalseconds - elapsedseconds;
-        int hours = 0;
-        int minutes = 0;
-        if (secondsleft >= 3600) {hours = secondsleft / 3600; secondsleft -= hours * 3600;}
-        if (secondsleft >= 60) {minutes = secondsleft / 60; secondsleft -= minutes * 60;}
-        if (hours > 0) {
-            return String.format("-" + "%02d:%02d:%02d", hours, minutes, secondsleft);
-        } else {
-            return String.format("-" + "%02d:%02d", minutes, secondsleft);
-        }
-    }
+
 // Date Methods
     public static String gettodaysdate() {
         Calendar currentDate = Calendar.getInstance();

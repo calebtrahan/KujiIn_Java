@@ -92,10 +92,6 @@ public class Qi_Gong extends Meditatable {
         return Util.convert_minstodecimalhours(this.getdurationinminutes(), 2);
     }
     @Override
-    public String gettotaltimeformatted() {
-        return Util.format_secondsforplayerdisplay(this.getdurationinseconds());
-    }
-    @Override
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists

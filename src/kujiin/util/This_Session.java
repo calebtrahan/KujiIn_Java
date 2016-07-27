@@ -10,9 +10,9 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.MainController;
-import kujiin.dialogs.SimpleTextDialogWithCancelButton;
 import kujiin.ui.CreatorAndExporterUI;
 import kujiin.ui.PlayerUI;
+import kujiin.ui.SimpleTextDialogWithCancelButton;
 import kujiin.xml.*;
 
 import java.io.File;
@@ -492,10 +492,10 @@ public class This_Session {
                         int count = 1;
                         for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
                             a.append("\n");
-                            Meditatable thiscut = cutsorelementswithreducedambience.get(i);
-                            String formattedcurrentduration = Util.format_minstohrsandmins_short((int) ((thiscut.getAmbience().gettotalActualDuration() / 1000) / 60));
-                            String formattedexpectedduration = Util.format_minstohrsandmins_short(cutsorelementswithreducedambience.get(i).getdurationinminutes());
-                            a.append(count).append(". ").append(thiscut.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
+                            Meditatable thismeditatable = cutsorelementswithreducedambience.get(i);
+                            String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(new Duration(thismeditatable.getAmbience().gettotalActualDuration() * 1000), 10);
+                            String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(new Duration(thismeditatable.getdurationinmillis()), 10);
+                            a.append(count).append(". ").append(thismeditatable.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }
                         if (cutsorelementswithreducedambience.size() == 1) {
@@ -651,7 +651,7 @@ public class This_Session {
                 totalsecondselapsed = 0;
                 totalsecondsinsession = 0;
                 for (Meditatable i : itemsinsession) {totalsecondsinsession += i.getdurationinseconds();}
-                getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(totalsecondsinsession));
+                getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(totalsecondsinsession * 1000)));
                 updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 updateuitimeline.play();
@@ -697,10 +697,10 @@ public class This_Session {
             getPlayerUI().CutCurrentLabel.setText(currentmeditatable.getcurrenttimeformatted());
             boolean displaynormaltime = getPlayerUI().displaynormaltime;
             if (displaynormaltime) {getPlayerUI().CutTotalLabel.setText(currentmeditatable.gettotaltimeformatted());}
-            else {getPlayerUI().CutTotalLabel.setText(Util.format_secondsleftforplayerdisplay(currentmeditatable.secondselapsed, currentmeditatable.getdurationinseconds()));}
-            getPlayerUI().TotalCurrentLabel.setText(Util.format_secondsforplayerdisplay(totalsecondselapsed));
-            if (displaynormaltime) {getPlayerUI().TotalTotalLabel.setText(Util.format_secondsforplayerdisplay(getTotalsecondsinsession()));}
-            else {getPlayerUI().TotalTotalLabel.setText(Util.format_secondsleftforplayerdisplay(totalsecondselapsed, getTotalsecondsinsession()));}
+            else {getPlayerUI().CutTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(new Duration((currentmeditatable.getdurationinseconds() - currentmeditatable.secondselapsed) * 1000)));}
+            getPlayerUI().TotalCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(totalsecondselapsed * 1000)));
+            if (displaynormaltime) {getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(getTotalsecondsinsession() * 1000)));}
+            else {getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(new Duration((getTotalsecondsinsession() - totalsecondselapsed) * 1000)));}
             try {
                 if (getDisplayReference() != null && getDisplayReference().isShowing()) {
                     getDisplayReference().CurrentProgress.setProgress(currentprogress / 100);
@@ -818,15 +818,6 @@ public class This_Session {
     }
 
 // Reference Files
-    public void choosereferencetype() {
-        if (! Root.getOptions().getSessionOptions().getReferenceoption() && Root.getOptions().getSessionOptions().getReferencetype() == null) {
-            PlayerUI.ReferenceTypeDialog reftype = new PlayerUI.ReferenceTypeDialog(Root);
-            reftype.showAndWait();
-            Root.getOptions().getSessionOptions().setReferencetype(reftype.getReferenceType());
-            Root.getOptions().getSessionOptions().setReferencefullscreen(reftype.getFullscreen());
-            Root.getOptions().getSessionOptions().setReferenceoption(reftype.getEnabled());
-        }
-    }
 //    public void togglereferencedisplay(CheckBox ReferenceFileCheckbox) {
 //        if (ReferenceFileCheckbox.isSelected()) {choosereferencetype();}
 //        ReferenceFileCheckbox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());

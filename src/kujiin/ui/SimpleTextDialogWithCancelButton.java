@@ -1,4 +1,4 @@
-package kujiin.dialogs;
+package kujiin.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

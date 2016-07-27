@@ -1,5 +1,7 @@
 package kujiin;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -221,8 +223,7 @@ public class MainController implements Initializable {
 
 // Creator And Exporter UI
     public void loadpreset(ActionEvent actionEvent) {
-        new ProgressAndGoalsUI.GoalOverView(this).showAndWait();
-//        CreatorAndExporter.loadpreset();
+        CreatorAndExporter.loadpreset();
     }
     public void savepreset(ActionEvent actionEvent) {CreatorAndExporter.savepreset();}
     public void toggleexporter(ActionEvent actionEvent) {
@@ -287,8 +288,6 @@ public class MainController implements Initializable {
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
         }
 
-    // Getters And Setters
-
     // Button Actions
         public void accept(ActionEvent actionEvent) {
             if (AlertFileToggleButton.isSelected() && alertfile == null) {
@@ -323,9 +322,10 @@ public class MainController implements Initializable {
             alertfileTextField.setDisable(! AlertFileToggleButton.isSelected() || alertfile == null);
             if (alertfile != null && alertfile.exists()) {
                 Double duration = Util.audio_getduration(alertfile);
-                String durationtext;
-                if (duration < SUGGESTED_ALERT_FILE_MAX_LENGTH) {durationtext = Util.format_secstominsandseconds(duration, 1);}
-                else {durationtext = Util.format_secstominsandseconds(duration.intValue());}
+                String durationtext = Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), alertfileTextField.getLength());
+                if (duration < SUGGESTED_ALERT_FILE_MAX_LENGTH) {
+                    // TODO Ask Confirmation Here
+                } else {}
                 String text = String.format("%s (%s)", alertfile.getName(), durationtext);
                 alertfileTextField.setText(text);
             } else {
@@ -340,7 +340,7 @@ public class MainController implements Initializable {
     // Utility Methods
         public boolean fileisgood(File testfile) {
         // Test If Valid Extension
-        if (! Util.audio_isValid(testfile)) {
+            if (! Util.audio_isValid(testfile)) {
                 Util.gui_showinformationdialog(Root, "Information", "Invalid Audio Format", "Supported Audio Formats: " + Arrays.asList(Util.SUPPORTEDAUDIOFORMATS).toString());
                 return false;
             }
@@ -348,10 +348,10 @@ public class MainController implements Initializable {
             if (duration == 0.0) {Util.gui_showinformationdialog(Root, "Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
             else if (duration >= (SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
                 String confirmationtext = String.format("%s Is %s Which Is Longer Than The Suggested Maximum Duration %s", testfile.getName(),
-                        Util.format_secstominsandseconds(duration.intValue()), Util.format_secstominsandseconds(SUGGESTED_ALERT_FILE_MAX_LENGTH));
+                        Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), 10), Util.formatdurationtoStringSpelledOut(new Duration(SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), 10));
                 return Util.gui_getokcancelconfirmationdialog(Root, "Alert File Too Long", confirmationtext, "This May Break Session Immersion. Really Use This File As Your Alert File?");
             } else if (duration >= ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.format_secstominsandseconds(duration.intValue()), Util.format_secstominsandseconds(ABSOLUTE_ALERT_FILE_MAX_LENGTH));
+                String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), 10), Util.formatdurationtoStringSpelledOut(new Duration(ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), 10));
                 Util.gui_showinformationdialog(Root, "Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
                 return false;
             } else {return true;}
@@ -669,7 +669,7 @@ public class MainController implements Initializable {
         public AdvancedAmbienceEditor(MainController root, Ambiences ambiences) {
             Root = root;
             this.ambiences = ambiences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AdvancedAmbienceEditor.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Advanced.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -687,7 +687,7 @@ public class MainController implements Initializable {
         public AdvancedAmbienceEditor(MainController root, Ambiences ambiences, String cutname) {
             Root = root;
             this.ambiences = ambiences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AdvancedAmbienceEditor.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Advanced.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -747,9 +747,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : Temp_Table.getItems()) {
                 temptotalduration += i.getDuration();
             }
-            String longtext = Util.format_minstohrsandmins_long((int) ((temptotalduration / 1000) / 60));
-            if (longtext.length() < 20) {Temp_TotalDuration.setText(longtext);}
-            else {Temp_TotalDuration.setText(Util.format_minstohrsandmins_short((int) ((temptotalduration / 1000) / 60)));}
+            Temp_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(temptotalduration), Temp_TotalDuration.getLength()));
         }
         public void deletetempambiencefromdirectory() {
             try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
@@ -768,9 +766,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : Actual_Table.getItems()) {
                 actualtotalduration += i.getDuration();
             }
-            String longtext = Util.format_minstohrsandmins_long((int) ((actualtotalduration / 1000) / 60));
-            if (longtext.length() < 20) {Actual_TotalDuration.setText(longtext);}
-            else {Actual_TotalDuration.setText(Util.format_minstohrsandmins_short((int) ((actualtotalduration / 1000) / 60)));}
+            Actual_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(actualtotalduration), Actual_TotalDuration.getLength()));
         }
 
     // Table Methods
@@ -940,7 +936,7 @@ public class MainController implements Initializable {
         public SimpleAmbienceEditor(MainController root, Ambiences ambiences) {
             Root = root;
             this.ambiences = ambiences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleAmbienceEditor.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Simple.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -955,7 +951,7 @@ public class MainController implements Initializable {
         public SimpleAmbienceEditor(MainController root, Ambiences ambiences, String cutorelementname) {
             Root = root;
             this.ambiences = ambiences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleAmbienceEditor.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Simple.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -1084,7 +1080,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : AmbienceTable.getItems()) {
                 totalselectedduration += i.getDuration();
             }
-            TotalDuration.setText(Util.format_minstohrsandmins_long((int) ((totalselectedduration / 1000) / 60)));
+            TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(totalselectedduration), TotalDuration.getLength()));
         }
         public boolean unsavedchanges() {
             if (MeditatableChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
@@ -1165,8 +1161,8 @@ public class MainController implements Initializable {
                     PauseButton.setDisable(true);
                     StopButton.setDisable(true);
                     PreviewPlayer.setOnReady(() -> {
-                        CurrentTime.setText(Util.format_secondsforplayerdisplay(0));
-                        TotalTime.setText(Util.format_secondsforplayerdisplay((int) PreviewPlayer.getTotalDuration().toSeconds()));
+                        CurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(0)));
+                        TotalTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(PreviewPlayer.getTotalDuration().toSeconds() * 1000)));
                         PlayButton.setDisable(false);
                         PauseButton.setDisable(false);
                         StopButton.setDisable(false);
@@ -1188,7 +1184,7 @@ public class MainController implements Initializable {
                     PreviewPlayer.seek(seektothis);
                 });
                 PreviewPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-                    CurrentTime.setText(Util.format_secondsforplayerdisplay((int) newValue.toSeconds()));
+                    CurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(newValue));
                     updatePositionSlider(PreviewPlayer.getCurrentTime());
                 });
                 VolumeSlider.valueChangingProperty().unbind();
@@ -1396,7 +1392,7 @@ public class MainController implements Initializable {
                 if (Options.getSessionOptions().getAlertfilelocation() != null) {
                     File alertfile = new File(Options.getSessionOptions().getAlertfilelocation());
                     if (! alertfile.exists()) {Options.getSessionOptions().setAlertfilelocation(null); alertfiletoggled();}
-                    String duration = Util.format_secstominsandseconds(new Double(Util.audio_getduration(alertfile)).intValue() / 1000);
+                    String duration = Util.formatdurationtoStringSpelledOut(new Duration(Util.audio_getduration(alertfile) * 1000), AlertFileTextField.getLength() - (alertfile.getName().length()) + 3);
                     String text = String.format("%s (%s)", alertfile.getName(), duration);
                     AlertFileTextField.setText(text);
                     AlertFileTextField.setDisable(false);
@@ -1558,7 +1554,7 @@ public class MainController implements Initializable {
                 else {GoalsCompletedTopLabel.setText("No Goals Completed This Session");}
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
-                SessionDurationTextField.setText(Util.format_minstohrsandmins_long(totalsessiontime));
+                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((totalsessiontime * 60) * 1000), SessionDurationTextField.getLength()));
                 SessionDurationTextField.setEditable(false);
                 SessionBarChart.requestFocus();
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
@@ -1566,7 +1562,7 @@ public class MainController implements Initializable {
         public SessionDetails(MainController root, kujiin.xml.Session session) {
             try {
                 Root = root;
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails_Individual.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
@@ -1590,7 +1586,7 @@ public class MainController implements Initializable {
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
                 SessionNumbersAxis.setUpperBound(Util.list_getmaxintegervalue(values));
-                SessionDurationTextField.setText(Util.format_minstohrsandmins_long(session.getTotal_Session_Duration()));
+                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((session.getTotal_Session_Duration() * 60) * 1000), SessionDurationTextField.getLength()));
                 SessionDurationTextField.setEditable(false);
                 SessionBarChart.requestFocus();
             } catch (IOException | NullPointerException e) {new ExceptionDialog(Root, e).showAndWait();}
@@ -1598,6 +1594,24 @@ public class MainController implements Initializable {
 
         public void closeDialog(ActionEvent actionEvent) {
             close();
+        }
+
+        class CompletedGoalsAtEndOfSessionBinding {
+            private StringProperty cutname;
+            private StringProperty practicedhours;
+            private StringProperty goalhours;
+            private StringProperty dateset;
+            private IntegerProperty daysittooktocomplete;
+            private StringProperty datecompleted;
+
+            public CompletedGoalsAtEndOfSessionBinding(String cutname, String practicedhours, String goalhours, String dateset, int daysittooktocomplete, String datecompleted) {
+                this.cutname = new SimpleStringProperty(cutname);
+                this.practicedhours = new SimpleStringProperty(practicedhours);
+                this.goalhours = new SimpleStringProperty(goalhours);
+                this.dateset = new SimpleStringProperty(dateset);
+                this.daysittooktocomplete = new SimpleIntegerProperty(daysittooktocomplete);
+                this.datecompleted = new SimpleStringProperty(datecompleted);
+            }
         }
     }
     public static class AmbienceSong {
@@ -1610,7 +1624,7 @@ public class MainController implements Initializable {
             this.name = new SimpleStringProperty(soundFile.getName());
             this.file = soundFile.getFile();
             duration = soundFile.getDuration();
-            this.length = new SimpleStringProperty(Util.format_secondsforplayerdisplay((int) (duration / 1000)));
+            this.length = new SimpleStringProperty(Util.formatdurationtoStringSpelledOut(new Duration(duration), 10));
         }
 
         public String getName() {

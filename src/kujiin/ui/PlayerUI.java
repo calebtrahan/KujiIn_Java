@@ -18,8 +18,6 @@ import kujiin.util.Meditatable;
 import kujiin.util.This_Session;
 import kujiin.util.Util;
 import kujiin.xml.Options;
-import kujiin.xml.Session;
-import kujiin.xml.Sessions;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -299,108 +297,6 @@ public class PlayerUI extends Stage {
         public void pause(ActionEvent actionEvent) {Root.getSession().pause();}
         public void stop(ActionEvent actionEvent) {Root.getSession().stop();}
 
-    }
-    public static class ReferenceTypeDialog extends Stage {
-        private MainController Root;
-        public Button AcceptButton;
-        public RadioButton HTMLOption;
-        public RadioButton TextOption;
-        public Button CancelButton;
-        public CheckBox FullScreenOption;
-        private ReferenceType referenceType;
-        private Boolean fullscreen;
-        private Boolean enabled;
-
-        public ReferenceTypeDialog (MainController root) {
-            Root = root;
-            referenceType = Root.getOptions().getSessionOptions().getReferencetype();
-            fullscreen = Root.getOptions().getSessionOptions().getReferencefullscreen();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceTypeDialog.fxml"));
-            fxmlLoader.setController(this);
-            try {
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                HTMLOption.setTooltip(new Tooltip("Will Display .html Formatted Text During Each Individual Cut/Element"));
-                TextOption.setTooltip(new Tooltip("Will Display Contents Of Plain Text File During Each Individual Cut/Element"));
-                this.setResizable(false);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Reference Type Select");
-            if (referenceType != null) {
-                switch (referenceType) {
-                    case txt:
-                        TextOption.setSelected(true);
-                        break;
-                    case html:
-                        HTMLOption.setSelected(true);
-                        break;
-                }
-            }
-            FullScreenOption.setSelected(fullscreen);
-        }
-
-    // Getters And Setters
-        public ReferenceType getReferenceType() {
-            return referenceType;
-        }
-        public Boolean getFullscreen() {return fullscreen;}
-        public void setFullscreen(Boolean fullscreen) {
-            this.fullscreen = fullscreen;
-        }
-        public Boolean getEnabled() {
-            return enabled;
-        }
-        public void setEnabled(Boolean enabled) {
-            this.enabled = enabled;
-        }
-
-    // Button Actions
-        public void selecthtml(ActionEvent actionEvent) {
-            if (HTMLOption.isSelected()) {TextOption.setSelected(false);}
-        }
-        public void selecttxt(ActionEvent actionEvent) {
-            if (TextOption.isSelected()) {HTMLOption.setSelected(false);}
-        }
-        public void accept(ActionEvent actionEvent) {
-            if (HTMLOption.isSelected()) {referenceType = ReferenceType.html;}
-            else if (TextOption.isSelected()) {referenceType = ReferenceType.txt;}
-            setFullscreen(FullScreenOption.isSelected());
-            setEnabled(true);
-            this.close();
-        }
-        public void cancel(ActionEvent actionEvent) {
-            setEnabled(false);
-            this.close();
-        }
-    }
-    public static class SessionFinishedDialog extends Stage {
-        public TextField TotalPracticeDuration;
-        public TextField SessionDuration;
-        public Button CloseButton;
-        private MainController Root;
-
-        public SessionFinishedDialog(MainController root) {
-            try {
-                Root = root;
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionFinishedDialog.fxml"));
-                fxmlLoader.setController(this);
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-                Sessions currentsessions = Root.getProgressTracker().getSessions();
-                Session thissession = currentsessions.sessioninformation_getspecificsession(currentsessions.sessioninformation_totalsessioncount() - 1);
-                int thisessionminutes = thissession.getTotal_Session_Duration();
-                SessionDuration.setText(Util.format_minstohrsandmins_abbreviated(thisessionminutes));
-                SessionDuration.setEditable(false);
-//                int totalsessionminutes = currentsessions.sessioninformation_getallsessiontotals(11, true);
-//                TotalPracticeDuration.setText(Util.format_minstohrsandmins_abbreviated(totalsessionminutes));
-                TotalPracticeDuration.setEditable(false);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Session Completed");
-        }
-
-        public void closedialog(ActionEvent actionEvent) {close();}
     }
 
 // Enumerators
