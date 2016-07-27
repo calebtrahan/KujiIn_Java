@@ -112,7 +112,7 @@ public class CreatorAndExporterUI {
             totalsessiontime += rampduration * 2;
             if (rampduration > 0) {TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + rampduration + "Mins. On Both Presession And Postsession"));}
             else {TotalSessionTime.setTooltip(null);}
-            TotalSessionTime.setText(Util.formatdurationtoStringSpelledOut(new Duration(totalsessiontime * 1000), TotalSessionTime.getLength()));
+            TotalSessionTime.setText(Util.formatdurationtoStringSpelledOut(new Duration((totalsessiontime * 60) * 1000), TotalSessionTime.getLayoutBounds().getWidth()));
             ApproximateEndTime.setTooltip(new Tooltip("Time You Finish Will Vary Depending On When You Start Playback"));
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, totalsessiontime);
@@ -449,7 +449,7 @@ public class CreatorAndExporterUI {
                 Cut selectedcut = allcuts.get(i);
                 currentcuttext.append(selectedcut.number).append(". ").append(selectedcut.name);
                 if (selectedcut.getdurationinminutes() > 0) {
-                    currentcuttext.append(" (").append(Util.formatdurationtoStringSpelledOut(new Duration(selectedcut.getdurationinmillis() * 1000), new Double(SessionListView.getLayoutBounds().getWidth()).intValue() - (currentcuttext.length() + 1)));
+                    currentcuttext.append(" (").append(Util.formatdurationtoStringSpelledOut(new Duration(selectedcut.getdurationinmillis() * 1000), SessionListView.getLayoutBounds().getWidth() - (currentcuttext.length() + 1)));
                     currentcuttext.append(")");
                 } else {
                     if (missingcuts == null) {missingcuts = new ArrayList<>();}

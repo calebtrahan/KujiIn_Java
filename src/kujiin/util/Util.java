@@ -23,7 +23,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -307,9 +306,6 @@ public class Util {
             }
         });
     }
-    public static void custom_label_withautoclear(Label label, int millistillclear) {
-        label.textProperty().addListener((observable, oldValue, newValue) -> new Timeline(new KeyFrame(Duration.millis(millistillclear), ae -> label.setText(""))).play());
-    }
 
 // Math Methods
     public static Double rounddouble(double number, int decimalplaces) {
@@ -341,7 +337,7 @@ public class Util {
         decimalminutes += hours;
         return rounddouble(decimalminutes, 2);
     }
-    public static int convertdecimalhourstominutes(double decimalhours) {
+    public static int convert_decimalhourstominutes(double decimalhours) {
         Double minutes = 60 * decimalhours;
         return minutes.intValue();
     }
@@ -358,7 +354,7 @@ public class Util {
         if (seconds > 0) {abbreviatedtext.append(String.format("%02d", seconds));}
         return abbreviatedtext.toString();
     }
-    public static String formatdurationtoStringSpelledOut(Duration duration, Integer maxcharlength) {
+    public static String formatdurationtoStringSpelledOut(Duration duration, Double maxcharlength) {
         int seconds = new Double(duration.toSeconds()).intValue();
         int hours = 0;
         int minutes = 0;
@@ -367,7 +363,7 @@ public class Util {
             // Long
         if (hours == 0 && minutes == 0 && seconds == 0) {return "0 Minutes";}
         StringBuilder longtext = new StringBuilder();
-        if (hours > 0) {longtext.append(hours).append("Hour"); if (hours > 1) {longtext.append("s");} if (minutes > 0) {longtext.append(" ");}}
+        if (hours > 0) {longtext.append(hours).append(" Hour"); if (hours > 1) {longtext.append("s");} if (minutes > 0) {longtext.append(" ");}}
         if (minutes > 0) {
             longtext.append(minutes);
             longtext.append(" Minute");
@@ -406,15 +402,6 @@ public class Util {
         Calendar currentDate = Calendar.getInstance();
         SimpleDateFormat formatter= new SimpleDateFormat("MM/dd/yyyy");
         return formatter.format(currentDate.getTime());
-    }
-    public static String checkifdateoverdue(String DateFormatted) {
-        LocalDate datedue = Util.convert_stringtolocaldate(DateFormatted);
-        int daystilldue = Period.between(LocalDate.now(), datedue).getDays();
-        if (daystilldue > 1) {return DateFormatted;}
-        if (daystilldue == 1) {return "Tomorrow";}
-        if (daystilldue == 0) {return "Today";}
-        if (daystilldue < 0) {return "Past Due";}
-        else {return "";}
     }
 
 // File Methods

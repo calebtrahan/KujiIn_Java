@@ -493,8 +493,8 @@ public class This_Session {
                         for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
                             a.append("\n");
                             Meditatable thismeditatable = cutsorelementswithreducedambience.get(i);
-                            String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(new Duration(thismeditatable.getAmbience().gettotalActualDuration() * 1000), 10);
-                            String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(new Duration(thismeditatable.getdurationinmillis()), 10);
+                            String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(new Duration(thismeditatable.getAmbience().gettotalActualDuration() * 1000), null);
+                            String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(new Duration(thismeditatable.getdurationinmillis()), null);
                             a.append(count).append(". ").append(thismeditatable.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }

@@ -145,8 +145,8 @@ public class ProgressAndGoalsUI {
             Integer totalminutespracticed = SelectedMeditatable.getTotalMinutesPracticed(PreAndPostOption.isSelected());
             Integer numberofsessionspracticed = SelectedMeditatable.getNumberOfSessionsPracticed(PreAndPostOption.isSelected());
             if (numberofsessionspracticed > 0) {
-                averagesessiondurationtext = Util.formatdurationtoStringSpelledOut(new Duration(averagesessionduration * 1000), AverageSessionDuration.getLength());
-                totalminutespracticedtext = Util.formatdurationtoStringSpelledOut(new Duration(totalminutespracticed * 1000), TotalTimePracticed.getLength());
+                averagesessiondurationtext = Util.formatdurationtoStringSpelledOut(new Duration(averagesessionduration * 1000), AverageSessionDuration.getLayoutBounds().getWidth());
+                totalminutespracticedtext = Util.formatdurationtoStringSpelledOut(new Duration(totalminutespracticed * 1000), TotalTimePracticed.getLayoutBounds().getWidth());
                 numberofsessionspracticedtext = numberofsessionspracticed.toString();
                 disabled = false;
             } else {
@@ -478,10 +478,10 @@ public class ProgressAndGoalsUI {
                 setTitle("Goal Pacing");
                 practicedhours = (double) (meditatable.getTotalMinutesPracticed(false) / 60);
                 goalhours = meditatable.getCurrentGoal().getGoal_Hours();
-                GoalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(goalhours * 3_600_000), GoalDuration.getLength()));
-                TotalPracticedTime.setText(Util.formatdurationtoStringSpelledOut(new Duration(practicedhours * 3600000), TotalPracticedTime.getLength()));
+                GoalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(goalhours * 3_600_000), GoalDuration.getLayoutBounds().getWidth()));
+                TotalPracticedTime.setText(Util.formatdurationtoStringSpelledOut(new Duration(practicedhours * 3600000), TotalPracticedTime.getLayoutBounds().getWidth()));
                 hoursleft = goalhours - practicedhours;
-                GoalTimeLeft.setText(Util.formatdurationtoStringSpelledOut(new Duration(hoursleft * 3600000), GoalTimeLeft.getLength()));
+                GoalTimeLeft.setText(Util.formatdurationtoStringSpelledOut(new Duration(hoursleft * 3600000), GoalTimeLeft.getLayoutBounds().getWidth()));
                 Util.custom_spinner_integer(PracticeDays, 1, Integer.MAX_VALUE, 1, false);
                 PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> calculate());
                 PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
@@ -489,15 +489,12 @@ public class ProgressAndGoalsUI {
             } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
         }
 
-    // Button Actions
-        public void closedialog(ActionEvent actionEvent) {close();}
-
     // Other Methods
         public void calculate() {
             Double days = (double) PracticeDays.getValue();
             Float hourstopractice = hoursleft.floatValue() / days.floatValue();
-            int minsaday = Util.convertdecimalhourstominutes(hourstopractice.doubleValue());
-            PracticeTimeADay.setText(Util.formatdurationtoStringSpelledOut(new Duration(minsaday * 1000), PracticeTimeADay.getLength()));
+            int minsaday = Util.convert_decimalhourstominutes(hourstopractice.doubleValue());
+            PracticeTimeADay.setText(Util.formatdurationtoStringSpelledOut(new Duration(minsaday * 1000), PracticeTimeADay.getLayoutBounds().getWidth()));
         }
     }
     public static class AllSessionsDetails extends Stage {

@@ -14,7 +14,7 @@
       </Label>
       <HBox alignment="CENTER_RIGHT" layoutX="352.0" layoutY="153.0" prefHeight="26.0" prefWidth="71.0">
          <children>
-            <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#closedialog" text="Close" />
+            <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#close" text="Close" />
          </children>
       </HBox>
       <HBox alignment="CENTER_RIGHT" layoutX="52.0" layoutY="98.0" prefHeight="53.0" prefWidth="371.0">

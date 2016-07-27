@@ -322,10 +322,10 @@ public class MainController implements Initializable {
             alertfileTextField.setDisable(! AlertFileToggleButton.isSelected() || alertfile == null);
             if (alertfile != null && alertfile.exists()) {
                 Double duration = Util.audio_getduration(alertfile);
-                String durationtext = Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), alertfileTextField.getLength());
                 if (duration < SUGGESTED_ALERT_FILE_MAX_LENGTH) {
                     // TODO Ask Confirmation Here
                 } else {}
+                String durationtext = Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), alertfileTextField.getLayoutBounds().getWidth());
                 String text = String.format("%s (%s)", alertfile.getName(), durationtext);
                 alertfileTextField.setText(text);
             } else {
@@ -348,10 +348,10 @@ public class MainController implements Initializable {
             if (duration == 0.0) {Util.gui_showinformationdialog(Root, "Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
             else if (duration >= (SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
                 String confirmationtext = String.format("%s Is %s Which Is Longer Than The Suggested Maximum Duration %s", testfile.getName(),
-                        Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), 10), Util.formatdurationtoStringSpelledOut(new Duration(SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), 10));
+                        Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), null));
                 return Util.gui_getokcancelconfirmationdialog(Root, "Alert File Too Long", confirmationtext, "This May Break Session Immersion. Really Use This File As Your Alert File?");
             } else if (duration >= ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), 10), Util.formatdurationtoStringSpelledOut(new Duration(ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), 10));
+                String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), null));
                 Util.gui_showinformationdialog(Root, "Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
                 return false;
             } else {return true;}
@@ -747,7 +747,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : Temp_Table.getItems()) {
                 temptotalduration += i.getDuration();
             }
-            Temp_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(temptotalduration), Temp_TotalDuration.getLength()));
+            Temp_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(temptotalduration), Temp_TotalDuration.getLayoutBounds().getWidth()));
         }
         public void deletetempambiencefromdirectory() {
             try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
@@ -766,7 +766,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : Actual_Table.getItems()) {
                 actualtotalduration += i.getDuration();
             }
-            Actual_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(actualtotalduration), Actual_TotalDuration.getLength()));
+            Actual_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(actualtotalduration), Actual_TotalDuration.getLayoutBounds().getWidth()));
         }
 
     // Table Methods
@@ -1080,7 +1080,7 @@ public class MainController implements Initializable {
             for (AmbienceSong i : AmbienceTable.getItems()) {
                 totalselectedduration += i.getDuration();
             }
-            TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(totalselectedduration), TotalDuration.getLength()));
+            TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(totalselectedduration), TotalDuration.getLayoutBounds().getWidth()));
         }
         public boolean unsavedchanges() {
             if (MeditatableChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
@@ -1392,7 +1392,7 @@ public class MainController implements Initializable {
                 if (Options.getSessionOptions().getAlertfilelocation() != null) {
                     File alertfile = new File(Options.getSessionOptions().getAlertfilelocation());
                     if (! alertfile.exists()) {Options.getSessionOptions().setAlertfilelocation(null); alertfiletoggled();}
-                    String duration = Util.formatdurationtoStringSpelledOut(new Duration(Util.audio_getduration(alertfile) * 1000), AlertFileTextField.getLength() - (alertfile.getName().length()) + 3);
+                    String duration = Util.formatdurationtoStringSpelledOut(new Duration(Util.audio_getduration(alertfile) * 1000), AlertFileTextField.getLayoutBounds().getWidth() - (alertfile.getName().length()) + 3);
                     String text = String.format("%s (%s)", alertfile.getName(), duration);
                     AlertFileTextField.setText(text);
                     AlertFileTextField.setDisable(false);
@@ -1554,7 +1554,7 @@ public class MainController implements Initializable {
                 else {GoalsCompletedTopLabel.setText("No Goals Completed This Session");}
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
-                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((totalsessiontime * 60) * 1000), SessionDurationTextField.getLength()));
+                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((totalsessiontime * 60) * 1000), SessionDurationTextField.getLayoutBounds().getWidth()));
                 SessionDurationTextField.setEditable(false);
                 SessionBarChart.requestFocus();
             } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
@@ -1586,7 +1586,7 @@ public class MainController implements Initializable {
                 SessionBarChart.getData().add(series);
                 SessionBarChart.setLegendVisible(false);
                 SessionNumbersAxis.setUpperBound(Util.list_getmaxintegervalue(values));
-                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((session.getTotal_Session_Duration() * 60) * 1000), SessionDurationTextField.getLength()));
+                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((session.getTotal_Session_Duration() * 60) * 1000), SessionDurationTextField.getLayoutBounds().getWidth()));
                 SessionDurationTextField.setEditable(false);
                 SessionBarChart.requestFocus();
             } catch (IOException | NullPointerException e) {new ExceptionDialog(Root, e).showAndWait();}
@@ -1624,7 +1624,7 @@ public class MainController implements Initializable {
             this.name = new SimpleStringProperty(soundFile.getName());
             this.file = soundFile.getFile();
             duration = soundFile.getDuration();
-            this.length = new SimpleStringProperty(Util.formatdurationtoStringSpelledOut(new Duration(duration), 10));
+            this.length = new SimpleStringProperty(Util.formatdurationtoStringSpelledOut(new Duration(duration), null));
         }
 
         public String getName() {
