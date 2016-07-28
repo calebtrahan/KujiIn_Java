@@ -4,7 +4,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
-import kujiin.ui.PlayerUI;
+import kujiin.MainController;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
@@ -55,8 +55,8 @@ public class Cut extends Meditatable {
     @Override
     public void tick() {
         super.tick();
-        if (thisession.getPlayerState() == PlayerUI.PlayerState.PLAYING) {
-            thisession.Root.getProgressTracker().getSessions().sessioninformation_getspecificsession(thisession.Root.getProgressTracker().getSessions().getSession().size() - 1).updatecutduration(number, new Double(elapsedtime.toMinutes()).intValue());
+        if (thisession.getPlayerState() == MainController.PlayerState.PLAYING) {
+            thisession.Root.getSessions().sessioninformation_getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatecutduration(number, new Double(elapsedtime.toMinutes()).intValue());
         }
     }
     @Override

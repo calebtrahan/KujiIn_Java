@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kujiin.MainController;
-import kujiin.ui.PlayerUI;
 import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
@@ -66,11 +65,13 @@ public class Options {
     public static final File REFERENCE_THEMEFILE = new File(DIRECTORYSTYLES, "referencefile.css");
     public static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
     public static final Integer DEFAULT_RAMP_DURATION = 2;
-    public static final PlayerUI.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = PlayerUI.ReferenceType.html;
+    public static final MainController.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = MainController.ReferenceType.html;
     public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
     public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
     public static final Integer DEFAULT_LONG_MEDITATABLE_DURATION = 10;
-// Files
+    public static final String NEWGOALTEXT = "New Goal";
+    public static final String GOALPACINGTEXT = "Goal Pacing";
+    // Files
     private ProgramOptions ProgramOptions;
     private SessionOptions SessionOptions;
     private AppearanceOptions AppearanceOptions;
@@ -214,7 +215,7 @@ public class Options {
         private Boolean alertfunction;
         private Integer rampduration;
         private Boolean referenceoption;
-        private PlayerUI.ReferenceType referencetype;
+        private MainController.ReferenceType referencetype;
         private Boolean referencefullscreen;
 
         public SessionOptions() {}
@@ -274,10 +275,10 @@ public class Options {
         public void setReferenceoption(Boolean referenceoption) {
             this.referenceoption = referenceoption;
         }
-        public PlayerUI.ReferenceType getReferencetype() {
+        public MainController.ReferenceType getReferencetype() {
             return referencetype;
         }
-        public void setReferencetype(PlayerUI.ReferenceType referencetype) {
+        public void setReferencetype(MainController.ReferenceType referencetype) {
             this.referencetype = referencetype;
         }
         public Boolean getReferencefullscreen() {

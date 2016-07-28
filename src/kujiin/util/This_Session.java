@@ -10,10 +10,10 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.MainController;
-import kujiin.ui.CreatorAndExporterUI;
-import kujiin.ui.PlayerUI;
-import kujiin.ui.SimpleTextDialogWithCancelButton;
-import kujiin.xml.*;
+import kujiin.xml.Ambiences;
+import kujiin.xml.Entrainments;
+import kujiin.xml.Options;
+import kujiin.xml.Session;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,24 +46,23 @@ public class This_Session {
     private Element Water;
     private Element Void;
     private Meditatable Total;
-    private PlayerUI.PlayerState playerState;
+    private MainController.PlayerState playerState;
     private Meditatable currentmeditatable;
     private Timeline updateuitimeline;
-    private Sessions sessions;
     private Duration totalsessiondurationelapsed;
     private Duration totalsessionduration;
     private int meditatablecount;
-    private PlayerUI.DisplayReference displayReference;
+    private MainController.PlayerUI.DisplayReference displayReference;
     public MainController Root;
     public List<Meditatable> MeditatableswithGoalsCompletedThisSession;
-    private PlayerUI playerUI;
+    private MainController.PlayerUI playerUI;
     private List<Meditatable> itemsinsession;
     private Entrainments entrainments;
     private Ambiences ambiences;
 
     public This_Session(MainController mainController) {
         Root = mainController;
-        setPlayerState(PlayerUI.PlayerState.IDLE);
+        setPlayerState(MainController.PlayerState.IDLE);
         entrainments = new Entrainments(Root);
         entrainments.unmarshall();
         ambiences = new Ambiences(Root);
@@ -89,20 +88,17 @@ public class This_Session {
 
 // Getters And Setters
     public MainController getRoot() {return Root;}
-    public void setPlayerState(PlayerUI.PlayerState playerState) {this.playerState = playerState;}
-    public PlayerUI.PlayerState getPlayerState() {return playerState;}
+    public void setPlayerState(MainController.PlayerState playerState) {this.playerState = playerState;}
+    public MainController.PlayerState getPlayerState() {return playerState;}
     public boolean isValid() {
         Duration totaltime = Duration.ZERO;
         for (Meditatable i : getAllMeditatables()) {totaltime.add(i.getduration());}
         return totaltime.greaterThan(Duration.ZERO);
     }
-    public void setSessions() {
-        sessions = Root.getProgressTracker().getSessions();
-    }
-    public PlayerUI getPlayerUI() {
+    public MainController.PlayerUI getPlayerUI() {
         return playerUI;
     }
-    public void setPlayerUI(PlayerUI playerUI) {
+    public void setPlayerUI(MainController.PlayerUI playerUI) {
         this.playerUI = playerUI;
     }
     public ArrayList<Meditatable> getAllMeditatables() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
@@ -141,10 +137,10 @@ public class This_Session {
     public void setAmbiences(Ambiences ambiences) {
         this.ambiences = ambiences;
     }
-    public PlayerUI.DisplayReference getDisplayReference() {
+    public MainController.PlayerUI.DisplayReference getDisplayReference() {
         return displayReference;
     }
-    public void setDisplayReference(PlayerUI.DisplayReference displayReference) {
+    public void setDisplayReference(MainController.PlayerUI.DisplayReference displayReference) {
         this.displayReference = displayReference;
     }
 
@@ -280,7 +276,7 @@ public class This_Session {
             if (! rinnotstartpoint) {rinnotstartpoint = ! Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Cuts In Session Not Connected To RIN, And May Lack The Energy They Need To Get Results",
                     "Connect " + cutsinsession.get(0).name + " Back To RIN?");}
             if (! rinnotstartpoint || ! firstandlastcutsconnect(cutsinsession)) {
-                CreatorAndExporterUI.CutsMissingDialog cutsMissingDialog = new CreatorAndExporterUI.CutsMissingDialog(Root, cutsinsession);
+                MainController.CutsMissingDialog cutsMissingDialog = new MainController.CutsMissingDialog(Root, cutsinsession);
                 cutsMissingDialog.showAndWait();
                 switch (cutsMissingDialog.getResult()) {
                     case YES:
@@ -297,7 +293,7 @@ public class This_Session {
             }
         }
         if (cutsinsession != null && elementsinsession != null && cutsinsession.size() > 0 && elementsinsession.size() > 0) {
-            CreatorAndExporterUI.SortSessionItems sortSessionItems = new CreatorAndExporterUI.SortSessionItems(Root, getallitemsinSession());
+            MainController.SortSessionItems sortSessionItems = new MainController.SortSessionItems(Root, getallitemsinSession());
             sortSessionItems.showAndWait();
             switch (sortSessionItems.getResult()) {
                 case YES:
@@ -316,7 +312,7 @@ public class This_Session {
     }
     // Goals Validation
     public Util.AnswerType checkgoals() {
-        ArrayList<Meditatable> meditatableswithoutlongenoughgoals = Root.getProgressTracker().getmeditatableswithoutlongenoughgoals(getallitemsinSession());
+        ArrayList<Meditatable> meditatableswithoutlongenoughgoals = Root.goals_util_getmeditatableswithoutlongenoughgoals(getallitemsinSession());
         List<Integer>  notgooddurations = new ArrayList<>();
         if (! meditatableswithoutlongenoughgoals.isEmpty()) {
             boolean presessionmissinggoals = false;
@@ -398,9 +394,9 @@ public class This_Session {
                     };
                 }
             };
-            final SimpleTextDialogWithCancelButton[] cad = new SimpleTextDialogWithCancelButton[1];
+            final MainController.SimpleTextDialogWithCancelButton[] cad = new MainController.SimpleTextDialogWithCancelButton[1];
             ambiencecheckerservice.setOnRunning(event -> {
-                cad[0] = new SimpleTextDialogWithCancelButton(Root, "Checking Ambience", "Checking Ambience", "");
+                cad[0] = new MainController.SimpleTextDialogWithCancelButton(Root, "Checking Ambience", "Checking Ambience", "");
                 cad[0].Message.textProperty().bind(ambiencecheckerservice.messageProperty());
                 cad[0].CancelButton.setOnAction(ev -> ambiencecheckerservice.cancel());
                 cad[0].showAndWait();
@@ -464,7 +460,7 @@ public class This_Session {
             Util.gui_showinformationdialog(Root, "Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
     // Reference Files Validation
-    public boolean checkallreferencefilesforsession(PlayerUI.ReferenceType referenceType, boolean enableprompt) {
+    public boolean checkallreferencefilesforsession(MainController.ReferenceType referenceType, boolean enableprompt) {
         int invalidcutcount = 0;
         for (Meditatable i : getallitemsinSession()) {
             if (!i.referencefilevalid(referenceType)) invalidcutcount++;
@@ -583,7 +579,7 @@ public class This_Session {
     }
 
 // Playback
-    public void play(PlayerUI playerUI) {
+    public void play(MainController.PlayerUI playerUI) {
         switch (playerState) {
             case IDLE:
             case STOPPED:
@@ -598,7 +594,7 @@ public class This_Session {
                 updateuitimeline.play();
                 meditatablecount = 0;
                 currentmeditatable = itemsinsession.get(meditatablecount);
-                sessions.createnewsession();
+                Root.getSessions().createnewsession();
                 currentmeditatable.start();
                 break;
             case PAUSED:
@@ -608,7 +604,7 @@ public class This_Session {
         }
     }
     public void pause() {
-        if (playerState == PlayerUI.PlayerState.PLAYING) {
+        if (playerState == MainController.PlayerState.PLAYING) {
             currentmeditatable.pause();
             updateuitimeline.pause();
         }
@@ -651,8 +647,8 @@ public class This_Session {
                     getDisplayReference().CurrentName.setText(currentmeditatable.name);
                 }
             } catch (NullPointerException ignored) {}
-            Root.getProgressTracker().updategoalsui();
-            Root.getProgressTracker().updatesessionsprogressui();
+            Root.goals_gui_updateui();
+            Root.sessions_gui_updateui();
             currentmeditatable.tick();
         } catch (Exception e) {e.printStackTrace();
 //            new MainController.ExceptionDialog(Root, e).show();
@@ -669,7 +665,7 @@ public class This_Session {
                         currentmeditatable = getallitemsinSession().get(meditatablecount);
                         currentmeditatable.start();
                     } catch (IndexOutOfBoundsException ignored) {
-                        setPlayerState(PlayerUI.PlayerState.IDLE);
+                        setPlayerState(MainController.PlayerState.IDLE);
                         currentmeditatable.cleanupPlayersandAnimations();
                         endofsession();
                     }
@@ -685,38 +681,39 @@ public class This_Session {
         getPlayerUI().CurrentCutTopLabel.setText(currentmeditatable.name + " Completed");
         getPlayerUI().TotalSessionLabel.setText("Session Completed");
         updateuitimeline.stop();
-        setPlayerState(PlayerUI.PlayerState.STOPPED);
-        sessions.deletenonvalidsessions();
+        setPlayerState(MainController.PlayerState.STOPPED);
+        Root.getSessions().deletenonvalidsessions();
         // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It Then Change Session Finsished Dialog To Showandwait
         MainController.SessionDetails sessionDetails = new MainController.SessionDetails(Root, getallitemsinSession());
         sessionDetails.show();
         // TODO Prompt For Export
 //        if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            getsessionexporter();}
-        Root.getProgressTracker().updategoalsui();
+        Root.sessions_gui_updateui();
+        Root.goals_gui_updateui();
         resetthissession();
     }
     public void resetthissession() {
         updateuitimeline = null;
-        sessions.deletenonvalidsessions();
+        Root.getSessions().deletenonvalidsessions();
         meditatablecount = 0;
         totalsessiondurationelapsed = Duration.ZERO;
         totalsessionduration = Duration.ZERO;
         getPlayerUI().reset();
     }
     public void transition() {
-        Session currentsession = sessions.sessioninformation_getspecificsession(sessions.sessioninformation_totalsessioncount() - 1);
+        Session currentsession =  Root.getSessions().sessioninformation_getspecificsession( Root.getSessions().sessioninformation_totalsessioncount() - 1);
         currentsession.updatecutduration(currentmeditatable.number, new Double(currentmeditatable.getduration().toMinutes()).intValue());
-        sessions.marshall();
-        Root.getProgressTracker().updategoalsui();
+        Root.getSessions().marshall();
+        Root.goals_gui_updateui();
         currentmeditatable.stop();
-        if (currentmeditatable.name.equals("Postsession")) {setPlayerState(PlayerUI.PlayerState.TRANSITIONING); progresstonextcut();}
+        if (currentmeditatable.name.equals("Postsession")) {setPlayerState(MainController.PlayerState.TRANSITIONING); progresstonextcut();}
         else {
             if (Root.getOptions().getSessionOptions().getAlertfunction()) {
                 Media alertmedia = new Media(Root.getOptions().getSessionOptions().getAlertfilelocation());
                 MediaPlayer alertplayer = new MediaPlayer(alertmedia);
                 alertplayer.play();
-                setPlayerState(PlayerUI.PlayerState.TRANSITIONING);
+                setPlayerState(MainController.PlayerState.TRANSITIONING);
                 alertplayer.setOnEndOfMedia(() -> {
                     alertplayer.stop();
                     alertplayer.dispose();
@@ -735,7 +732,7 @@ public class This_Session {
                     }
                 });
             } else {
-                setPlayerState(PlayerUI.PlayerState.TRANSITIONING);
+                setPlayerState(MainController.PlayerState.TRANSITIONING);
                 progresstonextcut();
             }
         }
@@ -744,14 +741,14 @@ public class This_Session {
 
     }
     public boolean endsessionprematurely() {
-        if (getPlayerState() == PlayerUI.PlayerState.PLAYING || getPlayerState() == PlayerUI.PlayerState.PAUSED || getPlayerState() == PlayerUI.PlayerState.TRANSITIONING) {
+        if (getPlayerState() == MainController.PlayerState.PLAYING || getPlayerState() == MainController.PlayerState.PAUSED || getPlayerState() == MainController.PlayerState.TRANSITIONING) {
             pause();
             if (Util.gui_getokcancelconfirmationdialog(Root, "End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {return true;}
             else {play(Root.getPlayer()); return false;}
         } else {return true;}
     }
     public void togglevolumebinding() {
-        if (getPlayerState() != PlayerUI.PlayerState.IDLE && getPlayerState() != PlayerUI.PlayerState.STOPPED) {
+        if (getPlayerState() != MainController.PlayerState.IDLE && getPlayerState() != MainController.PlayerState.STOPPED) {
             currentmeditatable.volume_rebindentrainment();
             if (currentmeditatable.getAmbienceenabled()) {
                 currentmeditatable.volume_rebindambience();}
@@ -772,9 +769,9 @@ public class This_Session {
     public void displayreferencefile() {
         boolean notalreadyshowing = displayReference == null || ! displayReference.isShowing();
         boolean referenceenabledwithvalidtype = Root.getOptions().getSessionOptions().getReferenceoption() &&
-                (Root.getOptions().getSessionOptions().getReferencetype() == PlayerUI.ReferenceType.html || Root.getOptions().getSessionOptions().getReferencetype() == PlayerUI.ReferenceType.txt);
+                (Root.getOptions().getSessionOptions().getReferencetype() == MainController.ReferenceType.html || Root.getOptions().getSessionOptions().getReferencetype() == MainController.ReferenceType.txt);
         if (notalreadyshowing && referenceenabledwithvalidtype) {
-            displayReference = new PlayerUI.DisplayReference(Root, currentmeditatable);
+            displayReference = new MainController.PlayerUI.DisplayReference(Root, currentmeditatable);
             displayReference.show();
             displayReference.setOnHidden(event -> {
                 currentmeditatable.volume_rebindentrainment();

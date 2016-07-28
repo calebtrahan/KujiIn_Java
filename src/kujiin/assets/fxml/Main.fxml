@@ -48,16 +48,16 @@
          <font>
             <Font size="10.0" />
          </font></Label>
-      <ComboBox fx:id="GoalCutComboBox" layoutX="725.0" layoutY="68.0" prefHeight="26.0" prefWidth="146.0" promptText="Select...">
+      <ComboBox fx:id="GoalMeditatableComboBox" layoutX="725.0" layoutY="68.0" prefHeight="26.0" prefWidth="146.0" promptText="Select..." onAction="#sessionsandgoals_meditatableselectionchanged">
          <cursor>
             <Cursor fx:constant="OPEN_HAND" />
          </cursor></ComboBox>
-      <Button fx:id="LoadPresetButton" layoutX="402.0" layoutY="39.0" mnemonicParsing="false" onAction="#loadpreset" prefHeight="23.0" prefWidth="93.0" text="Load Preset">
+      <Button fx:id="LoadPresetButton" layoutX="402.0" layoutY="39.0" mnemonicParsing="false" onAction="#preset_load" prefHeight="23.0" prefWidth="93.0" text="Load Preset">
          <font>
             <Font size="12.0" />
          </font>
       </Button>
-      <Button fx:id="SavePresetButton" layoutX="495.0" layoutY="39.0" mnemonicParsing="false" onAction="#savepreset" prefHeight="23.0" prefWidth="93.0" text="Save Preset">
+      <Button fx:id="SavePresetButton" layoutX="495.0" layoutY="39.0" mnemonicParsing="false" onAction="#preset_save" prefHeight="23.0" prefWidth="93.0" text="Save Preset">
          <font>
             <Font size="12.0" />
          </font>
@@ -65,7 +65,7 @@
       <HBox alignment="TOP_RIGHT" layoutX="54.0" layoutY="565.0" prefHeight="28.0" prefWidth="377.0" />
       <HBox alignment="CENTER_RIGHT" layoutX="351.0" layoutY="240.0" prefHeight="23.0" prefWidth="239.0">
          <children>
-            <CheckBox fx:id="AmbienceSwitch" mnemonicParsing="false" onAction="#ambienceswitch" text="Ambience">
+            <CheckBox fx:id="AmbienceSwitch" mnemonicParsing="false" onAction="#creation_gui_toggleambience" text="Ambience">
                <HBox.margin>
                   <Insets right="5.0" />
                </HBox.margin>
@@ -74,7 +74,7 @@
                <font>
                   <Font size="12.0" />
                </font></Button>
-            <Button fx:id="ExportButton" mnemonicParsing="false" onAction="#toggleexporter" prefHeight="23.0" prefWidth="63.0" text="Export">
+            <Button fx:id="ExportButton" mnemonicParsing="false" onAction="#exporter_toggle" prefHeight="23.0" prefWidth="63.0" text="Export">
                <font>
                   <Font size="12.0" />
                </font>
@@ -323,17 +323,17 @@
       </Label>
       <HBox layoutX="10.0" layoutY="240.0" prefHeight="26.0" prefWidth="353.0">
          <children>
-            <Button fx:id="ChangeAllCutsButton" mnemonicParsing="false" onAction="#changeallcutsvalues" text="Change All Cuts">
+            <Button fx:id="ChangeAllCutsButton" mnemonicParsing="false" onAction="#creation_gui_changeallvalues_cuts" text="Change All Cuts">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="ChangeAllElementsButton" mnemonicParsing="false" onAction="#changeallelementsvalues" text="Change All Elements">
+            <Button fx:id="ChangeAllElementsButton" mnemonicParsing="false" onAction="#creation_gui_changeallvalues_elements" text="Change All Elements">
                <font>
                   <Font size="12.0" />
                </font>
             </Button>
-            <Button fx:id="ResetCreatorButton" mnemonicParsing="false" onAction="#resetallcreatorvalues" prefHeight="23.0" prefWidth="54.0" text="Reset">
+            <Button fx:id="ResetCreatorButton" mnemonicParsing="false" onAction="#creation_gui_resetallvalues" prefHeight="23.0" prefWidth="54.0" text="Reset">
                <font>
                   <Font size="12.0" />
                </font>
@@ -367,11 +367,11 @@
             </HBox>
             <HBox alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="316.0">
                <children>
-                  <CheckBox fx:id="PrePostSwitch" mnemonicParsing="false" onAction="#updatetotalprogresswidget" text="Include Qi-Gong">
+                  <CheckBox fx:id="PrePostSwitch" mnemonicParsing="false" onAction="#sessions_gui_togglepreandpost" text="Include Qi-Gong">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin></CheckBox>
-                  <Button fx:id="ListOfSessionsButton" mnemonicParsing="false" onMousePressed="#displaylistofsessions" prefHeight="23.0" prefWidth="126.0" text="View All Sessions">
+                  <Button fx:id="ListOfSessionsButton" mnemonicParsing="false" onMousePressed="#sessions_gui_displaysessionlist" prefHeight="23.0" prefWidth="126.0" text="View All Sessions">
                      <font>
                         <Font size="12.0" />
                      </font>
@@ -399,12 +399,12 @@
                <children>
                   <HBox alignment="CENTER_RIGHT" prefHeight="28.0" prefWidth="349.0">
                      <children>
-                        <Button fx:id="newgoalButton" mnemonicParsing="false" onMousePressed="#setnewgoal" text="New Goal">
+                        <Button fx:id="newgoalButton" mnemonicParsing="false" onMousePressed="#goals_gui_setnewgoal" text="New Goal">
                            <font>
                               <Font size="12.0" />
                            </font>
                         </Button>
-                        <Button fx:id="viewcurrrentgoalsButton" mnemonicParsing="false" onMousePressed="#viewcurrentgoals" text="Goal Editor">
+                        <Button fx:id="viewcurrrentgoalsButton" mnemonicParsing="false" onMousePressed="#goals_gui_viewcurrentgoals" text="Goal Editor">
                            <font>
                               <Font size="12.0" />
                            </font>
