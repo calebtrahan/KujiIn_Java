@@ -348,11 +348,8 @@ public class Util {
         int minutes = 0;
         if (seconds >= 3600) {hours = seconds / 3600; seconds -= hours * 3600;}
         if (seconds >= 60) {minutes = seconds / 60; seconds -= minutes * 60;}
-        StringBuilder abbreviatedtext = new StringBuilder();
-        if (hours > 0) {abbreviatedtext.append(String.format("%02d", hours));}
-        if (minutes > 0) {abbreviatedtext.append(String.format("%02d", minutes));}
-        if (seconds > 0) {abbreviatedtext.append(String.format("%02d", seconds));}
-        return abbreviatedtext.toString();
+        if (hours > 0) {return String.format("%02d:%02d:%02d", hours, minutes, seconds);}
+        else {return String.format("%02d:%02d", minutes, seconds);}
     }
     public static String formatdurationtoStringSpelledOut(Duration duration, Double maxcharlength) {
         int seconds = new Double(duration.toSeconds()).intValue();

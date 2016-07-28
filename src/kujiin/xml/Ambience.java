@@ -123,14 +123,15 @@ public class Ambience {
     public Duration gettotalActualDuration() {
         Duration duration = new Duration(0);
         if (Ambience != null) {
-            for (SoundFile i : Ambience) {duration.add(new Duration(i.getDuration()));}
+            System.out.println(Ambience.size());
+            for (SoundFile i : Ambience) {duration = duration.add(new Duration(i.getDuration()));}
         }
         return duration;
     }
     public Duration gettotalCreatedDuration() {
         Duration duration = new Duration(0);
         if (CreatedAmbience != null) {
-            for (SoundFile i : CreatedAmbience) {duration.add(new Duration(i.getDuration()));}
+            for (SoundFile i : CreatedAmbience) {duration = duration.add(new Duration(i.getDuration()));}
         }
         return duration;
     }

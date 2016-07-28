@@ -26,11 +26,17 @@ public class Cut extends Meditatable {
     public boolean buildEntrainment() {
         if (duration.equals(Duration.ZERO)) {return false;}
         Duration adjustedduration = duration;
-        if (number == 3 && duration.greaterThanOrEqualTo(Duration.minutes(3))) {adjustedduration.subtract(Duration.minutes(2));}
-        int fivetimes = new Double(adjustedduration.toMinutes() / 5).intValue();
-        int singletimes = new Double(adjustedduration.toMinutes() % 5).intValue();
-        for (int i = 0; i < fivetimes; i++) {entrainment.created_add(entrainment.getFreqlong());}
-        for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
+        if (number == 3 && duration.greaterThanOrEqualTo(Duration.minutes(3))) {adjustedduration = adjustedduration.subtract(Duration.minutes(2));}
+        Duration freqlongduration = new Duration(entrainment.getFreqlong().getDuration());
+        Duration freqshortduration = new Duration(entrainment.getFreqshort().getDuration());
+        while (adjustedduration.greaterThan(freqlongduration)) {
+            entrainment.created_add(entrainment.getFreqlong());
+            adjustedduration = adjustedduration.subtract(freqlongduration);
+        }
+        while (adjustedduration.greaterThan(Duration.ZERO)) {
+            entrainment.created_add(entrainment.getFreqshort());
+            adjustedduration = adjustedduration.subtract(freqshortduration);
+        }
         entrainment.shuffleCreated();
         if (number == 3 && duration.greaterThanOrEqualTo(Duration.minutes(3))) {
             int index = getAllmeditatablestoplay().indexOf(this);
@@ -47,6 +53,7 @@ public class Cut extends Meditatable {
             }
             entrainment.created_add(0, entrainment.getRampinfile());
             entrainment.created_add(entrainment.getRampoutfile());
+            return entrainment.created_getAll().size() > 0;
         }
         return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().greaterThanOrEqualTo(getduration());
     }

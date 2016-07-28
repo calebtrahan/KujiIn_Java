@@ -659,12 +659,14 @@ public class MainController implements Initializable {
     public void playthisession(ActionEvent actionEvent) {
         creation_util_createsession();
         if (creatorState == CreatorState.CREATED) {
+            System.out.println("Session Created");
             if (getPlayer() != null && getPlayer().isShowing()) {return;}
             getStage().setIconified(true);
             setPlayer(new PlayerUI(this));
             getPlayer().showAndWait();
             getStage().setIconified(false);
         }
+        else {System.out.println("Session Not Created");}
     }
 
 // Dialogs
@@ -2938,7 +2940,7 @@ public class MainController implements Initializable {
             try {
                 Root = root;
                 Session = Root.getSession();
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionPlayerDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);

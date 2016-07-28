@@ -220,7 +220,9 @@ public class This_Session {
                 return false;
         }
         for (Meditatable i : getallitemsinSession()) {
+            System.out.println("Building " + i.name);
             if (! i.build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}
+            System.out.println("Sucessfully Built " + i.name);
         }
         switch (checkgoals()) {
             case YES:
@@ -371,7 +373,7 @@ public class This_Session {
     public void checkambience(CheckBox ambiencecheckbox) {
         if (sessionhasvalidvalues()) {
             ArrayList<Meditatable> cutsorelementswithnoambience = new ArrayList<>();
-            ArrayList<Meditatable> cutsorelementswithreducedambience = new ArrayList<>();
+            ArrayList<Meditatable> meditatableswithreducedambience = new ArrayList<>();
             Service<Void> ambiencecheckerservice = new Service<Void>() {
                 @Override
                 protected Task<Void> createTask() {
@@ -382,7 +384,7 @@ public class This_Session {
                                 for (Meditatable i : getAllMeditatables()) {
                                     updateMessage(String.format("Currently Checking %s...", i.name));
                                     if (! i.getAmbience().hasAnyAmbience()) {cutsorelementswithnoambience.add(i);}
-                                    else if (! i.getAmbience().hasEnoughAmbience(i.getduration())) {cutsorelementswithreducedambience.add(i);}
+                                    else if (! i.getAmbience().hasEnoughAmbience(i.getduration())) {meditatableswithreducedambience.add(i);}
                                 }
                                 updateMessage("Done Checking Ambience");
                                 return null;
@@ -424,18 +426,19 @@ public class This_Session {
                     }
                     ambiencecheckbox.setSelected(false);
                 } else {
-                    if (cutsorelementswithreducedambience.size() > 0) {
+                    if (meditatableswithreducedambience.size() > 0) {
                         StringBuilder a = new StringBuilder();
                         int count = 1;
-                        for (int i = 0; i < cutsorelementswithreducedambience.size(); i++) {
+                        for (int i = 0; i < meditatableswithreducedambience.size(); i++) {
                             a.append("\n");
-                            Meditatable thismeditatable = cutsorelementswithreducedambience.get(i);
+                            Meditatable thismeditatable = meditatableswithreducedambience.get(i);
                             String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(thismeditatable.getAmbience().gettotalActualDuration(), null);
                             String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(thismeditatable.getduration(), null);
                             a.append(count).append(". ").append(thismeditatable.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                             count++;
                         }
-                        if (cutsorelementswithreducedambience.size() == 1) {
+                        System.out.println(a.toString());
+                        if (meditatableswithreducedambience.size() == 1) {
                             ambiencecheckbox.setSelected(Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
                         } else {
                             ambiencecheckbox.setSelected(Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
@@ -587,13 +590,14 @@ public class This_Session {
                 setPlayerUI(playerUI);
                 totalsessiondurationelapsed = Duration.ZERO;
                 totalsessionduration = Duration.ZERO;
-                for (Meditatable i : itemsinsession) {totalsessionduration.add(i.getduration());}
+                for (Meditatable i : itemsinsession) {totalsessionduration = totalsessionduration.add(i.getduration());}
                 getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
                 updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 updateuitimeline.play();
                 meditatablecount = 0;
                 currentmeditatable = itemsinsession.get(meditatablecount);
+                currentmeditatable.elapsedtime = Duration.ZERO;
                 Root.getSessions().createnewsession();
                 currentmeditatable.start();
                 break;
@@ -617,8 +621,8 @@ public class This_Session {
     }
     public void updateplayerui() {
         try {
-            totalsessiondurationelapsed.add(Duration.seconds(1.0));
-            currentmeditatable.elapsedtime.add(Duration.seconds(1.0));
+            totalsessiondurationelapsed = totalsessiondurationelapsed.add(Duration.seconds(1.0));
+            currentmeditatable.elapsedtime = currentmeditatable.elapsedtime.add(Duration.seconds(1.0));
             Float currentprogress;
             Float totalprogress;
             if (currentmeditatable.elapsedtime.greaterThan(Duration.ZERO)) {currentprogress = (float) currentmeditatable.elapsedtime.toMillis() / (float) currentmeditatable.getduration().toMillis();}
@@ -631,11 +635,11 @@ public class This_Session {
             totalprogress *= 100;
             getPlayerUI().CurrentCutTopLabel.setText(String.format("%s (%d", currentmeditatable.name, currentprogress.intValue()) + "%)");
             getPlayerUI().TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
-            getPlayerUI().CutCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getelapsedtime()));
+            getPlayerUI().CutCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.elapsedtime));
+            getPlayerUI().TotalCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessiondurationelapsed));
             boolean displaynormaltime = getPlayerUI().displaynormaltime;
             if (displaynormaltime) {getPlayerUI().CutTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getduration()));}
             else {getPlayerUI().CutTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getduration().subtract(currentmeditatable.elapsedtime)));}
-            getPlayerUI().TotalCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessiondurationelapsed));
             if (displaynormaltime) {getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));}
             else {getPlayerUI().TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration.subtract(totalsessiondurationelapsed)));}
             try {
@@ -754,18 +758,6 @@ public class This_Session {
                 currentmeditatable.volume_rebindambience();}
         }
     }
-
-// Reference Files
-//    public void togglereferencedisplay(CheckBox ReferenceFileCheckbox) {
-//        if (ReferenceFileCheckbox.isSelected()) {choosereferencetype();}
-//        ReferenceFileCheckbox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
-//        if (ReferenceFileCheckbox.isSelected()  && playerState == PlayerUI.PlayerState.PLAYING) {displayreferencefile();}
-//        else {
-//            Root.getOptions().getSessionOptions().setReferenceoption(false);
-//            Root.getOptions().getSessionOptions().setReferencetype(null);
-//            closereferencefile();
-//        }
-//    }
     public void displayreferencefile() {
         boolean notalreadyshowing = displayReference == null || ! displayReference.isShowing();
         boolean referenceenabledwithvalidtype = Root.getOptions().getSessionOptions().getReferenceoption() &&

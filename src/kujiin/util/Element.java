@@ -3,6 +3,7 @@ package kujiin.util;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.util.Duration;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
@@ -54,23 +55,29 @@ public class Element extends Meditatable {
         Meditatable meditatableafter = null;
         if (index != 0) {meditatablebefore = getAllmeditatablestoplay().get(index - 1);}
         if (index != getAllmeditatablestoplay().size() - 1) {meditatableafter = getAllmeditatablestoplay().get(index + 1);}
-        double durationinminutes = getduration().toMinutes();
+        Duration timeleft = getduration();
+        Duration freqlongduration = new Duration(entrainment.getFreqlong().getDuration());
+        Duration freqshortduration = new Duration(entrainment.getFreqshort().getDuration());
         SoundFile rampinfile = null;
         SoundFile rampoutfile = null;
         if (meditatablebefore != null || meditatableafter != null) {
             if (meditatablebefore != null) {
                rampinfile = new SoundFile(new File(Options.DIRECTORYRAMP, "elementin" + meditatablebefore.name.toLowerCase() + ".mp3"));
-                durationinminutes -= 1;
+                timeleft = timeleft.subtract(Duration.minutes(1));
             }
             if (meditatableafter != null) {
                 rampoutfile = new SoundFile(new File(Options.DIRECTORYRAMP, "elementout" + meditatableafter.name.toLowerCase() + ".mp3"));
-                durationinminutes -= 1;
+                timeleft = timeleft.subtract(Duration.minutes(1));
             }
         }
-        int fivetimes = (int) Math.ceil(durationinminutes / 5);
-        int singletimes = (int) Math.ceil(durationinminutes % 5);
-        for (int i = 0; i < fivetimes; i++) {entrainment.created_add(entrainment.getFreqlong());}
-        for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
+        while (timeleft.greaterThan(freqlongduration)) {
+            entrainment.created_add(entrainment.getFreqlong());
+            timeleft = timeleft.subtract(freqlongduration);
+        }
+        while (timeleft.greaterThan(Duration.ZERO)) {
+            entrainment.created_add(entrainment.getFreqshort());
+            timeleft = timeleft.subtract(freqshortduration);
+        }
         entrainment.shuffleCreated();
         if (rampinfile != null) {entrainment.created_add(0, rampinfile);}
         if (rampoutfile != null) {entrainment.created_add(rampoutfile);}

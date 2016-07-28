@@ -73,7 +73,7 @@ public class Entrainment {
     public Duration gettotalCreatedDuration() {
         Duration duration = Duration.ZERO;
         for (SoundFile i : CreatedEntrainment) {
-            if (i.getDuration() != null) {duration.add(new Duration(i.getDuration()));}
+            if (i.getDuration() != null) {duration = duration.add(new Duration(i.getDuration()));}
         }
         return duration;
     }

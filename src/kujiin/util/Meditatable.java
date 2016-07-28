@@ -188,7 +188,7 @@ public class Meditatable {
             for (SoundFile i : ambience.getAmbience()) {
                 if (ambience.gettotalCreatedDuration().lessThan(getduration())) {
                     ambience.created_add(i);
-                    currentambienceduration.add(new Duration(i.getDuration()));
+                    currentambienceduration = currentambienceduration.add(new Duration(i.getDuration()));
                 } else {break;}
             }
         } else {
@@ -198,26 +198,26 @@ public class Meditatable {
                 SoundFile selectedsoundfile = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
                 if (createdambience.size() < 2) {
                     ambience.created_add(selectedsoundfile);
-                    currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+                    currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
                 } else if (createdambience.size() == 2) {
                     if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1))) {
                         ambience.created_add(selectedsoundfile);
-                        currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+                        currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
                     }
                 } else if (createdambience.size() == 3) {
                     if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2))) {
                         ambience.created_add(selectedsoundfile);
-                        currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+                        currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
                     }
                 } else if (createdambience.size() <= 5) {
                     if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3))) {
                         ambience.created_add(selectedsoundfile);
-                        currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+                        currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
                     }
                 } else if (createdambience.size() > 5) {
                     if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 4))) {
                         ambience.created_add(selectedsoundfile);
-                        currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+                        currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
                     }
                 }
             }
