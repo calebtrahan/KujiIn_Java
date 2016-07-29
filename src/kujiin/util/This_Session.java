@@ -220,9 +220,7 @@ public class This_Session {
                 return false;
         }
         for (Meditatable i : getallitemsinSession()) {
-            System.out.println("Building " + i.name);
             if (! i.build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {return false;}
-            System.out.println("Sucessfully Built " + i.name);
         }
         switch (checkgoals()) {
             case YES:
@@ -597,7 +595,6 @@ public class This_Session {
                 updateuitimeline.play();
                 meditatablecount = 0;
                 currentmeditatable = itemsinsession.get(meditatablecount);
-                currentmeditatable.elapsedtime = Duration.ZERO;
                 Root.getSessions().createnewsession();
                 currentmeditatable.start();
                 break;
@@ -622,12 +619,18 @@ public class This_Session {
     public void updateplayerui() {
         try {
             totalsessiondurationelapsed = totalsessiondurationelapsed.add(Duration.seconds(1.0));
-            currentmeditatable.elapsedtime = currentmeditatable.elapsedtime.add(Duration.seconds(1.0));
+            try {
+                currentmeditatable.elapsedtime = currentmeditatable.elapsedtime.add(Duration.seconds(1.0));
+            } catch (NullPointerException ignored) {}
             Float currentprogress;
             Float totalprogress;
-            if (currentmeditatable.elapsedtime.greaterThan(Duration.ZERO)) {currentprogress = (float) currentmeditatable.elapsedtime.toMillis() / (float) currentmeditatable.getduration().toMillis();}
-            else {currentprogress = (float) 0.0;}
-            if (totalsessiondurationelapsed.greaterThan(Duration.ZERO)) {totalprogress = (float) totalsessiondurationelapsed.toMillis() / (float) totalsessionduration.toMillis();}
+            try {
+                if (currentmeditatable.elapsedtime.greaterThan(Duration.ZERO)) {currentprogress = (float) currentmeditatable.elapsedtime.toMillis() / (float) currentmeditatable.getduration().toMillis();}
+                else {currentprogress = (float) 0;}
+            } catch (NullPointerException ignored) {currentprogress = (float) 0;}
+            if (totalsessiondurationelapsed.greaterThan(Duration.ZERO)) {
+                totalprogress = (float) totalsessiondurationelapsed.toMillis()
+                        / (float) totalsessionduration.toMillis();}
             else {totalprogress = (float) 0.0;}
             getPlayerUI().CurrentCutProgress.setProgress(currentprogress);
             getPlayerUI().TotalProgress.setProgress(totalprogress);
@@ -635,7 +638,8 @@ public class This_Session {
             totalprogress *= 100;
             getPlayerUI().CurrentCutTopLabel.setText(String.format("%s (%d", currentmeditatable.name, currentprogress.intValue()) + "%)");
             getPlayerUI().TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
-            getPlayerUI().CutCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.elapsedtime));
+            try {getPlayerUI().CutCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.elapsedtime));}
+            catch (NullPointerException ignored) {getPlayerUI().CutCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(Duration.ZERO));}
             getPlayerUI().TotalCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessiondurationelapsed));
             boolean displaynormaltime = getPlayerUI().displaynormaltime;
             if (displaynormaltime) {getPlayerUI().CutTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getduration()));}
@@ -658,7 +662,7 @@ public class This_Session {
 //            new MainController.ExceptionDialog(Root, e).show();
         }
     }
-    public void progresstonextcut() {
+    public void progresstonextmeditatable() {
         try {
             switch (playerState) {
                 case TRANSITIONING:
@@ -711,7 +715,7 @@ public class This_Session {
         Root.getSessions().marshall();
         Root.goals_gui_updateui();
         currentmeditatable.stop();
-        if (currentmeditatable.name.equals("Postsession")) {setPlayerState(MainController.PlayerState.TRANSITIONING); progresstonextcut();}
+        if (currentmeditatable.name.equals("Postsession")) {setPlayerState(MainController.PlayerState.TRANSITIONING); progresstonextmeditatable();}
         else {
             if (Root.getOptions().getSessionOptions().getAlertfunction()) {
                 Media alertmedia = new Media(Root.getOptions().getSessionOptions().getAlertfilelocation());
@@ -721,7 +725,7 @@ public class This_Session {
                 alertplayer.setOnEndOfMedia(() -> {
                     alertplayer.stop();
                     alertplayer.dispose();
-                    progresstonextcut();
+                    progresstonextmeditatable();
                 });
                 alertplayer.setOnError(() -> {
                     if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "An Error Occured While Playing Alert File" +
@@ -732,12 +736,12 @@ public class This_Session {
                     } else {
                         alertplayer.stop();
                         alertplayer.dispose();
-                        progresstonextcut();
+                        progresstonextmeditatable();
                     }
                 });
             } else {
                 setPlayerState(MainController.PlayerState.TRANSITIONING);
-                progresstonextcut();
+                progresstonextmeditatable();
             }
         }
     }

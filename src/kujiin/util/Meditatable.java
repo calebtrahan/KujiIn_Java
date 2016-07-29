@@ -361,24 +361,24 @@ public class Meditatable {
     // STOP
         if (thisession.Root.getOptions().getSessionOptions().getFadeoutduration() > 0.0) {
             fade_entrainment_stop = new Transition() {
-                    {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000));}
+                {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000));}
 
-                    @Override
-                    protected void interpolate(double frac) {
-                        double basevalue;
-                        double entrainmentvolume;
-                        if (currententrainmentvolume != null && currententrainmentvolume > 0.0) {basevalue = getCurrententrainmentvolume(); entrainmentvolume = frac * basevalue;}
-                        else {basevalue = thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume(); entrainmentvolume = frac * basevalue;}
-                        double fadeoutvolume = basevalue - entrainmentvolume;
-                        getCurrentEntrainmentPlayer().setVolume(fadeoutvolume);
-                        thisession.Root.getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
-                        Double value = fadeoutvolume * 100;
-                        thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                        if (thisession.referencecurrentlyDisplayed()) {
-                            thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
-                            thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                        }
+                @Override
+                protected void interpolate(double frac) {
+                    double basevalue;
+                    double entrainmentvolume;
+                    if (currententrainmentvolume != null && currententrainmentvolume > 0.0) {basevalue = getCurrententrainmentvolume(); entrainmentvolume = frac * basevalue;}
+                    else {basevalue = thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume(); entrainmentvolume = frac * basevalue;}
+                    double fadeoutvolume = basevalue - entrainmentvolume;
+                    getCurrentEntrainmentPlayer().setVolume(fadeoutvolume);
+                    thisession.Root.getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
+                    Double value = fadeoutvolume * 100;
+                    thisession.Root.getPlayer().EntrainmentVolumePercentage.setText(value.intValue() + "%");
+                    if (thisession.referencecurrentlyDisplayed()) {
+                        thisession.getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
+                        thisession.getDisplayReference().EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     }
+                }
             };
             fade_entrainment_stop.setOnFinished(event -> {entrainmentplayer.stop(); entrainmentplayer.dispose(); timeline_progresstonextmeditatable.stop(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();} thisession.setPlayerState(MainController.PlayerState.STOPPED); toggleplayerbuttons();});
             if (ambienceenabled) {
@@ -407,6 +407,7 @@ public class Meditatable {
         }
     }
     public void start() {
+        elapsedtime = Duration.ZERO;
         entrainmentplaycount = 0;
         ambienceplaycount = 0;
         setupfadeanimations();
@@ -416,7 +417,7 @@ public class Meditatable {
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
-        timeline_progresstonextmeditatable = new Timeline(new KeyFrame(getduration(), ae -> thisession.progresstonextcut()));
+        timeline_progresstonextmeditatable = new Timeline(new KeyFrame(getduration(), ae -> thisession.progresstonextmeditatable()));
         timeline_progresstonextmeditatable.play();
         if (fade_entrainment_stop != null) {
             timeline_fadeout_timer = new Timeline(new KeyFrame(getduration().subtract(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000)), ae -> {
@@ -485,12 +486,14 @@ public class Meditatable {
         volume_unbindentrainment();
         if (fade_entrainment_pause != null) {
             if (fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
+            // Open Loading Dialog
             thisession.setPlayerState(MainController.PlayerState.FADING_PAUSE);
             fade_entrainment_pause.play();
             if (ambienceenabled) {
                 volume_unbindambience();
                 fade_ambience_pause.play();
             }
+            // Close Loading Dialog
         } else {
             thisession.setPlayerState(MainController.PlayerState.PAUSED);
             entrainmentplayer.pause();
@@ -808,7 +811,9 @@ public class Meditatable {
 //            if (ambienceenabled) ambienceplayer.setVolume(currentambiencevolume);
 //        } catch (NullPointerException ignored) {}
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            thisession.Root.getSessions().sessioninformation_getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatecutduration(number, new Double(elapsedtime.toMinutes()).intValue());
+            try {
+                thisession.Root.getSessions().sessioninformation_getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatecutduration(number, new Double(elapsedtime.toMinutes()).intValue());
+            } catch (NullPointerException ignored) {}
         }
     }
     // Error Handling

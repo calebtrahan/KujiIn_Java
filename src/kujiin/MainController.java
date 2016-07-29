@@ -659,14 +659,12 @@ public class MainController implements Initializable {
     public void playthisession(ActionEvent actionEvent) {
         creation_util_createsession();
         if (creatorState == CreatorState.CREATED) {
-            System.out.println("Session Created");
             if (getPlayer() != null && getPlayer().isShowing()) {return;}
             getStage().setIconified(true);
             setPlayer(new PlayerUI(this));
             getPlayer().showAndWait();
             getStage().setIconified(false);
         }
-        else {System.out.println("Session Not Created");}
     }
 
 // Dialogs
@@ -3065,7 +3063,7 @@ public class MainController implements Initializable {
                     this.currentmeditatable = currentmeditatable;
                     referenceType = Root.getOptions().getSessionOptions().getReferencetype();
                     fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
+                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ReferenceDisplay.fxml"));
                     fxmlLoader.setController(this);
                     scene = new Scene(fxmlLoader.load());
                     setScene(scene);
@@ -3199,6 +3197,24 @@ public class MainController implements Initializable {
             setTitle(titletext);
             Message.setText(message);
             TopTitle.setText(toptitletext);
+        }
+    }
+    public static class LoadingDialog extends Stage {
+        public Label Message;
+        public ProgressIndicator Progress;
+
+        public LoadingDialog(MainController Root, String titletext, String message) {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/LoadingDialog.fxml"));
+                fxmlLoader.setController(this);
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(this);
+                this.setResizable(false);
+                this.setOnCloseRequest(Event::consume);
+            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+            setTitle(titletext);
+            Message.setText(message);
         }
     }
 

@@ -123,7 +123,6 @@ public class Ambience {
     public Duration gettotalActualDuration() {
         Duration duration = new Duration(0);
         if (Ambience != null) {
-            System.out.println(Ambience.size());
             for (SoundFile i : Ambience) {duration = duration.add(new Duration(i.getDuration()));}
         }
         return duration;
@@ -137,4 +136,5 @@ public class Ambience {
     }
 
     // Playback Methods
+
 }

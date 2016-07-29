@@ -55,6 +55,7 @@ public class Qi_Gong extends Meditatable {
                 entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampdowntopost)));
                 entrainment.created_add(0, entrainment.getRampoutfile());
             }
+            if (entrainment.created_getAll().size() == 1) {return true;}
         }
         return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().greaterThan(Duration.ZERO);
     }
