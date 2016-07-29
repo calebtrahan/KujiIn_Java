@@ -595,6 +595,19 @@ public class This_Session {
     }
 
 // Playback
+    public void openplayer() {
+        playerUI = new PlayerUI();
+        playerUI.setOnShowing(event -> Root.getStage().setIconified(true));
+        playerUI.setOnCloseRequest(event -> {
+            if (! endsessionprematurely()) {event.consume();}
+            else {stopsession();}
+        });
+        playerUI.setOnHidden(event -> {
+            // Reset Created Session
+            Root.getStage().setIconified(false);
+        });
+        playerUI.showAndWait();
+    }
     public void playsession() {
         switch (playerState) {
             case IDLE:
@@ -625,7 +638,6 @@ public class This_Session {
         }
     }
     public void stopsession() {
-        if (! endsessionprematurely()) {return;}
         currentmeditatable.stop();
         updateuitimeline.stop();
         resetthissession();
@@ -802,7 +814,7 @@ public class This_Session {
 
 
 // Dialogs
-    class CutsMissingDialog  extends Stage {
+    public class CutsMissingDialog  extends Stage {
     public Button AddMissingCutsButton;
     public ListView<Text> SessionListView;
     public Button CreateAnywayButton;
@@ -814,7 +826,7 @@ public class This_Session {
 
     public CutsMissingDialog(MainController root, List<Cut> allcuts) {
         Root = root;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/CutsOutOfOrderOrMissing.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CutsOutOfOrderOrMissing.fxml"));
         fxmlLoader.setController(this);
         try {
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -895,7 +907,7 @@ public class This_Session {
         this.close();
     }
 }
-    class SortSessionItems extends Stage {
+    public class SortSessionItems extends Stage {
         public TableView<SessionItem> SessionItemsTable;
         public TableColumn<SessionItem, Integer> NumberColumn;
         public TableColumn<SessionItem, String> NameColumn;
@@ -912,7 +924,7 @@ public class This_Session {
         public SortSessionItems(MainController Root, List<Meditatable> sessionitems) {
             this.sessionitems = sessionitems;
             this.Root = Root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SortSessionParts.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SortSessionParts.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -1062,7 +1074,7 @@ public class This_Session {
         // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
         // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
         // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
-        public PlayerUI(MainController root) {
+        public PlayerUI() {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
                 fxmlLoader.setController(this);
@@ -1161,7 +1173,7 @@ public class This_Session {
         }
 
     }
-    class ExporterUI extends Stage {
+    public class ExporterUI extends Stage {
         public Button CancelButton;
         public ProgressBar TotalProgress;
         public Label StatusBar;
@@ -1188,7 +1200,7 @@ public class This_Session {
             CurrentLabel.textProperty().unbind();
         }
     }
-    class DisplayReference extends Stage {
+    public class DisplayReference extends Stage {
         public ScrollPane ContentPane;
         public Slider EntrainmentVolumeSlider;
         public Label EntrainmentVolumePercentage;
@@ -1209,7 +1221,7 @@ public class This_Session {
             try {
                 referenceType = Root.getOptions().getSessionOptions().getReferencetype();
                 fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ReferenceDisplay.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferenceDisplay.fxml"));
                 fxmlLoader.setController(this);
                 scene = new Scene(fxmlLoader.load());
                 setScene(scene);
@@ -1318,14 +1330,14 @@ public class This_Session {
         public void stop(ActionEvent actionEvent) {stopsession();}
 
 }
-    class CutInvocationDialog extends Stage {
+    public class CutInvocationDialog extends Stage {
         public Button CancelButton;
         public Button OKButton;
         public TextField MinutesTextField;
         private int duration;
 
         public CutInvocationDialog() {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/CutInvocationDialog.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CutInvocationDialog.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -1368,7 +1380,7 @@ public class This_Session {
                 Root.gui_showerrordialog("Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
         }
     }
-    class ExportDialog extends Stage {
+    public class ExportDialog extends Stage {
         private File finalexportfile;
         private File tempentrainmenttextfile;
         private File tempambiencetextfile;

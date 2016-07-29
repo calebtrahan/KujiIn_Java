@@ -36,6 +36,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
+// TODO Design A 'Select Your Own Ambience' Wizard As An Alternative To Randomized Ambience During Session Creation
+
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;
@@ -655,9 +657,7 @@ public class MainController implements Initializable {
         creation_util_createsession();
         if (Session.creatorState == This_Session.CreatorState.CREATED) {
             if (Session.playerUI != null && Session.playerUI.isShowing()) {return;}
-            getStage().setIconified(true);
-            Session.playerUI.showAndWait();
-            getStage().setIconified(false);
+            Session.openplayer();
         }
     }
 
@@ -744,7 +744,7 @@ public class MainController implements Initializable {
 
 
 // Dialogs
-    class ChangeAlertFile extends Stage {
+    public class ChangeAlertFile extends Stage {
         public Button HelpButton;
         public Button AcceptButton;
         public Button CancelButton;
@@ -895,7 +895,7 @@ public class MainController implements Initializable {
 //        }
 
     }
-    class EditReferenceFiles extends Stage {
+    public class EditReferenceFiles extends Stage {
         public ChoiceBox<String> CutNamesChoiceBox;
         public TextArea MainTextArea;
         public Button CloseButton;
@@ -1096,7 +1096,7 @@ public class MainController implements Initializable {
     }
 
     }
-    class PreviewFile extends Stage {
+    public class PreviewFile extends Stage {
         public Label CurrentTime;
         public Slider ProgressSlider;
         public Label TotalTime;
@@ -1198,7 +1198,7 @@ public class MainController implements Initializable {
             VolumeSlider.setValue(0);
         }
     }
-    class ExceptionDialog extends Stage {
+    public class ExceptionDialog extends Stage {
         public TextArea StackTraceTextField;
         public Button CloseButton;
         public Button ContinueButton;
@@ -1236,7 +1236,7 @@ public class MainController implements Initializable {
         }
 
     }
-    class ChangeProgramOptions extends Stage {
+    public class ChangeProgramOptions extends Stage {
         public CheckBox TooltipsCheckBox;
         public CheckBox HelpDialogsCheckBox;
         public TextField AlertFileTextField;
@@ -1481,7 +1481,7 @@ public class MainController implements Initializable {
         }
 
     }
-    class ChangeAllValuesDialog extends Stage {
+    public class ChangeAllValuesDialog extends Stage {
             public Button AcceptButton;
             public Button CancelButton;
             public TextField MinutesTextField;
@@ -1506,7 +1506,7 @@ public class MainController implements Initializable {
                         try {setMinutes(Integer.parseInt(MinutesTextField.getText()));}
                         catch (NumberFormatException ignored) {setMinutes(0);}
                     });
-                } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
+                } catch (IOException e) {}
             }
 
         // Getters And Setters
@@ -1529,7 +1529,7 @@ public class MainController implements Initializable {
             public boolean getincludepresession() {return PresessionCheckbox.isSelected();}
             public boolean getincludepostsession() {return PostsessionCheckBox.isSelected();}
     }
-    class AllMeditatablesGoalProgress extends Stage {
+    public class AllMeditatablesGoalProgress extends Stage {
         public TableView<GoalProgressBinding> GoalsTable;
         public TableColumn<GoalProgressBinding, String> NameColumn;
         public TableColumn<GoalProgressBinding, String> PracticedTimeColumn;
@@ -1641,7 +1641,7 @@ public class MainController implements Initializable {
             }
         }
     }
-    class SimpleGoalSetDialog extends Stage {
+    public class SimpleGoalSetDialog extends Stage {
         public MainController Root;
         public Label TopLabel;
         public Spinner<Integer> HoursSpinner;
@@ -1701,7 +1701,7 @@ public class MainController implements Initializable {
         }
 
     }
-    class GoalPacingDialog extends Stage {
+    public class GoalPacingDialog extends Stage {
         public Spinner<Integer> PracticeDays;
         public TextField PracticeTimeADay;
         public TextField GoalDuration;
@@ -1743,7 +1743,7 @@ public class MainController implements Initializable {
             PracticeTimeADay.setText(Util.formatdurationtoStringSpelledOut(new Duration((minsaday * 60) * 1000), PracticeTimeADay.getLayoutBounds().getWidth()));
         }
     }
-    class AllSessionsDetails extends Stage {
+    public class AllSessionsDetails extends Stage {
         // All Session Totals Tab Fields
         public BarChart<String, Number> SessionTotalsBarGraph;
         public javafx.scene.chart.CategoryAxis CategoryAxis;
@@ -1807,10 +1807,10 @@ public class MainController implements Initializable {
         private ObservableList<SessionRow> sessionrowlist = FXCollections.observableArrayList();
 
         public AllSessionsDetails() {
-            allsessionslist = getSessions().getSession();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails_All.fxml"));
-            fxmlLoader.setController(this);
             try {
+                allsessionslist = getSessions().getSession();
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails_All.fxml"));
+                fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 getOptions().setStyle(this);
@@ -2001,7 +2001,7 @@ public class MainController implements Initializable {
             }
         }
     }
-    class AdvancedAmbienceEditor extends Stage implements Initializable {
+    public class AdvancedAmbienceEditor extends Stage implements Initializable {
         public Button RightArrow;
         public Button LeftArrow;
         public ChoiceBox<String> MeditatableSelectionBox;
@@ -2282,7 +2282,7 @@ public class MainController implements Initializable {
             } else {new SimpleAmbienceEditor().show();}
         }
     }
-    class SimpleAmbienceEditor extends Stage implements Initializable {
+    public class SimpleAmbienceEditor extends Stage implements Initializable {
         public TableView<AmbienceSong> AmbienceTable;
         public TableColumn<AmbienceSong, String> NameColumn;
         public TableColumn<AmbienceSong, String> DurationColumn;
@@ -2403,6 +2403,7 @@ public class MainController implements Initializable {
                 AmbienceSong tempsong = new AmbienceSong(soundFile);
                 AmbienceList.add(tempsong);
                 AmbienceTable.getItems().add(tempsong);
+                selectedmeditatable.getAmbience().actual_add(soundFile);
                 calculatetotalduration();
             });
         }
@@ -2410,6 +2411,7 @@ public class MainController implements Initializable {
             int index = AmbienceTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 SoundFile soundFile = SoundList.get(index);
+                selectedmeditatable.getAmbience().actual_remove(soundFile);
                 if (gui_getokcancelconfirmationdialog("Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
                     soundFile.getFile().delete();
                 }
@@ -2498,7 +2500,7 @@ public class MainController implements Initializable {
             close();
         }
     }
-    class SessionDetails extends Stage {
+    public class SessionDetails extends Stage {
         public BarChart<String, java.lang.Number> SessionBarChart;
         public CategoryAxis SessionCategoryAxis;
         public NumberAxis SessionNumbersAxis;
@@ -2595,7 +2597,7 @@ public class MainController implements Initializable {
         }
     }
 // Table Classes
-    class AmbienceSong {
+    public class AmbienceSong {
     private StringProperty name;
     private StringProperty length;
     private File file;
