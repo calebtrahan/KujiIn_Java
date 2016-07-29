@@ -17,8 +17,8 @@
       </VBox>
       <HBox alignment="BOTTOM_RIGHT" layoutX="156.0" layoutY="46.0" prefHeight="34.0" prefWidth="158.0">
          <children>
-            <Button fx:id="AcceptButton" mnemonicParsing="false" onMousePressed="#acceptbuttonpressed" text="Accept" />
-            <Button fx:id="CancelButton" mnemonicParsing="false" onMousePressed="#cancelbuttonpressed" text="Cancel" />
+            <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#acceptbuttonpressed" text="Accept" />
+            <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#cancelbuttonpressed" text="Cancel" />
          </children>
       </HBox>
    </children>

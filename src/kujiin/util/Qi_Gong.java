@@ -73,7 +73,7 @@ public class Qi_Gong extends Meditatable {
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists
-        if (Util.gui_getokcancelconfirmationdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
+        if (thisession.Root.gui_getokcancelconfirmationdialog("Confirmation", "An Error Occured While Playing " + name +
                         "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             entrainmentplayer.stop();
@@ -85,7 +85,7 @@ public class Qi_Gong extends Meditatable {
     public void ambienceerror() {
         System.out.println("Ambience Error!");
         // Pause Entrainment
-        if (Util.gui_getokcancelconfirmationdialog(thisession.Root, "Confirmation", "An Error Occured While Playing " + name +
+        if (thisession.Root.gui_getokcancelconfirmationdialog("Confirmation", "An Error Occured While Playing " + name +
                         "'s Ambience. Problem File Is: '" + getCurrentAmbiencePlayer().getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             ambienceplayer.stop();

@@ -73,7 +73,7 @@ public class Goals {
                 PostsessionGoals = currentGoals.PostsessionGoals;
                 TotalGoals = currentGoals.TotalGoals;
             } catch (JAXBException e) {
-                Util.gui_showinformationdialog(Root, "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+                Root.gui_showinformationdialog("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -84,7 +84,7 @@ public class Goals {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.GOALSXMLFILE);
         } catch (JAXBException e) {
-            Util.gui_showinformationdialog(Root, "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+            Root.gui_showinformationdialog("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
         }
     }
     // Add

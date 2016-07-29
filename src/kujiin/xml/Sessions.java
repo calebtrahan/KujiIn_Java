@@ -3,7 +3,6 @@ package kujiin.xml;
 import kujiin.MainController;
 import kujiin.util.Meditatable;
 import kujiin.util.Qi_Gong;
-import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -42,7 +41,7 @@ public class Sessions {
                 Sessions noises1 = (Sessions) createMarshaller.unmarshal(Options.SESSIONSXMLFILE);
                 setSession(noises1.getSession());
             } catch (JAXBException e) {
-                Util.gui_showinformationdialog(Root, "Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
+                Root.gui_showinformationdialog("Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -53,12 +52,12 @@ public class Sessions {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.SESSIONSXMLFILE);
         } catch (JAXBException e) {
-            Util.gui_showinformationdialog(Root, "Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
+            Root.gui_showinformationdialog("Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
     }
     public void createnewsession() {
         try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
         catch (JAXBException ignored) {
-            Util.gui_showerrordialog(Root, "Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
+            Root.gui_showerrordialog("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
     public void addsession(Session session) throws JAXBException {
         if (Options.SESSIONSXMLFILE.exists()) {unmarshall();}

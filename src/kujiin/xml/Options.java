@@ -4,7 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kujiin.MainController;
-import kujiin.util.Util;
+import kujiin.util.This_Session;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -65,7 +65,7 @@ public class Options {
     public static final File REFERENCE_THEMEFILE = new File(DIRECTORYSTYLES, "referencefile.css");
     public static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
     public static final Integer DEFAULT_RAMP_DURATION = 2;
-    public static final MainController.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = MainController.ReferenceType.html;
+    public static final This_Session.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = This_Session.ReferenceType.html;
     public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
     public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
     public static final Integer DEFAULT_LONG_MEDITATABLE_DURATION = 10;
@@ -116,7 +116,7 @@ public class Options {
                 setAppearanceOptions(options.getAppearanceOptions());
                 populatethemefiles();
             } catch (JAXBException ignored) {
-                Platform.runLater(() -> Util.gui_showinformationdialog(Root, "Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
+                Platform.runLater(() -> Root.gui_showinformationdialog("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
             }
         } else {
@@ -131,7 +131,7 @@ public class Options {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, OPTIONSXMLFILE);
         } catch (JAXBException e) {
-            Util.gui_showinformationdialog(Root, "Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
+            Root.gui_showinformationdialog("Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
         }
     }
     public void resettodefaults() {
@@ -215,7 +215,7 @@ public class Options {
         private Boolean alertfunction;
         private Integer rampduration;
         private Boolean referenceoption;
-        private MainController.ReferenceType referencetype;
+        private This_Session.ReferenceType referencetype;
         private Boolean referencefullscreen;
 
         public SessionOptions() {}
@@ -275,10 +275,10 @@ public class Options {
         public void setReferenceoption(Boolean referenceoption) {
             this.referenceoption = referenceoption;
         }
-        public MainController.ReferenceType getReferencetype() {
+        public This_Session.ReferenceType getReferencetype() {
             return referencetype;
         }
-        public void setReferencetype(MainController.ReferenceType referencetype) {
+        public void setReferencetype(This_Session.ReferenceType referencetype) {
             this.referencetype = referencetype;
         }
         public Boolean getReferencefullscreen() {

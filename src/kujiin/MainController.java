@@ -9,25 +9,18 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -35,9 +28,7 @@ import kujiin.util.*;
 import kujiin.xml.*;
 import org.apache.commons.io.FileUtils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -112,23 +103,16 @@ public class MainController implements Initializable {
 
 // My Fields
     // Creation
-    private CreatorState creatorState;
     private Timeline creator_updateuitimeline;
     // Export
-    private ExporterState exporterState;
-    private ExportingSessionDialog exportingSessionDialog;
-    private Integer exportserviceindex;
-    private ArrayList<Service<Boolean>> exportservices;
-    private Service<Boolean> currentexporterservice;
+
     // Sessions
     private Sessions Sessions;
     private Meditatable SessionsAndGoalsSelectedMeditatable;
     // Goals
     private Goals Goals;
 
-
     //
-    private PlayerUI Player;
     private Options Options;
 
 // Event Handlers
@@ -160,12 +144,6 @@ public class MainController implements Initializable {
     public void setSession(This_Session session) {
         this.Session = session;
     }
-    public PlayerUI getPlayer() {
-        return Player;
-    }
-    public void setPlayer(PlayerUI player) {
-        this.Player = player;
-    }
     public Options getOptions() {
         return Options;
     }
@@ -193,21 +171,30 @@ public class MainController implements Initializable {
 
 // Top Menu Actions
     public void changesessionoptions(ActionEvent actionEvent) {
-        new ChangeProgramOptions(this).showAndWait();
+        new ChangeProgramOptions().showAndWait();
         Options.marshall();
         sessions_gui_updateui();
         goals_gui_updateui();
     }
     public void editprogramsambience(ActionEvent actionEvent) {
         getStage().setIconified(true);
-        SimpleAmbienceEditor sae = new SimpleAmbienceEditor(this, getSession().getAmbiences());
-        sae.showAndWait();
+        new SimpleAmbienceEditor().showAndWait();
         getStage().setIconified(false);
+    }
+    public void opensimpleambienceeditor() {
+        new SimpleAmbienceEditor().showAndWait();
+    }
+    public void opensimpleambienceeditor(Meditatable meditatable) {
+        new SimpleAmbienceEditor(meditatable).showAndWait();
+    }
+    public void openadvancedambienceeditor() {}
+    public void openadvancedambienceeditor(Meditatable meditatable) {
+        AdvancedAmbienceEditor sae = new AdvancedAmbienceEditor(meditatable);
+        sae.showAndWait();
     }
     public void editreferencefiles(ActionEvent actionEvent) {
         getStage().setIconified(true);
-        EditReferenceFiles a = new EditReferenceFiles(this);
-        a.showAndWait();
+        new EditReferenceFiles(getSession().referenceType).showAndWait();
         getStage().setIconified(false);
     }
     public void howtouseprogram(ActionEvent actionEvent) {
@@ -232,16 +219,18 @@ public class MainController implements Initializable {
         File presetfile = Preset.openpreset();
         if (presetfile != null && Preset.validpreset()) {
             preset_changecreationvaluestopreset(Preset.getpresettimes());
-        } else {if (presetfile != null) Util.gui_showinformationdialog(this, "Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
+        } else {if (presetfile != null) gui_showinformationdialog("Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
     }
     public void preset_save(ActionEvent actionEvent) {
         // TODO Saving Preset Is Broke!
         ArrayList<Double> creatorvalues = new ArrayList<>();
         for (Meditatable i : getSession().getAllMeditatables()) {creatorvalues.add(i.getduration().toMinutes());}
         Preset.setpresettimes(creatorvalues);
-        if (! Preset.validpreset()) {Util.gui_showinformationdialog(this, "Information", "Cannot Save Preset", "All Values Are 0"); return;}
+        if (! Preset.validpreset()) {
+            gui_showinformationdialog("Information", "Cannot Save Preset", "All Values Are 0"); return;}
         if (Preset.savepreset()) {Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Preset Successfully Saved", 4000);}
-        else {Util.gui_showerrordialog(this, "Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
+        else {
+            gui_showerrordialog("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
     }
     public void preset_changecreationvaluestopreset(ArrayList<Double> presetvalues) {
         try {
@@ -249,7 +238,7 @@ public class MainController implements Initializable {
                 getSession().getAllMeditatables().get(i).setDuration(presetvalues.get(i));
             }
         } catch (ArrayIndexOutOfBoundsException ignored) {
-            Util.gui_showerrordialog(this, "Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
+            gui_showerrordialog("Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
         }
     }
 
@@ -313,7 +302,7 @@ public class MainController implements Initializable {
             if (creation_gui_allvaluesnotzero()) {
                 Session.checkambience(AmbienceSwitch);
             } else {
-                Util.gui_showinformationdialog(this, "Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
+                gui_showinformationdialog("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
                 AmbienceSwitch.setSelected(false);
             }
         } else {
@@ -324,7 +313,7 @@ public class MainController implements Initializable {
         Session.resetcreateditems();
     }
     public void creation_gui_changeallvalues_cuts(ActionEvent actionEvent) {
-        ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(this, "Change All Cut Values To: ");
+        ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog("Change All Cut Values To: ");
         changevaluesdialog.showAndWait();
         if (changevaluesdialog.getAccepted()) {
             Integer min = changevaluesdialog.getMinutes();
@@ -334,7 +323,7 @@ public class MainController implements Initializable {
         }
     }
     public void creation_gui_changeallvalues_elements(ActionEvent actionEvent) {
-        ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog(this, "Change All Element Values To: ");
+        ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog("Change All Element Values To: ");
         changevaluesdialog.showAndWait();
         if (changevaluesdialog.getAccepted()) {
             Integer min = changevaluesdialog.getMinutes();
@@ -359,22 +348,20 @@ public class MainController implements Initializable {
     public void creation_util_createsession() {
         // TODO Check Exporter Here
         if (! creation_gui_allvaluesnotzero()) {
-            Util.gui_showerrordialog(this, "Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session");
-            creatorState = CreatorState.NOT_CREATED;
+            gui_showerrordialog("Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session");
+            getSession().creatorState = This_Session.CreatorState.NOT_CREATED;
             return;
         }
         if (creation_util_isLongSession()) {
             if (! getOptions().getSessionOptions().getAlertfunction()) {
-                if (Util.gui_getokcancelconfirmationdialog(this, "Add Alert File", "I've Detected A Long Session. Long Sessions Can Make It Difficult To Hear " +
+                if (gui_getokcancelconfirmationdialog("Add Alert File", "I've Detected A Long Session. Long Sessions Can Make It Difficult To Hear " +
                         "The Subtle Transitions In Between Session Parts", "Add Alert File In Between Session Parts?")) {
-                    new ChangeAlertFile(this).showAndWait();
+                    new ChangeAlertFile().showAndWait();
                 }
             }
         }
-        boolean creationstate = Session.createsession();
-        if (creationstate) creatorState = CreatorState.CREATED;
-        else {creatorState = CreatorState.NOT_CREATED;}
-        creation_gui_setDisable(creatorState == CreatorState.NOT_CREATED);
+        Session.createsession();
+        creation_gui_setDisable(Session.creatorState == This_Session.CreatorState.NOT_CREATED);
     }
     public void creation_util_resetcreatedsession() {}
     public boolean creation_cleanup() {return true;}
@@ -382,7 +369,7 @@ public class MainController implements Initializable {
 // Export
     public void exporter_initialize() {}
     public void exporter_toggle(ActionEvent actionEvent) {
-        switch (exporterState) {
+        switch (Session.exporterState) {
             case NOT_EXPORTED:
                 break;
             case WORKING:
@@ -420,8 +407,8 @@ public class MainController implements Initializable {
 //                        exportservices.add(i.getexportservice());
 //                    }
 //                    exportservices.add(session.getsessionexporter());
-//                    exportingSessionDialog = new ExportingSessionDialog(Root);
-//                    exportingSessionDialog.show();
+//                    exporterUI = new ExporterUI(Root);
+//                    exporterUI.show();
 //                    setExporterState(ExporterState.WORKING);
 //                    exporter_util_movetonextexportservice();
 //                } else {
@@ -440,39 +427,42 @@ public class MainController implements Initializable {
     }
     private void exporter_util_movetonextexportservice() {
 //        System.out.println("Starting Next Export Service");
-        exportingSessionDialog.TotalProgress.setProgress((double) exportserviceindex / exportservices.size());
-        try {
-            currentexporterservice = exportservices.get(exportserviceindex);
-            currentexporterservice.setOnRunning(event -> {
-                exportingSessionDialog.CurrentProgress.progressProperty().bind(currentexporterservice.progressProperty());
-                exportingSessionDialog.StatusBar.textProperty().bind(currentexporterservice.messageProperty());
-                exportingSessionDialog.CurrentLabel.textProperty().bind(currentexporterservice.titleProperty());
-            });
-            currentexporterservice.setOnSucceeded(event -> {exportingSessionDialog.unbindproperties(); exportserviceindex++; exporter_util_movetonextexportservice();});
-            currentexporterservice.setOnCancelled(event -> exporter_export_cancelled());
-            currentexporterservice.setOnFailed(event -> exporter_export_failed());
-            currentexporterservice.start();
-        } catch (ArrayIndexOutOfBoundsException ignored) {
-            exporter_export_finished();}
+//        exporterUI.TotalProgress.setProgress((double) exportserviceindex / exportservices.size());
+//        try {
+//            currentexporterservice = exportservices.get(exportserviceindex);
+//            currentexporterservice.setOnRunning(event -> {
+//                exporterUI.CurrentProgress.progressProperty().bind(currentexporterservice.progressProperty());
+//                exporterUI.StatusBar.textProperty().bind(currentexporterservice.messageProperty());
+//                exporterUI.CurrentLabel.textProperty().bind(currentexporterservice.titleProperty());
+//            });
+//            currentexporterservice.setOnSucceeded(event -> {
+//                exporterUI.unbindproperties(); exportserviceindex++; exporter_util_movetonextexportservice();});
+//            currentexporterservice.setOnCancelled(event -> exporter_export_cancelled());
+//            currentexporterservice.setOnFailed(event -> exporter_export_failed());
+//            currentexporterservice.start();
+//        } catch (ArrayIndexOutOfBoundsException ignored) {
+//            exporter_export_finished();}
     }
     public void exporter_export_finished() {
-        System.out.println("Export Finished!");
-        exporterState = ExporterState.COMPLETED;
+//        System.out.println("Export Finished!");
+//        exporterState = ExporterState.COMPLETED;
     }
     public void exporter_export_cancelled() {
-        System.out.println("Cancelled!");
-        exporterState = ExporterState.CANCELLED;}
+//        System.out.println("Cancelled!");
+//        exporterState = ExporterState.CANCELLED;}
+    }
     public void exporter_export_failed() {
-        System.out.println(currentexporterservice.getException().getMessage());
-        System.out.println("Failed!");
-        exporterState = ExporterState.FAILED;
+//        System.out.println(currentexporterservice.getException().getMessage());
+//        System.out.println("Failed!");
+//        exporterState = ExporterState.FAILED;
     }
     public boolean exporter_cleanup() {
-        boolean currentlyexporting = exporterState == ExporterState.WORKING;
-        if (currentlyexporting) {
-            Util.gui_showinformationdialog(this, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
-        } else {This_Session.deleteprevioussession();}
-        return ! currentlyexporting;
+//        boolean currentlyexporting = exporterState == ExporterState.WORKING;
+//        if (currentlyexporting) {
+//            gui_showinformationdialog(this, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
+//        } else {This_Session.deleteprevioussession();}
+//        return ! currentlyexporting;
+        return true;
     }
 
 
@@ -544,14 +534,20 @@ public class MainController implements Initializable {
     }
     public void sessions_gui_displaysessionlist(Event event) {
         if (Sessions.getSession() == null || Sessions.getSession().size() == 0) {
-            Util.gui_showinformationdialog(this, "No Sessions", "No Practiced Sessions", "Cannot View Sessions");
-        } else {new AllSessionsDetails(this).showAndWait();}
+            gui_showinformationdialog("No Sessions", "No Practiced Sessions", "Cannot View Sessions");
+        } else {new AllSessionsDetails().showAndWait();}
     }
     public void sessions_gui_togglepreandpost(ActionEvent actionEvent) {sessions_gui_updateui();}
     public void sessions_gui_resetallvalues() {
         TotalTimePracticed.setText("No Sessions");
         NumberOfSessionsPracticed.setText("No Sessions");
         AverageSessionDuration.setText("No Sessions");
+    }
+    public void session_gui_opensessiondetailsdialog() {
+
+    }
+    public void session_gui_opensessiondetailsdialog(Session individualsession) {
+        new SessionDetails(individualsession).showAndWait();
     }
         // Util
     public boolean sessions_cleanup() {Sessions.marshall(); return true;}
@@ -617,20 +613,19 @@ public class MainController implements Initializable {
         goalsprogressbar.setTooltip(goalprogresstooltip);
         newgoalButton.setText(newgoalbuttontext);
         newgoalButton.setTooltip(newgoalbuttontooltip);
-        PlayerUI playerUI = getPlayer();
-        if (playerUI != null && playerUI.isShowing()) {
-            playerUI.GoalTopLabel.setDisable(disabled);
-            playerUI.GoalPercentageLabel.setDisable(disabled);
-            playerUI.GoalProgressBar.setDisable(disabled);
-            playerUI.GoalTopLabel.setText(toptext);
-            playerUI.GoalProgressBar.setProgress(progress);
-            playerUI.GoalPercentageLabel.setText(percentage);
+        if (Session.playerUI != null && Session.playerUI.isShowing()) {
+            Session.playerUI.GoalTopLabel.setDisable(disabled);
+            Session.playerUI.GoalPercentageLabel.setDisable(disabled);
+            Session.playerUI.GoalProgressBar.setDisable(disabled);
+            Session.playerUI.GoalTopLabel.setText(toptext);
+            Session.playerUI.GoalProgressBar.setProgress(progress);
+            Session.playerUI.GoalPercentageLabel.setText(percentage);
             // String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue()) + "%)");
         }
     }
     public void goals_gui_setnewgoal(Event event) {
         if (newgoalButton.getText().equals(kujiin.xml.Options.NEWGOALTEXT)) {
-            SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog(this, SessionsAndGoalsSelectedMeditatable);
+            SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog();
             simpleGoalSetDialog.showAndWait();
             if (simpleGoalSetDialog.shouldSetgoal()) {
                 // TODO Set Goal Here
@@ -638,13 +633,13 @@ public class MainController implements Initializable {
                 goals_gui_updateui();
             }
         } else if (newgoalButton.getText().equals(kujiin.xml.Options.GOALPACINGTEXT)) {
-            new GoalPacingDialog(this, SessionsAndGoalsSelectedMeditatable).showAndWait();
+            new GoalPacingDialog().showAndWait();
         }
     }
     public void goals_gui_viewcurrentgoals(Event event) {
         if (SessionsAndGoalsSelectedMeditatable.getAllGoals() == null || SessionsAndGoalsSelectedMeditatable.getAllGoals().size() == 0) {
-            Util.gui_showinformationdialog(this, "Information", "No Goals Exist For " + SessionsAndGoalsSelectedMeditatable.name, "Please Add A Goal For " + SessionsAndGoalsSelectedMeditatable.name);
-        } else {new AllMeditatablesGoalProgress(this, SessionsAndGoalsSelectedMeditatable).showAndWait();}
+            gui_showinformationdialog("Information", "No Goals Exist For " + SessionsAndGoalsSelectedMeditatable.name, "Please Add A Goal For " + SessionsAndGoalsSelectedMeditatable.name);
+        } else {new AllMeditatablesGoalProgress().showAndWait();}
     }
     public void goals_gui_resetallvalues() {
         goalsprogressbar.setProgress(0.0);
@@ -658,17 +653,98 @@ public class MainController implements Initializable {
 // Session Player Widget
     public void playthisession(ActionEvent actionEvent) {
         creation_util_createsession();
-        if (creatorState == CreatorState.CREATED) {
-            if (getPlayer() != null && getPlayer().isShowing()) {return;}
+        if (Session.creatorState == This_Session.CreatorState.CREATED) {
+            if (Session.playerUI != null && Session.playerUI.isShowing()) {return;}
             getStage().setIconified(true);
-            setPlayer(new PlayerUI(this));
-            getPlayer().showAndWait();
+            Session.playerUI.showAndWait();
             getStage().setIconified(false);
         }
     }
 
+
+// Answer Dialog Methods
+// Gui Methods
+//     TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified (When It's Supposed To Be)
+    public boolean gui_getokcancelconfirmationdialog(String titletext, String headertext, String contenttext) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setTitle(titletext);
+        a.setHeaderText(headertext);
+        a.setContentText(contenttext);
+        DialogPane dialogPane = a.getDialogPane();
+        dialogPane.getStylesheets().add(getOptions().getAppearanceOptions().getThemefile());
+        Optional<ButtonType> answer = a.showAndWait();
+        return answer.isPresent() && answer.get() == ButtonType.OK;
+    }
+    public Util.AnswerType gui_getyesnocancelconfirmationdialog(String titletext, String headertext, String contenttext) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setTitle(titletext);
+        a.setHeaderText(headertext);
+        a.setContentText(contenttext);
+        ButtonType yes = new ButtonType("Yes");
+        ButtonType no = new ButtonType("No");
+        ButtonType cancel = new ButtonType("Cancel");
+        a.getButtonTypes().clear();
+        a.getButtonTypes().add(yes);
+        a.getButtonTypes().add(no);
+        a.getButtonTypes().add(cancel);
+        DialogPane dialogPane = a.getDialogPane();
+        dialogPane.getStylesheets().add(getOptions().getAppearanceOptions().getThemefile());
+        Optional<ButtonType> answer = a.showAndWait();
+        if (answer.isPresent()) {
+            if (answer.get() == yes) {return Util.AnswerType.YES;}
+            if (answer.get() == no) {return Util.AnswerType.NO;}
+            if (answer.get() == cancel) {return Util.AnswerType.CANCEL;}
+        }
+        return Util.AnswerType.CANCEL;
+    }
+    public Util.AnswerType gui_getyesnocancelconfirmationdialog(String titletext, String headertext, String contenttext, String yesbuttontext, String nobuttontext, String cancelbuttontext) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setTitle(titletext);
+        a.setHeaderText(headertext);
+        a.setContentText(contenttext);
+        ButtonType yes;
+        ButtonType no;
+        ButtonType cancel;
+        if (yesbuttontext != null) {yes = new ButtonType("Yes");} else {yes = new ButtonType(yesbuttontext);}
+        if (nobuttontext != null) {no = new ButtonType("No");} else {no = new ButtonType(nobuttontext);}
+        if (cancelbuttontext != null) {cancel = new ButtonType("Cancel");} else {cancel = new ButtonType(cancelbuttontext);}
+        a.getButtonTypes().clear();
+        a.getButtonTypes().add(yes);
+        a.getButtonTypes().add(no);
+        a.getButtonTypes().add(cancel);
+        DialogPane dialogPane = a.getDialogPane();
+        dialogPane.getStylesheets().add(getOptions().getAppearanceOptions().getThemefile());
+        Optional<ButtonType> answer = a.showAndWait();
+        if (answer.isPresent()) {
+            if (answer.get() == yes) {return Util.AnswerType.YES;}
+            if (answer.get() == no) {return Util.AnswerType.NO;}
+            if (answer.get() == cancel) {return Util.AnswerType.CANCEL;}
+        }
+        return Util.AnswerType.CANCEL;
+    }
+    public void gui_showinformationdialog(String titletext, String headertext, String contexttext) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle(titletext);
+        a.setHeaderText(headertext);
+        a.setContentText(contexttext);
+        DialogPane dialogPane = a.getDialogPane();
+        dialogPane.getStylesheets().add(getOptions().getAppearanceOptions().getThemefile());
+        a.showAndWait();
+    }
+    public void gui_showerrordialog(String titletext, String headertext, String contenttext) {
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle(titletext);
+        a.setHeaderText(headertext);
+        a.setContentText(contenttext);
+        DialogPane dialogPane = a.getDialogPane();
+        dialogPane.getStylesheets().add(getOptions().getAppearanceOptions().getThemefile());
+        a.showAndWait();
+    }
+
+
+
 // Dialogs
-    public static class ChangeAlertFile extends Stage {
+    class ChangeAlertFile extends Stage {
         public Button HelpButton;
         public Button AcceptButton;
         public Button CancelButton;
@@ -676,39 +752,37 @@ public class MainController implements Initializable {
         public TextField alertfileTextField;
         public Button openFileButton;
         public Button PreviewButton;
-        private MainController Root;
         private File alertfile;
         private final static String NO_ALERT_FILE_SELECTED_TEXT = "No Alert File Selected";
         private final static int SUGGESTED_ALERT_FILE_MAX_LENGTH = 10;
         private final static int ABSOLUTE_ALERT_FILE_MAX_LENGTH = 30;
 
-        public ChangeAlertFile(MainController root) {
+        public ChangeAlertFile() {
             try {
-                Root = root;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeAlertDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                getOptions().setStyle(this);
                 setTitle("Alert File Editor");
                 alertfileTextField.setEditable(false);
-                AlertFileToggleButton.setSelected(Root.getOptions().getSessionOptions().getAlertfunction());
-                String alertfilelocation = Root.getOptions().getSessionOptions().getAlertfilelocation();
-                if (alertfilelocation != null) {alertfile = new File(Root.getOptions().getSessionOptions().getAlertfilelocation());}
+                AlertFileToggleButton.setSelected(getOptions().getSessionOptions().getAlertfunction());
+                String alertfilelocation = getOptions().getSessionOptions().getAlertfilelocation();
+                if (alertfilelocation != null) {alertfile = new File(getOptions().getSessionOptions().getAlertfilelocation());}
                 alertfiletoggled(null);
-            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
         }
 
     // Button Actions
         public void accept(ActionEvent actionEvent) {
             if (AlertFileToggleButton.isSelected() && alertfile == null) {
-                Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
+                gui_getokcancelconfirmationdialog("Confirmation", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
                 return;
             }
-            Root.getOptions().getSessionOptions().setAlertfunction(AlertFileToggleButton.isSelected());
-            if (alertfile != null) {Root.getOptions().getSessionOptions().setAlertfilelocation(alertfile.toURI().toString());}
-            else {Root.getOptions().getSessionOptions().setAlertfilelocation(null);}
-            Root.getOptions().marshall();
+            getOptions().getSessionOptions().setAlertfunction(AlertFileToggleButton.isSelected());
+            if (alertfile != null) {getOptions().getSessionOptions().setAlertfilelocation(alertfile.toURI().toString());}
+            else {getOptions().getSessionOptions().setAlertfilelocation(null);}
+            getOptions().marshall();
             close();
         }
         public void cancel(ActionEvent actionEvent) {
@@ -721,7 +795,7 @@ public class MainController implements Initializable {
         }
         public void preview(ActionEvent actionEvent) {
             if (alertfile != null && alertfile.exists()) {
-                PreviewFile previewFile = new PreviewFile(Root, alertfile);
+                PreviewFile previewFile = new PreviewFile(alertfile);
                 previewFile.showAndWait();
             }
         }
@@ -745,25 +819,26 @@ public class MainController implements Initializable {
             }
         }
         public void help(ActionEvent actionEvent) {
-            Util.gui_showinformationdialog(Root, "What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to transition to the next\npart of the session");
+            gui_showinformationdialog("What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to transition to the next\npart of the session");
         }
 
     // Utility Methods
         public boolean fileisgood(File testfile) {
         // Test If Valid Extension
             if (! Util.audio_isValid(testfile)) {
-                Util.gui_showinformationdialog(Root, "Information", "Invalid Audio Format", "Supported Audio Formats: " + Arrays.asList(Util.SUPPORTEDAUDIOFORMATS).toString());
+                gui_showinformationdialog("Information", "Invalid Audio Format", "Supported Audio Formats: " + Arrays.asList(Util.SUPPORTEDAUDIOFORMATS).toString());
                 return false;
             }
             Double duration = Util.audio_getduration(testfile);
-            if (duration == 0.0) {Util.gui_showinformationdialog(Root, "Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
+            if (duration == 0.0) {
+                gui_showinformationdialog("Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
             else if (duration >= (SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
                 String confirmationtext = String.format("%s Is %s Which Is Longer Than The Suggested Maximum Duration %s", testfile.getName(),
                         Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), null));
-                return Util.gui_getokcancelconfirmationdialog(Root, "Alert File Too Long", confirmationtext, "This May Break Session Immersion. Really Use This File As Your Alert File?");
+                return gui_getokcancelconfirmationdialog("Alert File Too Long", confirmationtext, "This May Break Session Immersion. Really Use This File As Your Alert File?");
             } else if (duration >= ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
                 String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), null));
-                Util.gui_showinformationdialog(Root, "Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
+                gui_showinformationdialog("Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
                 return false;
             } else {return true;}
         }
@@ -820,7 +895,7 @@ public class MainController implements Initializable {
 //        }
 
     }
-    public static class EditReferenceFiles extends Stage {
+    class EditReferenceFiles extends Stage {
         public ChoiceBox<String> CutNamesChoiceBox;
         public TextArea MainTextArea;
         public Button CloseButton;
@@ -832,18 +907,17 @@ public class MainController implements Initializable {
         private File selectedfile;
         private String selectedmeditatable;
         private MainController Root;
-        private MainController.ReferenceType referenceType;
         private ArrayList<Integer> userselectedindexes;
+        private This_Session.ReferenceType referenceType;
 
-        public EditReferenceFiles(MainController root) {
-            Root = root;
+        public EditReferenceFiles(This_Session.ReferenceType referenceType) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/EditReferenceFiles.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
-            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
             setTitle("Reference Files Editor");
             ObservableList<String> meditatablenames = FXCollections.observableArrayList();
             meditatablenames.addAll(kujiin.xml.Options.ALLNAMES);
@@ -853,14 +927,16 @@ public class MainController implements Initializable {
             CutNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {if (oldValue != null) userselectedindexes.add(oldValue.intValue());});
             HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             TEXTVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
-            setReferenceType(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);
-            HTMLVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == MainController.ReferenceType.html);
-            TEXTVariation.setSelected(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION == MainController.ReferenceType.txt);
+            if (referenceType == null) {referenceType = kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION;}
+            HTMLVariation.setSelected(referenceType == This_Session.ReferenceType.html);
+            TEXTVariation.setSelected(referenceType == This_Session.ReferenceType.txt);
+            this.referenceType = referenceType;
             PreviewButton.setDisable(true);
             SaveButton.setDisable(true);
+            String referencename = referenceType.name();
             this.setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", CutNamesChoiceBox.getValue() + " " + getReferenceType().name() + " Variation Has Unsaved Changes", "Save Changes Before Exiting?")) {
+                    switch (gui_getyesnocancelconfirmationdialog("Confirmation", CutNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes", "Save Changes Before Exiting?")) {
                         case YES:
                             saveselectedfile(null);
                             break;
@@ -874,12 +950,6 @@ public class MainController implements Initializable {
         }
 
     // Getters And Setters
-        public MainController.ReferenceType getReferenceType() {
-            return referenceType;
-        }
-        public void setReferenceType(MainController.ReferenceType referenceType) {
-            this.referenceType = referenceType;
-        }
 
     // Text Area Methods
         private boolean unsavedchanges() {
@@ -891,7 +961,7 @@ public class MainController implements Initializable {
             HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             TEXTVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             if (userselectedindexes.size() > 0 && selectedfile != null && unsavedchanges()) {
-                Util.AnswerType answerType = Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading A Different Cut/Element");
+                Util.AnswerType answerType = gui_getyesnocancelconfirmationdialog("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading A Different Cut/Element");
                 switch (answerType) {
                     case YES:
                         saveselectedfile(null);
@@ -906,11 +976,11 @@ public class MainController implements Initializable {
             loadselectedfile();
         }
         private void textchanged() {
-            if (getReferenceType() != null && selectedmeditatable != null && selectedfile != null) {
+            if (referenceType != null && selectedmeditatable != null && selectedfile != null) {
                 boolean hasvalidtext = MainTextArea.getText() != null && MainTextArea.getText().length() > 0;
-                PreviewButton.setDisable(! hasvalidtext || getReferenceType() == MainController.ReferenceType.txt);
+                PreviewButton.setDisable(! hasvalidtext || referenceType == This_Session.ReferenceType.txt);
                 SaveButton.setDisable(MainTextArea.getText() == null || Util.file_getcontents(selectedfile).equals(MainTextArea.getText().toCharArray()));
-                switch (getReferenceType()) {
+                switch (referenceType) {
                     case html:
                         if (MainTextArea.getText() != null && Util.String_validhtml(MainTextArea.getText())) {StatusBar.setTextFill(Color.BLACK); StatusBar.setText("");}
                         else {StatusBar.setTextFill(Color.RED); StatusBar.setText("Not Valid .html");}
@@ -930,9 +1000,10 @@ public class MainController implements Initializable {
     // Other Methods
         public void saveselectedfile(ActionEvent actionEvent) {
             if (Util.file_writecontents(selectedfile, MainTextArea.getText())) {
-                String text = selectedmeditatable + "'s Reference File (" + getReferenceType().toString() + " Variation) Has Been Saved";
-                Util.gui_showinformationdialog(Root, "Changes Saved", text, "");
-            } else {Util.gui_showerrordialog(Root, "Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
+                String text = selectedmeditatable + "'s Reference File (" + referenceType.toString() + " Variation) Has Been Saved";
+                gui_showinformationdialog("Changes Saved", text, "");
+            } else {
+                gui_showerrordialog("Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
         }
         public void loadselectedfile() {
             if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
@@ -945,27 +1016,29 @@ public class MainController implements Initializable {
                 StatusBar.setText("");
                 SaveButton.setDisable(true);
             } else {
-                if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1) {Util.gui_showinformationdialog(Root, "Information", "No Cut Selected", "Select A Cut To Load");}
-                else {Util.gui_showinformationdialog(Root, "Information", "No Variation Selected", "Select A Variation To Load");}
+                if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1) {
+                    gui_showinformationdialog("Information", "No Cut Selected", "Select A Cut To Load");}
+                else {
+                    gui_showinformationdialog("Information", "No Variation Selected", "Select A Variation To Load");}
                 PreviewButton.setDisable(true);
             }
         }
         public void selectnewfile() {
-            if (getReferenceType() == null || selectedmeditatable == null) {selectedfile = null; return;}
-            switch (getReferenceType()) {
+            if (referenceType == null || selectedmeditatable == null) {selectedfile = null; return;}
+            switch (referenceType) {
                 case html:
                     selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html"), selectedmeditatable + ".html");
-                    if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root, e);}}
+                    if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(e);}}
                     break;
                 case txt:
                     selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt"), selectedmeditatable + ".txt");
-                    if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root, e);}}
+                    if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(e);}}
                     break;
             }
         }
         public void htmlselected(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                Util.AnswerType answerType = Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading HTML Variation");
+                Util.AnswerType answerType = gui_getyesnocancelconfirmationdialog("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading HTML Variation");
                 switch (answerType) {
                     case YES:
                         saveselectedfile(null);
@@ -981,13 +1054,13 @@ public class MainController implements Initializable {
             // Test If Unsaved Changes Here
             TEXTVariation.setSelected(false);
             PreviewButton.setDisable(! HTMLVariation.isSelected());
-            setReferenceType(MainController.ReferenceType.html);
+            referenceType = This_Session.ReferenceType.html;
             selectnewfile();
             loadselectedfile();
         }
         public void textselected(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                Util.AnswerType answerType = Util.gui_getyesnocancelconfirmationdialog(Root, "Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading TXT Variation");
+                Util.AnswerType answerType = gui_getyesnocancelconfirmationdialog("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading TXT Variation");
                 switch (answerType) {
                     case YES:
                         saveselectedfile(null);
@@ -1003,17 +1076,16 @@ public class MainController implements Initializable {
             // Test If Unsaved Changes Here
             HTMLVariation.setSelected(false);
             PreviewButton.setDisable(! HTMLVariation.isSelected());
-            setReferenceType(MainController.ReferenceType.txt);
+            referenceType = This_Session.ReferenceType.txt;
             selectnewfile();
             loadselectedfile();
         }
         public void preview(ActionEvent actionEvent) {
-            if (MainTextArea.getText().length() > 0 && HTMLVariation.isSelected() && getReferenceType() == MainController.ReferenceType.html) {
+            if (MainTextArea.getText().length() > 0 && HTMLVariation.isSelected() && referenceType == This_Session.ReferenceType.html) {
                 if (! Util.String_validhtml(MainTextArea.getText())) {
-                    if (! Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Html Code In Text Area Is Not Valid HTML", "Preview Anyways?")) {return;}
+                    if (! gui_getokcancelconfirmationdialog("Confirmation", "Html Code In Text Area Is Not Valid HTML", "Preview Anyways?")) {return;}
                 }
-                PlayerUI.DisplayReference dr = new PlayerUI.DisplayReference(Root, MainTextArea.getText());
-                dr.showAndWait();
+                Session.displayreferencepreview(MainTextArea.getText());
             }
         }
 
@@ -1023,519 +1095,8 @@ public class MainController implements Initializable {
         this.close();
     }
 
-}
-    public static class AdvancedAmbienceEditor extends Stage implements Initializable {
-        public Button RightArrow;
-        public Button LeftArrow;
-        public ChoiceBox<String> MeditatableSelectionBox;
-        public TableView<AmbienceSong> Actual_Table;
-        public TableColumn<AmbienceSong, String> Actual_NameColumn;
-        public TableColumn<AmbienceSong, String> Actual_DurationColumn;
-        public TextField Actual_TotalDuration;
-        public Button Actual_AddButton;
-        public Button Actual_RemoveButton;
-        public Button Actual_PreviewButton;
-        public TableView<AmbienceSong> Temp_Table;
-        public TableColumn<AmbienceSong, String> Temp_NameColumn;
-        public TableColumn<AmbienceSong, String> Temp_DurationColumn;
-        public TextField Temp_TotalDuration;
-        public Button Temp_AddButton;
-        public Button Temp_RemoveButton;
-        public Button Temp_PreviewButton;
-        public Button SaveButton;
-        public Button CloseButton;
-        public Button SwitchToSimpleEditor;
-        private ObservableList<AmbienceSong> actual_ambiencesonglist = FXCollections.observableArrayList();
-        private ArrayList<SoundFile> actual_soundfilelist;
-        private ObservableList<AmbienceSong> temp_ambiencesonglist = FXCollections.observableArrayList();
-        private ArrayList<SoundFile> temp_soundfilelist;
-        private AmbienceSong selected_temp_ambiencesong;
-        private AmbienceSong selected_actual_ambiencesong;
-        private double temptotalduration;
-        private double actualtotalduration;
-        private String selectedmeditatablename;
-        private File tempdirectory;
-        private MainController Root;
-        private PreviewFile previewdialog;
-        private Ambiences ambiences;
-        private Ambience selectedambience;
-
-        @Override
-        public void initialize(URL location, ResourceBundle resources) {
-            Temp_NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
-            Temp_DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
-            Actual_NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
-            Actual_DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
-            Temp_Table.getSelectionModel().selectedItemProperty().addListener(
-                    (observable, oldValue, newValue) -> tempselectionchanged(newValue));
-            Actual_Table.getSelectionModel().selectedItemProperty().addListener(
-                    (observable, oldValue, newValue) -> actualselectionchanged(newValue));
-            ObservableList<String> allnames = FXCollections.observableArrayList();
-            allnames.addAll(kujiin.xml.Options.ALLNAMES);
-            MeditatableSelectionBox.setItems(allnames);
-            Actual_TotalDuration.setEditable(false);
-            Temp_TotalDuration.setEditable(false);
-        }
-
-        public AdvancedAmbienceEditor(MainController root, Ambiences ambiences) {
-            Root = root;
-            this.ambiences = ambiences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Advanced.fxml"));
-            fxmlLoader.setController(this);
-            try {
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-                this.setOnCloseRequest(event -> {
-
-                });
-            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Advanced Ambience Editor");
-            MeditatableSelectionBox.setOnAction(event -> selectandloadcut());
-            tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
-        }
-        public AdvancedAmbienceEditor(MainController root, Ambiences ambiences, String cutname) {
-            Root = root;
-            this.ambiences = ambiences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Advanced.fxml"));
-            fxmlLoader.setController(this);
-            try {
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-            setTitle("Advanced Ambience Editor");
-            MeditatableSelectionBox.setOnAction(event -> selectandloadcut());
-            MeditatableSelectionBox.getSelectionModel().select(kujiin.xml.Options.ALLNAMES.indexOf(cutname));
-            tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
-        }
-
-    // Transfer Methods
-        // TODO Add Check Duplicates Before Moving Over (Or Ask Allow Duplicates?)
-        public void rightarrowpressed(ActionEvent actionEvent) {
-            // Transfer To Current Cut (use Task)
-            if (selected_temp_ambiencesong != null && selectedmeditatablename != null) {
-                if (! Actual_Table.getItems().contains(selected_temp_ambiencesong)) {
-                    int tempindex = Temp_Table.getItems().indexOf(selected_actual_ambiencesong);
-                    actual_ambiencesonglist.add(temp_ambiencesonglist.get(tempindex));
-                    actual_soundfilelist.add(temp_soundfilelist.get(tempindex));
-                    Actual_Table.getItems().add(selected_temp_ambiencesong);
-                    calculateactualtotalduration();
-                }
-            } else {
-                if (selected_temp_ambiencesong == null) {
-                    Util.gui_showinformationdialog(Root, "Information", "Cannot Transfer", "Nothing Selected");}
-                else {
-                    Util.gui_showinformationdialog(Root, "Information", "Cannot Transfer", "No Cut Selected");}
-            }
-        }
-        public void leftarrowpressed(ActionEvent actionEvent) {
-            if (selected_actual_ambiencesong != null && selectedmeditatablename != null) {
-                if (! Temp_Table.getItems().contains(selected_actual_ambiencesong)) {
-                    int actualindex = Actual_Table.getItems().indexOf(selected_actual_ambiencesong);
-                    temp_ambiencesonglist.add(actual_ambiencesonglist.get(actualindex));
-                    temp_soundfilelist.add(actual_soundfilelist.get(actualindex));
-                    Temp_Table.getItems().add(selected_actual_ambiencesong);
-                    calculatetemptotalduration();
-                }
-            }
-        }
-
-    // Temp Ambience Methods
-        public void addtotempambience(ActionEvent actionEvent) {
-            if (temp_soundfilelist == null) {temp_soundfilelist = new ArrayList<>();}
-            if (temp_ambiencesonglist == null) {temp_ambiencesonglist = FXCollections.observableArrayList();}
-            addto(Temp_Table, temp_soundfilelist, temp_ambiencesonglist);}
-        public void removefromtempambience(ActionEvent actionEvent) {removefrom(Temp_Table, temp_soundfilelist, temp_ambiencesonglist);}
-        public void previewtempambience(ActionEvent actionEvent) {preview(selected_temp_ambiencesong);}
-        public void tempselectionchanged(AmbienceSong ambiencesong) {
-            selected_temp_ambiencesong = ambiencesong;
-        }
-        public void calculatetemptotalduration() {
-            temptotalduration = 0.0;
-            for (AmbienceSong i : Temp_Table.getItems()) {
-                temptotalduration += i.getDuration();
-            }
-            Temp_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(temptotalduration), Temp_TotalDuration.getLayoutBounds().getWidth()));
-        }
-        public void deletetempambiencefromdirectory() {
-            try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
-        }
-
-    // Actual Ambience Methods
-        public void addtoactualambience(ActionEvent actionEvent) {
-            if (actual_soundfilelist == null) {actual_soundfilelist = new ArrayList<>();}
-            if (actual_ambiencesonglist == null) {actual_ambiencesonglist = FXCollections.observableArrayList();}
-            addto(Actual_Table, actual_soundfilelist, actual_ambiencesonglist);}
-        public void removeactualambience(ActionEvent actionEvent) {removefrom(Actual_Table, actual_soundfilelist, actual_ambiencesonglist);}
-        public void previewactualambience(ActionEvent actionEvent) {preview(selected_actual_ambiencesong);}
-        public void actualselectionchanged(AmbienceSong ambiencesong) {selected_actual_ambiencesong = ambiencesong;}
-        public void calculateactualtotalduration() {
-            actualtotalduration = 0.0;
-            for (AmbienceSong i : Actual_Table.getItems()) {
-                actualtotalduration += i.getDuration();
-            }
-            Actual_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(actualtotalduration), Actual_TotalDuration.getLayoutBounds().getWidth()));
-        }
-
-    // Table Methods
-        public void selectandloadcut() {
-            int index = MeditatableSelectionBox.getSelectionModel().getSelectedIndex();
-            if (index != -1) {
-                selectedambience = ambiences.getmeditatableAmbience(index);
-                if (actual_ambiencesonglist == null) {actual_ambiencesonglist = FXCollections.observableArrayList();}
-                else {actual_ambiencesonglist.clear();}
-                if (actual_soundfilelist == null) {actual_soundfilelist = new ArrayList<>();}
-                else {actual_soundfilelist.clear();}
-                Actual_Table.getItems().clear();
-                selectedmeditatablename = kujiin.xml.Options.ALLNAMES.get(index);
-                if (populateactualambiencetable()) {
-                    Actual_Table.setItems(actual_ambiencesonglist);
-                }
-                calculateactualtotalduration();
-            }
-        }
-        private void addto(TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
-            List<File> files = Util.filechooser_multiple(getScene(), "Add Files", null);
-            ArrayList<File> notvalidfilenames = new ArrayList<>();
-            if (files != null) {
-                for (File i : files) {
-                    SoundFile soundFile = new SoundFile(i);
-                    if (soundFile.isValid()) {
-                        addandcalculateduration(soundFile, table, soundfilelist, songlist);
-                    } else {notvalidfilenames.add(i);}
-                }
-                if (notvalidfilenames.size() > 0) {
-                    Util.gui_showinformationdialog(Root, "Files Couldn't Be Added", "These Files Couldn't Be Added", notvalidfilenames.toString());}
-            }
-        }
-        public void addandcalculateduration(SoundFile soundFile, TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
-                MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
-                calculatedurationplayer.setOnReady(() -> {
-                    soundFile.setDuration(calculatedurationplayer.getTotalDuration().toMillis());
-                    calculatedurationplayer.dispose();
-                    soundfilelist.add(soundFile);
-                    AmbienceSong tempsong = new AmbienceSong(soundFile);
-                    songlist.add(tempsong);
-                    table.getItems().add(tempsong);
-                    calculateactualtotalduration();
-                    calculatetemptotalduration();
-                });
-        }
-        private void removefrom(TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
-            int index = table.getSelectionModel().getSelectedIndex();
-            if (index != -1) {
-                SoundFile soundFile = soundfilelist.get(index);
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
-                    soundFile.getFile().delete();
-                }
-                table.getItems().remove(index);
-                soundfilelist.remove(index);
-                songlist.remove(index);
-                calculateactualtotalduration();
-                calculatetemptotalduration();
-            }
-            else {
-                Util.gui_showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
-        }
-        private void preview(AmbienceSong selectedsong) {
-            if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
-                if (previewdialog == null || !previewdialog.isShowing()) {
-                    previewdialog = new PreviewFile(Root, selectedsong.getFile());
-                    previewdialog.showAndWait();
-                }
-            }
-        }
-        private boolean populateactualambiencetable() {
-            actual_ambiencesonglist.clear();
-            if (selectedmeditatablename != null) {
-                try {
-                    if (selectedambience.getAmbience() == null) {return false;}
-                    for (SoundFile i : selectedambience.getAmbience()) {
-                        actual_soundfilelist.add(i);
-                        actual_ambiencesonglist.add(new AmbienceSong(i));
-                    }
-                    return true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Util.gui_showinformationdialog(Root, "Information", selectedmeditatablename + " Has No Ambience", "Please Add Ambience To " + selectedmeditatablename);
-                    return false;
-                }
-            } else {
-                Util.gui_showinformationdialog(Root, "Information", "No Cut Loaded", "Load A Cut's Ambience First");
-                return false;
-            }
-        }
-
-    // Dialog Methods
-        public boolean unsavedchanges() {
-            if (MeditatableSelectionBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
-            try {
-                if (actual_soundfilelist.size() != selectedambience.getAmbience().size()) {return true;}
-                List<SoundFile> ambiencelist = selectedambience.getAmbience();
-                for (SoundFile x : actual_soundfilelist) {
-                    if (! ambiencelist.contains(x)) {return true;}
-                }
-                return false;
-            } catch (NullPointerException ignored) {return false;}
-        }
-        public void save(ActionEvent actionEvent) {
-            int index = MeditatableSelectionBox.getSelectionModel().getSelectedIndex();
-            if (index != -1) {
-                for (SoundFile i : actual_soundfilelist) {
-                    if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
-                }
-                ambiences.setmeditatableAmbience(index, selectedambience);
-                ambiences.marshall();
-                Util.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedmeditatablename, "");
-            } else {
-                Util.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
-        }
-        public void closebuttonpressed(ActionEvent actionEvent) {
-            if (unsavedchanges()) {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedmeditatablename, "Save Changes Before Closing?")) {save(null);}
-                else {return;}
-            }
-            close();
-        }
-        public void switchtosimple(ActionEvent actionEvent) {
-            if (unsavedchanges()) {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedmeditatablename, "Save Changes Before Switching To Simple Mode?")) {save(null);}
-            }
-            this.close();
-            deletetempambiencefromdirectory();
-            if (selected_temp_ambiencesong != null && kujiin.xml.Options.ALLNAMES.contains(selectedmeditatablename)) {
-                new SimpleAmbienceEditor(Root, Root.getSession().getAmbiences(), selectedmeditatablename).show();
-            } else {new SimpleAmbienceEditor(Root, Root.getSession().getAmbiences()).show();}
-        }
     }
-    public static class SimpleAmbienceEditor extends Stage implements Initializable {
-        public TableView<AmbienceSong> AmbienceTable;
-        public TableColumn<AmbienceSong, String> NameColumn;
-        public TableColumn<AmbienceSong, String> DurationColumn;
-        public ChoiceBox<String> MeditatableChoiceBox;
-        public Button SaveButton;
-        public Button CloseButton;
-        public Button AddButton;
-        public Button RemoveButton;
-        public Button PreviewButton;
-        public TextField TotalDuration;
-        public Button AdvancedButton;
-        private MainController Root;
-        private ObservableList<AmbienceSong> AmbienceList;
-        private ArrayList<SoundFile> SoundList;
-        private AmbienceSong selectedambiencesong;
-        private String selectedmeditatable;
-        private PreviewFile previewdialog;
-        private Ambiences ambiences;
-        private Ambience selectedambience;
-        private double totalselectedduration;
-
-        @Override
-        public void initialize(URL location, ResourceBundle resources) {
-            NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
-            DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
-            AmbienceTable.getSelectionModel().selectedItemProperty().addListener(
-                    (observable, oldValue, newValue) -> tableselectionchanged(newValue));
-            ObservableList<String> allnames = FXCollections.observableArrayList();
-            allnames.addAll(kujiin.xml.Options.ALLNAMES);
-            MeditatableChoiceBox.setItems(allnames);
-        }
-
-        public SimpleAmbienceEditor(MainController root, Ambiences ambiences) {
-            Root = root;
-            this.ambiences = ambiences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Simple.fxml"));
-            fxmlLoader.setController(this);
-            try {
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-                setTitle("Simple Ambience Editor");
-            } catch (IOException ignored) {}
-            MeditatableChoiceBox.setOnAction(event -> selectandloadcut());
-            NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
-        }
-        public SimpleAmbienceEditor(MainController root, Ambiences ambiences, String cutorelementname) {
-            Root = root;
-            this.ambiences = ambiences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Simple.fxml"));
-            fxmlLoader.setController(this);
-            try {
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-                setTitle("Simple Ambience Editor");
-            } catch (IOException ignored) {}
-            setOnShowing(event -> {
-                if (kujiin.xml.Options.ALLNAMES.contains(cutorelementname)) {
-                    MeditatableChoiceBox.getSelectionModel().select(cutorelementname);
-                    selectandloadcut();
-                }
-            });
-            MeditatableChoiceBox.setOnAction(event -> selectandloadcut());
-        }
-
-    // Table Methods
-        public void tableselectionchanged(AmbienceSong ambienceSong) {selectedambiencesong = ambienceSong;}
-        public void selectandloadcut() {
-            int index = MeditatableChoiceBox.getSelectionModel().getSelectedIndex();
-            if (index != -1) {
-                selectedambience = ambiences.getmeditatableAmbience(index);
-                if (AmbienceList == null) {AmbienceList = FXCollections.observableArrayList();}
-                else {AmbienceList.clear();}
-                if (SoundList == null) {SoundList = new ArrayList<>();}
-                else {SoundList.clear();}
-                AmbienceTable.getItems().clear();
-                selectedmeditatable = kujiin.xml.Options.ALLNAMES.get(index);
-                if (populateactualambiencetable()) {
-                    AmbienceTable.setItems(AmbienceList);
-                }
-                calculatetotalduration();
-            }
-        }
-        public void add() {
-            List<File> filesselected = new FileChooser().showOpenMultipleDialog(Root.Scene.getWindow());
-            List<File> notvalidfilenames = new ArrayList<>();
-            if (filesselected == null || filesselected.size() == 0) {return;}
-            for (File i : filesselected) {
-                for (String x : Util.SUPPORTEDAUDIOFORMATS) {
-                    if (i.getName().endsWith(x)) {
-                        if (Util.audio_getduration(i) != 0.0) {AmbienceList.add(new AmbienceSong(new SoundFile(i))); break;}
-                    }
-                }
-                if (! i.equals(AmbienceList.get(AmbienceList.size() - 1).getFile())) {notvalidfilenames.add(i);}
-            }
-            if (notvalidfilenames.size() > 0) {
-                Util.gui_showinformationdialog(Root, "Information", notvalidfilenames.size() + " Files Weren't Added Because They Are Unsupported", "");
-            }
-        }
-        public void addfiles(ActionEvent actionEvent) {
-            List<File> files = Util.filechooser_multiple(getScene(), "Add Files", null);
-            ArrayList<File> notvalidfilenames = new ArrayList<>();
-            if (files != null) {
-                for (File i : files) {
-                    SoundFile soundFile = new SoundFile(i);
-                    if (soundFile.isValid()) {
-                        addandcalculateduration(soundFile);
-                    }
-                    else {notvalidfilenames.add(i);}
-                }
-                if (notvalidfilenames.size() > 0) {
-                    Util.gui_showinformationdialog(Root, "Couldn't Add Files", "Supported Audio Formats: " + Util.audio_getsupportedText(), "Couldn't Add " + notvalidfilenames.size() + "Files");
-                }
-            }
-            if (AmbienceList.size() > 0) {AmbienceTable.setItems(AmbienceList);}
-        }
-        public void addandcalculateduration(SoundFile soundFile) {
-            MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
-            calculatedurationplayer.setOnReady(() -> {
-                soundFile.setDuration(calculatedurationplayer.getTotalDuration().toMillis());
-                calculatedurationplayer.dispose();
-                SoundList.add(soundFile);
-                AmbienceSong tempsong = new AmbienceSong(soundFile);
-                AmbienceList.add(tempsong);
-                AmbienceTable.getItems().add(tempsong);
-                calculatetotalduration();
-            });
-        }
-        public void remove(ActionEvent actionEvent) {
-            int index = AmbienceTable.getSelectionModel().getSelectedIndex();
-            if (index != -1) {
-                SoundFile soundFile = SoundList.get(index);
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
-                    soundFile.getFile().delete();
-                }
-                AmbienceTable.getItems().remove(index);
-                AmbienceList.remove(index);
-                SoundList.remove(index);
-                calculatetotalduration();
-            }
-            else {
-                Util.gui_showinformationdialog(Root, "Information", "Nothing Selected", "Select A Table Item To Remove");}
-        }
-        public void preview(ActionEvent actionEvent) {
-            if (selectedambiencesong != null && selectedambiencesong.getFile() != null && selectedambiencesong.getFile().exists()) {
-                if (previewdialog == null || !previewdialog.isShowing()) {
-                    previewdialog = new PreviewFile(Root, selectedambiencesong.getFile());
-                    previewdialog.showAndWait();
-                }
-            }
-        }
-        public boolean populateactualambiencetable() {
-            AmbienceList.clear();
-            if (selectedmeditatable != null) {
-                try {
-                    if (selectedambience.getAmbience() == null) {return false;}
-                    for (SoundFile i : selectedambience.getAmbience()) {
-                        SoundList.add(i);
-                        AmbienceList.add(new AmbienceSong(i));
-                    }
-                    return true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Util.gui_showinformationdialog(Root, "Information", selectedmeditatable + " Has No Ambience", "Please Add Ambience To " + selectedmeditatable);
-                    return false;
-                }
-            } else {
-                Util.gui_showinformationdialog(Root, "Information", "No Cut Loaded", "Load A Cut's Ambience First");
-                return false;
-            }
-        }
-        public void calculatetotalduration() {
-            totalselectedduration = 0.0;
-            for (AmbienceSong i : AmbienceTable.getItems()) {
-                totalselectedduration += i.getDuration();
-            }
-            TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(totalselectedduration), TotalDuration.getLayoutBounds().getWidth()));
-        }
-        public boolean unsavedchanges() {
-            if (MeditatableChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
-            try {
-                if (SoundList.size() != selectedambience.getAmbience().size()) {return true;}
-                List<SoundFile> ambiencelist = selectedambience.getAmbience();
-                for (SoundFile x : SoundList) {
-                    if (! ambiencelist.contains(x)) {return true;}
-                }
-                return false;
-            } catch (NullPointerException ignored) {return false;}
-        }
-
-    // Dialog Methods
-        public void advancedmode(ActionEvent actionEvent) {
-            if (unsavedchanges()) {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Switching To Advanced Mode?")) {save(null);}
-            }
-            this.close();
-            if (selectedmeditatable != null && kujiin.xml.Options.ALLNAMES.contains(selectedmeditatable)) {
-                new AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences(), selectedmeditatable).show();
-            } else {new AdvancedAmbienceEditor(Root, Root.getSession().getAmbiences()).show();}
-        }
-        public void save(ActionEvent actionEvent) {
-            int index = MeditatableChoiceBox.getSelectionModel().getSelectedIndex();
-            if (index != -1) {
-                for (SoundFile i : SoundList) {
-                    if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
-                }
-                ambiences.setmeditatableAmbience(index, selectedambience);
-                ambiences.marshall();
-                Util.gui_showinformationdialog(Root, "Saved", "Ambience Saved To " + selectedmeditatable, "");
-            } else {
-                Util.gui_showinformationdialog(Root, "Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
-        }
-        public void closedialog(ActionEvent actionEvent) {
-            if (unsavedchanges()) {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Closing?")) {save(null);}
-                else {return;}
-            }
-            close();
-        }
-    }
-    public static class PreviewFile extends Stage {
+    class PreviewFile extends Stage {
         public Label CurrentTime;
         public Slider ProgressSlider;
         public Label TotalTime;
@@ -1545,14 +1106,12 @@ public class MainController implements Initializable {
         public Slider VolumeSlider;
         public Label VolumePercentage;
         public Label TopLabel;
-        private MainController Root;
         private Media Mediatopreview;
         private File Filetopreview;
         private MediaPlayer PreviewPlayer;
 
-        public PreviewFile(MainController root, File filetopreview) {
+        public PreviewFile(File filetopreview) {
             if (Util.audio_isValid(filetopreview)) {
-                Root = root;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/PreviewAudioDialog.fxml"));
                 fxmlLoader.setController(this);
                 setOnHidden(event -> {
@@ -1562,7 +1121,7 @@ public class MainController implements Initializable {
                 try {
                     Scene defaultscene = new Scene(fxmlLoader.load());
                     setScene(defaultscene);
-                    Root.getOptions().setStyle(this);
+                    getOptions().setStyle(this);
                     this.setResizable(false);
                     Filetopreview = filetopreview;
                     TopLabel.setText(Filetopreview.getName().substring(0, Filetopreview.getName().lastIndexOf(".")));
@@ -1582,7 +1141,7 @@ public class MainController implements Initializable {
                     VolumePercentage.setText("0%");
                 } catch (IOException ignored) {}
             } else {
-                Util.gui_showinformationdialog(Root, "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+                gui_showinformationdialog("Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
         }
 
         public void play(ActionEvent actionEvent) {
@@ -1639,22 +1198,20 @@ public class MainController implements Initializable {
             VolumeSlider.setValue(0);
         }
     }
-    public static class ExceptionDialog extends Stage {
+    class ExceptionDialog extends Stage {
         public TextArea StackTraceTextField;
         public Button CloseButton;
         public Button ContinueButton;
         public CheckBox NotifyMeCheckbox;
         public Label TopText;
-        private MainController Root;
 
-        public ExceptionDialog(MainController root, Exception exception) {
-            Root = root;
+        public ExceptionDialog(Exception exception) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ExceptionDialog.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                getOptions().setStyle(this);
             } catch (IOException ignored) {}
             System.out.println(String.format("Time %s Encountered: %s", exception.getClass().getName(), LocalDate.now()));
             exception.printStackTrace();
@@ -1679,7 +1236,7 @@ public class MainController implements Initializable {
         }
 
     }
-    public static class ChangeProgramOptions extends Stage {
+    class ChangeProgramOptions extends Stage {
         public CheckBox TooltipsCheckBox;
         public CheckBox HelpDialogsCheckBox;
         public TextField AlertFileTextField;
@@ -1701,18 +1258,16 @@ public class MainController implements Initializable {
         public CheckBox RampSwitch;
         public Button AddNewThemeButton;
         private kujiin.xml.Options Options;
-        private MainController Root;
-        private MainController.ReferenceType tempreferencetype;
+        private This_Session.ReferenceType tempreferencetype;
 
-        public ChangeProgramOptions(MainController root) {
+        public ChangeProgramOptions() {
             try {
-                Root = root;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));
                 fxmlLoader.setController(this);
-                Options = Root.getOptions();
+                Options = getOptions();
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                getOptions().setStyle(this);
                 setResizable(false);
                 setTitle("Preferences");
                 AlertFileTextField.setEditable(false);
@@ -1722,21 +1277,21 @@ public class MainController implements Initializable {
                 referencetoggle();
                 setOnCloseRequest(event -> {
                     if (valuesdifferentthanxml()) {
-                        switch (Util.gui_getyesnocancelconfirmationdialog(Root, "Unsaved Changes", "You Have Unsaved Changes", "Save Changes Before Exiting?")) {
+                        switch (gui_getyesnocancelconfirmationdialog("Unsaved Changes", "You Have Unsaved Changes", "Save Changes Before Exiting?")) {
                             case YES: save(); break;
                             case NO: break;
                             case CANCEL: event.consume(); break;
                         }
                     }
                 });
-            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
         }
 
     // Setup Methods
         public void populatefromxml() {
         // Program Options
-            TooltipsCheckBox.setSelected(Root.getOptions().getProgramOptions().getTooltips());
-            HelpDialogsCheckBox.setSelected(Root.getOptions().getProgramOptions().getHelpdialogs());
+            TooltipsCheckBox.setSelected(getOptions().getProgramOptions().getTooltips());
+            HelpDialogsCheckBox.setSelected(getOptions().getProgramOptions().getHelpdialogs());
         // Session Options
             alertfiletoggled();
         // Playback Options
@@ -1746,15 +1301,15 @@ public class MainController implements Initializable {
             EntrainmentVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getEntrainmentvolume() * 100).intValue()));
             AmbienceVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getAmbiencevolume() * 100).intValue()));
         // Appearance Options
-            ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(Root.getOptions().STYLE_THEMES_NAMES));
+            ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(getOptions().STYLE_THEMES_NAMES));
             try {
-                int index = Root.getOptions().STYLE_THEMES_ACTUAL.indexOf(Root.getOptions().getAppearanceOptions().getThemefile());
+                int index = getOptions().STYLE_THEMES_ACTUAL.indexOf(getOptions().getAppearanceOptions().getThemefile());
                 ProgramThemeChoiceBox.getSelectionModel().select(index);
             } catch (Exception ignored) {}
         }
         public void setuptooltips() {
             TooltipsCheckBox.setTooltip(new Tooltip("Display Messages Like These When Hovering Over Program Controls"));
-            if (Root.getOptions().getProgramOptions().getTooltips()) {
+            if (getOptions().getProgramOptions().getTooltips()) {
                 HelpDialogsCheckBox.setTooltip(new Tooltip(""));
                 AlertFileTextField.setTooltip(new Tooltip("Alert File Is A Sound File Played In Between Different Session Parts"));
                 AlertFileEditButton.setTooltip(new Tooltip("Edit Alert File"));
@@ -1793,12 +1348,12 @@ public class MainController implements Initializable {
 
     // Alert File Methods
         public void editalertfile(ActionEvent actionEvent) {
-            ChangeAlertFile changeAlertFile = new ChangeAlertFile(Root);
+            ChangeAlertFile changeAlertFile = new ChangeAlertFile();
             changeAlertFile.showAndWait();
             alertfiletoggled();
         }
         public void alertfiletoggled() {
-            boolean enabled = Root.getOptions().getSessionOptions().getAlertfunction();
+            boolean enabled = getOptions().getSessionOptions().getAlertfunction();
             if (enabled) {
                 if (Options.getSessionOptions().getAlertfilelocation() != null) {
                     File alertfile = new File(Options.getSessionOptions().getAlertfilelocation());
@@ -1840,12 +1395,12 @@ public class MainController implements Initializable {
         public void HTMLTypeSelected() {
             ReferenceHTMLRadioButton.setSelected(true);
             ReferenceTXTRadioButton.setSelected(false);
-            tempreferencetype = MainController.ReferenceType.html;
+            tempreferencetype = This_Session.ReferenceType.html;
         }
         public void TXTTypeSelected() {
             ReferenceHTMLRadioButton.setSelected(false);
             ReferenceTXTRadioButton.setSelected(true);
-            tempreferencetype = MainController.ReferenceType.txt;
+            tempreferencetype = This_Session.ReferenceType.txt;
         }
 
     // Appearance Methods
@@ -1855,7 +1410,7 @@ public class MainController implements Initializable {
         public void selectnewtheme() {
             int index = ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
-                Options.getAppearanceOptions().setThemefile(Root.getOptions().STYLE_THEMES_ACTUAL.get(index));
+                Options.getAppearanceOptions().setThemefile(getOptions().STYLE_THEMES_ACTUAL.get(index));
                 getScene().getStylesheets().clear();
                 getScene().getStylesheets().add(Options.getAppearanceOptions().getThemefile());
             }
@@ -1903,167 +1458,45 @@ public class MainController implements Initializable {
             return entrainmentgood && ambiencegood;
         }
         public void resettodefaults(ActionEvent actionEvent) {
-            if (Util.gui_getokcancelconfirmationdialog(Root, "Reset To Defaults", "Reset All Values To Defaults?", "You Will Lose Any Unsaved Changes")) {
+            if (gui_getokcancelconfirmationdialog("Reset To Defaults", "Reset All Values To Defaults?", "You Will Lose Any Unsaved Changes")) {
                 Options.resettodefaults();
                 populatefromxml();
             }
         }
         public void deleteallsessions(ActionEvent actionEvent) {
-            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+            if (gui_getokcancelconfirmationdialog("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
                 if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
-                    Util.gui_showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                    gui_showerrordialog("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
                 } else {
-                    Util.gui_showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
+                    gui_showinformationdialog("Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }
         }
         public void deleteallgoals(ActionEvent actionEvent) {
-            if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+            if (gui_getokcancelconfirmationdialog("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
                 if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
-                    Util.gui_showerrordialog(Root, "Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                    gui_showerrordialog("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
                 } else {
-                    Util.gui_showinformationdialog(Root, "Success", "Successfully Delete Sessions And Reset All Progress", "");}
+                    gui_showinformationdialog("Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }
         }
 
     }
-    public static class SessionDetails extends Stage {
-        public MainController Root;
-        public BarChart<String, java.lang.Number> SessionBarChart;
-        public CategoryAxis SessionCategoryAxis;
-        public NumberAxis SessionNumbersAxis;
-        public TextField DatePracticedTextField;
-        public TextField SessionDurationTextField;
-        public Button CloseButton;
-        public Label GoalsCompletedTopLabel;
-        public ListView<String> GoalsCompletedListView;
-
-        public SessionDetails(MainController root, List<Meditatable> meditatablesinsession) {
-            Root = root;
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionCompleteDialog.fxml"));
-                fxmlLoader.setController(this);
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-                SessionNumbersAxis.setLabel("Minutes");
-                setTitle("Session Details");
-                XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
-                Duration totalsessionduration = new Duration(0);
-                ObservableList<String> completedgoalsitems = FXCollections.observableArrayList();
-                for (Meditatable i : meditatablesinsession) {
-                    series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getduration().toMinutes()));
-                    totalsessionduration.add(i.getduration());
-                    for (Goals.Goal x : i.getGoalsCompletedThisSession()) {
-                        completedgoalsitems.add(String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getduration().toHours()));
-                    }
-                }
-                if (completedgoalsitems.size() > 0) {
-                    GoalsCompletedTopLabel.setText(completedgoalsitems.size() + " Goals Completed This Session");
-                    GoalsCompletedListView.setItems(completedgoalsitems);
-                }
-                else {GoalsCompletedTopLabel.setText("No Goals Completed This Session");}
-                SessionBarChart.getData().add(series);
-                SessionBarChart.setLegendVisible(false);
-                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(totalsessionduration, SessionDurationTextField.getLayoutBounds().getWidth()));
-                SessionDurationTextField.setEditable(false);
-                SessionBarChart.requestFocus();
-            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-        }
-        public SessionDetails(MainController root, kujiin.xml.Session session) {
-            try {
-                Root = root;
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails_Individual.fxml"));
-                fxmlLoader.setController(this);
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-                SessionNumbersAxis.setLabel("Minutes");
-                setTitle("Session Details");
-                DatePracticedTextField.setText(session.getDate_Practiced());
-                DatePracticedTextField.setEditable(false);
-                XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
-                List<Integer> values = new ArrayList<>();
-                for (int i = 0; i < 16; i++) {
-                    int duration = session.getcutduration(i);
-                    values.add(duration);
-                    String name;
-                    if (i == 0) {name = "Pre";}
-                    else if (i == 15) {name = "Post";}
-                    else {name = kujiin.xml.Options.ALLNAMES.get(i);}
-                    series.getData().add(new XYChart.Data<>(name, duration));
-                }
-                SessionBarChart.getData().add(series);
-                SessionBarChart.setLegendVisible(false);
-                SessionNumbersAxis.setUpperBound(Util.list_getmaxintegervalue(values));
-                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((session.getTotal_Session_Duration() * 60) * 1000), SessionDurationTextField.getLayoutBounds().getWidth()));
-                SessionDurationTextField.setEditable(false);
-                SessionBarChart.requestFocus();
-            } catch (IOException | NullPointerException e) {new ExceptionDialog(Root, e).showAndWait();}
-        }
-
-        public void closeDialog(ActionEvent actionEvent) {
-            close();
-        }
-
-        class CompletedGoalsAtEndOfSessionBinding {
-            private StringProperty cutname;
-            private StringProperty practicedhours;
-            private StringProperty goalhours;
-            private StringProperty dateset;
-            private IntegerProperty daysittooktocomplete;
-            private StringProperty datecompleted;
-
-            public CompletedGoalsAtEndOfSessionBinding(String cutname, String practicedhours, String goalhours, String dateset, int daysittooktocomplete, String datecompleted) {
-                this.cutname = new SimpleStringProperty(cutname);
-                this.practicedhours = new SimpleStringProperty(practicedhours);
-                this.goalhours = new SimpleStringProperty(goalhours);
-                this.dateset = new SimpleStringProperty(dateset);
-                this.daysittooktocomplete = new SimpleIntegerProperty(daysittooktocomplete);
-                this.datecompleted = new SimpleStringProperty(datecompleted);
-            }
-        }
-    }
-    public static class AmbienceSong {
-        private StringProperty name;
-        private StringProperty length;
-        private File file;
-        private double duration;
-
-        public AmbienceSong(SoundFile soundFile) {
-            this.name = new SimpleStringProperty(soundFile.getName());
-            this.file = soundFile.getFile();
-            duration = soundFile.getDuration();
-            this.length = new SimpleStringProperty(Util.formatdurationtoStringSpelledOut(new Duration(duration), null));
-        }
-
-        public String getName() {
-            return name.getValue();
-        }
-        public File getFile() {
-            return file;
-        }
-        public double getDuration() {return duration;}
-    }
-    public static class ChangeAllValuesDialog extends Stage {
+    class ChangeAllValuesDialog extends Stage {
             public Button AcceptButton;
             public Button CancelButton;
             public TextField MinutesTextField;
             public CheckBox PresessionCheckbox;
             public CheckBox PostsessionCheckBox;
             private Boolean accepted;
-            private MainController Root;
             private int minutes;
 
-            public ChangeAllValuesDialog(MainController root, String toptext) {
+            public ChangeAllValuesDialog(String toptext) {
                 try {
-                    Root = root;
                     FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeAllValuesDialog.fxml"));
                     fxmlLoader.setController(this);
                     Scene defaultscene = new Scene(fxmlLoader.load());
                     setScene(defaultscene);
-                    Root.getOptions().setStyle(this);
+                    getOptions().setStyle(this);
                     this.setResizable(false);
                     setTitle(toptext);
                     setAccepted(false);
@@ -2073,7 +1506,7 @@ public class MainController implements Initializable {
                         try {setMinutes(Integer.parseInt(MinutesTextField.getText()));}
                         catch (NumberFormatException ignored) {setMinutes(0);}
                     });
-                } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
+                } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
             }
 
         // Getters And Setters
@@ -2091,321 +1524,12 @@ public class MainController implements Initializable {
             }
 
         // Button Actions
-            public void acceptbuttonpressed(Event event) {setAccepted(true); this.close();}
-            public void cancelbuttonpressed(Event event) {setAccepted(false); this.close();}
+            public void acceptbuttonpressed(ActionEvent event) {setAccepted(true); close();}
+            public void cancelbuttonpressed(ActionEvent event) {setAccepted(false); close();}
             public boolean getincludepresession() {return PresessionCheckbox.isSelected();}
             public boolean getincludepostsession() {return PostsessionCheckBox.isSelected();}
     }
-    public static class ExportingSessionDialog extends Stage {
-            public Button CancelButton;
-            public ProgressBar TotalProgress;
-            public Label StatusBar;
-            public ProgressBar CurrentProgress;
-            public Label TotalLabel;
-            public Label CurrentLabel;
-            private MainController Root;
-
-            public ExportingSessionDialog(MainController root) {
-                Root = root;
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ExportingSessionDialog.fxml"));
-                fxmlLoader.setController(this);
-                try {
-                    Scene defaultscene = new Scene(fxmlLoader.load());
-                    setScene(defaultscene);
-                    Root.getOptions().setStyle(this);
-                    this.setResizable(false);
-                } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-                setTitle("Exporting Session");
-            }
-
-            public void unbindproperties() {
-                TotalProgress.progressProperty().unbind();
-                CurrentProgress.progressProperty().unbind();
-                StatusBar.textProperty().unbind();
-                CurrentLabel.textProperty().unbind();
-            }
-        }
-    public static class CutsMissingDialog  extends Stage {
-            public Button AddMissingCutsButton;
-            public ListView<Text> SessionListView;
-            public Button CreateAnywayButton;
-            public Button CancelCreationButton;
-            private List<Cut> allcuts;
-            private List<Cut> missingcuts;
-            private Util.AnswerType result;
-            private MainController Root;
-
-            public CutsMissingDialog(MainController root, List<Cut> allcuts) {
-                Root = root;
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/CutsOutOfOrderOrMissing.fxml"));
-                fxmlLoader.setController(this);
-                try {
-                    Scene defaultscene = new Scene(fxmlLoader.load());
-                    setScene(defaultscene);
-                    Root.getOptions().setStyle(this);
-                    this.setResizable(false);
-                    this.setOnCloseRequest(event -> dialogclosed());
-                } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-                setTitle("Cuts Missing");
-                this.allcuts = allcuts;
-                populatelistview();
-                Util.gui_showinformationdialog(Root, "Cuts Missing", "Due To The Nature Of Kuji-In, Each Cut Should Connect From RIN Up, Or The Later Cuts Might Lack The Energy They Need", "Use This Dialog To Connect Cuts, Or Cancel Without Creating");
-            }
-
-            public int getlastworkingcutindex() {
-                int lastcutindex = 0;
-                for (Cut i : allcuts) {
-                    if (i.getduration().greaterThan(Duration.ZERO)) {lastcutindex = i.number;}
-                }
-                return lastcutindex;
-            }
-            public void populatelistview() {
-                ObservableList<Text> sessionitems = FXCollections.observableArrayList();
-                for (int i=0; i<getlastworkingcutindex(); i++) {
-                    Text item = new Text();
-                    StringBuilder currentcuttext = new StringBuilder();
-                    Cut selectedcut = allcuts.get(i);
-                    currentcuttext.append(selectedcut.number).append(". ").append(selectedcut.name);
-                    if (selectedcut.getduration().greaterThan(Duration.ZERO)) {
-                        currentcuttext.append(" (").append(Util.formatdurationtoStringSpelledOut(selectedcut.getduration(), SessionListView.getLayoutBounds().getWidth() - (currentcuttext.length() + 1)));
-                        currentcuttext.append(")");
-                    } else {
-                        if (missingcuts == null) {missingcuts = new ArrayList<>();}
-                        missingcuts.add(selectedcut);
-                        currentcuttext.append(" (Missing Value!)");
-                        item.setStyle("-fx-font-weight:bold; -fx-font-style: italic;");
-                    }
-                    item.setText(currentcuttext.toString());
-                    sessionitems.add(item);
-                }
-                SessionListView.setItems(sessionitems);
-            }
-            public void addmissingcutstoSession(Event event) {
-                if (missingcuts != null && missingcuts.size() > 0) {
-                    CutInvocationDialog cutdurationdialog = new CutInvocationDialog(Root);
-                    cutdurationdialog.showAndWait();
-                    for (Cut i : missingcuts) {
-                        if (cutdurationdialog.getDuration() != 0) {
-                            i.setDuration(cutdurationdialog.getDuration());
-                        }
-                    }
-                }
-                setResult(Util.AnswerType.YES);
-                this.close();
-            }
-            public void createSessionwithoutmissingcuts(Event event) {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
-                    setResult(Util.AnswerType.YES);
-                    this.close();
-                }
-            }
-            public void dialogclosed() {
-                if (result == null && Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Close Dialog Without Creating", "This Will Return To The Creator")) {
-                    setResult(Util.AnswerType.CANCEL);
-                    this.close();
-                }
-            }
-            public Util.AnswerType getResult() {
-                return result;
-            }
-            public void setResult(Util.AnswerType result) {
-                this.result = result;
-            }
-            public void cancelcreation(ActionEvent actionEvent) {
-                setResult(Util.AnswerType.CANCEL);
-                this.close();
-            }
-        }
-    public static class CutInvocationDialog extends Stage {
-            public Button CancelButton;
-            public Button OKButton;
-            public TextField MinutesTextField;
-            private int duration;
-            private MainController Root;
-
-            public CutInvocationDialog(MainController root) {
-                Root = root;
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/CutInvocationDialog.fxml"));
-                fxmlLoader.setController(this);
-                try {
-                    Scene defaultscene = new Scene(fxmlLoader.load());
-                    setScene(defaultscene);
-                    Root.getOptions().setStyle(this);
-                    this.setResizable(false);
-                } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-                setTitle("Cut Invocation");
-                MinutesTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-                    try {if (newValue.matches("\\d*")) {
-                        MinutesTextField.setText(Integer.toString(Integer.parseInt(newValue)));}  else {
-                        MinutesTextField.setText(oldValue);}}
-                    catch (Exception e) {MinutesTextField.setText("");}
-                });
-                MinutesTextField.setText("0");
-            }
-            public int getDuration() {
-                return duration;
-            }
-            public void setDuration(int duration) {
-                this.duration = duration;
-            }
-            public void CancelButtonPressed(Event event) {
-                setDuration(0);
-                this.close();
-            }
-            public void OKButtonPressed(Event event) {
-                try {
-                    int value = Integer.parseInt(MinutesTextField.getText());
-                    if (value != 0) {
-                        setDuration(value);
-                        this.close();
-                    } else {
-                        if (Util.gui_getokcancelconfirmationdialog(Root, "Confirmation", "Cut Invocation Value Is 0", "Continue With Zero Value (These Cuts Won't Be Included)" )) {
-                            setDuration(0);
-                            this.close();
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    Util.gui_showerrordialog(Root, "Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
-            }
-        }
-    public static class SortSessionItems extends Stage {
-            public TableView<SessionItem> SessionItemsTable;
-            public TableColumn<SessionItem, Integer> NumberColumn;
-            public TableColumn<SessionItem, String> NameColumn;
-            public TableColumn<SessionItem, String> DurationColumn;
-            public Button UpButton;
-            public Button DownButton;
-            public Button AcceptButton;
-            public Button CancelButton;
-            private List<Meditatable> sessionitems;
-            private ObservableList<SessionItem> tableitems;
-            private MainController Root;
-            private Util.AnswerType result;
-
-            public SortSessionItems(MainController Root, List<Meditatable> sessionitems) {
-                this.sessionitems = sessionitems;
-                this.Root = Root;
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SortSessionParts.fxml"));
-                fxmlLoader.setController(this);
-                try {
-                    Scene defaultscene = new Scene(fxmlLoader.load());
-                    setScene(defaultscene);
-                    Root.getOptions().setStyle(this);
-                    this.setResizable(false);
-                    this.setOnCloseRequest(event -> dialogClosed());
-                } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
-                NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
-                NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
-                DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
-                SessionItemsTable.setOnMouseClicked(event -> itemselected());
-                tableitems = FXCollections.observableArrayList();
-                UpButton.setDisable(true);
-                DownButton.setDisable(true);
-                populatetable();
-            }
-
-            public void itemselected() {
-                int index = SessionItemsTable.getSelectionModel().getSelectedIndex();
-                boolean validitemselected = index != -1;
-                UpButton.setDisable(! validitemselected && index == 0);
-                DownButton.setDisable(! validitemselected && index != SessionItemsTable.getItems().size() - 1);
-            }
-            public void populatetable() {
-                SessionItemsTable.getItems().clear();
-                tableitems.clear();
-                int count = 1;
-                for (Meditatable i : sessionitems) {
-                    tableitems.add(new SessionItem(count, i.name, Util.formatdurationtoStringDecimalWithColons(i.getduration())));
-                    count++;
-                }
-                SessionItemsTable.setItems(tableitems);
-            }
-            public void moveitemup(ActionEvent actionEvent) {
-                int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
-                if (selectedindex == -1) {return;}
-                if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
-                    Util.gui_showinformationdialog(Root, "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
-                    return;
-                }
-                if (selectedindex == 0) {return;}
-                Meditatable selecteditem = sessionitems.get(selectedindex);
-                Meditatable oneitemup = sessionitems.get(selectedindex - 1);
-                if (selecteditem instanceof Cut && oneitemup instanceof Cut) {
-                    if (selecteditem.number > oneitemup.number) {
-                        Util.gui_showinformationdialog(Root, "Cannot Move", selecteditem.name + " Cannot Be Moved Before " + oneitemup.name + ". Cuts Would Be Out Of Order", "Cannot Move");
-                        return;
-                    }
-                }
-                if (oneitemup instanceof Qi_Gong) {
-                    Util.gui_showinformationdialog(Root, "Cannot Move", "Cannot Replace Presession", "Cannot Move");
-                    return;
-                }
-                Collections.swap(sessionitems, selectedindex, selectedindex - 1);
-                populatetable();
-            }
-            public void moveitemdown(ActionEvent actionEvent) {
-                int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
-                if (selectedindex == -1) {return;}
-                if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
-                    Util.gui_showinformationdialog(Root, "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
-                    return;
-                }
-                if (selectedindex == tableitems.size() - 1) {return;}
-                Meditatable selecteditem = sessionitems.get(selectedindex);
-                Meditatable oneitemdown = sessionitems.get(selectedindex + 1);
-                if (selecteditem instanceof Cut && oneitemdown instanceof Cut) {
-                    if (selecteditem.number < oneitemdown.number) {
-                        Util.gui_showinformationdialog(Root, "Cannot Move", selecteditem.name + " Cannot Be Moved After " + oneitemdown.name + ". Cuts Would Be Out Of Order", "Cannot Move");
-                        return;
-                    }
-                }
-                if (oneitemdown instanceof Qi_Gong) {
-                    Util.gui_showinformationdialog(Root, "Cannot Move", "Cannot Replace Postsession", "Cannot Move");
-                    return;
-                }
-                Collections.swap(sessionitems, selectedindex, selectedindex + 1);
-                populatetable();
-            }
-            public void cutcheck() {
-
-            }
-            public List<Meditatable> getorderedsessionitems() {
-                return sessionitems;
-            }
-            public void accept(ActionEvent actionEvent) {
-                close();
-            }
-            public void cancel(ActionEvent actionEvent) {
-                sessionitems = null;
-                close();
-            }
-            public void dialogClosed() {
-                if (Util.gui_getokcancelconfirmationdialog(Root, "Cancel Creation", "Cancel Creation", "This Will Return To The Creator Main Window")) {
-                    setResult(Util.AnswerType.CANCEL);
-                    this.close();
-                }
-            }
-
-            public Util.AnswerType getResult() {
-                return result;
-            }
-            public void setResult(Util.AnswerType result) {
-                this.result = result;
-            }
-
-            class SessionItem {
-                private IntegerProperty number;
-                private StringProperty name;
-                private StringProperty duration;
-
-                public SessionItem(int number, String name, String duration) {
-                    this.number = new SimpleIntegerProperty(number);
-                    this.name = new SimpleStringProperty(name);
-                    this.duration = new SimpleStringProperty(duration);
-                }
-            }
-        }
-    public static class AllMeditatablesGoalProgress extends Stage {
+    class AllMeditatablesGoalProgress extends Stage {
         public TableView<GoalProgressBinding> GoalsTable;
         public TableColumn<GoalProgressBinding, String> NameColumn;
         public TableColumn<GoalProgressBinding, String> PracticedTimeColumn;
@@ -2416,19 +1540,16 @@ public class MainController implements Initializable {
         public Button ViewCompletedGoalsButton;
         public Button CloseButton;
         private ObservableList<GoalProgressBinding> allgoalsdetails = FXCollections.observableArrayList();
-        private Meditatable selectedmeditatable;
-        public MainController Root;
         private String setgoaltext = "Set Goal";
         private String goalpacingtext = "Current Goal Pacing";
 
-        public AllMeditatablesGoalProgress(MainController Root, Meditatable selectedmeditatable) {
-            this.Root = Root;
+        public AllMeditatablesGoalProgress() {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AllMeditatablesGoalProgress.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                getOptions().setStyle(this);
                 this.setResizable(false);
                 setTitle("Goal Progress");
                 NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
@@ -2444,7 +1565,7 @@ public class MainController implements Initializable {
                 GoalsTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> newrowselected());
                 populatetable();
                 newrowselected();
-                if (selectedmeditatable != null) {GoalsTable.getSelectionModel().select(selectedmeditatable.number);}
+                if (SessionsAndGoalsSelectedMeditatable != null) {GoalsTable.getSelectionModel().select(SessionsAndGoalsSelectedMeditatable.number);}
                 this.setOnCloseRequest(new EventHandler<WindowEvent>() {
                     @Override
                     public void handle(WindowEvent event) {
@@ -2452,12 +1573,12 @@ public class MainController implements Initializable {
 
                     }
                 });
-            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
         }
 
         public void populatetable() {
             allgoalsdetails.clear();
-            for (Meditatable i : Root.getSession().getAllMeditatablesincludingTotalforTracking()) {
+            for (Meditatable i : getSession().getAllMeditatablesincludingTotalforTracking()) {
                 String practicedtime = Util.formatdurationtoStringSpelledOut(new Duration(i.getTotalMinutesPracticed(false)), null);
                 if (practicedtime.equals("0 Minutes")) {
                     // TODO None Text Here! No Practiced Time Set
@@ -2476,30 +1597,30 @@ public class MainController implements Initializable {
             GoalsTable.setItems(allgoalsdetails);
         }
         public void newrowselected() {
-            if (GoalsTable.getSelectionModel().getSelectedIndex() == -1) {selectedmeditatable = null;}
-            else {selectedmeditatable = Root.getSession().getAllMeditatablesincludingTotalforTracking().get(GoalsTable.getSelectionModel().getSelectedIndex());}
-            if (selectedmeditatable == null) {
+            if (GoalsTable.getSelectionModel().getSelectedIndex() == -1) {SessionsAndGoalsSelectedMeditatable = null;}
+            else {SessionsAndGoalsSelectedMeditatable = getSession().getAllMeditatablesincludingTotalforTracking().get(GoalsTable.getSelectionModel().getSelectedIndex());}
+            if (SessionsAndGoalsSelectedMeditatable == null) {
                 SetCurrentGoalButton.setDisable(true);
                 ViewCompletedGoalsButton.setDisable(true);
             } else {
                 SetCurrentGoalButton.setDisable(false);
-                if (selectedmeditatable.getCurrentGoal() == null) {SetCurrentGoalButton.setText(setgoaltext);}
+                if (SessionsAndGoalsSelectedMeditatable.getCurrentGoal() == null) {SetCurrentGoalButton.setText(setgoaltext);}
                 else {SetCurrentGoalButton.setText(goalpacingtext);}
-                ViewCompletedGoalsButton.setDisable(selectedmeditatable.getcompletedgoalcount() == 0);
+                ViewCompletedGoalsButton.setDisable(SessionsAndGoalsSelectedMeditatable.getcompletedgoalcount() == 0);
             }
         }
         public void setcurrentgoal(ActionEvent actionEvent) {
-            if (selectedmeditatable != null) {
-                SimpleGoalSetDialog setDialog = new SimpleGoalSetDialog(Root, selectedmeditatable);
+            if (SessionsAndGoalsSelectedMeditatable != null) {
+                SimpleGoalSetDialog setDialog = new SimpleGoalSetDialog();
                 setDialog.showAndWait();
                 if (setDialog.shouldSetgoal()) {
-                    selectedmeditatable.addGoal(new Goals.Goal(setDialog.getNewGoalHours(), selectedmeditatable));
+                    SessionsAndGoalsSelectedMeditatable.addGoal(new Goals.Goal(setDialog.getNewGoalHours(), SessionsAndGoalsSelectedMeditatable));
                     populatetable();
                 }
             }
         }
         public void viewcompletedgoals(ActionEvent actionEvent) {
-            if (selectedmeditatable != null) {
+            if (SessionsAndGoalsSelectedMeditatable != null) {
 
             }
         }
@@ -2520,7 +1641,7 @@ public class MainController implements Initializable {
             }
         }
     }
-    public static class SimpleGoalSetDialog extends Stage {
+    class SimpleGoalSetDialog extends Stage {
         public MainController Root;
         public Label TopLabel;
         public Spinner<Integer> HoursSpinner;
@@ -2529,14 +1650,11 @@ public class MainController implements Initializable {
         public Label StatusBar;
         public Button AcceptButton;
         public Button CancelButton;
-        private Meditatable SelectedMeditatable;
         private boolean setgoal = false;
         private int practicedminutes;
 
-        public SimpleGoalSetDialog(MainController root, Meditatable selectedmeditatable) {
+        public SimpleGoalSetDialog() {
             try {
-                Root = root;
-                SelectedMeditatable = selectedmeditatable;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SetGoalDialog_Simple.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -2546,13 +1664,13 @@ public class MainController implements Initializable {
                 setTitle("Set A New Goal");
                 HoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
                 MinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
-                HoursSpinner.getValueFactory().setValue(SelectedMeditatable.getTotalMinutesPracticed(false) / 60);
-                MinutesSpinner.getValueFactory().setValue(SelectedMeditatable.getTotalMinutesPracticed(false) % 60);
+                HoursSpinner.getValueFactory().setValue(SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false) / 60);
+                MinutesSpinner.getValueFactory().setValue(SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false) % 60);
                 Util.custom_spinner_integer(HoursSpinner, 0, Integer.MAX_VALUE, 1, false);
                 Util.custom_spinner_integer(MinutesSpinner, 0, 59, 1, false);
-                practicedminutes = SelectedMeditatable.getTotalMinutesPracticed(false);
+                practicedminutes = SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false);
                 DecimalHoursTextField.setText(Util.convert_minstodecimalhours(practicedminutes, 1).toString());
-            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
         }
 
         public boolean shouldSetgoal() {
@@ -2576,14 +1694,14 @@ public class MainController implements Initializable {
         }
         public void accept(ActionEvent actionEvent) {
             if (((HoursSpinner.getValue() * 60) + MinutesSpinner.getValue()) <= practicedminutes) {
-                Util.gui_showinformationdialog(Root, "Cannot Accept", "Goal Is Less Than Or Equal To Practiced Minutes", "Goal Must Be Greater Than Practiced Minutes");
+                gui_showinformationdialog("Cannot Accept", "Goal Is Less Than Or Equal To Practiced Minutes", "Goal Must Be Greater Than Practiced Minutes");
                 return;
             }
             setgoal = true;
         }
 
     }
-    public static class GoalPacingDialog extends Stage {
+    class GoalPacingDialog extends Stage {
         public Spinner<Integer> PracticeDays;
         public TextField PracticeTimeADay;
         public TextField GoalDuration;
@@ -2591,23 +1709,21 @@ public class MainController implements Initializable {
         public TextField GoalTimeLeft;
         public TextField TotalPracticedTime;
         public Label TopLabel;
-        private MainController Root;
         private Double practicedhours;
         private Double goalhours;
         private Double hoursleft;
 
-        public GoalPacingDialog(MainController root, Meditatable meditatable) {
+        public GoalPacingDialog() {
             try {
-                Root = root;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalPacingDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                getOptions().setStyle(this);
                 this.setResizable(false);
                 setTitle("Goal Pacing");
-                practicedhours = (double) (meditatable.getTotalMinutesPracticed(false) / 60);
-                goalhours = meditatable.getCurrentGoal().getGoal_Hours();
+                practicedhours = (double) (SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false) / 60);
+                goalhours = SessionsAndGoalsSelectedMeditatable.getCurrentGoal().getGoal_Hours();
                 GoalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(goalhours * 3_600_000), GoalDuration.getLayoutBounds().getWidth()));
                 TotalPracticedTime.setText(Util.formatdurationtoStringSpelledOut(new Duration(practicedhours * 3600000), TotalPracticedTime.getLayoutBounds().getWidth()));
                 hoursleft = goalhours - practicedhours;
@@ -2615,8 +1731,8 @@ public class MainController implements Initializable {
                 Util.custom_spinner_integer(PracticeDays, 1, Integer.MAX_VALUE, 1, false);
                 PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> calculate());
                 PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
-                TopLabel.setText("Goal Pacing For " + meditatable.name + " Current Goal");
-            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
+                TopLabel.setText("Goal Pacing For " + SessionsAndGoalsSelectedMeditatable.name + " Current Goal");
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
         }
 
         // Other Methods
@@ -2627,7 +1743,7 @@ public class MainController implements Initializable {
             PracticeTimeADay.setText(Util.formatdurationtoStringSpelledOut(new Duration((minsaday * 60) * 1000), PracticeTimeADay.getLayoutBounds().getWidth()));
         }
     }
-    public static class AllSessionsDetails extends Stage {
+    class AllSessionsDetails extends Stage {
         // All Session Totals Tab Fields
         public BarChart<String, Number> SessionTotalsBarGraph;
         public javafx.scene.chart.CategoryAxis CategoryAxis;
@@ -2689,19 +1805,17 @@ public class MainController implements Initializable {
         private List<Session> allsessionslist;
         private List<Session> filteredsessionlist;
         private ObservableList<SessionRow> sessionrowlist = FXCollections.observableArrayList();
-        private MainController Root;
 
-        public AllSessionsDetails(MainController root) {
-            Root = root;
-            allsessionslist = Root.getSessions().getSession();
+        public AllSessionsDetails() {
+            allsessionslist = getSessions().getSession();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails_All.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                getOptions().setStyle(this);
                 this.setResizable(false);
-            } catch (IOException e) {new ExceptionDialog(Root, e).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
             setTitle("Session List");
             DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
             DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
@@ -2756,7 +1870,7 @@ public class MainController implements Initializable {
             ObservableList<TotalProgressRow> totalprogressrows = FXCollections.observableArrayList();
             ObservableList<PieChart.Data> piecesofthepie = FXCollections.observableArrayList();
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            for (Meditatable i : Root.getSession().getAllMeditatablesincludingTotalforTracking()) {
+            for (Meditatable i : getSession().getAllMeditatablesincludingTotalforTracking()) {
                 if (! (i instanceof Total)) {
                     series.getData().add(new XYChart.Data<>(i.getNameForChart(), Util.convert_minstodecimalhours(i.getTotalMinutesPracticed(false), 1)));
                     piecesofthepie.add(new PieChart.Data(i.getNameForChart(), Util.convert_minstodecimalhours(i.getTotalMinutesPracticed(false), 1)));
@@ -2804,7 +1918,8 @@ public class MainController implements Initializable {
         public void viewsessiondetails(ActionEvent actionEvent) {
             int index = sessionsTableView.getSelectionModel().getSelectedIndex();
             if (index != -1) {
-                new SessionDetails(Root, filteredsessionlist.get(index)).showAndWait();
+                sessions_gui_displaysessionlist(null);
+                new SessionDetails(filteredsessionlist.get(index)).showAndWait();
             }
         }
         public void filterbydateselected(ActionEvent actionEvent) {
@@ -2886,314 +2001,637 @@ public class MainController implements Initializable {
             }
         }
     }
-    public static class ExportDialog extends Stage {
-        private File finalexportfile;
-        private File tempentrainmenttextfile;
-        private File tempambiencetextfile;
-        private File tempentrainmentfile;
-        private File tempambiencefile;
-        private File finalentrainmentfile;
-        private File finalambiencefile;
+    class AdvancedAmbienceEditor extends Stage implements Initializable {
+        public Button RightArrow;
+        public Button LeftArrow;
+        public ChoiceBox<String> MeditatableSelectionBox;
+        public TableView<AmbienceSong> Actual_Table;
+        public TableColumn<AmbienceSong, String> Actual_NameColumn;
+        public TableColumn<AmbienceSong, String> Actual_DurationColumn;
+        public TextField Actual_TotalDuration;
+        public Button Actual_AddButton;
+        public Button Actual_RemoveButton;
+        public Button Actual_PreviewButton;
+        public TableView<AmbienceSong> Temp_Table;
+        public TableColumn<AmbienceSong, String> Temp_NameColumn;
+        public TableColumn<AmbienceSong, String> Temp_DurationColumn;
+        public TextField Temp_TotalDuration;
+        public Button Temp_AddButton;
+        public Button Temp_RemoveButton;
+        public Button Temp_PreviewButton;
+        public Button SaveButton;
+        public Button CloseButton;
+        public Button SwitchToSimpleEditor;
+        private ObservableList<AmbienceSong> actual_ambiencesonglist = FXCollections.observableArrayList();
+        private ArrayList<SoundFile> actual_soundfilelist;
+        private ObservableList<AmbienceSong> temp_ambiencesonglist = FXCollections.observableArrayList();
+        private ArrayList<SoundFile> temp_soundfilelist;
+        private AmbienceSong selected_temp_ambiencesong;
+        private AmbienceSong selected_actual_ambiencesong;
+        private double temptotalduration;
+        private double actualtotalduration;
+        private Meditatable selectedmeditatable;
+        private File tempdirectory;
+        private PreviewFile previewdialog;
+        private Ambience selectedambience;
 
-
-        public ExportDialog() {
-
+        @Override
+        public void initialize(URL location, ResourceBundle resources) {
+            Temp_NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+            Temp_DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
+            Actual_NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+            Actual_DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
+            Temp_Table.getSelectionModel().selectedItemProperty().addListener(
+                    (observable, oldValue, newValue) -> tempselectionchanged(newValue));
+            Actual_Table.getSelectionModel().selectedItemProperty().addListener(
+                    (observable, oldValue, newValue) -> actualselectionchanged(newValue));
+            ObservableList<String> allnames = FXCollections.observableArrayList();
+            allnames.addAll(kujiin.xml.Options.ALLNAMES);
+            MeditatableSelectionBox.setItems(allnames);
+            Actual_TotalDuration.setEditable(false);
+            Temp_TotalDuration.setEditable(false);
         }
 
-
-    }
-    public static class PlayerUI extends Stage {
-        public Button PlayButton;
-        public Button PauseButton;
-        public Button StopButton;
-        public Label StatusBar;
-        public RadioButton ReferenceHTMLButton;
-        public RadioButton ReferenceTXTButton;
-        public Slider EntrainmentVolume;
-        public Label EntrainmentVolumePercentage;
-        public Slider AmbienceVolume;
-        public Label AmbienceVolumePercentage;
-        public Label CurrentCutTopLabel;
-        public Label CutCurrentLabel;
-        public ProgressBar CurrentCutProgress;
-        public Label CutTotalLabel;
-        public Label TotalCurrentLabel;
-        public ProgressBar TotalProgress;
-        public Label TotalTotalLabel;
-        public Label TotalSessionLabel;
-        public Label GoalTopLabel;
-        public ProgressBar GoalProgressBar;
-        public ToggleButton ReferenceToggleButton;
-        public Label GoalPercentageLabel;
-        private This_Session Session;
-        private MainController Root;
-        public boolean displaynormaltime = true;
-
-        // TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
-        // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
-        // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
-        // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
-        // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
-        public PlayerUI(MainController root) {
+        public AdvancedAmbienceEditor() {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Advanced.fxml"));
+            fxmlLoader.setController(this);
             try {
-                Root = root;
-                Session = Root.getSession();
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionPlayerDialog.fxml"));
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                getOptions().setStyle(this);
+                this.setResizable(false);
+                this.setOnCloseRequest(event -> {
+
+                });
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
+            setTitle("Advanced Ambience Editor");
+            MeditatableSelectionBox.setOnAction(event -> selectandloadcut());
+            tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
+        }
+        public AdvancedAmbienceEditor(Meditatable meditatable) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Advanced.fxml"));
+            fxmlLoader.setController(this);
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                getOptions().setStyle(this);
+                this.setResizable(false);
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
+            setTitle("Advanced Ambience Editor");
+            MeditatableSelectionBox.setOnAction(event -> selectandloadcut());
+            MeditatableSelectionBox.getSelectionModel().select(meditatable.number);
+            tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
+        }
+
+        // Transfer Methods
+        // TODO Add Check Duplicates Before Moving Over (Or Ask Allow Duplicates?)
+        public void rightarrowpressed(ActionEvent actionEvent) {
+            // Transfer To Current Cut (use Task)
+            if (selected_temp_ambiencesong != null && selectedmeditatable != null) {
+                if (! Actual_Table.getItems().contains(selected_temp_ambiencesong)) {
+                    int tempindex = Temp_Table.getItems().indexOf(selected_actual_ambiencesong);
+                    actual_ambiencesonglist.add(temp_ambiencesonglist.get(tempindex));
+                    actual_soundfilelist.add(temp_soundfilelist.get(tempindex));
+                    Actual_Table.getItems().add(selected_temp_ambiencesong);
+                    calculateactualtotalduration();
+                }
+            } else {
+                if (selected_temp_ambiencesong == null) {
+                    gui_showinformationdialog("Information", "Cannot Transfer", "Nothing Selected");}
+                else {
+                    gui_showinformationdialog("Information", "Cannot Transfer", "No Cut Selected");}
+            }
+        }
+        public void leftarrowpressed(ActionEvent actionEvent) {
+            if (selected_actual_ambiencesong != null && selectedmeditatable != null) {
+                if (! Temp_Table.getItems().contains(selected_actual_ambiencesong)) {
+                    int actualindex = Actual_Table.getItems().indexOf(selected_actual_ambiencesong);
+                    temp_ambiencesonglist.add(actual_ambiencesonglist.get(actualindex));
+                    temp_soundfilelist.add(actual_soundfilelist.get(actualindex));
+                    Temp_Table.getItems().add(selected_actual_ambiencesong);
+                    calculatetemptotalduration();
+                }
+            }
+        }
+
+        // Temp Ambience Methods
+        public void addtotempambience(ActionEvent actionEvent) {
+            if (temp_soundfilelist == null) {temp_soundfilelist = new ArrayList<>();}
+            if (temp_ambiencesonglist == null) {temp_ambiencesonglist = FXCollections.observableArrayList();}
+            addto(Temp_Table, temp_soundfilelist, temp_ambiencesonglist);}
+        public void removefromtempambience(ActionEvent actionEvent) {removefrom(Temp_Table, temp_soundfilelist, temp_ambiencesonglist);}
+        public void previewtempambience(ActionEvent actionEvent) {preview(selected_temp_ambiencesong);}
+        public void tempselectionchanged(AmbienceSong ambiencesong) {
+            selected_temp_ambiencesong = ambiencesong;
+        }
+        public void calculatetemptotalduration() {
+            temptotalduration = 0.0;
+            for (AmbienceSong i : Temp_Table.getItems()) {
+                temptotalduration += i.getDuration();
+            }
+            Temp_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(temptotalduration), Temp_TotalDuration.getLayoutBounds().getWidth()));
+        }
+        public void deletetempambiencefromdirectory() {
+            try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
+        }
+
+        // Actual Ambience Methods
+        public void addtoactualambience(ActionEvent actionEvent) {
+            if (actual_soundfilelist == null) {actual_soundfilelist = new ArrayList<>();}
+            if (actual_ambiencesonglist == null) {actual_ambiencesonglist = FXCollections.observableArrayList();}
+            addto(Actual_Table, actual_soundfilelist, actual_ambiencesonglist);}
+        public void removeactualambience(ActionEvent actionEvent) {removefrom(Actual_Table, actual_soundfilelist, actual_ambiencesonglist);}
+        public void previewactualambience(ActionEvent actionEvent) {preview(selected_actual_ambiencesong);}
+        public void actualselectionchanged(AmbienceSong ambiencesong) {selected_actual_ambiencesong = ambiencesong;}
+        public void calculateactualtotalduration() {
+            actualtotalduration = 0.0;
+            for (AmbienceSong i : Actual_Table.getItems()) {
+                actualtotalduration += i.getDuration();
+            }
+            Actual_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(actualtotalduration), Actual_TotalDuration.getLayoutBounds().getWidth()));
+        }
+
+        // Table Methods
+        public void selectandloadcut() {
+            int index = MeditatableSelectionBox.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                selectedambience = getSession().getAmbiences().getmeditatableAmbience(index);
+                if (actual_ambiencesonglist == null) {actual_ambiencesonglist = FXCollections.observableArrayList();}
+                else {actual_ambiencesonglist.clear();}
+                if (actual_soundfilelist == null) {actual_soundfilelist = new ArrayList<>();}
+                else {actual_soundfilelist.clear();}
+                Actual_Table.getItems().clear();
+                selectedmeditatable = Session.getAllMeditatables().get(index);
+                if (populateactualambiencetable()) {
+                    Actual_Table.setItems(actual_ambiencesonglist);
+                }
+                calculateactualtotalduration();
+            }
+        }
+        private void addto(TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
+            List<File> files = Util.filechooser_multiple(getScene(), "Add Files", null);
+            ArrayList<File> notvalidfilenames = new ArrayList<>();
+            if (files != null) {
+                for (File i : files) {
+                    SoundFile soundFile = new SoundFile(i);
+                    if (soundFile.isValid()) {
+                        addandcalculateduration(soundFile, table, soundfilelist, songlist);
+                    } else {notvalidfilenames.add(i);}
+                }
+                if (notvalidfilenames.size() > 0) {
+                    gui_showinformationdialog("Files Couldn't Be Added", "These Files Couldn't Be Added", notvalidfilenames.toString());}
+            }
+        }
+        public void addandcalculateduration(SoundFile soundFile, TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
+            MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
+            calculatedurationplayer.setOnReady(() -> {
+                soundFile.setDuration(calculatedurationplayer.getTotalDuration().toMillis());
+                calculatedurationplayer.dispose();
+                soundfilelist.add(soundFile);
+                AmbienceSong tempsong = new AmbienceSong(soundFile);
+                songlist.add(tempsong);
+                table.getItems().add(tempsong);
+                calculateactualtotalduration();
+                calculatetemptotalduration();
+            });
+        }
+        private void removefrom(TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
+            int index = table.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                SoundFile soundFile = soundfilelist.get(index);
+                if (gui_getokcancelconfirmationdialog("Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
+                    soundFile.getFile().delete();
+                }
+                table.getItems().remove(index);
+                soundfilelist.remove(index);
+                songlist.remove(index);
+                calculateactualtotalduration();
+                calculatetemptotalduration();
+            }
+            else {
+                gui_showinformationdialog("Information", "Nothing Selected", "Select A Table Item To Remove");}
+        }
+        private void preview(AmbienceSong selectedsong) {
+            if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
+                if (previewdialog == null || !previewdialog.isShowing()) {
+                    previewdialog = new PreviewFile(selectedsong.getFile());
+                    previewdialog.showAndWait();
+                }
+            }
+        }
+        private boolean populateactualambiencetable() {
+            actual_ambiencesonglist.clear();
+            if (selectedmeditatable != null) {
+                try {
+                    if (selectedambience.getAmbience() == null) {return false;}
+                    for (SoundFile i : selectedambience.getAmbience()) {
+                        actual_soundfilelist.add(i);
+                        actual_ambiencesonglist.add(new AmbienceSong(i));
+                    }
+                    return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    gui_showinformationdialog("Information", selectedmeditatable + " Has No Ambience", "Please Add Ambience To " + selectedmeditatable);
+                    return false;
+                }
+            } else {
+                gui_showinformationdialog("Information", "No Cut Loaded", "Load A Cut's Ambience First");
+                return false;
+            }
+        }
+
+        // Dialog Methods
+        public boolean unsavedchanges() {
+            if (MeditatableSelectionBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
+            try {
+                if (actual_soundfilelist.size() != selectedambience.getAmbience().size()) {return true;}
+                List<SoundFile> ambiencelist = selectedambience.getAmbience();
+                for (SoundFile x : actual_soundfilelist) {
+                    if (! ambiencelist.contains(x)) {return true;}
+                }
+                return false;
+            } catch (NullPointerException ignored) {return false;}
+        }
+        public void save(ActionEvent actionEvent) {
+            int index = MeditatableSelectionBox.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                for (SoundFile i : actual_soundfilelist) {
+                    if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
+                }
+                getSession().getAmbiences().setmeditatableAmbience(index, selectedambience);
+                getSession().getAmbiences().marshall();
+                gui_showinformationdialog("Saved", "Ambience Saved To " + selectedmeditatable, "");
+            } else {
+                gui_showinformationdialog("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
+        }
+        public void closebuttonpressed(ActionEvent actionEvent) {
+            if (unsavedchanges()) {
+                if (gui_getokcancelconfirmationdialog("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Closing?")) {save(null);}
+                else {return;}
+            }
+            close();
+        }
+        public void switchtosimple(ActionEvent actionEvent) {
+            if (unsavedchanges()) {
+                if (gui_getokcancelconfirmationdialog("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Switching To Simple Mode?")) {save(null);}
+            }
+            this.close();
+            deletetempambiencefromdirectory();
+            if (selected_temp_ambiencesong != null && selectedmeditatable != null) {
+                new SimpleAmbienceEditor(selectedmeditatable).show();
+            } else {new SimpleAmbienceEditor().show();}
+        }
+    }
+    class SimpleAmbienceEditor extends Stage implements Initializable {
+        public TableView<AmbienceSong> AmbienceTable;
+        public TableColumn<AmbienceSong, String> NameColumn;
+        public TableColumn<AmbienceSong, String> DurationColumn;
+        public ChoiceBox<String> MeditatableChoiceBox;
+        public Button SaveButton;
+        public Button CloseButton;
+        public Button AddButton;
+        public Button RemoveButton;
+        public Button PreviewButton;
+        public TextField TotalDuration;
+        public Button AdvancedButton;
+        private ObservableList<AmbienceSong> AmbienceList;
+        private ArrayList<SoundFile> SoundList;
+        private AmbienceSong selectedambiencesong;
+        private Meditatable selectedmeditatable;
+        private PreviewFile previewdialog;
+        private Ambience selectedambience;
+        private double totalselectedduration;
+
+        @Override
+        public void initialize(URL location, ResourceBundle resources) {
+            NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+            DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
+            AmbienceTable.getSelectionModel().selectedItemProperty().addListener(
+                    (observable, oldValue, newValue) -> tableselectionchanged(newValue));
+            ObservableList<String> allnames = FXCollections.observableArrayList();
+            allnames.addAll(kujiin.xml.Options.ALLNAMES);
+            MeditatableChoiceBox.setItems(allnames);
+        }
+
+        public SimpleAmbienceEditor() {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Simple.fxml"));
+            fxmlLoader.setController(this);
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                getOptions().setStyle(this);
+                this.setResizable(false);
+                setTitle("Simple Ambience Editor");
+            } catch (IOException ignored) {}
+            MeditatableChoiceBox.setOnAction(event -> selectandloadcut());
+            NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
+        }
+        public SimpleAmbienceEditor(Meditatable meditatable) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Simple.fxml"));
+            fxmlLoader.setController(this);
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                getOptions().setStyle(this);
+                this.setResizable(false);
+                setTitle("Simple Ambience Editor");
+            } catch (IOException ignored) {}
+            setOnShowing(event -> {
+                MeditatableChoiceBox.getSelectionModel().select(meditatable.number);
+                selectandloadcut();
+            });
+            MeditatableChoiceBox.setOnAction(event -> selectandloadcut());
+        }
+
+        // Table Methods
+        public void tableselectionchanged(AmbienceSong ambienceSong) {selectedambiencesong = ambienceSong;}
+        public void selectandloadcut() {
+            int index = MeditatableChoiceBox.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                selectedambience = getSession().getAmbiences().getmeditatableAmbience(index);
+                if (AmbienceList == null) {AmbienceList = FXCollections.observableArrayList();}
+                else {AmbienceList.clear();}
+                if (SoundList == null) {SoundList = new ArrayList<>();}
+                else {SoundList.clear();}
+                AmbienceTable.getItems().clear();
+                selectedmeditatable = Session.getAllMeditatables().get(index);
+                if (populateactualambiencetable()) {
+                    AmbienceTable.setItems(AmbienceList);
+                }
+                calculatetotalduration();
+            }
+        }
+        public void add() {
+            List<File> filesselected = new FileChooser().showOpenMultipleDialog(null);
+            List<File> notvalidfilenames = new ArrayList<>();
+            if (filesselected == null || filesselected.size() == 0) {return;}
+            for (File i : filesselected) {
+                for (String x : Util.SUPPORTEDAUDIOFORMATS) {
+                    if (i.getName().endsWith(x)) {
+                        if (Util.audio_getduration(i) != 0.0) {AmbienceList.add(new AmbienceSong(new SoundFile(i))); break;}
+                    }
+                }
+                if (! i.equals(AmbienceList.get(AmbienceList.size() - 1).getFile())) {notvalidfilenames.add(i);}
+            }
+            if (notvalidfilenames.size() > 0) {
+                gui_showinformationdialog("Information", notvalidfilenames.size() + " Files Weren't Added Because They Are Unsupported", "");
+            }
+        }
+        public void addfiles(ActionEvent actionEvent) {
+            List<File> files = Util.filechooser_multiple(getScene(), "Add Files", null);
+            ArrayList<File> notvalidfilenames = new ArrayList<>();
+            if (files != null) {
+                for (File i : files) {
+                    SoundFile soundFile = new SoundFile(i);
+                    if (soundFile.isValid()) {
+                        addandcalculateduration(soundFile);
+                    }
+                    else {notvalidfilenames.add(i);}
+                }
+                if (notvalidfilenames.size() > 0) {
+                    gui_showinformationdialog("Couldn't Add Files", "Supported Audio Formats: " + Util.audio_getsupportedText(), "Couldn't Add " + notvalidfilenames.size() + "Files");
+                }
+            }
+            if (AmbienceList.size() > 0) {AmbienceTable.setItems(AmbienceList);}
+        }
+        public void addandcalculateduration(SoundFile soundFile) {
+            MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
+            calculatedurationplayer.setOnReady(() -> {
+                soundFile.setDuration(calculatedurationplayer.getTotalDuration().toMillis());
+                calculatedurationplayer.dispose();
+                SoundList.add(soundFile);
+                AmbienceSong tempsong = new AmbienceSong(soundFile);
+                AmbienceList.add(tempsong);
+                AmbienceTable.getItems().add(tempsong);
+                calculatetotalduration();
+            });
+        }
+        public void remove(ActionEvent actionEvent) {
+            int index = AmbienceTable.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                SoundFile soundFile = SoundList.get(index);
+                if (gui_getokcancelconfirmationdialog("Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
+                    soundFile.getFile().delete();
+                }
+                AmbienceTable.getItems().remove(index);
+                AmbienceList.remove(index);
+                SoundList.remove(index);
+                calculatetotalduration();
+            }
+            else {
+                gui_showinformationdialog("Information", "Nothing Selected", "Select A Table Item To Remove");}
+        }
+        public void preview(ActionEvent actionEvent) {
+            if (selectedambiencesong != null && selectedambiencesong.getFile() != null && selectedambiencesong.getFile().exists()) {
+                if (previewdialog == null || !previewdialog.isShowing()) {
+                    previewdialog = new PreviewFile(selectedambiencesong.getFile());
+                    previewdialog.showAndWait();
+                }
+            }
+        }
+        public boolean populateactualambiencetable() {
+            AmbienceList.clear();
+            if (selectedmeditatable != null) {
+                try {
+                    if (selectedambience.getAmbience() == null) {return false;}
+                    for (SoundFile i : selectedambience.getAmbience()) {
+                        SoundList.add(i);
+                        AmbienceList.add(new AmbienceSong(i));
+                    }
+                    return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    gui_showinformationdialog("Information", selectedmeditatable + " Has No Ambience", "Please Add Ambience To " + selectedmeditatable);
+                    return false;
+                }
+            } else {
+                gui_showinformationdialog("Information", "No Cut Loaded", "Load A Cut's Ambience First");
+                return false;
+            }
+        }
+        public void calculatetotalduration() {
+            totalselectedduration = 0.0;
+            for (AmbienceSong i : AmbienceTable.getItems()) {
+                totalselectedduration += i.getDuration();
+            }
+            TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(totalselectedduration), TotalDuration.getLayoutBounds().getWidth()));
+        }
+        public boolean unsavedchanges() {
+            if (MeditatableChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
+            try {
+                if (SoundList.size() != selectedambience.getAmbience().size()) {return true;}
+                List<SoundFile> ambiencelist = selectedambience.getAmbience();
+                for (SoundFile x : SoundList) {
+                    if (! ambiencelist.contains(x)) {return true;}
+                }
+                return false;
+            } catch (NullPointerException ignored) {return false;}
+        }
+
+        // Dialog Methods
+        public void advancedmode(ActionEvent actionEvent) {
+            if (unsavedchanges()) {
+                if (gui_getokcancelconfirmationdialog("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Switching To Advanced Mode?")) {save(null);}
+            }
+            this.close();
+            if (selectedmeditatable != null) {
+                new AdvancedAmbienceEditor(selectedmeditatable).show();
+            } else {new AdvancedAmbienceEditor().show();}
+        }
+        public void save(ActionEvent actionEvent) {
+            int index = MeditatableChoiceBox.getSelectionModel().getSelectedIndex();
+            if (index != -1) {
+                for (SoundFile i : SoundList) {
+                    if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
+                }
+                getSession().getAmbiences().setmeditatableAmbience(index, selectedambience);
+                getSession().getAmbiences().marshall();
+                gui_showinformationdialog("Saved", "Ambience Saved To " + selectedmeditatable, "");
+            } else {
+                gui_showinformationdialog("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
+        }
+        public void closedialog(ActionEvent actionEvent) {
+            if (unsavedchanges()) {
+                if (gui_getokcancelconfirmationdialog("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Closing?")) {save(null);}
+                else {return;}
+            }
+            close();
+        }
+    }
+    class SessionDetails extends Stage {
+        public BarChart<String, java.lang.Number> SessionBarChart;
+        public CategoryAxis SessionCategoryAxis;
+        public NumberAxis SessionNumbersAxis;
+        public TextField DatePracticedTextField;
+        public TextField SessionDurationTextField;
+        public Button CloseButton;
+        public Label GoalsCompletedTopLabel;
+        public ListView<String> GoalsCompletedListView;
+
+        public SessionDetails() {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionCompleteDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions();
-                Root.getOptions().setStyle(this);
-                setTitle("Session Player");
-                reset();
-                boolean referenceoption = Root.getOptions().getSessionOptions().getReferenceoption();
-                ReferenceType referenceType = Root.getOptions().getSessionOptions().getReferencetype();
-                if (referenceoption && referenceType != null && Session.checkallreferencefilesforsession(referenceType, false)) {ReferenceToggleButton.setSelected(true);}
-                else {ReferenceToggleButton.setSelected(false);}
-                togglereference(null);
-                ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
-                setResizable(false);
-                CutTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
-                TotalTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
-                setOnCloseRequest(event -> {
-                    if (Session.getPlayerState() == PlayerState.PLAYING || Session.getPlayerState() == PlayerState.STOPPED || Session.getPlayerState() == PlayerState.PAUSED || Session.getPlayerState() == PlayerState.IDLE) {
-                        if (Session.endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}
-                    } else {
-                        Util.gui_showtimedmessageonlabel(StatusBar, "Cannot Close Player During Fade Animation", 400);
-                        new Timeline(new KeyFrame(Duration.millis(400), ae -> Session.getCurrentmeditatable().toggleplayerbuttons()));
-                        event.consume();
+                getOptions().setStyle(this);
+                this.setResizable(false);
+                SessionNumbersAxis.setLabel("Minutes");
+                setTitle("Session Details");
+                XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
+                Duration totalsessionduration = new Duration(0);
+                ObservableList<String> completedgoalsitems = FXCollections.observableArrayList();
+                for (Meditatable i : getSession().getallitemsinSession()) {
+                    series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getduration().toMinutes()));
+                    totalsessionduration.add(i.getduration());
+                    for (Goals.Goal x : i.getGoalsCompletedThisSession()) {
+                        completedgoalsitems.add(String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getduration().toHours()));
                     }
-                });
-            } catch (Exception e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-        }
-
-        // Button Actions
-        public void play() {Session.play(this);}
-        public void pause() {Session.pause();}
-        public void stop() {Session.stop();}
-        public void togglereference(ActionEvent actionEvent) {
-            boolean buttontoggled = ReferenceToggleButton.isSelected();
-            Root.getOptions().getSessionOptions().setReferenceoption(buttontoggled);
-            ReferenceHTMLButton.setDisable(! buttontoggled);
-            ReferenceTXTButton.setDisable(! buttontoggled);
-            if (! buttontoggled) {
-                ReferenceHTMLButton.setSelected(false);
-                ReferenceTXTButton.setSelected(false);
-                Root.getOptions().getSessionOptions().setReferencetype(null);
-                Session.closereferencefile();
-                Session.togglevolumebinding();
-            } else {
-                if (Root.getOptions().getSessionOptions().getReferencetype() == null) {Root.getOptions().getSessionOptions().setReferencetype(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);}
-                switch (Root.getOptions().getSessionOptions().getReferencetype()) {
-                    case html:
-                        ReferenceHTMLButton.setSelected(true);
-                        htmlreferenceoptionselected(null);
-                        break;
-                    case txt:
-                        ReferenceTXTButton.setSelected(true);
-                        txtreferenceoptionselected(null);
-                        break;
                 }
-                if (! Session.checkallreferencefilesforsession(Root.getOptions().getSessionOptions().getReferencetype(), true)) {
-                    ReferenceToggleButton.setSelected(false);
-                    togglereference(null);
+                if (completedgoalsitems.size() > 0) {
+                    GoalsCompletedTopLabel.setText(completedgoalsitems.size() + " Goals Completed This Session");
+                    GoalsCompletedListView.setItems(completedgoalsitems);
                 }
-                if (Session.getPlayerState() == PlayerState.PLAYING) {
-                    Session.displayreferencefile();
-                    Session.togglevolumebinding();
-                }
-            }
+                else {GoalsCompletedTopLabel.setText("No Goals Completed This Session");}
+                SessionBarChart.getData().add(series);
+                SessionBarChart.setLegendVisible(false);
+                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(totalsessionduration, SessionDurationTextField.getLayoutBounds().getWidth()));
+                SessionDurationTextField.setEditable(false);
+                SessionBarChart.requestFocus();
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
         }
-        public void htmlreferenceoptionselected(ActionEvent actionEvent) {
-            if (ReferenceToggleButton.isSelected()) {
-                ReferenceTXTButton.setSelected(! ReferenceHTMLButton.isSelected());
-                if (ReferenceHTMLButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
-                else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
-            } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
-        }
-        public void txtreferenceoptionselected(ActionEvent actionEvent) {
-            if (ReferenceToggleButton.isSelected()) {
-                ReferenceHTMLButton.setSelected(! ReferenceTXTButton.isSelected());
-                if (ReferenceTXTButton.isSelected()) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
-                else {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
-            } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
-        }
-        public void cleanupPlayer() {}
-        public void reset() {
-            CutCurrentLabel.setText("--:--");
-            CurrentCutProgress.setProgress(0.0);
-            CutTotalLabel.setText("--:--");
-            TotalCurrentLabel.setText("--:--");
-            TotalProgress.setProgress(0.0);
-            TotalTotalLabel.setText("--:--");
-            EntrainmentVolume.setDisable(true);
-            EntrainmentVolumePercentage.setText("0%");
-            AmbienceVolume.setDisable(true);
-            AmbienceVolumePercentage.setText("0%");
-            // TODO Reset Goal UI Here
-            PlayButton.setText("Start");
-            PauseButton.setDisable(true);
-            StopButton.setDisable(true);
-        }
-
-        // Dialogs
-        public static class DisplayReference extends Stage {
-            public ScrollPane ContentPane;
-            public Slider EntrainmentVolumeSlider;
-            public Label EntrainmentVolumePercentage;
-            public Slider AmbienceVolumeSlider;
-            public Label AmbienceVolumePercentage;
-            public Button PlayButton;
-            public Button PauseButton;
-            public Button StopButton;
-            public ProgressBar TotalProgress;
-            public ProgressBar CurrentProgress;
-            public Label CurrentName;
-            public Label CurrentPercentage;
-            public Label TotalPercentage;
-            private MainController Root;
-            private Meditatable currentmeditatable;
-            private ReferenceType referenceType;
-            private Boolean fullscreenoption;
-            private Scene scene;
-
-            public DisplayReference(MainController root, Meditatable currentmeditatable) {
-                try {
-                    Root = root;
-                    this.currentmeditatable = currentmeditatable;
-                    referenceType = Root.getOptions().getSessionOptions().getReferencetype();
-                    fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ReferenceDisplay.fxml"));
-                    fxmlLoader.setController(this);
-                    scene = new Scene(fxmlLoader.load());
-                    setScene(scene);
-                    Root.getOptions().setStyle(this);
-//                this.setResizable(false);
-                    setTitle(this.currentmeditatable.name + "'s Reference");
-                    setsizing();
-                    loadcontent();
-                    AmbienceVolumeSlider.setValue(Root.getPlayer().AmbienceVolume.getValue());
-                    AmbienceVolumePercentage.setText(Root.getPlayer().AmbienceVolumePercentage.getText());
-                    EntrainmentVolumeSlider.setValue(Root.getPlayer().EntrainmentVolume.getValue());
-                    EntrainmentVolumePercentage.setText(Root.getPlayer().EntrainmentVolumePercentage.getText());
-                    setOnCloseRequest(event -> untoggleplayerreference());
-                    if (Root.getSession().getCurrentindexofplayingelement() == 0) {
-                        setFullScreenExitHint("Press F11 To Toggle Fullscreen, ESC To Hide Reference");
-                    } else {setFullScreenExitHint("");}
-                    addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                        switch (event.getCode()) {
-                            case ESCAPE:
-                                // TODO Closing Reference Display On Escape Is Crashing The Whole App
-//                                hide();
-//                                untoggleplayerreference();
-//                                break;
-                            case F11:
-                                if (Root.getSession().getPlayerState() == PlayerState.PLAYING) {
-                                    boolean fullscreen = this.isFullScreen();
-                                    fullscreenoption = !fullscreen;
-                                    Root.getOptions().getSessionOptions().setReferencefullscreen(fullscreenoption);
-                                    setsizing();
-                                    if (!fullscreen) {setFullScreenExitHint("");}
-                                    break;
-                                }
-                        }
-                    });
-                } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-            }
-            public DisplayReference(MainController root, String htmlcontent) {
-                Root = root;
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferencePreview.fxml"));
+        public SessionDetails(kujiin.xml.Session session) {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails_Individual.fxml"));
                 fxmlLoader.setController(this);
-                try {
-                    scene = new Scene(fxmlLoader.load());
-                    setScene(scene);
-                    Root.getOptions().setStyle(this);
-                    this.setResizable(false);
-                } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
-                setTitle("Reference File Preview");
-                fullscreenoption = false;
-                setsizing();
-                WebView browser = new WebView();
-                WebEngine webEngine = browser.getEngine();
-                webEngine.setUserStyleSheetLocation(new File(kujiin.xml.Options.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
-                webEngine.loadContent(htmlcontent);
-                ContentPane.setContent(browser);
-            }
-
-            public void setsizing() {
-                Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-                double height = primaryScreenBounds.getHeight();
-                double width = primaryScreenBounds.getWidth();
-                if (! fullscreenoption) {height -= 100; width -= 100;}
-                this.setFullScreen(fullscreenoption);
-                this.setHeight(height);
-                this.setWidth(width);
-                this.centerOnScreen();
-                ContentPane.setFitToWidth(true);
-                ContentPane.setFitToHeight(true);
-                ContentPane.setStyle("-fx-background-color: #212526");
-            }
-            public void loadcontent() {
-                File referencefile = currentmeditatable.getReferenceFile();
-                if (referencefile != null) {
-                    switch (referenceType) {
-                        case txt:
-                            StringBuilder sb = new StringBuilder();
-                            try (FileInputStream fis = new FileInputStream(referencefile);
-                                 BufferedInputStream bis = new BufferedInputStream(fis)) {
-                                while (bis.available() > 0) {
-                                    sb.append((char) bis.read());
-                                }
-                            } catch (Exception e) {
-                                new MainController.ExceptionDialog(Root, e).showAndWait();
-                            }
-                            TextArea ta = new TextArea();
-                            ta.setText(sb.toString());
-                            ta.setWrapText(true);
-                            ContentPane.setContent(ta);
-                            Root.getOptions().setStyle(this);
-                            break;
-                        case html:
-                            WebView browser = new WebView();
-                            WebEngine webEngine = browser.getEngine();
-                            webEngine.load(referencefile.toURI().toString());
-                            webEngine.setUserStyleSheetLocation(new File(kujiin.xml.Options.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
-                            ContentPane.setContent(browser);
-                            break;
-                        default:
-                            break;
-                    }
-                } else {System.out.println("Reference File Is Null");}
-            }
-            public void untoggleplayerreference() {
-                Root.getPlayer().ReferenceToggleButton.setSelected(false);
-                Root.getPlayer().togglereference(null);
-            }
-
-            public void play(ActionEvent actionEvent) {Root.getSession().play(Root.getPlayer());}
-            public void pause(ActionEvent actionEvent) {Root.getSession().pause();}
-            public void stop(ActionEvent actionEvent) {Root.getSession().stop();}
-
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                getOptions().setStyle(this);
+                this.setResizable(false);
+                SessionNumbersAxis.setLabel("Minutes");
+                setTitle("Session Details");
+                DatePracticedTextField.setText(session.getDate_Practiced());
+                DatePracticedTextField.setEditable(false);
+                XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
+                List<Integer> values = new ArrayList<>();
+                for (int i = 0; i < 16; i++) {
+                    int duration = session.getcutduration(i);
+                    values.add(duration);
+                    String name;
+                    if (i == 0) {name = "Pre";}
+                    else if (i == 15) {name = "Post";}
+                    else {name = kujiin.xml.Options.ALLNAMES.get(i);}
+                    series.getData().add(new XYChart.Data<>(name, duration));
+                }
+                SessionBarChart.getData().add(series);
+                SessionBarChart.setLegendVisible(false);
+                SessionNumbersAxis.setUpperBound(Util.list_getmaxintegervalue(values));
+                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((session.getTotal_Session_Duration() * 60) * 1000), SessionDurationTextField.getLayoutBounds().getWidth()));
+                SessionDurationTextField.setEditable(false);
+                SessionBarChart.requestFocus();
+            } catch (IOException | NullPointerException e) {new ExceptionDialog(e).showAndWait();}
         }
 
+        public void closeDialog(ActionEvent actionEvent) {
+            close();
+        }
 
+        class CompletedGoalsAtEndOfSessionBinding {
+            private StringProperty cutname;
+            private StringProperty practicedhours;
+            private StringProperty goalhours;
+            private StringProperty dateset;
+            private IntegerProperty daysittooktocomplete;
+            private StringProperty datecompleted;
+
+            public CompletedGoalsAtEndOfSessionBinding(String cutname, String practicedhours, String goalhours, String dateset, int daysittooktocomplete, String datecompleted) {
+                this.cutname = new SimpleStringProperty(cutname);
+                this.practicedhours = new SimpleStringProperty(practicedhours);
+                this.goalhours = new SimpleStringProperty(goalhours);
+                this.dateset = new SimpleStringProperty(dateset);
+                this.daysittooktocomplete = new SimpleIntegerProperty(daysittooktocomplete);
+                this.datecompleted = new SimpleStringProperty(datecompleted);
+            }
+        }
     }
+// Table Classes
+    class AmbienceSong {
+    private StringProperty name;
+    private StringProperty length;
+    private File file;
+    private double duration;
+
+    public AmbienceSong(SoundFile soundFile) {
+        this.name = new SimpleStringProperty(soundFile.getName());
+        this.file = soundFile.getFile();
+        duration = soundFile.getDuration();
+        this.length = new SimpleStringProperty(Util.formatdurationtoStringSpelledOut(new Duration(duration), null));
+    }
+
+    public String getName() {
+        return name.getValue();
+    }
+    public File getFile() {
+        return file;
+    }
+    public double getDuration() {return duration;}
+}
+
+// Boilerplate Dialogs
     public static class SimpleTextDialogWithCancelButton extends Stage {
         public Button CancelButton;
         public Label Message;
         public Label TopTitle;
-        private MainController Root;
 
-        public SimpleTextDialogWithCancelButton(MainController root, String titletext, String toptitletext, String message) {
-            Root = root;
+        public SimpleTextDialogWithCancelButton(Options options, String titletext, String toptitletext, String message) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleTextDialogWithCancelButton.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                options.setStyle(this);
                 this.setResizable(false);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+            } catch (IOException ignored) {}
             setTitle(titletext);
             Message.setText(message);
             TopTitle.setText(toptitletext);
@@ -3203,32 +2641,19 @@ public class MainController implements Initializable {
         public Label Message;
         public ProgressIndicator Progress;
 
-        public LoadingDialog(MainController Root, String titletext, String message) {
+        public LoadingDialog(Options options, String titletext, String message) {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/LoadingDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                options.setStyle(this);
                 this.setResizable(false);
                 this.setOnCloseRequest(Event::consume);
-            } catch (IOException e) {new MainController.ExceptionDialog(Root, e).showAndWait();}
+            } catch (IOException e) {}
             setTitle(titletext);
             Message.setText(message);
         }
     }
 
-    // Enums
-    public enum ExporterState {
-        NOT_EXPORTED, WORKING, COMPLETED, FAILED, CANCELLED
-    }
-    public enum CreatorState {
-        NOT_CREATED, CREATED
-    }
-    public enum ReferenceType {
-        html, txt
-    }
-    public enum PlayerState {
-        PLAYING, PAUSED, STOPPED, TRANSITIONING, IDLE, FADING_PLAY, FADING_RESUME, FADING_PAUSE, FADING_STOP
-    }
 }

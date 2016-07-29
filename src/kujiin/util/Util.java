@@ -36,84 +36,6 @@ public class Util {
     public static void menu_contactme() {
 
     }
-
-// Gui Methods
-//     TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified (When It's Supposed To Be)
-    public static boolean gui_getokcancelconfirmationdialog(MainController root, String titletext, String headertext, String contenttext) {
-        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-        a.setTitle(titletext);
-        a.setHeaderText(headertext);
-        a.setContentText(contenttext);
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
-        Optional<ButtonType> answer = a.showAndWait();
-        return answer.isPresent() && answer.get() == ButtonType.OK;
-    }
-    public static AnswerType gui_getyesnocancelconfirmationdialog(MainController root, String titletext, String headertext, String contenttext) {
-        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-        a.setTitle(titletext);
-        a.setHeaderText(headertext);
-        a.setContentText(contenttext);
-        ButtonType yes = new ButtonType("Yes");
-        ButtonType no = new ButtonType("No");
-        ButtonType cancel = new ButtonType("Cancel");
-        a.getButtonTypes().clear();
-        a.getButtonTypes().add(yes);
-        a.getButtonTypes().add(no);
-        a.getButtonTypes().add(cancel);
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
-        Optional<ButtonType> answer = a.showAndWait();
-        if (answer.isPresent()) {
-            if (answer.get() == yes) {return AnswerType.YES;}
-            if (answer.get() == no) {return AnswerType.NO;}
-            if (answer.get() == cancel) {return AnswerType.CANCEL;}
-        }
-        return AnswerType.CANCEL;
-    }
-    public static AnswerType gui_getyesnocancelconfirmationdialog(MainController root, String titletext, String headertext, String contenttext, String yesbuttontext, String nobuttontext, String cancelbuttontext) {
-        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-        a.setTitle(titletext);
-        a.setHeaderText(headertext);
-        a.setContentText(contenttext);
-        ButtonType yes;
-        ButtonType no;
-        ButtonType cancel;
-        if (yesbuttontext != null) {yes = new ButtonType("Yes");} else {yes = new ButtonType(yesbuttontext);}
-        if (nobuttontext != null) {no = new ButtonType("No");} else {no = new ButtonType(nobuttontext);}
-        if (cancelbuttontext != null) {cancel = new ButtonType("Cancel");} else {cancel = new ButtonType(cancelbuttontext);}
-        a.getButtonTypes().clear();
-        a.getButtonTypes().add(yes);
-        a.getButtonTypes().add(no);
-        a.getButtonTypes().add(cancel);
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
-        Optional<ButtonType> answer = a.showAndWait();
-        if (answer.isPresent()) {
-            if (answer.get() == yes) {return AnswerType.YES;}
-            if (answer.get() == no) {return AnswerType.NO;}
-            if (answer.get() == cancel) {return AnswerType.CANCEL;}
-        }
-        return AnswerType.CANCEL;
-    }
-    public static void gui_showinformationdialog(MainController root, String titletext, String headertext, String contexttext) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setTitle(titletext);
-        a.setHeaderText(headertext);
-        a.setContentText(contexttext);
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
-        a.showAndWait();
-    }
-    public static void gui_showerrordialog(MainController root, String titletext, String headertext, String contenttext) {
-        Alert a = new Alert(Alert.AlertType.ERROR);
-        a.setTitle(titletext);
-        a.setHeaderText(headertext);
-        a.setContentText(contenttext);
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(root.getOptions().getAppearanceOptions().getThemefile());
-        a.showAndWait();
-    }
     public static void gui_showtimedmessageonlabel(Label label, String text, double millis) {
         label.setText(text);
         new Timeline(new KeyFrame(Duration.millis(millis), ae -> label.setText(""))).play();
@@ -464,12 +386,12 @@ public class Util {
     }
     public static File file_extensioncorrect(MainController root, String expectedextension, File filetocheck) {
         if (! filetocheck.getName().contains(".")) {
-            if (Util.gui_getokcancelconfirmationdialog(root, "Confirmation", "Invalid Extension", "Save As A ." + expectedextension + " File?")) {
+            if (root.gui_getokcancelconfirmationdialog("Confirmation", "Invalid Extension", "Save As A ." + expectedextension + " File?")) {
                 return new File(filetocheck.getAbsolutePath().concat("." + expectedextension));
             } else {return filetocheck;}
         } else {
             String extension = filetocheck.getName().substring(filetocheck.getName().lastIndexOf("."));
-            if (Util.gui_getokcancelconfirmationdialog(root, "Confirmation", "Invalid Extension " + extension, "Rename As ." + expectedextension + "?")) {
+            if (root.gui_getokcancelconfirmationdialog("Confirmation", "Invalid Extension " + extension, "Rename As ." + expectedextension + "?")) {
                 String filewithoutextension = filetocheck.getAbsolutePath().substring(0, filetocheck.getName().lastIndexOf("."));
                 return new File(filewithoutextension.concat("." + expectedextension));
             } else {
@@ -605,10 +527,7 @@ public class Util {
 //                }
             temptextfile.delete();
             return exitcode == 0;
-        } catch (IOException | InterruptedException e) {
-            new MainController.ExceptionDialog(null, e);
-            return false;
-        }
+        } catch (IOException | InterruptedException e) {return false;}
     }
     public static boolean audio_mixfiles(ArrayList<File> filestomix, File outputfile) {
         try {
@@ -636,7 +555,7 @@ public class Util {
             System.out.println("Finished Mixing Audio. Exited With Code" + exitcode);
             return exitcode == 0;
         } catch (IOException | InterruptedException e) {
-            new MainController.ExceptionDialog(null, e);
+//            new MainController.ExceptionDialog(null, e);
             return false;
         }
     }
@@ -662,7 +581,7 @@ public class Util {
             tempfile.delete();
             return exitcode == 0;
         } catch (IOException | InterruptedException e) {
-            new MainController.ExceptionDialog(null, e);
+//            new MainController.ExceptionDialog(null, e);
             return false;
         }
     }
