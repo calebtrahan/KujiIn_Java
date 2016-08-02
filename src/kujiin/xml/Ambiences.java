@@ -160,7 +160,7 @@ public class Ambiences {
                 setVoid(ambiences.getVoid());
                 setPostsession(ambiences.getPostsession());
             } catch (JAXBException e) {
-                Root.gui_showinformationdialog("Information", "Couldn't Read Ambience XML File", "Check Read File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());
+                Root.displayDialog_Information("Information", "Couldn't Read Ambience XML File", "Check Read File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());
             }
         } else {
             for (int i = 0; i < AllAmbiences.size(); i++) {
@@ -178,7 +178,7 @@ public class Ambiences {
             createMarshaller.marshal(this, Options.AMBIENCEXMLFILE);
         } catch (JAXBException e) {
             e.printStackTrace();
-            Root.gui_showinformationdialog("Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
+            Root.displayDialog_Information("Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
     }
 
 // Other Methods

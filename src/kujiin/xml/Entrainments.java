@@ -160,7 +160,7 @@ public class Entrainments {
                 setVoid(entrainments.getVoid());
                 setPostsession(entrainments.getPostsession());
             } catch (JAXBException e) {
-                Root.gui_showinformationdialog("Information", "Couldn't Read Entrainment XML File", "Check Read File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+                Root.displayDialog_Information("Information", "Couldn't Read Entrainment XML File", "Check Read File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
             }
         } else {
             for (int i = 0; i < AllEntrainment.size(); i++) {
@@ -178,7 +178,7 @@ public class Entrainments {
             createMarshaller.marshal(this, Options.ENTRAINMENTXMLFILE);
         } catch (JAXBException e) {
             e.printStackTrace();
-            Root.gui_showinformationdialog("Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+            Root.displayDialog_Information("Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
         }
     }
 
