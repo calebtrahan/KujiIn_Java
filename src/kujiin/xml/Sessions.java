@@ -100,7 +100,7 @@ public class Sessions {
             int totalminutes = 0;
             for (kujiin.xml.Session i : getSession()) {totalminutes += i.getcutduration(index);}
             if (includepreandpost) {
-                for (Meditatable i : Root.getSession().getAllMeditatablesincludingTotalforTracking()) {
+                for (Meditatable i : Root.getSession().getAllMeditatablesincludingTotal()) {
                     if (i instanceof Qi_Gong) {
                         for (kujiin.xml.Session x : getSession()) {totalminutes += x.getcutduration(i.number);}
                     }

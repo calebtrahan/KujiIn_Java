@@ -31,11 +31,11 @@ public class Meditatable {
     protected Ambience ambience;
     protected Entrainment entrainment;
 // Playback Fields
+    protected boolean ambienceenabled;
     protected int entrainmentplaycount;
     protected int ambienceplaycount;
     protected MediaPlayer entrainmentplayer;
     protected MediaPlayer ambienceplayer;
-    protected Boolean ambienceenabled;
     protected Animation fade_entrainment_play;
     protected Animation fade_entrainment_resume;
     protected Animation fade_entrainment_pause;
@@ -49,8 +49,6 @@ public class Meditatable {
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     public Duration elapsedtime;
-    protected List<Cut> cutstoplay;
-    protected List<Element> elementstoplay;
     protected List<Meditatable> allmeditatablestoplay;
     protected List<kujiin.xml.Goals.Goal> goalscompletedthissession;
 // Goal Fields
@@ -69,15 +67,15 @@ public class Meditatable {
             Value.textProperty().addListener((observable, oldValue, newValue) -> {
                 try {
                     setDuration(Integer.parseInt(Value.getText()));
-                    thissession.getRoot().creation_gui_update();
+                    thissession.Root.creation_gui_update();
                 } catch (NumberFormatException ignored) {setDuration(0);}
             });
             if (briefsummary != null) {Switch.setTooltip(new Tooltip(briefsummary));}
-            Switch.setOnAction(event -> toggleswitch());
-            toggleswitch();
+            Switch.setOnAction(event -> gui_toggleswitch());
+            gui_toggleswitch();
         }
-        entrainment = thissession.getEntrainments().getmeditatableEntrainment(number);
-        ambience = thissession.getAmbiences().getmeditatableAmbience(number);
+        entrainment = thissession.Root.getEntrainments().getmeditatableEntrainment(number);
+        ambience = thissession.Root.getAmbiences().getmeditatableAmbience(number);
         //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
 //        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
@@ -88,7 +86,7 @@ public class Meditatable {
     }
 
 // GUI Methods
-    private void toggleswitch() {
+    private void gui_toggleswitch() {
     if (Switch.isSelected()) {
         Value.setText("0");
         Value.setDisable(false);
@@ -111,46 +109,20 @@ public class Meditatable {
     public boolean hasValidValue() {
         return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
     }
-    public void setDisable(boolean disabled) {
+    public void gui_setDisable(boolean disabled) {
         Switch.setDisable(disabled);
         Value.setDisable(disabled);
     }
 // Getters And Setters
     public String getNameForChart() {return name;}
-    protected MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
-    protected MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
     private void setDuration(double newduration) {
         duration = new Duration((newduration * 60) * 1000);
     }
-    public void setAmbienceenabled(boolean ambienceenabled) {
-        this.ambienceenabled = ambienceenabled;
-    }
-    public void setCutstoplay(ArrayList<Cut> cutstoplay) {this.cutstoplay = cutstoplay;}
-    public void setElementstoplay(ArrayList<Element> elementstoplay) {this.elementstoplay = elementstoplay;}
-    public void setAllmeditatablestoplay(List<Meditatable> allmeditatablestoplay) {
-        this.allmeditatablestoplay = allmeditatablestoplay;
-        sortElementsAndCuts();
-    }
-    public List<Meditatable> getAllmeditatablestoplay() {
-        return allmeditatablestoplay;
-    }
     public Ambience getAmbience() {return ambience;}
     public Entrainment getEntrainment() {return entrainment;}
-    public void sortElementsAndCuts() {
-        ArrayList<Cut> cutlist = new ArrayList<>();
-        ArrayList<Element> elementlist = new ArrayList<>();
-        for (Object i : getAllmeditatablestoplay()) {
-            if (i instanceof Cut) {cutlist.add((Cut) i);}
-            if (i instanceof Element) {elementlist.add((Element) i);}
-        }
-        setCutstoplay(cutlist);
-        setElementstoplay(elementlist);
-    }
+    public void setEntrainment(Entrainment entrainment) {this.entrainment = entrainment;}
     public void setGoalsController(Goals goals) {
         GoalsController = goals;
-    }
-    public Boolean getAmbienceenabled() {
-        return ambienceenabled;
     }
     public Double getCurrententrainmentvolume() {
         return currententrainmentvolume;
@@ -169,21 +141,21 @@ public class Meditatable {
     public Duration getelapsedtime() {return elapsedtime;}
 
 // Creation
-    public boolean build(List<Meditatable> allcutandelementitems, boolean ambienceenabled) {
-        setAmbienceenabled(ambienceenabled);
-        setAllmeditatablestoplay(allcutandelementitems);
-        if (ambienceenabled) {return buildEntrainment() && buildAmbience();}
-        else {return buildEntrainment();}
+    public boolean creation_build(List<Meditatable> allmeditatables, boolean ambienceenabled) {
+        this.ambienceenabled = ambienceenabled;
+        allmeditatablestoplay = allmeditatables;
+        if (ambienceenabled) {return creation_buildEntrainment() && creation_buildAmbience();}
+        else {return creation_buildEntrainment();}
     }
-    protected boolean buildEntrainment() {
+    protected boolean creation_buildEntrainment() {
         entrainment.created_clear();
         return true;
     }
-    protected boolean buildAmbience() {
+    protected boolean creation_buildAmbience() {
         ambience.created_clear();
         Duration currentambienceduration = new Duration(0);
         if (ambience.hasEnoughAmbience(getduration())) {
-            for (SoundFile i : ambience.getAmbience()) {
+            for (SoundFile i : ambience.getAmbienceList()) {
                 if (ambience.gettotalCreatedDuration().lessThan(getduration())) {
                     ambience.created_add(i);
                     currentambienceduration = currentambienceduration.add(new Duration(i.getDuration()));
@@ -193,7 +165,7 @@ public class Meditatable {
             Random randint = new Random();
             while (currentambienceduration.lessThan(getduration())) {
                 List<SoundFile> createdambience = ambience.created_getAll();
-                SoundFile selectedsoundfile = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
+                SoundFile selectedsoundfile = ambience.actual_get(randint.nextInt(ambience.getAmbienceList().size() - 1));
                 if (createdambience.size() < 2) {
                     ambience.created_add(selectedsoundfile);
                     currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
@@ -222,11 +194,11 @@ public class Meditatable {
         }
         return ambience.created_getAll().size() > 0 && currentambienceduration.greaterThanOrEqualTo(getduration());
     }
-    public void resetCreation() {
+    public void creation_reset() {
         entrainment.created_clear();
         ambience.created_clear();
         Switch.setSelected(false);
-        toggleswitch();
+        gui_toggleswitch();
     }
 
 // Playback
@@ -239,11 +211,11 @@ public class Meditatable {
                 @Override
                 protected void interpolate(double frac) {
                     double entrainmentvolume = frac * thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();
-                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+                    entrainmentplayer.setVolume(entrainmentvolume);
                     thisession.playerUI.EntrainmentVolume.setValue(entrainmentvolume);
                     Double value = entrainmentvolume * 100;
                     thisession.playerUI.EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.referencecurrentlyDisplayed()) {
+                    if (thisession.player_isreferencecurrentlyDisplayed()) {
                         thisession.displayReference.EntrainmentVolumeSlider.setValue(entrainmentvolume);
                         thisession.displayReference.EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -257,11 +229,11 @@ public class Meditatable {
                     @Override
                     protected void interpolate(double frac) {
                         double ambiencevolume = frac * thisession.Root.getOptions().getSessionOptions().getAmbiencevolume();
-                        getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                        ambienceplayer.setVolume(ambiencevolume);
                         thisession.playerUI.AmbienceVolume.setValue(ambiencevolume);
                         Double value = ambiencevolume * 100;
                         thisession.playerUI.AmbienceVolumePercentage.setText(value.intValue() + "%");
-                        if (thisession.referencecurrentlyDisplayed()) {
+                        if (thisession.player_isreferencecurrentlyDisplayed()) {
                             thisession.displayReference.AmbienceVolumeSlider.setValue(ambiencevolume);
                             thisession.displayReference.AmbienceVolumePercentage.setText(value.intValue() + "%");
                         }
@@ -279,11 +251,11 @@ public class Meditatable {
                     double entrainmentvolume;
                     if (currententrainmentvolume != null && currententrainmentvolume > 0.0) {entrainmentvolume = frac * getCurrententrainmentvolume();}
                     else {entrainmentvolume = frac * thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume();}
-                    getCurrentEntrainmentPlayer().setVolume(entrainmentvolume);
+                    entrainmentplayer.setVolume(entrainmentvolume);
                     thisession.playerUI.EntrainmentVolume.setValue(entrainmentvolume);
                     Double value = entrainmentvolume * 100;
                     thisession.playerUI.EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.referencecurrentlyDisplayed()) {
+                    if (thisession.player_isreferencecurrentlyDisplayed()) {
                         thisession.displayReference.EntrainmentVolumeSlider.setValue(entrainmentvolume);
                         thisession.displayReference.EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -299,11 +271,11 @@ public class Meditatable {
                     double ambiencevolume;
                     if (currentambiencevolume != null && currentambiencevolume > 0.0) {ambiencevolume = frac * getCurrentambiencevolume();}
                     else {ambiencevolume = frac * thisession.Root.getOptions().getSessionOptions().getAmbiencevolume();}
-                    getCurrentAmbiencePlayer().setVolume(ambiencevolume);
+                    ambienceplayer.setVolume(ambiencevolume);
                     thisession.playerUI.AmbienceVolume.setValue(ambiencevolume);
                     Double value = ambiencevolume * 100;
                     thisession.playerUI.AmbienceVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.referencecurrentlyDisplayed()) {
+                    if (thisession.player_isreferencecurrentlyDisplayed()) {
                         thisession.displayReference.AmbienceVolumeSlider.setValue(ambiencevolume);
                         thisession.displayReference.AmbienceVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -322,11 +294,11 @@ public class Meditatable {
                     if (currententrainmentvolume != null && currententrainmentvolume > 0.0) {basevalue = getCurrententrainmentvolume(); entrainmentvolume = frac * basevalue;}
                     else {basevalue = thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume(); entrainmentvolume = frac * basevalue;}
                     double fadeoutvolume = basevalue - entrainmentvolume;
-                    getCurrentEntrainmentPlayer().setVolume(fadeoutvolume);
+                    entrainmentplayer.setVolume(fadeoutvolume);
                     thisession.playerUI.EntrainmentVolume.setValue(fadeoutvolume);
                     Double value = fadeoutvolume * 100;
                     thisession.playerUI.EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.referencecurrentlyDisplayed()) {
+                    if (thisession.player_isreferencecurrentlyDisplayed()) {
                         thisession.displayReference.EntrainmentVolumeSlider.setValue(fadeoutvolume);
                         thisession.displayReference.EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -344,11 +316,11 @@ public class Meditatable {
                     if (currentambiencevolume != null && currentambiencevolume > 0.0) {basevalue = getCurrentambiencevolume(); ambiencevolume = frac * basevalue;}
                     else {basevalue = thisession.Root.getOptions().getSessionOptions().getAmbiencevolume(); ambiencevolume = frac * basevalue;}
                     double fadeoutvolume = basevalue - ambiencevolume;
-                    getCurrentAmbiencePlayer().setVolume(fadeoutvolume);
+                    ambienceplayer.setVolume(fadeoutvolume);
                     thisession.playerUI.AmbienceVolume.setValue(fadeoutvolume);
                     Double value = fadeoutvolume * 100;
                     thisession.playerUI.AmbienceVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.referencecurrentlyDisplayed()) {
+                    if (thisession.player_isreferencecurrentlyDisplayed()) {
                         thisession.displayReference.AmbienceVolumeSlider.setValue(fadeoutvolume);
                         thisession.displayReference.AmbienceVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -368,11 +340,11 @@ public class Meditatable {
                     if (currententrainmentvolume != null && currententrainmentvolume > 0.0) {basevalue = getCurrententrainmentvolume(); entrainmentvolume = frac * basevalue;}
                     else {basevalue = thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume(); entrainmentvolume = frac * basevalue;}
                     double fadeoutvolume = basevalue - entrainmentvolume;
-                    getCurrentEntrainmentPlayer().setVolume(fadeoutvolume);
+                    entrainmentplayer.setVolume(fadeoutvolume);
                     thisession.playerUI.EntrainmentVolume.setValue(fadeoutvolume);
                     Double value = fadeoutvolume * 100;
                     thisession.playerUI.EntrainmentVolumePercentage.setText(value.intValue() + "%");
-                    if (thisession.referencecurrentlyDisplayed()) {
+                    if (thisession.player_isreferencecurrentlyDisplayed()) {
                         thisession.displayReference.EntrainmentVolumeSlider.setValue(fadeoutvolume);
                         thisession.displayReference.EntrainmentVolumePercentage.setText(value.intValue() + "%");
                     }
@@ -390,11 +362,11 @@ public class Meditatable {
                         if (currentambiencevolume != null && currentambiencevolume > 0.0) {basevalue = getCurrentambiencevolume(); ambiencevolume = frac * basevalue;}
                         else {basevalue = thisession.Root.getOptions().getSessionOptions().getAmbiencevolume(); ambiencevolume = frac * basevalue;}
                         double fadeoutvolume = basevalue - ambiencevolume;
-                        getCurrentAmbiencePlayer().setVolume(fadeoutvolume);
+                        ambienceplayer.setVolume(fadeoutvolume);
                         thisession.playerUI.AmbienceVolume.setValue(fadeoutvolume);
                         Double value = fadeoutvolume * 100;
                         thisession.playerUI.AmbienceVolumePercentage.setText(value.intValue() + "%");
-                        if (thisession.referencecurrentlyDisplayed()) {
+                        if (thisession.player_isreferencecurrentlyDisplayed()) {
                             thisession.displayReference.AmbienceVolumeSlider.setValue(fadeoutvolume);
                             thisession.displayReference.AmbienceVolumePercentage.setText(value.intValue() + "%");
                         }
@@ -415,7 +387,7 @@ public class Meditatable {
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
-        timeline_progresstonextmeditatable = new Timeline(new KeyFrame(getduration(), ae -> thisession.progresstonextmeditatable()));
+        timeline_progresstonextmeditatable = new Timeline(new KeyFrame(getduration(), ae -> thisession.player_progresstonextmeditatable()));
         timeline_progresstonextmeditatable.play();
         if (fade_entrainment_stop != null) {
             timeline_fadeout_timer = new Timeline(new KeyFrame(getduration().subtract(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000)), ae -> {
@@ -428,7 +400,7 @@ public class Meditatable {
             }));
             timeline_fadeout_timer.play();
         }
-        thisession.displayreferencefile();
+        thisession.player_displayreferencefile();
         if (fade_entrainment_play != null) {
             if (fade_entrainment_play.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.playerState = This_Session.PlayerState.FADING_PLAY;
@@ -505,7 +477,7 @@ public class Meditatable {
         toggleplayerbuttons();
     }
     public void stop() {
-        thisession.closereferencefile();
+        thisession.player_closereferencefile();
         volume_unbindentrainment();
         if (fade_ambience_stop != null) {
             if (fade_ambience_stop.getStatus() == Animation.Status.RUNNING) {return;}
@@ -562,8 +534,8 @@ public class Meditatable {
     }
     public void cleanupPlayersandAnimations() {
         try {
-            if (getCurrentEntrainmentPlayer() != null) {getCurrentEntrainmentPlayer().dispose();}
-            if (getCurrentAmbiencePlayer() != null && ambienceenabled) {getCurrentAmbiencePlayer().dispose();}
+            if (entrainmentplayer != null) {entrainmentplayer.dispose();}
+            if (ambienceplayer != null && ambienceenabled) {ambienceplayer.dispose();}
             if (fade_entrainment_play != null) {fade_entrainment_play.stop();}
             if (fade_entrainment_pause != null) {fade_entrainment_pause.stop();}
             if (fade_entrainment_resume != null) {fade_entrainment_resume.stop();}
@@ -593,7 +565,7 @@ public class Meditatable {
         thisession.playerUI.ReferenceToggleButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
         thisession.playerUI.ReferenceHTMLButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
         thisession.playerUI.ReferenceTXTButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
-        if (thisession.referencecurrentlyDisplayed()) {
+        if (thisession.player_isreferencecurrentlyDisplayed()) {
             thisession.displayReference.PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
             thisession.displayReference.PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
             thisession.displayReference.StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
@@ -671,7 +643,7 @@ public class Meditatable {
         thisession.playerUI.PauseButton.setText(pausebuttontext);
         thisession.playerUI.StopButton.setText(stopbuttontext);
         thisession.playerUI.StatusBar.setText(statusbartext);
-        if (thisession.referencecurrentlyDisplayed()) {
+        if (thisession.player_isreferencecurrentlyDisplayed()) {
             thisession.displayReference.PlayButton.setText(playbuttontext);
             thisession.displayReference.PauseButton.setText(pausebuttontext);
             thisession.displayReference.StopButton.setText(stopbuttontext);
@@ -682,13 +654,13 @@ public class Meditatable {
         boolean enabled = thisession.playerState == This_Session.PlayerState.PLAYING;
         thisession.playerUI.EntrainmentVolume.setDisable(! enabled);
         if (ambienceenabled) {thisession.playerUI.AmbienceVolume.setDisable(! enabled);}
-        if (thisession.referencecurrentlyDisplayed()) {
+        if (thisession.player_isreferencecurrentlyDisplayed()) {
             thisession.displayReference.EntrainmentVolumeSlider.setDisable(! enabled);
             if (ambienceenabled) {thisession.displayReference.AmbienceVolumeSlider.setDisable(! enabled);}
         }
     }
     public void volume_bindentrainment() {
-        thisession.playerUI.EntrainmentVolume.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
+        thisession.playerUI.EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
         thisession.playerUI.EntrainmentVolume.setDisable(false);
         thisession.playerUI.EntrainmentVolume.setOnMouseDragged(event1 -> {
             setCurrententrainmentvolume(thisession.playerUI.EntrainmentVolume.getValue());
@@ -709,8 +681,8 @@ public class Meditatable {
                 thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
             }
         });
-        if (thisession.referencecurrentlyDisplayed()) {
-            thisession.displayReference.EntrainmentVolumeSlider.valueProperty().bindBidirectional(getCurrentEntrainmentPlayer().volumeProperty());
+        if (thisession.player_isreferencecurrentlyDisplayed()) {
+            thisession.displayReference.EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
             thisession.displayReference.EntrainmentVolumeSlider.setDisable(false);
             thisession.displayReference.EntrainmentVolumeSlider.setOnMouseDragged(event1 -> {
                 setCurrententrainmentvolume(thisession.playerUI.EntrainmentVolume.getValue());
@@ -738,13 +710,13 @@ public class Meditatable {
     public void volume_unbindentrainment() {
         thisession.playerUI.EntrainmentVolume.valueProperty().unbind();
         thisession.playerUI.EntrainmentVolume.setDisable(true);
-        if (thisession.referencecurrentlyDisplayed()) {
+        if (thisession.player_isreferencecurrentlyDisplayed()) {
             thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbind();
             thisession.displayReference.EntrainmentVolumeSlider.setDisable(true);
         }
     }
     public void volume_bindambience() {
-        thisession.playerUI.AmbienceVolume.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
+        thisession.playerUI.AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
         thisession.playerUI.AmbienceVolume.setDisable(false);
         thisession.playerUI.AmbienceVolume.setOnMouseDragged(event1 -> {
             setCurrentambiencevolume(thisession.playerUI.AmbienceVolume.getValue());
@@ -765,8 +737,8 @@ public class Meditatable {
                 thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
             }
         });
-        if (thisession.referencecurrentlyDisplayed()) {
-            thisession.displayReference.AmbienceVolumeSlider.valueProperty().bindBidirectional(getCurrentAmbiencePlayer().volumeProperty());
+        if (thisession.player_isreferencecurrentlyDisplayed()) {
+            thisession.displayReference.AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
             thisession.displayReference.AmbienceVolumeSlider.setDisable(false);
             thisession.displayReference.AmbienceVolumeSlider.setOnMouseDragged(event1 -> {
                 setCurrentambiencevolume(thisession.playerUI.AmbienceVolume.getValue());
@@ -795,7 +767,7 @@ public class Meditatable {
         thisession.playerUI.AmbienceVolume.valueProperty().unbind();
         thisession.playerUI.AmbienceVolume.setDisable(true);
         try {
-            if (thisession.referencecurrentlyDisplayed()) {
+            if (thisession.player_isreferencecurrentlyDisplayed()) {
                 thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbind();
                 thisession.displayReference.AmbienceVolumeSlider.setDisable(true);
             }
@@ -807,8 +779,8 @@ public class Meditatable {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             try {
                 thisession.Root.getSessions().sessioninformation_getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatecutduration(number, new Double(elapsedtime.toMinutes()).intValue());
-                if (getCurrentGoal() != null && (getCurrentGoal().getGoal_Hours() * 60) >= getTotalMinutesPracticed(false)) {
-                    goalscompletedthissession.addAll(completegoalsandgetcompleted());
+                if (goals_getCurrent() != null && (goals_getCurrent().getGoal_Hours() * 60) >= sessions_getTotalMinutesPracticed(false)) {
+                    goalscompletedthissession.addAll(goals_completeandgetcompleted());
                 }
             } catch (NullPointerException ignored) {}
         }
@@ -895,68 +867,62 @@ public class Meditatable {
     }
 
 // Goals
-    // Add
-    public void addGoal(kujiin.xml.Goals.Goal newgoal) {
+    public void goals_add(kujiin.xml.Goals.Goal newgoal) {
         System.out.println("Called Add Goal In Meditatable Logic");
         GoalsController.add(number, newgoal);
     }
-    // Update
-    public void updateGoals(List<kujiin.xml.Goals.Goal> goalslist) {
+    public void goals_update(List<kujiin.xml.Goals.Goal> goalslist) {
         GoalsController.update(goalslist, number);
     }
-    // Delete
-    public void deleteGoal(kujiin.xml.Goals.Goal currentgoal) {
+    public void goals_delete(kujiin.xml.Goals.Goal currentgoal) {
         GoalsController.delete(number, currentgoal);
     }
-    public void deleteGoal(int goalindex) {
+    public void goals_delete(int goalindex) {
         GoalsController.delete(number, goalindex);
     }
-    // Getters
-    public kujiin.xml.Goals.Goal getCurrentGoal() {
+    public kujiin.xml.Goals.Goal goals_getCurrent() {
         return GoalsController.getCurrentGoal(number);
     }
-    public List<kujiin.xml.Goals.Goal> getAllGoals() {return GoalsController.getAllGoals(number);}
-    public List<kujiin.xml.Goals.Goal> getCompletedGoals() {return GoalsController.getCompletedGoals(number);}
-    public int getcompletedgoalcount() {return GoalsController.count_completedgoals(number);}
-    // Validation
-    public boolean goalsarelongenough() {
+    public List<kujiin.xml.Goals.Goal> goals_getAll() {return GoalsController.getAllGoals(number);}
+    public List<kujiin.xml.Goals.Goal> goals_getCompleted() {return GoalsController.getCompletedGoals(number);}
+    public int goals_getCompletedGoalCount() {return GoalsController.count_completedgoals(number);}
+    public boolean goals_arelongenough() {
         try {
-            return (getTotalMinutesPracticed(false) / 60) + getduration().toHours() >= getCurrentGoal().getGoal_Hours();
+            return (sessions_getTotalMinutesPracticed(false) / 60) + getduration().toHours() >= goals_getCurrent().getGoal_Hours();
         } catch (NullPointerException e) {return true;}
     }
-    // Utility
-    public void transition_goalscheck() {
-        goalscompletedthissession = completegoalsandgetcompleted();
+    public void goals_transitioncheck() {
+        goalscompletedthissession = goals_completeandgetcompleted();
         if (goalscompletedthissession.size() > 0) {
             thisession.MeditatableswithGoalsCompletedThisSession.add(this);
         }
     }
-    public void completecutgoals() {
+    public void goals_complete() {
         GoalsController.completegoals(number, getduration());
     }
-    public List<kujiin.xml.Goals.Goal> completegoalsandgetcompleted() {
+    public List<kujiin.xml.Goals.Goal> goals_completeandgetcompleted() {
         return GoalsController.completegoalsandgetcompleted(number, getduration());
     }
-    public List<kujiin.xml.Goals.Goal> getGoalsCompletedThisSession() {
+    public List<kujiin.xml.Goals.Goal> goals_getGoalsCompletedThisSession() {
         return GoalsController.getgoalsCompletedOn(number, LocalDate.now());
     }
-    public List<kujiin.xml.Goals.Goal> getGoalsCompletedOn(LocalDate localDate) {
+    public List<kujiin.xml.Goals.Goal> goals_getGoalsCompletedOn(LocalDate localDate) {
         return GoalsController.getgoalsCompletedOn(number, localDate);
     }
 
 // Session Tracking
-    public double getAveragePracticeTime(boolean includepreandpost) {
+    public double sessions_getAveragePracticeTime(boolean includepreandpost) {
         return thisession.Root.getSessions().sessioninformation_getaveragepracticetime(number, includepreandpost);
     }
-    public int getTotalMinutesPracticed(boolean includepreandpost) {
+    public int sessions_getTotalMinutesPracticed(boolean includepreandpost) {
         return thisession.Root.getSessions().sessioninformation_getallsessiontotals(number, includepreandpost);
     }
-    public int getNumberOfSessionsPracticed(boolean includepreandpost) {
+    public int sessions_getNumberOfSessionsPracticed(boolean includepreandpost) {
         return thisession.Root.getSessions().sessioninformation_getsessioncount(number, includepreandpost);
     }
 
 // Reference Files
-    public File getReferenceFile() {
+    public File reference_getFile() {
         This_Session.ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
         if (referenceType == null) {return null;}
         switch (referenceType) {
@@ -972,10 +938,10 @@ public class Meditatable {
                 return null;
         }
     }
-    public boolean referencefilevalid(This_Session.ReferenceType referenceType) {
+    public boolean reference_filevalid(This_Session.ReferenceType referenceType) {
         if (referenceType == null) {return false;}
-        if (! getReferenceFile().exists()) {return false;}
-        String contents = Util.file_getcontents(getReferenceFile());
+        if (! reference_getFile().exists()) {return false;}
+        String contents = Util.file_getcontents(reference_getFile());
         if (contents == null) {return false;}
         switch (referenceType) {
             case html:

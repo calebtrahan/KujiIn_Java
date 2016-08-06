@@ -31,7 +31,7 @@ public class Qi_Gong extends Meditatable {
 
 // Creation
     @Override
-    public boolean buildEntrainment() {
+    public boolean creation_buildEntrainment() {
         Duration timeleft = getduration();
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {timeleft = timeleft.subtract(Duration.minutes(2));}
         int fivetimes = new Double(timeleft.toMinutes() / 5).intValue();
@@ -40,11 +40,11 @@ public class Qi_Gong extends Meditatable {
         for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
         entrainment.shuffleCreated();
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            int index = getAllmeditatablestoplay().indexOf(this);
+            int index = allmeditatablestoplay.indexOf(this);
             Meditatable meditatablebefore = null;
             Meditatable meditatableafter = null;
-            if (index != 0) {meditatablebefore = getAllmeditatablestoplay().get(index - 1);}
-            if (index != getAllmeditatablestoplay().size() - 1) {meditatableafter = getAllmeditatablestoplay().get(index + 1);}
+            if (index != 0) {meditatablebefore = allmeditatablestoplay.get(index - 1);}
+            if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
             if (name.equals("Presession") && meditatableafter != null) {
                 String rampupfirstname = "qiin" + meditatableafter.name.toLowerCase() + ".mp3";
                 entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampupfirstname)));
@@ -77,24 +77,24 @@ public class Qi_Gong extends Meditatable {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists
         if (thisession.Root.dialog_YesNoConfirmation("Confirmation", "An Error Occured While Playing " + name +
-                        "'s Entrainment. Problem File Is: '" + getCurrentEntrainmentPlayer().getMedia().getSource() + "'",
+                        "'s Entrainment. Problem File Is: '" + entrainmentplayer.getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             entrainmentplayer.stop();
             entrainmentplayer.play();
             entrainmentplayer.setOnError(this::entrainmenterror);
-        } else {thisession.error_endplayback();}
+        } else {thisession.player_error();}
     }
     @Override
     public void ambienceerror() {
         System.out.println("Ambience Error!");
         // Pause Entrainment
         if (thisession.Root.dialog_YesNoConfirmation("Confirmation", "An Error Occured While Playing " + name +
-                        "'s Ambience. Problem File Is: '" + getCurrentAmbiencePlayer().getMedia().getSource() + "'",
+                        "'s Ambience. Problem File Is: '" + ambienceplayer.getMedia().getSource() + "'",
                 "Retry Playing This File? (Pressing Cancel Will Completely Stop Session Playback)")) {
             ambienceplayer.stop();
             ambienceplayer.play();
             ambienceplayer.setOnError(this::ambienceerror);
-        } else {thisession.error_endplayback();}
+        } else {thisession.player_error();}
     }
 // Goals
 

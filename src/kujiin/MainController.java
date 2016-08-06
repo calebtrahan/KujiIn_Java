@@ -116,28 +116,22 @@ public class MainController implements Initializable {
     private Preset Preset;
 
 // My Fields
-    // Creation
     private Timeline creator_updateuitimeline;
-    // Export
-
-    // Sessions
     private Sessions Sessions;
     private Meditatable SessionsAndGoalsSelectedMeditatable;
-    // Goals
     private Goals Goals;
-
-    //
     private Options Options;
-
-// Event Handlers
-//    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Util.dialog_Information(this, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
-//    public final EventHandler<ActionEvent> CHECKBOXONOFFLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("ON");} else {a.setText("OFF");}};
-//    public final EventHandler<ActionEvent> CHECKBOXYESNOLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("YES");} else {a.setText("NO");}};
+    private Entrainments Entrainments;
+    private Ambiences Ambiences;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setOptions(new Options(this));
         getOptions().unmarshall();
+        Entrainments = new Entrainments(this);
+        Entrainments.unmarshall();
+        Ambiences = new Ambiences(this);
+        Ambiences.unmarshall();
         setSession(new This_Session(this));
         preset_initialize();
         creation_initialize();
@@ -146,8 +140,8 @@ public class MainController implements Initializable {
         goals_initialize();
     }
     public boolean cleanup() {
-        getSession().getAmbiences().marshall();
-        getSession().getEntrainments().marshall();
+        Ambiences.marshall();
+        Entrainments.marshall();
         getOptions().marshall();
         return creation_cleanup() && exporter_cleanup() && sessions_cleanup() && goals_cleanup();
     }
@@ -156,6 +150,18 @@ public class MainController implements Initializable {
     }
 
 // Getters And Setters
+    public Entrainments getEntrainments() {
+    return Entrainments;
+}
+    public void setEntrainments(Entrainments entrainments) {
+        Entrainments = entrainments;
+    }
+    public Ambiences getAmbiences() {
+        return Ambiences;
+    }
+    public void setAmbiences(Ambiences ambiences) {
+        this.Ambiences = ambiences;
+    }
     public This_Session getSession() {
         return Session;
     }
@@ -290,18 +296,18 @@ public class MainController implements Initializable {
         AmbienceSwitch.setDisable(disable);
         ApproximateEndTime.setDisable(disable);
         TotalSessionTime.setDisable(disable);
-        for (Meditatable i : getSession().getAllMeditatables()) {i.setDisable(disable);}
+        for (Meditatable i : getSession().getAllMeditatables()) {i.gui_setDisable(disable);}
         if (! disable) {creator_updateuitimeline.play();}
         else {creator_updateuitimeline.stop();}
     }
     public void creation_gui_update() {
         boolean notallzero = false;
         try {
-            for (Integer i : getSession().getallsessionvalues()) {if (i > 0) {notallzero = true;}}
+            for (Integer i : getSession().gui_getallsessionvalues()) {if (i > 0) {notallzero = true;}}
         } catch (NullPointerException ignored) {}
         if (notallzero) {
             Integer totalsessiontime = 0;
-            for (Integer i : getSession().getallsessionvalues()) {totalsessiontime += i;}
+            for (Integer i : getSession().gui_getallsessionvalues()) {totalsessiontime += i;}
             int rampduration = getOptions().getSessionOptions().getRampduration();
             totalsessiontime += rampduration * 2;
             if (rampduration > 0) {TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + rampduration + "Mins. On Both Presession And Postsession"));}
@@ -324,17 +330,17 @@ public class MainController implements Initializable {
     public void creation_gui_toggleambience(ActionEvent actionEvent) {
         if (AmbienceSwitch.isSelected()) {
             if (creation_gui_allvaluesnotzero()) {
-                Session.checkambience(AmbienceSwitch);
+                Session.creation_checkambience(AmbienceSwitch);
             } else {
                 dialog_Information("Cannot Add Ambience", "All Durations Are Zero", "Nothing To Add Ambience For");
                 AmbienceSwitch.setSelected(false);
             }
         } else {
-            Session.resetcreateditems();
+            Session.creation_reset();
         }
     }
     public void creation_gui_resetallvalues(ActionEvent actionEvent) {
-        Session.resetcreateditems();
+        Session.creation_reset();
     }
     public void creation_gui_changeallvalues_cuts(ActionEvent actionEvent) {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog("Change All Cut Values To: ");
@@ -364,7 +370,7 @@ public class MainController implements Initializable {
     }
     // Utility
     public boolean creation_util_isLongSession() {
-        for (Integer i : Session.getallsessionvalues()) {
+        for (Integer i : Session.gui_getallsessionvalues()) {
             if (i >= kujiin.xml.Options.DEFAULT_LONG_MEDITATABLE_DURATION) {return true;}
         }
         return false;
@@ -391,7 +397,7 @@ public class MainController implements Initializable {
                 }
             }
         }
-        Session.createsession();
+        Session.creation_createsession();
         creation_gui_setDisable(Session.creatorState == This_Session.CreatorState.NOT_CREATED);
     }
     public void creation_util_resetcreatedsession() {}
@@ -422,13 +428,13 @@ public class MainController implements Initializable {
 //            if (getExporterState() == ExporterState.NOT_EXPORTED) {
 //                if (checkforffmpeg()) {
 //                    if (session.exportfile() == null) {
-//                        session.getnewexportsavefile();
+//                        session.exporter_getnewexportsavefile();
 //                    } else {
 //                        if (session.getExportfile().exists()) {
 //                            if (!Util.dialog_YesNoConfirmation(Root, "Confirmation", "Overwrite Saved Exported Session?", "Saved Session: " + session.getExportfile().getAbsolutePath())) {
-//                                session.getnewexportsavefile();
+//                                session.exporter_getnewexportsavefile();
 //                            }
-//                        } else {session.getnewexportsavefile();}
+//                        } else {session.exporter_getnewexportsavefile();}
 //                    }
 //                    if (session.getExportfile() == null) {Util.gui_showtimedmessageonlabel(StatusBar, "Export Session Cancelled", 3000); return;}
 //                    exportserviceindex = 0;
@@ -436,7 +442,7 @@ public class MainController implements Initializable {
 //                    for (Cut i : cutsinsession) {
 //                        exportservices.add(i.getexportservice());
 //                    }
-//                    exportservices.add(session.getsessionexporter());
+//                    exportservices.add(session.exporter_getsessionexporter());
 //                    exporterUI = new ExporterUI(Root);
 //                    exporterUI.show();
 //                    setExporterState(ExporterState.WORKING);
@@ -490,7 +496,7 @@ public class MainController implements Initializable {
 //        boolean currentlyexporting = exporterState == ExporterState.WORKING;
 //        if (currentlyexporting) {
 //            dialog_Information(this, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
-//        } else {This_Session.deleteprevioussession();}
+//        } else {This_Session.exporter_deleteprevioussession();}
 //        return ! currentlyexporting;
         return true;
     }
@@ -500,7 +506,7 @@ public class MainController implements Initializable {
     public void sessionsandgoals_meditatableselectionchanged(ActionEvent actionEvent) {
         try {
             int index = GoalMeditatableComboBox.getSelectionModel().getSelectedIndex();
-            SessionsAndGoalsSelectedMeditatable = getSession().getAllMeditatablesincludingTotalforTracking().get(index);
+            SessionsAndGoalsSelectedMeditatable = getSession().getAllMeditatablesincludingTotal().get(index);
             if (SessionsAndGoalsSelectedMeditatable instanceof Total) {PrePostSwitch.setSelected(true);}
             sessions_gui_updateui();
             goals_gui_updateui();
@@ -521,7 +527,7 @@ public class MainController implements Initializable {
     public void sessions_initialize() {
         Sessions = new Sessions(this);
         Sessions.unmarshall();
-        GoalMeditatableComboBox.setItems(FXCollections.observableArrayList(getSession().getAllMeditablesincludingTotalNames()));
+        GoalMeditatableComboBox.setItems(FXCollections.observableArrayList(getSession().getAllMeditablesincludingTotal_Names()));
         sessions_gui_updateui();
     }
     public void sessions_gui_updateui() {
@@ -536,9 +542,9 @@ public class MainController implements Initializable {
             numberofsessionspracticedtext = "No Sessions";
             disabled = true;
         } else {
-            Double averagesessionduration = SessionsAndGoalsSelectedMeditatable.getAveragePracticeTime(PrePostSwitch.isSelected());
-            Integer totalminutespracticed = SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(PrePostSwitch.isSelected());
-            Integer numberofsessionspracticed = SessionsAndGoalsSelectedMeditatable.getNumberOfSessionsPracticed(PrePostSwitch.isSelected());
+            Double averagesessionduration = SessionsAndGoalsSelectedMeditatable.sessions_getAveragePracticeTime(PrePostSwitch.isSelected());
+            Integer totalminutespracticed = SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(PrePostSwitch.isSelected());
+            Integer numberofsessionspracticed = SessionsAndGoalsSelectedMeditatable.sessions_getNumberOfSessionsPracticed(PrePostSwitch.isSelected());
             if (numberofsessionspracticed > 0) {
                 averagesessiondurationtext = Util.formatdurationtoStringSpelledOut(new Duration(averagesessionduration * 1000), AverageSessionDuration.getLayoutBounds().getWidth());
                 totalminutespracticedtext = Util.formatdurationtoStringSpelledOut(new Duration(totalminutespracticed * 1000), TotalTimePracticed.getLayoutBounds().getWidth());
@@ -587,11 +593,11 @@ public class MainController implements Initializable {
     public void goals_initialize() {
         Goals = new Goals(this);
         Goals.unmarshall();
-        for (Meditatable i : getSession().getAllMeditatablesincludingTotalforTracking()) {i.setGoalsController(Goals);}
+        for (Meditatable i : getSession().getAllMeditatablesincludingTotal()) {i.setGoalsController(Goals);}
         goals_gui_updateui();
     }
     public void goals_gui_updateui() {
-        boolean disabled = SessionsAndGoalsSelectedMeditatable == null || SessionsAndGoalsSelectedMeditatable.getCurrentGoal() == null;
+        boolean disabled = SessionsAndGoalsSelectedMeditatable == null || SessionsAndGoalsSelectedMeditatable.goals_getCurrent() == null;
         Tooltip goalprogresstooltip;
         String percentage;
         String toptext;
@@ -610,7 +616,7 @@ public class MainController implements Initializable {
             goalprogresstooltip = new Tooltip("");
             newgoalbuttontext = kujiin.xml.Options.NEWGOALTEXT;
             newgoalbuttontooltip = new Tooltip("Set A New Goal");
-        } else if (SessionsAndGoalsSelectedMeditatable.getCurrentGoal() == null || SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false) == 0) {
+        } else if (SessionsAndGoalsSelectedMeditatable.goals_getCurrent() == null || SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false) == 0) {
             // No Current Goal Set
             toptext = "No Current Goal";
             percentage = "";
@@ -620,10 +626,10 @@ public class MainController implements Initializable {
             newgoalbuttontooltip = new Tooltip("Set A New Goal");
         } else {
             toptext = "Current Goal Progress";
-            Double goalminutes = SessionsAndGoalsSelectedMeditatable.getCurrentGoal().getGoal_Hours() * 60;
-            progress = Util.convert_minstodecimalhours(SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false), 2) / (goalminutes / 60);
+            Double goalminutes = SessionsAndGoalsSelectedMeditatable.goals_getCurrent().getGoal_Hours() * 60;
+            progress = Util.convert_minstodecimalhours(SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false), 2) / (goalminutes / 60);
             goalprogresstooltip = new Tooltip(String.format("Currently Practiced: %s -> Goal: %s",
-                    Util.formatdurationtoStringSpelledOut(new Duration(SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false) * 1000), null),
+                    Util.formatdurationtoStringSpelledOut(new Duration(SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false) * 1000), null),
                     Util.formatdurationtoStringSpelledOut(new Duration(goalminutes * 1000), null))
             );
             percentage = new Double(progress * 100).intValue() + "%";
@@ -656,7 +662,7 @@ public class MainController implements Initializable {
             SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog();
             simpleGoalSetDialog.showAndWait();
             if (simpleGoalSetDialog.shouldSetgoal()) {
-                SessionsAndGoalsSelectedMeditatable.addGoal(new Goals.Goal(simpleGoalSetDialog.getNewGoalHours(), SessionsAndGoalsSelectedMeditatable));
+                SessionsAndGoalsSelectedMeditatable.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalHours(), SessionsAndGoalsSelectedMeditatable));
                 goals_gui_updateui();
             }
         } else if (newgoalButton.getText().equals(kujiin.xml.Options.GOALPACINGTEXT)) {
@@ -664,7 +670,7 @@ public class MainController implements Initializable {
         }
     }
     public void goals_gui_viewcurrentgoals(Event event) {
-        if (SessionsAndGoalsSelectedMeditatable.getAllGoals() == null || SessionsAndGoalsSelectedMeditatable.getAllGoals().size() == 0) {
+        if (SessionsAndGoalsSelectedMeditatable.goals_getAll() == null || SessionsAndGoalsSelectedMeditatable.goals_getAll().size() == 0) {
             dialog_Information("Information", "No Goals Exist For " + SessionsAndGoalsSelectedMeditatable.name, "Please Add A Goal For " + SessionsAndGoalsSelectedMeditatable.name);
         } else {new AllMeditatablesGoalProgress().showAndWait();}
     }
@@ -673,7 +679,7 @@ public class MainController implements Initializable {
     }
         // Util
     public ArrayList<Meditatable> goals_util_getmeditatableswithoutlongenoughgoals(List<Meditatable> cutsandelementsinsession) {
-        return cutsandelementsinsession.stream().filter(i -> i.getduration().greaterThan(Duration.ZERO) && !i.goalsarelongenough()).collect(Collectors.toCollection(ArrayList::new));
+        return cutsandelementsinsession.stream().filter(i -> i.getduration().greaterThan(Duration.ZERO) && !i.goals_arelongenough()).collect(Collectors.toCollection(ArrayList::new));
     }
     public boolean goals_cleanup() {Goals.marshall(); return true;}
 
@@ -682,7 +688,7 @@ public class MainController implements Initializable {
         creation_util_createsession();
         if (Session.creatorState == This_Session.CreatorState.CREATED) {
             if (Session.playerUI != null && Session.playerUI.isShowing()) {return;}
-            Session.openplayer();
+            Session.player_openplayer();
         }
     }
 
@@ -852,7 +858,7 @@ public class MainController implements Initializable {
             }
         }
         public void help(ActionEvent actionEvent) {
-            dialog_Information("What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to transition to the next\npart of the session");
+            dialog_Information("What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to player_transition to the next\npart of the session");
         }
 
     // Utility Methods
@@ -921,8 +927,8 @@ public class MainController implements Initializable {
 //                Options.getSessionOptions().setAlertfilelocation(null);
 //            }
 //            Options.getSessionOptions().setAlertfunction(good);
-//            AlertFileEditButton.setDisable(! good);
-//            AlertFileTextField.setDisable(! good);
+//            AlertFileEditButton.gui_setDisable(! good);
+//            AlertFileTextField.gui_setDisable(! good);
 //            AlertSwitch.setSelected(good);
 //            return good;
 //        }
@@ -1118,7 +1124,7 @@ public class MainController implements Initializable {
                 if (! Util.String_validhtml(MainTextArea.getText())) {
                     if (! dialog_YesNoConfirmation("Confirmation", "Html Code In Text Area Is Not Valid HTML", "Preview Anyways?")) {return;}
                 }
-                Session.displayreferencepreview(MainTextArea.getText());
+                Session.player_displayreferencepreview(MainTextArea.getText());
             }
         }
 
@@ -1600,7 +1606,7 @@ public class MainController implements Initializable {
                 newrowselected();
                 if (SessionsAndGoalsSelectedMeditatable != null) {GoalsTable.getSelectionModel().select(SessionsAndGoalsSelectedMeditatable.number);}
                 this.setOnCloseRequest(event -> {
-                    ArrayList<Meditatable> meditatablesmissingcurrentgoals = getSession().getAllMeditatablesincludingTotalforTracking().stream().filter(i -> i.getCurrentGoal() == null).collect(Collectors.toCollection(ArrayList::new));
+                    ArrayList<Meditatable> meditatablesmissingcurrentgoals = getSession().getAllMeditatablesincludingTotal().stream().filter(i -> i.goals_getCurrent() == null).collect(Collectors.toCollection(ArrayList::new));
                     if (meditatablesmissingcurrentgoals.size() > 0) {
                         if (! dialog_YesNoConfirmation("Confirmation", "Missing Current Goals For " + meditatablesmissingcurrentgoals.size() + " Meditatables", "Really Close Without Setting A Current Goal For All Meditatables?")) {
                             event.consume();
@@ -1612,35 +1618,35 @@ public class MainController implements Initializable {
 
         public void populatetable() {
             allgoalsdetails.clear();
-            for (Meditatable i : getSession().getAllMeditatablesincludingTotalforTracking()) {
-                String practicedtime = Util.formatdurationtoStringSpelledOut(new Duration(i.getTotalMinutesPracticed(false)), null);
+            for (Meditatable i : getSession().getAllMeditatablesincludingTotal()) {
+                String practicedtime = Util.formatdurationtoStringSpelledOut(new Duration(i.sessions_getTotalMinutesPracticed(false)), null);
                 if (practicedtime.equals("0 Minutes")) {
                     // TODO None Text Here! No Practiced Time Set
                 }
                 String currentgoaltime;
                 String percentcompleted ;
                 try {
-                    currentgoaltime = Util.formatdurationtoStringSpelledOut(new Duration(i.getCurrentGoal().getGoal_Hours() * 3_600_000), null);
-                    percentcompleted = String.valueOf(new Double((i.getTotalMinutesPracticed(false) / (i.getCurrentGoal().getGoal_Hours() * 60)) * 100).intValue()) + "%";
+                    currentgoaltime = Util.formatdurationtoStringSpelledOut(new Duration(i.goals_getCurrent().getGoal_Hours() * 3_600_000), null);
+                    percentcompleted = String.valueOf(new Double((i.sessions_getTotalMinutesPracticed(false) / (i.goals_getCurrent().getGoal_Hours() * 60)) * 100).intValue()) + "%";
                 } catch (NullPointerException ignored) {
                     currentgoaltime = "No Goal Set";
                     percentcompleted = "No Goal Set";
                 }
-                allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtime, currentgoaltime, percentcompleted, i.getcompletedgoalcount()));
+                allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtime, currentgoaltime, percentcompleted, i.goals_getCompletedGoalCount()));
             }
             GoalsTable.setItems(allgoalsdetails);
         }
         public void newrowselected() {
             if (GoalsTable.getSelectionModel().getSelectedIndex() == -1) {SessionsAndGoalsSelectedMeditatable = null;}
-            else {SessionsAndGoalsSelectedMeditatable = getSession().getAllMeditatablesincludingTotalforTracking().get(GoalsTable.getSelectionModel().getSelectedIndex());}
+            else {SessionsAndGoalsSelectedMeditatable = getSession().getAllMeditatablesincludingTotal().get(GoalsTable.getSelectionModel().getSelectedIndex());}
             if (SessionsAndGoalsSelectedMeditatable == null) {
                 SetCurrentGoalButton.setDisable(true);
                 ViewCompletedGoalsButton.setDisable(true);
             } else {
                 SetCurrentGoalButton.setDisable(false);
-                if (SessionsAndGoalsSelectedMeditatable.getCurrentGoal() == null) {SetCurrentGoalButton.setText(setgoaltext);}
+                if (SessionsAndGoalsSelectedMeditatable.goals_getCurrent() == null) {SetCurrentGoalButton.setText(setgoaltext);}
                 else {SetCurrentGoalButton.setText(goalpacingtext);}
-                ViewCompletedGoalsButton.setDisable(SessionsAndGoalsSelectedMeditatable.getcompletedgoalcount() == 0);
+                ViewCompletedGoalsButton.setDisable(SessionsAndGoalsSelectedMeditatable.goals_getCompletedGoalCount() == 0);
             }
         }
         public void setcurrentgoal(ActionEvent actionEvent) {
@@ -1648,7 +1654,7 @@ public class MainController implements Initializable {
                 SimpleGoalSetDialog setDialog = new SimpleGoalSetDialog();
                 setDialog.showAndWait();
                 if (setDialog.shouldSetgoal()) {
-                    SessionsAndGoalsSelectedMeditatable.addGoal(new Goals.Goal(setDialog.getNewGoalHours(), SessionsAndGoalsSelectedMeditatable));
+                    SessionsAndGoalsSelectedMeditatable.goals_add(new Goals.Goal(setDialog.getNewGoalHours(), SessionsAndGoalsSelectedMeditatable));
                     populatetable();
                 }
             }
@@ -1698,11 +1704,11 @@ public class MainController implements Initializable {
                 setTitle("Set A New Goal");
                 HoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
                 MinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
-                HoursSpinner.getValueFactory().setValue(SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false) / 60);
-                MinutesSpinner.getValueFactory().setValue(SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false) % 60);
+                HoursSpinner.getValueFactory().setValue(SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false) / 60);
+                MinutesSpinner.getValueFactory().setValue(SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false) % 60);
                 Util.custom_spinner_integer(HoursSpinner, 0, Integer.MAX_VALUE, 1, false);
                 Util.custom_spinner_integer(MinutesSpinner, 0, 59, 1, false);
-                practicedminutes = SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false);
+                practicedminutes = SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false);
                 DecimalHoursTextField.setText(Util.convert_minstodecimalhours(practicedminutes, 1).toString());
             } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
         }
@@ -1756,8 +1762,8 @@ public class MainController implements Initializable {
                 getOptions().setStyle(this);
                 this.setResizable(false);
                 setTitle("Goal Pacing");
-                practicedhours = (double) (SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false) / 60);
-                goalhours = SessionsAndGoalsSelectedMeditatable.getCurrentGoal().getGoal_Hours();
+                practicedhours = (double) (SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false) / 60);
+                goalhours = SessionsAndGoalsSelectedMeditatable.goals_getCurrent().getGoal_Hours();
                 GoalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(goalhours * 3_600_000), GoalDuration.getLayoutBounds().getWidth()));
                 TotalPracticedTime.setText(Util.formatdurationtoStringSpelledOut(new Duration(practicedhours * 3600000), TotalPracticedTime.getLayoutBounds().getWidth()));
                 hoursleft = goalhours - practicedhours;
@@ -1904,12 +1910,12 @@ public class MainController implements Initializable {
             ObservableList<TotalProgressRow> totalprogressrows = FXCollections.observableArrayList();
             ObservableList<PieChart.Data> piecesofthepie = FXCollections.observableArrayList();
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            for (Meditatable i : getSession().getAllMeditatablesincludingTotalforTracking()) {
+            for (Meditatable i : getSession().getAllMeditatablesincludingTotal()) {
                 if (! (i instanceof Total)) {
-                    series.getData().add(new XYChart.Data<>(i.getNameForChart(), Util.convert_minstodecimalhours(i.getTotalMinutesPracticed(false), 1)));
-                    piecesofthepie.add(new PieChart.Data(i.getNameForChart(), Util.convert_minstodecimalhours(i.getTotalMinutesPracticed(false), 1)));
+                    series.getData().add(new XYChart.Data<>(i.getNameForChart(), Util.convert_minstodecimalhours(i.sessions_getTotalMinutesPracticed(false), 1)));
+                    piecesofthepie.add(new PieChart.Data(i.getNameForChart(), Util.convert_minstodecimalhours(i.sessions_getTotalMinutesPracticed(false), 1)));
                 }
-                totalprogressrows.add(new TotalProgressRow(i.getNameForChart(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getTotalMinutesPracticed(false) * 60000))));
+                totalprogressrows.add(new TotalProgressRow(i.getNameForChart(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.sessions_getTotalMinutesPracticed(false) * 60000))));
             }
             SessionBalancePieChart.getData().addAll(piecesofthepie);
             TotalProgressTableView.setItems(totalprogressrows);
@@ -2065,7 +2071,6 @@ public class MainController implements Initializable {
         private Meditatable selectedmeditatable;
         private File tempdirectory;
         private PreviewFile previewdialog;
-        private Ambience selectedambience;
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
@@ -2187,16 +2192,13 @@ public class MainController implements Initializable {
         public void selectandloadcut() {
             int index = MeditatableSelectionBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
-                selectedambience = getSession().getAmbiences().getmeditatableAmbience(index);
                 if (actual_ambiencesonglist == null) {actual_ambiencesonglist = FXCollections.observableArrayList();}
                 else {actual_ambiencesonglist.clear();}
                 if (actual_soundfilelist == null) {actual_soundfilelist = new ArrayList<>();}
                 else {actual_soundfilelist.clear();}
                 Actual_Table.getItems().clear();
                 selectedmeditatable = Session.getAllMeditatables().get(index);
-                if (populateactualambiencetable()) {
-                    Actual_Table.setItems(actual_ambiencesonglist);
-                }
+                if (populateactualambiencetable()) {Actual_Table.setItems(actual_ambiencesonglist);}
                 calculateactualtotalduration();
             }
         }
@@ -2255,8 +2257,8 @@ public class MainController implements Initializable {
             actual_ambiencesonglist.clear();
             if (selectedmeditatable != null) {
                 try {
-                    if (selectedambience.getAmbience() == null) {return false;}
-                    for (SoundFile i : selectedambience.getAmbience()) {
+                    if (selectedmeditatable.getAmbience() == null) {return false;}
+                    for (SoundFile i : selectedmeditatable.getAmbience().getAmbienceList()) {
                         actual_soundfilelist.add(i);
                         actual_ambiencesonglist.add(new AmbienceSong(i));
                     }
@@ -2276,8 +2278,8 @@ public class MainController implements Initializable {
         public boolean unsavedchanges() {
             if (MeditatableSelectionBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
             try {
-                if (actual_soundfilelist.size() != selectedambience.getAmbience().size()) {return true;}
-                List<SoundFile> ambiencelist = selectedambience.getAmbience();
+                List<SoundFile> ambiencelist = selectedmeditatable.getAmbience().getAmbienceList();
+                if (actual_soundfilelist.size() != ambiencelist.size()) {return true;}
                 for (SoundFile x : actual_soundfilelist) {
                     if (! ambiencelist.contains(x)) {return true;}
                 }
@@ -2288,13 +2290,12 @@ public class MainController implements Initializable {
             int index = MeditatableSelectionBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 for (SoundFile i : actual_soundfilelist) {
-                    if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
+                    if (! selectedmeditatable.getAmbience().ambienceexistsinActual(i)) {selectedmeditatable.getAmbience().actual_add(i);}
                 }
-                getSession().getAmbiences().setmeditatableAmbience(index, selectedambience);
-                getSession().getAmbiences().marshall();
+                Ambiences.setmeditatableAmbience(selectedmeditatable.number, selectedmeditatable.getAmbience());
+                Ambiences.marshall();
                 dialog_Information("Saved", "Ambience Saved To " + selectedmeditatable, "");
-            } else {
-                dialog_Information("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
+            } else {dialog_Information("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closebuttonpressed(ActionEvent actionEvent) {
             if (unsavedchanges()) {
@@ -2331,7 +2332,6 @@ public class MainController implements Initializable {
         private AmbienceSong selectedambiencesong;
         private Meditatable selectedmeditatable;
         private PreviewFile previewdialog;
-        private Ambience selectedambience;
         private double totalselectedduration;
 
         @Override
@@ -2380,7 +2380,6 @@ public class MainController implements Initializable {
         public void selectandloadcut() {
             int index = MeditatableChoiceBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
-                selectedambience = getSession().getAmbiences().getmeditatableAmbience(index);
                 if (AmbienceList == null) {AmbienceList = FXCollections.observableArrayList();}
                 else {AmbienceList.clear();}
                 if (SoundList == null) {SoundList = new ArrayList<>();}
@@ -2467,8 +2466,8 @@ public class MainController implements Initializable {
             AmbienceList.clear();
             if (selectedmeditatable != null) {
                 try {
-                    if (selectedambience.getAmbience() == null) {return false;}
-                    for (SoundFile i : selectedambience.getAmbience()) {
+                    if (selectedmeditatable.getAmbience() == null) {return false;}
+                    for (SoundFile i : selectedmeditatable.getAmbience().getAmbienceList()) {
                         SoundList.add(i);
                         AmbienceList.add(new AmbienceSong(i));
                     }
@@ -2493,8 +2492,8 @@ public class MainController implements Initializable {
         public boolean unsavedchanges() {
             if (MeditatableChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
             try {
-                if (SoundList.size() != selectedambience.getAmbience().size()) {return true;}
-                List<SoundFile> ambiencelist = selectedambience.getAmbience();
+                List<SoundFile> ambiencelist = selectedmeditatable.getAmbience().getAmbienceList();
+                if (SoundList.size() != ambiencelist.size()) {return true;}
                 for (SoundFile x : SoundList) {
                     if (! ambiencelist.contains(x)) {return true;}
                 }
@@ -2516,10 +2515,10 @@ public class MainController implements Initializable {
             int index = MeditatableChoiceBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 for (SoundFile i : SoundList) {
-                    if (! selectedambience.ambienceexistsinActual(i)) {selectedambience.actual_add(i);}
+                    if (! selectedmeditatable.getAmbience().ambienceexistsinActual(i)) {selectedmeditatable.getAmbience().actual_add(i);}
                 }
-                getSession().getAmbiences().setmeditatableAmbience(index, selectedambience);
-                getSession().getAmbiences().marshall();
+                Ambiences.setmeditatableAmbience(selectedmeditatable.number, selectedmeditatable.getAmbience());
+                Ambiences.marshall();
                 dialog_Information("Saved", "Ambience Saved To " + selectedmeditatable, "");
             } else {
                 dialog_Information("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
@@ -2558,7 +2557,7 @@ public class MainController implements Initializable {
                 for (Meditatable i : getSession().getallitemsinSession()) {
                     series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getduration().toMinutes()));
                     totalsessionduration.add(i.getduration());
-                    for (Goals.Goal x : i.getGoalsCompletedThisSession()) {
+                    for (Goals.Goal x : i.goals_getGoalsCompletedThisSession()) {
                         completedgoalsitems.add(String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getduration().toHours()));
                     }
                 }

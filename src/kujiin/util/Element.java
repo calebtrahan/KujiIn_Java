@@ -37,12 +37,12 @@ public class Element extends Meditatable {
 
 // Creation
     @Override
-    public boolean buildEntrainment() {
-        int index = getAllmeditatablestoplay().indexOf(this);
+    public boolean creation_buildEntrainment() {
+        int index = allmeditatablestoplay.indexOf(this);
         Meditatable meditatablebefore = null;
         Meditatable meditatableafter = null;
-        if (index != 0) {meditatablebefore = getAllmeditatablestoplay().get(index - 1);}
-        if (index != getAllmeditatablestoplay().size() - 1) {meditatableafter = getAllmeditatablestoplay().get(index + 1);}
+        if (index != 0) {meditatablebefore = allmeditatablestoplay.get(index - 1);}
+        if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
         Duration timeleft = getduration();
         Duration freqlongduration = new Duration(entrainment.getFreqlong().getDuration());
         Duration freqshortduration = new Duration(entrainment.getFreqshort().getDuration());

@@ -27,7 +27,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.MainController;
-import kujiin.xml.*;
+import kujiin.xml.Options;
+import kujiin.xml.Session;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -56,7 +57,7 @@ public class This_Session {
     private Element Fire;
     private Element Water;
     private Element Void;
-    private Meditatable Total;
+    private Total Total;
     private Meditatable currentmeditatable;
     private Timeline updateuitimeline;
     private Duration totalsessiondurationelapsed;
@@ -65,9 +66,6 @@ public class This_Session {
     public MainController Root;
     public List<Meditatable> MeditatableswithGoalsCompletedThisSession;
     private List<Meditatable> itemsinsession;
-    private Entrainments entrainments;
-    private Ambiences ambiences;
-    private Sessions sessions;
     public PlayerUI playerUI;
     public DisplayReference displayReference;
     public Options options;
@@ -82,10 +80,6 @@ public class This_Session {
     public This_Session(MainController mainController) {
         Root = mainController;
         playerState = PlayerState.IDLE;
-        entrainments = new Entrainments(Root);
-        entrainments.unmarshall();
-        ambiences = new Ambiences(Root);
-        ambiences.unmarshall();
         options = Root.getOptions();
         Presession =  new Qi_Gong(0, "Presession", 0, "Gather Qi Before The Session Starts", this, Root.PreSwitch, Root.PreTime);
         Rin = new Cut(1, "RIN", 0, "Meet (Spirit & Invite Into The Body)", this, Root.RinSwitch, Root.RinTime);
@@ -107,20 +101,14 @@ public class This_Session {
     }
 
 // Getters And Setters
-    public MainController getRoot() {return Root;}
-    public boolean isValid() {
-        Duration totaltime = Duration.ZERO;
-        for (Meditatable i : getAllMeditatables()) {totaltime.add(i.getduration());}
-        return totaltime.greaterThan(Duration.ZERO);
-    }
     public ArrayList<Meditatable> getAllMeditatables() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
-    public ArrayList<String> getAllMeditatablesNames() {
+    public ArrayList<String> getAllMeditatables_Names() {
         ArrayList<String> allmeditatablesnames = getAllMeditatables().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
         return allmeditatablesnames;
     }
-    public ArrayList<Meditatable> getAllMeditatablesincludingTotalforTracking() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession, Total));}
-    public ArrayList<String> getAllMeditablesincludingTotalNames() {
-        return getAllMeditatablesincludingTotalforTracking().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
+    public ArrayList<Meditatable> getAllMeditatablesincludingTotal() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession, Total));}
+    public ArrayList<String> getAllMeditablesincludingTotal_Names() {
+        return getAllMeditatablesincludingTotal().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
     }
     public ArrayList<Cut> getallCuts()  {return new ArrayList<>(Arrays.asList(Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen));}
     public ArrayList<Element> getallElements() {return new ArrayList<>(Arrays.asList(Earth, Air, Fire, Water, Void));}
@@ -136,18 +124,6 @@ public class This_Session {
     }
     public void setItemsinsession(List<Meditatable> itemsinsession) {
         this.itemsinsession = itemsinsession;
-    }
-    public Entrainments getEntrainments() {
-        return entrainments;
-    }
-    public void setEntrainments(Entrainments entrainments) {
-        this.entrainments = entrainments;
-    }
-    public Ambiences getAmbiences() {
-        return ambiences;
-    }
-    public void setAmbiences(Ambiences ambiences) {
-        this.ambiences = ambiences;
     }
 
 // Cut And Element Getters
@@ -199,25 +175,19 @@ public class This_Session {
     public Element getVoid() {
         return Void;
     }
+    public Total getTotal() {return Total;}
 
 // GUI
-    public ArrayList<Integer> getallsessionvalues() {
+    public ArrayList<Integer> gui_getallsessionvalues() {
         ArrayList<Integer> values = getAllMeditatables().stream().map(i -> new Double(i.getduration().toMinutes()).intValue()).collect(Collectors.toCollection(ArrayList::new));
         return values;
     }
-    public ArrayList<Integer> getcutsessionvalues(boolean includepreandpost) {
-        if (includepreandpost) {return new ArrayList<>(getallsessionvalues().subList(0, 11));}
-        else {return new ArrayList<>(getallsessionvalues().subList(1, 10));}
-    }
-    public ArrayList<Integer> getelementvalues() {
-        return new ArrayList<>(getallsessionvalues().subList(11, 15));
-    }
 
-// Creation Methods
-    public void createsession() {
-        if (sessionhasvalidvalues()) {
-            populateitemsinsession();
-            switch (checksessionwellformed()) {
+// Creation
+    public void creation_createsession() {
+        if (creation_sessionhasvalidvalues()) {
+            creation_populateitemsinsession();
+            switch (creation_checksessionwellformed()) {
                 case YES:
                     break;
                 case NO:
@@ -226,13 +196,13 @@ public class This_Session {
                     creatorState = CreatorState.NOT_CREATED;
             }
             for (Meditatable i : getallitemsinSession()) {
-                if (! i.build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {
+                if (! i.creation_build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {
                     itemsinsession.clear();
                     creatorState = CreatorState.NOT_CREATED;
                     return;
                 }
             }
-            switch (checkgoals()) {
+            switch (creation_checkgoals()) {
                 case YES:
                     break;
                 case NO:
@@ -243,11 +213,9 @@ public class This_Session {
             creatorState = CreatorState.CREATED;
         } else {creatorState = CreatorState.NOT_CREATED;}
     }
-    // Get Session Values
-    public List<Cut> getCutsInSession() {return getallitemsinSession().stream().filter(i -> i instanceof Cut).map(i -> (Cut) i).collect(Collectors.toCollection(ArrayList::new));}
-    public List<Element> getElementsInSession() {return getallitemsinSession().stream().filter(i -> i instanceof Element).map(i -> (Element) i).collect(Collectors.toCollection(ArrayList::new));}
-    // Session Values Validation
-    public void populateitemsinsession() {
+    public List<Cut> creation_getCutsInSession() {return getallitemsinSession().stream().filter(i -> i instanceof Cut).map(i -> (Cut) i).collect(Collectors.toCollection(ArrayList::new));}
+    public List<Element> creation_getElementsInSession() {return getallitemsinSession().stream().filter(i -> i instanceof Element).map(i -> (Element) i).collect(Collectors.toCollection(ArrayList::new));}
+    public void creation_populateitemsinsession() {
         itemsinsession = new ArrayList<>();
         for (Meditatable i : getAllMeditatables()) {
             if (i instanceof Qi_Gong) {
@@ -256,18 +224,17 @@ public class This_Session {
             else if (i.getduration().greaterThan(Duration.ZERO)) {itemsinsession.add(i);}
         }
     }
-    public boolean sessionhasvalidvalues() {
+    public boolean creation_sessionhasvalidvalues() {
         boolean sessionhasvalidvalues = false;
         for (Meditatable i : getAllMeditatables()) {if (i.getduration().greaterThan(Duration.ZERO)) {sessionhasvalidvalues = true;}}
         return sessionhasvalidvalues;
     }
-    // Well Formed Session Validation
-    public boolean firstcutconnectedtorin(List<Cut> cutsinsession) {
+    public boolean creation_checkfirstcutconnectedtorin(List<Cut> cutsinsession) {
         try {
             return cutsinsession.get(0).number == 1;
         } catch (Exception e) {return false;}
     }
-    public boolean firstandlastcutsconnect(List<Cut> cutsinsession) {
+    public boolean creation_checkfirstandlastcutsconnect(List<Cut> cutsinsession) {
         if (cutsinsession.size() == 1) {return true;}
         try {
             int count = cutsinsession.get(0).number;
@@ -278,20 +245,20 @@ public class This_Session {
             return true;
         } catch (NullPointerException | IndexOutOfBoundsException ignored) {return false;}
     }
-    public Util.AnswerType checksessionwellformed() {
-        List<Cut> cutsinsession = getCutsInSession();
-        List<Element> elementsinsession = getElementsInSession();
+    public Util.AnswerType creation_checksessionwellformed() {
+        List<Cut> cutsinsession = creation_getCutsInSession();
+        List<Element> elementsinsession = creation_getElementsInSession();
         if (cutsinsession != null && cutsinsession.size() > 0) {
-            boolean rinnotstartpoint = firstcutconnectedtorin(cutsinsession);
+            boolean rinnotstartpoint = creation_checkfirstcutconnectedtorin(cutsinsession);
             if (! rinnotstartpoint) {rinnotstartpoint = ! Root.dialog_YesNoConfirmation("Confirmation", "Cuts In Session Not Connected To RIN, And May Lack The Energy They Need To Get Results",
                     "Connect " + cutsinsession.get(0).name + " Back To RIN?");}
-            if (! rinnotstartpoint || ! firstandlastcutsconnect(cutsinsession)) {
+            if (! rinnotstartpoint || ! creation_checkfirstandlastcutsconnect(cutsinsession)) {
                 CutsMissingDialog cutsMissingDialog = new CutsMissingDialog(Root, cutsinsession);
                 cutsMissingDialog.showAndWait();
                 switch (cutsMissingDialog.getResult()) {
                     case YES:
-                        populateitemsinsession();
-                        cutsinsession = getCutsInSession();
+                        creation_populateitemsinsession();
+                        cutsinsession = creation_getCutsInSession();
                         break;
                     case NO:
                         break;
@@ -320,8 +287,7 @@ public class This_Session {
         }
         return Util.AnswerType.YES;
     }
-    // Goals Validation
-    public Util.AnswerType checkgoals() {
+    public Util.AnswerType creation_checkgoals() {
         ArrayList<Meditatable> meditatableswithoutlongenoughgoals = Root.goals_util_getmeditatableswithoutlongenoughgoals(getallitemsinSession());
         List<Integer>  notgooddurations = new ArrayList<>();
         if (! meditatableswithoutlongenoughgoals.isEmpty()) {
@@ -356,11 +322,11 @@ public class This_Session {
                         boolean goalssetsuccessfully = true;
                         for (Integer i : cutindexes) {
                             try {
-                                Meditatable x = getAllMeditatablesincludingTotalforTracking().get(i);
-                                x.addGoal(new Goals.Goal(goalhours, x.name));
+                                Meditatable x = getAllMeditatablesincludingTotal().get(i);
+                                x.goals_add(new Goals.Goal(goalhours, x.name));
                             } catch (JAXBException ignored) {
                                 goalssetsuccessfully = false;
-                                Util.dialog_Error(Root, "Error", "Couldn't Add Goal For " + getAllMeditatablesincludingTotalforTracking().get(i).name, "Check File Permissions");
+                                Util.dialog_Error(Root, "Error", "Couldn't Add Goal For " + getAllMeditatablesincludingTotal().get(i).name, "Check File Permissions");
                             }
                         }
                         if (goalssetsuccessfully) {
@@ -377,9 +343,8 @@ public class This_Session {
             return Util.AnswerType.YES;
         } else {return Util.AnswerType.YES;}
     }
-    // Ambience Validation
-    public void checkambience(CheckBox ambiencecheckbox) {
-        if (sessionhasvalidvalues()) {
+    public void creation_checkambience(CheckBox ambiencecheckbox) {
+        if (creation_sessionhasvalidvalues()) {
             ArrayList<Meditatable> cutsorelementswithnoambience = new ArrayList<>();
             ArrayList<Meditatable> meditatableswithreducedambience = new ArrayList<>();
             Service<Void> ambiencecheckerservice = new Service<Void>() {
@@ -468,23 +433,21 @@ public class This_Session {
         } else {
             Root.dialog_Information("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
-    // Reference Files Validation
-    public boolean checkallreferencefilesforsession(boolean enableprompt) {
+    public boolean creation_checkreferencefiles(boolean enableprompt) {
         int invalidcutcount = 0;
         for (Meditatable i : getallitemsinSession()) {
-            if (!i.referencefilevalid(referenceType)) invalidcutcount++;
+            if (!i.reference_filevalid(referenceType)) invalidcutcount++;
         }
         if (invalidcutcount > 0 && enableprompt) {
             return Root.dialog_YesNoConfirmation("Confirmation", "There Are " + invalidcutcount + " Cuts/Elements With Empty/Invalid Reference Files", "Enable Reference Anyways?");
         } else {return invalidcutcount == 0;}
     }
-    // Reset
-    public void resetcreateditems() {
-        getAllMeditatables().forEach(Meditatable::resetCreation);
+    public void creation_reset() {
+        getAllMeditatables().forEach(Meditatable::creation_reset);
     }
 
 // Export
-    public Service<Boolean> getsessionexporter() {
+    public Service<Boolean> exporter_getsessionexporter() {
 //        CreatorAndExporterUI.ExporterUI exportingSessionDialog = new CreatorAndExporterUI.ExporterUI(this);
         return new Service<Boolean>() {
             @Override
@@ -503,11 +466,11 @@ public class This_Session {
 //                            updateMessage("Finished Combining " + i.name);
 //                        }
                         updateMessage("Creating Final Session File (May Take A While)");
-                        export();
+                        exporter_export();
                         if (isCancelled()) {return false;}
 //                        updateProgress(taskcount - 1, 1.0);
                         updateMessage("Double-Checking Final Session File");
-                        boolean success = testexportfile();
+                        boolean success = exporter_testfile();
                         if (isCancelled()) {return false;}
                         updateProgress(1.0, 1.0);
                         return success;
@@ -527,17 +490,17 @@ public class This_Session {
 //            String v = exporterservice.getException().getMessage();
 //            Util.dialog_Error("Error", "Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v,
 //                    "Please Try Again Or Contact Me For Support");
-//            This_Session.deleteprevioussession();
+//            This_Session.exporter_deleteprevioussession();
 //            exportingSessionDialog.close();
 //        });
 //        exporterservice.setOnCancelled(event -> {
 //            Util.dialog_Information("Cancelled", "Export Cancelled", "You Cancelled Export");
-//            This_Session.deleteprevioussession();
+//            This_Session.exporter_deleteprevioussession();
 //            exportingSessionDialog.close();
 //        });
 //        return false;
     }
-    public void getnewexportsavefile() {
+    public void exporter_getnewexportsavefile() {
 //        File tempfile = Util.filechooser_save(Root.getScene(), "Save Export File As", null);
 //        if (tempfile != null && Util.audio_isValid(tempfile)) {
 //            setExportfile(tempfile);
@@ -551,7 +514,7 @@ public class This_Session {
 //            }
 //        }
     }
-    public boolean export() {
+    public boolean exporter_export() {
         ArrayList<File> filestoexport = new ArrayList<>();
 //        for (int i=0; i < cutsinsession.size(); i++) {
 //            filestoexport.add(cutsinsession.get(i).getFinalexportfile());
@@ -561,7 +524,7 @@ public class This_Session {
 //        }
         return filestoexport.size() != 0;
     }
-    public boolean testexportfile() {
+    public boolean exporter_testfile() {
 //        try {
 //            MediaPlayer test = new MediaPlayer(new Media(getExportfile().toURI().toString()));
 //            test.setOnReady(test::dispose);
@@ -569,7 +532,7 @@ public class This_Session {
 //        } catch (MediaException ignored) {return false;}
         return false;
     }
-    public static void deleteprevioussession() {
+    public static void exporter_deleteprevioussession() {
         ArrayList<File> folders = new ArrayList<>();
         folders.add(new File(Options.DIRECTORYTEMP, "Ambience"));
         folders.add(new File(Options.DIRECTORYTEMP, "Entrainment"));
@@ -588,12 +551,13 @@ public class This_Session {
     }
 
 // Playback
-    public void openplayer() {
+    public void player_openplayer() {
         playerUI = new PlayerUI();
         playerUI.setOnShowing(event -> Root.getStage().setIconified(true));
         playerUI.setOnCloseRequest(event -> {
-            if (! endsessionprematurely()) {event.consume();}
-            else {stopsession();}
+            if (! player_endsessionprematurely()) {event.consume();}
+            else {
+                player_stop();}
         });
         playerUI.setOnHidden(event -> {
             // Reset Created Session
@@ -601,7 +565,7 @@ public class This_Session {
         });
         playerUI.showAndWait();
     }
-    public void playsession() {
+    public void player_play() {
         switch (playerState) {
             case IDLE:
             case STOPPED:
@@ -610,7 +574,7 @@ public class This_Session {
                 totalsessionduration = Duration.ZERO;
                 for (Meditatable i : itemsinsession) {totalsessionduration = totalsessionduration.add(i.getduration());}
                 playerUI.TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
-                updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> updateplayerui()));
+                updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> player_updateui()));
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 updateuitimeline.play();
                 meditatablecount = 0;
@@ -624,20 +588,20 @@ public class This_Session {
                 break;
         }
     }
-    public void pausesession() {
+    public void player_pause() {
         if (playerState == PlayerState.PLAYING) {
             currentmeditatable.pause();
             updateuitimeline.pause();
         }
     }
-    public void stopsession() {
+    public void player_stop() {
         try {
             currentmeditatable.stop();
             updateuitimeline.stop();
         } catch (NullPointerException ignored) {}
-        resetthissession();
+        player_reset();
     }
-    public void updateplayerui() {
+    public void player_updateui() {
         try {
             totalsessiondurationelapsed = totalsessiondurationelapsed.add(Duration.seconds(1.0));
             try {
@@ -683,12 +647,12 @@ public class This_Session {
 //            new MainController.ExceptionDialog(Root, e).show();
         }
     }
-    public void progresstonextmeditatable() {
+    public void player_progresstonextmeditatable() {
         try {
             switch (playerState) {
                 case TRANSITIONING:
                     try {
-                        currentmeditatable.transition_goalscheck();
+                        currentmeditatable.goals_transitioncheck();
                         currentmeditatable.cleanupPlayersandAnimations();
                         meditatablecount++;
                         currentmeditatable = getallitemsinSession().get(meditatablecount);
@@ -696,17 +660,17 @@ public class This_Session {
                     } catch (IndexOutOfBoundsException ignored) {
                         playerState = PlayerState.IDLE;
                         currentmeditatable.cleanupPlayersandAnimations();
-                        endofsession();
+                        player_endofsession();
                     }
                     break;
                 case PLAYING:
-                    closereferencefile();
-                    transition();
+                    player_closereferencefile();
+                    player_transition();
                     break;
             }
         } catch (Exception ignored) {}
     }
-    public void endofsession() {
+    public void player_endofsession() {
         playerUI.CurrentCutTopLabel.setText(currentmeditatable.name + " Completed");
         playerUI.TotalSessionLabel.setText("Session Completed");
         updateuitimeline.stop();
@@ -716,12 +680,12 @@ public class This_Session {
         Root.session_gui_opensessiondetailsdialog();
         // TODO Prompt For Export
 //        if (Util.dialog_YesNoConfirmation(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
-//            getsessionexporter();}
+//            exporter_getsessionexporter();}
         Root.sessions_gui_updateui();
         Root.goals_gui_updateui();
-        resetthissession();
+        player_reset();
     }
-    public void resetthissession() {
+    public void player_reset() {
         updateuitimeline = null;
         Root.getSessions().deletenonvalidsessions();
         meditatablecount = 0;
@@ -729,13 +693,13 @@ public class This_Session {
         totalsessionduration = Duration.ZERO;
         playerUI.reset();
     }
-    public void transition() {
+    public void player_transition() {
         Session currentsession =  Root.getSessions().sessioninformation_getspecificsession( Root.getSessions().sessioninformation_totalsessioncount() - 1);
         currentsession.updatecutduration(currentmeditatable.number, new Double(currentmeditatable.getduration().toMinutes()).intValue());
         Root.getSessions().marshall();
         Root.goals_gui_updateui();
         currentmeditatable.stop();
-        if (currentmeditatable.name.equals("Postsession")) {playerState = PlayerState.TRANSITIONING; progresstonextmeditatable();}
+        if (currentmeditatable.name.equals("Postsession")) {playerState = PlayerState.TRANSITIONING; player_progresstonextmeditatable();}
         else if (Root.getOptions().getSessionOptions().getAlertfunction()) {
             Media alertmedia = new Media(Root.getOptions().getSessionOptions().getAlertfilelocation());
             MediaPlayer alertplayer = new MediaPlayer(alertmedia);
@@ -744,7 +708,7 @@ public class This_Session {
             alertplayer.setOnEndOfMedia(() -> {
                 alertplayer.stop();
                 alertplayer.dispose();
-                progresstonextmeditatable();
+                player_progresstonextmeditatable();
             });
             alertplayer.setOnError(() -> {
                 if (Root.dialog_YesNoConfirmation("Confirmation", "An Error Occured While Playing Alert File" +
@@ -755,32 +719,32 @@ public class This_Session {
                 } else {
                     alertplayer.stop();
                     alertplayer.dispose();
-                    progresstonextmeditatable();
+                    player_progresstonextmeditatable();
                 }
             });
         } else {
                 playerState = PlayerState.TRANSITIONING;
-                progresstonextmeditatable();
+                player_progresstonextmeditatable();
         }
     }
-    public void error_endplayback() {
+    public void player_error() {
 
     }
-    public boolean endsessionprematurely() {
+    public boolean player_endsessionprematurely() {
         if (playerState == PlayerState.PLAYING || playerState == PlayerState.PAUSED || playerState == PlayerState.TRANSITIONING) {
-            pausesession();
+            player_pause();
             if (Root.dialog_YesNoConfirmation("End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {return true;}
-            else {playsession(); return false;}
+            else {player_play(); return false;}
         } else {return true;}
     }
-    public void togglevolumebinding() {
+    public void player_togglevolumebinding() {
         if (playerState == PlayerState.IDLE || playerState == PlayerState.STOPPED) {
             currentmeditatable.volume_rebindentrainment();
-            if (currentmeditatable.getAmbienceenabled()) {
+            if (currentmeditatable.ambienceenabled) {
                 currentmeditatable.volume_rebindambience();}
         }
     }
-    public void displayreferencefile() {
+    public void player_displayreferencefile() {
         boolean notalreadyshowing = displayReference == null || ! displayReference.isShowing();
         boolean referenceenabledwithvalidtype = Root.getOptions().getSessionOptions().getReferenceoption() &&
                 (Root.getOptions().getSessionOptions().getReferencetype() == ReferenceType.html || Root.getOptions().getSessionOptions().getReferencetype() == ReferenceType.txt);
@@ -795,15 +759,15 @@ public class This_Session {
             });
         }
     }
-    public void displayreferencepreview(String referencetext) {
+    public void player_displayreferencepreview(String referencetext) {
         new DisplayReference(referencetext).showAndWait();
     }
-    public void closereferencefile() {
-        if (referencecurrentlyDisplayed()) {
+    public void player_closereferencefile() {
+        if (player_isreferencecurrentlyDisplayed()) {
             displayReference.close();
         }
     }
-    public boolean referencecurrentlyDisplayed() {
+    public boolean player_isreferencecurrentlyDisplayed() {
         return displayReference != null && displayReference.isShowing() && displayReference.EntrainmentVolumeSlider != null;
     }
 
@@ -1074,7 +1038,7 @@ public class This_Session {
                 setTitle("Session Player");
                 reset();
                 boolean referenceoption = Root.getOptions().getSessionOptions().getReferenceoption();
-                if (referenceoption && referenceType != null && checkallreferencefilesforsession(false)) {ReferenceToggleButton.setSelected(true);}
+                if (referenceoption && referenceType != null && creation_checkreferencefiles(false)) {ReferenceToggleButton.setSelected(true);}
                 else {ReferenceToggleButton.setSelected(false);}
                 togglereference(null);
                 ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
@@ -1083,7 +1047,7 @@ public class This_Session {
                 TotalTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
                 setOnCloseRequest(event -> {
                     if (playerState == PlayerState.PLAYING || playerState == PlayerState.STOPPED || playerState == PlayerState.PAUSED || playerState == PlayerState.IDLE) {
-                        if (endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}
+                        if (player_endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}
                     } else {
                         Util.gui_showtimedmessageonlabel(StatusBar, "Cannot Close Player During Fade Animation", 400);
                         new Timeline(new KeyFrame(Duration.millis(400), ae -> currentmeditatable.toggleplayerbuttons()));
@@ -1094,9 +1058,11 @@ public class This_Session {
         }
 
         // Button Actions
-        public void play() {playsession();}
-        public void pause() {pausesession();}
-        public void stop() {stopsession();}
+        public void play() {player_play();}
+        public void pause() {
+            player_pause();}
+        public void stop() {
+            player_stop();}
         public void togglereference(ActionEvent actionEvent) {
             boolean buttontoggled = ReferenceToggleButton.isSelected();
             Root.getOptions().getSessionOptions().setReferenceoption(buttontoggled);
@@ -1106,8 +1072,8 @@ public class This_Session {
                 ReferenceHTMLButton.setSelected(false);
                 ReferenceTXTButton.setSelected(false);
                 Root.getOptions().getSessionOptions().setReferencetype(null);
-                closereferencefile();
-                togglevolumebinding();
+                player_closereferencefile();
+                player_togglevolumebinding();
             } else {
                 if (Root.getOptions().getSessionOptions().getReferencetype() == null) {Root.getOptions().getSessionOptions().setReferencetype(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);}
                 switch (Root.getOptions().getSessionOptions().getReferencetype()) {
@@ -1120,13 +1086,13 @@ public class This_Session {
                         txtreferenceoptionselected(null);
                         break;
                 }
-                if (! checkallreferencefilesforsession(true)) {
+                if (! creation_checkreferencefiles(true)) {
                     ReferenceToggleButton.setSelected(false);
                     togglereference(null);
                 }
                 if (playerState == PlayerState.PLAYING) {
-                    displayreferencefile();
-                    togglevolumebinding();
+                    player_displayreferencefile();
+                    player_togglevolumebinding();
                 }
             }
         }
@@ -1281,7 +1247,7 @@ public class This_Session {
             ContentPane.setStyle("-fx-background-color: #212526");
         }
         public void loadcontent() {
-            File referencefile = currentmeditatable.getReferenceFile();
+            File referencefile = currentmeditatable.reference_getFile();
             if (referencefile != null) {
                 switch (referenceType) {
                     case txt:
@@ -1315,9 +1281,11 @@ public class This_Session {
             playerUI.togglereference(null);
         }
 
-        public void play(ActionEvent actionEvent) {playsession();}
-        public void pause(ActionEvent actionEvent) {pausesession();}
-        public void stop(ActionEvent actionEvent) {stopsession();}
+        public void play(ActionEvent actionEvent) {player_play();}
+        public void pause(ActionEvent actionEvent) {
+            player_pause();}
+        public void stop(ActionEvent actionEvent) {
+            player_stop();}
 
 }
     public class CutInvocationDialog extends Stage {

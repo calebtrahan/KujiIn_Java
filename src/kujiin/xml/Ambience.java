@@ -7,22 +7,24 @@ import kujiin.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Ambience {
     private List<SoundFile> Ambience;
+    @XmlTransient
     private List<SoundFile> CreatedAmbience;
 
     public Ambience() {}
 
     // Getters And Setters
-    public List<SoundFile> getAmbience() {
+    public List<SoundFile> getAmbienceList() {
         return Ambience;
     }
-    public void setAmbience(List<SoundFile> ambience) {
+    public void setAmbienceList(List<SoundFile> ambience) {
         this.Ambience = ambience;
     }
 
@@ -64,13 +66,13 @@ public class Ambience {
     }
     public SoundFile actual_get(int index) {return Ambience.get(index);}
     public SoundFile actual_get(String name) {
-        for (SoundFile i : getAmbience()) {
+        for (SoundFile i : getAmbienceList()) {
             if (i.getName().equals(name)) return i;
         }
         return null;
     }
     public SoundFile actual_get(File file) {
-        for (SoundFile i : getAmbience()) {
+        for (SoundFile i : getAmbienceList()) {
             if (i.getFile().equals(file)) return i;
         }
         return null;
