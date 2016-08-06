@@ -143,23 +143,24 @@ public class Entrainments {
                 JAXBContext context = JAXBContext.newInstance(Entrainments.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
                 Entrainments entrainments = (Entrainments) createMarshaller.unmarshal(Options.ENTRAINMENTXMLFILE);
-                setPresession(entrainments.getPresession());
-                setRin(entrainments.getRin());
-                setKyo(entrainments.getKyo());
-                setToh(entrainments.getToh());
-                setSha(entrainments.getSha());
-                setKai(entrainments.getKai());
-                setJin(entrainments.getJin());
-                setRetsu(entrainments.getRetsu());
-                setZai(entrainments.getZai());
-                setZen(entrainments.getZen());
-                setEarth(entrainments.getEarth());
-                setAir(entrainments.getAir());
-                setFire(entrainments.getFire());
-                setWater(entrainments.getWater());
-                setVoid(entrainments.getVoid());
-                setPostsession(entrainments.getPostsession());
+                Presession = entrainments.Presession;
+                Rin = entrainments.Rin;
+                Kyo = entrainments.Kyo;
+                Toh = entrainments.Toh;
+                Sha = entrainments.Sha;
+                Kai = entrainments.Kai;
+                Jin = entrainments.Jin;
+                Retsu = entrainments.Retsu;
+                Zai = entrainments.Zai;
+                Zen = entrainments.Zen;
+                Earth = entrainments.Earth;
+                Air = entrainments.Air;
+                Fire = entrainments.Fire;
+                Water = entrainments.Water;
+                Void = entrainments.Void;
+                Postsession = entrainments.Postsession;
             } catch (JAXBException e) {
+                e.printStackTrace();
                 Root.dialog_Information("Information", "Couldn't Read Entrainment XML File", "Check Read File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
             }
         } else {
@@ -185,92 +186,44 @@ public class Entrainments {
 // Other Methods
     public Entrainment getmeditatableEntrainment(int index) {
         switch (index) {
-            case 0:
-                return getPresession();
-            case 1:
-                return getRin();
-            case 2:
-                return getKyo();
-            case 3:
-                return getToh();
-            case 4:
-                return getSha();
-            case 5:
-                return getKai();
-            case 6:
-                return getJin();
-            case 7:
-                return getRetsu();
-            case 8:
-                return getZai();
-            case 9:
-                return getZen();
-            case 10:
-                return getEarth();
-            case 11:
-                return getAir();
-            case 12:
-                return getFire();
-            case 13:
-                return getWater();
-            case 14:
-                return getVoid();
-            case 15:
-                return getPostsession();
-            default:
-                return null;
+            case 0: return Presession;
+            case 1: return Rin;
+            case 2: return Kyo;
+            case 3: return Toh;
+            case 4: return Sha;
+            case 5: return Kai;
+            case 6: return Jin;
+            case 7: return Retsu;
+            case 8: return Zai;
+            case 9: return Zen;
+            case 10: return Earth;
+            case 11: return Air;
+            case 12: return Fire;
+            case 13: return Water;
+            case 14: return Void;
+            case 15: return Postsession;
+            default: return null;
         }
     }
     public void setmeditatableEntrainment(int index, Entrainment entrainment) {
         switch (index) {
-            case 0:
-                setPresession(entrainment);
-                break;
-            case 1:
-                setRin(entrainment);
-                break;
-            case 2:
-                setKyo(entrainment);
-                break;
-            case 3:
-                setToh(entrainment);
-                break;
-            case 4:
-                setSha(entrainment);
-                break;
-            case 5:
-                setKai(entrainment);
-                break;
-            case 6:
-                setJin(entrainment);
-                break;
-            case 7:
-                setRetsu(entrainment);
-                break;
-            case 8:
-                setZai(entrainment);
-                break;
-            case 9:
-                setZen(entrainment);
-                break;
-            case 10:
-                setEarth(entrainment);
-                break;
-            case 11:
-                setAir(entrainment);
-                break;
-            case 12:
-                setFire(entrainment);
-                break;
-            case 13:
-                setWater(entrainment);
-                break;
-            case 14:
-                setVoid(entrainment);
-                break;
-            case 15:
-                setPostsession(entrainment);
-                break;
+            case 0: Presession = entrainment; break;
+            case 1: Rin = entrainment; break;
+            case 2: Kyo = entrainment; break;
+            case 3: Toh = entrainment; break;
+            case 4: Sha = entrainment; break;
+            case 5: Kai = entrainment; break;
+            case 6: Jin = entrainment; break;
+            case 7: Retsu = entrainment; break;
+            case 8: Zai = entrainment; break;
+            case 9: Zen = entrainment; break;
+            case 10: Earth = entrainment; break;
+            case 11: Air = entrainment; break;
+            case 12: Fire = entrainment; break;
+            case 13: Water = entrainment; break;
+            case 14: Void = entrainment; break;
+            case 15: Postsession = entrainment; break;
         }
     }
+
 }

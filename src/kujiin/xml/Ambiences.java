@@ -9,12 +9,11 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlRootElement
 public class Ambiences {
     private Ambience Presession;
@@ -33,15 +32,111 @@ public class Ambiences {
     private Ambience Water;
     private Ambience Void;
     private Ambience Postsession;
-    @XmlTransient
     private final List<Ambience> AllAmbiences = new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));
-    @XmlTransient
     private MainController Root;
 
     public Ambiences() {}
     public Ambiences(MainController Root) {this.Root = Root;}
 
-// XML Processing
+// Getters And Setters
+    public Ambience getPresession() {
+        return Presession;
+    }
+    public void setPresession(Ambience presession) {
+        Presession = presession;
+    }
+    public Ambience getRin() {
+        return Rin;
+    }
+    public void setRin(Ambience rin) {
+        Rin = rin;
+    }
+    public Ambience getKyo() {
+        return Kyo;
+    }
+    public void setKyo(Ambience kyo) {
+        Kyo = kyo;
+    }
+    public Ambience getToh() {
+        return Toh;
+    }
+    public void setToh(Ambience toh) {
+        Toh = toh;
+    }
+    public Ambience getSha() {
+        return Sha;
+    }
+    public void setSha(Ambience sha) {
+        Sha = sha;
+    }
+    public Ambience getKai() {
+        return Kai;
+    }
+    public void setKai(Ambience kai) {
+        Kai = kai;
+    }
+    public Ambience getJin() {
+        return Jin;
+    }
+    public void setJin(Ambience jin) {
+        Jin = jin;
+    }
+    public Ambience getRetsu() {
+        return Retsu;
+    }
+    public void setRetsu(Ambience retsu) {
+        Retsu = retsu;
+    }
+    public Ambience getZai() {
+        return Zai;
+    }
+    public void setZai(Ambience zai) {
+        Zai = zai;
+    }
+    public Ambience getZen() {
+        return Zen;
+    }
+    public void setZen(Ambience zen) {
+        Zen = zen;
+    }
+    public Ambience getEarth() {
+        return Earth;
+    }
+    public void setEarth(Ambience earth) {
+        Earth = earth;
+    }
+    public Ambience getAir() {
+        return Air;
+    }
+    public void setAir(Ambience air) {
+        Air = air;
+    }
+    public Ambience getFire() {
+        return Fire;
+    }
+    public void setFire(Ambience fire) {
+        Fire = fire;
+    }
+    public Ambience getWater() {
+        return Water;
+    }
+    public void setWater(Ambience water) {
+        Water = water;
+    }
+    public Ambience getVoid() {
+        return Void;
+    }
+    public void setVoid(Ambience aVoid) {
+        Void = aVoid;
+    }
+    public Ambience getPostsession() {
+        return Postsession;
+    }
+    public void setPostsession(Ambience postsession) {
+        Postsession = postsession;
+    }
+
+    // XML Processing
     public void unmarshall() {
         if (Options.AMBIENCEXMLFILE.exists()) {
             try {
@@ -64,9 +159,7 @@ public class Ambiences {
                 Water = ambiences.Water;
                 Void = ambiences.Void;
                 Postsession = ambiences.Postsession;
-            } catch (JAXBException e) {
-                Root.dialog_Information("Information", "Couldn't Read Ambience XML File", "Check Read File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());
-            }
+            } catch (JAXBException e) {Root.dialog_Information("Information", "Couldn't Read Ambience XML File", "Check Read File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
         } else {
             for (int i = 0; i < AllAmbiences.size(); i++) {
                 Ambience selectedambience = AllAmbiences.get(i);
@@ -81,9 +174,7 @@ public class Ambiences {
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.AMBIENCEXMLFILE);
-        } catch (JAXBException e) {
-            e.printStackTrace();
-            Root.dialog_Information("Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
+        } catch (JAXBException ignored) {Root.dialog_Information("Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
     }
 
 // Other Methods
@@ -177,4 +268,12 @@ public class Ambiences {
                 break;
         }
     }
+    public void getSessionValues() {
+        for (int i = 0; i < 15; i++) {
+            for (SoundFile x : getmeditatableAmbience(i).getAmbience()) {
+                System.out.println(x.getName());
+            }
+        }
+    }
+
 }

@@ -118,7 +118,9 @@ public class Meditatable {
     private void setDuration(double newduration) {
         duration = new Duration((newduration * 60) * 1000);
     }
-    public Ambience getAmbience() {return ambience;}
+    public Ambience getAmbience() {
+        return ambience;
+    }
     public Entrainment getEntrainment() {return entrainment;}
     public void setEntrainment(Entrainment entrainment) {this.entrainment = entrainment;}
     public void setGoalsController(Goals goals) {
@@ -155,7 +157,7 @@ public class Meditatable {
         ambience.created_clear();
         Duration currentambienceduration = new Duration(0);
         if (ambience.hasEnoughAmbience(getduration())) {
-            for (SoundFile i : ambience.getAmbienceList()) {
+            for (SoundFile i : ambience.getAmbience()) {
                 if (ambience.gettotalCreatedDuration().lessThan(getduration())) {
                     ambience.created_add(i);
                     currentambienceduration = currentambienceduration.add(new Duration(i.getDuration()));
@@ -165,7 +167,7 @@ public class Meditatable {
             Random randint = new Random();
             while (currentambienceduration.lessThan(getduration())) {
                 List<SoundFile> createdambience = ambience.created_getAll();
-                SoundFile selectedsoundfile = ambience.actual_get(randint.nextInt(ambience.getAmbienceList().size() - 1));
+                SoundFile selectedsoundfile = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
                 if (createdambience.size() < 2) {
                     ambience.created_add(selectedsoundfile);
                     currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));

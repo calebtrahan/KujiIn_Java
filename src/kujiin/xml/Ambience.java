@@ -12,19 +12,24 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlAccessorType(XmlAccessType.FIELD)
+/**
+ * Created by caleb on 8/6/16.
+ */
+@XmlAccessorType(XmlAccessType.PROPERTY)
 public class Ambience {
     private List<SoundFile> Ambience;
     @XmlTransient
     private List<SoundFile> CreatedAmbience;
 
-    public Ambience() {}
+    public Ambience() {
+    }
 
     // Getters And Setters
-    public List<SoundFile> getAmbienceList() {
+    public List<SoundFile> getAmbience() {
         return Ambience;
     }
-    public void setAmbienceList(List<SoundFile> ambience) {
+
+    public void setAmbience(List<SoundFile> ambience) {
         this.Ambience = ambience;
     }
 
@@ -34,11 +39,20 @@ public class Ambience {
         if (Util.audio_isValid(file)) {
             SoundFile tempfile = new SoundFile(file);
             if (!ambienceexistsinActual(tempfile)) {
-                actual_add(tempfile); return true;}
-            else {return false;}
-        } else {return false;}
+                actual_add(tempfile);
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
-    private void actual_initialize() {if (Ambience == null) Ambience = new ArrayList<>();}
+
+    private void actual_initialize() {
+        if (Ambience == null) Ambience = new ArrayList<>();
+    }
+
     public void actual_add(SoundFile soundFile) {
         actual_initialize();
         if (soundFile.getDuration() == null) {
@@ -49,8 +63,11 @@ public class Ambience {
                 Ambience.add(soundFile);
                 calcdurationplayer.dispose();
             });
-        } else {Ambience.add(soundFile);}
+        } else {
+            Ambience.add(soundFile);
+        }
     }
+
     public void actual_add(int index, SoundFile soundFile) {
         actual_initialize();
         if (soundFile.getDuration() == null) {
@@ -64,75 +81,126 @@ public class Ambience {
             Ambience.add(soundFile);
         }
     }
-    public SoundFile actual_get(int index) {return Ambience.get(index);}
+
+    public SoundFile actual_get(int index) {
+        return Ambience.get(index);
+    }
+
     public SoundFile actual_get(String name) {
-        for (SoundFile i : getAmbienceList()) {
+        for (SoundFile i : getAmbience()) {
             if (i.getName().equals(name)) return i;
         }
         return null;
     }
+
     public SoundFile actual_get(File file) {
-        for (SoundFile i : getAmbienceList()) {
+        for (SoundFile i : getAmbience()) {
             if (i.getFile().equals(file)) return i;
         }
         return null;
     }
-    public void actual_remove(SoundFile soundFile) {Ambience.remove(soundFile);}
-    public void actual_remove(int index) {Ambience.remove(index);}
+
+    public void actual_remove(SoundFile soundFile) {
+        Ambience.remove(soundFile);
+    }
+
+    public void actual_remove(int index) {
+        Ambience.remove(index);
+    }
+
     // Created Ambience
-    private void created_initialize() {if (CreatedAmbience == null) CreatedAmbience = new ArrayList<>();}
+    private void created_initialize() {
+        if (CreatedAmbience == null) CreatedAmbience = new ArrayList<>();
+    }
+
     public void created_add(SoundFile soundFile) {
-        created_initialize(); CreatedAmbience.add(soundFile);}
+        created_initialize();
+        CreatedAmbience.add(soundFile);
+    }
+
     public SoundFile created_get(int index) {
-        if (CreatedAmbience == null) {System.out.println("Created Ambience Is Null");}
+        if (CreatedAmbience == null) {
+            System.out.println("Created Ambience Is Null");
+        }
         return CreatedAmbience.get(index);
     }
+
     public SoundFile created_get(String name) {
         for (SoundFile i : CreatedAmbience) {
             if (i.getName().equals(name)) return i;
         }
         return null;
     }
+
     public SoundFile created_get(File file) {
         for (SoundFile i : CreatedAmbience) {
             if (i.getFile().equals(file)) return i;
         }
         return null;
     }
-    public List<SoundFile> created_getAll() {return CreatedAmbience;}
-    public void created_remove(SoundFile soundFile) {CreatedAmbience.remove(soundFile);}
-    public void created_remove(int index) {CreatedAmbience.remove(index);}
-    public void created_clear() {if (CreatedAmbience != null) CreatedAmbience.clear();}
+
+    public List<SoundFile> created_getAll() {
+        return CreatedAmbience;
+    }
+
+    public void created_remove(SoundFile soundFile) {
+        CreatedAmbience.remove(soundFile);
+    }
+
+    public void created_remove(int index) {
+        CreatedAmbience.remove(index);
+    }
+
+    public void created_clear() {
+        if (CreatedAmbience != null) CreatedAmbience.clear();
+    }
 
     // Validation Methods
-    public boolean hasAnyAmbience() {return Ambience != null && Ambience.size() > 0;}
+    public boolean hasAnyAmbience() {
+        return Ambience != null && Ambience.size() > 0;
+    }
+
     public boolean hasEnoughAmbience(Duration duration) {
         return gettotalActualDuration().greaterThanOrEqualTo(duration);
     }
+
     public boolean ambienceexistsinActual(SoundFile soundFile) {
         try {
-            if (Ambience.contains(soundFile)) {return true;}
+            if (Ambience.contains(soundFile)) {
+                return true;
+            }
             for (SoundFile i : Ambience) {
-                if (i.getFile().equals(soundFile.getFile())) {return true;}
+                if (i.getFile().equals(soundFile.getFile())) {
+                    return true;
+                }
             }
             return false;
+        } catch (NullPointerException ignored) {
+            return false;
         }
-        catch (NullPointerException ignored) {return false;}
     }
-    public boolean ambienceexistsinCreated(SoundFile soundFile) {return CreatedAmbience.contains(soundFile);}
+
+    public boolean ambienceexistsinCreated(SoundFile soundFile) {
+        return CreatedAmbience.contains(soundFile);
+    }
 
     // Information Methods
     public Duration gettotalActualDuration() {
         Duration duration = new Duration(0);
         if (Ambience != null) {
-            for (SoundFile i : Ambience) {duration = duration.add(new Duration(i.getDuration()));}
+            for (SoundFile i : Ambience) {
+                duration = duration.add(new Duration(i.getDuration()));
+            }
         }
         return duration;
     }
+
     public Duration gettotalCreatedDuration() {
         Duration duration = new Duration(0);
         if (CreatedAmbience != null) {
-            for (SoundFile i : CreatedAmbience) {duration = duration.add(new Duration(i.getDuration()));}
+            for (SoundFile i : CreatedAmbience) {
+                duration = duration.add(new Duration(i.getDuration()));
+            }
         }
         return duration;
     }

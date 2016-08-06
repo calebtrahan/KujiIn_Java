@@ -33,10 +33,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-// Bugs
+    // Bugs
 // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
 
-// Additional Features
+    // Additional Features
 // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
 // TODO Design A 'Select Your Own Ambience' Wizard As An Alternative To Randomized Ambience During Session Creation
 // TODO Redesign Goals Completed Dialog Using Bar Charts/Graphs
@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
 // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
 
-// Optional Features
+    // Optional Features
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
 // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
 // TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
@@ -112,10 +112,10 @@ public class MainController implements Initializable {
     public Label GoalProgressPercentageLabel;
     private Scene Scene;
     private Stage Stage;
-    private This_Session Session;
-    private Preset Preset;
 
 // My Fields
+    private This_Session Session;
+    private Preset Preset;
     private Timeline creator_updateuitimeline;
     private Sessions Sessions;
     private Meditatable SessionsAndGoalsSelectedMeditatable;
@@ -142,7 +142,7 @@ public class MainController implements Initializable {
     public boolean cleanup() {
         Ambiences.marshall();
         Entrainments.marshall();
-        getOptions().marshall();
+        Options.marshall();
         return creation_cleanup() && exporter_cleanup() && sessions_cleanup() && goals_cleanup();
     }
     public void close(ActionEvent actionEvent) {
@@ -153,14 +153,8 @@ public class MainController implements Initializable {
     public Entrainments getEntrainments() {
     return Entrainments;
 }
-    public void setEntrainments(Entrainments entrainments) {
-        Entrainments = entrainments;
-    }
     public Ambiences getAmbiences() {
         return Ambiences;
-    }
-    public void setAmbiences(Ambiences ambiences) {
-        this.Ambiences = ambiences;
     }
     public This_Session getSession() {
         return Session;
@@ -236,9 +230,7 @@ public class MainController implements Initializable {
         Util.menu_contactme();}
 
 // Presets
-    public void preset_initialize() {
-        Preset = new Preset(this);
-    }
+    public void preset_initialize() {Preset = new Preset(this);}
     public void preset_load(ActionEvent actionEvent) {
         File presetfile = Preset.open();
         if (presetfile != null && Preset.hasvalidValues()) {
@@ -692,10 +684,8 @@ public class MainController implements Initializable {
         }
     }
 
-
-// Answer Dialog Methods
 // Gui Methods
-//     TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified (When It's Supposed To Be)
+    // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified (When It's Supposed To Be)
     public boolean dialog_YesNoConfirmation(String titletext, String headertext, String contenttext) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setTitle(titletext);
@@ -2258,7 +2248,7 @@ public class MainController implements Initializable {
             if (selectedmeditatable != null) {
                 try {
                     if (selectedmeditatable.getAmbience() == null) {return false;}
-                    for (SoundFile i : selectedmeditatable.getAmbience().getAmbienceList()) {
+                    for (SoundFile i : selectedmeditatable.getAmbience().getAmbience()) {
                         actual_soundfilelist.add(i);
                         actual_ambiencesonglist.add(new AmbienceSong(i));
                     }
@@ -2278,7 +2268,7 @@ public class MainController implements Initializable {
         public boolean unsavedchanges() {
             if (MeditatableSelectionBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
             try {
-                List<SoundFile> ambiencelist = selectedmeditatable.getAmbience().getAmbienceList();
+                List<SoundFile> ambiencelist = selectedmeditatable.getAmbience().getAmbience();
                 if (actual_soundfilelist.size() != ambiencelist.size()) {return true;}
                 for (SoundFile x : actual_soundfilelist) {
                     if (! ambiencelist.contains(x)) {return true;}
@@ -2467,7 +2457,7 @@ public class MainController implements Initializable {
             if (selectedmeditatable != null) {
                 try {
                     if (selectedmeditatable.getAmbience() == null) {return false;}
-                    for (SoundFile i : selectedmeditatable.getAmbience().getAmbienceList()) {
+                    for (SoundFile i : selectedmeditatable.getAmbience().getAmbience()) {
                         SoundList.add(i);
                         AmbienceList.add(new AmbienceSong(i));
                     }
@@ -2492,7 +2482,7 @@ public class MainController implements Initializable {
         public boolean unsavedchanges() {
             if (MeditatableChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
             try {
-                List<SoundFile> ambiencelist = selectedmeditatable.getAmbience().getAmbienceList();
+                List<SoundFile> ambiencelist = selectedmeditatable.getAmbience().getAmbience();
                 if (SoundList.size() != ambiencelist.size()) {return true;}
                 for (SoundFile x : SoundList) {
                     if (! ambiencelist.contains(x)) {return true;}
@@ -2627,6 +2617,7 @@ public class MainController implements Initializable {
             }
         }
     }
+
 // Table Classes
     public class AmbienceSong {
     private StringProperty name;
