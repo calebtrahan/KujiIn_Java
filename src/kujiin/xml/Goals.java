@@ -99,7 +99,7 @@ public class Goals {
             return true;
         } catch (Exception ignored) {return false;}
     }
-    // Deletennnn
+    // Delete
     public boolean delete(int meditatableindex, Goal currentGoal) {
         try {
             getAllGoals(meditatableindex).remove(currentGoal);
@@ -165,8 +165,11 @@ public class Goals {
         }
     }
     public Goal getCurrentGoal(int meditatableindex) {
-        try {return getallMeditatableGoalLists().get(meditatableindex).get(getAllGoals(meditatableindex).size() - 1);}
-        catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}
+        try {
+            Goal goal = getallMeditatableGoalLists().get(meditatableindex).get(getAllGoals(meditatableindex).size() - 1);
+            if (goal.getCompleted() != null && ! goal.getCompleted()) {return goal;}
+            else {return null;}
+        } catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}
     }
     public List<Goal> getAllGoals(int meditatableindex) {
         return getallMeditatableGoalLists().get(meditatableindex);

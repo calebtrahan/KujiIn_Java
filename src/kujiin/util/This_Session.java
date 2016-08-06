@@ -638,8 +638,10 @@ public class This_Session {
         }
     }
     public void stopsession() {
-        currentmeditatable.stop();
-        updateuitimeline.stop();
+        try {
+            currentmeditatable.stop();
+            updateuitimeline.stop();
+        } catch (NullPointerException ignored) {}
         resetthissession();
     }
     public void updateplayerui() {
@@ -812,7 +814,6 @@ public class This_Session {
         return displayReference != null && displayReference.isShowing() && displayReference.EntrainmentVolumeSlider != null;
     }
 
-
 // Dialogs
     public class CutsMissingDialog  extends Stage {
     public Button AddMissingCutsButton;
@@ -877,7 +878,7 @@ public class This_Session {
             cutdurationdialog.showAndWait();
             for (Cut i : missingcuts) {
                 if (cutdurationdialog.getDuration() != 0) {
-                    i.setDuration(cutdurationdialog.getDuration());
+                    i.changevalue(cutdurationdialog.getDuration());
                 }
             }
         }

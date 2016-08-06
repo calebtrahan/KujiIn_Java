@@ -88,7 +88,7 @@ public class Meditatable {
     }
 
 // GUI Methods
-    public void toggleswitch() {
+    private void toggleswitch() {
     if (Switch.isSelected()) {
         Value.setText("0");
         Value.setDisable(false);
@@ -119,7 +119,9 @@ public class Meditatable {
     public String getNameForChart() {return name;}
     protected MediaPlayer getCurrentEntrainmentPlayer() {return entrainmentplayer;}
     protected MediaPlayer getCurrentAmbiencePlayer() {return ambienceplayer;}
-    public void setDuration(double newduration) {duration = new Duration((newduration * 60) * 1000);}
+    private void setDuration(double newduration) {
+        duration = new Duration((newduration * 60) * 1000);
+    }
     public void setAmbienceenabled(boolean ambienceenabled) {
         this.ambienceenabled = ambienceenabled;
     }
@@ -147,9 +149,6 @@ public class Meditatable {
     public void setGoalsController(Goals goals) {
         GoalsController = goals;
     }
-    public Goals getGoalsController() {
-        return GoalsController;
-    }
     public Boolean getAmbienceenabled() {
         return ambienceenabled;
     }
@@ -176,11 +175,11 @@ public class Meditatable {
         if (ambienceenabled) {return buildEntrainment() && buildAmbience();}
         else {return buildEntrainment();}
     }
-    public boolean buildEntrainment() {
+    protected boolean buildEntrainment() {
         entrainment.created_clear();
         return true;
     }
-    public boolean buildAmbience() {
+    protected boolean buildAmbience() {
         ambience.created_clear();
         Duration currentambienceduration = new Duration(0);
         if (ambience.hasEnoughAmbience(getduration())) {
@@ -805,13 +804,12 @@ public class Meditatable {
     public void volume_rebindambience() {volume_unbindambience(); volume_bindambience();}
     public void volume_rebindentrainment() {volume_unbindentrainment(); volume_bindentrainment();}
     public void tick() {
-//        try {
-//            entrainmentplayer.setVolume(currententrainmentvolume);
-//            if (ambienceenabled) ambienceplayer.setVolume(currentambiencevolume);
-//        } catch (NullPointerException ignored) {}
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             try {
                 thisession.Root.getSessions().sessioninformation_getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatecutduration(number, new Double(elapsedtime.toMinutes()).intValue());
+                if (getCurrentGoal() != null && (getCurrentGoal().getGoal_Hours() * 60) >= getTotalMinutesPracticed(false)) {
+                    goalscompletedthissession.addAll(completegoalsandgetcompleted());
+                }
             } catch (NullPointerException ignored) {}
         }
     }

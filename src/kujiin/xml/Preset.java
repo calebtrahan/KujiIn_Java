@@ -35,57 +35,87 @@ public class Preset {
     private Double VoidTime;
     private Double PostTime;
     @XmlTransient
+    private File presetfile;
+    @XmlTransient
     private MainController Root;
 
     public Preset() {}
-    public Preset(MainController root) {
-        Root = root;
-    }
+    public Preset(MainController Root) {this.Root = Root;}
 
 // XML Processing
-    public void marshall(File presetfile) throws JAXBException {
-        JAXBContext context = JAXBContext.newInstance(Preset.class);
-        Marshaller createMarshaller = context.createMarshaller();
-        createMarshaller.marshal(this, presetfile);
+    public boolean marshall(File presetfile) {
+        try {
+            JAXBContext context = JAXBContext.newInstance(Preset.class);
+            Marshaller createMarshaller = context.createMarshaller();
+            createMarshaller.marshal(this, presetfile);
+            return presetfile.exists();
+        } catch (JAXBException ignored) {
+            if (presetfile.exists()) {presetfile.delete();}
+            return false;
+        }
     }
-    public void unmarshall(File presetfile) throws JAXBException {
-        JAXBContext context = JAXBContext.newInstance(Preset.class);
-        Unmarshaller createMarshaller = context.createUnmarshaller();
-        Preset loadedsession = (Preset) createMarshaller.unmarshal(presetfile);
-        PreTime = loadedsession.PreTime;
-        RinTime = loadedsession.PreTime;
-        KyoTime = loadedsession.PreTime;
-        TohTime = loadedsession.PreTime;
-        ShaTime = loadedsession.PreTime;
-        KaiTime = loadedsession.PreTime;
-        JinTime = loadedsession.PreTime;
-        RetsuTime = loadedsession.PreTime;
-        ZaiTime = loadedsession.PreTime;
-        ZenTime = loadedsession.PreTime;
-        EarthTime = loadedsession.PreTime;
-        AirTime = loadedsession.PreTime;
-        FireTime = loadedsession.PreTime;
-        WaterTime = loadedsession.PreTime;
-        VoidTime = loadedsession.PreTime;
-        PostTime = loadedsession.PreTime;
+    public boolean unmarshall(File presetfile) {
+        try {
+            JAXBContext context = JAXBContext.newInstance(Preset.class);
+            Unmarshaller createMarshaller = context.createUnmarshaller();
+            Preset loadedsession = (Preset) createMarshaller.unmarshal(presetfile);
+            PreTime = loadedsession.PreTime;
+            RinTime = loadedsession.RinTime;
+            KyoTime = loadedsession.KyoTime;
+            TohTime = loadedsession.TohTime;
+            ShaTime = loadedsession.ShaTime;
+            KaiTime = loadedsession.KaiTime;
+            JinTime = loadedsession.JinTime;
+            RetsuTime = loadedsession.RetsuTime;
+            ZaiTime = loadedsession.ZaiTime;
+            ZenTime = loadedsession.ZenTime;
+            EarthTime = loadedsession.EarthTime;
+            AirTime = loadedsession.AirTime;
+            FireTime = loadedsession.FireTime;
+            WaterTime = loadedsession.WaterTime;
+            VoidTime = loadedsession.VoidTime;
+            PostTime = loadedsession.PostTime;
+            return true;
+        } catch (JAXBException ignored) {return false;}
     }
 
 // Methods
     public boolean savepreset() {
-        File presetfile = Util.filechooser_save(Root.getScene(), "Save Preset As", null);
-        if (presetfile != null && Util.file_extensioncorrect(Root, "xml", presetfile).getName().endsWith(".xml")) {
-            try {
-                marshall(presetfile);
-                return true;
-            } catch (JAXBException e) {return false;}
-        } else {return false;}
+        presetfile = Util.filechooser_save(Root.getScene(), "Save Preset As", null);
+        if (presetfile == null) {return false;}
+        if (! presetfile.getName().endsWith(".xml")) {
+            if (! presetfile.getName().contains(".")) {
+                // No File Extension
+                if (Root.displayDialog_YesNoConfirmation("Confirmation", "Invalid Extension", "Save As A .xml File?")) {
+                    presetfile = new File(presetfile.getAbsolutePath().concat(".xml"));
+                } else {
+                    if (! Root.displayDialog_YesNoConfirmation("Confirmation", "Save Preset As Invalid XML File", "Really Save Without Valid Extension? You May Not Be Able To Load This Preset")) {
+                        presetfile = null;
+                        return false;
+                    }
+                }
+            } else {
+                // Invalid File Extension
+                String extension = presetfile.getName().substring(presetfile.getName().lastIndexOf("."));
+                if (Root.displayDialog_YesNoConfirmation("Confirmation", "Invalid Extension " + extension, "Rename As .xml?")) {
+                    String filewithoutextension = presetfile.getAbsolutePath().substring(0, presetfile.getName().lastIndexOf("."));
+                    presetfile = new File(filewithoutextension.concat(".xml"));
+                } else {
+                    if (! Root.displayDialog_YesNoConfirmation("Confirmation", "Really Save Preset With ." + extension + " Extension?", "You May Not Be Able To Load This Preset As It's Not A Valid .xml File")) {
+                        presetfile = null;
+                        return false;
+                    }
+                }
+            }
+        }
+        return marshall(presetfile);
     }
     public File openpreset() {
-        File presetfile = Util.filechooser_single(Root.getScene(), "Load Session Preset", null);
+        presetfile = Util.filechooser_single(Root.getScene(), "Load Session Preset", null);
         if (presetfile != null && presetfile.getName().endsWith(".xml")) {
-            try {unmarshall(presetfile); return presetfile;}
-            catch (JAXBException ignored) {return null;}
-        } else {return presetfile;}
+            if (unmarshall(presetfile)) {return presetfile;}
+            else {return null;}
+        } else {return null;}
     }
     public ArrayList<Double> getpresettimes() {
         return new ArrayList<>(Arrays.asList(PreTime, RinTime, KyoTime, TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, EarthTime, AirTime, FireTime, WaterTime, VoidTime, PostTime));
@@ -110,7 +140,7 @@ public class Preset {
             PostTime = (creatorvalues.get(15));
         } catch (ArrayIndexOutOfBoundsException ignored) {}
     }
-    public boolean validpreset() {
+    public boolean presethasvalidValues() {
         for (Double i : getpresettimes()) {if (i == null) {return false;}}
         return true;
     }

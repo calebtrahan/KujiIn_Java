@@ -125,6 +125,7 @@ public class MainController implements Initializable {
         setOptions(new Options(this));
         getOptions().unmarshall();
         setSession(new This_Session(this));
+        preset_initialize();
         creation_initialize();
         exporter_initialize();
         sessions_initialize();
@@ -215,27 +216,34 @@ public class MainController implements Initializable {
     }
 
 // Presets
+    public void preset_initialize() {
+        Preset = new Preset(this);
+    }
     public void preset_load(ActionEvent actionEvent) {
         File presetfile = Preset.openpreset();
-        if (presetfile != null && Preset.validpreset()) {
+        if (presetfile != null && Preset.presethasvalidValues()) {
             preset_changecreationvaluestopreset(Preset.getpresettimes());
         } else {if (presetfile != null) displayDialog_Information("Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
     }
     public void preset_save(ActionEvent actionEvent) {
-        // TODO Saving Preset Is Broke!
-        ArrayList<Double> creatorvalues = new ArrayList<>();
-        for (Meditatable i : getSession().getAllMeditatables()) {creatorvalues.add(i.getduration().toMinutes());}
-        Preset.setpresettimes(creatorvalues);
-        if (! Preset.validpreset()) {
-            displayDialog_Information("Information", "Cannot Save Preset", "All Values Are 0"); return;}
-        if (Preset.savepreset()) {Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Preset Successfully Saved", 4000);}
-        else {
-            displayDialog_Error("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
+        ArrayList<Double> creatorvaluesinminutes = new ArrayList<>();
+        boolean validsession = false;
+        for (Meditatable i : getSession().getAllMeditatables()) {
+            creatorvaluesinminutes.add(i.getduration().toMinutes());
+            if (i instanceof Qi_Gong) {if (((Qi_Gong) i).getdurationwithoutramp().greaterThan(Duration.ZERO)) {validsession = true;}}
+            else {if (i.getduration().greaterThan(Duration.ZERO)) {validsession = true;}}
+        }
+        if (validsession) {
+            Preset.setpresettimes(creatorvaluesinminutes);
+            if (Preset.savepreset()) {Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Preset Successfully Saved", 1500);}
+            else {displayDialog_Error("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
+        }
+        else {displayDialog_Information("Information", "Cannot Save Preset", "All Values Are 0");}
     }
     public void preset_changecreationvaluestopreset(ArrayList<Double> presetvalues) {
         try {
             for (int i = 0; i < getSession().getAllMeditatables().size(); i++) {
-                getSession().getAllMeditatables().get(i).setDuration(presetvalues.get(i));
+                getSession().getAllMeditatables().get(i).changevalue(presetvalues.get(i).intValue());
             }
         } catch (ArrayIndexOutOfBoundsException ignored) {
             displayDialog_Error("Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
@@ -302,7 +310,7 @@ public class MainController implements Initializable {
             if (creation_gui_allvaluesnotzero()) {
                 Session.checkambience(AmbienceSwitch);
             } else {
-                displayDialog_Information("Information", "All Cut Durations Are Zero", "Please Increase Cut(s) Durations Before Checking This");
+                displayDialog_Information("Cannot Add Ambience", "All Durations Are Zero", "Nothing To Add Ambience For");
                 AmbienceSwitch.setSelected(false);
             }
         } else {
@@ -589,7 +597,6 @@ public class MainController implements Initializable {
             newgoalbuttontext = kujiin.xml.Options.NEWGOALTEXT;
             newgoalbuttontooltip = new Tooltip("Set A New Goal");
         } else if (SessionsAndGoalsSelectedMeditatable.getCurrentGoal() == null || SessionsAndGoalsSelectedMeditatable.getTotalMinutesPracticed(false) == 0) {
-            System.out.println(SessionsAndGoalsSelectedMeditatable.getCurrentGoal());
             // No Current Goal Set
             toptext = "No Current Goal";
             percentage = "";

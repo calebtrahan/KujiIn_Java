@@ -384,21 +384,6 @@ public class Util {
         } else {fileChooser.setInitialDirectory(initialdirectory);}
         return fileChooser.showSaveDialog(scene.getWindow());
     }
-    public static File file_extensioncorrect(MainController root, String expectedextension, File filetocheck) {
-        if (! filetocheck.getName().contains(".")) {
-            if (root.displayDialog_YesNoConfirmation("Confirmation", "Invalid Extension", "Save As A ." + expectedextension + " File?")) {
-                return new File(filetocheck.getAbsolutePath().concat("." + expectedextension));
-            } else {return filetocheck;}
-        } else {
-            String extension = filetocheck.getName().substring(filetocheck.getName().lastIndexOf("."));
-            if (root.displayDialog_YesNoConfirmation("Confirmation", "Invalid Extension " + extension, "Rename As ." + expectedextension + "?")) {
-                String filewithoutextension = filetocheck.getAbsolutePath().substring(0, filetocheck.getName().lastIndexOf("."));
-                return new File(filewithoutextension.concat("." + expectedextension));
-            } else {
-                return filetocheck;
-            }
-        }
-    }
     public static File file_removetrailingnonalphabeticcharactersfromfilename(File file) {
         try {
             int firstindex = 0;

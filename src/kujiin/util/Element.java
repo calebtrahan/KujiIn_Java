@@ -35,17 +35,6 @@ public class Element extends Meditatable {
             Value.setTooltip(new Tooltip(name + " Is Disabled. Click " + name + " Button Above To Enable"));
         }
     }
-    public void changevalue(int newvalue) {
-        if (newvalue == 0) {
-            Switch.setSelected(false);
-            toggleswitch();
-        } else {
-            Switch.setSelected(true);
-            Value.setDisable(false);
-            Value.setText(Integer.toString(newvalue));
-            setDuration(newvalue);
-        }
-    }
 
 // Creation
     @Override

@@ -70,6 +70,9 @@ public class Qi_Gong extends Meditatable {
         }
         return new Duration(dur * 1000);
     }
+    public Duration getdurationwithoutramp() {
+        return super.getduration();
+    }
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists
