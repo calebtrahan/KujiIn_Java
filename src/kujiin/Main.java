@@ -23,7 +23,7 @@ public class Main extends Application {
             Root.getOptions().setStyle(primaryStage);
         });
         primaryStage.setOnCloseRequest(event -> {
-            if (Root.displayDialog_YesNoConfirmation("Confirmation", "Really Exit?", "")) {System.exit(0);}
+            if (Root.dialog_YesNoConfirmation("Confirmation", "Really Exit?", "")) {System.exit(0);}
             else {event.consume();}
         });
         primaryStage.show();

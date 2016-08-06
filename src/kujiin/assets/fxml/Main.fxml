@@ -11,21 +11,21 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem mnemonicParsing="false" onAction="#changesessionoptions" text="Preferences" />
+                  <MenuItem mnemonicParsing="false" onAction="#menu_changesessionoptions" text="Preferences" />
                   <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Tools">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#editprogramsambience" text="Edit Program's Ambience" />
-              <MenuItem mnemonicParsing="false" onAction="#editreferencefiles" text="Edit Reference Files" />
+              <MenuItem mnemonicParsing="false" onAction="#menu_editprogramsambience" text="Edit Program's Ambience" />
+              <MenuItem mnemonicParsing="false" onAction="#menu_editreferencefiles" text="Edit Reference Files" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#howtouseprogram" text="How To Use This Program" />
-              <MenuItem mnemonicParsing="false" onAction="#aboutthisprogram" text="About" />
-              <MenuItem mnemonicParsing="false" onAction="#contactme" text="Contact Me" />
+              <MenuItem mnemonicParsing="false" onAction="#menu_howtouseprogram" text="How To Use This Program" />
+              <MenuItem mnemonicParsing="false" onAction="#menu_aboutthisprogram" text="About" />
+              <MenuItem mnemonicParsing="false" onAction="#menu_contactme" text="Contact Me" />
             </items>
           </Menu>
         </menus>
@@ -70,7 +70,7 @@
                   <Insets right="5.0" />
                </HBox.margin>
             </CheckBox>
-            <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#playthisession" prefHeight="17.0" prefWidth="62.0" text="Play">
+            <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#player_playthisession" prefHeight="17.0" prefWidth="62.0" text="Play">
                <font>
                   <Font size="12.0" />
                </font></Button>

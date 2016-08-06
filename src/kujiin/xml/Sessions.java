@@ -41,7 +41,7 @@ public class Sessions {
                 Sessions noises1 = (Sessions) createMarshaller.unmarshal(Options.SESSIONSXMLFILE);
                 setSession(noises1.getSession());
             } catch (JAXBException e) {
-                Root.displayDialog_Information("Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
+                Root.dialog_Information("Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -52,24 +52,25 @@ public class Sessions {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.SESSIONSXMLFILE);
         } catch (JAXBException e) {
-            Root.displayDialog_Information("Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
+            Root.dialog_Information("Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
     }
-    public void createnewsession() {
-        try {addsession(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
+    public void createnew() {
+        try {
+            add(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
         catch (JAXBException ignored) {
-            Root.displayDialog_Error("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
+            Root.dialog_Error("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
-    public void addsession(Session session) throws JAXBException {
+    public void add(Session session) throws JAXBException {
         if (Options.SESSIONSXMLFILE.exists()) {unmarshall();}
         List<Session> sessionsList = getSession();
         if (sessionsList != null && sessionsList.size() > 0) {
-            sortsessions();
+            sort();
         } else {sessionsList = new ArrayList<>();}
         sessionsList.add(session);
         setSession(sessionsList);
         marshall();
     }
-    public void removesession(Session session) throws JAXBException {
+    public void remove(Session session) throws JAXBException {
         List<Session> sessionList = getSession();
         sessionList.remove(sessionList.indexOf(session));
         setSession(sessionList);
@@ -82,13 +83,14 @@ public class Sessions {
         try {
             for (kujiin.xml.Session i : getSession()) {
                 if (! i.sessionnotEmpty()) {
-                    try {removesession(i);}
+                    try {
+                        remove(i);}
                     catch (JAXBException ignored) {}
                 }
             }
         } catch (NullPointerException | ConcurrentModificationException ignored) {}
     }
-    public void sortsessions() {
+    public void sort() {
         // TODO Sort Sessions By Practice Date
     }
 

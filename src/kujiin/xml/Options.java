@@ -116,7 +116,7 @@ public class Options {
                 setAppearanceOptions(options.getAppearanceOptions());
                 populatethemefiles();
             } catch (JAXBException ignored) {
-                Platform.runLater(() -> Root.displayDialog_Information("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
+                Platform.runLater(() -> Root.dialog_Information("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
             }
         } else {
@@ -131,7 +131,7 @@ public class Options {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, OPTIONSXMLFILE);
         } catch (JAXBException e) {
-            Root.displayDialog_Information("Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
+            Root.dialog_Information("Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
         }
     }
     public void resettodefaults() {

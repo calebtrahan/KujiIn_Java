@@ -39,13 +39,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO Work On Completed Goals
-// TODO If Ramp Disabled (And No Pre/PostSession Set) Ask User If They Want TO Add A Ramp Into 1st Practiced Cut (2/3/5) Min, Then Update UI And Create Session
-// TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
-
-// TODO Redesign Goals Completed Dialog Using Bar Charts/Graphs
-
-
 public class This_Session {
     private Qi_Gong Presession;
     private Cut Rin;
@@ -290,7 +283,7 @@ public class This_Session {
         List<Element> elementsinsession = getElementsInSession();
         if (cutsinsession != null && cutsinsession.size() > 0) {
             boolean rinnotstartpoint = firstcutconnectedtorin(cutsinsession);
-            if (! rinnotstartpoint) {rinnotstartpoint = ! Root.displayDialog_YesNoConfirmation("Confirmation", "Cuts In Session Not Connected To RIN, And May Lack The Energy They Need To Get Results",
+            if (! rinnotstartpoint) {rinnotstartpoint = ! Root.dialog_YesNoConfirmation("Confirmation", "Cuts In Session Not Connected To RIN, And May Lack The Energy They Need To Get Results",
                     "Connect " + cutsinsession.get(0).name + " Back To RIN?");}
             if (! rinnotstartpoint || ! firstandlastcutsconnect(cutsinsession)) {
                 CutsMissingDialog cutsMissingDialog = new CutsMissingDialog(Root, cutsinsession);
@@ -350,7 +343,7 @@ public class This_Session {
             if (cutcount > 0) {notgoodtext.append(cutcount).append(" Cut(s)\n");}
             if (elementcount > 0) {notgoodtext.append(elementcount).append(" Element(s)\n");}
             if (postsessionmissinggoals) {notgoodtext.append("Postsession\n");}
-            switch (Root.displayDialog_YesNoCancelConfirmation("Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?", "Set Goal", "Continue Anyway", "Cancel Playback")) {
+            switch (Root.dialog_YesNoCancelConfirmation("Confirmation", "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString(), "Set A Goal Before Playback?", "Set Goal", "Continue Anyway", "Cancel Playback")) {
                 case YES:
                     // TODO Make A Goal Set Dialog Before Playback Here
                     // Was last parameter-> Util.list_getmaxintegervalue(notgooddurations)
@@ -367,11 +360,11 @@ public class This_Session {
                                 x.addGoal(new Goals.Goal(goalhours, x.name));
                             } catch (JAXBException ignored) {
                                 goalssetsuccessfully = false;
-                                Util.displayDialog_Error(Root, "Error", "Couldn't Add Goal For " + getAllMeditatablesincludingTotalforTracking().get(i).name, "Check File Permissions");
+                                Util.dialog_Error(Root, "Error", "Couldn't Add Goal For " + getAllMeditatablesincludingTotalforTracking().get(i).name, "Check File Permissions");
                             }
                         }
                         if (goalssetsuccessfully) {
-                            Util.displayDialog_Information(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
+                            Util.dialog_Information(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
                         }
                     }
                     break;*/
@@ -427,14 +420,14 @@ public class This_Session {
                         if (i != cutsorelementswithnoambience.size() - 1) {a.append(", ");}
                     }
                     if (cutsorelementswithnoambience.size() > 1) {
-                        Root.displayDialog_Error("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
-                        if (Root.displayDialog_YesNoConfirmation("Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
-                            Root.openadvancedambienceeditor();
+                        Root.dialog_Error("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
+                        if (Root.dialog_YesNoConfirmation("Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
+                            Root.menu_openadvancedambienceeditor();
                         }
                     } else {
-                        Root.displayDialog_Error("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
-                        if (Root.displayDialog_YesNoConfirmation("Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
-                            Root.openadvancedambienceeditor(cutsorelementswithnoambience.get(0));
+                        Root.dialog_Error("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
+                        if (Root.dialog_YesNoConfirmation("Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
+                            Root.menu_openadvancedambienceeditor(cutsorelementswithnoambience.get(0));
                         }
                     }
                     ambiencecheckbox.setSelected(false);
@@ -452,9 +445,9 @@ public class This_Session {
                         }
                         System.out.println(a.toString());
                         if (meditatableswithreducedambience.size() == 1) {
-                            ambiencecheckbox.setSelected(Root.displayDialog_YesNoConfirmation("Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
+                            ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
                         } else {
-                            ambiencecheckbox.setSelected(Root.displayDialog_YesNoConfirmation("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
+                            ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
                         }
                     } else {
                         ambiencecheckbox.setSelected(true);
@@ -468,12 +461,12 @@ public class This_Session {
             ambiencecheckerservice.setOnFailed(event -> {
                 System.out.println("Failed!!");
                 cad[0].close();
-                Root.displayDialog_Error("Error", "Couldn't Check Ambience", "Check Ambience Folder Read Permissions");
+                Root.dialog_Error("Error", "Couldn't Check Ambience", "Check Ambience Folder Read Permissions");
                 ambiencecheckbox.setSelected(false);
             });
             ambiencecheckerservice.start();
         } else {
-            Root.displayDialog_Information("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
+            Root.dialog_Information("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
     // Reference Files Validation
     public boolean checkallreferencefilesforsession(boolean enableprompt) {
@@ -482,7 +475,7 @@ public class This_Session {
             if (!i.referencefilevalid(referenceType)) invalidcutcount++;
         }
         if (invalidcutcount > 0 && enableprompt) {
-            return Root.displayDialog_YesNoConfirmation("Confirmation", "There Are " + invalidcutcount + " Cuts/Elements With Empty/Invalid Reference Files", "Enable Reference Anyways?");
+            return Root.dialog_YesNoConfirmation("Confirmation", "There Are " + invalidcutcount + " Cuts/Elements With Empty/Invalid Reference Files", "Enable Reference Anyways?");
         } else {return invalidcutcount == 0;}
     }
     // Reset
@@ -526,19 +519,19 @@ public class This_Session {
 //        exportingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(exporterservice.messageProperty());
 //        exportingSessionDialog.CancelButton.setOnAction(event -> exporterservice.cancel());
 //        exporterservice.setOnSucceeded(event -> {
-//            if (exporterservice.getValue()) {Util.displayDialog_Information("Information", "Export Succeeded", "File Saved To: ");}
-//            else {Util.displayDialog_Error("Error", "Errors Occured During Export", "Please Try Again Or Contact Me For Support");}
+//            if (exporterservice.getValue()) {Util.dialog_Information("Information", "Export Succeeded", "File Saved To: ");}
+//            else {Util.dialog_Error("Error", "Errors Occured During Export", "Please Try Again Or Contact Me For Support");}
 //            exportingSessionDialog.close();
 //        });
 //        exporterservice.setOnFailed(event -> {
 //            String v = exporterservice.getException().getMessage();
-//            Util.displayDialog_Error("Error", "Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v,
+//            Util.dialog_Error("Error", "Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v,
 //                    "Please Try Again Or Contact Me For Support");
 //            This_Session.deleteprevioussession();
 //            exportingSessionDialog.close();
 //        });
 //        exporterservice.setOnCancelled(event -> {
-//            Util.displayDialog_Information("Cancelled", "Export Cancelled", "You Cancelled Export");
+//            Util.dialog_Information("Cancelled", "Export Cancelled", "You Cancelled Export");
 //            This_Session.deleteprevioussession();
 //            exportingSessionDialog.close();
 //        });
@@ -550,7 +543,7 @@ public class This_Session {
 //            setExportfile(tempfile);
 //        } else {
 //            if (tempfile == null) {return;}
-//            if (Util.displayDialog_YesNoConfirmation(Root, "Confirmation", "Invalid Audio File Extension", "Save As .mp3?")) {
+//            if (Util.dialog_YesNoConfirmation(Root, "Confirmation", "Invalid Audio File Extension", "Save As .mp3?")) {
 //                String file = tempfile.getAbsolutePath();
 //                int index = file.lastIndexOf(".");
 //                String firstpart = file.substring(0, index - 1);
@@ -622,7 +615,7 @@ public class This_Session {
                 updateuitimeline.play();
                 meditatablecount = 0;
                 currentmeditatable = itemsinsession.get(meditatablecount);
-                Root.getSessions().createnewsession();
+                Root.getSessions().createnew();
                 currentmeditatable.start();
                 break;
             case PAUSED:
@@ -722,7 +715,7 @@ public class This_Session {
         // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It Then Change Session Finsished Dialog To Showandwait
         Root.session_gui_opensessiondetailsdialog();
         // TODO Prompt For Export
-//        if (Util.displayDialog_YesNoConfirmation(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
+//        if (Util.dialog_YesNoConfirmation(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            getsessionexporter();}
         Root.sessions_gui_updateui();
         Root.goals_gui_updateui();
@@ -754,7 +747,7 @@ public class This_Session {
                 progresstonextmeditatable();
             });
             alertplayer.setOnError(() -> {
-                if (Root.displayDialog_YesNoConfirmation("Confirmation", "An Error Occured While Playing Alert File" +
+                if (Root.dialog_YesNoConfirmation("Confirmation", "An Error Occured While Playing Alert File" +
                         alertplayer.getMedia().getSource() + "'", "Retry Playing Alert File? (Pressing Cancel " +
                         "Will Progress To The Next Cut)")) {
                     alertplayer.stop();
@@ -776,7 +769,7 @@ public class This_Session {
     public boolean endsessionprematurely() {
         if (playerState == PlayerState.PLAYING || playerState == PlayerState.PAUSED || playerState == PlayerState.TRANSITIONING) {
             pausesession();
-            if (Root.displayDialog_YesNoConfirmation("End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {return true;}
+            if (Root.dialog_YesNoConfirmation("End Session Early", "End Session Prematurely?", "Really End Session Prematurely")) {return true;}
             else {playsession(); return false;}
         } else {return true;}
     }
@@ -841,7 +834,7 @@ public class This_Session {
         setTitle("Cuts Missing");
         this.allcuts = allcuts;
         populatelistview();
-        Root.displayDialog_Information("Cuts Missing", "Due To The Nature Of Kuji-In, Each Cut Should Connect From RIN Up, Or The Later Cuts Might Lack The Energy They Need", "Use This Dialog To Connect Cuts, Or Cancel Without Creating");
+        Root.dialog_Information("Cuts Missing", "Due To The Nature Of Kuji-In, Each Cut Should Connect From RIN Up, Or The Later Cuts Might Lack The Energy They Need", "Use This Dialog To Connect Cuts, Or Cancel Without Creating");
     }
 
     public int getlastworkingcutindex() {
@@ -886,13 +879,13 @@ public class This_Session {
         this.close();
     }
     public void createSessionwithoutmissingcuts(Event event) {
-        if (Root.displayDialog_YesNoConfirmation("Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
+        if (Root.dialog_YesNoConfirmation("Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
             setResult(Util.AnswerType.YES);
             this.close();
         }
     }
     public void dialogclosed() {
-        if (result == null && Root.displayDialog_YesNoConfirmation("Confirmation", "Close Dialog Without Creating", "This Will Return To The Creator")) {
+        if (result == null && Root.dialog_YesNoConfirmation("Confirmation", "Close Dialog Without Creating", "This Will Return To The Creator")) {
             setResult(Util.AnswerType.CANCEL);
             this.close();
         }
@@ -964,7 +957,7 @@ public class This_Session {
             int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
             if (selectedindex == -1) {return;}
             if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
-                Root.displayDialog_Information("Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
+                Root.dialog_Information("Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
                 return;
             }
             if (selectedindex == 0) {return;}
@@ -972,12 +965,12 @@ public class This_Session {
             Meditatable oneitemup = sessionitems.get(selectedindex - 1);
             if (selecteditem instanceof Cut && oneitemup instanceof Cut) {
                 if (selecteditem.number > oneitemup.number) {
-                    Root.displayDialog_Information("Cannot Move", selecteditem.name + " Cannot Be Moved Before " + oneitemup.name + ". Cuts Would Be Out Of Order", "Cannot Move");
+                    Root.dialog_Information("Cannot Move", selecteditem.name + " Cannot Be Moved Before " + oneitemup.name + ". Cuts Would Be Out Of Order", "Cannot Move");
                     return;
                 }
             }
             if (oneitemup instanceof Qi_Gong) {
-                Root.displayDialog_Information("Cannot Move", "Cannot Replace Presession", "Cannot Move");
+                Root.dialog_Information("Cannot Move", "Cannot Replace Presession", "Cannot Move");
                 return;
             }
             Collections.swap(sessionitems, selectedindex, selectedindex - 1);
@@ -987,7 +980,7 @@ public class This_Session {
             int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
             if (selectedindex == -1) {return;}
             if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
-                Root.displayDialog_Information("Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
+                Root.dialog_Information("Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
                 return;
             }
             if (selectedindex == tableitems.size() - 1) {return;}
@@ -995,12 +988,12 @@ public class This_Session {
             Meditatable oneitemdown = sessionitems.get(selectedindex + 1);
             if (selecteditem instanceof Cut && oneitemdown instanceof Cut) {
                 if (selecteditem.number < oneitemdown.number) {
-                    Root.displayDialog_Information("Cannot Move", selecteditem.name + " Cannot Be Moved After " + oneitemdown.name + ". Cuts Would Be Out Of Order", "Cannot Move");
+                    Root.dialog_Information("Cannot Move", selecteditem.name + " Cannot Be Moved After " + oneitemdown.name + ". Cuts Would Be Out Of Order", "Cannot Move");
                     return;
                 }
             }
             if (oneitemdown instanceof Qi_Gong) {
-                Root.displayDialog_Information("Cannot Move", "Cannot Replace Postsession", "Cannot Move");
+                Root.dialog_Information("Cannot Move", "Cannot Replace Postsession", "Cannot Move");
                 return;
             }
             Collections.swap(sessionitems, selectedindex, selectedindex + 1);
@@ -1020,7 +1013,7 @@ public class This_Session {
             close();
         }
         public void dialogClosed() {
-            if (Root.displayDialog_YesNoConfirmation("Cancel Creation", "Cancel Creation", "This Will Return To The Creator Main Window")) {
+            if (Root.dialog_YesNoConfirmation("Cancel Creation", "Cancel Creation", "This Will Return To The Creator Main Window")) {
                 setResult(Util.AnswerType.CANCEL);
                 this.close();
             }
@@ -1070,11 +1063,7 @@ public class This_Session {
         public Label GoalPercentageLabel;
         public boolean displaynormaltime = true;
 
-        // TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
-        // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
-        // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
-        // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
-        // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
+
         public PlayerUI() {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
@@ -1372,13 +1361,13 @@ public class This_Session {
                     setDuration(value);
                     this.close();
                 } else {
-                    if (Root.displayDialog_YesNoConfirmation("Confirmation", "Cut Invocation Value Is 0", "Continue With Zero Value (These Cuts Won't Be Included)" )) {
+                    if (Root.dialog_YesNoConfirmation("Confirmation", "Cut Invocation Value Is 0", "Continue With Zero Value (These Cuts Won't Be Included)" )) {
                         setDuration(0);
                         this.close();
                     }
                 }
             } catch (NumberFormatException e) {
-                Root.displayDialog_Error("Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
+                Root.dialog_Error("Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
         }
     }
     public class ExportDialog extends Stage {

@@ -33,9 +33,23 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-// TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
-// TODO Design A 'Select Your Own Ambience' Wizard As An Alternative To Randomized Ambience During Session Creation
+// Bugs
+// TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
 
+// Additional Features
+// TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
+// TODO Design A 'Select Your Own Ambience' Wizard As An Alternative To Randomized Ambience During Session Creation
+// TODO Redesign Goals Completed Dialog Using Bar Charts/Graphs
+// TODO If Ramp Disabled (And No Pre/PostSession Set) Ask User If They Want TO Add A Ramp Into 1st Practiced Cut (2/3/5) Min, Then Update UI And Create Session
+// TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
+// TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
+// TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
+
+// Optional Features
+// TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
+// TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
+// TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
+// TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;
@@ -116,7 +130,7 @@ public class MainController implements Initializable {
     private Options Options;
 
 // Event Handlers
-//    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Util.displayDialog_Information(this, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
+//    public final EventHandler<KeyEvent> NONEDITABLETEXTFIELD = event -> Util.dialog_Information(this, "Not Editable", "Non-Editable Text Field", "This Text Field Can't Be Edited");
 //    public final EventHandler<ActionEvent> CHECKBOXONOFFLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("ON");} else {a.setText("OFF");}};
 //    public final EventHandler<ActionEvent> CHECKBOXYESNOLISTENER = event -> {CheckBox a = (CheckBox) event.getSource(); if (a.isSelected()) {a.setText("YES");} else {a.setText("NO");}};
 
@@ -136,6 +150,9 @@ public class MainController implements Initializable {
         getSession().getEntrainments().marshall();
         getOptions().marshall();
         return creation_cleanup() && exporter_cleanup() && sessions_cleanup() && goals_cleanup();
+    }
+    public void close(ActionEvent actionEvent) {
+        if (cleanup()) {System.exit(0);}
     }
 
 // Getters And Setters
@@ -171,37 +188,37 @@ public class MainController implements Initializable {
     }
 
 // Top Menu Actions
-    public void changesessionoptions(ActionEvent actionEvent) {
+    public void menu_changesessionoptions(ActionEvent actionEvent) {
         new ChangeProgramOptions().showAndWait();
         Options.marshall();
         sessions_gui_updateui();
         goals_gui_updateui();
     }
-    public void editprogramsambience(ActionEvent actionEvent) {
+    public void menu_editprogramsambience(ActionEvent actionEvent) {
         getStage().setIconified(true);
         new SimpleAmbienceEditor().showAndWait();
         getStage().setIconified(false);
     }
-    public void opensimpleambienceeditor() {
+    public void menu_opensimpleambienceeditor() {
         new SimpleAmbienceEditor().showAndWait();
     }
-    public void opensimpleambienceeditor(Meditatable meditatable) {
+    public void menu_opensimpleambienceeditor(Meditatable meditatable) {
         new SimpleAmbienceEditor(meditatable).showAndWait();
     }
-    public void openadvancedambienceeditor() {}
-    public void openadvancedambienceeditor(Meditatable meditatable) {
+    public void menu_openadvancedambienceeditor() {}
+    public void menu_openadvancedambienceeditor(Meditatable meditatable) {
         AdvancedAmbienceEditor sae = new AdvancedAmbienceEditor(meditatable);
         sae.showAndWait();
     }
-    public void editreferencefiles(ActionEvent actionEvent) {
+    public void menu_editreferencefiles(ActionEvent actionEvent) {
         getStage().setIconified(true);
         new EditReferenceFiles(getSession().referenceType).showAndWait();
         getStage().setIconified(false);
     }
-    public void howtouseprogram(ActionEvent actionEvent) {
+    public void menu_howtouseprogram(ActionEvent actionEvent) {
         Util.menu_howtouse(this);
     }
-    public void aboutthisprogram(ActionEvent actionEvent) {
+    public void menu_aboutthisprogram(ActionEvent actionEvent) {
         List<Integer> numbers = new ArrayList<>();
         numbers.addAll(Arrays.asList(0, 1, 2, 3, 4, 5));
         System.out.println(numbers);
@@ -209,21 +226,18 @@ public class MainController implements Initializable {
         System.out.println(numbers);
 //        Util.menu_aboutthisprogram();
     }
-    public void contactme(ActionEvent actionEvent) {
+    public void menu_contactme(ActionEvent actionEvent) {
         Util.menu_contactme();}
-    public void close(ActionEvent actionEvent) {
-        if (cleanup()) {System.exit(0);}
-    }
 
 // Presets
     public void preset_initialize() {
         Preset = new Preset(this);
     }
     public void preset_load(ActionEvent actionEvent) {
-        File presetfile = Preset.openpreset();
-        if (presetfile != null && Preset.presethasvalidValues()) {
-            preset_changecreationvaluestopreset(Preset.getpresettimes());
-        } else {if (presetfile != null) displayDialog_Information("Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
+        File presetfile = Preset.open();
+        if (presetfile != null && Preset.hasvalidValues()) {
+            preset_changecreationvaluestopreset(Preset.gettimes());
+        } else {if (presetfile != null) dialog_Information("Invalid Preset File", "Invalid Preset File", "Cannot Load File");}
     }
     public void preset_save(ActionEvent actionEvent) {
         ArrayList<Double> creatorvaluesinminutes = new ArrayList<>();
@@ -234,11 +248,13 @@ public class MainController implements Initializable {
             else {if (i.getduration().greaterThan(Duration.ZERO)) {validsession = true;}}
         }
         if (validsession) {
-            Preset.setpresettimes(creatorvaluesinminutes);
-            if (Preset.savepreset()) {Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Preset Successfully Saved", 1500);}
-            else {displayDialog_Error("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
+            Preset.settimes(creatorvaluesinminutes);
+            if (Preset.save()) {Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Preset Successfully Saved", 1500);}
+            else {
+                dialog_Error("Error", "Couldn't Save Preset", "Your Preset Could Not Be Saved, Do You Have Write Access To That Directory?");}
         }
-        else {displayDialog_Information("Information", "Cannot Save Preset", "All Values Are 0");}
+        else {
+            dialog_Information("Information", "Cannot Save Preset", "All Values Are 0");}
     }
     public void preset_changecreationvaluestopreset(ArrayList<Double> presetvalues) {
         try {
@@ -246,7 +262,7 @@ public class MainController implements Initializable {
                 getSession().getAllMeditatables().get(i).changevalue(presetvalues.get(i).intValue());
             }
         } catch (ArrayIndexOutOfBoundsException ignored) {
-            displayDialog_Error("Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
+            dialog_Error("Error", "Couldn't Change Creator Values To Preset", "Try Reloaded Preset");
         }
     }
 
@@ -310,7 +326,7 @@ public class MainController implements Initializable {
             if (creation_gui_allvaluesnotzero()) {
                 Session.checkambience(AmbienceSwitch);
             } else {
-                displayDialog_Information("Cannot Add Ambience", "All Durations Are Zero", "Nothing To Add Ambience For");
+                dialog_Information("Cannot Add Ambience", "All Durations Are Zero", "Nothing To Add Ambience For");
                 AmbienceSwitch.setSelected(false);
             }
         } else {
@@ -356,20 +372,20 @@ public class MainController implements Initializable {
     public void creation_util_createsession() {
         // TODO Check Exporter Here
         if (! creation_gui_allvaluesnotzero()) {
-            displayDialog_Error("Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session");
+            dialog_Error("Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session");
             getSession().creatorState = This_Session.CreatorState.NOT_CREATED;
             return;
         }
         if (creation_util_isLongSession()) {
             if (! getOptions().getSessionOptions().getAlertfunction()) {
-                if (displayDialog_YesNoConfirmation("Add Alert File", "I've Detected A Long Session. Long Sessions Can Make It Difficult To Hear " +
+                if (dialog_YesNoConfirmation("Add Alert File", "I've Detected A Long Session. Long Sessions Can Make It Difficult To Hear " +
                         "The Subtle Transitions In Between Session Parts", "Add Alert File In Between Session Parts?")) {
                     new ChangeAlertFile().showAndWait();
                 }
             }
         } else {
             if (getOptions().getSessionOptions().getAlertfunction()) {
-                if (displayDialog_YesNoConfirmation("Disable Alert File", "I've Detected A Relatively Short Session, And An Alert File Might Not Be Necessary",
+                if (dialog_YesNoConfirmation("Disable Alert File", "I've Detected A Relatively Short Session, And An Alert File Might Not Be Necessary",
                         "Turn Off Alert File Between Session Parts?")) {
                     getOptions().getSessionOptions().setAlertfunction(false);
                 }
@@ -408,9 +424,8 @@ public class MainController implements Initializable {
 //                    if (session.exportfile() == null) {
 //                        session.getnewexportsavefile();
 //                    } else {
-//                        // TODO Continue Fixing Logic Here
 //                        if (session.getExportfile().exists()) {
-//                            if (!Util.displayDialog_YesNoConfirmation(Root, "Confirmation", "Overwrite Saved Exported Session?", "Saved Session: " + session.getExportfile().getAbsolutePath())) {
+//                            if (!Util.dialog_YesNoConfirmation(Root, "Confirmation", "Overwrite Saved Exported Session?", "Saved Session: " + session.getExportfile().getAbsolutePath())) {
 //                                session.getnewexportsavefile();
 //                            }
 //                        } else {session.getnewexportsavefile();}
@@ -427,18 +442,18 @@ public class MainController implements Initializable {
 //                    setExporterState(ExporterState.WORKING);
 //                    exporter_util_movetonextexportservice();
 //                } else {
-//                    Util.displayDialog_Error(Root, "Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
+//                    Util.dialog_Error(Root, "Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
 //                    // TODO Open A Browser Showing How To Install FFMPEG
 //                }
 //            } else if (getExporterState() == ExporterState.WORKING) {
 //                Util.gui_showtimedmessageonlabel(StatusBar, "Session Currently Being Exported", 3000);
 //            } else {
-//                if (Util.displayDialog_YesNoConfirmation(Root, "Confirmation", "Session Already Exported", "Export Again?")) {
+//                if (Util.dialog_YesNoConfirmation(Root, "Confirmation", "Session Already Exported", "Export Again?")) {
 //                    setExporterState(ExporterState.NOT_EXPORTED);
 //                    startexport();
 //                }
 //            }
-//        } else {Util.displayDialog_Information(Root, "Information", "Cannot Export", "No Cuts Selected");}
+//        } else {Util.dialog_Information(Root, "Information", "Cannot Export", "No Cuts Selected");}
     }
     private void exporter_util_movetonextexportservice() {
 //        System.out.println("Starting Next Export Service");
@@ -474,7 +489,7 @@ public class MainController implements Initializable {
     public boolean exporter_cleanup() {
 //        boolean currentlyexporting = exporterState == ExporterState.WORKING;
 //        if (currentlyexporting) {
-//            displayDialog_Information(this, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
+//            dialog_Information(this, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
 //        } else {This_Session.deleteprevioussession();}
 //        return ! currentlyexporting;
         return true;
@@ -549,7 +564,7 @@ public class MainController implements Initializable {
     }
     public void sessions_gui_displaysessionlist(Event event) {
         if (Sessions.getSession() == null || Sessions.getSession().size() == 0) {
-            displayDialog_Information("No Sessions", "No Practiced Sessions", "Cannot View Sessions");
+            dialog_Information("No Sessions", "No Practiced Sessions", "Cannot View Sessions");
         } else {new AllSessionsDetails().showAndWait();}
     }
     public void sessions_gui_togglepreandpost(ActionEvent actionEvent) {sessions_gui_updateui();}
@@ -566,7 +581,6 @@ public class MainController implements Initializable {
     }
         // Util
     public boolean sessions_cleanup() {Sessions.marshall(); return true;}
-
 
     // Goals
         // GUI
@@ -642,7 +656,6 @@ public class MainController implements Initializable {
             SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog();
             simpleGoalSetDialog.showAndWait();
             if (simpleGoalSetDialog.shouldSetgoal()) {
-                // TODO Set Goal Here
                 SessionsAndGoalsSelectedMeditatable.addGoal(new Goals.Goal(simpleGoalSetDialog.getNewGoalHours(), SessionsAndGoalsSelectedMeditatable));
                 goals_gui_updateui();
             }
@@ -652,7 +665,7 @@ public class MainController implements Initializable {
     }
     public void goals_gui_viewcurrentgoals(Event event) {
         if (SessionsAndGoalsSelectedMeditatable.getAllGoals() == null || SessionsAndGoalsSelectedMeditatable.getAllGoals().size() == 0) {
-            displayDialog_Information("Information", "No Goals Exist For " + SessionsAndGoalsSelectedMeditatable.name, "Please Add A Goal For " + SessionsAndGoalsSelectedMeditatable.name);
+            dialog_Information("Information", "No Goals Exist For " + SessionsAndGoalsSelectedMeditatable.name, "Please Add A Goal For " + SessionsAndGoalsSelectedMeditatable.name);
         } else {new AllMeditatablesGoalProgress().showAndWait();}
     }
     public void goals_gui_resetallvalues() {
@@ -665,7 +678,7 @@ public class MainController implements Initializable {
     public boolean goals_cleanup() {Goals.marshall(); return true;}
 
 // Session Player Widget
-    public void playthisession(ActionEvent actionEvent) {
+    public void player_playthisession(ActionEvent actionEvent) {
         creation_util_createsession();
         if (Session.creatorState == This_Session.CreatorState.CREATED) {
             if (Session.playerUI != null && Session.playerUI.isShowing()) {return;}
@@ -677,7 +690,7 @@ public class MainController implements Initializable {
 // Answer Dialog Methods
 // Gui Methods
 //     TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified (When It's Supposed To Be)
-    public boolean displayDialog_YesNoConfirmation(String titletext, String headertext, String contenttext) {
+    public boolean dialog_YesNoConfirmation(String titletext, String headertext, String contenttext) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setTitle(titletext);
         a.setHeaderText(headertext);
@@ -687,7 +700,7 @@ public class MainController implements Initializable {
         Optional<ButtonType> answer = a.showAndWait();
         return answer.isPresent() && answer.get() == ButtonType.OK;
     }
-    public Util.AnswerType displayDialog_YesNoCancelConfirmation(String titletext, String headertext, String contenttext) {
+    public Util.AnswerType dialog_YesNoCancelConfirmation(String titletext, String headertext, String contenttext) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setTitle(titletext);
         a.setHeaderText(headertext);
@@ -709,7 +722,7 @@ public class MainController implements Initializable {
         }
         return Util.AnswerType.CANCEL;
     }
-    public Util.AnswerType displayDialog_YesNoCancelConfirmation(String titletext, String headertext, String contenttext, String yesbuttontext, String nobuttontext, String cancelbuttontext) {
+    public Util.AnswerType dialog_YesNoCancelConfirmation(String titletext, String headertext, String contenttext, String yesbuttontext, String nobuttontext, String cancelbuttontext) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setTitle(titletext);
         a.setHeaderText(headertext);
@@ -734,7 +747,7 @@ public class MainController implements Initializable {
         }
         return Util.AnswerType.CANCEL;
     }
-    public void displayDialog_Information(String titletext, String headertext, String contexttext) {
+    public void dialog_Information(String titletext, String headertext, String contexttext) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setTitle(titletext);
         a.setHeaderText(headertext);
@@ -743,7 +756,7 @@ public class MainController implements Initializable {
         dialogPane.getStylesheets().add(getOptions().getAppearanceOptions().getThemefile());
         a.showAndWait();
     }
-    public void displayDialog_Error(String titletext, String headertext, String contenttext) {
+    public void dialog_Error(String titletext, String headertext, String contenttext) {
         Alert a = new Alert(Alert.AlertType.ERROR);
         a.setTitle(titletext);
         a.setHeaderText(headertext);
@@ -786,7 +799,7 @@ public class MainController implements Initializable {
     // Button Actions
         public void accept(ActionEvent actionEvent) {
             if (AlertFileToggleButton.isSelected() && alertfile == null) {
-                displayDialog_YesNoConfirmation("Confirmation", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
+                dialog_YesNoConfirmation("Confirmation", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
                 return;
             }
             getOptions().getSessionOptions().setAlertfunction(AlertFileToggleButton.isSelected());
@@ -819,14 +832,13 @@ public class MainController implements Initializable {
                 Double duration = Util.audio_getduration(alertfile);
                 Duration alertfileduration = new Duration(duration * 1000);
                 if (duration >= SUGGESTED_ALERT_FILE_MAX_LENGTH && duration < ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                    // TODO Ask Confirmation Here
-                    if (! displayDialog_YesNoConfirmation("Confirmation",
+                    if (! dialog_YesNoConfirmation("Confirmation",
                         String.format("Alert File Is %s Which Is Longer Than Suggested Duration: %s And May Break Immersion",
                             Util.formatdurationtoStringDecimalWithColons(alertfileduration),
                             Util.formatdurationtoStringDecimalWithColons(new Duration(SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000))
                         ), "Really Use " + alertfile.getName() + " As Your Alert File?")) {return;}
                 } else if (duration >= ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                    displayDialog_Information("Cannot Add Alert File",
+                    dialog_Information("Cannot Add Alert File",
                             String.format("Alert File Is %s Which Is Too Long And Will Break Immersion", Util.formatdurationtoStringDecimalWithColons(alertfileduration)),
                             "Cannot Add Alert File");
                     return;
@@ -840,26 +852,26 @@ public class MainController implements Initializable {
             }
         }
         public void help(ActionEvent actionEvent) {
-            displayDialog_Information("What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to transition to the next\npart of the session");
+            dialog_Information("What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to transition to the next\npart of the session");
         }
 
     // Utility Methods
         public boolean fileisgood(File testfile) {
         // Test If Valid Extension
             if (! Util.audio_isValid(testfile)) {
-                displayDialog_Information("Information", "Invalid Audio Format", "Supported Audio Formats: " + Arrays.asList(Util.SUPPORTEDAUDIOFORMATS).toString());
+                dialog_Information("Information", "Invalid Audio Format", "Supported Audio Formats: " + Arrays.asList(Util.SUPPORTEDAUDIOFORMATS).toString());
                 return false;
             }
             Double duration = Util.audio_getduration(testfile);
             if (duration == 0.0) {
-                displayDialog_Information("Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
+                dialog_Information("Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
             else if (duration >= (SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
                 String confirmationtext = String.format("%s Is %s Which Is Longer Than The Suggested Maximum Duration %s", testfile.getName(),
                         Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), null));
-                return displayDialog_YesNoConfirmation("Alert File Too Long", confirmationtext, "This May Break Session Immersion. Really Use This File As Your Alert File?");
+                return dialog_YesNoConfirmation("Alert File Too Long", confirmationtext, "This May Break Session Immersion. Really Use This File As Your Alert File?");
             } else if (duration >= ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
                 String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), null));
-                displayDialog_Information("Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
+                dialog_Information("Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
                 return false;
             } else {return true;}
         }
@@ -871,7 +883,7 @@ public class MainController implements Initializable {
 //                    checkalertfile();
 //                }
 //            } else {
-//                if (Util.displayDialog_YesNoConfirmation(Root, "Confirmation", "This Will Disable The Audible Alert File Played In Between Cuts", "Really Disable This Feature?")) {
+//                if (Util.dialog_YesNoConfirmation(Root, "Confirmation", "This Will Disable The Audible Alert File Played In Between Cuts", "Really Disable This Feature?")) {
 //                    AlertFile = null;
 //                    checkalertfile();
 //                } else {
@@ -885,12 +897,12 @@ public class MainController implements Initializable {
 //                if (Util.audio_isValid(newfile)) {
 //                    double duration = Util.audio_getduration(newfile);
 //                    if (duration > 10000) {
-//                        if (!Util.displayDialog_YesNoConfirmation(Root, "Validation", "Alert File Is longer Than 10 Seconds",
+//                        if (!Util.dialog_YesNoConfirmation(Root, "Validation", "Alert File Is longer Than 10 Seconds",
 //                                String.format("This Alert File Is %s Seconds, And May Break Immersion, " +
 //                                        "Really Use It?", duration))) {newfile = null;}
 //                    }
 //                } else {
-//                    Util.displayDialog_Information(Root, "Information", newfile.getName() + " Isn't A Valid Audio File", "Supported Audio Formats: " + Util.audio_getsupportedText());
+//                    Util.dialog_Information(Root, "Information", newfile.getName() + " Isn't A Valid Audio File", "Supported Audio Formats: " + Util.audio_getsupportedText());
 //                    newfile = null;
 //                }
 //            }
@@ -957,7 +969,7 @@ public class MainController implements Initializable {
             String referencename = referenceType.name();
             this.setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (displayDialog_YesNoCancelConfirmation("Confirmation", CutNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes", "Save Changes Before Exiting?")) {
+                    switch (dialog_YesNoCancelConfirmation("Confirmation", CutNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes", "Save Changes Before Exiting?")) {
                         case YES:
                             saveselectedfile(null);
                             break;
@@ -982,7 +994,7 @@ public class MainController implements Initializable {
             HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             TEXTVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             if (userselectedindexes.size() > 0 && selectedfile != null && unsavedchanges()) {
-                Util.AnswerType answerType = displayDialog_YesNoCancelConfirmation("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading A Different Cut/Element");
+                Util.AnswerType answerType = dialog_YesNoCancelConfirmation("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading A Different Cut/Element");
                 switch (answerType) {
                     case YES:
                         saveselectedfile(null);
@@ -1022,9 +1034,9 @@ public class MainController implements Initializable {
         public void saveselectedfile(ActionEvent actionEvent) {
             if (Util.file_writecontents(selectedfile, MainTextArea.getText())) {
                 String text = selectedmeditatable + "'s Reference File (" + referenceType.toString() + " Variation) Has Been Saved";
-                displayDialog_Information("Changes Saved", text, "");
+                dialog_Information("Changes Saved", text, "");
             } else {
-                displayDialog_Error("Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
+                dialog_Error("Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
         }
         public void loadselectedfile() {
             if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
@@ -1038,9 +1050,9 @@ public class MainController implements Initializable {
                 SaveButton.setDisable(true);
             } else {
                 if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1) {
-                    displayDialog_Information("Information", "No Cut Selected", "Select A Cut To Load");}
+                    dialog_Information("Information", "No Cut Selected", "Select A Cut To Load");}
                 else {
-                    displayDialog_Information("Information", "No Variation Selected", "Select A Variation To Load");}
+                    dialog_Information("Information", "No Variation Selected", "Select A Variation To Load");}
                 PreviewButton.setDisable(true);
             }
         }
@@ -1059,7 +1071,7 @@ public class MainController implements Initializable {
         }
         public void htmlselected(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                Util.AnswerType answerType = displayDialog_YesNoCancelConfirmation("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading HTML Variation");
+                Util.AnswerType answerType = dialog_YesNoCancelConfirmation("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading HTML Variation");
                 switch (answerType) {
                     case YES:
                         saveselectedfile(null);
@@ -1081,7 +1093,7 @@ public class MainController implements Initializable {
         }
         public void textselected(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                Util.AnswerType answerType = displayDialog_YesNoCancelConfirmation("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading TXT Variation");
+                Util.AnswerType answerType = dialog_YesNoCancelConfirmation("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading TXT Variation");
                 switch (answerType) {
                     case YES:
                         saveselectedfile(null);
@@ -1104,7 +1116,7 @@ public class MainController implements Initializable {
         public void preview(ActionEvent actionEvent) {
             if (MainTextArea.getText().length() > 0 && HTMLVariation.isSelected() && referenceType == This_Session.ReferenceType.html) {
                 if (! Util.String_validhtml(MainTextArea.getText())) {
-                    if (! displayDialog_YesNoConfirmation("Confirmation", "Html Code In Text Area Is Not Valid HTML", "Preview Anyways?")) {return;}
+                    if (! dialog_YesNoConfirmation("Confirmation", "Html Code In Text Area Is Not Valid HTML", "Preview Anyways?")) {return;}
                 }
                 Session.displayreferencepreview(MainTextArea.getText());
             }
@@ -1162,7 +1174,7 @@ public class MainController implements Initializable {
                     VolumePercentage.setText("0%");
                 } catch (IOException ignored) {}
             } else {
-                displayDialog_Information("Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+                dialog_Information("Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
         }
 
         public void play(ActionEvent actionEvent) {
@@ -1298,7 +1310,7 @@ public class MainController implements Initializable {
                 referencetoggle();
                 setOnCloseRequest(event -> {
                     if (valuesdifferentthanxml()) {
-                        switch (displayDialog_YesNoCancelConfirmation("Unsaved Changes", "You Have Unsaved Changes", "Save Changes Before Exiting?")) {
+                        switch (dialog_YesNoCancelConfirmation("Unsaved Changes", "You Have Unsaved Changes", "Save Changes Before Exiting?")) {
                             case YES: save(); break;
                             case NO: break;
                             case CANCEL: event.consume(); break;
@@ -1479,25 +1491,25 @@ public class MainController implements Initializable {
             return entrainmentgood && ambiencegood;
         }
         public void resettodefaults(ActionEvent actionEvent) {
-            if (displayDialog_YesNoConfirmation("Reset To Defaults", "Reset All Values To Defaults?", "You Will Lose Any Unsaved Changes")) {
+            if (dialog_YesNoConfirmation("Reset To Defaults", "Reset All Values To Defaults?", "You Will Lose Any Unsaved Changes")) {
                 Options.resettodefaults();
                 populatefromxml();
             }
         }
         public void deleteallsessions(ActionEvent actionEvent) {
-            if (displayDialog_YesNoConfirmation("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+            if (dialog_YesNoConfirmation("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
                 if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
-                    displayDialog_Error("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                    dialog_Error("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
                 } else {
-                    displayDialog_Information("Success", "Successfully Delete Sessions And Reset All Progress", "");}
+                    dialog_Information("Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }
         }
         public void deleteallgoals(ActionEvent actionEvent) {
-            if (displayDialog_YesNoConfirmation("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
+            if (dialog_YesNoConfirmation("Confirmation", "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Really Delete?")) {
                 if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {
-                    displayDialog_Error("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
+                    dialog_Error("Error", "Couldn't Delete Sessions File", "Check File Permissions For This File");
                 } else {
-                    displayDialog_Information("Success", "Successfully Delete Sessions And Reset All Progress", "");}
+                    dialog_Information("Success", "Successfully Delete Sessions And Reset All Progress", "");}
             }
         }
 
@@ -1590,7 +1602,7 @@ public class MainController implements Initializable {
                 this.setOnCloseRequest(event -> {
                     ArrayList<Meditatable> meditatablesmissingcurrentgoals = getSession().getAllMeditatablesincludingTotalforTracking().stream().filter(i -> i.getCurrentGoal() == null).collect(Collectors.toCollection(ArrayList::new));
                     if (meditatablesmissingcurrentgoals.size() > 0) {
-                        if (! displayDialog_YesNoConfirmation("Confirmation", "Missing Current Goals For " + meditatablesmissingcurrentgoals.size() + " Meditatables", "Really Close Without Setting A Current Goal For All Meditatables?")) {
+                        if (! dialog_YesNoConfirmation("Confirmation", "Missing Current Goals For " + meditatablesmissingcurrentgoals.size() + " Meditatables", "Really Close Without Setting A Current Goal For All Meditatables?")) {
                             event.consume();
                         }
                     }
@@ -1716,7 +1728,7 @@ public class MainController implements Initializable {
         }
         public void accept(ActionEvent actionEvent) {
             if (((HoursSpinner.getValue() * 60) + MinutesSpinner.getValue()) <= practicedminutes) {
-                displayDialog_Information("Cannot Accept", "Goal Is Less Than Or Equal To Practiced Minutes", "Goal Must Be Greater Than Practiced Minutes");
+                dialog_Information("Cannot Accept", "Goal Is Less Than Or Equal To Practiced Minutes", "Goal Must Be Greater Than Practiced Minutes");
                 return;
             }
             setgoal = true;
@@ -2117,9 +2129,9 @@ public class MainController implements Initializable {
                 }
             } else {
                 if (selected_temp_ambiencesong == null) {
-                    displayDialog_Information("Information", "Cannot Transfer", "Nothing Selected");}
+                    dialog_Information("Information", "Cannot Transfer", "Nothing Selected");}
                 else {
-                    displayDialog_Information("Information", "Cannot Transfer", "No Cut Selected");}
+                    dialog_Information("Information", "Cannot Transfer", "No Cut Selected");}
             }
         }
         public void leftarrowpressed(ActionEvent actionEvent) {
@@ -2199,7 +2211,7 @@ public class MainController implements Initializable {
                     } else {notvalidfilenames.add(i);}
                 }
                 if (notvalidfilenames.size() > 0) {
-                    displayDialog_Information("Files Couldn't Be Added", "These Files Couldn't Be Added", notvalidfilenames.toString());}
+                    dialog_Information("Files Couldn't Be Added", "These Files Couldn't Be Added", notvalidfilenames.toString());}
             }
         }
         public void addandcalculateduration(SoundFile soundFile, TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
@@ -2219,7 +2231,7 @@ public class MainController implements Initializable {
             int index = table.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 SoundFile soundFile = soundfilelist.get(index);
-                if (displayDialog_YesNoConfirmation("Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
+                if (dialog_YesNoConfirmation("Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
                     soundFile.getFile().delete();
                 }
                 table.getItems().remove(index);
@@ -2229,7 +2241,7 @@ public class MainController implements Initializable {
                 calculatetemptotalduration();
             }
             else {
-                displayDialog_Information("Information", "Nothing Selected", "Select A Table Item To Remove");}
+                dialog_Information("Information", "Nothing Selected", "Select A Table Item To Remove");}
         }
         private void preview(AmbienceSong selectedsong) {
             if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
@@ -2251,11 +2263,11 @@ public class MainController implements Initializable {
                     return true;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    displayDialog_Information("Information", selectedmeditatable + " Has No Ambience", "Please Add Ambience To " + selectedmeditatable);
+                    dialog_Information("Information", selectedmeditatable + " Has No Ambience", "Please Add Ambience To " + selectedmeditatable);
                     return false;
                 }
             } else {
-                displayDialog_Information("Information", "No Cut Loaded", "Load A Cut's Ambience First");
+                dialog_Information("Information", "No Cut Loaded", "Load A Cut's Ambience First");
                 return false;
             }
         }
@@ -2280,20 +2292,20 @@ public class MainController implements Initializable {
                 }
                 getSession().getAmbiences().setmeditatableAmbience(index, selectedambience);
                 getSession().getAmbiences().marshall();
-                displayDialog_Information("Saved", "Ambience Saved To " + selectedmeditatable, "");
+                dialog_Information("Saved", "Ambience Saved To " + selectedmeditatable, "");
             } else {
-                displayDialog_Information("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
+                dialog_Information("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closebuttonpressed(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (displayDialog_YesNoConfirmation("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Closing?")) {save(null);}
+                if (dialog_YesNoConfirmation("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Closing?")) {save(null);}
                 else {return;}
             }
             close();
         }
         public void switchtosimple(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (displayDialog_YesNoConfirmation("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Switching To Simple Mode?")) {save(null);}
+                if (dialog_YesNoConfirmation("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Switching To Simple Mode?")) {save(null);}
             }
             this.close();
             deletetempambiencefromdirectory();
@@ -2394,7 +2406,7 @@ public class MainController implements Initializable {
                 if (! i.equals(AmbienceList.get(AmbienceList.size() - 1).getFile())) {notvalidfilenames.add(i);}
             }
             if (notvalidfilenames.size() > 0) {
-                displayDialog_Information("Information", notvalidfilenames.size() + " Files Weren't Added Because They Are Unsupported", "");
+                dialog_Information("Information", notvalidfilenames.size() + " Files Weren't Added Because They Are Unsupported", "");
             }
         }
         public void addfiles(ActionEvent actionEvent) {
@@ -2409,7 +2421,7 @@ public class MainController implements Initializable {
                     else {notvalidfilenames.add(i);}
                 }
                 if (notvalidfilenames.size() > 0) {
-                    displayDialog_Information("Couldn't Add Files", "Supported Audio Formats: " + Util.audio_getsupportedText(), "Couldn't Add " + notvalidfilenames.size() + "Files");
+                    dialog_Information("Couldn't Add Files", "Supported Audio Formats: " + Util.audio_getsupportedText(), "Couldn't Add " + notvalidfilenames.size() + "Files");
                 }
             }
             if (AmbienceList.size() > 0) {AmbienceTable.setItems(AmbienceList);}
@@ -2432,7 +2444,7 @@ public class MainController implements Initializable {
             if (index != -1) {
                 SoundFile soundFile = SoundList.get(index);
                 selectedmeditatable.getAmbience().actual_remove(soundFile);
-                if (displayDialog_YesNoConfirmation("Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
+                if (dialog_YesNoConfirmation("Confirmation", "Also Delete File " + soundFile.getName() + " From Hard Drive?", "This Cannot Be Undone")) {
                     soundFile.getFile().delete();
                 }
                 AmbienceTable.getItems().remove(index);
@@ -2441,7 +2453,7 @@ public class MainController implements Initializable {
                 calculatetotalduration();
             }
             else {
-                displayDialog_Information("Information", "Nothing Selected", "Select A Table Item To Remove");}
+                dialog_Information("Information", "Nothing Selected", "Select A Table Item To Remove");}
         }
         public void preview(ActionEvent actionEvent) {
             if (selectedambiencesong != null && selectedambiencesong.getFile() != null && selectedambiencesong.getFile().exists()) {
@@ -2463,11 +2475,11 @@ public class MainController implements Initializable {
                     return true;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    displayDialog_Information("Information", selectedmeditatable + " Has No Ambience", "Please Add Ambience To " + selectedmeditatable);
+                    dialog_Information("Information", selectedmeditatable + " Has No Ambience", "Please Add Ambience To " + selectedmeditatable);
                     return false;
                 }
             } else {
-                displayDialog_Information("Information", "No Cut Loaded", "Load A Cut's Ambience First");
+                dialog_Information("Information", "No Cut Loaded", "Load A Cut's Ambience First");
                 return false;
             }
         }
@@ -2493,7 +2505,7 @@ public class MainController implements Initializable {
         // Dialog Methods
         public void advancedmode(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (displayDialog_YesNoConfirmation("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Switching To Advanced Mode?")) {save(null);}
+                if (dialog_YesNoConfirmation("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Switching To Advanced Mode?")) {save(null);}
             }
             this.close();
             if (selectedmeditatable != null) {
@@ -2508,13 +2520,13 @@ public class MainController implements Initializable {
                 }
                 getSession().getAmbiences().setmeditatableAmbience(index, selectedambience);
                 getSession().getAmbiences().marshall();
-                displayDialog_Information("Saved", "Ambience Saved To " + selectedmeditatable, "");
+                dialog_Information("Saved", "Ambience Saved To " + selectedmeditatable, "");
             } else {
-                displayDialog_Information("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
+                dialog_Information("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
         }
         public void closedialog(ActionEvent actionEvent) {
             if (unsavedchanges()) {
-                if (displayDialog_YesNoConfirmation("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Closing?")) {save(null);}
+                if (dialog_YesNoConfirmation("Save Changes", "You Have Unsaved Changes To " + selectedmeditatable, "Save Changes Before Closing?")) {save(null);}
                 else {return;}
             }
             close();

@@ -80,16 +80,16 @@ public class Preset {
     }
 
 // Methods
-    public boolean savepreset() {
+    public boolean save() {
         presetfile = Util.filechooser_save(Root.getScene(), "Save Preset As", null);
         if (presetfile == null) {return false;}
         if (! presetfile.getName().endsWith(".xml")) {
             if (! presetfile.getName().contains(".")) {
                 // No File Extension
-                if (Root.displayDialog_YesNoConfirmation("Confirmation", "Invalid Extension", "Save As A .xml File?")) {
+                if (Root.dialog_YesNoConfirmation("Confirmation", "Invalid Extension", "Save As A .xml File?")) {
                     presetfile = new File(presetfile.getAbsolutePath().concat(".xml"));
                 } else {
-                    if (! Root.displayDialog_YesNoConfirmation("Confirmation", "Save Preset As Invalid XML File", "Really Save Without Valid Extension? You May Not Be Able To Load This Preset")) {
+                    if (! Root.dialog_YesNoConfirmation("Confirmation", "Save Preset As Invalid XML File", "Really Save Without Valid Extension? You May Not Be Able To Load This Preset")) {
                         presetfile = null;
                         return false;
                     }
@@ -97,11 +97,11 @@ public class Preset {
             } else {
                 // Invalid File Extension
                 String extension = presetfile.getName().substring(presetfile.getName().lastIndexOf("."));
-                if (Root.displayDialog_YesNoConfirmation("Confirmation", "Invalid Extension " + extension, "Rename As .xml?")) {
+                if (Root.dialog_YesNoConfirmation("Confirmation", "Invalid Extension " + extension, "Rename As .xml?")) {
                     String filewithoutextension = presetfile.getAbsolutePath().substring(0, presetfile.getName().lastIndexOf("."));
                     presetfile = new File(filewithoutextension.concat(".xml"));
                 } else {
-                    if (! Root.displayDialog_YesNoConfirmation("Confirmation", "Really Save Preset With ." + extension + " Extension?", "You May Not Be Able To Load This Preset As It's Not A Valid .xml File")) {
+                    if (! Root.dialog_YesNoConfirmation("Confirmation", "Really Save Preset With ." + extension + " Extension?", "You May Not Be Able To Load This Preset As It's Not A Valid .xml File")) {
                         presetfile = null;
                         return false;
                     }
@@ -110,17 +110,17 @@ public class Preset {
         }
         return marshall(presetfile);
     }
-    public File openpreset() {
+    public File open() {
         presetfile = Util.filechooser_single(Root.getScene(), "Load Session Preset", null);
         if (presetfile != null && presetfile.getName().endsWith(".xml")) {
             if (unmarshall(presetfile)) {return presetfile;}
             else {return null;}
         } else {return null;}
     }
-    public ArrayList<Double> getpresettimes() {
+    public ArrayList<Double> gettimes() {
         return new ArrayList<>(Arrays.asList(PreTime, RinTime, KyoTime, TohTime, ShaTime, KaiTime, JinTime, RetsuTime, ZaiTime, ZenTime, EarthTime, AirTime, FireTime, WaterTime, VoidTime, PostTime));
     }
-    public void setpresettimes(ArrayList<Double> creatorvalues) {
+    public void settimes(ArrayList<Double> creatorvalues) {
         try {
             PreTime = (creatorvalues.get(0));
             RinTime = (creatorvalues.get(1));
@@ -140,8 +140,8 @@ public class Preset {
             PostTime = (creatorvalues.get(15));
         } catch (ArrayIndexOutOfBoundsException ignored) {}
     }
-    public boolean presethasvalidValues() {
-        for (Double i : getpresettimes()) {if (i == null) {return false;}}
+    public boolean hasvalidValues() {
+        for (Double i : gettimes()) {if (i == null) {return false;}}
         return true;
     }
 
