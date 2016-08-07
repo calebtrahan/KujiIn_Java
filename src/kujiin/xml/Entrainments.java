@@ -1,5 +1,7 @@
 package kujiin.xml;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import kujiin.MainController;
 
 import javax.xml.bind.JAXBContext;
@@ -9,6 +11,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +38,12 @@ public class Entrainments {
     private Entrainment Postsession;
     private final List<Entrainment> AllEntrainment = new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));
     private MainController Root;
+    @XmlTransient
+    private int meditatablecount;
+    @XmlTransient
+    private static final List<Integer> DURATIONSVARIATIONS = Arrays.asList(1, 5);
+    @XmlTransient
+    private int variationcount;
 
     public Entrainments() {}
     public Entrainments(MainController Root) {this.Root = Root;}
@@ -163,13 +173,7 @@ public class Entrainments {
                 e.printStackTrace();
                 Root.dialog_Information("Information", "Couldn't Read Entrainment XML File", "Check Read File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
             }
-        } else {
-            for (int i = 0; i < AllEntrainment.size(); i++) {
-                Entrainment selectedentrainment = AllEntrainment.get(i);
-                selectedentrainment = new Entrainment();
-                setmeditatableEntrainment(i, selectedentrainment);
-            }
-        }
+        } else {populateentrainmentdurations();}
     }
     public void marshall() {
         try {
@@ -180,6 +184,39 @@ public class Entrainments {
         } catch (JAXBException e) {
             e.printStackTrace();
             Root.dialog_Information("Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+        }
+    }
+    public void populateentrainmentdurations() {
+        // Calculate File With Variation
+        String meditatablename;
+        int variation;
+        Entrainment selectedentrainment;
+        try {
+            selectedentrainment = getmeditatableEntrainment(meditatablecount);
+            if (meditatablecount > 9 && meditatablecount < 15) {meditatablename = "ELEMENT";}
+            else {meditatablename = Root.getSession().getAllMeditatables_Names().get(meditatablecount).toUpperCase();}
+            try {variation = DURATIONSVARIATIONS.get(variationcount); variationcount++;}
+            catch (IndexOutOfBoundsException e) {
+                variation = 0;
+                variationcount = 0;
+                meditatablecount++;
+                populateentrainmentdurations();
+            }
+        } catch (IndexOutOfBoundsException ignored) {
+            return;
+            // End Calculation
+        }
+        File actualfile = new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + meditatablename + variation + ".mp3");
+        if (actualfile.exists()) {
+            MediaPlayer mediaPlayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
+            mediaPlayer.setOnReady(() -> {
+                SoundFile soundFile = new SoundFile(actualfile);
+                soundFile.setDuration(mediaPlayer.getTotalDuration().toMillis());
+                if (variationcount == 0) {selectedentrainment.setFreqshort(soundFile);
+                } else if (variationcount == 1) {selectedentrainment.setFreqlong(soundFile);}
+                mediaPlayer.dispose();
+                populateentrainmentdurations();
+            });
         }
     }
 

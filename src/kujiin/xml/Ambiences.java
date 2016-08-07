@@ -1,6 +1,11 @@
 package kujiin.xml;
 
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import kujiin.MainController;
+import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -9,6 +14,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +41,17 @@ public class Ambiences {
     private Ambience Postsession;
     private final List<Ambience> AllAmbiences = new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));
     private MainController Root;
+    @XmlTransient
+    private int meditatablecount;
+    @XmlTransient
+    private ArrayList<File> soundfilestocalculateduration = new ArrayList<>();
+    @XmlTransient
+    private int soundfilescount;
+    private String meditatablename;
+    private File ambiencedirectory;
+    private Ambience selectedambience;
+    private MediaPlayer calculateplayer;
+
 
     public Ambiences() {}
     public Ambiences(MainController Root) {this.Root = Root;}
@@ -160,13 +178,7 @@ public class Ambiences {
                 Void = ambiences.Void;
                 Postsession = ambiences.Postsession;
             } catch (JAXBException e) {Root.dialog_Information("Information", "Couldn't Read Ambience XML File", "Check Read File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
-        } else {
-            for (int i = 0; i < AllAmbiences.size(); i++) {
-                Ambience selectedambience = AllAmbiences.get(i);
-                selectedambience = new Ambience();
-                setmeditatableAmbience(i, selectedambience);
-            }
-        }
+        } else {populateambiencedurations();}
     }
     public void marshall() {
         try {
@@ -175,6 +187,70 @@ public class Ambiences {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.AMBIENCEXMLFILE);
         } catch (JAXBException ignored) {Root.dialog_Information("Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
+    }
+    public void populateambiencedurations() {
+        Service<Void> populateambienceservice = new Service<java.lang.Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<java.lang.Void>() {
+                    @Override
+                    protected java.lang.Void call() throws Exception {
+                        if (soundfilestocalculateduration.isEmpty()) {
+                            try {
+                                selectedambience = getmeditatableAmbience(meditatablecount);
+                                if (selectedambience == null) {selectedambience = new Ambience();}
+                                if (meditatablecount == 0) {meditatablename = "Presession";}
+                                else if (meditatablecount == 15) {meditatablename = "Postsession";}
+                                else {meditatablename = Root.getSession().getAllMeditatables_Names().get(meditatablecount).toUpperCase();}
+                                updateMessage("Starting Scan For Ambience " + meditatablename);
+                                ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, meditatablename);
+                                try {
+                                    for (File i : ambiencedirectory.listFiles()) {
+                                        for (String x : Util.SUPPORTEDAUDIOFORMATS) {
+                                            if (i.getName().endsWith(x)) {soundfilestocalculateduration.add(i); break;}
+                                        }
+                                    }
+                                    soundfilescount = 0;
+                                } catch (NullPointerException ignored) {
+                                    meditatablecount++;
+                                    soundfilescount = 0;
+                                }
+                                try {call();} catch (Exception e) {e.printStackTrace();}
+                            } catch (IndexOutOfBoundsException e) {return null;}
+                        } else {
+                            try {
+                                File actualfile = soundfilestocalculateduration.get(soundfilescount);
+                                calculateplayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
+                                calculateplayer.setOnReady(() -> {
+                                    updateMessage("Scanning Directories For Ambience" + meditatablename + " (" + soundfilescount + 1 + "/" + soundfilestocalculateduration.size() + ")");
+                                    updateProgress(soundfilescount, soundfilestocalculateduration.size() - 1);
+                                    SoundFile soundFile = new SoundFile(actualfile);
+                                    soundFile.setDuration(calculateplayer.getTotalDuration().toMillis());
+                                    selectedambience.actual_add(meditatablecount, soundFile);
+                                    soundfilescount++;
+                                    calculateplayer.dispose();
+                                    try {call();} catch (Exception e) {e.printStackTrace();}
+                                });
+                                calculateplayer.setOnError(() -> {
+                                    soundfilescount++;
+                                    calculateplayer.dispose();
+                                    try {call();} catch (Exception e) {e.printStackTrace();}
+                                });
+                            } catch (IndexOutOfBoundsException ignored) {
+                                soundfilestocalculateduration.clear();
+                                setmeditatableAmbience(meditatablecount, selectedambience);
+                                meditatablecount++;
+                                try {call();} catch (Exception e) {e.printStackTrace();}
+                            }
+                        }
+                        return null;
+                    }
+                };
+            }
+        };
+        populateambienceservice.setOnRunning(event -> Root.CreatorStatusBar.textProperty().bind(populateambienceservice.messageProperty()));
+        populateambienceservice.setOnSucceeded(event -> Root.CreatorStatusBar.textProperty().unbind());
+        populateambienceservice.start();
     }
 
 // Other Methods

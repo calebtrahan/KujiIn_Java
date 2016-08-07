@@ -126,18 +126,10 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("Initialize");
         setOptions(new Options(this));
         getOptions().unmarshall();
-        Entrainments = new Entrainments(this);
-        Entrainments.unmarshall();
-        Ambiences = new Ambiences(this);
-        Ambiences.unmarshall();
-        setSession(new This_Session(this));
-        preset_initialize();
-        creation_initialize();
-        exporter_initialize();
-        sessions_initialize();
-        goals_initialize();
+
     }
     public boolean cleanup() {
         Ambiences.marshall();
@@ -153,6 +145,12 @@ public class MainController implements Initializable {
     public Entrainments getEntrainments() {
     return Entrainments;
 }
+    public void setEntrainments(kujiin.xml.Entrainments entrainments) {
+        Entrainments = entrainments;
+    }
+    public void setAmbiences(kujiin.xml.Ambiences ambiences) {
+        Ambiences = ambiences;
+    }
     public Ambiences getAmbiences() {
         return Ambiences;
     }
@@ -2678,6 +2676,26 @@ public class MainController implements Initializable {
             setTitle(titletext);
             Message.setText(message);
         }
+    }
+    public static class TaskProgressDialog extends Stage {
+        public Label TopLabel;
+        public Label ProgressLabel;
+        public ProgressBar Progress;
+        public Button CancelButton;
+
+        public TaskProgressDialog(Options options) {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ComplexTaskProgressDialog.fxml"));
+                fxmlLoader.setController(this);
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                options.setStyle(this);
+                setOnShowing(event -> System.out.println("Task Progress Dialog Showing!"));
+                this.setResizable(false);
+                this.setOnCloseRequest(Event::consume);
+            } catch (IOException e) {}
+        }
+
     }
 
 }
