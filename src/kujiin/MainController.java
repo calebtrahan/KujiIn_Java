@@ -319,10 +319,6 @@ public class MainController implements Initializable {
             TotalSessionTime.setText("");
             ApproximateEndTime.setText("");
         }
-        if (AmbienceSwitch.isSelected()) {
-            AmbienceSwitch.setSelected(false);
-            Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Session Values Changed, Ambience Unselected", 5000);
-        }
     }
     public void creation_gui_toggleambience(ActionEvent actionEvent) {
         if (AmbienceSwitch.isSelected()) {
@@ -2698,7 +2694,6 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 options.setStyle(this);
-                setOnShowing(event -> System.out.println("Task Progress Dialog Showing!"));
                 this.setResizable(false);
                 this.setOnCloseRequest(Event::consume);
             } catch (IOException e) {}

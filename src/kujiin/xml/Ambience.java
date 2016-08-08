@@ -23,9 +23,7 @@ public class Ambience {
     }
 
     // Getters And Setters
-    public List<SoundFile> getAmbience() {
-        return Ambience;
-    }
+    public List<SoundFile> getAmbience() {return Ambience;}
     public void setAmbience(List<SoundFile> ambience) {
         this.Ambience = ambience;
     }

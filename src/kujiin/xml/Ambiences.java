@@ -78,9 +78,42 @@ public class Ambiences {
 
 // Other Methods
     public Ambience getmeditatableAmbience(int index) {
-        Ambience ambience = AllAmbiences.get(index);
-        if (ambience == null) {return new Ambience();}
-        else {return ambience;}
+        switch (index) {
+            case 0:
+                if (Presession != null) {return Presession;} else {return new Ambience();}
+            case 1:
+                if (Rin != null) {return Rin;} else {return new Ambience();}
+            case 2:
+                if (Kyo != null) {return Kyo;} else {return new Ambience();}
+            case 3:
+                if (Toh != null) {return Toh;} else {return new Ambience();}
+            case 4:
+                if (Sha != null) {return Sha;} else {return new Ambience();}
+            case 5:
+                if (Kai != null) {return Kai;} else {return new Ambience();}
+            case 6:
+                if (Jin != null) {return Jin;} else {return new Ambience();}
+            case 7:
+                if (Retsu != null) {return Retsu;} else {return new Ambience();}
+            case 8:
+                if (Zai != null) {return Zai;} else {return new Ambience();}
+            case 9:
+                if (Zen != null) {return Zen;} else {return new Ambience();}
+            case 10:
+                if (Earth != null) {return Earth;} else {return new Ambience();}
+            case 11:
+                if (Air != null) {return Air;} else {return new Ambience();}
+            case 12:
+                if (Fire != null) {return Fire;} else {return new Ambience();}
+            case 13:
+                if (Water != null) {return Water;} else {return new Ambience();}
+            case 14:
+                if (Void != null) {return Void;} else {return new Ambience();}
+            case 15:
+                if (Postsession != null) {return Postsession;} else {return new Ambience();}
+            default:
+                return null;
+        }
     }
     public void setmeditatableAmbience(int index, Ambience ambience) {
         switch (index) {

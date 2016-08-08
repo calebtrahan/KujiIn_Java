@@ -22,7 +22,6 @@ public class Main extends Application {
         primaryStage.setResizable(false);
         primaryStage.setOnShowing(event -> {
             primaryStage.setIconified(false);
-            System.out.println("Showing");
             Root.setScene(Scene);
             Root.setStage(primaryStage);
             Root.getOptions().setStyle(primaryStage);

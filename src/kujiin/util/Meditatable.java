@@ -140,10 +140,14 @@ public class Meditatable {
             ambiencechecker_soundfilescount = 0;
             try {
                 for (File i : ambiencedirectory.listFiles()) {
-                    if (! ambience.getAmbienceFiles().contains(i) && Util.audio_isValid(i)) {ambiencechecker_soundfilelist.add(i);}
-                    else {
-                        Double duration = ambience.getAmbience().get(ambience.getAmbienceFiles().indexOf(i)).getDuration();
-                        if (duration == null || duration == 0.0) {ambiencechecker_soundfilelist.add(i);}
+                    if (Util.audio_isValid(i)) {
+                        if (! ambience.getAmbienceFiles().contains(i)) {ambiencechecker_soundfilelist.add(i);}
+                        else {
+                            try {
+                                Double duration = ambience.getAmbience().get(ambience.getAmbienceFiles().indexOf(i)).getDuration();
+                                if (duration == null || duration == 0.0) {ambiencechecker_soundfilelist.add(i);}
+                            } catch (ArrayIndexOutOfBoundsException ignored) {ambiencechecker_soundfilelist.add(i);}
+                        }
                     }
                 }
                 if (! ambiencechecker_soundfilelist.isEmpty()) {ambience_populate();}
@@ -168,7 +172,12 @@ public class Meditatable {
                     ambience_populate();
                 });
             } catch (IndexOutOfBoundsException ignored) {
+                System.out.println(Boolean.toString(ambience == null));
                 thisession.Root.getAmbiences().setmeditatableAmbience(number, ambience);
+//                System.out.println(name + "'s Ambience:");
+//                for (SoundFile i : thisession.Root.getAmbiences().getmeditatableAmbience(number).getAmbience()) {
+//                    System.out.println(i.getName() + ": " + i.getDuration());
+//                }
                 thisession.Root.getAmbiences().marshall();
                 ambienceready = true;
             }

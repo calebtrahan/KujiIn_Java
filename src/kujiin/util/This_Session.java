@@ -354,29 +354,22 @@ public class This_Session {
                         protected Void call() throws Exception {
                             try {
                                 for (Meditatable i : getAllMeditatables()) {
-                                    updateMessage(String.format("Currently Checking %s...", i.name));
+                                    Root.CreatorStatusBar.setText(String.format("Checking Ambience. Currently Checking %s...", i.name));
                                     if (! i.getAmbience().hasAnyAmbience()) {meditatableswithnoambience.add(i);}
                                     else if (! i.getAmbience().hasEnoughAmbience(i.getduration())) {meditatableswithreducedambience.add(i);}
                                 }
-                                updateMessage("Done Checking Ambience");
                                 return null;
                             } catch (Exception e) {
-                                e.printStackTrace();
                                 return null;
                             }
                         }
                     };
                 }
             };
-            final MainController.SimpleTextDialogWithCancelButton[] cad = new MainController.SimpleTextDialogWithCancelButton[1];
             ambiencecheckerservice.setOnRunning(event -> {
-                cad[0] = new MainController.SimpleTextDialogWithCancelButton(Root.getOptions(), "Checking Ambience", "Checking Ambience", "");
-                cad[0].Message.textProperty().bind(ambiencecheckerservice.messageProperty());
-                cad[0].CancelButton.setOnAction(ev -> ambiencecheckerservice.cancel());
-                cad[0].showAndWait();
+                Root.CreatorStatusBar.textProperty().bind(ambiencecheckerservice.messageProperty());
             });
             ambiencecheckerservice.setOnSucceeded(event -> {
-                cad[0].close();
                 if (meditatableswithnoambience.size() > 0) {
                     StringBuilder a = new StringBuilder();
                     for (int i = 0; i < meditatableswithnoambience.size(); i++) {
@@ -418,13 +411,10 @@ public class This_Session {
                 }
             });
             ambiencecheckerservice.setOnCancelled(event -> {
-                cad[0].close();
                 ambiencecheckbox.setSelected(false);
             });
             ambiencecheckerservice.setOnFailed(event -> {
                 System.out.println("Failed!!");
-                cad[0].close();
-                Root.dialog_Error("Error", "Couldn't Check Ambience", "Check Ambience Folder Read Permissions");
                 ambiencecheckbox.setSelected(false);
             });
             ambiencecheckerservice.start();
