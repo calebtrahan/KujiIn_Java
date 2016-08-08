@@ -54,7 +54,18 @@ public class Meditatable {
 // Goal Fields
     protected Goals GoalsController;
     protected List<kujiin.xml.Goals.Goal> Goals;
+// Entrainment Fields
+    private boolean entrainmentready = false;
+    private int entrainmentchecker_variationcount = 0;
+    private MediaPlayer entrainmentchecker_calculateplayer;
+    private List<File> entrainmentchecker_missingfiles = new ArrayList<>();
+// Ambience Fields
+    private ArrayList<File> ambiencechecker_soundfilelist = new ArrayList<>();
+    private int ambiencechecker_soundfilescount = 0;
+    private MediaPlayer ambiencechecker_calculateplayer;
+    private boolean ambienceready = false;
 
+    public Meditatable() {}
     public Meditatable(int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
@@ -75,8 +86,10 @@ public class Meditatable {
             gui_toggleswitch();
         }
         entrainment = thissession.Root.getEntrainments().getmeditatableEntrainment(number);
+        entrainment_populate();
         ambience = thissession.Root.getAmbiences().getmeditatableAmbience(number);
-        //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
+        ambience_populate();
+    //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
 //        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
 //        tempambiencetextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Amb.txt");
@@ -84,6 +97,76 @@ public class Meditatable {
 //        finalambiencefile = new File(Options.DIRECTORYTEMP, "Ambience/" + name + ".mp3");
 //        setFinalexportfile(new File(Options.DIRECTORYTEMP, name + ".mp3"));
     }
+
+// Entrainment Methods
+    public void entrainment_populate() {
+        try {
+            int variation = Entrainments.DURATIONSVARIATIONS.get(entrainmentchecker_variationcount);
+            StringBuilder filename = new StringBuilder();
+            if (number == 0 || number == 15) {filename.append("Qi-Gong");}
+            else if (number > 9 && number < 15) {filename.append("ELEMENT");}
+            else {filename.append(name);}
+            filename.append(variation).append(".mp3");
+            File actualfile = new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + filename.toString());
+            if (actualfile.exists()) {
+                entrainmentchecker_calculateplayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
+                entrainmentchecker_calculateplayer.setOnReady(() -> {
+                    SoundFile soundFile = new SoundFile(actualfile);
+                    soundFile.setDuration(entrainmentchecker_calculateplayer.getTotalDuration().toMillis());
+                    if (entrainmentchecker_variationcount == 0) {entrainment.setFreqshort(soundFile);
+                    } else if (entrainmentchecker_variationcount == 1) {entrainment.setFreqlong(soundFile);}
+                    entrainmentchecker_calculateplayer.dispose();
+                    entrainmentchecker_variationcount++;
+                    entrainment_populate();
+                });
+            } else {entrainmentchecker_missingfiles.add(actualfile);}
+        } catch (IndexOutOfBoundsException ignored) {}
+    }
+    public boolean entrainment_isReady() {return entrainmentready;}
+    public List<File> entrainment_getMissingFiles() {return entrainmentchecker_missingfiles;}
+
+// Ambience Methods
+    public void ambience_populate() {
+        if (ambiencechecker_soundfilelist.isEmpty()) {
+            File ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
+            ambiencechecker_soundfilescount = 0;
+            try {
+                for (File i : ambiencedirectory.listFiles()) {
+                    if (! ambience.getAmbienceFiles().contains(i) && Util.audio_isValid(i)) {ambiencechecker_soundfilelist.add(i); break;}
+                    else {
+                        Double duration = ambience.getAmbience().get(ambience.getAmbienceFiles().indexOf(i)).getDuration();
+                        if (duration == null || duration == 0.0) {ambiencechecker_soundfilelist.add(i); break;}
+                    }
+                }
+                if (! ambiencechecker_soundfilelist.isEmpty()) {ambience_populate();}
+                else {ambienceready = true;}
+            } catch (NullPointerException ignored) {}
+        } else {
+            // Find Audio Durations Of Files
+            try {
+                File actualfile = ambiencechecker_soundfilelist.get(ambiencechecker_soundfilescount);
+                ambiencechecker_calculateplayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
+                ambiencechecker_calculateplayer.setOnReady(() -> {
+//                    thisession.CreatorStatusBar.setText("Scanning Directories For Ambience" + meditatablename + " (" + soundfilescount + 1 + "/" + soundfilestocalculateduration.size() + ")");
+                    SoundFile soundFile = new SoundFile(actualfile);
+                    soundFile.setDuration(ambiencechecker_calculateplayer.getTotalDuration().toMillis());
+                    ambience.actual_add(soundFile);
+                    ambiencechecker_soundfilescount++;
+                    ambiencechecker_calculateplayer.dispose();
+                    ambience_populate();
+                });
+                ambiencechecker_calculateplayer.setOnError(() -> {
+                    ambiencechecker_soundfilescount++;
+                    ambiencechecker_calculateplayer.dispose();
+                    ambience_populate();
+                });
+            } catch (IndexOutOfBoundsException ignored) {
+                thisession.Root.getAmbiences().setmeditatableAmbience(number, ambience);
+                ambienceready = true;
+            }
+        }
+    }
+    public boolean ambience_isReady() {return ambienceready;}
 
 // GUI Methods
     private void gui_toggleswitch() {
@@ -138,7 +221,7 @@ public class Meditatable {
     public void setCurrentambiencevolume(Double currentambiencevolume) {
         this.currentambiencevolume = currentambiencevolume;
     }
-    // Duration
+// Duration
     public Duration getduration() {return duration;}
     public Duration getelapsedtime() {return elapsedtime;}
 
@@ -780,7 +863,7 @@ public class Meditatable {
     public void tick() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             try {
-                thisession.Root.getSessions().sessioninformation_getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatecutduration(number, new Double(elapsedtime.toMinutes()).intValue());
+                thisession.Root.getSessions().sessioninformation_getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatemeditatableduration(number, new Double(elapsedtime.toMinutes()).intValue());
                 if (goals_getCurrent() != null && (goals_getCurrent().getGoal_Hours() * 60) >= sessions_getTotalMinutesPracticed(false)) {
                     goalscompletedthissession.addAll(goals_completeandgetcompleted());
                 }

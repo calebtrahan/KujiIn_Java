@@ -15,13 +15,14 @@ public class Qi_Gong extends Meditatable {
         super(number, name, duration, briefsummary, thissession, aSwitch, value);
 //        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "Qi-Gong5.mp3")));}
 //        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "Qi-Gong1.mp3")));}
-        if (number == 0) {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Preceding The Session"));}
-        else {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Following The Session"));}
-        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/Qi-Gong1.mp3"))); entrainment.calculateshortfreqduration();}
-        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/Qi-Gong5.mp3"))); entrainment.calculatelongfreqduration();}
+        if (thissession.Root.getOptions().getProgramOptions().getTooltips()) {
+            if (number == 0) {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Preceding The Session"));}
+            else {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Following The Session"));}
+        } else {Value.setTooltip(null);}
     }
 
 // GUI
+
 
     @Override
     public String getNameForChart() {

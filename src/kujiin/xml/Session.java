@@ -268,87 +268,139 @@ public class Session {
     public void setDate_Practiced(String date_Practiced) {Date_Practiced = date_Practiced;}
 
 // Other Methods
-    public void updatecutduration(int cutindex, int duration) {
-        if (cutindex == 0) {setPresession_Duration(duration);}
-        if (cutindex == 1) {setRin_Duration(duration);}
-        if (cutindex == 2) {setKyo_Duration(duration);}
-        if (cutindex == 3) {setToh_Duration(duration);}
-        if (cutindex == 4) {setSha_Duration(duration);}
-        if (cutindex == 5) {setKai_Duration(duration);}
-        if (cutindex == 6) {setJin_Duration(duration);}
-        if (cutindex == 7) {setRetsu_Duration(duration);}
-        if (cutindex == 8) {setZai_Duration(duration);}
-        if (cutindex == 9) {setZen_Duration(duration);}
-        if (cutindex == 10) {setEarth_Duration(duration);}
-        if (cutindex == 11) {setAir_Duration(duration);}
-        if (cutindex == 12) {setFire_Duration(duration);}
-        if (cutindex == 13) {setWater_Duration(duration);}
-        if (cutindex == 14) {setVoid_Duration(duration);}
-        if (cutindex == 15) {setPostsession_Duration(duration);}
+    public void updatemeditatableduration(int meditatableindex, int duration) {
+        if (meditatableindex == 0) {setPresession_Duration(duration);}
+        if (meditatableindex == 1) {setRin_Duration(duration);}
+        if (meditatableindex == 2) {setKyo_Duration(duration);}
+        if (meditatableindex == 3) {setToh_Duration(duration);}
+        if (meditatableindex == 4) {setSha_Duration(duration);}
+        if (meditatableindex == 5) {setKai_Duration(duration);}
+        if (meditatableindex == 6) {setJin_Duration(duration);}
+        if (meditatableindex == 7) {setRetsu_Duration(duration);}
+        if (meditatableindex == 8) {setZai_Duration(duration);}
+        if (meditatableindex == 9) {setZen_Duration(duration);}
+        if (meditatableindex == 10) {setEarth_Duration(duration);}
+        if (meditatableindex == 11) {setAir_Duration(duration);}
+        if (meditatableindex == 12) {setFire_Duration(duration);}
+        if (meditatableindex == 13) {setWater_Duration(duration);}
+        if (meditatableindex == 14) {setVoid_Duration(duration);}
+        if (meditatableindex == 15) {setPostsession_Duration(duration);}
         updatetotalsessionduration();
     }
-    public int getcutduration(int cutindex) {
-        if (cutindex == 0) {return getPresession_Duration();}
-        if (cutindex == 1) {return getRin_Duration();}
-        if (cutindex == 2) {return getKyo_Duration();}
-        if (cutindex == 3) {return getToh_Duration();}
-        if (cutindex == 4) {return getSha_Duration();}
-        if (cutindex == 5) {return getKai_Duration();}
-        if (cutindex == 6) {return getJin_Duration();}
-        if (cutindex == 7) {return getRetsu_Duration();}
-        if (cutindex == 8) {return getZai_Duration();}
-        if (cutindex == 9) {return getZen_Duration();}
-        if (cutindex == 10) {return getEarth_Duration();}
-        if (cutindex == 11) {return getAir_Duration();}
-        if (cutindex == 12) {return getFire_Duration();}
-        if (cutindex == 13) {return getWater_Duration();}
-        if (cutindex == 14) {return getVoid_Duration();}
-        if (cutindex == 15) {return getPostsession_Duration();}
-        else {return 0;}
+    public int getmeditatableduration(int meditatableindex) {
+        switch (meditatableindex) {
+            case 0:
+                return getPresession_Duration();
+            case 1:
+                return getRin_Duration();
+            case 2:
+                return getKyo_Duration();
+            case 3:
+                return getToh_Duration();
+            case 4:
+                return getSha_Duration();
+            case 5:
+                return getKai_Duration();
+            case 6:
+                return getJin_Duration();
+            case 7:
+                return getRetsu_Duration();
+            case 8:
+                return getZai_Duration();
+            case 9:
+                return getZen_Duration();
+            case 10:
+                return getEarth_Duration();
+            case 11:
+                return getAir_Duration();
+            case 12:
+                return getFire_Duration();
+            case 13:
+                return getWater_Duration();
+            case 14:
+                return getVoid_Duration();
+            case 15:
+                return getPostsession_Duration();
+            default:
+                return 0;
+        }
     }
-    public void setcutambience(int cutindex, ArrayList<File> ambiencelist) {
-        if (cutindex == 0) setPresession_Ambience(ambiencelist);
-        if (cutindex == 1) setRin_Ambience(ambiencelist);
-        if (cutindex == 2) setKyo_Ambience(ambiencelist);
-        if (cutindex == 3) setToh_Ambience(ambiencelist);
-        if (cutindex == 4) setSha_Ambience(ambiencelist);
-        if (cutindex == 5) setKai_Ambience(ambiencelist);
-        if (cutindex == 6) setJin_Ambience(ambiencelist);
-        if (cutindex == 7) setRetsu_Ambience(ambiencelist);
-        if (cutindex == 8) setZai_Ambience(ambiencelist);
-        if (cutindex == 9) setZen_Ambience(ambiencelist);
-        if (cutindex == 10) setEarth_Ambience(ambiencelist);
-        if (cutindex == 11) setAir_Ambience(ambiencelist);
-        if (cutindex == 12) setFire_Ambience(ambiencelist);
-        if (cutindex == 13) setWater_Ambience(ambiencelist);
-        if (cutindex == 14) setVoid_Ambience(ambiencelist);
-        if (cutindex == 15) setPostsession_Ambience(ambiencelist);
-        else System.out.println("Can't Set Cut Ambience Not A Valid Index: " + cutindex);
+    public void setmeditatableambience(int meditatableindex, ArrayList<File> ambiencelist) {
+        switch (meditatableindex) {
+            case 0:
+                setPresession_Ambience(ambiencelist);
+                break;
+            case 1:
+                setRin_Ambience(ambiencelist);
+                break;
+            case 2:
+                setKyo_Ambience(ambiencelist);
+                break;
+            case 3:
+                setToh_Ambience(ambiencelist);
+                break;
+            case 4:
+                setSha_Ambience(ambiencelist);
+                break;
+            case 5:
+                setKai_Ambience(ambiencelist);
+                break;
+            case 6:
+                setJin_Ambience(ambiencelist);
+                break;
+            case 7:
+                setRetsu_Ambience(ambiencelist);
+                break;
+            case 8:
+                setZai_Ambience(ambiencelist);
+                break;
+            case 9:
+                setZen_Ambience(ambiencelist);
+                break;
+            case 10:
+                setEarth_Ambience(ambiencelist);
+                break;
+            case 11:
+                setAir_Ambience(ambiencelist);
+                break;
+            case 12:
+                setFire_Ambience(ambiencelist);
+                break;
+            case 13:
+                setWater_Ambience(ambiencelist);
+                break;
+            case 14:
+                setVoid_Ambience(ambiencelist);
+                break;
+            case 15:
+                setPostsession_Ambience(ambiencelist);
+                break;
+        }
     }
-    public ArrayList<Integer> getallcuttimes() {
-        ArrayList<Integer> allcuttimes = new ArrayList<>();
-        allcuttimes.add(getPresession_Duration());
-        allcuttimes.add(getRin_Duration());
-        allcuttimes.add(getKyo_Duration());
-        allcuttimes.add(getToh_Duration());
-        allcuttimes.add(getSha_Duration());
-        allcuttimes.add(getKai_Duration());
-        allcuttimes.add(getJin_Duration());
-        allcuttimes.add(getRetsu_Duration());
-        allcuttimes.add(getZai_Duration());
-        allcuttimes.add(getZen_Duration());
-        allcuttimes.add(getZen_Duration());
-        allcuttimes.add(getEarth_Duration());
-        allcuttimes.add(getAir_Duration());
-        allcuttimes.add(getFire_Duration());
-        allcuttimes.add(getWater_Duration());
-        allcuttimes.add(getVoid_Duration());
-        allcuttimes.add(getPostsession_Duration());
-        return allcuttimes;
+    public ArrayList<Integer> getallmeditatabletimes() {
+        ArrayList<Integer> allmeditatabletimes = new ArrayList<>();
+        allmeditatabletimes.add(getPresession_Duration());
+        allmeditatabletimes.add(getRin_Duration());
+        allmeditatabletimes.add(getKyo_Duration());
+        allmeditatabletimes.add(getToh_Duration());
+        allmeditatabletimes.add(getSha_Duration());
+        allmeditatabletimes.add(getKai_Duration());
+        allmeditatabletimes.add(getJin_Duration());
+        allmeditatabletimes.add(getRetsu_Duration());
+        allmeditatabletimes.add(getZai_Duration());
+        allmeditatabletimes.add(getZen_Duration());
+        allmeditatabletimes.add(getZen_Duration());
+        allmeditatabletimes.add(getEarth_Duration());
+        allmeditatabletimes.add(getAir_Duration());
+        allmeditatabletimes.add(getFire_Duration());
+        allmeditatabletimes.add(getWater_Duration());
+        allmeditatabletimes.add(getVoid_Duration());
+        allmeditatabletimes.add(getPostsession_Duration());
+        return allmeditatabletimes;
     }
     public boolean sessionnotEmpty() {
         int count = 0;
-        for (Integer i : getallcuttimes()) {
+        for (Integer i : getallmeditatabletimes()) {
             if (count > 0 && count < 15) {if (i > 0) {return true;}}
             count++;
         }
@@ -356,7 +408,7 @@ public class Session {
     }
     public void updatetotalsessionduration() {
         Integer total = 0;
-        for (Integer i: getallcuttimes()) {total += i;}
+        for (Integer i: getallmeditatabletimes()) {total += i;}
         setTotal_Session_Duration(total);
     }
 

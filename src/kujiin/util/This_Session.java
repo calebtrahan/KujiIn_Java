@@ -83,7 +83,7 @@ public class This_Session {
         options = Root.getOptions();
         Presession =  new Qi_Gong(0, "Presession", 0, "Gather Qi Before The Session Starts", this, Root.PreSwitch, Root.PreTime);
         Rin = new Cut(1, "RIN", 0, "Meet (Spirit & Invite Into The Body)", this, Root.RinSwitch, Root.RinTime);
-        Kyo = new Cut(2, "KYO", 0, "Troops (Manage Internal Strategy/Util)", this, Root.KyoSwitch, Root.KyoTime);
+        Kyo = new Cut(2, "KYO", 0, "Troops (Manage Internal Strategy/Tools)", this, Root.KyoSwitch, Root.KyoTime);
         Toh = new Cut(3, "TOH", 0, "Fighting (Against Myself To Attain Harmony)", this, Root.TohSwitch, Root.TohTime);
         Sha = new Cut(4, "SHA", 0, "Person (Meet & Become Person We Met In RIN)", this, Root.ShaSwitch, Root.ShaTime);
         Kai = new Cut(5, "KAI", 0, "All/Everything (Feeling Love & Compassion For Absolutely Everything)", this, Root.KaiSwitch, Root.KaiTime);
@@ -102,9 +102,8 @@ public class This_Session {
 
 // Getters And Setters
     public ArrayList<Meditatable> getAllMeditatables() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
-    public ArrayList<String> getAllMeditatables_Names() {
-        ArrayList<String> allmeditatablesnames = getAllMeditatables().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
-        return allmeditatablesnames;
+    public static ArrayList<String> getAllMeditatables_Names() {
+        return new ArrayList<>(Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "EARTH", "AIR", "FIRE", "WATER", "VOID", "Postsession"));
     }
     public ArrayList<Meditatable> getAllMeditatablesincludingTotal() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession, Total));}
     public ArrayList<String> getAllMeditablesincludingTotal_Names() {
@@ -345,7 +344,7 @@ public class This_Session {
     }
     public void creation_checkambience(CheckBox ambiencecheckbox) {
         if (creation_sessionhasvalidvalues()) {
-            ArrayList<Meditatable> cutsorelementswithnoambience = new ArrayList<>();
+            ArrayList<Meditatable> meditatableswithnoambience = new ArrayList<>();
             ArrayList<Meditatable> meditatableswithreducedambience = new ArrayList<>();
             Service<Void> ambiencecheckerservice = new Service<Void>() {
                 @Override
@@ -356,7 +355,7 @@ public class This_Session {
                             try {
                                 for (Meditatable i : getAllMeditatables()) {
                                     updateMessage(String.format("Currently Checking %s...", i.name));
-                                    if (! i.getAmbience().hasAnyAmbience()) {cutsorelementswithnoambience.add(i);}
+                                    if (! i.getAmbience().hasAnyAmbience()) {meditatableswithnoambience.add(i);}
                                     else if (! i.getAmbience().hasEnoughAmbience(i.getduration())) {meditatableswithreducedambience.add(i);}
                                 }
                                 updateMessage("Done Checking Ambience");
@@ -378,24 +377,23 @@ public class This_Session {
             });
             ambiencecheckerservice.setOnSucceeded(event -> {
                 cad[0].close();
-                if (cutsorelementswithnoambience.size() > 0) {
+                if (meditatableswithnoambience.size() > 0) {
                     StringBuilder a = new StringBuilder();
-                    for (int i = 0; i < cutsorelementswithnoambience.size(); i++) {
-                        a.append(cutsorelementswithnoambience.get(i).name);
-                        if (i != cutsorelementswithnoambience.size() - 1) {a.append(", ");}
+                    for (int i = 0; i < meditatableswithnoambience.size(); i++) {
+                        a.append(meditatableswithnoambience.get(i).name);
+                        if (i != meditatableswithnoambience.size() - 1) {a.append(", ");}
                     }
-                    if (cutsorelementswithnoambience.size() > 1) {
-                        Root.dialog_Error("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
-                        if (Root.dialog_YesNoConfirmation("Add Ambience", a.toString() + " Needs Ambience", "Open The Ambience Editor?")) {
-                            Root.menu_openadvancedambienceeditor();
-                        }
-                    } else {
-                        Root.dialog_Error("Error", String.format("%s Have No Ambience At All", a.toString()), "Cannot Add Ambience");
-                        if (Root.dialog_YesNoConfirmation("Add Ambience", a.toString() + " Need Ambience", "Open The Ambience Editor?")) {
-                            Root.menu_openadvancedambienceeditor(cutsorelementswithnoambience.get(0));
-                        }
+                    switch (Root.dialog_YesNoCancelConfirmation("Missing Ambience", "Missing Ambience For " + a.toString(), "Add Ambience Before Session Playback?")) {
+                        case YES:
+                            if (meditatableswithnoambience.size() == 1) {Root.menu_openadvancedambienceeditor(meditatableswithnoambience.get(0));}
+                            else { Root.menu_openadvancedambienceeditor();}
+                            break;
+                        case NO:
+                            break;
+                        case CANCEL:
+                            ambiencecheckbox.setSelected(false);
+                            break;
                     }
-                    ambiencecheckbox.setSelected(false);
                 } else {
                     if (meditatableswithreducedambience.size() > 0) {
                         StringBuilder a = new StringBuilder();
@@ -410,9 +408,9 @@ public class This_Session {
                         }
                         System.out.println(a.toString());
                         if (meditatableswithreducedambience.size() == 1) {
-                            ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Cut's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Cut?"));
+                            ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Meditatable's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Meditatables?"));
                         } else {
-                            ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Cuts?"));
+                            ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Meditatables?"));
                         }
                     } else {
                         ambiencecheckbox.setSelected(true);
@@ -431,16 +429,16 @@ public class This_Session {
             });
             ambiencecheckerservice.start();
         } else {
-            Root.dialog_Information("Information", "Cannot Check Ambience", "No Cuts Have > 0 Values, So I Don't Know Which Ambience To Check");}
+            Root.dialog_Information("Information", "Cannot Check Ambience", "No Meditatables Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
     public boolean creation_checkreferencefiles(boolean enableprompt) {
-        int invalidcutcount = 0;
+        int invalidmeditatablecount = 0;
         for (Meditatable i : getallitemsinSession()) {
-            if (!i.reference_filevalid(referenceType)) invalidcutcount++;
+            if (!i.reference_filevalid(referenceType)) invalidmeditatablecount++;
         }
-        if (invalidcutcount > 0 && enableprompt) {
-            return Root.dialog_YesNoConfirmation("Confirmation", "There Are " + invalidcutcount + " Cuts/Elements With Empty/Invalid Reference Files", "Enable Reference Anyways?");
-        } else {return invalidcutcount == 0;}
+        if (invalidmeditatablecount > 0 && enableprompt) {
+            return Root.dialog_YesNoConfirmation("Confirmation", "There Are " + invalidmeditatablecount + " Meditatables With Empty/Invalid Reference Files", "Enable Reference Anyways?");
+        } else {return invalidmeditatablecount == 0;}
     }
     public void creation_reset() {
         getAllMeditatables().forEach(Meditatable::creation_reset);
@@ -573,7 +571,7 @@ public class This_Session {
                 totalsessiondurationelapsed = Duration.ZERO;
                 totalsessionduration = Duration.ZERO;
                 for (Meditatable i : itemsinsession) {totalsessionduration = totalsessionduration.add(i.getduration());}
-                playerUI.TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
+                playerUI.TotalTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
                 updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> player_updateui()));
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 updateuitimeline.play();
@@ -617,20 +615,20 @@ public class This_Session {
                 totalprogress = (float) totalsessiondurationelapsed.toMillis()
                         / (float) totalsessionduration.toMillis();}
             else {totalprogress = (float) 0.0;}
-            playerUI.CurrentCutProgress.setProgress(currentprogress);
+            playerUI.CurrentMeditatableProgress.setProgress(currentprogress);
             playerUI.TotalProgress.setProgress(totalprogress);
             currentprogress *= 100;
             totalprogress *= 100;
-            playerUI.CurrentCutTopLabel.setText(String.format("%s (%d", currentmeditatable.name, currentprogress.intValue()) + "%)");
+            playerUI.CurrentMeditatableTopLabel.setText(String.format("%s (%d", currentmeditatable.name, currentprogress.intValue()) + "%)");
             playerUI.TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
-            try {playerUI.CutCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.elapsedtime));}
-            catch (NullPointerException ignored) {playerUI.CutCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(Duration.ZERO));}
-            playerUI.TotalCurrentLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessiondurationelapsed));
+            try {playerUI.MeditatableCurrentTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.elapsedtime));}
+            catch (NullPointerException ignored) {playerUI.MeditatableCurrentTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(Duration.ZERO));}
+            playerUI.TotalCurrentTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessiondurationelapsed));
             boolean displaynormaltime = playerUI.displaynormaltime;
-            if (displaynormaltime) {playerUI.CutTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getduration()));}
-            else {playerUI.CutTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getduration().subtract(currentmeditatable.elapsedtime)));}
-            if (displaynormaltime) {playerUI.TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));}
-            else {playerUI.TotalTotalLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration.subtract(totalsessiondurationelapsed)));}
+            if (displaynormaltime) {playerUI.MeditatableTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getduration()));}
+            else {playerUI.MeditatableTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentmeditatable.getduration().subtract(currentmeditatable.elapsedtime)));}
+            if (displaynormaltime) {playerUI.TotalTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));}
+            else {playerUI.TotalTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration.subtract(totalsessiondurationelapsed)));}
             try {
                 if (displayReference != null && displayReference.isShowing()) {
                     displayReference.CurrentProgress.setProgress(currentprogress / 100);
@@ -671,7 +669,7 @@ public class This_Session {
         } catch (Exception ignored) {}
     }
     public void player_endofsession() {
-        playerUI.CurrentCutTopLabel.setText(currentmeditatable.name + " Completed");
+        playerUI.CurrentMeditatableTopLabel.setText(currentmeditatable.name + " Completed");
         playerUI.TotalSessionLabel.setText("Session Completed");
         updateuitimeline.stop();
         playerState = PlayerState.STOPPED;
@@ -695,7 +693,7 @@ public class This_Session {
     }
     public void player_transition() {
         Session currentsession =  Root.getSessions().sessioninformation_getspecificsession( Root.getSessions().sessioninformation_totalsessioncount() - 1);
-        currentsession.updatecutduration(currentmeditatable.number, new Double(currentmeditatable.getduration().toMinutes()).intValue());
+        currentsession.updatemeditatableduration(currentmeditatable.number, new Double(currentmeditatable.getduration().toMinutes()).intValue());
         Root.getSessions().marshall();
         Root.goals_gui_updateui();
         currentmeditatable.stop();
@@ -772,13 +770,13 @@ public class This_Session {
     }
 
 // Dialogs
-    public class CutsMissingDialog  extends Stage {
-    public Button AddMissingCutsButton;
+    public class CutsMissingDialog extends Stage {
+    public Button AddMissingMeditatablesButton;
     public ListView<Text> SessionListView;
     public Button CreateAnywayButton;
     public Button CancelCreationButton;
     private List<Cut> allcuts;
-    private List<Cut> missingcuts;
+    private List<Cut> missingmeditatables;
     private Util.AnswerType result;
     private MainController Root;
 
@@ -795,7 +793,7 @@ public class This_Session {
         } catch (IOException e) {
 //            new MainController.ExceptionDialog(Root, e).showAndWait();
         }
-        setTitle("Cuts Missing");
+        setTitle("Meditatables Missing");
         this.allcuts = allcuts;
         populatelistview();
         Root.dialog_Information("Cuts Missing", "Due To The Nature Of Kuji-In, Each Cut Should Connect From RIN Up, Or The Later Cuts Might Lack The Energy They Need", "Use This Dialog To Connect Cuts, Or Cancel Without Creating");
@@ -819,8 +817,9 @@ public class This_Session {
                 currentcuttext.append(" (").append(Util.formatdurationtoStringSpelledOut(selectedcut.getduration(), SessionListView.getLayoutBounds().getWidth() - (currentcuttext.length() + 1)));
                 currentcuttext.append(")");
             } else {
-                if (missingcuts == null) {missingcuts = new ArrayList<>();}
-                missingcuts.add(selectedcut);
+                if (missingmeditatables == null) {
+                    missingmeditatables = new ArrayList<>();}
+                missingmeditatables.add(selectedcut);
                 currentcuttext.append(" (Missing Value!)");
                 item.setStyle("-fx-font-weight:bold; -fx-font-style: italic;");
             }
@@ -830,19 +829,17 @@ public class This_Session {
         SessionListView.setItems(sessionitems);
     }
     public void addmissingcutstoSession(Event event) {
-        if (missingcuts != null && missingcuts.size() > 0) {
-            CutInvocationDialog cutdurationdialog = new CutInvocationDialog();
-            cutdurationdialog.showAndWait();
-            for (Cut i : missingcuts) {
-                if (cutdurationdialog.getDuration() != 0) {
-                    i.changevalue(cutdurationdialog.getDuration());
-                }
-            }
+        if (missingmeditatables != null && missingmeditatables.size() > 0) {
+            MeditatableInvocationDialog meditatabledurationdialog = new MeditatableInvocationDialog();
+            meditatabledurationdialog.showAndWait();
+            missingmeditatables.stream().filter(i -> meditatabledurationdialog.getDuration() != 0).forEach(i -> {
+                i.changevalue(meditatabledurationdialog.getDuration());
+            });
         }
         setResult(Util.AnswerType.YES);
         this.close();
     }
-    public void createSessionwithoutmissingcuts(Event event) {
+    public void createSessionwithoutmissingmeditatables(Event event) {
         if (Root.dialog_YesNoConfirmation("Confirmation", "Session Not Well-Formed", "Really Create Anyway?")) {
             setResult(Util.AnswerType.YES);
             this.close();
@@ -1013,13 +1010,13 @@ public class This_Session {
         public Label EntrainmentVolumePercentage;
         public Slider AmbienceVolume;
         public Label AmbienceVolumePercentage;
-        public Label CurrentCutTopLabel;
-        public Label CutCurrentLabel;
-        public ProgressBar CurrentCutProgress;
-        public Label CutTotalLabel;
-        public Label TotalCurrentLabel;
+        public Label CurrentMeditatableTopLabel;
+        public Label MeditatableCurrentTimeLabel;
+        public ProgressBar CurrentMeditatableProgress;
+        public Label MeditatableTotalTimeLabel;
+        public Label TotalCurrentTimeLabel;
         public ProgressBar TotalProgress;
-        public Label TotalTotalLabel;
+        public Label TotalTotalTimeLabel;
         public Label TotalSessionLabel;
         public Label GoalTopLabel;
         public ProgressBar GoalProgressBar;
@@ -1043,8 +1040,8 @@ public class This_Session {
                 togglereference(null);
                 ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
                 setResizable(false);
-                CutTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
-                TotalTotalLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
+                MeditatableTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
+                TotalTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
                 setOnCloseRequest(event -> {
                     if (playerState == PlayerState.PLAYING || playerState == PlayerState.STOPPED || playerState == PlayerState.PAUSED || playerState == PlayerState.IDLE) {
                         if (player_endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}
@@ -1112,12 +1109,12 @@ public class This_Session {
         }
         public void cleanupPlayer() {}
         public void reset() {
-            CutCurrentLabel.setText("--:--");
-            CurrentCutProgress.setProgress(0.0);
-            CutTotalLabel.setText("--:--");
-            TotalCurrentLabel.setText("--:--");
+            MeditatableCurrentTimeLabel.setText("--:--");
+            CurrentMeditatableProgress.setProgress(0.0);
+            MeditatableTotalTimeLabel.setText("--:--");
+            TotalCurrentTimeLabel.setText("--:--");
             TotalProgress.setProgress(0.0);
-            TotalTotalLabel.setText("--:--");
+            TotalTotalTimeLabel.setText("--:--");
             EntrainmentVolume.setDisable(true);
             EntrainmentVolumePercentage.setText("0%");
             AmbienceVolume.setDisable(true);
@@ -1288,14 +1285,14 @@ public class This_Session {
             player_stop();}
 
 }
-    public class CutInvocationDialog extends Stage {
+    public class MeditatableInvocationDialog extends Stage {
         public Button CancelButton;
         public Button OKButton;
         public TextField MinutesTextField;
         private int duration;
 
-        public CutInvocationDialog() {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CutInvocationDialog.fxml"));
+        public MeditatableInvocationDialog() {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/MeditatableInvocationDialog.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -1303,7 +1300,7 @@ public class This_Session {
                 options.setStyle(this);
                 this.setResizable(false);
             } catch (IOException ignored) {}
-            setTitle("Cut Invocation");
+            setTitle("Meditatable Invocation");
             MinutesTextField.textProperty().addListener((observable, oldValue, newValue) -> {
                 try {if (newValue.matches("\\d*")) {
                     MinutesTextField.setText(Integer.toString(Integer.parseInt(newValue)));}  else {

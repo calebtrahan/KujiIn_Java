@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Ambience {
@@ -27,6 +28,13 @@ public class Ambience {
     }
     public void setAmbience(List<SoundFile> ambience) {
         this.Ambience = ambience;
+    }
+    public List<File> getAmbienceFiles() {
+        List<File> files = new ArrayList<>();
+        try {
+            files.addAll(getAmbience().stream().map(SoundFile::getFile).collect(Collectors.toList()));
+            return files;
+        } catch (NullPointerException ignored) {return new ArrayList<>();}
     }
 
     // Ambience Editing Methods

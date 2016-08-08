@@ -1,7 +1,5 @@
 package kujiin.xml;
 
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import kujiin.MainController;
 
 import javax.xml.bind.JAXBContext;
@@ -12,13 +10,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
+// TODO Add Ramp Functionality To Entrainment
 public class Entrainments {
     private Entrainment Presession;
     private Entrainment Rin;
@@ -36,115 +34,15 @@ public class Entrainments {
     private Entrainment Water;
     private Entrainment Void;
     private Entrainment Postsession;
+    @XmlTransient
     private final List<Entrainment> AllEntrainment = new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));
+    @XmlTransient
     private MainController Root;
     @XmlTransient
-    private int meditatablecount;
-    @XmlTransient
-    private static final List<Integer> DURATIONSVARIATIONS = Arrays.asList(1, 5);
-    @XmlTransient
-    private int variationcount;
+    public static final List<Integer> DURATIONSVARIATIONS = Arrays.asList(1, 5);
 
     public Entrainments() {}
-    public Entrainments(MainController Root) {this.Root = Root;}
-
-// Getters And Setters
-    public Entrainment getPresession() {
-        return Presession;
-    }
-    public void setPresession(Entrainment presession) {
-        Presession = presession;
-    }
-    public Entrainment getRin() {
-        return Rin;
-    }
-    public void setRin(Entrainment rin) {
-        Rin = rin;
-    }
-    public Entrainment getKyo() {
-        return Kyo;
-    }
-    public void setKyo(Entrainment kyo) {
-        Kyo = kyo;
-    }
-    public Entrainment getToh() {
-        return Toh;
-    }
-    public void setToh(Entrainment toh) {
-        Toh = toh;
-    }
-    public Entrainment getSha() {
-        return Sha;
-    }
-    public void setSha(Entrainment sha) {
-        Sha = sha;
-    }
-    public Entrainment getKai() {
-        return Kai;
-    }
-    public void setKai(Entrainment kai) {
-        Kai = kai;
-    }
-    public Entrainment getJin() {
-        return Jin;
-    }
-    public void setJin(Entrainment jin) {
-        Jin = jin;
-    }
-    public Entrainment getRetsu() {
-        return Retsu;
-    }
-    public void setRetsu(Entrainment retsu) {
-        Retsu = retsu;
-    }
-    public Entrainment getZai() {
-        return Zai;
-    }
-    public void setZai(Entrainment zai) {
-        Zai = zai;
-    }
-    public Entrainment getZen() {
-        return Zen;
-    }
-    public void setZen(Entrainment zen) {
-        Zen = zen;
-    }
-    public Entrainment getEarth() {
-        return Earth;
-    }
-    public void setEarth(Entrainment earth) {
-        Earth = earth;
-    }
-    public Entrainment getAir() {
-        return Air;
-    }
-    public void setAir(Entrainment air) {
-        Air = air;
-    }
-    public Entrainment getFire() {
-        return Fire;
-    }
-    public void setFire(Entrainment fire) {
-        Fire = fire;
-    }
-    public Entrainment getWater() {
-        return Water;
-    }
-    public void setWater(Entrainment water) {
-        Water = water;
-    }
-    public Entrainment getVoid() {
-        return Void;
-    }
-    public void setVoid(Entrainment aVoid) {
-        Void = aVoid;
-    }
-    public Entrainment getPostsession() {
-        return Postsession;
-    }
-    public void setPostsession(Entrainment postsession) {
-        Postsession = postsession;
-    }
+    public Entrainments(MainController Root) {this.Root = Root; unmarshall();}
 
 // XML Processing
     public void unmarshall() {
@@ -169,11 +67,8 @@ public class Entrainments {
                 Water = entrainments.Water;
                 Void = entrainments.Void;
                 Postsession = entrainments.Postsession;
-            } catch (JAXBException e) {
-                e.printStackTrace();
-                Root.dialog_Information("Information", "Couldn't Read Entrainment XML File", "Check Read File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
-            }
-        } else {populateentrainmentdurations();}
+            } catch (JAXBException ignored) {}
+        }
     }
     public void marshall() {
         try {
@@ -186,61 +81,12 @@ public class Entrainments {
             Root.dialog_Information("Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
         }
     }
-    public void populateentrainmentdurations() {
-        // Calculate File With Variation
-        String meditatablename;
-        int variation;
-        Entrainment selectedentrainment;
-        try {
-            selectedentrainment = getmeditatableEntrainment(meditatablecount);
-            if (meditatablecount > 9 && meditatablecount < 15) {meditatablename = "ELEMENT";}
-            else {meditatablename = Root.getSession().getAllMeditatables_Names().get(meditatablecount).toUpperCase();}
-            try {variation = DURATIONSVARIATIONS.get(variationcount); variationcount++;}
-            catch (IndexOutOfBoundsException e) {
-                variation = 0;
-                variationcount = 0;
-                meditatablecount++;
-                populateentrainmentdurations();
-            }
-        } catch (IndexOutOfBoundsException ignored) {
-            return;
-            // End Calculation
-        }
-        File actualfile = new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + meditatablename + variation + ".mp3");
-        if (actualfile.exists()) {
-            MediaPlayer mediaPlayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
-            mediaPlayer.setOnReady(() -> {
-                SoundFile soundFile = new SoundFile(actualfile);
-                soundFile.setDuration(mediaPlayer.getTotalDuration().toMillis());
-                if (variationcount == 0) {selectedentrainment.setFreqshort(soundFile);
-                } else if (variationcount == 1) {selectedentrainment.setFreqlong(soundFile);}
-                mediaPlayer.dispose();
-                populateentrainmentdurations();
-            });
-        }
-    }
 
 // Other Methods
     public Entrainment getmeditatableEntrainment(int index) {
-        switch (index) {
-            case 0: return Presession;
-            case 1: return Rin;
-            case 2: return Kyo;
-            case 3: return Toh;
-            case 4: return Sha;
-            case 5: return Kai;
-            case 6: return Jin;
-            case 7: return Retsu;
-            case 8: return Zai;
-            case 9: return Zen;
-            case 10: return Earth;
-            case 11: return Air;
-            case 12: return Fire;
-            case 13: return Water;
-            case 14: return Void;
-            case 15: return Postsession;
-            default: return null;
-        }
+        Entrainment entrainment = AllEntrainment.get(index);
+        if (entrainment == null) {return new Entrainment();}
+        else {return entrainment;}
     }
     public void setmeditatableEntrainment(int index, Entrainment entrainment) {
         switch (index) {

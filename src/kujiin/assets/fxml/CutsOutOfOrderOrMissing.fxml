@@ -14,8 +14,8 @@
       <ListView fx:id="SessionListView" layoutX="5.0" layoutY="42.0" prefHeight="275.0" prefWidth="387.0" />
       <HBox alignment="CENTER_RIGHT" layoutX="5.0" layoutY="317.0" prefHeight="33.0" prefWidth="387.0">
          <children>
-            <Button fx:id="AddMissingCutsButton" mnemonicParsing="false" onMousePressed="#addmissingcutstoSession" text="Add Missing Cuts" />
-            <Button fx:id="CreateAnywayButton" mnemonicParsing="false" onMousePressed="#createSessionwithoutmissingcuts" text="Create Anyway" />
+            <Button fx:id="AddMissingMeditatablesButton" mnemonicParsing="false" onMousePressed="#addmissingcutstoSession" text="Add Missing Cuts" />
+            <Button fx:id="CreateAnywayButton" mnemonicParsing="false" onMousePressed="#createSessionwithoutmissingmeditatables" text="Create Anyway" />
             <Button fx:id="CancelCreationButton" mnemonicParsing="false" text="Cancel Creation" onAction="#cancelcreation"/>
          </children>
       </HBox>

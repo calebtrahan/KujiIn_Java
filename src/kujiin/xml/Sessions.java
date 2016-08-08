@@ -98,11 +98,11 @@ public class Sessions {
     public int sessioninformation_getallsessiontotals(int index, boolean includepreandpost) {
         try {
             int totalminutes = 0;
-            for (kujiin.xml.Session i : getSession()) {totalminutes += i.getcutduration(index);}
+            for (kujiin.xml.Session i : getSession()) {totalminutes += i.getmeditatableduration(index);}
             if (includepreandpost) {
                 for (Meditatable i : Root.getSession().getAllMeditatablesincludingTotal()) {
                     if (i instanceof Qi_Gong) {
-                        for (kujiin.xml.Session x : getSession()) {totalminutes += x.getcutduration(i.number);}
+                        for (kujiin.xml.Session x : getSession()) {totalminutes += x.getmeditatableduration(i.number);}
                     }
                 }
             }
@@ -118,9 +118,9 @@ public class Sessions {
         try {
             int sessioncount = 0;
             for (kujiin.xml.Session i : getSession()) {
-                if (i.getcutduration(index) != 0) {sessioncount++; continue;}
+                if (i.getmeditatableduration(index) != 0) {sessioncount++; continue;}
                 if (includepreandpost) {
-                    if (i.getcutduration(0) != 0 || i.getcutduration(15) != 0) {sessioncount++;}
+                    if (i.getmeditatableduration(0) != 0 || i.getmeditatableduration(15) != 0) {sessioncount++;}
                 }
             }
             return sessioncount;

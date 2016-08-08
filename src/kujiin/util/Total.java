@@ -2,12 +2,16 @@ package kujiin.util;
 
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.util.Duration;
 
 public class Total extends Meditatable {
 
 
     public Total(int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
-        super(number, name, duration, briefsummary, thissession, aSwitch, value);
+        this.number = number;
+        this.name = name;
+        this.duration = new Duration((duration * 60) * 1000);
+        this.thisession = thissession;
     }
 
 

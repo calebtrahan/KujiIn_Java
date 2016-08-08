@@ -211,8 +211,8 @@ public class Goals {
             } catch (Exception ignored) {}
         }
     }
-    public void update(List<Goal> cutgoallist, int meditatableindex) {
-        setMeditatableGoalList(meditatableindex, cutgoallist);
+    public void update(List<Goal> meditatablegoallist, int meditatableindex) {
+        setMeditatableGoalList(meditatableindex, meditatablegoallist);
     }
     // Playback Utility
     public void completegoals(int meditatableindex, Duration currentpracticedhours) {

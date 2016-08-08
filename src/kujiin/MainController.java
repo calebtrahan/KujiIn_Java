@@ -274,6 +274,15 @@ public class MainController implements Initializable {
         LoadPresetButton.setTooltip(new Tooltip("Load A Saved Preset"));
         SavePresetButton.setTooltip(new Tooltip("Save This Session As A Preset"));
         ExportButton.setTooltip(new Tooltip("Export This Session To .mp3 For Use Without The Program"));
+    } else {
+        TotalSessionTime.setTooltip(null);
+        ApproximateEndTime.setTooltip(null);
+        AmbienceSwitch.setTooltip(null);
+        ChangeAllCutsButton.setTooltip(null);
+        ChangeAllElementsButton.setTooltip(null);
+        LoadPresetButton.setTooltip(null);
+        SavePresetButton.setTooltip(null);
+        ExportButton.setTooltip(null);
     }
 }
     public void creation_gui_setDisable(boolean disable) {
@@ -298,10 +307,10 @@ public class MainController implements Initializable {
             for (Integer i : getSession().gui_getallsessionvalues()) {totalsessiontime += i;}
             int rampduration = getOptions().getSessionOptions().getRampduration();
             totalsessiontime += rampduration * 2;
-            if (rampduration > 0) {TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + rampduration + "Mins. On Both Presession And Postsession"));}
+            if (rampduration > 0 && getOptions().getProgramOptions().getTooltips()) {TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + rampduration + "Mins. On Both Presession And Postsession"));}
             else {TotalSessionTime.setTooltip(null);}
             TotalSessionTime.setText(Util.formatdurationtoStringSpelledOut(new Duration((totalsessiontime * 60) * 1000), TotalSessionTime.getLayoutBounds().getWidth()));
-            ApproximateEndTime.setTooltip(new Tooltip("Time You Finish Will Vary Depending On When You Start Playback"));
+            if (getOptions().getProgramOptions().getTooltips()) {ApproximateEndTime.setTooltip(new Tooltip("Time You Finish Will Vary Depending On When You Start Playback"));}
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, totalsessiontime);
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
@@ -366,7 +375,7 @@ public class MainController implements Initializable {
     public void creation_util_createsession() {
         // TODO Check Exporter Here
         if (! creation_gui_allvaluesnotzero()) {
-            dialog_Error("Error Creating Session", "At Least One Cut Or Element's Value Must Not Be 0", "Cannot Create Session");
+            dialog_Error("Error Creating Session", "At Least One Meditatable's Value Must Not Be 0", "Cannot Create Session");
             getSession().creatorState = This_Session.CreatorState.NOT_CREATED;
             return;
         }
@@ -665,8 +674,8 @@ public class MainController implements Initializable {
         goalsprogressbar.setProgress(0.0);
     }
         // Util
-    public ArrayList<Meditatable> goals_util_getmeditatableswithoutlongenoughgoals(List<Meditatable> cutsandelementsinsession) {
-        return cutsandelementsinsession.stream().filter(i -> i.getduration().greaterThan(Duration.ZERO) && !i.goals_arelongenough()).collect(Collectors.toCollection(ArrayList::new));
+    public ArrayList<Meditatable> goals_util_getmeditatableswithoutlongenoughgoals(List<Meditatable> meditatablesinsession) {
+        return meditatablesinsession.stream().filter(i -> i.getduration().greaterThan(Duration.ZERO) && !i.goals_arelongenough()).collect(Collectors.toCollection(ArrayList::new));
     }
     public boolean goals_cleanup() {Goals.marshall(); return true;}
 
@@ -920,7 +929,7 @@ public class MainController implements Initializable {
 
     }
     public class EditReferenceFiles extends Stage {
-        public ChoiceBox<String> CutNamesChoiceBox;
+        public ChoiceBox<String> MeditatableNamesChoiceBox;
         public TextArea MainTextArea;
         public Button CloseButton;
         public Label StatusBar;
@@ -946,11 +955,11 @@ public class MainController implements Initializable {
             ObservableList<String> meditatablenames = FXCollections.observableArrayList();
             meditatablenames.addAll(kujiin.xml.Options.ALLNAMES);
             userselectedindexes = new ArrayList<>();
-            CutNamesChoiceBox.setItems(meditatablenames);
+            MeditatableNamesChoiceBox.setItems(meditatablenames);
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
-            CutNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {if (oldValue != null) userselectedindexes.add(oldValue.intValue());});
-            HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
-            TEXTVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
+            MeditatableNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {if (oldValue != null) userselectedindexes.add(oldValue.intValue());});
+            HTMLVariation.setDisable(MeditatableNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
+            TEXTVariation.setDisable(MeditatableNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             if (referenceType == null) {referenceType = kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION;}
             HTMLVariation.setSelected(referenceType == This_Session.ReferenceType.html);
             TEXTVariation.setSelected(referenceType == This_Session.ReferenceType.txt);
@@ -960,7 +969,7 @@ public class MainController implements Initializable {
             String referencename = referenceType.name();
             this.setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (dialog_YesNoCancelConfirmation("Confirmation", CutNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes", "Save Changes Before Exiting?")) {
+                    switch (dialog_YesNoCancelConfirmation("Confirmation", MeditatableNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes", "Save Changes Before Exiting?")) {
                         case YES:
                             saveselectedfile(null);
                             break;
@@ -982,10 +991,10 @@ public class MainController implements Initializable {
             } catch (Exception e) {return false;}
         }
         public void newmeditatableselected(ActionEvent actionEvent) {
-            HTMLVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
-            TEXTVariation.setDisable(CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
+            HTMLVariation.setDisable(MeditatableNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
+            TEXTVariation.setDisable(MeditatableNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             if (userselectedindexes.size() > 0 && selectedfile != null && unsavedchanges()) {
-                Util.AnswerType answerType = dialog_YesNoCancelConfirmation("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading A Different Cut/Element");
+                Util.AnswerType answerType = dialog_YesNoCancelConfirmation("Confirmation", "Previous Reference File Has Unsaved Changes", "Save Changes Before Loading A Different Meditatable");
                 switch (answerType) {
                     case YES:
                         saveselectedfile(null);
@@ -993,7 +1002,7 @@ public class MainController implements Initializable {
                     case NO:
                         break;
                     case CANCEL:
-                        CutNamesChoiceBox.getSelectionModel().select(userselectedindexes.get(userselectedindexes.size() - 1));
+                        MeditatableNamesChoiceBox.getSelectionModel().select(userselectedindexes.get(userselectedindexes.size() - 1));
                         return;
                 }
             }
@@ -1017,7 +1026,7 @@ public class MainController implements Initializable {
             } else {
                 MainTextArea.clear();
                 StatusBar.setTextFill(Color.RED);
-                Util.gui_showtimedmessageonlabel(StatusBar, "No Cut Or Element Selected", 3000);
+                Util.gui_showtimedmessageonlabel(StatusBar, "No Meditatable Selected", 3000);
             }
         }
 
@@ -1030,8 +1039,8 @@ public class MainController implements Initializable {
                 dialog_Error("Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
         }
         public void loadselectedfile() {
-            if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
-                selectedmeditatable = CutNamesChoiceBox.getSelectionModel().getSelectedItem();
+            if (MeditatableNamesChoiceBox.getSelectionModel().getSelectedIndex() != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
+                selectedmeditatable = MeditatableNamesChoiceBox.getSelectionModel().getSelectedItem();
                 selectnewfile();
                 String contents = Util.file_getcontents(selectedfile);
                 MainTextArea.setText(contents);
@@ -1040,8 +1049,8 @@ public class MainController implements Initializable {
                 StatusBar.setText("");
                 SaveButton.setDisable(true);
             } else {
-                if (CutNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1) {
-                    dialog_Information("Information", "No Cut Selected", "Select A Cut To Load");}
+                if (MeditatableNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1) {
+                    dialog_Information("Information", "No Meditatable Selected", "Select A Meditatable To Load");}
                 else {
                     dialog_Information("Information", "No Variation Selected", "Select A Variation To Load");}
                 PreviewButton.setDisable(true);
@@ -1925,9 +1934,9 @@ public class MainController implements Initializable {
                         if (getcheckbox(j).isSelected()) {
                             if (Filter_DurationThresholdCheckbox.isSelected()) {
                                 try {
-                                    if (i.getcutduration(j) <= Integer.parseInt(Filter_ThresholdMinutesTextField.getText())) {validsession = false;}
-                                } catch (NumberFormatException | NullPointerException ignored) {validsession = i.getcutduration(j) > 0;}
-                            } else {if (i.getcutduration(j) == 0) {validsession = false;}}
+                                    if (i.getmeditatableduration(j) <= Integer.parseInt(Filter_ThresholdMinutesTextField.getText())) {validsession = false;}
+                                } catch (NumberFormatException | NullPointerException ignored) {validsession = i.getmeditatableduration(j) > 0;}
+                            } else {if (i.getmeditatableduration(j) == 0) {validsession = false;}}
                         }
                     }
                     if (! validsession) {continue;}
@@ -2089,7 +2098,7 @@ public class MainController implements Initializable {
                 });
             } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
             setTitle("Advanced Ambience Editor");
-            MeditatableSelectionBox.setOnAction(event -> selectandloadcut());
+            MeditatableSelectionBox.setOnAction(event -> selectandloadmeditatable());
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
         public AdvancedAmbienceEditor(Meditatable meditatable) {
@@ -2102,7 +2111,7 @@ public class MainController implements Initializable {
                 this.setResizable(false);
             } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
             setTitle("Advanced Ambience Editor");
-            MeditatableSelectionBox.setOnAction(event -> selectandloadcut());
+            MeditatableSelectionBox.setOnAction(event -> selectandloadmeditatable());
             MeditatableSelectionBox.getSelectionModel().select(meditatable.number);
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
         }
@@ -2123,7 +2132,7 @@ public class MainController implements Initializable {
                 if (selected_temp_ambiencesong == null) {
                     dialog_Information("Information", "Cannot Transfer", "Nothing Selected");}
                 else {
-                    dialog_Information("Information", "Cannot Transfer", "No Cut Selected");}
+                    dialog_Information("Information", "Cannot Transfer", "No Meditatable Selected");}
             }
         }
         public void leftarrowpressed(ActionEvent actionEvent) {
@@ -2176,7 +2185,7 @@ public class MainController implements Initializable {
         }
 
         // Table Methods
-        public void selectandloadcut() {
+        public void selectandloadmeditatable() {
             int index = MeditatableSelectionBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 if (actual_ambiencesonglist == null) {actual_ambiencesonglist = FXCollections.observableArrayList();}
@@ -2256,7 +2265,7 @@ public class MainController implements Initializable {
                     return false;
                 }
             } else {
-                dialog_Information("Information", "No Cut Loaded", "Load A Cut's Ambience First");
+                dialog_Information("Information", "No Meditatable Loaded", "Load A Meditatable's Ambience First");
                 return false;
             }
         }
@@ -2282,7 +2291,7 @@ public class MainController implements Initializable {
                 Ambiences.setmeditatableAmbience(selectedmeditatable.number, selectedmeditatable.getAmbience());
                 Ambiences.marshall();
                 dialog_Information("Saved", "Ambience Saved To " + selectedmeditatable, "");
-            } else {dialog_Information("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
+            } else {dialog_Information("Cannot Save", "No Meditatable Selected", "Cannot Save");}
         }
         public void closebuttonpressed(ActionEvent actionEvent) {
             if (unsavedchanges()) {
@@ -2342,7 +2351,7 @@ public class MainController implements Initializable {
                 this.setResizable(false);
                 setTitle("Simple Ambience Editor");
             } catch (IOException ignored) {}
-            MeditatableChoiceBox.setOnAction(event -> selectandloadcut());
+            MeditatableChoiceBox.setOnAction(event -> selectandloadmeditatable());
             NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
         }
         public SimpleAmbienceEditor(Meditatable meditatable) {
@@ -2357,14 +2366,14 @@ public class MainController implements Initializable {
             } catch (IOException ignored) {}
             setOnShowing(event -> {
                 MeditatableChoiceBox.getSelectionModel().select(meditatable.number);
-                selectandloadcut();
+                selectandloadmeditatable();
             });
-            MeditatableChoiceBox.setOnAction(event -> selectandloadcut());
+            MeditatableChoiceBox.setOnAction(event -> selectandloadmeditatable());
         }
 
         // Table Methods
         public void tableselectionchanged(AmbienceSong ambienceSong) {selectedambiencesong = ambienceSong;}
-        public void selectandloadcut() {
+        public void selectandloadmeditatable() {
             int index = MeditatableChoiceBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 if (AmbienceList == null) {AmbienceList = FXCollections.observableArrayList();}
@@ -2465,7 +2474,7 @@ public class MainController implements Initializable {
                     return false;
                 }
             } else {
-                dialog_Information("Information", "No Cut Loaded", "Load A Cut's Ambience First");
+                dialog_Information("Information", "No Meditatable Loaded", "Load A Meditatable's Ambience First");
                 return false;
             }
         }
@@ -2508,7 +2517,7 @@ public class MainController implements Initializable {
                 Ambiences.marshall();
                 dialog_Information("Saved", "Ambience Saved To " + selectedmeditatable, "");
             } else {
-                dialog_Information("Cannot Save", "No Cut Or Element Selected", "Cannot Save");}
+                dialog_Information("Cannot Save", "No Meditatable Selected", "Cannot Save");}
         }
         public void closedialog(ActionEvent actionEvent) {
             if (unsavedchanges()) {
@@ -2575,7 +2584,7 @@ public class MainController implements Initializable {
                 XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
                 List<Integer> values = new ArrayList<>();
                 for (int i = 0; i < 16; i++) {
-                    int duration = session.getcutduration(i);
+                    int duration = session.getmeditatableduration(i);
                     values.add(duration);
                     String name;
                     if (i == 0) {name = "Pre";}
@@ -2597,15 +2606,15 @@ public class MainController implements Initializable {
         }
 
         class CompletedGoalsAtEndOfSessionBinding {
-            private StringProperty cutname;
+            private StringProperty meditatablename;
             private StringProperty practicedhours;
             private StringProperty goalhours;
             private StringProperty dateset;
             private IntegerProperty daysittooktocomplete;
             private StringProperty datecompleted;
 
-            public CompletedGoalsAtEndOfSessionBinding(String cutname, String practicedhours, String goalhours, String dateset, int daysittooktocomplete, String datecompleted) {
-                this.cutname = new SimpleStringProperty(cutname);
+            public CompletedGoalsAtEndOfSessionBinding(String meditatablename, String practicedhours, String goalhours, String dateset, int daysittooktocomplete, String datecompleted) {
+                this.meditatablename = new SimpleStringProperty(meditatablename);
                 this.practicedhours = new SimpleStringProperty(practicedhours);
                 this.goalhours = new SimpleStringProperty(goalhours);
                 this.dateset = new SimpleStringProperty(dateset);
