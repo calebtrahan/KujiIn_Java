@@ -14,9 +14,8 @@ public class Element extends Meditatable {
 
     public Element(int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         super(number, name, duration, briefsummary, thissession, aSwitch, value);
-        if (thissession.Root.getOptions().getProgramOptions().getTooltips()) {
-            Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
-        } else {Value.setTooltip(null);}
+        if (thissession.Root.getOptions().getProgramOptions().getTooltips()) {Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));}
+        else {Value.setTooltip(null);}
     }
 
 // GUI

@@ -108,19 +108,27 @@ public class Meditatable {
             else {filename.append(name);}
             filename.append(variation).append(".mp3");
             File actualfile = new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + filename.toString());
+            SoundFile actualsoundfile;
+            if (entrainmentchecker_variationcount == 0) {actualsoundfile = entrainment.getFreqshort();}
+            else {actualsoundfile = entrainment.getFreqlong();}
             if (actualfile.exists()) {
-                entrainmentchecker_calculateplayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
-                entrainmentchecker_calculateplayer.setOnReady(() -> {
-                    SoundFile soundFile = new SoundFile(actualfile);
-                    soundFile.setDuration(entrainmentchecker_calculateplayer.getTotalDuration().toMillis());
-                    if (entrainmentchecker_variationcount == 0) {entrainment.setFreqshort(soundFile);
-                    } else if (entrainmentchecker_variationcount == 1) {entrainment.setFreqlong(soundFile);}
-                    entrainmentchecker_calculateplayer.dispose();
-                    entrainmentchecker_variationcount++;
-                    entrainment_populate();
-                });
+                if (actualsoundfile == null || actualsoundfile.getDuration() == null || actualsoundfile.getDuration() == 0.0) {
+                    entrainmentchecker_calculateplayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
+                    entrainmentchecker_calculateplayer.setOnReady(() -> {
+                        SoundFile soundFile = new SoundFile(actualfile);
+                        soundFile.setDuration(entrainmentchecker_calculateplayer.getTotalDuration().toMillis());
+                        if (entrainmentchecker_variationcount == 0) {entrainment.setFreqshort(soundFile);
+                        } else if (entrainmentchecker_variationcount == 1) {entrainment.setFreqlong(soundFile);}
+                        entrainmentchecker_calculateplayer.dispose();
+                        entrainmentchecker_variationcount++;
+                        entrainment_populate();
+                    });
+                } else {entrainment_populate();}
             } else {entrainmentchecker_missingfiles.add(actualfile);}
-        } catch (IndexOutOfBoundsException ignored) {}
+        } catch (IndexOutOfBoundsException ignored) {
+            thisession.Root.getEntrainments().setmeditatableEntrainment(number, entrainment);
+            thisession.Root.getEntrainments().marshall();
+        }
     }
     public boolean entrainment_isReady() {return entrainmentready;}
     public List<File> entrainment_getMissingFiles() {return entrainmentchecker_missingfiles;}
@@ -132,17 +140,16 @@ public class Meditatable {
             ambiencechecker_soundfilescount = 0;
             try {
                 for (File i : ambiencedirectory.listFiles()) {
-                    if (! ambience.getAmbienceFiles().contains(i) && Util.audio_isValid(i)) {ambiencechecker_soundfilelist.add(i); break;}
+                    if (! ambience.getAmbienceFiles().contains(i) && Util.audio_isValid(i)) {ambiencechecker_soundfilelist.add(i);}
                     else {
                         Double duration = ambience.getAmbience().get(ambience.getAmbienceFiles().indexOf(i)).getDuration();
-                        if (duration == null || duration == 0.0) {ambiencechecker_soundfilelist.add(i); break;}
+                        if (duration == null || duration == 0.0) {ambiencechecker_soundfilelist.add(i);}
                     }
                 }
                 if (! ambiencechecker_soundfilelist.isEmpty()) {ambience_populate();}
                 else {ambienceready = true;}
             } catch (NullPointerException ignored) {}
         } else {
-            // Find Audio Durations Of Files
             try {
                 File actualfile = ambiencechecker_soundfilelist.get(ambiencechecker_soundfilescount);
                 ambiencechecker_calculateplayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
@@ -162,6 +169,7 @@ public class Meditatable {
                 });
             } catch (IndexOutOfBoundsException ignored) {
                 thisession.Root.getAmbiences().setmeditatableAmbience(number, ambience);
+                thisession.Root.getAmbiences().marshall();
                 ambienceready = true;
             }
         }

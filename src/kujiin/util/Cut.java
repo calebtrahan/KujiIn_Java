@@ -13,8 +13,6 @@ public class Cut extends Meditatable {
 
     public Cut(int number, String name, int duration, String briefsummary, This_Session thisession, ToggleButton aSwitch, TextField value) {
         super(number, name, duration, briefsummary, thisession, aSwitch, value);
-//        if (entrainment.getFreqshort() == null) {entrainment.setFreqshort(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + super.name + "1.mp3"))); entrainment.calculateshortfreqduration();}
-//        if (entrainment.getFreqlong() == null) {entrainment.setFreqlong(new SoundFile(new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + super.name + "5.mp3"))); entrainment.calculatelongfreqduration();}
         if (thisession.Root.getOptions().getProgramOptions().getTooltips()) {
             Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
         }
