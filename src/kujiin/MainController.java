@@ -126,10 +126,8 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("Initialize");
         setOptions(new Options(this));
         getOptions().unmarshall();
-
     }
     public boolean cleanup() {
         Ambiences.marshall();
@@ -490,7 +488,6 @@ public class MainController implements Initializable {
 //        return ! currentlyexporting;
         return true;
     }
-
 
 // Sessions And Goals
     public void sessionsandgoals_meditatableselectionchanged(ActionEvent actionEvent) {
@@ -1161,14 +1158,16 @@ public class MainController implements Initializable {
                         CurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(0)));
                         TotalTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(PreviewPlayer.getTotalDuration().toSeconds() * 1000)));
                         PlayButton.setDisable(false);
+                        PlayButton.setOnAction(event -> syncbuttons());
                         PauseButton.setDisable(false);
+                        PauseButton.setOnAction(event -> syncbuttons());
                         StopButton.setDisable(false);
+                        StopButton.setOnAction(event -> syncbuttons());
                     });
                     VolumeSlider.setValue(0.0);
                     VolumePercentage.setText("0%");
                 } catch (IOException ignored) {}
-            } else {
-                dialog_Information("Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+            } else {dialog_Information("Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
         }
 
         public void play(ActionEvent actionEvent) {
