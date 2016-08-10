@@ -33,10 +33,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-    // Bugs
+// Bugs
 // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
 
-    // Additional Features
+// Additional Features
 // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
 // TODO Design A 'Select Your Own Ambience' Wizard As An Alternative To Randomized Ambience During Session Creation
 // TODO Redesign Goals Completed Dialog Using Bar Charts/Graphs
@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 // TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
 // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
 
-    // Optional Features
+// Optional Features
 // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
 // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
 // TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
@@ -263,45 +263,52 @@ public class MainController implements Initializable {
 // Creation
     // GUI
     public void creation_initialize() {
-    creator_updateuitimeline = new Timeline(new KeyFrame(Duration.millis(10000), ae -> creation_gui_update()));
-    creator_updateuitimeline.setCycleCount(Animation.INDEFINITE);
-    if (getOptions().getProgramOptions().getTooltips()) {
-        TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
-        ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
-        AmbienceSwitch.setTooltip(new Tooltip("Check This After You Set All Values To Check For And Enable Ambience For This Session"));
-        ChangeAllCutsButton.setTooltip(new Tooltip("Change All Cut Values Simultaneously"));
-        ChangeAllElementsButton.setTooltip(new Tooltip("Change All Element Values Simultaneously"));
-        LoadPresetButton.setTooltip(new Tooltip("Load A Saved Preset"));
-        SavePresetButton.setTooltip(new Tooltip("Save This Session As A Preset"));
-        ExportButton.setTooltip(new Tooltip("Export This Session To .mp3 For Use Without The Program"));
-    } else {
-        TotalSessionTime.setTooltip(null);
-        ApproximateEndTime.setTooltip(null);
-        AmbienceSwitch.setTooltip(null);
-        ChangeAllCutsButton.setTooltip(null);
-        ChangeAllElementsButton.setTooltip(null);
-        LoadPresetButton.setTooltip(null);
-        SavePresetButton.setTooltip(null);
-        ExportButton.setTooltip(null);
+        creator_updateuitimeline = new Timeline(new KeyFrame(Duration.seconds(10), ae -> creation_gui_update()));
+        creator_updateuitimeline.setCycleCount(Animation.INDEFINITE);
+        if (getOptions().getProgramOptions().getTooltips()) {
+            TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
+            ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
+            AmbienceSwitch.setTooltip(new Tooltip("Check This After You Set All Values To Check For And Enable Ambience For This Session"));
+            ChangeAllCutsButton.setTooltip(new Tooltip("Change All Cut Values Simultaneously"));
+            ChangeAllElementsButton.setTooltip(new Tooltip("Change All Element Values Simultaneously"));
+            LoadPresetButton.setTooltip(new Tooltip("Load A Saved Preset"));
+            SavePresetButton.setTooltip(new Tooltip("Save This Session As A Preset"));
+            ExportButton.setTooltip(new Tooltip("Export This Session To .mp3 For Use Without The Program"));
+        } else {
+            TotalSessionTime.setTooltip(null);
+            ApproximateEndTime.setTooltip(null);
+            AmbienceSwitch.setTooltip(null);
+            ChangeAllCutsButton.setTooltip(null);
+            ChangeAllElementsButton.setTooltip(null);
+            LoadPresetButton.setTooltip(null);
+            SavePresetButton.setTooltip(null);
+            ExportButton.setTooltip(null);
+        }
     }
-}
-    public void creation_gui_setDisable(boolean disable) {
-        ChangeAllCutsButton.setDisable(disable);
-        ChangeAllElementsButton.setDisable(disable);
-        LoadPresetButton.setDisable(disable);
-        SavePresetButton.setDisable(disable);
-        AmbienceSwitch.setDisable(disable);
-        ApproximateEndTime.setDisable(disable);
-        TotalSessionTime.setDisable(disable);
-        for (Meditatable i : getSession().getAllMeditatables()) {i.gui_setDisable(disable);}
-        if (! disable) {creator_updateuitimeline.play();}
-        else {creator_updateuitimeline.stop();}
+    public void creation_gui_setDisable(boolean disabled) {
+        ChangeAllCutsButton.setDisable(disabled);
+        ChangeAllElementsButton.setDisable(disabled);
+        LoadPresetButton.setDisable(disabled);
+        SavePresetButton.setDisable(disabled);
+        AmbienceSwitch.setDisable(disabled);
+        ApproximateEndTime.setDisable(disabled);
+        TotalSessionTime.setDisable(disabled);
+        AmbienceSwitch.setDisable(disabled);
+        PlayButton.setDisable(disabled);
+        ExportButton.setDisable(disabled);
+        ResetCreatorButton.setDisable(disabled);
+        for (Meditatable i : getSession().getAllMeditatables()) {i.gui_setDisable(disabled);}
+        if (disabled) {
+            creator_updateuitimeline.stop();
+            CreatorStatusBar.setText("Creator Disabled While Session Player Open");
+        } else {
+            creator_updateuitimeline.play();
+            CreatorStatusBar.setText("");
+        }
     }
     public void creation_gui_update() {
         boolean notallzero = false;
-        try {
-            for (Integer i : getSession().gui_getallsessionvalues()) {if (i > 0) {notallzero = true;}}
-        } catch (NullPointerException ignored) {}
+        try {for (Integer i : getSession().gui_getallsessionvalues()) {if (i > 0) {notallzero = true;}}} catch (NullPointerException ignored) {}
         if (notallzero) {
             Integer totalsessiontime = 0;
             for (Integer i : getSession().gui_getallsessionvalues()) {totalsessiontime += i;}
@@ -323,17 +330,23 @@ public class MainController implements Initializable {
     public void creation_gui_toggleambience(ActionEvent actionEvent) {
         if (AmbienceSwitch.isSelected()) {
             if (creation_gui_allvaluesnotzero()) {
+                for (Meditatable i : Session.getAllMeditatables()) {
+                    if (i.gui_getvalue() > 0 && ! i.ambience_isReady()) {
+                        dialog_Information("Cannot Add Ambience", "Still Background Checking Existing Ambience", "Please Try Again In A Few Moments");
+                        Session.creation_reset(false);
+                        AmbienceSwitch.setSelected(false);
+                        return;
+                    }
+                }
                 Session.creation_checkambience(AmbienceSwitch);
             } else {
                 dialog_Information("Cannot Add Ambience", "All Durations Are Zero", "Nothing To Add Ambience For");
                 AmbienceSwitch.setSelected(false);
             }
-        } else {
-            Session.creation_reset();
-        }
+        } else {Session.creation_reset(false);}
     }
     public void creation_gui_resetallvalues(ActionEvent actionEvent) {
-        Session.creation_reset();
+        Session.creation_reset(true);
     }
     public void creation_gui_changeallvalues_cuts(ActionEvent actionEvent) {
         ChangeAllValuesDialog changevaluesdialog = new ChangeAllValuesDialog("Change All Cut Values To: ");
@@ -369,29 +382,31 @@ public class MainController implements Initializable {
         return false;
     }
     public void creation_util_createsession() {
+        for (Meditatable i : Session.getAllMeditatables()) {
+            if (! i.ambience_isReady() || ! i.entrainment_isReady()) {
+                dialog_Information("Information", "Cannot Play Session Yet, Still Performing Background Checks For Entrainment/Ambience", "Please Try Again In A Few Moments");
+                return;
+            }
+        }
         // TODO Check Exporter Here
         if (! creation_gui_allvaluesnotzero()) {
             dialog_Error("Error Creating Session", "At Least One Meditatable's Value Must Not Be 0", "Cannot Create Session");
             getSession().creatorState = This_Session.CreatorState.NOT_CREATED;
             return;
         }
-        if (creation_util_isLongSession()) {
-            if (! getOptions().getSessionOptions().getAlertfunction()) {
-                if (dialog_YesNoConfirmation("Add Alert File", "I've Detected A Long Session. Long Sessions Can Make It Difficult To Hear " +
-                        "The Subtle Transitions In Between Session Parts", "Add Alert File In Between Session Parts?")) {
-                    new ChangeAlertFile().showAndWait();
-                }
+        if (creation_util_isLongSession() && ! getOptions().getSessionOptions().getAlertfunction()) {
+            if (dialog_YesNoConfirmation("Add Alert File", "I've Detected A Long Session. Long Sessions Can Make It Difficult To Hear " +
+                    "The Subtle Transitions In Between Session Parts", "Add Alert File In Between Session Parts?")) {
+                new ChangeAlertFile().showAndWait();
             }
-        } else {
-            if (getOptions().getSessionOptions().getAlertfunction()) {
-                if (dialog_YesNoConfirmation("Disable Alert File", "I've Detected A Relatively Short Session, And An Alert File Might Not Be Necessary",
-                        "Turn Off Alert File Between Session Parts?")) {
-                    getOptions().getSessionOptions().setAlertfunction(false);
-                }
+        } else if (getOptions().getSessionOptions().getAlertfunction()) {
+            if (dialog_YesNoConfirmation("Disable Alert File", "I've Detected A Relatively Short Session, And An Alert File Might Not Be Necessary",
+                    "Turn Off Alert File Between Session Parts?")) {
+                getOptions().getSessionOptions().setAlertfunction(false);
             }
         }
         Session.creation_createsession();
-        creation_gui_setDisable(Session.creatorState == This_Session.CreatorState.NOT_CREATED);
+        creation_gui_setDisable(Session.creatorState != This_Session.CreatorState.NOT_CREATED);
     }
     public void creation_util_resetcreatedsession() {}
     public boolean creation_cleanup() {return true;}
@@ -677,10 +692,17 @@ public class MainController implements Initializable {
 
 // Session Player Widget
     public void player_playthisession(ActionEvent actionEvent) {
-        creation_util_createsession();
-        if (Session.creatorState == This_Session.CreatorState.CREATED) {
-            if (Session.playerUI != null && Session.playerUI.isShowing()) {return;}
-            Session.player_openplayer();
+        if (Session.playerUI != null && Session.playerUI.isShowing()) {return;}
+        switch (Session.creatorState) {
+            case CREATED:
+                Session.creation_reset(false);
+            case NOT_CREATED:
+                creation_util_createsession();
+                if (Session.creatorState == This_Session.CreatorState.CREATED) {Session.player_openplayer();}
+                else {Session.creation_reset(false);}
+                break;
+            default:
+                break;
         }
     }
 

@@ -70,7 +70,7 @@ public class This_Session {
     public DisplayReference displayReference;
     public Options options;
     public PlayerState playerState;
-    public CreatorState creatorState;
+    public CreatorState creatorState = CreatorState.NOT_CREATED;
     public ExporterState exporterState;
     public ReferenceType referenceType;
     private Integer exportserviceindex;
@@ -346,80 +346,52 @@ public class This_Session {
         if (creation_sessionhasvalidvalues()) {
             ArrayList<Meditatable> meditatableswithnoambience = new ArrayList<>();
             ArrayList<Meditatable> meditatableswithreducedambience = new ArrayList<>();
-            Service<Void> ambiencecheckerservice = new Service<Void>() {
-                @Override
-                protected Task<Void> createTask() {
-                    return new Task<Void>() {
-                        @Override
-                        protected Void call() throws Exception {
-                            try {
-                                for (Meditatable i : getAllMeditatables()) {
-                                    Root.CreatorStatusBar.setText(String.format("Checking Ambience. Currently Checking %s...", i.name));
-                                    if (! i.getAmbience().hasAnyAmbience()) {meditatableswithnoambience.add(i);}
-                                    else if (! i.getAmbience().hasEnoughAmbience(i.getduration())) {meditatableswithreducedambience.add(i);}
-                                }
-                                return null;
-                            } catch (Exception e) {
-                                return null;
-                            }
-                        }
-                    };
-                }
-            };
-            ambiencecheckerservice.setOnRunning(event -> {
-                Root.CreatorStatusBar.textProperty().bind(ambiencecheckerservice.messageProperty());
+            getAllMeditatables().stream().filter(i -> i.getduration().greaterThan(Duration.ZERO)).forEach(i -> {
+                Root.CreatorStatusBar.setText(String.format("Checking Ambience. Currently Checking %s...", i.name));
+                if (!i.getAmbience().hasAnyAmbience()) {meditatableswithnoambience.add(i);}
+                else if (!i.getAmbience().hasEnoughAmbience(i.getduration())) {meditatableswithreducedambience.add(i);}
             });
-            ambiencecheckerservice.setOnSucceeded(event -> {
-                if (meditatableswithnoambience.size() > 0) {
+            Root.CreatorStatusBar.setText("");
+            if (meditatableswithnoambience.size() > 0) {
+                StringBuilder a = new StringBuilder();
+                for (int i = 0; i < meditatableswithnoambience.size(); i++) {
+                    a.append(meditatableswithnoambience.get(i).name);
+                    if (i != meditatableswithnoambience.size() - 1) {a.append(", ");}
+                }
+                switch (Root.dialog_YesNoCancelConfirmation("Missing Ambience", "Missing Ambience For " + a.toString(), "Add Ambience Before Session Playback?")) {
+                    case YES:
+                        if (meditatableswithnoambience.size() == 1) {Root.menu_openadvancedambienceeditor(meditatableswithnoambience.get(0));}
+                        else { Root.menu_openadvancedambienceeditor();}
+                        break;
+                    case NO:
+                        break;
+                    case CANCEL:
+                        ambiencecheckbox.setSelected(false);
+                        break;
+                }
+            } else {
+                if (meditatableswithreducedambience.size() > 0) {
                     StringBuilder a = new StringBuilder();
-                    for (int i = 0; i < meditatableswithnoambience.size(); i++) {
-                        a.append(meditatableswithnoambience.get(i).name);
-                        if (i != meditatableswithnoambience.size() - 1) {a.append(", ");}
+                    int count = 1;
+                    for (int i = 0; i < meditatableswithreducedambience.size(); i++) {
+                        a.append("\n");
+                        Meditatable thismeditatable = meditatableswithreducedambience.get(i);
+                        String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(thismeditatable.getAmbience().gettotalActualDuration(), null);
+                        String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(thismeditatable.getduration(), null);
+                        a.append(count).append(". ").append(thismeditatable.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
+                        count++;
                     }
-                    switch (Root.dialog_YesNoCancelConfirmation("Missing Ambience", "Missing Ambience For " + a.toString(), "Add Ambience Before Session Playback?")) {
-                        case YES:
-                            if (meditatableswithnoambience.size() == 1) {Root.menu_openadvancedambienceeditor(meditatableswithnoambience.get(0));}
-                            else { Root.menu_openadvancedambienceeditor();}
-                            break;
-                        case NO:
-                            break;
-                        case CANCEL:
-                            ambiencecheckbox.setSelected(false);
-                            break;
+                    System.out.println(a.toString());
+                    if (meditatableswithreducedambience.size() == 1) {
+                        ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Meditatable's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Meditatables?"));
+                    } else {
+                        ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Meditatables?"));
                     }
                 } else {
-                    if (meditatableswithreducedambience.size() > 0) {
-                        StringBuilder a = new StringBuilder();
-                        int count = 1;
-                        for (int i = 0; i < meditatableswithreducedambience.size(); i++) {
-                            a.append("\n");
-                            Meditatable thismeditatable = meditatableswithreducedambience.get(i);
-                            String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(thismeditatable.getAmbience().gettotalActualDuration(), null);
-                            String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(thismeditatable.getduration(), null);
-                            a.append(count).append(". ").append(thismeditatable.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
-                            count++;
-                        }
-                        System.out.println(a.toString());
-                        if (meditatableswithreducedambience.size() == 1) {
-                            ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Meditatable's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Meditatables?"));
-                        } else {
-                            ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Meditatables?"));
-                        }
-                    } else {
-                        ambiencecheckbox.setSelected(true);
-                    }
+                    ambiencecheckbox.setSelected(true);
                 }
-            });
-            ambiencecheckerservice.setOnCancelled(event -> {
-                ambiencecheckbox.setSelected(false);
-            });
-            ambiencecheckerservice.setOnFailed(event -> {
-                System.out.println("Failed!!");
-                ambiencecheckbox.setSelected(false);
-            });
-            ambiencecheckerservice.start();
-        } else {
-            Root.dialog_Information("Information", "Cannot Check Ambience", "No Meditatables Have > 0 Values, So I Don't Know Which Ambience To Check");}
+            }
+        } else {Root.dialog_Information("Information", "Cannot Check Ambience", "No Meditatables Have > 0 Values, So I Don't Know Which Ambience To Check");}
     }
     public boolean creation_checkreferencefiles(boolean enableprompt) {
         int invalidmeditatablecount = 0;
@@ -430,8 +402,9 @@ public class This_Session {
             return Root.dialog_YesNoConfirmation("Confirmation", "There Are " + invalidmeditatablecount + " Meditatables With Empty/Invalid Reference Files", "Enable Reference Anyways?");
         } else {return invalidmeditatablecount == 0;}
     }
-    public void creation_reset() {
-        getAllMeditatables().forEach(Meditatable::creation_reset);
+    public void creation_reset(boolean setvaluetozero) {
+        if (itemsinsession != null) {itemsinsession.clear();}
+        for (Meditatable i : getAllMeditatables()) {i.creation_reset(setvaluetozero);}
     }
 
 // Export
@@ -552,6 +525,7 @@ public class This_Session {
             Root.getStage().setIconified(false);
         });
         playerUI.showAndWait();
+        Root.creation_gui_setDisable(false);
     }
     public void player_play() {
         switch (playerState) {

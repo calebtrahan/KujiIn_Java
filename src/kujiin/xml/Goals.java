@@ -4,6 +4,7 @@ import javafx.util.Duration;
 import kujiin.MainController;
 import kujiin.lib.BeanComparator;
 import kujiin.util.Meditatable;
+import kujiin.util.This_Session;
 import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
@@ -237,6 +238,7 @@ public class Goals {
                 boolean completed = currentpracticedhours.greaterThanOrEqualTo(Duration.hours(i.getGoal_Hours()));
                 boolean notcompletedbefore = i.getCompleted() != null && ! i.getCompleted();
                 if (completed && notcompletedbefore) {
+                    System.out.println(This_Session.getAllMeditatables_Names().get(meditatableindex) + ": Completing Goal + " + i.getGoal_Hours());
                     i.setCompleted(true);
                     i.setDate_Completed(Util.gettodaysdate());
                 }
@@ -244,7 +246,7 @@ public class Goals {
             }
             update(newgoallist, meditatableindex);
             return newgoallist;
-        } catch (Exception ignored) {return new ArrayList<Goal>();}
+        } catch (Exception ignored) {return new ArrayList<>();}
     }
 
 //    public List<Goal> getgoalscompletedondate(int cutindex, LocalDate localDate) {

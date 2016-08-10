@@ -56,6 +56,7 @@ public class Meditatable {
     protected List<kujiin.xml.Goals.Goal> Goals;
 // Entrainment Fields
     private boolean entrainmentready = false;
+    private boolean entrainmentmissingfiles = false;
     private int entrainmentchecker_variationcount = 0;
     private MediaPlayer entrainmentchecker_calculateplayer;
     private List<File> entrainmentchecker_missingfiles = new ArrayList<>();
@@ -124,14 +125,19 @@ public class Meditatable {
                         entrainment_populate();
                     });
                 } else {entrainment_populate();}
-            } else {entrainmentchecker_missingfiles.add(actualfile);}
+            } else {entrainmentmissingfiles = true; entrainmentchecker_missingfiles.add(actualfile);}
         } catch (IndexOutOfBoundsException ignored) {
+            entrainmentready = true;
             thisession.Root.getEntrainments().setmeditatableEntrainment(number, entrainment);
             thisession.Root.getEntrainments().marshall();
         }
     }
     public boolean entrainment_isReady() {return entrainmentready;}
+    public boolean isEntrainmentmissingfiles() {
+        return entrainmentmissingfiles;
+    }
     public List<File> entrainment_getMissingFiles() {return entrainmentchecker_missingfiles;}
+    public Duration ambience_getTotalActualDuration() {return ambience.gettotalActualDuration();}
 
 // Ambience Methods
     public void ambience_populate() {
@@ -152,7 +158,10 @@ public class Meditatable {
                 }
                 if (! ambiencechecker_soundfilelist.isEmpty()) {ambience_populate();}
                 else {ambienceready = true;}
-            } catch (NullPointerException ignored) {}
+            } catch (NullPointerException ignored) {
+                // TODO Change This To Reflect No Ambience Files In Directory
+                ambienceready= true;
+            }
         } else {
             try {
                 File actualfile = ambiencechecker_soundfilelist.get(ambiencechecker_soundfilescount);
@@ -177,7 +186,6 @@ public class Meditatable {
 //                System.out.println(name + "'s Ambience:");
 //                for (SoundFile i : thisession.Root.getAmbiences().getmeditatableAmbience(number).getAmbience()) {
 //                    System.out.println(i.getName() + ": " + i.getDuration());
-//                }
                 thisession.Root.getAmbiences().marshall();
                 ambienceready = true;
             }
@@ -213,6 +221,7 @@ public class Meditatable {
         Switch.setDisable(disabled);
         Value.setDisable(disabled);
     }
+    public int gui_getvalue() {return Integer.parseInt(Value.getText());}
 // Getters And Setters
     public String getNameForChart() {return name;}
     private void setDuration(double newduration) {
@@ -296,11 +305,13 @@ public class Meditatable {
         }
         return ambience.created_getAll().size() > 0 && currentambienceduration.greaterThanOrEqualTo(getduration());
     }
-    public void creation_reset() {
+    public void creation_reset(boolean setvaluetozero) {
         entrainment.created_clear();
         ambience.created_clear();
-        Switch.setSelected(false);
-        gui_toggleswitch();
+        if (setvaluetozero) {
+            Switch.setSelected(false);
+            gui_toggleswitch();
+        }
     }
 
 // Playback
@@ -994,19 +1005,19 @@ public class Meditatable {
         } catch (NullPointerException e) {return true;}
     }
     public void goals_transitioncheck() {
-        goalscompletedthissession = goals_completeandgetcompleted();
+        goalscompletedthissession.addAll(goals_completeandgetcompleted());
         if (goalscompletedthissession.size() > 0) {
             thisession.MeditatableswithGoalsCompletedThisSession.add(this);
         }
     }
     public void goals_complete() {
-        GoalsController.completegoals(number, getduration());
+        GoalsController.completegoals(number, session_getTotalDurationPracticed());
     }
     public List<kujiin.xml.Goals.Goal> goals_completeandgetcompleted() {
-        return GoalsController.completegoalsandgetcompleted(number, getduration());
+        return GoalsController.completegoalsandgetcompleted(number, session_getTotalDurationPracticed());
     }
     public List<kujiin.xml.Goals.Goal> goals_getGoalsCompletedThisSession() {
-        return GoalsController.getgoalsCompletedOn(number, LocalDate.now());
+        return goalscompletedthissession;
     }
     public List<kujiin.xml.Goals.Goal> goals_getGoalsCompletedOn(LocalDate localDate) {
         return GoalsController.getgoalsCompletedOn(number, localDate);
@@ -1015,6 +1026,11 @@ public class Meditatable {
 // Session Tracking
     public double sessions_getAveragePracticeTime(boolean includepreandpost) {
         return thisession.Root.getSessions().sessioninformation_getaveragepracticetime(number, includepreandpost);
+    }
+    public Duration session_getTotalDurationPracticed() {
+        Duration totalduration = new Duration((sessions_getTotalMinutesPracticed(false) * 60) * 1000);
+        if (elapsedtime.greaterThan(Duration.ZERO)) {return totalduration.add(elapsedtime);}
+        else {return totalduration;}
     }
     public int sessions_getTotalMinutesPracticed(boolean includepreandpost) {
         return thisession.Root.getSessions().sessioninformation_getallsessiontotals(number, includepreandpost);
