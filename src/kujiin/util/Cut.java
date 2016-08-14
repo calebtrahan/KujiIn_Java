@@ -47,13 +47,18 @@ public class Cut extends Meditatable {
             else {entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohin.mp3")));}
             if (meditatableafter != null && meditatableafter.name.equals("Postsession")) {
                 entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohoutqi.mp3")));
-            } else {
-                entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohout.mp3")));
-            }
+            } else {entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, "tohout.mp3")));}
             entrainment.created_add(0, entrainment.getRampinfile());
             entrainment.created_add(entrainment.getRampoutfile());
             return entrainment.created_getAll().size() > 0;
         }
+//        System.out.println(name);
+//        int count = 1;
+//        for (SoundFile i : entrainment.created_getAll()) {
+//            System.out.println("Entrainment " + count + ": " + i.getName());
+//            count++;
+//        }
+        System.out.println("Total Entrainment Duration: " + entrainment.gettotalCreatedDuration().toMinutes() + " Minutes");
         return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().greaterThanOrEqualTo(getduration());
     }
 

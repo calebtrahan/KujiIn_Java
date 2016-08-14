@@ -401,9 +401,7 @@ public class MainController implements Initializable {
             }
         } else if (getOptions().getSessionOptions().getAlertfunction()) {
             if (dialog_YesNoConfirmation("Disable Alert File", "I've Detected A Relatively Short Session, And An Alert File Might Not Be Necessary",
-                    "Turn Off Alert File Between Session Parts?")) {
-                getOptions().getSessionOptions().setAlertfunction(false);
-            }
+                    "Turn Off Alert File Between Session Parts?")) {getOptions().getSessionOptions().setAlertfunction(false);}
         }
         Session.creation_createsession();
         creation_gui_setDisable(Session.creatorState != This_Session.CreatorState.NOT_CREATED);

@@ -17,7 +17,6 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Meditatable {
 // GUI Fields
@@ -263,6 +262,7 @@ public class Meditatable {
         return true;
     }
     protected boolean creation_buildAmbience() {
+        System.out.println("Started Builing Ambience For " + name);
         ambience.created_clear();
         Duration currentambienceduration = new Duration(0);
         if (ambience.hasEnoughAmbience(getduration())) {
@@ -273,37 +273,70 @@ public class Meditatable {
                 } else {break;}
             }
         } else {
-            Random randint = new Random();
+            // TODO Creates Some Duplicate Files
+            SoundFile selectedsoundfile;
+            int ambiencecount = 0;
+            int sizetotest;
+            boolean includefile;
+            ambience.created_initialize();
             while (currentambienceduration.lessThan(getduration())) {
-                List<SoundFile> createdambience = ambience.created_getAll();
-                SoundFile selectedsoundfile = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
-                if (createdambience.size() < 2) {
+                try {selectedsoundfile = ambience.getAmbience().get(ambiencecount);}
+                catch (IndexOutOfBoundsException ignored) {ambiencecount = 0; selectedsoundfile = ambience.getAmbience().get(ambiencecount);}
+                ambience.created_add(selectedsoundfile);
+                currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+                ambiencecount++;
+                    currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+                if (ambience.getAmbience().size() == 1) {ambience.created_add(ambience.getAmbience().get(0)); currentambienceduration = currentambienceduration.add(new Duration(ambience.getAmbience().get(0).getDuration()));}
+                try {selectedsoundfile = ambience.getAmbience().get(ambiencecount);}
+                catch (IndexOutOfBoundsException ignored) {ambiencecount = 0; selectedsoundfile = ambience.getAmbience().get(ambiencecount);}
+                includefile = true;
+                if (ambience.getCreatedAmbience().size() >= ambience.getAmbience().size()) {sizetotest = (ambience.getAmbience().size() - 1) - ambience.getCreatedAmbience().size() % ambience.getAmbience().size();}
+                else {sizetotest = ambience.getCreatedAmbience().size() - 1;}
+                for (int i = sizetotest; i > 0; i--) {if (ambience.getCreatedAmbience().get(i).equals(selectedsoundfile)) {includefile = false; break;}}
+//                if (includefile && ambience.getCreatedAmbience().size() > 0 && ambience.getCreatedAmbience().get(ambience.getCreatedAmbience().size() - 1).equals(selectedsoundfile)) {includefile = false;}
+                if (includefile) {
                     ambience.created_add(selectedsoundfile);
                     currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-                } else if (createdambience.size() == 2) {
-                    if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1))) {
-                        ambience.created_add(selectedsoundfile);
-                        currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-                    }
-                } else if (createdambience.size() == 3) {
-                    if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2))) {
-                        ambience.created_add(selectedsoundfile);
-                        currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-                    }
-                } else if (createdambience.size() <= 5) {
-                    if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3))) {
-                        ambience.created_add(selectedsoundfile);
-                        currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-                    }
-                } else if (createdambience.size() > 5) {
-                    if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 4))) {
-                        ambience.created_add(selectedsoundfile);
-                        currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-                    }
                 }
+                ambiencecount++;
             }
         }
-        return ambience.created_getAll().size() > 0 && currentambienceduration.greaterThanOrEqualTo(getduration());
+//            else {
+//                Random randint = new Random();
+//                while (currentambienceduration.lessThan(getduration())) {
+//                    List<SoundFile> createdambience = ambience.getCreatedAmbience();
+//                    SoundFile selectedsoundfile = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
+//                    if (createdambience.size() < 2) {
+//                        ambience.created_add(selectedsoundfile);
+//                        currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+//                    } else if (createdambience.size() == 2) {
+//                        if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1))) {
+//                            ambience.created_add(selectedsoundfile);
+//                            currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+//                        }
+//                    } else if (createdambience.size() == 3) {
+//                        if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2))) {
+//                            ambience.created_add(selectedsoundfile);
+//                            currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+//                        }
+//                    } else if (createdambience.size() <= 5) {
+//                        if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3))) {
+//                            ambience.created_add(selectedsoundfile);
+//                            currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+//                        }
+//                    } else if (createdambience.size() > 5) {
+//                        if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 4))) {
+//                            ambience.created_add(selectedsoundfile);
+//                            currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
+//                        }
+//                    }
+//                }
+//            }
+        System.out.println(name);
+        int count = 1;
+        for (SoundFile x : ambience.getCreatedAmbience()) {System.out.println("Ambience " + count + ": " + x.getName()); count++;}
+        System.out.println("Total Ambience Duration: " + currentambienceduration.toMinutes() + " Minutes");
+        return ambience.getCreatedAmbience().size() > 0 && currentambienceduration.greaterThanOrEqualTo(getduration());
     }
     public void creation_reset(boolean setvaluetozero) {
         entrainment.created_clear();

@@ -178,8 +178,7 @@ public class This_Session {
 
 // GUI
     public ArrayList<Integer> gui_getallsessionvalues() {
-        ArrayList<Integer> values = getAllMeditatables().stream().map(i -> new Double(i.getduration().toMinutes()).intValue()).collect(Collectors.toCollection(ArrayList::new));
-        return values;
+        return getAllMeditatables().stream().map(i -> new Double(i.getduration().toMinutes()).intValue()).collect(Collectors.toCollection(ArrayList::new));
     }
 
 // Creation
@@ -381,7 +380,6 @@ public class This_Session {
                         a.append(count).append(". ").append(thismeditatable.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                         count++;
                     }
-                    System.out.println(a.toString());
                     if (meditatableswithreducedambience.size() == 1) {
                         ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Meditatable's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Meditatables?"));
                     } else {
@@ -566,9 +564,7 @@ public class This_Session {
     public void player_updateui() {
         try {
             totalsessiondurationelapsed = totalsessiondurationelapsed.add(Duration.seconds(1.0));
-            try {
-                currentmeditatable.elapsedtime = currentmeditatable.elapsedtime.add(Duration.seconds(1.0));
-            } catch (NullPointerException ignored) {}
+            try {currentmeditatable.elapsedtime = currentmeditatable.elapsedtime.add(Duration.seconds(1.0));} catch (NullPointerException ignored) {}
             Float currentprogress;
             Float totalprogress;
             try {

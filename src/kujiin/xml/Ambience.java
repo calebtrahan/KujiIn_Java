@@ -34,6 +34,9 @@ public class Ambience {
             return files;
         } catch (NullPointerException ignored) {return new ArrayList<>();}
     }
+    public List<SoundFile> getCreatedAmbience() {
+        return CreatedAmbience;
+    }
 
     // Ambience Editing Methods
     // Actual Ambience
@@ -103,7 +106,7 @@ public class Ambience {
     }
 
     // Created Ambience
-    private void created_initialize() {
+    public void created_initialize() {
         if (CreatedAmbience == null) CreatedAmbience = new ArrayList<>();
     }
     public void created_add(SoundFile soundFile) {
@@ -127,9 +130,6 @@ public class Ambience {
             if (i.getFile().equals(file)) return i;
         }
         return null;
-    }
-    public List<SoundFile> created_getAll() {
-        return CreatedAmbience;
     }
     public void created_remove(SoundFile soundFile) {
         CreatedAmbience.remove(soundFile);
