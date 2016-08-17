@@ -98,6 +98,7 @@ public class Util {
         textField.setOnScroll(event -> {
             Double newvalue = new Double(textField.getText());
             boolean validvalue;
+
             if (event.getDeltaY() < 0) {newvalue -= increment; validvalue = newvalue >= minvalue;} else {newvalue += increment; validvalue = newvalue <= maxvalue;}
             if (validvalue) {textField.setText(String.valueOf(newvalue.intValue()));}
         });

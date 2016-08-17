@@ -38,6 +38,7 @@ public class Cut extends Meditatable {
         }
         entrainment.shuffleCreated();
         if (number == 3 && duration.greaterThanOrEqualTo(Duration.minutes(3))) {
+            rampenabled = true;
             int index = allmeditatablestoplay.indexOf(this);
             Meditatable meditatablebefore = null;
             Meditatable meditatableafter = null;
@@ -51,14 +52,13 @@ public class Cut extends Meditatable {
             entrainment.created_add(0, entrainment.getRampinfile());
             entrainment.created_add(entrainment.getRampoutfile());
             return entrainment.created_getAll().size() > 0;
-        }
+        } else {rampenabled = false;}
 //        System.out.println(name);
 //        int count = 1;
 //        for (SoundFile i : entrainment.created_getAll()) {
 //            System.out.println("Entrainment " + count + ": " + i.getName());
 //            count++;
 //        }
-        System.out.println("Total Entrainment Duration: " + entrainment.gettotalCreatedDuration().toMinutes() + " Minutes");
         return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().greaterThanOrEqualTo(getduration());
     }
 

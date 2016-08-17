@@ -55,7 +55,8 @@ public class Element extends Meditatable {
             if (meditatableafter != null) {
                 rampoutfile = new SoundFile(new File(Options.DIRECTORYRAMP, "elementout" + meditatableafter.name.toLowerCase() + ".mp3"));
                 timeleft = timeleft.subtract(Duration.minutes(1));
-            }
+                rampenabled = true;
+            } else {rampenabled = false;}
         }
         while (timeleft.greaterThan(freqlongduration)) {
             entrainment.created_add(entrainment.getFreqlong());

@@ -20,8 +20,6 @@ public class Qi_Gong extends Meditatable {
     }
 
 // GUI
-
-
     @Override
     public String getNameForChart() {
         if (name.equals("Presession")) {return "Pre";}
@@ -48,11 +46,13 @@ public class Qi_Gong extends Meditatable {
                 String rampupfirstname = "qiin" + meditatableafter.name.toLowerCase() + ".mp3";
                 entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampupfirstname)));
                 entrainment.created_add(entrainment.getRampinfile());
-            }
+                rampenabled = false;
+            } else {rampenabled = false;}
             if (name.equals("Postsession") && meditatablebefore != null) {
                 String rampdowntopost = "qiout" + meditatablebefore.name.toLowerCase() + ".mp3";
                 entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampdowntopost)));
                 entrainment.created_add(0, entrainment.getRampoutfile());
+                rampenabled = false;
             }
             if (entrainment.created_getAll().size() == 1) {return true;}
         }
@@ -60,7 +60,6 @@ public class Qi_Gong extends Meditatable {
     }
 
 // Playback
-    // Playback Getters
     @Override
     public Duration getduration() {
         double dur = super.getduration().toSeconds();
@@ -95,8 +94,5 @@ public class Qi_Gong extends Meditatable {
             ambienceplayer.setOnError(this::ambienceerror);
         } else {thisession.player_error();}
     }
-// Goals
-
-// Export
 
 }

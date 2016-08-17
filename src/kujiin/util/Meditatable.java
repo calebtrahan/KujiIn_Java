@@ -33,6 +33,7 @@ public class Meditatable {
     protected boolean ambienceenabled;
     protected int entrainmentplaycount;
     protected int ambienceplaycount;
+    protected boolean rampenabled;
     protected MediaPlayer entrainmentplayer;
     protected MediaPlayer ambienceplayer;
     protected Animation fade_entrainment_play;
@@ -45,6 +46,7 @@ public class Meditatable {
     protected Animation fade_ambience_stop;
     protected Animation timeline_fadeout_timer;
     protected Animation timeline_progresstonextmeditatable;
+    protected Animation timeline_start_ramp;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     public Duration elapsedtime;
@@ -264,7 +266,7 @@ public class Meditatable {
     protected boolean creation_buildAmbience() {
         System.out.println("Started Builing Ambience For " + name);
         ambience.created_clear();
-        Duration currentambienceduration = new Duration(0);
+        Duration currentambienceduration = Duration.ZERO;
         if (ambience.hasEnoughAmbience(getduration())) {
             for (SoundFile i : ambience.getAmbience()) {
                 if (ambience.gettotalCreatedDuration().lessThan(getduration())) {
@@ -332,7 +334,6 @@ public class Meditatable {
 //                    }
 //                }
 //            }
-        System.out.println(name);
         int count = 1;
         for (SoundFile x : ambience.getCreatedAmbience()) {System.out.println("Ambience " + count + ": " + x.getName()); count++;}
         System.out.println("Total Ambience Duration: " + currentambienceduration.toMinutes() + " Minutes");
@@ -407,7 +408,8 @@ public class Meditatable {
                     }
                 }
             };
-        fade_entrainment_resume.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; timeline_progresstonextmeditatable.play(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();} toggleplayerbuttons(); volume_bindentrainment();});
+        fade_entrainment_resume.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; timeline_progresstonextmeditatable.play(); if (rampenabled && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
+            if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();} toggleplayerbuttons(); volume_bindentrainment();});
         if (ambienceenabled) {
             fade_ambience_resume = new Transition() {
                 {setCycleDuration(new Duration(Options.DEFAULT_FADERESUMEANDPAUSEDURATION * 1000));}
@@ -450,7 +452,9 @@ public class Meditatable {
                     }
                 }
     };
-        fade_entrainment_pause.setOnFinished(event -> {entrainmentplayer.pause(); timeline_progresstonextmeditatable.pause(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();} thisession.playerState = This_Session.PlayerState.PAUSED; toggleplayerbuttons();});
+        fade_entrainment_pause.setOnFinished(event -> {entrainmentplayer.pause(); timeline_progresstonextmeditatable.pause();
+            if (rampenabled && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.pause();}
+            if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();} thisession.playerState = This_Session.PlayerState.PAUSED; toggleplayerbuttons();});
         if (ambienceenabled) {
             fade_ambience_pause = new Transition() {
                 {setCycleDuration(new Duration(Options.DEFAULT_FADERESUMEANDPAUSEDURATION * 1000));}
@@ -496,7 +500,9 @@ public class Meditatable {
                     }
                 }
             };
-            fade_entrainment_stop.setOnFinished(event -> {entrainmentplayer.stop(); entrainmentplayer.dispose(); timeline_progresstonextmeditatable.stop(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();} thisession.playerState = This_Session.PlayerState.STOPPED; toggleplayerbuttons();});
+            fade_entrainment_stop.setOnFinished(event -> {entrainmentplayer.stop(); entrainmentplayer.dispose();
+                if (rampenabled && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.stop();}
+                timeline_progresstonextmeditatable.stop(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();} thisession.playerState = This_Session.PlayerState.STOPPED; toggleplayerbuttons();});
             if (ambienceenabled) {
                 fade_ambience_stop = new Transition() {
                     {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000));}
@@ -505,7 +511,7 @@ public class Meditatable {
                     protected void interpolate(double frac) {
                         double basevalue;
                         double ambiencevolume;
-                        if (currentambiencevolume != null && currentambiencevolume > 0.0) {basevalue = getCurrentambiencevolume(); ambiencevolume = frac * basevalue;}
+                        if (currentambiencevolume != null && currentambiencevolume > 0.0) {basevalue = currentambiencevolume; ambiencevolume = frac * basevalue;}
                         else {basevalue = thisession.Root.getOptions().getSessionOptions().getAmbiencevolume(); ambiencevolume = frac * basevalue;}
                         double fadeoutvolume = basevalue - ambiencevolume;
                         ambienceplayer.setVolume(fadeoutvolume);
@@ -535,6 +541,20 @@ public class Meditatable {
         entrainmentplayer.play();
         timeline_progresstonextmeditatable = new Timeline(new KeyFrame(getduration(), ae -> thisession.player_progresstonextmeditatable()));
         timeline_progresstonextmeditatable.play();
+        if (rampenabled) {
+            timeline_start_ramp = new Timeline(new KeyFrame(getduration().subtract(new Duration(entrainment.getRampoutfile().getDuration() * 1000)), ae -> {
+                entrainmentplayer.stop();
+                entrainmentplayer.dispose();
+                entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampoutfile().getFile().toURI().toString()));
+                entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
+                entrainmentplayer.setOnError(this::entrainmenterror);
+                if (currententrainmentvolume != null && currententrainmentvolume > 0.0) {entrainmentplayer.setVolume(getCurrententrainmentvolume());}
+                else {entrainmentplayer.setVolume(thisession.Root.getOptions().getSessionOptions().getEntrainmentvolume());}
+                entrainmentplayer.play();
+                entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
+            }));
+            timeline_start_ramp.play();
+        }
         if (fade_entrainment_stop != null) {
             timeline_fadeout_timer = new Timeline(new KeyFrame(getduration().subtract(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000)), ae -> {
                 volume_unbindentrainment();
@@ -582,6 +602,7 @@ public class Meditatable {
             volume_bindentrainment();
             thisession.playerState = This_Session.PlayerState.PLAYING;
             timeline_progresstonextmeditatable.play();
+            if (rampenabled && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();}
         }
         if (ambienceenabled) {
@@ -614,6 +635,7 @@ public class Meditatable {
             thisession.playerState = This_Session.PlayerState.PAUSED;
             entrainmentplayer.pause();
             timeline_progresstonextmeditatable.pause();
+            if (rampenabled && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.pause();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
             if (ambienceenabled) {
                 volume_unbindambience();
@@ -691,6 +713,7 @@ public class Meditatable {
             if (fade_ambience_resume != null) {fade_ambience_resume.stop();}
             if (fade_ambience_stop != null) {fade_ambience_stop.stop();}
             if (timeline_progresstonextmeditatable != null) {timeline_progresstonextmeditatable.stop();}
+            if (timeline_start_ramp != null) {timeline_fadeout_timer.stop();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
             toggleplayerbuttons();
         } catch (Exception ignored) {}
