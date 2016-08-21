@@ -140,7 +140,7 @@
                                                 <Insets />
                                              </HBox.margin>
                                           </Label>
-                                          <TextField fx:id="AlertFileTextField" prefHeight="26.0" prefWidth="238.0" text="Please Select...">
+                                          <TextField fx:id="AlertFileTextField" prefHeight="26.0" prefWidth="238.0" text="Please Select..." editable="false">
                                              <HBox.margin>
                                                 <Insets left="10.0" right="10.0" />
                                              </HBox.margin>
@@ -250,11 +250,15 @@
                   </Tab>
               </tabs>
             </TabPane>
-            <HBox alignment="BOTTOM_RIGHT" prefHeight="28.0" prefWidth="347.0">
+            <HBox alignment="CENTER_RIGHT" prefHeight="28.0" prefWidth="347.0">
                <children>
+                  <Label fx:id="ProgramOptionsStatusBar" prefHeight="16.0" prefWidth="234.0" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Label>
                   <Button fx:id="DefaultsButton" mnemonicParsing="false" onAction="#resettodefaults" text="Reset To Defaults" />
-                  <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#accept" text="Accept" />
-                  <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#cancel" text="Cancel">
+                  <Button fx:id="CloseButton" mnemonicParsing="false" text="Close">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>

@@ -40,10 +40,13 @@ public class Util {
         label.setText(text);
         new Timeline(new KeyFrame(Duration.millis(millis), ae -> label.setText(""))).play();
     }
-    public static void gui_validate(TextField txtfield, int highvalue, int valtotest) {
+    public static boolean gui_validate(TextField txtfield, int highvalue) {
         ObservableList<String> styleclass = txtfield.getStyleClass();
-        if (valtotest > highvalue) {if (!styleclass.contains("error")) {styleclass.add("error");}}
-        else {styleclass.removeAll(Collections.singleton("error"));}
+        try {
+            if (Integer.parseInt(txtfield.getText()) > highvalue) {if (!styleclass.contains("error")) {styleclass.add("error");}}
+            else {styleclass.removeAll(Collections.singleton("error"));}
+        } catch (NumberFormatException ignored) {return false;}
+        return ! styleclass.contains("error");
     }
     public static void gui_validate(ChoiceBox<String> choicebox, Boolean val) {
         ObservableList<String> styleclass = choicebox.getStyleClass();

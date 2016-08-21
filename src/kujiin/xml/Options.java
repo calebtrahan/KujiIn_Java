@@ -72,13 +72,12 @@ public class Options {
     public static final Integer DEFAULT_LONG_MEDITATABLE_DURATION = 10;
     public static final String NEWGOALTEXT = "New Goal";
     public static final String GOALPACINGTEXT = "Goal Pacing";
+    public static final Image PROGRAM_ICON = new Image(new File(Options.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString());
     // Files
     private ProgramOptions ProgramOptions;
     private SessionOptions SessionOptions;
     private AppearanceOptions AppearanceOptions;
     private MainController Root;
-    public ArrayList<String> STYLE_THEMES_NAMES = new ArrayList<>(Arrays.asList("Default (Light)", "Default (Legacy)"));
-    public ArrayList<String> STYLE_THEMES_ACTUAL = new ArrayList<>(Arrays.asList(STYLESHEET_MODENA, STYLESHEET_CASPIAN));
 
     public Options() {}
     public Options(MainController root) {
@@ -115,7 +114,6 @@ public class Options {
                 setProgramOptions(options.getProgramOptions());
                 setSessionOptions(options.getSessionOptions());
                 setAppearanceOptions(options.getAppearanceOptions());
-                populatethemefiles();
             } catch (JAXBException ignored) {
                 Platform.runLater(() -> Root.dialog_Information("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
@@ -155,32 +153,24 @@ public class Options {
         setSessionOptions(sessionOptions);
         kujiin.xml.Options.AppearanceOptions appearanceOptions = new AppearanceOptions();
         appearanceOptions.setThemefile(DEFAULT_THEMEFILE.toURI().toString());
+        appearanceOptions.setThemefiles(new ArrayList<>(Arrays.asList(DEFAULT_THEMEFILE.toURI().toString(), STYLESHEET_MODENA, STYLESHEET_CASPIAN)));
+        appearanceOptions.setThemefilenames(new ArrayList<>(Arrays.asList("Default (Dark)", "Default (Light)", "Default (Legacy)")));
         setAppearanceOptions(appearanceOptions);
         marshall();
     }
     public void setStyle(Stage stage) {
         stage.getIcons().clear();
-        stage.getIcons().add(new Image(new File(Options.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString()));
+        stage.getIcons().add(PROGRAM_ICON);
         String themefile = getAppearanceOptions().getThemefile();
         if (themefile != null) {stage.getScene().getStylesheets().add(themefile);}
     }
-    public void populatethemefiles() {
-        if (DEFAULT_THEMEFILE.exists() && ! STYLE_THEMES_ACTUAL.contains(DEFAULT_THEMEFILE.toURI().toString())) {
-            STYLE_THEMES_NAMES.add(0, "Default (Dark)");
-            STYLE_THEMES_ACTUAL.add(0, DEFAULT_THEMEFILE.toURI().toString());
-        }
-        try {
-            for (File i : DIRECTORYSTYLES.listFiles()) {
-                if (! i.equals(DEFAULT_THEMEFILE) && i.getName().endsWith(".css") && ! STYLE_THEMES_ACTUAL.contains(i.toURI().toString())
-                        && ! i.equals(REFERENCE_THEMEFILE)) {
-                    STYLE_THEMES_NAMES.add(i.getName().substring(0, i.getName().length() - 4));
-                    STYLE_THEMES_ACTUAL.add(i.toURI().toString());
-                }
-            }
-        } catch (NullPointerException ignored) {}
-    }
     public void addthemefile(String name, String file_location) {
-
+        ArrayList<String> files = getAppearanceOptions().getThemefiles();
+        ArrayList<String> names = getAppearanceOptions().getThemefilenames();
+        files.add(file_location);
+        names.add(name);
+        getAppearanceOptions().setThemefiles(files);
+        getAppearanceOptions().setThemefilenames(names);
     }
 
 // Subclasses
@@ -292,6 +282,8 @@ public class Options {
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class AppearanceOptions {
         private String themefile;
+        private ArrayList<String> themefiles;
+        private ArrayList<String> themefilenames;
 
         public AppearanceOptions() {}
 
@@ -301,7 +293,18 @@ public class Options {
         public void setThemefile(String themefile) {
             this.themefile = themefile;
         }
-
+        public ArrayList<String> getThemefiles() {
+            return themefiles;
+        }
+        public void setThemefiles(ArrayList<String> themefiles) {
+            this.themefiles = themefiles;
+        }
+        public ArrayList<String> getThemefilenames() {
+            return themefilenames;
+        }
+        public void setThemefilenames(ArrayList<String> themefilenames) {
+            this.themefilenames = themefilenames;
+        }
 
     }
 }

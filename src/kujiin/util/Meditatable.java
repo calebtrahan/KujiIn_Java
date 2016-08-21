@@ -134,7 +134,7 @@ public class Meditatable {
         }
     }
     public boolean entrainment_isReady() {return entrainmentready;}
-    public boolean isEntrainmentmissingfiles() {
+    public boolean entrainment_missingfiles() {
         return entrainmentmissingfiles;
     }
     public List<File> entrainment_getMissingFiles() {return entrainmentchecker_missingfiles;}
