@@ -59,6 +59,7 @@ public class Meditatable {
     private boolean entrainmentready = false;
     private boolean entrainmentmissingfiles = false;
     private int entrainmentchecker_variationcount = 0;
+    private int ramp_variationcount = 0;
     private MediaPlayer entrainmentchecker_calculateplayer;
     private List<File> entrainmentchecker_missingfiles = new ArrayList<>();
 // Ambience Fields
@@ -111,6 +112,23 @@ public class Meditatable {
             filename.append(variation).append(".mp3");
             File actualfile = new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + filename.toString());
             SoundFile actualsoundfile;
+//            switch (entrainmentchecker_variationcount) {
+//                case 0:
+//                    actualsoundfile = entrainment.getFreqshort();
+//                    break;
+//                case 1:
+//                    actualsoundfile = entrainment.getFreqlong();
+//                    break;
+//                case 2:
+//                    actualsoundfile = entrainment.getRampinfile();
+//                    break;
+//                case 3:
+//                    actualsoundfile = entrainment.getRampoutfile();
+//                    break;
+//                default:
+//                    actualsoundfile = null;
+//                    break;
+//            }
             if (entrainmentchecker_variationcount == 0) {actualsoundfile = entrainment.getFreqshort();}
             else {actualsoundfile = entrainment.getFreqlong();}
             if (actualfile.exists()) {
@@ -252,7 +270,6 @@ public class Meditatable {
         return true;
     }
     protected boolean creation_buildAmbience() {
-        System.out.println("Started Builing Ambience For " + name);
         ambience.created_clear();
         Duration currentambienceduration = Duration.ZERO;
         if (ambience.hasEnoughAmbience(getduration())) {
@@ -322,9 +339,9 @@ public class Meditatable {
 //                    }
 //                }
 //            }
-        int count = 1;
-        for (SoundFile x : ambience.getCreatedAmbience()) {System.out.println("Ambience " + count + ": " + x.getName()); count++;}
-        System.out.println("Total Ambience Duration: " + currentambienceduration.toMinutes() + " Minutes");
+//        int count = 1;
+//        for (SoundFile x : ambience.getCreatedAmbience()) {System.out.println("Ambience " + count + ": " + x.getName()); count++;}
+//        System.out.println("Total Ambience Duration: " + currentambienceduration.toMinutes() + " Minutes");
         return ambience.getCreatedAmbience().size() > 0 && currentambienceduration.greaterThanOrEqualTo(getduration());
     }
     public void creation_reset(boolean setvaluetozero) {
@@ -510,8 +527,12 @@ public class Meditatable {
         timeline_progresstonextmeditatable = new Timeline(new KeyFrame(getduration(), ae -> thisession.player_progresstonextmeditatable()));
         timeline_progresstonextmeditatable.play();
         currententrainmentvolume = thisession.getCurrententrainmentvolume();
+        rampenabled = false;
         if (rampenabled) {
+            System.out.println("Setting Up Ramp Timeline");
             timeline_start_ramp = new Timeline(new KeyFrame(getduration().subtract(new Duration(entrainment.getRampoutfile().getDuration() * 1000)), ae -> {
+                System.out.println("Ramp TimeLine Started At " + getelapsedtime().toSeconds() + " Seconds");
+                volume_unbindentrainment();
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
                 entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampoutfile().getFile().toURI().toString()));

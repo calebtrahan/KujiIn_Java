@@ -18,6 +18,15 @@ public class Cut extends Meditatable {
         }
     }
 
+// Entrainment
+
+    @Override
+    public void entrainment_populate() {
+
+        super.entrainment_populate();
+    }
+
+
 // GUI
 
 // Creation

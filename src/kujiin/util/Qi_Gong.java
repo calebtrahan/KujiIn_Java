@@ -19,7 +19,15 @@ public class Qi_Gong extends Meditatable {
         } else {Value.setTooltip(null);}
     }
 
-// GUI
+// Entrainment
+    @Override
+    public void entrainment_populate() {
+//        ArrayList<String> rampvariations = thisession.getallCuts().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
+
+        super.entrainment_populate();
+    }
+
+    // GUI
     @Override
     public String getNameForChart() {
         if (name.equals("Presession")) {return "Pre";}
@@ -46,14 +54,13 @@ public class Qi_Gong extends Meditatable {
                 String rampupfirstname = "qiin" + meditatableafter.name.toLowerCase() + ".mp3";
                 entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampupfirstname)));
                 entrainment.created_add(entrainment.getRampinfile());
-                rampenabled = false;
-            } else {rampenabled = false;}
-            if (name.equals("Postsession") && meditatablebefore != null) {
+                rampenabled = true;
+            } else if (name.equals("Postsession") && meditatablebefore != null) {
                 String rampdowntopost = "qiout" + meditatablebefore.name.toLowerCase() + ".mp3";
                 entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampdowntopost)));
                 entrainment.created_add(0, entrainment.getRampoutfile());
-                rampenabled = false;
-            }
+                rampenabled = true;
+            } else {rampenabled = false;}
             if (entrainment.created_getAll().size() == 1) {return true;}
         }
         return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().greaterThan(Duration.ZERO);
@@ -62,11 +69,11 @@ public class Qi_Gong extends Meditatable {
 // Playback
     @Override
     public Duration getduration() {
-        double dur = super.getduration().toSeconds();
+        Duration dur = super.getduration();
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            dur += thisession.Root.getOptions().getSessionOptions().getRampduration() * 60;
+            dur = dur.add(new Duration(thisession.Root.getOptions().getSessionOptions().getRampduration() * 1000));
         }
-        return new Duration(dur * 1000);
+        return dur;
     }
     public Duration getdurationwithoutramp() {
         return super.getduration();

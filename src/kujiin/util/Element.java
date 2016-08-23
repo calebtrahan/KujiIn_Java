@@ -18,6 +18,15 @@ public class Element extends Meditatable {
         else {Value.setTooltip(null);}
     }
 
+// Entrainment
+    @Override
+    public void entrainment_populate() {
+//        ArrayList<String> rampvariations = thisession.getallCuts().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
+        int rampvariationcount = 0;
+
+        super.entrainment_populate();
+    }
+
 // GUI
     public boolean hasValidValue() {
     return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
