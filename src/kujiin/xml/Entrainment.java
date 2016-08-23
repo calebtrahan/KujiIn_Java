@@ -51,7 +51,25 @@ public class Entrainment {
         this.rampoutfile = rampoutfile;
     }
 
-    // Add/Remove Created Entrainment
+// Ramp Methods
+    public void ramp_initialize() {
+        if (rampinfiles == null) {rampinfiles = new ArrayList<>();}
+        if (rampoutfiles == null) {rampoutfiles = new ArrayList<>();}
+    }
+    public void ramp_addin(SoundFile soundFile) {}
+    public void ramp_addin(int index, SoundFile soundFile) {}
+    public void ramp_addout(SoundFile soundFile) {}
+    public void ramp_addout(int index, SoundFile soundFile) {}
+    public SoundFile ramp_getin(int index) {
+        try {return rampinfiles.get(index);}
+        catch (Exception e) {return null;}
+    }
+    public SoundFile ramp_getout(int index) {
+        try {return rampoutfiles.get(index);}
+        catch (Exception e) {return null;}
+    }
+
+// Add/Remove Created Entrainment
     private void created_initialize() {
         if (CreatedEntrainment == null) CreatedEntrainment = new ArrayList<>();
     }
@@ -91,7 +109,7 @@ public class Entrainment {
         if (CreatedEntrainment != null) CreatedEntrainment.clear();
     }
 
-    // Information Methods
+// Information Methods
     public Duration gettotalCreatedDuration() {
         Duration duration = Duration.ZERO;
         for (SoundFile i : CreatedEntrainment) {
@@ -116,7 +134,7 @@ public class Entrainment {
         });
     }
 
-    // Other Methods
+// Other Methods
     public void shuffleCreated() {
         if (CreatedEntrainment != null) Collections.shuffle(CreatedEntrainment);
     }

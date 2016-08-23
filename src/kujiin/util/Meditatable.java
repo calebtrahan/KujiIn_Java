@@ -16,6 +16,7 @@ import kujiin.xml.*;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Meditatable {
@@ -56,12 +57,16 @@ public class Meditatable {
     protected Goals GoalsController;
     protected List<kujiin.xml.Goals.Goal> Goals;
 // Entrainment Fields
-    private boolean entrainmentready = false;
-    private boolean entrainmentmissingfiles = false;
-    private int entrainmentchecker_variationcount = 0;
-    private int ramp_variationcount = 0;
-    private MediaPlayer entrainmentchecker_calculateplayer;
-    private List<File> entrainmentchecker_missingfiles = new ArrayList<>();
+    protected boolean entrainmentready = false;
+    protected boolean entrainmentmissingfiles = false;
+    protected int entrainmentchecker_partcount;
+    protected int entrainmentchecker_variationcount;
+    protected int entrainmentchecker_ramptypecount;
+    protected int entrainmentchecker_rampvariationcount;
+    protected final ArrayList<String> entrainmentchecker_ramptypes = new ArrayList<>(Arrays.asList("in", "out"));
+    protected final ArrayList<String> entrainmentchecker_rampvariations = new ArrayList<>(Arrays.asList("rin", "kyo", "toh", "sha", "kai", "jin", "retsu", "zai", "zen"));
+    public MediaPlayer entrainmentchecker_calculateplayer;
+    public List<File> entrainmentchecker_missingfiles = new ArrayList<>();
 // Ambience Fields
     private ArrayList<File> ambiencechecker_soundfilelist = new ArrayList<>();
     private int ambiencechecker_soundfilescount = 0;
@@ -89,6 +94,10 @@ public class Meditatable {
             gui_toggleswitch();
         }
         entrainment = thissession.Root.getEntrainments().getmeditatableEntrainment(number);
+        entrainmentchecker_partcount = 0;
+        entrainmentchecker_variationcount = 0;
+        entrainmentchecker_ramptypecount = 0;
+        entrainmentchecker_rampvariationcount = 0;
         entrainment_populate();
         ambience = thissession.Root.getAmbiences().getmeditatableAmbience(number);
         ambience_populate();
@@ -103,53 +112,53 @@ public class Meditatable {
 
 // Entrainment Methods
     public void entrainment_populate() {
-        try {
-            int variation = Entrainments.DURATIONSVARIATIONS.get(entrainmentchecker_variationcount);
-            StringBuilder filename = new StringBuilder();
-            if (number == 0 || number == 15) {filename.append("Qi-Gong");}
-            else if (number > 9 && number < 15) {filename.append("ELEMENT");}
-            else {filename.append(name);}
-            filename.append(variation).append(".mp3");
-            File actualfile = new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + filename.toString());
-            SoundFile actualsoundfile;
-//            switch (entrainmentchecker_variationcount) {
-//                case 0:
-//                    actualsoundfile = entrainment.getFreqshort();
-//                    break;
-//                case 1:
-//                    actualsoundfile = entrainment.getFreqlong();
-//                    break;
-//                case 2:
-//                    actualsoundfile = entrainment.getRampinfile();
-//                    break;
-//                case 3:
-//                    actualsoundfile = entrainment.getRampoutfile();
-//                    break;
-//                default:
-//                    actualsoundfile = null;
-//                    break;
-//            }
-            if (entrainmentchecker_variationcount == 0) {actualsoundfile = entrainment.getFreqshort();}
-            else {actualsoundfile = entrainment.getFreqlong();}
-            if (actualfile.exists()) {
-                if (actualsoundfile == null || actualsoundfile.getDuration() == null || actualsoundfile.getDuration() == 0.0) {
-                    entrainmentchecker_calculateplayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
-                    entrainmentchecker_calculateplayer.setOnReady(() -> {
-                        SoundFile soundFile = new SoundFile(actualfile);
-                        soundFile.setDuration(entrainmentchecker_calculateplayer.getTotalDuration().toMillis());
-                        if (entrainmentchecker_variationcount == 0) {entrainment.setFreqshort(soundFile);
-                        } else if (entrainmentchecker_variationcount == 1) {entrainment.setFreqlong(soundFile);}
-                        entrainmentchecker_calculateplayer.dispose();
-                        entrainmentchecker_variationcount++;
-                        entrainment_populate();
-                    });
-                } else {entrainment_populate();}
-            } else {entrainmentmissingfiles = true; entrainmentchecker_missingfiles.add(actualfile);}
-        } catch (IndexOutOfBoundsException ignored) {
-            entrainmentready = true;
-            thisession.Root.getEntrainments().setmeditatableEntrainment(number, entrainment);
-            thisession.Root.getEntrainments().marshall();
-        }
+//        try {
+//            int variation = Entrainments.DURATIONSVARIATIONS.get(entrainmentchecker_variationcount);
+//            StringBuilder filename = new StringBuilder();
+//            if (number == 0 || number == 15) {filename.append("Qi-Gong");}
+//            else if (number > 9 && number < 15) {filename.append("ELEMENT");}
+//            else {filename.append(name);}
+//            filename.append(variation).append(".mp3");
+//            File actualfile = new File(Options.DIRECTORYENTRAINMENT, "entrainment/" + filename.toString());
+//            SoundFile actualsoundfile;
+////            switch (entrainmentchecker_variationcount) {
+////                case 0:
+////                    actualsoundfile = entrainment.getFreqshort();
+////                    break;
+////                case 1:
+////                    actualsoundfile = entrainment.getFreqlong();
+////                    break;
+////                case 2:
+////                    actualsoundfile = entrainment.getRampinfile();
+////                    break;
+////                case 3:
+////                    actualsoundfile = entrainment.getRampoutfile();
+////                    break;
+////                default:
+////                    actualsoundfile = null;
+////                    break;
+////            }
+//            if (entrainmentchecker_variationcount == 0) {actualsoundfile = entrainment.getFreqshort();}
+//            else {actualsoundfile = entrainment.getFreqlong();}
+//            if (actualfile.exists()) {
+//                if (actualsoundfile == null || actualsoundfile.getDuration() == null || actualsoundfile.getDuration() == 0.0) {
+//                    entrainmentchecker_calculateplayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
+//                    entrainmentchecker_calculateplayer.setOnReady(() -> {
+//                        SoundFile soundFile = new SoundFile(actualfile);
+//                        soundFile.setDuration(entrainmentchecker_calculateplayer.getTotalDuration().toMillis());
+//                        if (entrainmentchecker_variationcount == 0) {entrainment.setFreqshort(soundFile);
+//                        } else if (entrainmentchecker_variationcount == 1) {entrainment.setFreqlong(soundFile);}
+//                        entrainmentchecker_calculateplayer.dispose();
+//                        entrainmentchecker_variationcount++;
+//                        entrainment_populate();
+//                    });
+//                } else {entrainment_populate();}
+//            } else {entrainmentmissingfiles = true; entrainmentchecker_missingfiles.add(actualfile);}
+//        } catch (IndexOutOfBoundsException ignored) {
+//            entrainmentready = true;
+//            thisession.Root.getEntrainments().setmeditatableEntrainment(number, entrainment);
+//            thisession.Root.getEntrainments().marshall();
+//        }
     }
     public boolean entrainment_isReady() {return entrainmentready;}
     public boolean entrainment_missingfiles() {
@@ -157,8 +166,24 @@ public class Meditatable {
     }
     public List<File> entrainment_getMissingFiles() {return entrainmentchecker_missingfiles;}
     public Duration ambience_getTotalActualDuration() {return ambience.gettotalActualDuration();}
+    public void entrainment_incrementpart() {entrainmentchecker_partcount++;}
+    public void entrainment_incremenetvariation() {entrainmentchecker_variationcount++;}
+    public void entrainment_incremementramptype() {entrainmentchecker_ramptypecount++;}
+    public void entrainment_incremementrampvariation() {entrainmentchecker_rampvariationcount++;}
+    public int getEntrainmentchecker_partcount() {
+        return entrainmentchecker_partcount;
+    }
+    public int getEntrainmentchecker_variationcount() {
+        return entrainmentchecker_variationcount;
+    }
+    public int getEntrainmentchecker_ramptypecount() {
+        return entrainmentchecker_ramptypecount;
+    }
+    public int getEntrainmentchecker_rampvariationcount() {
+        return entrainmentchecker_rampvariationcount;
+    }
 
-// Ambience Methods
+    // Ambience Methods
     public void ambience_populate() {
         if (ambiencechecker_soundfilelist.isEmpty()) {
             File ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
@@ -225,6 +250,11 @@ public class Meditatable {
     }
 }
     public void changevalue(int newvalue) {
+        Switch.setSelected(newvalue != 0);
+        Value.setDisable(newvalue == 0);
+
+
+
         if (newvalue == 0) {Switch.setSelected(false);}
         else {
             Switch.setSelected(true);
@@ -545,7 +575,7 @@ public class Meditatable {
             timeline_start_ramp.play();
         }
         if (fade_entrainment_stop != null) {
-            timeline_fadeout_timer = new Timeline(new KeyFrame(getduration().subtract(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000)), ae -> {
+            timeline_fadeout_timer = new Timeline(new KeyFrame(getduration().subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration())), ae -> {
                 volume_unbindentrainment();
                 fade_entrainment_stop.play();
                 if (fade_ambience_stop != null) {

@@ -39,7 +39,7 @@ public class Main extends Application {
             else {event.consume();}
         });
         primaryStage.show();
-//        test();
+        test();
     }
 
     public static void main(String[] args) {
@@ -53,10 +53,6 @@ public class Main extends Application {
             System.exit(0);
         }
     }
-    public void test() {
-        for (int x = 1; x > 0; x--) {
-            System.out.println("Looping " + x);
-        }
-    }
+    public void test() {}
 
 }
