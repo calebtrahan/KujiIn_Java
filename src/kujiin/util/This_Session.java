@@ -73,6 +73,8 @@ public class This_Session {
     public CreatorState creatorState = CreatorState.NOT_CREATED;
     public ExporterState exporterState;
     public ReferenceType referenceType;
+    private Double currententrainmentvolume;
+    private Double currentambiencevolume;
     private Integer exportserviceindex;
     private ArrayList<Service<Boolean>> exportservices;
     private Service<Boolean> currentexporterservice;
@@ -124,8 +126,20 @@ public class This_Session {
     public void setItemsinsession(List<Meditatable> itemsinsession) {
         this.itemsinsession = itemsinsession;
     }
+    public Double getCurrententrainmentvolume() {
+        return currententrainmentvolume;
+    }
+    public void setCurrententrainmentvolume(Double currententrainmentvolume) {
+        this.currententrainmentvolume = currententrainmentvolume;
+    }
+    public Double getCurrentambiencevolume() {
+        return currentambiencevolume;
+    }
+    public void setCurrentambiencevolume(Double currentambiencevolume) {
+        this.currentambiencevolume = currentambiencevolume;
+    }
 
-// Cut And Element Getters
+    // Cut And Element Getters
     public Qi_Gong getPresession() {
         return Presession;
     }
@@ -540,6 +554,8 @@ public class This_Session {
                 meditatablecount = 0;
                 currentmeditatable = itemsinsession.get(meditatablecount);
                 Root.getSessions().createnew();
+                currententrainmentvolume = Root.getOptions().getSessionOptions().getEntrainmentvolume();
+                currentambiencevolume = Root.getOptions().getSessionOptions().getAmbiencevolume();
                 currentmeditatable.start();
                 break;
             case PAUSED:
@@ -1225,7 +1241,7 @@ public class This_Session {
                         WebView browser = new WebView();
                         WebEngine webEngine = browser.getEngine();
                         webEngine.load(referencefile.toURI().toString());
-                        webEngine.setUserStyleSheetLocation(new File(kujiin.xml.Options.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
+                        webEngine.setUserStyleSheetLocation(Options.REFERENCE_THEMEFILE.toURI().toString());
                         ContentPane.setContent(browser);
                         break;
                     default:
