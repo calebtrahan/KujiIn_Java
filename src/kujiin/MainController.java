@@ -44,8 +44,12 @@ import java.util.stream.Collectors;
     // Maybe Use Random To Pull Next Random Ambience File Directly During Playback Instead Of Creating A List Beforehand
 // TODO Place Ramps In Entrainment Duration (Don't Add On Like In Existing Qi-Gong)
 
+// TODO Dialog Before Session Playback If Actual Ambience < Practiced Duration
+    // Ambience Is Not Long Enough Select How You Would Like Me To Play Ambience
+    // (Shuffle)    (Repeat, Back To Back In Order) {These Are Buttons}
+
 // Mind Workstation
-// TODO (MWS) ReCreate Ramps To 1 Minute Across The Board (To Save Disk Space)
+// TODO (MWS) ReCreate Ramps To 30 Seconds Across The Board (To Save Disk Space)
 // TODO (MWS) ReCreate Ramps For All Cuts Connecting All Cuts And Elements
 
 // Additional Features

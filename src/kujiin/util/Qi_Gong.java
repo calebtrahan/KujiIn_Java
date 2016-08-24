@@ -3,6 +3,8 @@ package kujiin.util;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
@@ -19,12 +21,50 @@ public class Qi_Gong extends Meditatable {
         } else {Value.setTooltip(null);}
     }
 
+// Getters For Playback
+    @Override
+    public String getNameForFiles() {return "qi";}
+
 // Entrainment
     @Override
     public void entrainment_populate() {
-//        ArrayList<String> rampvariations = thisession.getallCuts().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
-
-        super.entrainment_populate();
+        File expectedentrainmentfile;
+        SoundFile actualsoundfile;
+        if (entrainmentchecker_partcount == 0) {
+            actualsoundfile = entrainment.getFreq();
+            expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
+        } else {
+            try {
+                actualsoundfile = entrainment.ramp_get(entrainmentchecker_partcount);
+                expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + entrainmentchecker_partcutnames.get(entrainmentchecker_partcount - 1) + ".mp3");
+            } catch (IndexOutOfBoundsException ignored) {
+                entrainmentready = true;
+                thisession.Root.getEntrainments().setmeditatableEntrainment(number, entrainment);
+                return;
+            }
+        }
+        if (expectedentrainmentfile.exists()) {
+            if (actualsoundfile == null || ! actualsoundfile.isValid()) {
+                entrainmentchecker_calculateplayer = new MediaPlayer(new Media(expectedentrainmentfile.toURI().toString()));
+                entrainmentchecker_calculateplayer.setOnReady(() -> {
+                    SoundFile soundFile = new SoundFile(expectedentrainmentfile);
+                    soundFile.setDuration(entrainmentchecker_calculateplayer.getTotalDuration().toMillis());
+                    if (this.entrainmentchecker_partcount == 0) {entrainment.setFreq(soundFile);}
+                    else {entrainment.ramp_add(soundFile);}
+                    entrainmentchecker_calculateplayer.dispose();
+                    entrainmentchecker_partcount++;
+                    entrainment_populate();
+                });
+            } else {
+                entrainmentchecker_partcount++;
+                entrainment_populate();
+            }
+        } else {
+            entrainmentmissingfiles = true;
+            entrainmentchecker_missingfiles.add(expectedentrainmentfile);
+            entrainmentchecker_partcount++;
+            entrainment_populate();
+        }
     }
 
     // GUI
@@ -37,33 +77,14 @@ public class Qi_Gong extends Meditatable {
 // Creation
     @Override
     public boolean creation_buildEntrainment() {
-        Duration timeleft = getduration();
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {timeleft = timeleft.subtract(Duration.minutes(2));}
-        int fivetimes = new Double(timeleft.toMinutes() / 5).intValue();
-        int singletimes = new Double(timeleft.toMinutes() % 5).intValue();
-        for (int i = 0; i < fivetimes; i++) {entrainment.created_add(entrainment.getFreqlong());}
-        for (int i = 0; i < singletimes; i++) {entrainment.created_add(entrainment.getFreqshort());}
-        entrainment.shuffleCreated();
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            int index = allmeditatablestoplay.indexOf(this);
-            Meditatable meditatablebefore = null;
-            Meditatable meditatableafter = null;
-            if (index != 0) {meditatablebefore = allmeditatablestoplay.get(index - 1);}
-            if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
-            if (name.equals("Presession") && meditatableafter != null) {
-                String rampupfirstname = "qiin" + meditatableafter.name.toLowerCase() + ".mp3";
-                entrainment.setRampinfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampupfirstname)));
-                entrainment.created_add(entrainment.getRampinfile());
-                rampenabled = true;
-            } else if (name.equals("Postsession") && meditatablebefore != null) {
-                String rampdowntopost = "qiout" + meditatablebefore.name.toLowerCase() + ".mp3";
-                entrainment.setRampoutfile(new SoundFile(new File(Options.DIRECTORYRAMP, rampdowntopost)));
-                entrainment.created_add(0, entrainment.getRampoutfile());
-                rampenabled = true;
-            } else {rampenabled = false;}
-            if (entrainment.created_getAll().size() == 1) {return true;}
+        int index = allmeditatablestoplay.indexOf(this);
+        Meditatable meditatableafter = null;
+        if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && meditatableafter != null && ! meditatableafter.getNameForFiles().equals("qi")) {
+            entrainment.setRampfile(entrainment.ramp_get(meditatableafter.number - 1));
+            return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
         }
-        return entrainment.created_getAll().size() > 0 && entrainment.gettotalCreatedDuration().greaterThan(Duration.ZERO);
+        return super.creation_buildEntrainment();
     }
 
 // Playback

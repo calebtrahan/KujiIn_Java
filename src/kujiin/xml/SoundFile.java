@@ -44,7 +44,6 @@ public class SoundFile {
 
     // Utility Methods
     public boolean isValid() {
-        if (file == null) {return false;}
-        return Util.audio_isValid(file);
+        return file != null && duration != null && Util.audio_isValid(file);
     }
 }
