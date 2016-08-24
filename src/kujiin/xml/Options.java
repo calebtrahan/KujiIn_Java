@@ -53,7 +53,7 @@ public class Options {
 /// Default Option Values
     public static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
     public static final Boolean DEFAULT_HELP_DIALOGS_OPTION = true;
-    public static final Double FADE_VALUE_MAX_DURATION = 60.0;
+    public static final Double FADE_VALUE_MAX_DURATION = 30.0;
     public static final Double VOLUME_SLIDER_ADJUSTMENT_INCREMENT = 5.0;
     public static final Double DEFAULT_ENTRAINMENTVOLUME = 0.6;
     public static final Double DEFAULT_AMBIENCEVOLUME = 1.0;

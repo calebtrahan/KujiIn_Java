@@ -36,6 +36,18 @@ import java.util.stream.Collectors;
 // Bugs
 // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
 
+// Refactor
+// TODO Refactor Player
+    // Use Animations To Fire Off Ramp In And Ramp Out
+    // Repeat Entrainment File Indefinitely In Between Ramps (Use Animations To Terminate Entrainment And Start Ramp Or New Session)
+    // Use 5 Minute Entrainment Freq Files And Kill 1 Minute Entrainment Freq Files
+    // Maybe Use Random To Pull Next Random Ambience File Directly During Playback Instead Of Creating A List Beforehand
+// TODO Place Ramps In Entrainment Duration (Don't Add On Like In Existing Qi-Gong)
+
+// Mind Workstation
+// TODO (MWS) ReCreate Ramps To 1 Minute Across The Board (To Save Disk Space)
+// TODO (MWS) ReCreate Ramps For All Cuts Connecting All Cuts And Elements
+
 // Additional Features
 // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
 // TODO Design A 'Select Your Own Ambience' Wizard As An Alternative To Randomized Ambience During Session Creation
