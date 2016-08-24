@@ -104,6 +104,15 @@ public class Ambience {
     public void actual_remove(int index) {
         Ambience.remove(index);
     }
+    public void actual_testifallexisting() {
+        if (getAmbience() == null) {return;}
+        int exitstingcount = 0;
+        for (SoundFile i : getAmbience()) {
+            if (i.getFile().exists()) {exitstingcount++;}
+            else {System.out.println(String.format("%s Does Not Exist", i.getFile().getAbsolutePath()));}
+        }
+        System.out.println("Existing Ambience: " + exitstingcount);
+    }
 
     // Created Ambience
     public void created_initialize() {

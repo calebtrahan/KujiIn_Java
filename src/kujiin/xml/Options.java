@@ -60,7 +60,7 @@ public class Options {
     public static final Double DEFAULT_FADEINDURATION = 10.0;
     public static final Double DEFAULT_FADEOUTDURATION = 10.0;
     public static final Double DEFAULT_FADERESUMEANDPAUSEDURATION = 2.0;
-    public static final Boolean DEFAULT_ALERTFUNCTION_OPTION = true;
+    public static final Boolean DEFAULT_ALERTFUNCTION_OPTION = false;
     public static final String DEFAULT_ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
     public static final File DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "default.css");
     public static final File REFERENCE_THEMEFILE = new File(DIRECTORYSTYLES, "referencefile.css");
@@ -307,4 +307,5 @@ public class Options {
         }
 
     }
+
 }

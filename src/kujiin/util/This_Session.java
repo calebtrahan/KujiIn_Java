@@ -415,6 +415,7 @@ public class This_Session {
         } else {return invalidmeditatablecount == 0;}
     }
     public void creation_reset(boolean setvaluetozero) {
+        System.out.println("Resetting Session Creation");
         if (itemsinsession != null) {itemsinsession.clear();}
         for (Meditatable i : getAllMeditatables()) {i.creation_reset(setvaluetozero);}
     }
@@ -548,7 +549,7 @@ public class This_Session {
                 totalsessionduration = Duration.ZERO;
                 for (Meditatable i : itemsinsession) {totalsessionduration = totalsessionduration.add(i.getduration());}
                 playerUI.TotalTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
-                updateuitimeline = new Timeline(new KeyFrame(Duration.millis(1000), ae -> player_updateui()));
+                updateuitimeline = new Timeline(new KeyFrame(Duration.millis(100), ae -> player_updateui()));
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 updateuitimeline.play();
                 meditatablecount = 0;
@@ -579,8 +580,8 @@ public class This_Session {
     }
     public void player_updateui() {
         try {
-            totalsessiondurationelapsed = totalsessiondurationelapsed.add(Duration.seconds(1.0));
-            try {currentmeditatable.elapsedtime = currentmeditatable.elapsedtime.add(Duration.seconds(1.0));} catch (NullPointerException ignored) {}
+            totalsessiondurationelapsed = totalsessiondurationelapsed.add(Duration.millis(100));
+            try {currentmeditatable.elapsedtime = currentmeditatable.elapsedtime.add(Duration.millis(100));} catch (NullPointerException ignored) {}
             Float currentprogress;
             Float totalprogress;
             try {
@@ -673,8 +674,7 @@ public class This_Session {
         Root.getSessions().marshall();
         Root.goals_gui_updateui();
         currentmeditatable.stop();
-        if (currentmeditatable.name.equals("Postsession")) {playerState = PlayerState.TRANSITIONING; player_progresstonextmeditatable();}
-        else if (Root.getOptions().getSessionOptions().getAlertfunction()) {
+        if (Root.getOptions().getSessionOptions().getAlertfunction()) {
             Media alertmedia = new Media(Root.getOptions().getSessionOptions().getAlertfilelocation());
             MediaPlayer alertplayer = new MediaPlayer(alertmedia);
             alertplayer.play();
@@ -697,8 +697,8 @@ public class This_Session {
                 }
             });
         } else {
-                playerState = PlayerState.TRANSITIONING;
-                player_progresstonextmeditatable();
+            playerState = PlayerState.TRANSITIONING;
+            player_progresstonextmeditatable();
         }
     }
     public void player_error() {

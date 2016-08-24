@@ -14,7 +14,7 @@
         <tooltips>true</tooltips>
     </programOptions>
     <sessionOptions>
-        <alertfunction>true</alertfunction>
+        <alertfunction>false</alertfunction>
         <ambiencevolume>1.0</ambiencevolume>
         <entrainmentvolume>0.6</entrainmentvolume>
         <fadeinduration>15.0</fadeinduration>

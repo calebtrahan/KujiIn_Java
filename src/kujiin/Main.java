@@ -35,7 +35,7 @@ public class Main extends Application {
             Root.goals_initialize();
         });
         primaryStage.setOnCloseRequest(event -> {
-            if (Root.dialog_YesNoConfirmation("Confirmation", "Really Exit?", "")) {System.exit(0);}
+            if (Root.dialog_YesNoConfirmation("Confirmation", "Really Exit?", "")) {Root.close(null);}
             else {event.consume();}
         });
         primaryStage.show();

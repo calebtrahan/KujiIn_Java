@@ -130,6 +130,7 @@ public class MainController implements Initializable {
         getOptions().unmarshall();
     }
     public boolean cleanup() {
+        System.out.println("Cleaning Up Program");
         Ambiences.marshall();
         Entrainments.marshall();
         Options.marshall();
@@ -310,21 +311,20 @@ public class MainController implements Initializable {
         boolean notallzero = false;
         try {for (Integer i : getSession().gui_getallsessionvalues()) {if (i > 0) {notallzero = true;}}} catch (NullPointerException ignored) {}
         if (notallzero) {
-            Integer totalsessiontime = 0;
-            for (Integer i : getSession().gui_getallsessionvalues()) {totalsessiontime += i;}
-            int rampduration = getOptions().getSessionOptions().getRampduration();
-            totalsessiontime += rampduration * 2;
-            if (rampduration > 0 && getOptions().getProgramOptions().getTooltips()) {TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + rampduration + "Mins. On Both Presession And Postsession"));}
+            Duration totalsessiontime = Duration.ZERO;
+            for (Meditatable i : getSession().getAllMeditatables()) {totalsessiontime = totalsessiontime.add(i.getduration());}
+            if (getOptions().getSessionOptions().getRampenabled() && getOptions().getProgramOptions().getTooltips()) {
+                TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + getOptions().getSessionOptions().getRampduration() + "Mins. On Both Presession And Postsession"));}
             else {TotalSessionTime.setTooltip(null);}
-            TotalSessionTime.setText(Util.formatdurationtoStringSpelledOut(new Duration((totalsessiontime * 60) * 1000), TotalSessionTime.getLayoutBounds().getWidth()));
+            TotalSessionTime.setText(Util.formatdurationtoStringSpelledOut(totalsessiontime, TotalSessionTime.getLayoutBounds().getWidth()));
             if (getOptions().getProgramOptions().getTooltips()) {ApproximateEndTime.setTooltip(new Tooltip("Time You Finish Will Vary Depending On When You Start Playback"));}
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.MINUTE, totalsessiontime);
+            cal.add(Calendar.MILLISECOND, new Double(totalsessiontime.toMillis()).intValue());
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
             ApproximateEndTime.setText(sdf.format(cal.getTime()));
         } else {
-            TotalSessionTime.setText("");
-            ApproximateEndTime.setText("");
+            TotalSessionTime.setText("-");
+            ApproximateEndTime.setText("-");
         }
     }
     public void creation_gui_toggleambience(ActionEvent actionEvent) {
@@ -384,6 +384,7 @@ public class MainController implements Initializable {
     public void creation_util_createsession() {
         for (Meditatable i : Session.getAllMeditatables()) {
             if (! i.ambience_isReady() || ! i.entrainment_isReady()) {
+                System.out.println(i.name + " Isn't Ready");
                 dialog_Information("Information", "Cannot Play Session Yet, Still Performing Background Checks For Entrainment/Ambience", "Please Try Again In A Few Moments");
                 return;
             }

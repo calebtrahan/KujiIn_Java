@@ -71,7 +71,7 @@ public class Qi_Gong extends Meditatable {
     public Duration getduration() {
         Duration dur = super.getduration();
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            dur = dur.add(new Duration(thisession.Root.getOptions().getSessionOptions().getRampduration() * 1000));
+            dur = dur.add(Duration.minutes(thisession.Root.getOptions().getSessionOptions().getRampduration()));
         }
         return dur;
     }
