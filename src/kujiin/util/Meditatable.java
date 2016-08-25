@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class Meditatable {
 // GUI Fields
@@ -31,10 +32,8 @@ public class Meditatable {
     protected Ambience ambience;
     protected Entrainment entrainment;
 // Playback Fields
-    protected boolean ambienceenabled;
     protected int entrainmentplaycount;
     protected int ambienceplaycount;
-    protected boolean rampenabled;
     protected MediaPlayer entrainmentplayer;
     protected MediaPlayer ambienceplayer;
     protected Animation fade_entrainment_play;
@@ -50,6 +49,7 @@ public class Meditatable {
     protected Animation timeline_start_ramp;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
+    private ArrayList<SoundFile> ambienceplayhistory;
     public Duration elapsedtime;
     protected List<Meditatable> allmeditatablestoplay;
     protected List<kujiin.xml.Goals.Goal> goalscompletedthissession;
@@ -223,92 +223,18 @@ public class Meditatable {
     public Duration getelapsedtime() {return elapsedtime;}
 
 // Creation
-    public boolean creation_build(List<Meditatable> allmeditatables, boolean ambienceenabled) {
-        this.ambienceenabled = ambienceenabled;
+    public boolean creation_build(List<Meditatable> allmeditatables) {
         allmeditatablestoplay = allmeditatables;
-        if (ambienceenabled) {return creation_buildEntrainment() && creation_buildAmbience();}
+        if (thisession.Root.AmbienceSwitch.isSelected()) {return creation_buildEntrainment() && creation_buildAmbience();}
         else {return creation_buildEntrainment();}
     }
     protected boolean creation_buildEntrainment() {
         return entrainment.getFreq().isValid();
     }
     protected boolean creation_buildAmbience() {
-        ambience.created_clear();
-        Duration currentambienceduration = Duration.ZERO;
-        if (ambience.hasEnoughAmbience(getduration())) {
-            for (SoundFile i : ambience.getAmbience()) {
-                if (ambience.gettotalCreatedDuration().lessThan(getduration())) {
-                    ambience.created_add(i);
-                    currentambienceduration = currentambienceduration.add(new Duration(i.getDuration()));
-                } else {break;}
-            }
-        } else {
-            // TODO Creates Some Duplicate Files
-            SoundFile selectedsoundfile;
-            int ambiencecount = 0;
-            int sizetotest;
-            boolean includefile;
-            ambience.created_initialize();
-            while (currentambienceduration.lessThan(getduration())) {
-                try {selectedsoundfile = ambience.getAmbience().get(ambiencecount);}
-                catch (IndexOutOfBoundsException ignored) {ambiencecount = 0; selectedsoundfile = ambience.getAmbience().get(ambiencecount);}
-                ambience.created_add(selectedsoundfile);
-                currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-                ambiencecount++;
-                    currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-                if (ambience.getAmbience().size() == 1) {ambience.created_add(ambience.getAmbience().get(0)); currentambienceduration = currentambienceduration.add(new Duration(ambience.getAmbience().get(0).getDuration()));}
-                try {selectedsoundfile = ambience.getAmbience().get(ambiencecount);}
-                catch (IndexOutOfBoundsException ignored) {ambiencecount = 0; selectedsoundfile = ambience.getAmbience().get(ambiencecount);}
-                includefile = true;
-                if (ambience.getCreatedAmbience().size() >= ambience.getAmbience().size()) {sizetotest = (ambience.getAmbience().size() - 1) - ambience.getCreatedAmbience().size() % ambience.getAmbience().size();}
-                else {sizetotest = ambience.getCreatedAmbience().size() - 1;}
-                for (int i = sizetotest; i > 0; i--) {if (ambience.getCreatedAmbience().get(i).equals(selectedsoundfile)) {includefile = false; break;}}
-//                if (includefile && ambience.getCreatedAmbience().size() > 0 && ambience.getCreatedAmbience().get(ambience.getCreatedAmbience().size() - 1).equals(selectedsoundfile)) {includefile = false;}
-                if (includefile) {
-                    ambience.created_add(selectedsoundfile);
-                    currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-                }
-                ambiencecount++;
-            }
-        }
-//            else {
-//                Random randint = new Random();
-//                while (currentambienceduration.lessThan(getduration())) {
-//                    List<SoundFile> createdambience = ambience.getCreatedAmbience();
-//                    SoundFile selectedsoundfile = ambience.actual_get(randint.nextInt(ambience.getAmbience().size() - 1));
-//                    if (createdambience.size() < 2) {
-//                        ambience.created_add(selectedsoundfile);
-//                        currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-//                    } else if (createdambience.size() == 2) {
-//                        if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1))) {
-//                            ambience.created_add(selectedsoundfile);
-//                            currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-//                        }
-//                    } else if (createdambience.size() == 3) {
-//                        if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2))) {
-//                            ambience.created_add(selectedsoundfile);
-//                            currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-//                        }
-//                    } else if (createdambience.size() <= 5) {
-//                        if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3))) {
-//                            ambience.created_add(selectedsoundfile);
-//                            currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-//                        }
-//                    } else if (createdambience.size() > 5) {
-//                        if (!selectedsoundfile.equals(createdambience.get(createdambience.size() - 1)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 2)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 3)) && !selectedsoundfile.equals(createdambience.get(createdambience.size() - 4))) {
-//                            ambience.created_add(selectedsoundfile);
-//                            currentambienceduration = currentambienceduration.add(new Duration(selectedsoundfile.getDuration()));
-//                        }
-//                    }
-//                }
-//            }
-//        int count = 1;
-//        for (SoundFile x : ambience.getCreatedAmbience()) {System.out.println("Ambience " + count + ": " + x.getName()); count++;}
-//        System.out.println("Total Ambience Duration: " + currentambienceduration.toMinutes() + " Minutes");
-        return ambience.getCreatedAmbience().size() > 0 && currentambienceduration.greaterThanOrEqualTo(getduration());
+        return ambience.hasAnyAmbience();
     }
     public void creation_reset(boolean setvaluetozero) {
-        ambience.created_clear();
         if (setvaluetozero) {
             Switch.setSelected(false);
             gui_toggleswitch();
@@ -330,20 +256,21 @@ public class Meditatable {
         timeline_progresstonextmeditatable = new Timeline(new KeyFrame(getduration(), ae -> thisession.player_progresstonextmeditatable()));
         timeline_progresstonextmeditatable.play();
         currententrainmentvolume = thisession.getCurrententrainmentvolume();
-        rampenabled = false;
-        if (rampenabled) {
-            timeline_start_ramp = new Timeline(new KeyFrame(getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
-                System.out.println("Ramp TimeLine Started At " + getelapsedtime().toSeconds() + " Seconds");
-                volume_unbindentrainment();
-                entrainmentplayer.stop();
-                entrainmentplayer.dispose();
-                entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampfile().getFile().toURI().toString()));
-                entrainmentplayer.setOnError(this::entrainmenterror);
-                entrainmentplayer.setVolume(currententrainmentvolume);
-                entrainmentplayer.play();
-                entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
-            }));
-            timeline_start_ramp.playFromStart();
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+            Duration durationtotest = getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration()));
+            System.out.println(String.format("Duration %s Subtracted By %s Equals %s", getduration(), Duration.millis(entrainment.getRampfile().getDuration()), durationtotest));
+//            timeline_start_ramp = new Timeline(new KeyFrame(durationtotest)), ae -> {
+//                System.out.println("Ramp TimeLine Started At " + getelapsedtime().toSeconds() + " Seconds");
+//                volume_unbindentrainment();
+//                entrainmentplayer.stop();
+//                entrainmentplayer.dispose();
+//                entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampfile().getFile().toURI().toString()));
+//                entrainmentplayer.setOnError(this::entrainmenterror);
+//                entrainmentplayer.setVolume(currententrainmentvolume);
+//                entrainmentplayer.play();
+//                entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
+//            }));
+//            timeline_start_ramp.playFromStart();
         }
         if (fade_entrainment_stop != null) {
             timeline_fadeout_timer = new Timeline(new KeyFrame(getduration().subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration())), ae -> {
@@ -365,11 +292,23 @@ public class Meditatable {
             entrainmentplayer.setVolume(currententrainmentvolume);
             thisession.playerState = This_Session.PlayerState.PLAYING;
             volume_bindentrainment();}
-        if (ambienceenabled) {
+        if (thisession.Root.AmbienceSwitch.isSelected() && thisession.ambiencePlaybackType != null) {
+            ambienceplayhistory = new ArrayList<>();
             currentambiencevolume = thisession.getCurrentambiencevolume();
             volume_unbindambience();
-            File file = ambience.created_get(ambienceplaycount).getFile();
-            ambienceplayer = new MediaPlayer(new Media(file.toURI().toString()));
+            File ambiencefile = null;
+            switch (thisession.ambiencePlaybackType) {
+                case REPEAT:
+                    ambiencefile = ambience.actual_get(0).getFile();
+                    break;
+                case SHUFFLE:
+                    Random random = new Random();
+                    SoundFile selectedsoundfile = ambience.actual_get(random.nextInt(ambience.getAmbience().size() - 1));
+                    ambiencefile = selectedsoundfile.getFile();
+                    ambienceplayhistory.add(selectedsoundfile);
+                    break;
+            }
+            ambienceplayer = new MediaPlayer(new Media(ambiencefile.toURI().toString()));
             ambienceplayer.setVolume(0.0);
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
@@ -399,10 +338,10 @@ public class Meditatable {
             volume_bindentrainment();
             thisession.playerState = This_Session.PlayerState.PLAYING;
             timeline_progresstonextmeditatable.play();
-            if (rampenabled && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
+            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();}
         }
-        if (ambienceenabled) {
+        if (thisession.Root.AmbienceSwitch.isSelected()) {
             volume_unbindambience();
             ambienceplayer.play();
             if (fade_ambience_resume != null) {
@@ -423,7 +362,7 @@ public class Meditatable {
             // Open Loading Dialog
             thisession.playerState = This_Session.PlayerState.FADING_PAUSE;
             fade_entrainment_pause.play();
-            if (ambienceenabled) {
+            if (thisession.Root.AmbienceSwitch.isSelected()) {
                 volume_unbindambience();
                 fade_ambience_pause.play();
             }
@@ -432,9 +371,9 @@ public class Meditatable {
             thisession.playerState = This_Session.PlayerState.PAUSED;
             entrainmentplayer.pause();
             timeline_progresstonextmeditatable.pause();
-            if (rampenabled && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.pause();}
+            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.pause();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
-            if (ambienceenabled) {
+            if (thisession.Root.AmbienceSwitch.isSelected()) {
                 volume_unbindambience();
                 ambienceplayer.pause();
             }
@@ -448,7 +387,7 @@ public class Meditatable {
             if (fade_ambience_stop.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.playerState = This_Session.PlayerState.FADING_STOP;
             fade_entrainment_stop.play();
-            if (ambienceenabled) {
+            if (thisession.Root.AmbienceSwitch.isSelected()) {
                 volume_unbindambience();
                 fade_ambience_stop.play();
             }
@@ -458,7 +397,7 @@ public class Meditatable {
             entrainmentplayer.dispose();
             timeline_progresstonextmeditatable.stop();
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
-            if (ambienceenabled) {
+            if (thisession.Root.AmbienceSwitch.isSelected()) {
                 volume_unbindambience();
                 ambienceplayer.stop();
                 ambienceplayer.dispose();
@@ -486,7 +425,7 @@ public class Meditatable {
                 }
             };
             fade_entrainment_play.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; toggleplayerbuttons(); volume_bindentrainment();});
-            if (ambienceenabled) {
+            if (thisession.Root.AmbienceSwitch.isSelected()) {
                 fade_ambience_play = new Transition() {
                     {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeinduration()));}
 
@@ -523,9 +462,9 @@ public class Meditatable {
                 }
             }
         };
-        fade_entrainment_resume.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; timeline_progresstonextmeditatable.play(); if (rampenabled && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
+        fade_entrainment_resume.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; timeline_progresstonextmeditatable.play(); if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();} toggleplayerbuttons(); volume_bindentrainment();});
-        if (ambienceenabled) {
+        if (thisession.Root.AmbienceSwitch.isSelected()) {
             fade_ambience_resume = new Transition() {
                 {setCycleDuration(new Duration(Options.DEFAULT_FADERESUMEANDPAUSEDURATION * 1000));}
 
@@ -562,9 +501,9 @@ public class Meditatable {
             }
         };
         fade_entrainment_pause.setOnFinished(event -> {entrainmentplayer.pause(); timeline_progresstonextmeditatable.pause();
-            if (rampenabled && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.pause();}
+            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.pause();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();} thisession.playerState = This_Session.PlayerState.PAUSED; toggleplayerbuttons();});
-        if (ambienceenabled) {
+        if (thisession.Root.AmbienceSwitch.isSelected()) {
             fade_ambience_pause = new Transition() {
                 {setCycleDuration(new Duration(Options.DEFAULT_FADERESUMEANDPAUSEDURATION * 1000));}
 
@@ -602,9 +541,9 @@ public class Meditatable {
                 }
             };
             fade_entrainment_stop.setOnFinished(event -> {entrainmentplayer.stop(); entrainmentplayer.dispose();
-                if (rampenabled && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.stop();}
+                if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.stop();}
                 timeline_progresstonextmeditatable.stop(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();} thisession.playerState = This_Session.PlayerState.STOPPED; toggleplayerbuttons();});
-            if (ambienceenabled) {
+            if (thisession.Root.AmbienceSwitch.isSelected()) {
                 fade_ambience_stop = new Transition() {
                     {setCycleDuration(new Duration(thisession.Root.getOptions().getSessionOptions().getFadeoutduration() * 1000));}
 
@@ -645,8 +584,37 @@ public class Meditatable {
         try {
             volume_unbindambience();
             ambienceplaycount++;
+            File ambiencefile = null;
+            File previousambiencefile = new File(ambienceplayer.getMedia().getSource());
+            switch (thisession.ambiencePlaybackType) {
+                case REPEAT:
+                    int currentambienceindex = ambience.getAmbienceFiles().indexOf(previousambiencefile);
+                    if (currentambienceindex < ambience.getAmbience().size()) {ambiencefile = ambience.actual_get(currentambienceindex + 1).getFile();}
+                    else {ambiencefile = ambience.actual_get(0).getFile();}
+                    break;
+                case SHUFFLE:
+                    Random random = new Random();
+                    int sizetotest;
+                    File filetotest;
+                    if (ambienceplayhistory.size() >= ambience.getAmbience().size()) {sizetotest = (ambience.getAmbience().size() - 1) - ambienceplayhistory.size() % ambience.getAmbience().size();}
+                    else {sizetotest = ambienceplayhistory.size() - 1;}
+                    if (ambience.getAmbience().size() == 1) {ambiencefile = ambience.actual_get(0).getFile(); break;}
+                    else {
+                        while (true) {
+                            filetotest = ambience.actual_get(random.nextInt(ambience.getAmbience().size() - 1)).getFile();
+                            // TODO Optimize Shuffle Algorithm For Ambience Here
+                            boolean includefile = false;
+                            for (int i = sizetotest; i > 0; i--) {
+                                if (! ambience.actual_get(i).getFile().equals(filetotest)) {includefile = true; break;}
+                            }
+                            if (includefile) {ambiencefile = filetotest; break;}
+                        }
+                    }
+                    break;
+            }
             ambienceplayer.dispose();
-            ambienceplayer = new MediaPlayer(new Media(ambience.created_get(ambienceplaycount).getFile().toURI().toString()));
+            System.out.println("Next Ambience File Is " + ambiencefile.getAbsolutePath());
+            ambienceplayer = new MediaPlayer(new Media(ambiencefile.toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.setVolume(currentambiencevolume);
@@ -657,7 +625,7 @@ public class Meditatable {
     public void cleanupPlayersandAnimations() {
         try {
             if (entrainmentplayer != null) {entrainmentplayer.dispose();}
-            if (ambienceplayer != null && ambienceenabled) {ambienceplayer.dispose();}
+            if (ambienceplayer != null) {ambienceplayer.dispose();}
             if (fade_entrainment_play != null) {fade_entrainment_play.stop();}
             if (fade_entrainment_pause != null) {fade_entrainment_pause.stop();}
             if (fade_entrainment_resume != null) {fade_entrainment_resume.stop();}
@@ -776,10 +744,10 @@ public class Meditatable {
     public void toggleplayervolumecontrols() {
         boolean enabled = thisession.playerState == This_Session.PlayerState.PLAYING;
         thisession.playerUI.EntrainmentVolume.setDisable(! enabled);
-        if (ambienceenabled) {thisession.playerUI.AmbienceVolume.setDisable(! enabled);}
+        if (thisession.Root.AmbienceSwitch.isSelected()) {thisession.playerUI.AmbienceVolume.setDisable(! enabled);}
         if (thisession.player_isreferencecurrentlyDisplayed()) {
             thisession.displayReference.EntrainmentVolumeSlider.setDisable(! enabled);
-            if (ambienceenabled) {thisession.displayReference.AmbienceVolumeSlider.setDisable(! enabled);}
+            if (thisession.Root.AmbienceSwitch.isSelected()) {thisession.displayReference.AmbienceVolumeSlider.setDisable(! enabled);}
         }
     }
     public void volume_bindentrainment() {

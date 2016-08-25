@@ -73,11 +73,13 @@ public class This_Session {
     public CreatorState creatorState = CreatorState.NOT_CREATED;
     public ExporterState exporterState;
     public ReferenceType referenceType;
+    public AmbiencePlaybackType ambiencePlaybackType;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     private Integer exportserviceindex;
     private ArrayList<Service<Boolean>> exportservices;
     private Service<Boolean> currentexporterservice;
+    public boolean ambienceenabled;
 
     public This_Session(MainController mainController) {
         Root = mainController;
@@ -208,7 +210,7 @@ public class This_Session {
                     creatorState = CreatorState.NOT_CREATED;
             }
             for (Meditatable i : getallitemsinSession()) {
-                if (! i.creation_build(getallitemsinSession(), Root.AmbienceSwitch.isSelected())) {
+                if (! i.creation_build(getallitemsinSession())) {
                     itemsinsession.clear();
                     creatorState = CreatorState.NOT_CREATED;
                     return;
@@ -385,20 +387,22 @@ public class This_Session {
             } else {
                 if (meditatableswithreducedambience.size() > 0) {
                     StringBuilder a = new StringBuilder();
-                    int count = 1;
+                    int count = 0;
                     for (int i = 0; i < meditatableswithreducedambience.size(); i++) {
                         a.append("\n");
                         Meditatable thismeditatable = meditatableswithreducedambience.get(i);
                         String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(thismeditatable.getAmbience().gettotalActualDuration(), null);
                         String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(thismeditatable.getduration(), null);
-                        a.append(count).append(". ").append(thismeditatable.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
+                        a.append(count + 1).append(". ").append(thismeditatable.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                         count++;
                     }
-                    if (meditatableswithreducedambience.size() == 1) {
-                        ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Meditatable's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Meditatables?"));
-                    } else {
-                        ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Meditatables?"));
-                    }
+                    new SelectAmbiencePlaybackType(count).showAndWait();
+                    if (ambiencePlaybackType == null) {ambiencecheckbox.setSelected(false);}
+//                    if (meditatableswithreducedambience.size() == 1) {
+//                        ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Meditatable's Ambience Isn't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For This Meditatables?"));
+//                    } else {
+//                        ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Meditatables?"));
+//                    }
                 } else {
                     ambiencecheckbox.setSelected(true);
                 }
@@ -714,7 +718,7 @@ public class This_Session {
     public void player_togglevolumebinding() {
         if (playerState == PlayerState.IDLE || playerState == PlayerState.STOPPED) {
             currentmeditatable.volume_rebindentrainment();
-            if (currentmeditatable.ambienceenabled) {
+            if (Root.AmbienceSwitch.isSelected()) {
                 currentmeditatable.volume_rebindambience();}
         }
     }
@@ -727,7 +731,7 @@ public class This_Session {
             displayReference.show();
             displayReference.setOnHidden(event -> {
                 currentmeditatable.volume_rebindentrainment();
-                if (currentmeditatable.ambienceenabled) {
+                if (Root.AmbienceSwitch.isSelected()) {
                     currentmeditatable.volume_rebindambience();
                 }
             });
@@ -1327,6 +1331,40 @@ public class This_Session {
 
 
     }
+    public class SelectAmbiencePlaybackType extends Stage {
+        public Label TopLabel;
+        public Button RepeatButton;
+        public Button ShuffleButton;
+
+        public SelectAmbiencePlaybackType(int meditatableswithoutsufficientambience) {
+            ambiencePlaybackType = null;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AmbiencePlaybackType.fxml"));
+            fxmlLoader.setController(this);
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                options.setStyle(this);
+                setResizable(false);
+                TopLabel.setText("Ambience Is Not Long Enough For " + meditatableswithoutsufficientambience +  " Meditatables");
+                setOnCloseRequest(event -> {
+                    if (ambiencePlaybackType == null) {
+                        if (! Root.dialog_YesNoConfirmation("Disable Ambience", "No Ambience Playback Type Selected", "Disable Ambience?")) {event.consume();}
+                    }
+                });
+            } catch (IOException ignored) {}
+            setTitle("Select Ambience Playback Type");
+        }
+
+        public void repeatbuttonpressed(ActionEvent actionEvent) {
+            ambiencePlaybackType = AmbiencePlaybackType.REPEAT;
+            close();
+        }
+        public void shufflebuttonpressed(ActionEvent actionEvent) {
+            ambiencePlaybackType = AmbiencePlaybackType.SHUFFLE;
+            close();
+        }
+
+    }
     public enum ExporterState {
         NOT_EXPORTED, WORKING, COMPLETED, FAILED, CANCELLED
     }
@@ -1338,6 +1376,9 @@ public class This_Session {
     }
     public enum PlayerState {
         PLAYING, PAUSED, STOPPED, TRANSITIONING, IDLE, FADING_PLAY, FADING_RESUME, FADING_PAUSE, FADING_STOP
+    }
+    public enum AmbiencePlaybackType {
+        REPEAT, SHUFFLE
     }
 
 }

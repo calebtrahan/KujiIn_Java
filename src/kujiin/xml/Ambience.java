@@ -7,7 +7,6 @@ import kujiin.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +15,6 @@ import java.util.stream.Collectors;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Ambience {
     private List<SoundFile> Ambience;
-    @XmlTransient
-    private List<SoundFile> CreatedAmbience;
 
     public Ambience() {
     }
@@ -33,9 +30,6 @@ public class Ambience {
             files.addAll(getAmbience().stream().map(SoundFile::getFile).collect(Collectors.toList()));
             return files;
         } catch (NullPointerException ignored) {return new ArrayList<>();}
-    }
-    public List<SoundFile> getCreatedAmbience() {
-        return CreatedAmbience;
     }
 
     // Ambience Editing Methods
@@ -113,41 +107,14 @@ public class Ambience {
         }
         System.out.println("Existing Ambience: " + exitstingcount);
     }
-
-    // Created Ambience
-    public void created_initialize() {
-        if (CreatedAmbience == null) CreatedAmbience = new ArrayList<>();
-    }
-    public void created_add(SoundFile soundFile) {
-        created_initialize();
-        CreatedAmbience.add(soundFile);
-    }
-    public SoundFile created_get(int index) {
-        if (CreatedAmbience == null) {
-            System.out.println("Created Ambience Is Null");
+    public Duration gettotalActualDuration() {
+        Duration duration = new Duration(0);
+        if (Ambience != null) {
+            for (SoundFile i : Ambience) {
+                duration = duration.add(new Duration(i.getDuration()));
+            }
         }
-        return CreatedAmbience.get(index);
-    }
-    public SoundFile created_get(String name) {
-        for (SoundFile i : CreatedAmbience) {
-            if (i.getName().equals(name)) return i;
-        }
-        return null;
-    }
-    public SoundFile created_get(File file) {
-        for (SoundFile i : CreatedAmbience) {
-            if (i.getFile().equals(file)) return i;
-        }
-        return null;
-    }
-    public void created_remove(SoundFile soundFile) {
-        CreatedAmbience.remove(soundFile);
-    }
-    public void created_remove(int index) {
-        CreatedAmbience.remove(index);
-    }
-    public void created_clear() {
-        if (CreatedAmbience != null) CreatedAmbience.clear();
+        return duration;
     }
 
     // Validation Methods
@@ -172,30 +139,5 @@ public class Ambience {
             return false;
         }
     }
-    public boolean ambienceexistsinCreated(SoundFile soundFile) {
-        return CreatedAmbience.contains(soundFile);
-    }
-
-    // Information Methods
-    public Duration gettotalActualDuration() {
-        Duration duration = new Duration(0);
-        if (Ambience != null) {
-            for (SoundFile i : Ambience) {
-                duration = duration.add(new Duration(i.getDuration()));
-            }
-        }
-        return duration;
-    }
-    public Duration gettotalCreatedDuration() {
-        Duration duration = new Duration(0);
-        if (CreatedAmbience != null) {
-            for (SoundFile i : CreatedAmbience) {
-                duration = duration.add(new Duration(i.getDuration()));
-            }
-        }
-        return duration;
-    }
-
-    // Playback Methods
 
 }

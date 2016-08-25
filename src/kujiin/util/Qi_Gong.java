@@ -5,7 +5,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
@@ -88,17 +87,6 @@ public class Qi_Gong extends Meditatable {
     }
 
 // Playback
-    @Override
-    public Duration getduration() {
-        Duration dur = super.getduration();
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            dur = dur.add(Duration.minutes(thisession.Root.getOptions().getSessionOptions().getRampduration()));
-        }
-        return dur;
-    }
-    public Duration getdurationwithoutramp() {
-        return super.getduration();
-    }
     public void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists

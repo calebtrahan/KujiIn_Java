@@ -255,8 +255,7 @@ public class MainController implements Initializable {
         boolean validsession = false;
         for (Meditatable i : getSession().getAllMeditatables()) {
             creatorvaluesinminutes.add(i.getduration().toMinutes());
-            if (i instanceof Qi_Gong) {if (((Qi_Gong) i).getdurationwithoutramp().greaterThan(Duration.ZERO)) {validsession = true;}}
-            else {if (i.getduration().greaterThan(Duration.ZERO)) {validsession = true;}}
+            if (i.getduration().greaterThan(Duration.ZERO)) {validsession = true;}
         }
         if (validsession) {
             Preset.settimes(creatorvaluesinminutes);
@@ -412,12 +411,11 @@ public class MainController implements Initializable {
             return;
         }
         if (creation_util_isLongSession() && ! getOptions().getSessionOptions().getAlertfunction()) {
-            if (dialog_YesNoConfirmation("Add Alert File", "I've Detected A Long Session. Long Sessions Can Make It Difficult To Hear " +
-                    "The Subtle Transitions In Between Session Parts", "Add Alert File In Between Session Parts?")) {
+            if (dialog_YesNoConfirmation("Add Alert File", "I've Detected A Long Session", "Add Alert File In Between Session Parts?")) {
                 new ChangeAlertFile().showAndWait();
             }
         } else if (getOptions().getSessionOptions().getAlertfunction()) {
-            if (dialog_YesNoConfirmation("Disable Alert File", "I've Detected A Relatively Short Session, And An Alert File Might Not Be Necessary",
+            if (dialog_YesNoConfirmation("Disable Alert File", "I've Detected A Relatively Short Session",
                     "Turn Off Alert File Between Session Parts?")) {getOptions().getSessionOptions().setAlertfunction(false);}
         }
         Session.creation_createsession();

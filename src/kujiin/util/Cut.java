@@ -76,7 +76,6 @@ public class Cut extends Meditatable {
     @Override
     public boolean creation_buildEntrainment() {
         if (duration.equals(Duration.ZERO)) {return false;}
-        rampenabled = true;
         int index = allmeditatablestoplay.indexOf(this);
         Meditatable meditatableafter = null;
         if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}

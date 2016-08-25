@@ -26,7 +26,6 @@ public class Element extends Meditatable {
 // Entrainment
     @Override
     public void entrainment_populate() {
-//        System.out.println("Looping Through " + name + " " + entrainmentchecker_partcount);
         File expectedentrainmentfile;
         SoundFile actualsoundfile;
         if (entrainmentchecker_partcount == 0) {
