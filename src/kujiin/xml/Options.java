@@ -65,7 +65,8 @@ public class Options {
     public static final File DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "default.css");
     public static final File REFERENCE_THEMEFILE = new File(DIRECTORYSTYLES, "referencefile.css");
     public static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
-    public static final Integer DEFAULT_RAMP_DURATION = 2;
+    public static final Boolean DEFAULT_PRE_RAMP_ENABLED_OPTION = false;
+    public static final Boolean DEFAULT_POST_RAMP_ENABLED_OPTION = false;
     public static final This_Session.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = This_Session.ReferenceType.html;
     public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
     public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
@@ -124,7 +125,6 @@ public class Options {
     }
     public void marshall() {
         try {
-            getSessionOptions().setRampenabled(getSessionOptions().getRampduration() > 0);
             JAXBContext context = JAXBContext.newInstance(Options.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -146,7 +146,8 @@ public class Options {
         sessionOptions.setFadeinduration(DEFAULT_FADEINDURATION);
         sessionOptions.setEntrainmentvolume(DEFAULT_ENTRAINMENTVOLUME);
         sessionOptions.setRampenabled(DEFAULT_RAMP_ENABLED_OPTION);
-        sessionOptions.setRampduration(DEFAULT_RAMP_DURATION);
+        sessionOptions.setPrerampenabled(DEFAULT_PRE_RAMP_ENABLED_OPTION);
+        sessionOptions.setPostrampenabled(DEFAULT_POST_RAMP_ENABLED_OPTION);
         sessionOptions.setReferenceoption(DEFAULT_REFERENCE_DISPLAY);
         sessionOptions.setReferencetype(DEFAULT_REFERENCE_TYPE_OPTION);
         sessionOptions.setReferencefullscreen(DEFAULT_REFERENCE_FULLSCREEN_OPTION);
@@ -203,8 +204,9 @@ public class Options {
         private Double fadeoutduration;
         private String alertfilelocation;
         private Boolean rampenabled;
+        private Boolean prerampenabled;
+        private Boolean postrampenabled;
         private Boolean alertfunction;
-        private Integer rampduration;
         private Boolean referenceoption;
         private This_Session.ReferenceType referencetype;
         private Boolean referencefullscreen;
@@ -248,11 +250,17 @@ public class Options {
         public void setRampenabled(Boolean rampenabled) {
             this.rampenabled = rampenabled;
         }
-        public Integer getRampduration() {
-            return rampduration;
+        public Boolean getPrerampenabled() {
+            return prerampenabled;
         }
-        public void setRampduration(Integer rampduration) {
-            this.rampduration = rampduration;
+        public void setPrerampenabled(Boolean prerampenabled) {
+            this.prerampenabled = prerampenabled;
+        }
+        public Boolean getPostrampenabled() {
+            return postrampenabled;
+        }
+        public void setPostrampenabled(Boolean postrampenabled) {
+            this.postrampenabled = postrampenabled;
         }
         public Boolean getAlertfunction() {
             return alertfunction;

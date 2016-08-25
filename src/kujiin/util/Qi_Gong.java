@@ -12,8 +12,8 @@ import java.io.File;
 
 public class Qi_Gong extends Meditatable {
 
-    public Qi_Gong (int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
-        super(number, name, duration, briefsummary, thissession, aSwitch, value);
+    public Qi_Gong (int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
+        super(number, name, briefsummary, thissession, aSwitch, value);
         if (thissession.Root.getOptions().getProgramOptions().getTooltips()) {
             if (number == 0) {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Preceding The Session"));}
             else {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Following The Session"));}

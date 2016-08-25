@@ -328,9 +328,6 @@ public class MainController implements Initializable {
         if (notallzero) {
             Duration totalsessiontime = Duration.ZERO;
             for (Meditatable i : getSession().getAllMeditatables()) {totalsessiontime = totalsessiontime.add(i.getduration());}
-            if (getOptions().getSessionOptions().getRampenabled() && getOptions().getProgramOptions().getTooltips()) {
-                TotalSessionTime.setTooltip(new Tooltip("Duration Includes A Ramp Of " + getOptions().getSessionOptions().getRampduration() + "Mins. On Both Presession And Postsession"));}
-            else {TotalSessionTime.setTooltip(null);}
             TotalSessionTime.setText(Util.formatdurationtoStringSpelledOut(totalsessiontime, TotalSessionTime.getLayoutBounds().getWidth()));
             if (getOptions().getProgramOptions().getTooltips()) {ApproximateEndTime.setTooltip(new Tooltip("Time You Finish Will Vary Depending On When You Start Playback"));}
             Calendar cal = Calendar.getInstance();
@@ -390,27 +387,25 @@ public class MainController implements Initializable {
         return false;
     }
     // Utility
-    public boolean creation_util_isLongSession() {
-        for (Integer i : Session.gui_getallsessionvalues()) {
-            if (i >= kujiin.xml.Options.DEFAULT_LONG_MEDITATABLE_DURATION) {return true;}
+    public boolean creation_prechecks() {
+    // TODO Check If Exporter Working/Open Here
+    // Check If Valid GUI Values
+        if (! creation_gui_allvaluesnotzero()) {dialog_Error("Error Creating Session", "At Least One Meditatable's Value Must Not Be 0", "Cannot Create Session"); return false;}
+    // Check Entrainment Ready
+        for (Meditatable i : Session.getAllMeditatables()) {if (! i.entrainment_isReady()) {dialog_Information("Cannot Play Session Yet", "Still Background Checking Entrainment", "Please Try Again In A Few Moments"); return false;}}
+    // Check Ambience Ready
+        if (AmbienceSwitch.isSelected()) {
+            for (Meditatable i : Session.getAllMeditatables()) {if (! i.ambience_isReady()) {dialog_Information("Cannot Play Session Yet", "Still Background Checking Ambience", "Please Try Again In A Few Moments"); return false;}}
         }
-        return false;
-    }
-    public void creation_util_createsession() {
-        for (Meditatable i : Session.getAllMeditatables()) {
-            if (! i.ambience_isReady() || ! i.entrainment_isReady()) {
-                System.out.println(i.name + " Isn't Ready");
-                dialog_Information("Information", "Cannot Play Session Yet, Still Performing Background Checks For Entrainment/Ambience", "Please Try Again In A Few Moments");
-                return;
-            }
-        }
-        // TODO Check Exporter Here
-        if (! creation_gui_allvaluesnotzero()) {
-            dialog_Error("Error Creating Session", "At Least One Meditatable's Value Must Not Be 0", "Cannot Create Session");
-            getSession().creatorState = This_Session.CreatorState.NOT_CREATED;
-            return;
-        }
-        if (creation_util_isLongSession() && ! getOptions().getSessionOptions().getAlertfunction()) {
+    // Add Pre/Post Ramp If Duration Is Zero || Ramp Is Disabled
+        Session.creation_checkprepostramp();
+    // Check Session Well Formed
+        Session.creation_populateitemsinsession();
+        if (! Session.creation_checksessionwellformed()) {return false;}
+    // Check Alert File Needed/Not Needed
+        boolean longsession = false;
+        for (Integer i : Session.gui_getallsessionvalues()) {if (i >= kujiin.xml.Options.DEFAULT_LONG_MEDITATABLE_DURATION) {longsession = true; break;}}
+        if (longsession && ! getOptions().getSessionOptions().getAlertfunction()) {
             if (dialog_YesNoConfirmation("Add Alert File", "I've Detected A Long Session", "Add Alert File In Between Session Parts?")) {
                 new ChangeAlertFile().showAndWait();
             }
@@ -418,6 +413,10 @@ public class MainController implements Initializable {
             if (dialog_YesNoConfirmation("Disable Alert File", "I've Detected A Relatively Short Session",
                     "Turn Off Alert File Between Session Parts?")) {getOptions().getSessionOptions().setAlertfunction(false);}
         }
+    // Check Goals
+        return Session.creation_checkgoals();
+    }
+    public void creation_util_createsession() {
         Session.creation_createsession();
         creation_gui_setDisable(Session.creatorState != This_Session.CreatorState.NOT_CREATED);
     }
@@ -710,7 +709,7 @@ public class MainController implements Initializable {
             case CREATED:
                 Session.creation_reset(false);
             case NOT_CREATED:
-                creation_util_createsession();
+                if (creation_prechecks()) {creation_util_createsession();}
                 if (Session.creatorState == This_Session.CreatorState.CREATED) {Session.player_openplayer();}
                 else {Session.creation_reset(false);}
                 break;
@@ -1374,8 +1373,8 @@ public class MainController implements Initializable {
             DeleteAllSessionsProgressButton.setTooltip((new Tooltip("Delete ALL Sessions Past, Present And Completed (This CANNOT Be Undone)")));
         }
         public void setuplisteners() {
-            Util.custom_textfield_double(FadeInValue, 0.0, 60.0, 1, 1);
-            Util.custom_textfield_double(FadeOutValue, 0.0, 60.0, 1, 1);
+            Util.custom_textfield_double(FadeInValue, 0.0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1, 1);
+            Util.custom_textfield_double(FadeOutValue, 0.0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1, 1);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
             CloseButton.setOnAction(event -> close());

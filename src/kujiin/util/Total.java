@@ -7,13 +7,12 @@ import javafx.util.Duration;
 public class Total extends Meditatable {
 
 
-    public Total(int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
+    public Total(int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
-        this.duration = new Duration((duration * 60) * 1000);
+        this.duration = Duration.ZERO;
         this.thisession = thissession;
     }
-
 
     @Override
     public double sessions_getAveragePracticeTime(boolean includepreandpost) {

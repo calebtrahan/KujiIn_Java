@@ -27,7 +27,7 @@ public class Meditatable {
 // Data Fields
     public int number;
     public String name;
-    protected Duration duration;
+    public Duration duration;
     protected This_Session thisession;
     protected Ambience ambience;
     protected Entrainment entrainment;
@@ -70,10 +70,10 @@ public class Meditatable {
     private boolean ambienceready = false;
 
     public Meditatable() {}
-    public Meditatable(int number, String name, int duration, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
+    public Meditatable(int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
-        this.duration = new Duration((duration * 60) * 1000);
+        this.duration = Duration.ZERO;
         this.thisession = thissession;
         if (aSwitch != null && value != null) {
             Switch = aSwitch;
@@ -81,7 +81,7 @@ public class Meditatable {
             Util.custom_textfield_integer(Value, Switch, 0, 600, 1);
             Value.textProperty().addListener((observable, oldValue, newValue) -> {
                 try {
-                    setDuration(Integer.parseInt(Value.getText()));
+                    changevalue(Integer.parseInt(Value.getText()));
                     thissession.Root.creation_gui_update();
                 } catch (NumberFormatException ignored) {setDuration(0);}
             });
@@ -183,18 +183,12 @@ public class Meditatable {
     }
 }
     public void changevalue(int newvalue) {
+        System.out.println("Changing " + name + " Value To " + newvalue);
         Switch.setSelected(newvalue != 0);
         Value.setDisable(newvalue == 0);
-
-
-
-        if (newvalue == 0) {Switch.setSelected(false);}
-        else {
-            Switch.setSelected(true);
-            Value.setDisable(false);
-            Value.setText(Integer.toString(newvalue));
-            setDuration(newvalue);
-        }
+        Value.setText(Integer.toString(newvalue));
+        setDuration(newvalue);
+        System.out.println("Duration Is " + duration.toSeconds());
     }
     public boolean hasValidValue() {
         return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;
@@ -257,23 +251,20 @@ public class Meditatable {
         timeline_progresstonextmeditatable.play();
         currententrainmentvolume = thisession.getCurrententrainmentvolume();
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            Duration durationtotest = getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration()));
-            System.out.println(String.format("Duration %s Subtracted By %s Equals %s", getduration(), Duration.millis(entrainment.getRampfile().getDuration()), durationtotest));
-//            timeline_start_ramp = new Timeline(new KeyFrame(durationtotest)), ae -> {
-//                System.out.println("Ramp TimeLine Started At " + getelapsedtime().toSeconds() + " Seconds");
-//                volume_unbindentrainment();
-//                entrainmentplayer.stop();
-//                entrainmentplayer.dispose();
-//                entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampfile().getFile().toURI().toString()));
-//                entrainmentplayer.setOnError(this::entrainmenterror);
-//                entrainmentplayer.setVolume(currententrainmentvolume);
-//                entrainmentplayer.play();
-//                entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
-//            }));
-//            timeline_start_ramp.playFromStart();
+            timeline_start_ramp = new Timeline(new KeyFrame(getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
+                volume_unbindentrainment();
+                entrainmentplayer.stop();
+                entrainmentplayer.dispose();
+                entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampfile().getFile().toURI().toString()));
+                entrainmentplayer.setOnError(this::entrainmenterror);
+                entrainmentplayer.setVolume(currententrainmentvolume);
+                entrainmentplayer.play();
+                entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
+            }));
+            timeline_start_ramp.playFromStart();
         }
         if (fade_entrainment_stop != null) {
-            timeline_fadeout_timer = new Timeline(new KeyFrame(getduration().subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration())), ae -> {
+            timeline_fadeout_timer = new Timeline(new KeyFrame(duration.subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration())), ae -> {
                 volume_unbindentrainment();
                 fade_entrainment_stop.playFromStart();
                 if (fade_ambience_stop != null) {

@@ -13,8 +13,8 @@ import java.io.File;
 
 public class Cut extends Meditatable {
 
-    public Cut(int number, String name, int duration, String briefsummary, This_Session thisession, ToggleButton aSwitch, TextField value) {
-        super(number, name, duration, briefsummary, thisession, aSwitch, value);
+    public Cut(int number, String name, String briefsummary, This_Session thisession, ToggleButton aSwitch, TextField value) {
+        super(number, name, briefsummary, thisession, aSwitch, value);
         if (thisession.Root.getOptions().getProgramOptions().getTooltips()) {
             Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
         }
