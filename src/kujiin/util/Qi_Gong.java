@@ -5,12 +5,14 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
 import java.io.File;
 
 public class Qi_Gong extends Meditatable {
+    protected boolean ramponly = false;
 
     public Qi_Gong (int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         super(number, name, briefsummary, thissession, aSwitch, value);
@@ -20,9 +22,22 @@ public class Qi_Gong extends Meditatable {
         } else {Value.setTooltip(null);}
     }
 
-// Getters For Playback
+    // Getters & Setters
+    public boolean isRamponly() {
+        return ramponly;
+    }
+    public void setRamponly(boolean ramponly) {
+        this.ramponly = ramponly;
+    }
+    public void setDuration(Duration duration) {this.duration = duration;}
     @Override
     public String getNameForFiles() {return "qi";}
+    @Override
+    public String getNameForChart() {
+        if (name.equals("Presession")) {return "Pre";}
+        else return "Post";
+    }
+
 
 // Entrainment
     @Override
@@ -66,13 +81,6 @@ public class Qi_Gong extends Meditatable {
         }
     }
 
-    // GUI
-    @Override
-    public String getNameForChart() {
-        if (name.equals("Presession")) {return "Pre";}
-        else return "Post";
-    }
-
 // Creation
     @Override
     public boolean creation_buildEntrainment() {
@@ -81,6 +89,7 @@ public class Qi_Gong extends Meditatable {
         if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && meditatableafter != null && ! meditatableafter.getNameForFiles().equals("qi")) {
             entrainment.setRampfile(entrainment.ramp_get(meditatableafter.number - 1));
+            if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
             return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
         }
         return super.creation_buildEntrainment();

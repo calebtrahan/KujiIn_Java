@@ -199,6 +199,10 @@ public class Meditatable {
     }
     public int gui_getvalue() {return Integer.parseInt(Value.getText());}
 // Getters And Setters
+    public boolean getramponly() {
+        try {return ((Qi_Gong) this).ramponly;}
+        catch (ClassCastException ignored) {return false;}
+    }
     public String getNameForFiles() {return name.toLowerCase();}
     public String getNameForChart() {return name;}
     private void setDuration(double newduration) {
@@ -237,12 +241,14 @@ public class Meditatable {
 
 // Playback
     public void start() {
+        boolean ramponly = getramponly();
         elapsedtime = Duration.ZERO;
         entrainmentplaycount = 0;
         ambienceplaycount = 0;
         setupfadeanimations();
         volume_unbindentrainment();
-        entrainmentplayer = new MediaPlayer(new Media(entrainment.getFreq().getFile().toURI().toString()));
+        if (! ramponly) {entrainmentplayer = new MediaPlayer(new Media(entrainment.getFreq().getFile().toURI().toString()));}
+        else {entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampfile().getFile().toURI().toString()));}
         entrainmentplayer.setVolume(0.0);
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         entrainmentplayer.setOnError(this::entrainmenterror);
@@ -250,7 +256,7 @@ public class Meditatable {
         timeline_progresstonextmeditatable = new Timeline(new KeyFrame(getduration(), ae -> thisession.player_progresstonextmeditatable()));
         timeline_progresstonextmeditatable.play();
         currententrainmentvolume = thisession.getCurrententrainmentvolume();
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+        if (! ramponly && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
             timeline_start_ramp = new Timeline(new KeyFrame(getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
@@ -263,7 +269,7 @@ public class Meditatable {
             }));
             timeline_start_ramp.playFromStart();
         }
-        if (fade_entrainment_stop != null) {
+        if (fade_entrainment_stop != null && ! ramponly) {
             timeline_fadeout_timer = new Timeline(new KeyFrame(duration.subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration())), ae -> {
                 volume_unbindentrainment();
                 fade_entrainment_stop.playFromStart();
@@ -275,7 +281,7 @@ public class Meditatable {
             timeline_fadeout_timer.play();
         }
         thisession.player_displayreferencefile();
-        if (fade_entrainment_play != null) {
+        if (fade_entrainment_play != null && ! ramponly) {
             if (fade_entrainment_play.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.playerState = This_Session.PlayerState.FADING_PLAY;
             fade_entrainment_play.playFromStart();
@@ -304,7 +310,7 @@ public class Meditatable {
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.play();
-            if (fade_ambience_play != null) {
+            if (fade_ambience_play != null && ! ramponly) {
                 fade_ambience_play.playFromStart();
             }
             else {
@@ -317,9 +323,10 @@ public class Meditatable {
         goalscompletedthissession = new ArrayList<>();
     }
     public void resume() {
+        boolean ramponly = getramponly();
         volume_unbindentrainment();
         entrainmentplayer.play();
-        if (fade_entrainment_resume != null) {
+        if (fade_entrainment_resume != null && ! ramponly) {
             entrainmentplayer.setVolume(0.0);
             if (fade_entrainment_resume.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.playerState = This_Session.PlayerState.FADING_RESUME;
@@ -335,7 +342,7 @@ public class Meditatable {
         if (thisession.Root.AmbienceSwitch.isSelected()) {
             volume_unbindambience();
             ambienceplayer.play();
-            if (fade_ambience_resume != null) {
+            if (fade_ambience_resume != null && ! ramponly) {
                 ambienceplayer.setVolume(0.0);
                 if (fade_ambience_resume.getStatus() == Animation.Status.RUNNING) {return;}
                 fade_ambience_resume.play();
@@ -347,8 +354,9 @@ public class Meditatable {
         toggleplayerbuttons();
     }
     public void pause() {
+        boolean ramponly = getramponly();
         volume_unbindentrainment();
-        if (fade_entrainment_pause != null) {
+        if (fade_entrainment_pause != null && ! ramponly) {
             if (fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
             // Open Loading Dialog
             thisession.playerState = This_Session.PlayerState.FADING_PAUSE;
@@ -372,9 +380,10 @@ public class Meditatable {
         toggleplayerbuttons();
     }
     public void stop() {
+        boolean ramponly = getramponly();
         thisession.player_closereferencefile();
         volume_unbindentrainment();
-        if (fade_ambience_stop != null) {
+        if (fade_ambience_stop != null && ! ramponly) {
             if (fade_ambience_stop.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.playerState = This_Session.PlayerState.FADING_STOP;
             fade_entrainment_stop.play();

@@ -211,6 +211,15 @@ public class This_Session {
     public List<Element> creation_getElementsInSession() {return getallitemsinSession().stream().filter(i -> i instanceof Element).map(i -> (Element) i).collect(Collectors.toCollection(ArrayList::new));}
     public void creation_populateitemsinsession() {
         itemsinsession = new ArrayList<>();
+        for (Meditatable i : getAllMeditatables()) {
+            if (i.getduration().greaterThan(Duration.ZERO)) {itemsinsession.add(i);}
+            else if (i instanceof Qi_Gong) {
+                if (i.number == 0 && Root.getOptions().getSessionOptions().getPrerampenabled()) {((Qi_Gong) i).setRamponly(true); itemsinsession.add(i);}
+                if (i.number == 15 && Root.getOptions().getSessionOptions().getPostrampenabled()) {((Qi_Gong) i).setRamponly(true); itemsinsession.add(i);}
+            }
+        }
+
+
         itemsinsession.addAll(getAllMeditatables().stream().filter(i -> i.getduration().greaterThan(Duration.ZERO)).collect(Collectors.toList()));
     }
     public boolean creation_checkfirstcutconnectedtorin(List<Cut> cutsinsession) {
@@ -316,22 +325,17 @@ break;*/
         } else {return true;}
     }
     public void creation_checkprepostramp() {
-        boolean preincluded = false;
-        boolean postincluded = false;
-        for (Meditatable i : getallitemsinSession()) {
-            if (i.number == 0) {preincluded = true;}
-            if (i.number == 15) {postincluded = true;}
+        AddPrePostRampDialog addPrePostRampDialog = new AddPrePostRampDialog();
+        addPrePostRampDialog.showAndWait();
+        if (! addPrePostRampDialog.PresessionButton.isDisabled()) {
+            Presession.setRamponly(addPrePostRampDialog.PresessionButton.isSelected());
+            if (addPrePostRampDialog.MakeDefaultCheckbox.isSelected()) {Root.getOptions().getSessionOptions().setPrerampenabled(addPrePostRampDialog.PresessionButton.isSelected());}
         }
-        if (! preincluded || ! postincluded) {
-            AddPrePostRampDialog addPrePostRampDialog = new AddPrePostRampDialog();
-            addPrePostRampDialog.showAndWait();
-            if (! addPrePostRampDialog.PostsessionButton.isDisabled() && addPrePostRampDialog.PostsessionButton.isSelected()) {
-
-            }
-            if (! addPrePostRampDialog.PresessionButton.isDisabled() && addPrePostRampDialog.PresessionButton.isSelected()) {
-
-            }
+        if (! addPrePostRampDialog.PostsessionButton.isDisabled()) {
+            Postsession.setRamponly(addPrePostRampDialog.PostsessionButton.isSelected());
+            if (addPrePostRampDialog.MakeDefaultCheckbox.isSelected()) {Root.getOptions().getSessionOptions().setPostrampenabled(addPrePostRampDialog.PostsessionButton.isSelected());}
         }
+        creation_populateitemsinsession();
     }
     public void creation_checkambience(CheckBox ambiencecheckbox) {
         ArrayList<Meditatable> meditatableswithnoambience = new ArrayList<>();
