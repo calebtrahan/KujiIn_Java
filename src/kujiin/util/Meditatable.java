@@ -117,7 +117,7 @@ public class Meditatable {
     public void ambience_cleanupexistingambience() {
         if (ambience.getAmbience() != null) {
             ambience.getAmbience().stream().filter(i -> i.getFile() == null || !i.getFile().exists()).forEach(i -> ambience.actual_remove(i));
-        }
+        } else {}
     }
     public void ambience_addnewfromdirectory() {
         // TODO Fix This So It Checks Existing Ambience If Existing (Deleting Non Existing), And Adds New From Ambience Directory If Valid
@@ -183,12 +183,10 @@ public class Meditatable {
     }
 }
     public void changevalue(int newvalue) {
-        System.out.println("Changing " + name + " Value To " + newvalue);
         Switch.setSelected(newvalue != 0);
         Value.setDisable(newvalue == 0);
         Value.setText(Integer.toString(newvalue));
         setDuration(newvalue);
-        System.out.println("Duration Is " + duration.toSeconds());
     }
     public boolean hasValidValue() {
         return Switch.isSelected() && Integer.parseInt(Value.getText()) != 0;

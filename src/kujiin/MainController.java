@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 // Bugs
 // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
+// TODO Make A Loading/Initializing Dialog While Entrainment And Ambience Checks Before Setting Up First Scene
 
 // Refactor
 // TODO Refactor Player
@@ -392,15 +393,17 @@ public class MainController implements Initializable {
     // Check If Valid GUI Values
         if (! creation_gui_allvaluesnotzero()) {dialog_Error("Error Creating Session", "At Least One Meditatable's Value Must Not Be 0", "Cannot Create Session"); return false;}
     // Check Entrainment Ready
-        for (Meditatable i : Session.getAllMeditatables()) {if (! i.entrainment_isReady()) {dialog_Information("Cannot Play Session Yet", "Still Background Checking Entrainment", "Please Try Again In A Few Moments"); return false;}}
+        for (Meditatable i : Session.getAllMeditatables()) {if (! i.entrainment_isReady()) {
+            System.out.println(i.name + "'s Entrainment Isn't Ready");
+            dialog_Information("Cannot Play Session Yet", "Still Background Checking Entrainment", "Please Try Again In A Few Moments"); return false;}}
     // Check Ambience Ready
         if (AmbienceSwitch.isSelected()) {
             for (Meditatable i : Session.getAllMeditatables()) {if (! i.ambience_isReady()) {dialog_Information("Cannot Play Session Yet", "Still Background Checking Ambience", "Please Try Again In A Few Moments"); return false;}}
         }
     // Add Pre/Post Ramp If Duration Is Zero || Ramp Is Disabled
+        Session.creation_populateitemsinsession();
         Session.creation_checkprepostramp();
     // Check Session Well Formed
-        Session.creation_populateitemsinsession();
         if (! Session.creation_checksessionwellformed()) {return false;}
     // Check Alert File Needed/Not Needed
         boolean longsession = false;
