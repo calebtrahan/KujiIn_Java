@@ -54,6 +54,7 @@ import java.util.stream.Collectors;
 // TODO (MWS) ReCreate Ramps For All Cuts Connecting All Cuts And Elements
 
 // Additional Features
+// TODO Add Custom To Ambience Playback Type (And Create Wizard To Add Ambience Individually To Each Meditatable In Session)
 // TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
 // TODO Design A 'Select Your Own Ambience' Wizard As An Alternative To Randomized Ambience During Session Creation
 // TODO Redesign Goals Completed Dialog Using Bar Charts/Graphs

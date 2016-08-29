@@ -67,6 +67,7 @@ public class Options {
     public static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
     public static final Boolean DEFAULT_PRE_RAMP_ENABLED_OPTION = false;
     public static final Boolean DEFAULT_POST_RAMP_ENABLED_OPTION = false;
+    public static final This_Session.AmbiencePlaybackType DEFAULT_AMBIENCE_PLAYBACK_TYPE = This_Session.AmbiencePlaybackType.SHUFFLE;
     public static final This_Session.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = This_Session.ReferenceType.html;
     public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
     public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
@@ -151,6 +152,7 @@ public class Options {
         sessionOptions.setReferenceoption(DEFAULT_REFERENCE_DISPLAY);
         sessionOptions.setReferencetype(DEFAULT_REFERENCE_TYPE_OPTION);
         sessionOptions.setReferencefullscreen(DEFAULT_REFERENCE_FULLSCREEN_OPTION);
+        sessionOptions.setAmbiencePlaybackType(DEFAULT_AMBIENCE_PLAYBACK_TYPE);
         setSessionOptions(sessionOptions);
         kujiin.xml.Options.AppearanceOptions appearanceOptions = new AppearanceOptions();
         appearanceOptions.setThemefile(DEFAULT_THEMEFILE.toURI().toString());
@@ -208,6 +210,7 @@ public class Options {
         private Boolean postrampenabled;
         private Boolean alertfunction;
         private Boolean referenceoption;
+        private This_Session.AmbiencePlaybackType ambiencePlaybackType;
         private This_Session.ReferenceType referencetype;
         private Boolean referencefullscreen;
 
@@ -286,6 +289,13 @@ public class Options {
         public void setReferencefullscreen(Boolean referencefullscreen) {
             this.referencefullscreen = referencefullscreen;
         }
+        public This_Session.AmbiencePlaybackType getAmbiencePlaybackType() {
+            return ambiencePlaybackType;
+        }
+        public void setAmbiencePlaybackType(This_Session.AmbiencePlaybackType ambiencePlaybackType) {
+            this.ambiencePlaybackType = ambiencePlaybackType;
+        }
+
     }
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class AppearanceOptions {

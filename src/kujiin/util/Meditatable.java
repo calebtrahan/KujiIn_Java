@@ -256,6 +256,7 @@ public class Meditatable {
         currententrainmentvolume = thisession.getCurrententrainmentvolume();
         if (! ramponly && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
             timeline_start_ramp = new Timeline(new KeyFrame(getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
+                System.out.println("Timeline Start Ramp Called!");
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
@@ -265,15 +266,15 @@ public class Meditatable {
                 entrainmentplayer.play();
                 entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
             }));
-            timeline_start_ramp.playFromStart();
+            timeline_start_ramp.play();
         }
         if (fade_entrainment_stop != null && ! ramponly) {
             timeline_fadeout_timer = new Timeline(new KeyFrame(duration.subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration())), ae -> {
                 volume_unbindentrainment();
-                fade_entrainment_stop.playFromStart();
+                fade_entrainment_stop.play();
                 if (fade_ambience_stop != null) {
                     volume_unbindambience();
-                    fade_ambience_stop.playFromStart();
+                    fade_ambience_stop.play();
                 }
             }));
             timeline_fadeout_timer.play();
@@ -282,10 +283,16 @@ public class Meditatable {
         if (fade_entrainment_play != null && ! ramponly) {
             if (fade_entrainment_play.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.playerState = This_Session.PlayerState.FADING_PLAY;
-            fade_entrainment_play.playFromStart();
+            fade_entrainment_play.play();
         } else {
             entrainmentplayer.setVolume(currententrainmentvolume);
+            String percentage = new Double(currententrainmentvolume * 100).intValue() + "%";
+            thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
             thisession.playerState = This_Session.PlayerState.PLAYING;
+            if (thisession.player_isreferencecurrentlyDisplayed()) {
+                thisession.displayReference.EntrainmentVolumeSlider.setValue(currententrainmentvolume);
+                thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
+            }
             volume_bindentrainment();}
         if (thisession.Root.AmbienceSwitch.isSelected() && thisession.ambiencePlaybackType != null) {
             ambienceplayhistory = new ArrayList<>();
@@ -308,11 +315,15 @@ public class Meditatable {
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.play();
-            if (fade_ambience_play != null && ! ramponly) {
-                fade_ambience_play.playFromStart();
-            }
+            if (fade_ambience_play != null && ! ramponly) {fade_ambience_play.play();}
             else {
                 ambienceplayer.setVolume(currentambiencevolume);
+                String percentage = new Double(currentambiencevolume * 100).intValue() + "%";
+                thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
+                if (thisession.player_isreferencecurrentlyDisplayed()) {
+                    thisession.displayReference.AmbienceVolumeSlider.setValue(currentambiencevolume);
+                    thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
+                }
                 volume_bindambience();
             }
         }
@@ -411,6 +422,7 @@ public class Meditatable {
 
                 @Override
                 protected void interpolate(double frac) {
+                    if (thisession.playerUI.EntrainmentVolume.valueProperty().isBound()) {System.out.println(name + "'s Entrainment Is Bound And Is Probably Throwing An Exception!");}
                     double entrainmentvolume = frac * currententrainmentvolume;
                     String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
                     entrainmentplayer.setVolume(entrainmentvolume);
@@ -429,6 +441,7 @@ public class Meditatable {
 
                     @Override
                     protected void interpolate(double frac) {
+                        if (thisession.playerUI.AmbienceVolume.valueProperty().isBound()) {System.out.println(name + "'s Ambience Is Bound And Is Probably Throwing An Exception!");}
                         double ambiencevolume = frac * currentambiencevolume;
                         String percentage = new Double(ambiencevolume * 100).intValue() + "%";
                         ambienceplayer.setVolume(ambiencevolume);
@@ -449,6 +462,7 @@ public class Meditatable {
 
             @Override
             protected void interpolate(double frac) {
+                if (thisession.playerUI.EntrainmentVolume.valueProperty().isBound()) {System.out.println(name + "'s Entrainment Is Bound And Is Probably Throwing An Exception!");}
                 double entrainmentvolume = frac * currententrainmentvolume;
                 String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
                 entrainmentplayer.setVolume(entrainmentvolume);
@@ -468,6 +482,7 @@ public class Meditatable {
 
                 @Override
                 protected void interpolate(double frac) {
+                    if (thisession.playerUI.AmbienceVolume.valueProperty().isBound()) {System.out.println(name + "'s Ambience Is Bound And Is Probably Throwing An Exception!");}
                     double ambiencevolume = frac * currentambiencevolume;
                     String percentage = new Double(ambiencevolume * 100).intValue() + "%";
                     ambienceplayer.setVolume(ambiencevolume);
@@ -487,6 +502,7 @@ public class Meditatable {
 
             @Override
             protected void interpolate(double frac) {
+                if (thisession.playerUI.EntrainmentVolume.valueProperty().isBound()) {System.out.println(name + "'s Entrainment Is Bound And Is Probably Throwing An Exception!");}
                 double fadeoutvolume = currententrainmentvolume - (frac * currententrainmentvolume);
                 String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
                 entrainmentplayer.setVolume(fadeoutvolume);
@@ -507,6 +523,7 @@ public class Meditatable {
 
                 @Override
                 protected void interpolate(double frac) {
+                    if (thisession.playerUI.AmbienceVolume.valueProperty().isBound()) {System.out.println(name + "'s Ambience Is Bound And Is Probably Throwing An Exception!");}
                     double fadeoutvolume = currentambiencevolume - (frac * currentambiencevolume);
                     String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
                     ambienceplayer.setVolume(fadeoutvolume);
@@ -527,6 +544,7 @@ public class Meditatable {
 
                 @Override
                 protected void interpolate(double frac) {
+                    if (thisession.playerUI.EntrainmentVolume.valueProperty().isBound()) {System.out.println(name + "'s Entrainment Is Bound And Is Probably Throwing An Exception!");}
                     double fadeoutvolume = currententrainmentvolume - (frac * currententrainmentvolume);
                     String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
                     entrainmentplayer.setVolume(fadeoutvolume);
@@ -547,6 +565,7 @@ public class Meditatable {
 
                     @Override
                     protected void interpolate(double frac) {
+                        if (thisession.playerUI.AmbienceVolume.valueProperty().isBound()) {System.out.println(name + "'s Ambience Is Bound And Is Probably Throwing An Exception!");}
                         double fadeoutvolume = currentambiencevolume - (frac * currentambiencevolume);
                         String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
                         ambienceplayer.setVolume(fadeoutvolume);
@@ -635,6 +654,8 @@ public class Meditatable {
             if (timeline_progresstonextmeditatable != null) {timeline_progresstonextmeditatable.stop();}
             if (timeline_start_ramp != null) {timeline_fadeout_timer.stop();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
+            volume_unbindentrainment();
+            volume_unbindambience();
             toggleplayerbuttons();
         } catch (Exception ignored) {}
     }

@@ -212,20 +212,19 @@ public class This_Session {
     public void creation_populateitemsinsession() {
         itemsinsession = new ArrayList<>();
         for (Meditatable i : getAllMeditatables()) {
-            if (i.getduration().greaterThan(Duration.ZERO)) {itemsinsession.add(i);}
-            else if (i instanceof Qi_Gong) {
-                if (i.number == 0 && Root.getOptions().getSessionOptions().getPrerampenabled()) {((Qi_Gong) i).setRamponly(true); itemsinsession.add(i);}
-                if (i.number == 15 && Root.getOptions().getSessionOptions().getPostrampenabled()) {((Qi_Gong) i).setRamponly(true); itemsinsession.add(i);}
+            if (i.getduration().greaterThan(Duration.ZERO)) {
+                itemsinsession.add(i);
+            } else if (i instanceof Qi_Gong) {
+                if (((Qi_Gong) i).ramponly) {itemsinsession.add(i);}
+                else {
+                    switch (i.number) {
+                        case 0: if (Root.getOptions().getSessionOptions().getPrerampenabled()) {itemsinsession.add(i);} break;
+                        case 15: if (Root.getOptions().getSessionOptions().getPostrampenabled()) {itemsinsession.add(i);} break;
+                    }
+                }
             }
         }
-
-
-        itemsinsession.addAll(getAllMeditatables().stream().filter(i -> i.getduration().greaterThan(Duration.ZERO)).collect(Collectors.toList()));
-    }
-    public boolean creation_checkfirstcutconnectedtorin(List<Cut> cutsinsession) {
-        try {
-            return cutsinsession.get(0).number == 1;
-        } catch (Exception e) {return false;}
+//        for (Meditatable i : itemsinsession) {System.out.println(String.format("%s With A Duration Of %s", i.name, i.getduration().toSeconds()));}
     }
     public boolean creation_checkfirstandlastcutsconnect(List<Cut> cutsinsession) {
         if (cutsinsession.size() == 1) {return true;}
@@ -241,11 +240,10 @@ public class This_Session {
     public boolean creation_checksessionwellformed() {
         List<Cut> cutsinsession = creation_getCutsInSession();
         List<Element> elementsinsession = creation_getElementsInSession();
-        if (cutsinsession != null && cutsinsession.size() > 0) {
-            boolean rinnotstartpoint = creation_checkfirstcutconnectedtorin(cutsinsession);
-            if (! rinnotstartpoint) {rinnotstartpoint = ! Root.dialog_YesNoConfirmation("Confirmation", "Cuts In Session Not Connected To RIN, And May Lack The Energy They Need To Get Results",
-                    "Connect " + cutsinsession.get(0).name + " Back To RIN?");}
-            if (! rinnotstartpoint || ! creation_checkfirstandlastcutsconnect(cutsinsession)) {
+        if (! cutsinsession.isEmpty()) {
+            boolean rinisfirstmeditatable = cutsinsession.get(0).number == 1;
+            if (! rinisfirstmeditatable) {rinisfirstmeditatable = ! Root.dialog_YesNoConfirmation("Session May ", "Cuts In Session Not Connected To RIN", "Connect " + cutsinsession.get(0).name + " Back To RIN?");}
+            if (! rinisfirstmeditatable || ! creation_checkfirstandlastcutsconnect(cutsinsession)) {
                 CutsMissingDialog cutsMissingDialog = new CutsMissingDialog(Root, cutsinsession);
                 cutsMissingDialog.showAndWait();
                 switch (cutsMissingDialog.getResult()) {
@@ -260,7 +258,7 @@ public class This_Session {
                 }
             }
         }
-        if (cutsinsession != null && elementsinsession != null && cutsinsession.size() > 0 && elementsinsession.size() > 0) {
+        if (! cutsinsession.isEmpty() && ! elementsinsession.isEmpty()) {
             SortSessionItems sortSessionItems = new SortSessionItems(Root, getallitemsinSession());
             sortSessionItems.showAndWait();
             switch (sortSessionItems.getResult()) {
@@ -325,15 +323,21 @@ break;*/
         } else {return true;}
     }
     public void creation_checkprepostramp() {
-        AddPrePostRampDialog addPrePostRampDialog = new AddPrePostRampDialog();
-        addPrePostRampDialog.showAndWait();
-        if (! addPrePostRampDialog.PresessionButton.isDisabled()) {
-            Presession.setRamponly(addPrePostRampDialog.PresessionButton.isSelected());
-            if (addPrePostRampDialog.MakeDefaultCheckbox.isSelected()) {Root.getOptions().getSessionOptions().setPrerampenabled(addPrePostRampDialog.PresessionButton.isSelected());}
-        }
-        if (! addPrePostRampDialog.PostsessionButton.isDisabled()) {
-            Postsession.setRamponly(addPrePostRampDialog.PostsessionButton.isSelected());
-            if (addPrePostRampDialog.MakeDefaultCheckbox.isSelected()) {Root.getOptions().getSessionOptions().setPostrampenabled(addPrePostRampDialog.PostsessionButton.isSelected());}
+        if (Root.getOptions().getSessionOptions().getRampenabled()) {
+            if (! itemsinsession.contains(Presession)) {Presession.setRamponly(true);}
+            if (! itemsinsession.contains(Postsession)) {Postsession.setRamponly(true);}
+        } else if (! itemsinsession.contains(Presession) || ! itemsinsession.contains(Postsession)) {
+            AddPrePostRampDialog addPrePostRampDialog = new AddPrePostRampDialog();
+            addPrePostRampDialog.showAndWait();
+            if (! addPrePostRampDialog.PresessionButton.isDisabled()) {
+                Presession.setRamponly(addPrePostRampDialog.PresessionButton.isSelected());
+                if (addPrePostRampDialog.MakeDefaultCheckbox.isSelected()) {Root.getOptions().getSessionOptions().setPrerampenabled(addPrePostRampDialog.PresessionButton.isSelected());}
+                if (addPrePostRampDialog.PresessionButton.isSelected()) {}
+            }
+            if (! addPrePostRampDialog.PostsessionButton.isDisabled()) {
+                Postsession.setRamponly(addPrePostRampDialog.PostsessionButton.isSelected());
+                if (addPrePostRampDialog.MakeDefaultCheckbox.isSelected()) {Root.getOptions().getSessionOptions().setPostrampenabled(addPrePostRampDialog.PostsessionButton.isSelected());}
+            }
         }
         creation_populateitemsinsession();
     }
@@ -346,7 +350,7 @@ break;*/
             else if (!i.getAmbience().hasEnoughAmbience(i.getduration())) {meditatableswithreducedambience.add(i);}
         });
         Root.CreatorStatusBar.setText("");
-        if (meditatableswithnoambience.size() > 0) {
+        if (! meditatableswithnoambience.isEmpty()) {
             StringBuilder a = new StringBuilder();
             for (int i = 0; i < meditatableswithnoambience.size(); i++) {
                 a.append(meditatableswithnoambience.get(i).name);
@@ -363,8 +367,7 @@ break;*/
                     ambiencecheckbox.setSelected(false);
                     break;
             }
-        } else {
-            if (meditatableswithreducedambience.size() > 0) {
+        } else if (! meditatableswithreducedambience.isEmpty()) {
                 StringBuilder a = new StringBuilder();
                 int count = 0;
                 for (int i = 0; i < meditatableswithreducedambience.size(); i++) {
@@ -382,9 +385,9 @@ break;*/
 //                    } else {
 //                        ambiencecheckbox.setSelected(Root.dialog_YesNoConfirmation("Confirmation", String.format("The Following Cuts' Ambience Aren't Long Enough: %s ", a.toString()), "Shuffle And Loop Ambience For These Meditatables?"));
 //                    }
-            } else {
-                ambiencecheckbox.setSelected(true);
-            }
+        } else {
+            ambiencecheckbox.setSelected(true);
+            ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();
         }
     }
     public boolean creation_checkreferencefiles(boolean enableprompt) {
@@ -401,7 +404,6 @@ break;*/
         creatorState = CreatorState.NOT_CREATED;
         for (Meditatable i : getAllMeditatables()) {i.creation_reset(setvaluetozero);}
     }
-
 
 // Export
     public Service<Boolean> exporter_getsessionexporter() {
@@ -784,7 +786,7 @@ break;*/
             setTitle("Meditatables Missing");
             this.allcuts = allcuts;
             populatelistview();
-            Root.dialog_Information("Cuts Missing", "Due To The Nature Of Kuji-In, Each Cut Should Connect From RIN Up, Or The Later Cuts Might Lack The Energy They Need", "Use This Dialog To Connect Cuts, Or Cancel Without Creating");
+            Root.dialog_Information("Cuts Missing", "Each Cut Should Connect From RIN Up", "Use This Dialog To Connect Cuts");
         }
 
         public int getlastworkingcutindex() {
@@ -1386,7 +1388,7 @@ break;*/
         PLAYING, PAUSED, STOPPED, TRANSITIONING, IDLE, FADING_PLAY, FADING_RESUME, FADING_PAUSE, FADING_STOP
     }
     public enum AmbiencePlaybackType {
-        REPEAT, SHUFFLE
+        REPEAT, SHUFFLE, CUSTOM
     }
 
 }
