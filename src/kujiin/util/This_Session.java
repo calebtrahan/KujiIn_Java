@@ -603,9 +603,7 @@ break;*/
             Root.goals_gui_updateui();
             Root.sessions_gui_updateui();
             currentmeditatable.tick();
-        } catch (Exception e) {e.printStackTrace();
-//            new MainController.ExceptionDialog(Root, e).show();
-        }
+        } catch (Exception ignored) {}
     }
     public void player_progresstonextmeditatable() {
         try {

@@ -1326,8 +1326,22 @@ public class MainController implements Initializable {
         public CheckBox RampSwitch;
         public Button AddNewThemeButton;
         public Label ProgramOptionsStatusBar;
+        public Label DescriptionBoxTopLabel;
+        public TextArea DescriptionTextField;
         private kujiin.xml.Options Options;
         private This_Session.ReferenceType tempreferencetype;
+        private ArrayList<ItemWithDescription> descriptionitems = new ArrayList<>();
+
+        // Tooltips
+        // Help Dialogs
+        // Fade In/Out
+        // Volume Defaults
+        // Alert File TextField -> Button
+        // Display Reference -> HTML -> TXT -> Fullscreen
+        // Ramp
+        // Delete Session Progress
+        // Delete Goal Progress
+        // Appearance ComboBox -> New Theme
 
         public ChangeProgramOptions() {
             try {
@@ -1342,6 +1356,7 @@ public class MainController implements Initializable {
                 AlertFileTextField.setEditable(false);
                 setuplisteners();
                 setuptooltips();
+                setupdescriptions();
                 populatefromxml();
                 referencetoggle();
             } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
@@ -1386,6 +1401,67 @@ public class MainController implements Initializable {
             ReferenceHTMLRadioButton.setOnAction(event1 -> HTMLTypeSelected());
             ReferenceTXTRadioButton.setOnAction(event1 -> TXTTypeSelected());
             ProgramThemeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectnewtheme());
+        }
+
+    // Description Box Methods
+        public void setupdescriptions() {
+            descriptionitems.add(new ItemWithDescription("Tool Tips Checkbox", "Display/Don't Display Description Messages When Hovering Over Program Controls"));
+            descriptionitems.add(new ItemWithDescription("Help Dialogs Checkbox", "Display/Don't Display Additional Dialogs Explaining Various Features Of The Program"));
+            descriptionitems.add(new ItemWithDescription("Fade In", "Seconds To Fade In From Silent Into Each Session Part"));
+            descriptionitems.add(new ItemWithDescription("Fade Out", "Seconds To Fade Out To Silent Into Each Session Part"));
+            descriptionitems.add(new ItemWithDescription("Entrainment Volume", "Default Volume Percentage For Entrainment (Can Be Adjusted In Session)"));
+            descriptionitems.add(new ItemWithDescription("Ambience Volume", "Default Volume Percentage For Ambience (Can Be Adjusted In Session)"));
+            descriptionitems.add(new ItemWithDescription("Alert File", "An Alert File Is An Optional Sound File Played In Between Session Elements"));
+            descriptionitems.add(new ItemWithDescription("Alert File Edit Button", "Add Or Edit Your Current Alert File"));
+            descriptionitems.add(new ItemWithDescription("Display Reference", "Default To Display/Don't Display Reference Files During Session Playback (Can Be Changed In Session)"));
+            descriptionitems.add(new ItemWithDescription("Display Reference Type 'HTML'", "Default To Display HTML Variation Of Reference Files During Session Playback (Can Be Changed In Session)"));
+            descriptionitems.add(new ItemWithDescription("Display Reference Type 'TXT'", "Default To Display HTML Variation Of Reference Files During Session Playback (Can Be Changed In Session)"));
+            descriptionitems.add(new ItemWithDescription("Ramp", "Enable/Disable A Ramp In Session Parts To Smooth Mental Transition"));
+            descriptionitems.add(new ItemWithDescription("Delete Session Button", "This Button Will Permanently Delete All Session Progress And Reset All Cut/Elements Progress"));
+            descriptionitems.add(new ItemWithDescription("Delete Goal Button", "This Button Will Permanently Delete All Current And Completed Goals"));
+            descriptionitems.add(new ItemWithDescription("Appearance Selection", "List Of The Available Appearance Themes For The Program"));
+            descriptionitems.add(new ItemWithDescription("Add New Theme Button", "Add A New Theme To The List Of Available Themes"));
+            TooltipsCheckBox.setOnMouseEntered(event -> populatedescriptionbox(0));
+            TooltipsCheckBox.setOnMouseExited(event -> cleardescription());
+            HelpDialogsCheckBox.setOnMouseEntered(event -> populatedescriptionbox(1));
+            HelpDialogsCheckBox.setOnMouseExited(event -> cleardescription());
+            FadeInValue.setOnMouseEntered(event -> populatedescriptionbox(2));
+            FadeInValue.setOnMouseExited(event -> cleardescription());
+            FadeOutValue.setOnMouseEntered(event -> populatedescriptionbox(3));
+            FadeOutValue.setOnMouseExited(event -> cleardescription());
+            EntrainmentVolumePercentage.setOnMouseEntered(event -> populatedescriptionbox(4));
+            EntrainmentVolumePercentage.setOnMouseExited(event -> cleardescription());
+            AmbienceVolumePercentage.setOnMouseEntered(event -> populatedescriptionbox(5));
+            AmbienceVolumePercentage.setOnMouseExited(event -> cleardescription());
+            AlertFileTextField.setOnMouseEntered(event -> populatedescriptionbox(6));
+            AlertFileTextField.setOnMouseExited(event -> cleardescription());
+            AlertFileEditButton.setOnMouseEntered(event -> populatedescriptionbox(7));
+            AlertFileEditButton.setOnMouseExited(event -> cleardescription());
+            ReferenceSwitch.setOnMouseEntered(event -> populatedescriptionbox(8));
+            ReferenceSwitch.setOnMouseExited(event -> cleardescription());
+            ReferenceHTMLRadioButton.setOnMouseEntered(event -> populatedescriptionbox(9));
+            ReferenceHTMLRadioButton.setOnMouseExited(event -> cleardescription());
+            ReferenceTXTRadioButton.setOnMouseEntered(event -> populatedescriptionbox(10));
+            ReferenceTXTRadioButton.setOnMouseExited(event -> cleardescription());
+            RampSwitch.setOnMouseEntered(event -> populatedescriptionbox(11));
+            RampSwitch.setOnMouseExited(event -> cleardescription());
+            DeleteAllSessionsProgressButton.setOnMouseEntered(event -> populatedescriptionbox(12));
+            DeleteAllSessionsProgressButton.setOnMouseExited(event -> cleardescription());
+            DeleteAllGoalsButton.setOnMouseEntered(event -> populatedescriptionbox(13));
+            DeleteAllGoalsButton.setOnMouseExited(event -> cleardescription());
+            ProgramThemeChoiceBox.setOnMouseEntered(event -> populatedescriptionbox(14));
+            ProgramThemeChoiceBox.setOnMouseExited(event -> cleardescription());
+            AddNewThemeButton.setOnMouseEntered(event -> populatedescriptionbox(15));
+            AddNewThemeButton.setOnMouseExited(event -> cleardescription());
+        }
+        public void populatedescriptionbox(int index) {
+            ItemWithDescription item = descriptionitems.get(index);
+            DescriptionBoxTopLabel.setText(item.getName());
+            DescriptionTextField.setText(item.getDescription());
+        }
+        public void cleardescription() {
+            DescriptionBoxTopLabel.setText("Description");
+            DescriptionTextField.setText("");
         }
 
     // Alert File Methods
@@ -1500,6 +1576,23 @@ public class MainController implements Initializable {
             Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
             Options.marshall();
             super.close();
+        }
+
+        class ItemWithDescription {
+            private final String name;
+            private final String description;
+
+            public ItemWithDescription(String name, String description) {
+                this.name = name + " Description";
+                this.description = description;
+            }
+
+            public String getName() {
+                return name;
+            }
+            public String getDescription() {
+                return description;
+            }
         }
     }
     public class ChangeAllValuesDialog extends Stage {
