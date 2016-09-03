@@ -9,7 +9,7 @@
          <children>
             <HBox alignment="CENTER" prefHeight="40.0" prefWidth="769.0">
                <children>
-                  <Label text="Select A Cut Or Element:">
+                  <Label text="Reference Files For:">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>

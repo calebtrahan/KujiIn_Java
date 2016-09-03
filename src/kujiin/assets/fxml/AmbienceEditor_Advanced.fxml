@@ -100,7 +100,7 @@
       </VBox>
       <HBox alignment="CENTER" layoutX="14.0" layoutY="9.0" prefHeight="34.0" prefWidth="696.0">
          <children>
-            <Label text="Select Cut Or Element:">
+            <Label text="Ambience For:">
                <HBox.margin>
                   <Insets right="20.0" />
                </HBox.margin>

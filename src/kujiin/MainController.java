@@ -1332,17 +1332,6 @@ public class MainController implements Initializable {
         private This_Session.ReferenceType tempreferencetype;
         private ArrayList<ItemWithDescription> descriptionitems = new ArrayList<>();
 
-        // Tooltips
-        // Help Dialogs
-        // Fade In/Out
-        // Volume Defaults
-        // Alert File TextField -> Button
-        // Display Reference -> HTML -> TXT -> Fullscreen
-        // Ramp
-        // Delete Session Progress
-        // Delete Goal Progress
-        // Appearance ComboBox -> New Theme
-
         public ChangeProgramOptions() {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));

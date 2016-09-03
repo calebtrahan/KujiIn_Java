@@ -21,7 +21,7 @@
       <Button fx:id="AdvancedButton" layoutX="6.0" layoutY="327.0" mnemonicParsing="false" onAction="#advancedmode" text="Advanced Editor" />
       <HBox alignment="CENTER" layoutX="6.0" layoutY="11.0" prefHeight="36.0" prefWidth="408.0">
          <children>
-            <Label alignment="CENTER_RIGHT" text="Select A Cut Or Element:" textAlignment="RIGHT">
+            <Label alignment="CENTER_RIGHT" text="Ambience For:" textAlignment="RIGHT">
                <HBox.margin>
                   <Insets right="5.0" />
                </HBox.margin>
