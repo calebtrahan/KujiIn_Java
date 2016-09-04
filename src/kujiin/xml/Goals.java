@@ -13,8 +13,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @XmlRootElement(name = "Goals")
@@ -46,10 +44,6 @@ public class Goals {
     }
 
 // List Getters
-    public List<List<Goal>> getallMeditatableGoalLists() {
-    return new ArrayList<>(Arrays.asList(PresessionGoals, RinGoals, KyoGoals, TohGoals, ShaGoals, KaiGoals, JinGoals, RetsuGoals, ZaiGoals, ZenGoals,
-            EarthGoals, AirGoals, FireGoals, WaterGoals, VoidGoals, PostsessionGoals));
-}
     public List<Goal> getMeditatableGoalList(int meditatableindex) {
         switch (meditatableindex) {
             case 0: return PresessionGoals;

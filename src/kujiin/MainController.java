@@ -616,7 +616,7 @@ public class MainController implements Initializable {
     public void goals_initialize() {
         Goals = new Goals(this);
         Goals.unmarshall();
-        for (Meditatable i : getSession().getAllMeditatablesincludingTotal()) {i.setGoalsController(Goals);}
+        for (Meditatable i : getSession().getAllMeditatablesincludingTotal()) {i.setGoalsController(Goals); i.goals_unmarshall();}
         goals_gui_updateui();
     }
     public void goals_gui_updateui() {
@@ -2621,9 +2621,7 @@ public class MainController implements Initializable {
                 for (Meditatable i : getSession().getallitemsinSession()) {
                     series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getduration().toMinutes()));
                     totalsessionduration.add(i.getduration());
-                    for (Goals.Goal x : i.getGoalscompletedthissession()) {
-                        completedgoalsitems.add(String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getduration().toHours()));
-                    }
+                    completedgoalsitems.addAll(i.getGoalscompletedthissession().stream().map(x -> String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getduration().toHours())).collect(Collectors.toList()));
                 }
                 if (completedgoalsitems.size() > 0) {
                     GoalsCompletedTopLabel.setText(completedgoalsitems.size() + " Goals Completed This Session");

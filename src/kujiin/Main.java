@@ -28,11 +28,11 @@ public class Main extends Application {
             Root.setEntrainments(new Entrainments(Root));
             Root.setAmbiences(new Ambiences(Root));
             Root.setSession(new This_Session(Root));
-            Root.preset_initialize();
             Root.creation_initialize();
             Root.exporter_initialize();
             Root.sessions_initialize();
             Root.goals_initialize();
+            Root.preset_initialize();
         });
         primaryStage.setOnCloseRequest(event -> {
             if (Root.dialog_YesNoConfirmation("Confirmation", "Really Exit?", "")) {Root.close(null);}

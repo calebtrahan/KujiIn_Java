@@ -1028,6 +1028,7 @@ public class Meditatable {
     public void goals_add(kujiin.xml.Goals.Goal newgoal) {
         if (Goals == null) {Goals = new ArrayList<>();}
         Goals.add(newgoal);
+        goals_sort();
     }
     private void goals_sort() {
         List<kujiin.xml.Goals.Goal> goallist = Goals;
@@ -1090,9 +1091,7 @@ public class Meditatable {
         Goals = goallist;
     }
     public void goals_transitioncheck() {
-        if (goalscompletedthissession.size() > 0) {
-            thisession.MeditatableswithGoalsCompletedThisSession.add(this);
-        }
+        if (goalscompletedthissession.size() > 0) {thisession.MeditatableswithGoalsCompletedThisSession.add(this);}
     }
 
 // Session Tracking
