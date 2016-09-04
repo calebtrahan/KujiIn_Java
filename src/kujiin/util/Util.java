@@ -284,7 +284,11 @@ public class Util {
         if (seconds >= 3600) {hours = seconds / 3600; seconds -= hours * 3600;}
         if (seconds >= 60) {minutes = seconds / 60; seconds -= minutes * 60;}
             // Long
-        if (hours == 0 && minutes == 0 && seconds == 0) {return "0 Minutes";}
+        if (hours == 0 && minutes == 0 && seconds == 0) {
+            if ("0 minutes".length() <= maxcharlength) {return "0 Minutes";}
+            else if ("0 Mins".length() <= maxcharlength) {return "0 Mins";}
+            else {return "0 M";}
+        }
         StringBuilder longtext = new StringBuilder();
         if (hours > 0) {longtext.append(hours).append(" Hour"); if (hours > 1) {longtext.append("s");} if (minutes > 0) {longtext.append(" ");}}
         if (minutes > 0) {

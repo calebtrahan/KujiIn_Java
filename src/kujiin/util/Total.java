@@ -15,36 +15,27 @@ public class Total extends Meditatable {
     }
 
     @Override
-    public double sessions_getAveragePracticeTime(boolean includepreandpost) {
-        int totalminutes = 0;
-        int sessioncount = 0;
+    public Duration sessions_getPracticedDuration(Boolean includepreandpostoverride) {
+        boolean includepreandpost;
+        if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
+        else {includepreandpost = sessions_includepreandpost();}
+        Duration duration = Duration.ZERO;
         for (Meditatable i : thisession.getAllMeditatables()) {
             if (! includepreandpost && i instanceof Qi_Gong) {continue;}
-            totalminutes += i.sessions_getTotalMinutesPracticed(false);
-            sessioncount += i.sessions_getNumberOfSessionsPracticed(false);
+            duration = duration.add(thisession.Root.getSessions().gettotalpracticedtime(number, false));
         }
-        try {
-            return totalminutes / sessioncount;
-        } catch (Exception ignored) {return 0.0;}
+        return duration;
     }
     @Override
-    public int sessions_getTotalMinutesPracticed(boolean includepreandpost) {
-        int totalminutes = 0;
-        for (Meditatable i : thisession.getAllMeditatables()) {
-            if (! includepreandpost && i instanceof Qi_Gong) {continue;}
-            totalminutes += i.sessions_getTotalMinutesPracticed(false);
-        }
-        try {return totalminutes;}
-        catch (Exception ignored) {return 0;}
+    public int sessions_getPracticedSessionCount(Boolean includepreandpostoverride) {
+        return thisession.Root.getSessions().totalsessioncount();
     }
     @Override
-    public int sessions_getNumberOfSessionsPracticed(boolean includepreandpost) {
-        int sessioncount = 0;
-        for (Meditatable i : thisession.getAllMeditatables()) {
-            if (! includepreandpost && i instanceof Qi_Gong) {continue;}
-            sessioncount += i.sessions_getNumberOfSessionsPracticed(false);
-        }
-        try {return sessioncount;} catch (Exception ignored) {return 0;}
+    public Duration sessions_getAverageSessionLength(Boolean includepreandpostoverride) {
+        boolean includepreandpost;
+        if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
+        else {includepreandpost = sessions_includepreandpost();}
+        return new Duration(sessions_getPracticedDuration(includepreandpost).toMillis() / sessions_getPracticedSessionCount(includepreandpost));
     }
 
 }

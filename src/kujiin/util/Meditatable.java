@@ -11,12 +11,14 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import kujiin.lib.BeanComparator;
 import kujiin.xml.*;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static kujiin.xml.Options.DEFAULT_FADERESUMEANDPAUSEDURATION;
@@ -932,7 +934,7 @@ public class Meditatable {
     public void tick() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             try {
-                thisession.Root.getSessions().sessioninformation_getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatemeditatableduration(number, new Double(elapsedtime.toMinutes()).intValue());
+                thisession.Root.getSessions().getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatemeditatableduration(number, new Double(elapsedtime.toMinutes()).intValue());
                 goals_updateduringplayback();
             } catch (NullPointerException ignored) {}
         }
@@ -1034,8 +1036,7 @@ public class Meditatable {
         List<kujiin.xml.Goals.Goal> goallist = Goals;
         if (goallist != null && ! goallist.isEmpty()) {
             try {
-                BeanComparator bc = new BeanComparator(kujiin.xml.Goals.Goal.class, "getGoal_Hours");
-                Collections.sort(goallist, bc);
+                goallist = kujiin.xml.Goals.sortgoalsbyHours(goallist);
                 int count = 1;
                 for (kujiin.xml.Goals.Goal i : goallist) {
                     i.setID(count);
@@ -1047,13 +1048,27 @@ public class Meditatable {
     }
     public void goals_remove(kujiin.xml.Goals.Goal currentgoal) {Goals.remove(currentgoal);}
     // Getters
+    // Current Goal
     public kujiin.xml.Goals.Goal goals_getCurrent() {
-        try {
-            kujiin.xml.Goals.Goal goal = Goals.get(Goals.size() - 1);
-            if (goal.getCompleted() != null && ! goal.getCompleted()) {return goal;}
-            else {return null;}
-        } catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}
+        if (Goals == null || Goals.isEmpty()) {return null;}
+        List<kujiin.xml.Goals.Goal> uncompletedgoals = goals_getAllCurrent();
+        if (! uncompletedgoals.isEmpty()) {
+            uncompletedgoals = kujiin.xml.Goals.sortgoalsbyHours(uncompletedgoals);
+            return uncompletedgoals.get(0);
+        } else {return null;}
     }
+    public Duration goals_getCurrentDuration() {
+        if (goals_ui_currentgoalisset()) {
+            return Duration.hours(goals_getCurrent().getGoal_Hours());
+        } else {
+            return Duration.ZERO;
+        }
+    }
+    // Current And Future Goals
+    public List<kujiin.xml.Goals.Goal> goals_getAllCurrent() {
+        return Goals.stream().filter(i -> i.getCompleted() != null && !i.getCompleted()).collect(Collectors.toList());
+    }
+    // Completed Goals
     public List<kujiin.xml.Goals.Goal> goals_getCompleted() {
         try {return Goals.stream().filter(i -> i.getCompleted() != null && i.getCompleted()).collect(Collectors.toList());}
         catch (NullPointerException e) {return new ArrayList<>();}
@@ -1072,19 +1087,19 @@ public class Meditatable {
     // Validation Methods
     public boolean goals_arelongenough() {
         try {
-            return (sessions_getTotalMinutesPracticed(false) / 60) + getduration().toHours() >= goals_getCurrent().getGoal_Hours();
+            Duration goalduration = Duration.hours(goals_getCurrent().getGoal_Hours());
+            Duration practiceddurationplusthissession = thisession.Root.getSessions().gettotalpracticedtime(number, false).add(getduration());
+            return goalduration.greaterThanOrEqualTo(practiceddurationplusthissession);
         } catch (NullPointerException e) {return true;}
     }
     // Playback Methods
     private void goals_updateduringplayback() {
         List<kujiin.xml.Goals.Goal> goallist = new ArrayList<>();
         for (kujiin.xml.Goals.Goal i : Goals) {
-            if (i.getCompleted() != null && ! i.getCompleted()) {
-                if (session_getTotalDurationPracticed().greaterThanOrEqualTo(Duration.hours(i.getGoal_Hours()))) {
-                    i.setCompleted(true);
-                    i.setDate_Completed(Util.gettodaysdate());
-                    goalscompletedthissession.add(i);
-                }
+            if (i.getCompleted() != null && ! i.getCompleted() && sessions_getPracticedDuration(false).greaterThanOrEqualTo(Duration.hours(i.getGoal_Hours()))) {
+                i.setCompleted(true);
+                i.setDate_Completed(Util.gettodaysdate());
+                goalscompletedthissession.add(i);
             }
             goallist.add(i);
         }
@@ -1093,21 +1108,54 @@ public class Meditatable {
     public void goals_transitioncheck() {
         if (goalscompletedthissession.size() > 0) {thisession.MeditatableswithGoalsCompletedThisSession.add(this);}
     }
+    // UI
+    public boolean goals_ui_currentgoalisset() {return goals_getCurrent() != null;}
+    public double goals_ui_getcurrentgoalprogress() {
+        if (goals_getCurrent() == null || goals_getCurrent().getGoal_Hours() == 0.0) {return 0.0;}
+        Duration goalduration = Duration.hours(goals_getCurrent().getGoal_Hours());
+        return sessions_getPracticedDuration(false).toMillis() / goalduration.toMillis();
+    }
+    public String goals_ui_getcurrentgoalpercentage() {
+        int percentage = new Double(goals_ui_getcurrentgoalprogress() * 100).intValue();
+        if (percentage > 0) {return String.valueOf(percentage) + "%";}
+        else {return "";}
+    }
+    public String goals_ui_getcurrentgoalDuration(Double maxchars) {
+        return Util.formatdurationtoStringSpelledOut(goals_getCurrentDuration(), maxchars);
+    }
 
 // Session Tracking
-    public double sessions_getAveragePracticeTime(boolean includepreandpost) {
-        return thisession.Root.getSessions().sessioninformation_getaveragepracticetime(number, includepreandpost);
+    // UI
+    public String sessions_ui_getPracticedDuration() {
+        return Util.formatdurationtoStringSpelledOut(sessions_getPracticedDuration(null), thisession.Root.TotalTimePracticed.getLayoutBounds().getWidth());
     }
-    public Duration session_getTotalDurationPracticed() {
-        Duration totalduration = new Duration((sessions_getTotalMinutesPracticed(false) * 60) * 1000);
-        if (elapsedtime.greaterThan(Duration.ZERO)) {return totalduration.add(elapsedtime);}
-        else {return totalduration;}
+    public String sessions_ui_getPracticedSessionCount() {
+        return String.valueOf(sessions_getPracticedSessionCount(null));
     }
-    public int sessions_getTotalMinutesPracticed(boolean includepreandpost) {
-        return thisession.Root.getSessions().sessioninformation_getallsessiontotals(number, includepreandpost);
+    public String sessions_ui_getAverageSessionLength() {
+        return Util.formatdurationtoStringSpelledOut(sessions_getAverageSessionLength(null), thisession.Root.AverageSessionDuration.getLayoutBounds().getWidth());
     }
-    public int sessions_getNumberOfSessionsPracticed(boolean includepreandpost) {
-        return thisession.Root.getSessions().sessioninformation_getsessioncount(number, includepreandpost);
+    // Utility
+    public boolean sessions_includepreandpost() {
+        return ! thisession.Root.PrePostSwitch.isDisabled() && thisession.Root.PrePostSwitch.isSelected();
+    }
+    public Duration sessions_getPracticedDuration(Boolean includepreandpostoverride) {
+        boolean includepreandpost;
+        if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
+        else {includepreandpost = sessions_includepreandpost();}
+        return thisession.Root.getSessions().gettotalpracticedtime(number, includepreandpost);
+    }
+    public int sessions_getPracticedSessionCount(Boolean includepreandpostoverride) {
+        boolean includepreandpost;
+        if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
+        else {includepreandpost = sessions_includepreandpost();}
+        return thisession.Root.getSessions().getsessioncount(number, includepreandpost);
+    }
+    public Duration sessions_getAverageSessionLength(Boolean includepreandpostoverride) {
+        boolean includepreandpost;
+        if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
+        else {includepreandpost = sessions_includepreandpost();}
+        return thisession.Root.getSessions().getaveragepracticedurationforallsessions(number,  includepreandpost);
     }
 
 // Reference Files

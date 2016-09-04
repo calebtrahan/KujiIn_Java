@@ -565,13 +565,10 @@ public class MainController implements Initializable {
             numberofsessionspracticedtext = "No Sessions";
             disabled = true;
         } else {
-            Double averagesessionduration = SessionsAndGoalsSelectedMeditatable.sessions_getAveragePracticeTime(PrePostSwitch.isSelected());
-            Integer totalminutespracticed = SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(PrePostSwitch.isSelected());
-            Integer numberofsessionspracticed = SessionsAndGoalsSelectedMeditatable.sessions_getNumberOfSessionsPracticed(PrePostSwitch.isSelected());
-            if (numberofsessionspracticed > 0) {
-                averagesessiondurationtext = Util.formatdurationtoStringSpelledOut(new Duration(averagesessionduration * 1000), AverageSessionDuration.getLayoutBounds().getWidth());
-                totalminutespracticedtext = Util.formatdurationtoStringSpelledOut(new Duration(totalminutespracticed * 1000), TotalTimePracticed.getLayoutBounds().getWidth());
-                numberofsessionspracticedtext = numberofsessionspracticed.toString();
+            if (SessionsAndGoalsSelectedMeditatable.sessions_getPracticedSessionCount(null) > 0) {
+                averagesessiondurationtext = SessionsAndGoalsSelectedMeditatable.sessions_ui_getAverageSessionLength();
+                totalminutespracticedtext = SessionsAndGoalsSelectedMeditatable.sessions_ui_getPracticedDuration();
+                numberofsessionspracticedtext = SessionsAndGoalsSelectedMeditatable.sessions_ui_getPracticedSessionCount();
                 disabled = false;
             } else {
                 averagesessiondurationtext = "No Sessions";
@@ -622,10 +619,10 @@ public class MainController implements Initializable {
     public void goals_gui_updateui() {
         boolean disabled = SessionsAndGoalsSelectedMeditatable == null || SessionsAndGoalsSelectedMeditatable.goals_getCurrent() == null;
         Tooltip goalprogresstooltip;
-        String percentage;
         String toptext;
-        Double progress;
         String newgoalbuttontext;
+        String percentage;
+        Double progress;
         Tooltip newgoalbuttontooltip;
         newgoalButton.setDisable(SessionsAndGoalsSelectedMeditatable == null);
         viewcurrrentgoalsButton.setDisable(disabled);
@@ -634,34 +631,29 @@ public class MainController implements Initializable {
         GoalTopLabel.setDisable(disabled);
         if (SessionsAndGoalsSelectedMeditatable == null) {
             toptext = "Goal Progress Tracker";
+            goalprogresstooltip = new Tooltip("");
             percentage = "";
             progress = 0.0;
-            goalprogresstooltip = new Tooltip("");
             newgoalbuttontext = kujiin.xml.Options.NEWGOALTEXT;
             newgoalbuttontooltip = new Tooltip("Set A New Goal");
-        } else if (SessionsAndGoalsSelectedMeditatable.goals_getCurrent() == null || SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false) == 0) {
+        } else if (SessionsAndGoalsSelectedMeditatable.goals_getCurrent() == null || SessionsAndGoalsSelectedMeditatable.sessions_getPracticedDuration(null).lessThanOrEqualTo(Duration.ZERO)) {
             // No Current Goal Set
             toptext = "No Current Goal";
-            percentage = "";
-            progress = 0.0;
+            percentage = SessionsAndGoalsSelectedMeditatable.goals_ui_getcurrentgoalpercentage();
+            progress = SessionsAndGoalsSelectedMeditatable.goals_ui_getcurrentgoalprogress();
             goalprogresstooltip = new Tooltip("No Current Goal Set For " + SessionsAndGoalsSelectedMeditatable.name);
             newgoalbuttontext = kujiin.xml.Options.NEWGOALTEXT;
             newgoalbuttontooltip = new Tooltip("Set A New Goal");
         } else {
             toptext = "Current Goal Progress";
-            Double goalminutes = SessionsAndGoalsSelectedMeditatable.goals_getCurrent().getGoal_Hours() * 60;
-            progress = Util.convert_minstodecimalhours(SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false), 2) / (goalminutes / 60);
+            percentage = SessionsAndGoalsSelectedMeditatable.goals_ui_getcurrentgoalpercentage();
+            progress = SessionsAndGoalsSelectedMeditatable.goals_ui_getcurrentgoalprogress();
             goalprogresstooltip = new Tooltip(String.format("Currently Practiced: %s -> Goal: %s",
-                    Util.formatdurationtoStringSpelledOut(new Duration(SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false) * 1000), null),
-                    Util.formatdurationtoStringSpelledOut(new Duration(goalminutes * 1000), null))
+                    Util.formatdurationtoStringSpelledOut(SessionsAndGoalsSelectedMeditatable.sessions_getPracticedDuration(null), null),
+                    Util.formatdurationtoStringSpelledOut(Duration.hours(SessionsAndGoalsSelectedMeditatable.goals_getCurrent().getGoal_Hours()), null))
             );
-            percentage = new Double(progress * 100).intValue() + "%";
             newgoalbuttontext = kujiin.xml.Options.GOALPACINGTEXT;
             newgoalbuttontooltip = new Tooltip("Calculate Goal Pacing For This Goal");
-        }
-        if (SessionsAndGoalsSelectedMeditatable != null && getOptions().getProgramOptions().getTooltips()) {
-            newgoalButton.setTooltip(new Tooltip("Set A New Goal"));
-            viewcurrrentgoalsButton.setTooltip(new Tooltip("Edit " + SessionsAndGoalsSelectedMeditatable.name + "'s Goals"));
         }
         GoalProgressPercentageLabel.setText(percentage);
         goalsprogressbar.setProgress(progress);
@@ -678,6 +670,10 @@ public class MainController implements Initializable {
             Session.playerUI.GoalProgressBar.setProgress(progress);
             Session.playerUI.GoalPercentageLabel.setText(percentage);
             // String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue()) + "%)");
+        }
+        if (SessionsAndGoalsSelectedMeditatable != null && getOptions().getProgramOptions().getTooltips()) {
+            newgoalButton.setTooltip(new Tooltip("Set A New Goal"));
+            viewcurrrentgoalsButton.setTooltip(new Tooltip("Edit " + SessionsAndGoalsSelectedMeditatable.name + "'s Goals"));
         }
     }
     public void goals_gui_setnewgoal(Event event) {
@@ -1683,20 +1679,20 @@ public class MainController implements Initializable {
         public void populatetable() {
             allgoalsdetails.clear();
             for (Meditatable i : getSession().getAllMeditatablesincludingTotal()) {
-                String practicedtime = Util.formatdurationtoStringSpelledOut(new Duration(i.sessions_getTotalMinutesPracticed(false)), null);
-                if (practicedtime.equals("0 Minutes")) {
-                    // TODO None Text Here! No Practiced Time Set
-                }
+                Duration practicedtime = i.sessions_getPracticedDuration(false);
+                String practicedtext;
+                if (practicedtime.lessThanOrEqualTo(Duration.ZERO)) {practicedtext = "No Practiced Time";}
+                else {practicedtext = Util.formatdurationtoStringSpelledOut(i.sessions_getPracticedDuration(false), null);}
                 String currentgoaltime;
                 String percentcompleted ;
-                try {
-                    currentgoaltime = Util.formatdurationtoStringSpelledOut(new Duration(i.goals_getCurrent().getGoal_Hours() * 3_600_000), null);
-                    percentcompleted = String.valueOf(new Double((i.sessions_getTotalMinutesPracticed(false) / (i.goals_getCurrent().getGoal_Hours() * 60)) * 100).intValue()) + "%";
-                } catch (NullPointerException ignored) {
+                if (i.goals_ui_currentgoalisset()) {
+                    currentgoaltime = i.goals_ui_getcurrentgoalDuration(null);
+                    percentcompleted = i.goals_ui_getcurrentgoalpercentage();
+                } else  {
                     currentgoaltime = "No Goal Set";
                     percentcompleted = "No Goal Set";
                 }
-                allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtime, currentgoaltime, percentcompleted, i.goals_getCompletedCount()));
+                allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtext, currentgoaltime, percentcompleted, i.goals_getCompletedCount()));
             }
             GoalsTable.setItems(allgoalsdetails);
         }
@@ -1750,12 +1746,12 @@ public class MainController implements Initializable {
         public Label TopLabel;
         public Spinner<Integer> HoursSpinner;
         public Spinner<Integer> MinutesSpinner;
-        public TextField DecimalHoursTextField;
         public Label StatusBar;
         public Button AcceptButton;
         public Button CancelButton;
+        public TextField PracticedDurationTextField;
         private boolean setgoal = false;
-        private int practicedminutes;
+        private Duration practicedduration;
 
         public SimpleGoalSetDialog() {
             try {
@@ -1768,42 +1764,48 @@ public class MainController implements Initializable {
                 setTitle("Set A New Goal");
                 HoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
                 MinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
-                HoursSpinner.getValueFactory().setValue(SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false) / 60);
-                MinutesSpinner.getValueFactory().setValue(SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false) % 60);
+                practicedduration = SessionsAndGoalsSelectedMeditatable.sessions_getPracticedDuration(false);
+                HoursSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() / 60);
+                MinutesSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() % 60);
                 Util.custom_spinner_integer(HoursSpinner, 0, Integer.MAX_VALUE, 1, false);
                 Util.custom_spinner_integer(MinutesSpinner, 0, 59, 1, false);
-                practicedminutes = SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false);
-                DecimalHoursTextField.setText(Util.convert_minstodecimalhours(practicedminutes, 1).toString());
+                PracticedDurationTextField.setText(Util.formatdurationtoStringSpelledOut(practicedduration, PracticedDurationTextField.getLayoutBounds().getWidth()));
+                setOnCloseRequest(event -> {
+                    if (getPotentialGoalDuration().lessThanOrEqualTo(practicedduration)) {
+                        dialog_Information("Cannot Accept", "Goal Is Less Than Or Equal To Practiced Minutes", "Goal Must Be Greater Than Practiced Minutes");
+                        event.consume();
+                    }
+                });
             } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
+        }
+
+        private Duration getPotentialGoalDuration() {
+            try {return Duration.hours(HoursSpinner.getValue()).add(Duration.minutes(MinutesSpinner.getValue()));}
+            catch (Exception e) {return Duration.ZERO;}
+        }
+        private void checkvalue() {
+            try {
+                if (getPotentialGoalDuration().lessThanOrEqualTo(practicedduration)) {
+                    HoursSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() / 60);
+                    MinutesSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() % 60);
+                    StatusBar.setText("Goal Must Be Greater Than Practiced Time");
+                } else {StatusBar.setText("");}
+                PracticedDurationTextField.setText(Util.formatdurationtoStringSpelledOut(practicedduration, PracticedDurationTextField.getLayoutBounds().getWidth()));
+            } catch (NullPointerException ignored) {}
+        }
+        private void accept(ActionEvent actionEvent) {
+            setgoal = true;
+            close();
         }
 
         public boolean shouldSetgoal() {
             return setgoal;
-        }
-        public void checkvalue() {
-            try {
-                int value = (HoursSpinner.getValue() * 60) + MinutesSpinner.getValue();
-                if (value < practicedminutes) {
-                    HoursSpinner.getValueFactory().setValue(practicedminutes / 60);
-                    MinutesSpinner.getValueFactory().setValue(practicedminutes % 60);
-                    StatusBar.setText("Cannot Set Goal Lower Than Practiced Hours");
-                } else {StatusBar.setText("");}
-                DecimalHoursTextField.setText(Util.convert_minstodecimalhours((HoursSpinner.getValue() * 60) + MinutesSpinner.getValue(), 1).toString());
-            } catch (NullPointerException ignored) {}
         }
         public Double getNewGoalHours() {
             try {
                 return Util.convert_minstodecimalhours((HoursSpinner.getValue() * 60) + MinutesSpinner.getValue(), 2);
             } catch (NullPointerException e) {return null;}
         }
-        public void accept(ActionEvent actionEvent) {
-            if (((HoursSpinner.getValue() * 60) + MinutesSpinner.getValue()) <= practicedminutes) {
-                dialog_Information("Cannot Accept", "Goal Is Less Than Or Equal To Practiced Minutes", "Goal Must Be Greater Than Practiced Minutes");
-                return;
-            }
-            setgoal = true;
-        }
-
     }
     public class GoalPacingDialog extends Stage {
         public Spinner<Integer> PracticeDays;
@@ -1813,9 +1815,9 @@ public class MainController implements Initializable {
         public TextField GoalTimeLeft;
         public TextField TotalPracticedTime;
         public Label TopLabel;
-        private Double practicedhours;
-        private Double goalhours;
-        private Double hoursleft;
+        private Duration practicedduration;
+        private Duration goalduration;
+        private Duration durationleft;
 
         public GoalPacingDialog() {
             try {
@@ -1826,12 +1828,12 @@ public class MainController implements Initializable {
                 getOptions().setStyle(this);
                 this.setResizable(false);
                 setTitle("Goal Pacing");
-                practicedhours = (double) (SessionsAndGoalsSelectedMeditatable.sessions_getTotalMinutesPracticed(false) / 60);
-                goalhours = SessionsAndGoalsSelectedMeditatable.goals_getCurrent().getGoal_Hours();
-                GoalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(goalhours * 3_600_000), GoalDuration.getLayoutBounds().getWidth()));
-                TotalPracticedTime.setText(Util.formatdurationtoStringSpelledOut(new Duration(practicedhours * 3600000), TotalPracticedTime.getLayoutBounds().getWidth()));
-                hoursleft = goalhours - practicedhours;
-                GoalTimeLeft.setText(Util.formatdurationtoStringSpelledOut(new Duration(hoursleft * 3600000), GoalTimeLeft.getLayoutBounds().getWidth()));
+                practicedduration = SessionsAndGoalsSelectedMeditatable.sessions_getPracticedDuration(false);
+                goalduration = Duration.hours(SessionsAndGoalsSelectedMeditatable.goals_getCurrent().getGoal_Hours());
+                GoalDuration.setText(Util.formatdurationtoStringSpelledOut(goalduration, GoalDuration.getLayoutBounds().getWidth()));
+                TotalPracticedTime.setText(Util.formatdurationtoStringSpelledOut(practicedduration, TotalPracticedTime.getLayoutBounds().getWidth()));
+                durationleft = goalduration.subtract(practicedduration);
+                GoalTimeLeft.setText(Util.formatdurationtoStringSpelledOut(durationleft, GoalTimeLeft.getLayoutBounds().getWidth()));
                 Util.custom_spinner_integer(PracticeDays, 1, Integer.MAX_VALUE, 1, false);
                 PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> calculate());
                 PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
@@ -1842,7 +1844,7 @@ public class MainController implements Initializable {
         // Other Methods
         public void calculate() {
             Double days = (double) PracticeDays.getValue();
-            Float hourstopractice = hoursleft.floatValue() / days.floatValue();
+            Float hourstopractice = (float) durationleft.toHours() / days.floatValue();
             int minsaday = Util.convert_decimalhourstominutes(hourstopractice.doubleValue());
             PracticeTimeADay.setText(Util.formatdurationtoStringSpelledOut(new Duration((minsaday * 60) * 1000), PracticeTimeADay.getLayoutBounds().getWidth()));
         }
@@ -1976,10 +1978,10 @@ public class MainController implements Initializable {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
             for (Meditatable i : getSession().getAllMeditatablesincludingTotal()) {
                 if (! (i instanceof Total)) {
-                    series.getData().add(new XYChart.Data<>(i.getNameForChart(), Util.convert_minstodecimalhours(i.sessions_getTotalMinutesPracticed(false), 1)));
-                    piecesofthepie.add(new PieChart.Data(i.getNameForChart(), Util.convert_minstodecimalhours(i.sessions_getTotalMinutesPracticed(false), 1)));
+                    series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.sessions_getPracticedDuration(false).toHours()));
+                    piecesofthepie.add(new PieChart.Data(i.getNameForChart(), i.sessions_getPracticedDuration(false).toHours()));
                 }
-                totalprogressrows.add(new TotalProgressRow(i.getNameForChart(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.sessions_getTotalMinutesPracticed(false) * 60000))));
+                totalprogressrows.add(new TotalProgressRow(i.getNameForChart(), Util.formatdurationtoStringDecimalWithColons(i.sessions_getPracticedDuration(false))));
             }
             SessionBalancePieChart.getData().addAll(piecesofthepie);
             TotalProgressTableView.setItems(totalprogressrows);
@@ -2130,8 +2132,8 @@ public class MainController implements Initializable {
         private ArrayList<SoundFile> temp_soundfilelist;
         private AmbienceSong selected_temp_ambiencesong;
         private AmbienceSong selected_actual_ambiencesong;
-        private double temptotalduration;
-        private double actualtotalduration;
+        private Duration temptotalduration;
+        private Duration actualtotalduration;
         private Meditatable selectedmeditatable;
         private File tempdirectory;
         private PreviewFile previewdialog;
@@ -2226,11 +2228,9 @@ public class MainController implements Initializable {
             selected_temp_ambiencesong = ambiencesong;
         }
         public void calculatetemptotalduration() {
-            temptotalduration = 0.0;
-            for (AmbienceSong i : Temp_Table.getItems()) {
-                temptotalduration += i.getDuration();
-            }
-            Temp_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(temptotalduration), Temp_TotalDuration.getLayoutBounds().getWidth()));
+            temptotalduration = Duration.ZERO;
+            for (AmbienceSong i : Temp_Table.getItems()) {temptotalduration = temptotalduration.add(Duration.millis(i.getDuration()));}
+            Temp_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(temptotalduration, Temp_TotalDuration.getLayoutBounds().getWidth()));
         }
         public void deletetempambiencefromdirectory() {
             try {FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
@@ -2245,11 +2245,9 @@ public class MainController implements Initializable {
         public void previewactualambience(ActionEvent actionEvent) {preview(selected_actual_ambiencesong);}
         public void actualselectionchanged(AmbienceSong ambiencesong) {selected_actual_ambiencesong = ambiencesong;}
         public void calculateactualtotalduration() {
-            actualtotalduration = 0.0;
-            for (AmbienceSong i : Actual_Table.getItems()) {
-                actualtotalduration += i.getDuration();
-            }
-            Actual_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(actualtotalduration), Actual_TotalDuration.getLayoutBounds().getWidth()));
+            actualtotalduration = Duration.ZERO;
+            for (AmbienceSong i : Actual_Table.getItems()) {actualtotalduration = actualtotalduration.add(Duration.millis(i.getDuration()));}
+            Actual_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(actualtotalduration, Actual_TotalDuration.getLayoutBounds().getWidth()));
         }
 
         // Table Methods
@@ -2396,7 +2394,7 @@ public class MainController implements Initializable {
         private AmbienceSong selectedambiencesong;
         private Meditatable selectedmeditatable;
         private PreviewFile previewdialog;
-        private double totalselectedduration;
+        private Duration totalselectedduration;
 
         @Override
         public void initialize(URL location, ResourceBundle resources) {
@@ -2547,11 +2545,11 @@ public class MainController implements Initializable {
             }
         }
         public void calculatetotalduration() {
-            totalselectedduration = 0.0;
+            totalselectedduration = Duration.ZERO;
             for (AmbienceSong i : AmbienceTable.getItems()) {
-                totalselectedduration += i.getDuration();
+                totalselectedduration = totalselectedduration.add(Duration.millis(i.getDuration()));
             }
-            TotalDuration.setText(Util.formatdurationtoStringSpelledOut(new Duration(totalselectedduration), TotalDuration.getLayoutBounds().getWidth()));
+            TotalDuration.setText(Util.formatdurationtoStringSpelledOut(totalselectedduration, TotalDuration.getLayoutBounds().getWidth()));
         }
         public boolean unsavedchanges() {
             if (MeditatableChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}

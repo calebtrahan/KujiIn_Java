@@ -1,6 +1,7 @@
 package kujiin.xml;
 
 import kujiin.MainController;
+import kujiin.lib.BeanComparator;
 import kujiin.util.Meditatable;
 import kujiin.util.Util;
 
@@ -13,6 +14,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @XmlRootElement(name = "Goals")
@@ -126,6 +128,18 @@ public class Goals {
         } catch (JAXBException e) {
             Root.dialog_Information("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
         }
+    }
+
+// Utility
+    public static List<Goal> sortgoalsbyHours(List<Goal> listtosort) {
+        BeanComparator bc = new BeanComparator(kujiin.xml.Goals.Goal.class, "getGoal_Hours");
+        Collections.sort(listtosort, bc);
+        return listtosort;
+    }
+    public static List<Goal> sortgoalsbyDate(List<Goal> listtosort) {
+        BeanComparator bc = new BeanComparator(kujiin.xml.Goals.Goal.class, "getDate_Set");
+        Collections.sort(listtosort, bc);
+        return listtosort;
     }
 
     @XmlAccessorType(XmlAccessType.PROPERTY)

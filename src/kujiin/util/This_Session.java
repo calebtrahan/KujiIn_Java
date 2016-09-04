@@ -648,7 +648,7 @@ break;*/
         playerUI.reset();
     }
     public void player_transition() {
-        Session currentsession =  Root.getSessions().sessioninformation_getspecificsession( Root.getSessions().sessioninformation_totalsessioncount() - 1);
+        Session currentsession =  Root.getSessions().getspecificsession( Root.getSessions().totalsessioncount() - 1);
         currentsession.updatemeditatableduration(currentmeditatable.number, new Double(currentmeditatable.getduration().toMinutes()).intValue());
         Root.getSessions().marshall();
         Root.goals_gui_updateui();

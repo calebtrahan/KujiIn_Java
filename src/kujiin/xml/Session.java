@@ -1,5 +1,6 @@
 package kujiin.xml;
 
+import javafx.util.Duration;
 import kujiin.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -324,6 +325,9 @@ public class Session {
             default:
                 return 0;
         }
+    }
+    public Duration getmeditatabledurationasObject(int meditableindex) {
+        return Duration.minutes(getmeditatableduration(meditableindex));
     }
     public void setmeditatableambience(int meditatableindex, ArrayList<File> ambiencelist) {
         switch (meditatableindex) {

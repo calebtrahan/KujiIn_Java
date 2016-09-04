@@ -1,5 +1,6 @@
 package kujiin.xml;
 
+import javafx.util.Duration;
 import kujiin.MainController;
 import kujiin.util.Meditatable;
 import kujiin.util.Qi_Gong;
@@ -95,26 +96,26 @@ public class Sessions {
     }
 
 // Session Information Getters
-    public int sessioninformation_getallsessiontotals(int index, boolean includepreandpost) {
+    public Duration gettotalpracticedtime(int index, boolean includepreandpost) {
         try {
-            int totalminutes = 0;
-            for (kujiin.xml.Session i : getSession()) {totalminutes += i.getmeditatableduration(index);}
+            Duration totalduration = Duration.ZERO;
+            for (kujiin.xml.Session i : getSession()) {totalduration = totalduration.add(i.getmeditatabledurationasObject(index));}
             if (includepreandpost) {
                 for (Meditatable i : Root.getSession().getAllMeditatablesincludingTotal()) {
                     if (i instanceof Qi_Gong) {
-                        for (kujiin.xml.Session x : getSession()) {totalminutes += x.getmeditatableduration(i.number);}
+                        for (kujiin.xml.Session x : getSession()) {totalduration = totalduration.add(x.getmeditatabledurationasObject(i.number));}
                     }
                 }
             }
-            return totalminutes;
-        } catch (NullPointerException ignored) {return 0;}
+            return totalduration;
+        } catch (NullPointerException ignored) {return Duration.ZERO;}
     }
-    public int sessioninformation_getaveragepracticetime(int index, boolean includepreandpost) {
+    public Duration getaveragepracticedurationforallsessions(int index, boolean includepreandpost) {
         try {
-            return sessioninformation_getallsessiontotals(index, includepreandpost) / sessioninformation_getsessioncount(index, includepreandpost);}
-        catch (NullPointerException | ArithmeticException ignored) {return 0;}
+            return new Duration(gettotalpracticedtime(index, includepreandpost).toMillis() / getsessioncount(index, includepreandpost));}
+        catch (NullPointerException | ArithmeticException ignored) {return Duration.ZERO;}
     }
-    public int sessioninformation_getsessioncount(int index, boolean includepreandpost) {
+    public int getsessioncount(int index, boolean includepreandpost) {
         try {
             int sessioncount = 0;
             for (kujiin.xml.Session i : getSession()) {
@@ -126,12 +127,12 @@ public class Sessions {
             return sessioncount;
         } catch (NullPointerException ignored) {return 0;}
     }
-    public int sessioninformation_totalsessioncount() {
+    public int totalsessioncount() {
         try {
             return getSession().size();
         } catch (NullPointerException ignored) {return 0;}
     }
-    public Session sessioninformation_getspecificsession(int index) {
+    public Session getspecificsession(int index) {
         return getSession().get(index);
     }
 
