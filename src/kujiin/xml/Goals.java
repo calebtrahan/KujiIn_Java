@@ -1,10 +1,7 @@
 package kujiin.xml;
 
-import javafx.util.Duration;
 import kujiin.MainController;
-import kujiin.lib.BeanComparator;
 import kujiin.util.Meditatable;
-import kujiin.util.This_Session;
 import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
@@ -18,7 +15,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @XmlRootElement(name = "Goals")
@@ -49,79 +45,11 @@ public class Goals {
         Root = root;
     }
 
-// XML Processing
-    public void unmarshall() {
-        if (Options.GOALSXMLFILE.exists()) {
-            try {
-                JAXBContext context = JAXBContext.newInstance(Goals.class);
-                Unmarshaller createMarshaller = context.createUnmarshaller();
-                Goals currentGoals = (Goals) createMarshaller.unmarshal(Options.GOALSXMLFILE);
-                PresessionGoals = currentGoals.PresessionGoals;
-                RinGoals = currentGoals.RinGoals;
-                KyoGoals = currentGoals.KyoGoals;
-                TohGoals = currentGoals.TohGoals;
-                ShaGoals = currentGoals.ShaGoals;
-                KaiGoals = currentGoals.KaiGoals;
-                JinGoals = currentGoals.JinGoals;
-                RetsuGoals = currentGoals.RetsuGoals;
-                ZaiGoals = currentGoals.ZaiGoals;
-                ZenGoals = currentGoals.ZenGoals;
-                EarthGoals = currentGoals.EarthGoals;
-                AirGoals = currentGoals.AirGoals;
-                FireGoals = currentGoals.FireGoals;
-                WaterGoals = currentGoals.WaterGoals;
-                VoidGoals = currentGoals.VoidGoals;
-                PostsessionGoals = currentGoals.PostsessionGoals;
-                TotalGoals = currentGoals.TotalGoals;
-            } catch (JAXBException e) {
-                Root.dialog_Information("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
-            }
-        }
-    }
-    public void marshall() {
-        try {
-            JAXBContext context = JAXBContext.newInstance(Goals.class);
-            Marshaller createMarshaller = context.createMarshaller();
-            createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, Options.GOALSXMLFILE);
-        } catch (JAXBException e) {
-            Root.dialog_Information("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
-        }
-    }
-    // Add
-    public boolean add(int meditatableindex, Goal newgoal) {
-        try {
-            List<Goal> allgoals = getAllGoals(meditatableindex);
-            if (allgoals == null) {allgoals = new ArrayList<>();}
-            allgoals.add(newgoal);
-            update(allgoals, meditatableindex);
-            sort(meditatableindex);
-            marshall();
-            return true;
-        } catch (Exception ignored) {return false;}
-    }
-    // Delete
-    public boolean delete(int meditatableindex, Goal currentGoal) {
-        try {
-            getAllGoals(meditatableindex).remove(currentGoal);
-            sort(meditatableindex);
-            marshall();
-            return true;
-        } catch (Exception e) {return false;}
-    }
-    public boolean delete(int meditatableindex, int goalindex) {
-        try {
-            getAllGoals(meditatableindex).remove(goalindex);
-            sort(meditatableindex);
-            marshall();
-            return true;
-        } catch (Exception e) {return false;}
-    }
-    // Query
+// List Getters
     public List<List<Goal>> getallMeditatableGoalLists() {
-        return new ArrayList<>(Arrays.asList(PresessionGoals, RinGoals, KyoGoals, TohGoals, ShaGoals, KaiGoals, JinGoals, RetsuGoals, ZaiGoals, ZenGoals,
-                EarthGoals, AirGoals, FireGoals, WaterGoals, VoidGoals, PostsessionGoals));
-    }
+    return new ArrayList<>(Arrays.asList(PresessionGoals, RinGoals, KyoGoals, TohGoals, ShaGoals, KaiGoals, JinGoals, RetsuGoals, ZaiGoals, ZenGoals,
+            EarthGoals, AirGoals, FireGoals, WaterGoals, VoidGoals, PostsessionGoals));
+}
     public List<Goal> getMeditatableGoalList(int meditatableindex) {
         switch (meditatableindex) {
             case 0: return PresessionGoals;
@@ -165,108 +93,46 @@ public class Goals {
             case 16: TotalGoals = goallist;
         }
     }
-    public Goal getCurrentGoal(int meditatableindex) {
-        try {
-            Goal goal = getallMeditatableGoalLists().get(meditatableindex).get(getAllGoals(meditatableindex).size() - 1);
-            if (goal.getCompleted() != null && ! goal.getCompleted()) {return goal;}
-            else {return null;}
-        } catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}
-    }
-    public List<Goal> getAllGoals(int meditatableindex) {
-        return getallMeditatableGoalLists().get(meditatableindex);
-    }
-    public List<Goal> getCompletedGoals(int meditatableindex) {
-        try {
-            List<Goal> newgoallist = new ArrayList<>();
-            for (Goal i : getallMeditatableGoalLists().get(meditatableindex)) {
-                if (i.getCompleted() != null && i.getCompleted()) {newgoallist.add(i);}
-            }
-            return newgoallist;
-        } catch (NullPointerException e) {return new ArrayList<>();}
-    }
-    public int count_completedgoals(int meditatableindex) {return getCompletedGoals(meditatableindex).size();}
-    public int count_allgoals(int meditatableindex) {return getallMeditatableGoalLists().get(meditatableindex).size();}
-    public List<Goal> getgoalsCompletedOn(int meditatableindex, LocalDate localDate) {
-        try {
-            List<Goal> goalslist = new ArrayList<>();
-            for (Goal i : getAllGoals(meditatableindex)) {
-                if (i.getDate_Completed() == null || ! i.getCompleted()) {continue;}
-                if (Util.convert_stringtolocaldate(i.getDate_Completed()).equals(localDate)) {goalslist.add(i);}
-            }
-            return goalslist;
-        } catch (Exception ignored) {return new ArrayList<Goal>();}
-    }
-    // Sort
-    public void sort(int meditatableindex) {
-        List<Goal> goallist = getallMeditatableGoalLists().get(meditatableindex);
-        if (goallist != null && ! goallist.isEmpty()) {
+
+// XML Processing
+    public void unmarshall() {
+        if (Options.GOALSXMLFILE.exists()) {
             try {
-                BeanComparator bc = new BeanComparator(Goal.class, "getGoal_Hours");
-                Collections.sort(goallist, bc);
-                int count = 1;
-                for (Goal i : goallist) {
-                    i.setID(count);
-                    count++;
-                }
-                update(goallist, meditatableindex);
-            } catch (Exception ignored) {}
+                JAXBContext context = JAXBContext.newInstance(Goals.class);
+                Unmarshaller createMarshaller = context.createUnmarshaller();
+                Goals currentGoals = (Goals) createMarshaller.unmarshal(Options.GOALSXMLFILE);
+                PresessionGoals = currentGoals.PresessionGoals;
+                RinGoals = currentGoals.RinGoals;
+                KyoGoals = currentGoals.KyoGoals;
+                TohGoals = currentGoals.TohGoals;
+                ShaGoals = currentGoals.ShaGoals;
+                KaiGoals = currentGoals.KaiGoals;
+                JinGoals = currentGoals.JinGoals;
+                RetsuGoals = currentGoals.RetsuGoals;
+                ZaiGoals = currentGoals.ZaiGoals;
+                ZenGoals = currentGoals.ZenGoals;
+                EarthGoals = currentGoals.EarthGoals;
+                AirGoals = currentGoals.AirGoals;
+                FireGoals = currentGoals.FireGoals;
+                WaterGoals = currentGoals.WaterGoals;
+                VoidGoals = currentGoals.VoidGoals;
+                PostsessionGoals = currentGoals.PostsessionGoals;
+                TotalGoals = currentGoals.TotalGoals;
+            } catch (JAXBException e) {
+                Root.dialog_Information("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+            }
         }
     }
-    public void update(List<Goal> meditatablegoallist, int meditatableindex) {
-        setMeditatableGoalList(meditatableindex, meditatablegoallist);
-    }
-    // Playback Utility
-    public void completegoals(int meditatableindex, Duration currentpracticedhours) {
+    public void marshall() {
         try {
-            List<Goal> newgoallist = getallMeditatableGoalLists().get(meditatableindex);
-            for (Goal i : getallMeditatableGoalLists().get(meditatableindex)) {
-                boolean completed = currentpracticedhours.greaterThanOrEqualTo(Duration.hours(i.getGoal_Hours()));
-                boolean notcompletedbefore = i.getCompleted() != null && ! i.getCompleted();
-                if (completed && notcompletedbefore) {
-                    i.setCompleted(true);
-                    i.setDate_Completed(Util.gettodaysdate());
-                }
-                newgoallist.add(i);
-            }
-            update(newgoallist, meditatableindex);
-        } catch (Exception ignored) {}
+            JAXBContext context = JAXBContext.newInstance(Goals.class);
+            Marshaller createMarshaller = context.createMarshaller();
+            createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            createMarshaller.marshal(this, Options.GOALSXMLFILE);
+        } catch (JAXBException e) {
+            Root.dialog_Information("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+        }
     }
-    public List<Goal> completegoalsandgetcompleted(int meditatableindex, Duration currentpracticedhours) {
-        try {
-            List<Goal> newgoallist = getallMeditatableGoalLists().get(meditatableindex);
-            for (Goal i : getallMeditatableGoalLists().get(meditatableindex)) {
-                boolean completed = currentpracticedhours.greaterThanOrEqualTo(Duration.hours(i.getGoal_Hours()));
-                boolean notcompletedbefore = i.getCompleted() != null && ! i.getCompleted();
-                if (completed && notcompletedbefore) {
-                    System.out.println(This_Session.getAllMeditatables_Names().get(meditatableindex) + ": Completing Goal + " + i.getGoal_Hours());
-                    i.setCompleted(true);
-                    i.setDate_Completed(Util.gettodaysdate());
-                }
-                newgoallist.add(i);
-            }
-            update(newgoallist, meditatableindex);
-            return newgoallist;
-        } catch (Exception ignored) {return new ArrayList<>();}
-    }
-
-//    public List<Goal> getgoalscompletedondate(int cutindex, LocalDate localDate) {
-//       List<Goal> goalscompletedondate = new ArrayList<>();
-//        for (Goal i : getallmeditatablegoals(cutindex, false)) {
-//            LocalDate date = Util.convert_stringtolocaldate(i.getDate_Completed())
-//        }
-//    }
-// Goal Getters
-//    public boolean goalsexist(int cutorelementindex, boolean includecompleted) {
-//        return getallmeditatablegoals(cutorelementindex, includecompleted) != null && ! getallmeditatablegoals(cutorelementindex, true).isEmpty();
-//    }
-//    public Goal getcurrentgoal(int cutorelementindex) {
-//        try {return getallmeditatablegoals(cutorelementindex, false).get(0);}
-//        catch (NullPointerException | IndexOutOfBoundsException ignored) {return null;}
-//    }
-//    public Goal getgoal(int cutorelementindex, Integer goalindex, boolean includecompleted) {
-//        try {return getallmeditatablegoals(cutorelementindex, includecompleted).get(goalindex);}
-//        catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}
-//    }
 
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class Goal {

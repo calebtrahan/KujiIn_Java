@@ -693,7 +693,7 @@ public class MainController implements Initializable {
         }
     }
     public void goals_gui_viewcurrentgoals(Event event) {
-        if (SessionsAndGoalsSelectedMeditatable.goals_getAll() == null || SessionsAndGoalsSelectedMeditatable.goals_getAll().size() == 0) {
+        if (SessionsAndGoalsSelectedMeditatable.getGoals() == null || SessionsAndGoalsSelectedMeditatable.getGoals().isEmpty()) {
             dialog_Information("Information", "No Goals Exist For " + SessionsAndGoalsSelectedMeditatable.name, "Please Add A Goal For " + SessionsAndGoalsSelectedMeditatable.name);
         } else {new AllMeditatablesGoalProgress().showAndWait();}
     }
@@ -1696,7 +1696,7 @@ public class MainController implements Initializable {
                     currentgoaltime = "No Goal Set";
                     percentcompleted = "No Goal Set";
                 }
-                allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtime, currentgoaltime, percentcompleted, i.goals_getCompletedGoalCount()));
+                allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtime, currentgoaltime, percentcompleted, i.goals_getCompletedCount()));
             }
             GoalsTable.setItems(allgoalsdetails);
         }
@@ -1710,7 +1710,7 @@ public class MainController implements Initializable {
                 SetCurrentGoalButton.setDisable(false);
                 if (SessionsAndGoalsSelectedMeditatable.goals_getCurrent() == null) {SetCurrentGoalButton.setText(setgoaltext);}
                 else {SetCurrentGoalButton.setText(goalpacingtext);}
-                ViewCompletedGoalsButton.setDisable(SessionsAndGoalsSelectedMeditatable.goals_getCompletedGoalCount() == 0);
+                ViewCompletedGoalsButton.setDisable(SessionsAndGoalsSelectedMeditatable.goals_getCompletedCount() == 0);
             }
         }
         public void setcurrentgoal(ActionEvent actionEvent) {
@@ -2621,7 +2621,7 @@ public class MainController implements Initializable {
                 for (Meditatable i : getSession().getallitemsinSession()) {
                     series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getduration().toMinutes()));
                     totalsessionduration.add(i.getduration());
-                    for (Goals.Goal x : i.goals_getGoalsCompletedThisSession()) {
+                    for (Goals.Goal x : i.getGoalscompletedthissession()) {
                         completedgoalsitems.add(String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getduration().toHours()));
                     }
                 }

@@ -11,14 +11,13 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import kujiin.lib.BeanComparator;
 import kujiin.xml.*;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static kujiin.xml.Options.DEFAULT_FADERESUMEANDPAUSEDURATION;
 
@@ -199,6 +198,12 @@ public class Meditatable {
     }
     public int gui_getvalue() {return Integer.parseInt(Value.getText());}
 // Getters And Setters
+    public List<kujiin.xml.Goals.Goal> getGoals() {
+        return Goals;
+    }
+    public List<kujiin.xml.Goals.Goal> getGoalscompletedthissession() {
+        return goalscompletedthissession;
+    }
     public boolean getramponly() {
         try {return ((Qi_Gong) this).ramponly;}
         catch (ClassCastException ignored) {return false;}
@@ -928,9 +933,7 @@ public class Meditatable {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             try {
                 thisession.Root.getSessions().sessioninformation_getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatemeditatableduration(number, new Double(elapsedtime.toMinutes()).intValue());
-                if (goals_getCurrent() != null && (goals_getCurrent().getGoal_Hours() * 60) >= sessions_getTotalMinutesPracticed(false)) {
-                    goalscompletedthissession.addAll(goals_completeandgetcompleted());
-                }
+                goals_updateduringplayback();
             } catch (NullPointerException ignored) {}
         }
     }
@@ -1018,47 +1021,78 @@ public class Meditatable {
     }
 
 // Goals
+    // Goals XML
+    public void goals_unmarshall() {Goals = thisession.Root.getGoals().getMeditatableGoalList(number);}
+    public void goals_marshall() {thisession.Root.getGoals().setMeditatableGoalList(number, Goals);}
+    // List Methods
     public void goals_add(kujiin.xml.Goals.Goal newgoal) {
-        System.out.println("Called Add Goal In Meditatable Logic");
-        GoalsController.add(number, newgoal);
+        if (Goals == null) {Goals = new ArrayList<>();}
+        Goals.add(newgoal);
     }
-    public void goals_update(List<kujiin.xml.Goals.Goal> goalslist) {
-        GoalsController.update(goalslist, number);
+    private void goals_sort() {
+        List<kujiin.xml.Goals.Goal> goallist = Goals;
+        if (goallist != null && ! goallist.isEmpty()) {
+            try {
+                BeanComparator bc = new BeanComparator(kujiin.xml.Goals.Goal.class, "getGoal_Hours");
+                Collections.sort(goallist, bc);
+                int count = 1;
+                for (kujiin.xml.Goals.Goal i : goallist) {
+                    i.setID(count);
+                    count++;
+                }
+                Goals = goallist;
+            } catch (Exception ignored) {}
+        }
     }
-    public void goals_delete(kujiin.xml.Goals.Goal currentgoal) {
-        GoalsController.delete(number, currentgoal);
-    }
-    public void goals_delete(int goalindex) {
-        GoalsController.delete(number, goalindex);
-    }
+    public void goals_remove(kujiin.xml.Goals.Goal currentgoal) {Goals.remove(currentgoal);}
+    // Getters
     public kujiin.xml.Goals.Goal goals_getCurrent() {
-        return GoalsController.getCurrentGoal(number);
+        try {
+            kujiin.xml.Goals.Goal goal = Goals.get(Goals.size() - 1);
+            if (goal.getCompleted() != null && ! goal.getCompleted()) {return goal;}
+            else {return null;}
+        } catch (IndexOutOfBoundsException | NullPointerException ignored) {return null;}
     }
-    public List<kujiin.xml.Goals.Goal> goals_getAll() {return GoalsController.getAllGoals(number);}
-    public List<kujiin.xml.Goals.Goal> goals_getCompleted() {return GoalsController.getCompletedGoals(number);}
-    public int goals_getCompletedGoalCount() {return GoalsController.count_completedgoals(number);}
+    public List<kujiin.xml.Goals.Goal> goals_getCompleted() {
+        try {return Goals.stream().filter(i -> i.getCompleted() != null && i.getCompleted()).collect(Collectors.toList());}
+        catch (NullPointerException e) {return new ArrayList<>();}
+    }
+    public int goals_getCompletedCount() {return goals_getCompleted().size();}
+    public List<kujiin.xml.Goals.Goal> goals_getCompletedOn(LocalDate localDate) {
+        try {
+            List<kujiin.xml.Goals.Goal> goalslist = new ArrayList<>();
+            for (kujiin.xml.Goals.Goal i : Goals) {
+                if (i.getDate_Completed() == null || ! i.getCompleted()) {continue;}
+                if (Util.convert_stringtolocaldate(i.getDate_Completed()).equals(localDate)) {goalslist.add(i);}
+            }
+            return goalslist;
+        } catch (Exception ignored) {return new ArrayList<>();}
+    }
+    // Validation Methods
     public boolean goals_arelongenough() {
         try {
             return (sessions_getTotalMinutesPracticed(false) / 60) + getduration().toHours() >= goals_getCurrent().getGoal_Hours();
         } catch (NullPointerException e) {return true;}
     }
+    // Playback Methods
+    private void goals_updateduringplayback() {
+        List<kujiin.xml.Goals.Goal> goallist = new ArrayList<>();
+        for (kujiin.xml.Goals.Goal i : Goals) {
+            if (i.getCompleted() != null && ! i.getCompleted()) {
+                if (session_getTotalDurationPracticed().greaterThanOrEqualTo(Duration.hours(i.getGoal_Hours()))) {
+                    i.setCompleted(true);
+                    i.setDate_Completed(Util.gettodaysdate());
+                    goalscompletedthissession.add(i);
+                }
+            }
+            goallist.add(i);
+        }
+        Goals = goallist;
+    }
     public void goals_transitioncheck() {
-        goalscompletedthissession.addAll(goals_completeandgetcompleted());
         if (goalscompletedthissession.size() > 0) {
             thisession.MeditatableswithGoalsCompletedThisSession.add(this);
         }
-    }
-    public void goals_complete() {
-        GoalsController.completegoals(number, session_getTotalDurationPracticed());
-    }
-    public List<kujiin.xml.Goals.Goal> goals_completeandgetcompleted() {
-        return GoalsController.completegoalsandgetcompleted(number, session_getTotalDurationPracticed());
-    }
-    public List<kujiin.xml.Goals.Goal> goals_getGoalsCompletedThisSession() {
-        return goalscompletedthissession;
-    }
-    public List<kujiin.xml.Goals.Goal> goals_getGoalsCompletedOn(LocalDate localDate) {
-        return GoalsController.getgoalsCompletedOn(number, localDate);
     }
 
 // Session Tracking

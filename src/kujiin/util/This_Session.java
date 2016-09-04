@@ -515,13 +515,9 @@ break;*/
         playerUI.setOnShowing(event -> Root.getStage().setIconified(true));
         playerUI.setOnCloseRequest(event -> {
             if (! player_endsessionprematurely()) {event.consume();}
-            else {
-                player_stop();}
+            else {player_stop();}
         });
-        playerUI.setOnHidden(event -> {
-            // Reset Created Session
-            Root.getStage().setIconified(false);
-        });
+        playerUI.setOnHidden(event -> {if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}});
         playerUI.showAndWait();
         Root.creation_gui_setDisable(false);
     }
