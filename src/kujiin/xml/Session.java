@@ -269,27 +269,27 @@ public class Session {
     public void setDate_Practiced(String date_Practiced) {Date_Practiced = date_Practiced;}
 
 // Other Methods
-    public void updatemeditatableduration(int meditatableindex, int duration) {
-        if (meditatableindex == 0) {setPresession_Duration(duration);}
-        if (meditatableindex == 1) {setRin_Duration(duration);}
-        if (meditatableindex == 2) {setKyo_Duration(duration);}
-        if (meditatableindex == 3) {setToh_Duration(duration);}
-        if (meditatableindex == 4) {setSha_Duration(duration);}
-        if (meditatableindex == 5) {setKai_Duration(duration);}
-        if (meditatableindex == 6) {setJin_Duration(duration);}
-        if (meditatableindex == 7) {setRetsu_Duration(duration);}
-        if (meditatableindex == 8) {setZai_Duration(duration);}
-        if (meditatableindex == 9) {setZen_Duration(duration);}
-        if (meditatableindex == 10) {setEarth_Duration(duration);}
-        if (meditatableindex == 11) {setAir_Duration(duration);}
-        if (meditatableindex == 12) {setFire_Duration(duration);}
-        if (meditatableindex == 13) {setWater_Duration(duration);}
-        if (meditatableindex == 14) {setVoid_Duration(duration);}
-        if (meditatableindex == 15) {setPostsession_Duration(duration);}
+    public void updatesessionpartduration(int sessionpartindex, int duration) {
+        if (sessionpartindex == 0) {setPresession_Duration(duration);}
+        if (sessionpartindex == 1) {setRin_Duration(duration);}
+        if (sessionpartindex == 2) {setKyo_Duration(duration);}
+        if (sessionpartindex == 3) {setToh_Duration(duration);}
+        if (sessionpartindex == 4) {setSha_Duration(duration);}
+        if (sessionpartindex == 5) {setKai_Duration(duration);}
+        if (sessionpartindex == 6) {setJin_Duration(duration);}
+        if (sessionpartindex == 7) {setRetsu_Duration(duration);}
+        if (sessionpartindex == 8) {setZai_Duration(duration);}
+        if (sessionpartindex == 9) {setZen_Duration(duration);}
+        if (sessionpartindex == 10) {setEarth_Duration(duration);}
+        if (sessionpartindex == 11) {setAir_Duration(duration);}
+        if (sessionpartindex == 12) {setFire_Duration(duration);}
+        if (sessionpartindex == 13) {setWater_Duration(duration);}
+        if (sessionpartindex == 14) {setVoid_Duration(duration);}
+        if (sessionpartindex == 15) {setPostsession_Duration(duration);}
         updatetotalsessionduration();
     }
-    public int getmeditatableduration(int meditatableindex) {
-        switch (meditatableindex) {
+    public int getsessionpartduration(int sessionpartindex) {
+        switch (sessionpartindex) {
             case 0:
                 return getPresession_Duration();
             case 1:
@@ -326,11 +326,11 @@ public class Session {
                 return 0;
         }
     }
-    public Duration getmeditatabledurationasObject(int meditableindex) {
-        return Duration.minutes(getmeditatableduration(meditableindex));
+    public Duration getsessionpartdurationasObject(int sessionpartindex) {
+        return Duration.minutes(getsessionpartduration(sessionpartindex));
     }
-    public void setmeditatableambience(int meditatableindex, ArrayList<File> ambiencelist) {
-        switch (meditatableindex) {
+    public void setsessionpartambience(int sessionpartindex, ArrayList<File> ambiencelist) {
+        switch (sessionpartindex) {
             case 0:
                 setPresession_Ambience(ambiencelist);
                 break;
@@ -381,30 +381,30 @@ public class Session {
                 break;
         }
     }
-    public ArrayList<Integer> getallmeditatabletimes() {
-        ArrayList<Integer> allmeditatabletimes = new ArrayList<>();
-        allmeditatabletimes.add(getPresession_Duration());
-        allmeditatabletimes.add(getRin_Duration());
-        allmeditatabletimes.add(getKyo_Duration());
-        allmeditatabletimes.add(getToh_Duration());
-        allmeditatabletimes.add(getSha_Duration());
-        allmeditatabletimes.add(getKai_Duration());
-        allmeditatabletimes.add(getJin_Duration());
-        allmeditatabletimes.add(getRetsu_Duration());
-        allmeditatabletimes.add(getZai_Duration());
-        allmeditatabletimes.add(getZen_Duration());
-        allmeditatabletimes.add(getZen_Duration());
-        allmeditatabletimes.add(getEarth_Duration());
-        allmeditatabletimes.add(getAir_Duration());
-        allmeditatabletimes.add(getFire_Duration());
-        allmeditatabletimes.add(getWater_Duration());
-        allmeditatabletimes.add(getVoid_Duration());
-        allmeditatabletimes.add(getPostsession_Duration());
-        return allmeditatabletimes;
+    public ArrayList<Integer> getallsessionparttimes() {
+        ArrayList<Integer> allsessionparttimes = new ArrayList<>();
+        allsessionparttimes.add(getPresession_Duration());
+        allsessionparttimes.add(getRin_Duration());
+        allsessionparttimes.add(getKyo_Duration());
+        allsessionparttimes.add(getToh_Duration());
+        allsessionparttimes.add(getSha_Duration());
+        allsessionparttimes.add(getKai_Duration());
+        allsessionparttimes.add(getJin_Duration());
+        allsessionparttimes.add(getRetsu_Duration());
+        allsessionparttimes.add(getZai_Duration());
+        allsessionparttimes.add(getZen_Duration());
+        allsessionparttimes.add(getZen_Duration());
+        allsessionparttimes.add(getEarth_Duration());
+        allsessionparttimes.add(getAir_Duration());
+        allsessionparttimes.add(getFire_Duration());
+        allsessionparttimes.add(getWater_Duration());
+        allsessionparttimes.add(getVoid_Duration());
+        allsessionparttimes.add(getPostsession_Duration());
+        return allsessionparttimes;
     }
     public boolean sessionnotEmpty() {
         int count = 0;
-        for (Integer i : getallmeditatabletimes()) {
+        for (Integer i : getallsessionparttimes()) {
             if (count > 0 && count < 15) {if (i > 0) {return true;}}
             count++;
         }
@@ -412,7 +412,7 @@ public class Session {
     }
     public void updatetotalsessionduration() {
         Integer total = 0;
-        for (Integer i: getallmeditatabletimes()) {total += i;}
+        for (Integer i: getallsessionparttimes()) {total += i;}
         setTotal_Session_Duration(total);
     }
 

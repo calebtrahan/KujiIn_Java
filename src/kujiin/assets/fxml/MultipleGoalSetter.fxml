@@ -22,7 +22,7 @@
                                     <Insets bottom="12.0" />
                                  </VBox.margin>
                               </Label>
-                              <ListView fx:id="MeditatableSelectListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                              <ListView fx:id="SessionPartsSelectListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                  <contextMenu>
                                     <ContextMenu>
                                       <items>
@@ -44,7 +44,7 @@
                                        <children>
                                           <VBox alignment="CENTER" layoutX="14.0" layoutY="14.0" prefHeight="329.0" prefWidth="416.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                <Label alignment="CENTER" text="Meditatable Name">
+                                                <Label alignment="CENTER" text="Session Part">
                                                    <font>
                                                       <Font size="16.0" />
                                                    </font>

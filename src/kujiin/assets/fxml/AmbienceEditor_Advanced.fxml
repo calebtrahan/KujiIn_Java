@@ -108,13 +108,13 @@
                   <Font name="System Bold" size="17.0" />
                </font>
             </Label>
-            <ChoiceBox fx:id="MeditatableSelectionBox" prefHeight="26.0" prefWidth="160.0" />
+            <ChoiceBox fx:id="SessionPartSelectionBox" prefHeight="26.0" prefWidth="160.0" />
          </children>
       </HBox>
       <HBox alignment="CENTER_RIGHT" layoutX="388.0" layoutY="455.0" prefHeight="26.0" prefWidth="322.0">
          <children>
             <Button fx:id="SaveButton" mnemonicParsing="false" onAction="#save" text="Save" />
-            <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#closebuttonpressed" text="Close" />
+            <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#close" text="Close" />
          </children>
       </HBox>
       <Button fx:id="SwitchToSimpleEditor" layoutX="14.0" layoutY="455.0" mnemonicParsing="false" onAction="#switchtosimple" text="Switch To Simple Editor" />

@@ -11,7 +11,7 @@ import kujiin.xml.SoundFile;
 import java.io.File;
 
 
-public class Element extends Meditatable {
+public class Element extends SessionPart {
 
     public Element(int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         super(number, name, briefsummary, thissession, aSwitch, value);
@@ -37,7 +37,7 @@ public class Element extends Meditatable {
                 expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + entrainmentchecker_partcutnames.get(entrainmentchecker_partcount - 1) + ".mp3");
             } catch (IndexOutOfBoundsException ignored) {
                 entrainmentready = true;
-                thisession.Root.getEntrainments().setmeditatableEntrainment(number, entrainment);
+                thisession.Root.getEntrainments().setsessionpartEntrainment(number, entrainment);
                 return;
             }
         }
@@ -80,12 +80,12 @@ public class Element extends Meditatable {
 
     @Override
     public boolean creation_buildEntrainment() {
-        int index = allmeditatablestoplay.indexOf(this);
-        Meditatable meditatableafter = null;
-        if (index != allmeditatablestoplay.size() - 1) {meditatableafter = allmeditatablestoplay.get(index + 1);}
+        int index = allsessionpartstoplay.indexOf(this);
+        SessionPart partafter = null;
+        if (index != allsessionpartstoplay.size() - 1) {partafter = allsessionpartstoplay.get(index + 1);}
         // rin kyo toh sha kai jin retsu zai zen
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && meditatableafter != null && ! meditatableafter.getNameForFiles().equals("qi")) {
-            entrainment.setRampfile(entrainment.ramp_get(meditatableafter.number - 1));
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && partafter != null && ! partafter.getNameForFiles().equals("qi")) {
+            entrainment.setRampfile(entrainment.ramp_get(partafter.number - 1));
             return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
         }
         return super.creation_buildEntrainment();

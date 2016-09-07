@@ -71,7 +71,7 @@ public class Options {
     public static final This_Session.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = This_Session.ReferenceType.html;
     public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
     public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
-    public static final Integer DEFAULT_LONG_MEDITATABLE_DURATION = 10;
+    public static final Integer DEFAULT_LONG_SESSIONPART_DURATION = 10;
     public static final String NEWGOALTEXT = "New Goal";
     public static final String GOALPACINGTEXT = "Goal Pacing";
     public static final Image PROGRAM_ICON = new Image(new File(Options.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString());
@@ -117,7 +117,7 @@ public class Options {
                 setSessionOptions(options.getSessionOptions());
                 setAppearanceOptions(options.getAppearanceOptions());
             } catch (JAXBException ignored) {
-                Platform.runLater(() -> Root.dialog_Information("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
+                Platform.runLater(() -> Root.dialog_displayInformation("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
             }
         } else {
@@ -131,7 +131,7 @@ public class Options {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, OPTIONSXMLFILE);
         } catch (JAXBException e) {
-            Root.dialog_Information("Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
+            Root.dialog_displayInformation("Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
         }
     }
     public void resettodefaults() {

@@ -2,7 +2,7 @@ package kujiin.xml;
 
 import kujiin.MainController;
 import kujiin.lib.BeanComparator;
-import kujiin.util.Meditatable;
+import kujiin.util.SessionPart;
 import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
@@ -46,8 +46,8 @@ public class Goals {
     }
 
 // List Getters
-    public List<Goal> getMeditatableGoalList(int meditatableindex) {
-        switch (meditatableindex) {
+    public List<Goal> getSessionPartGoalList(int sessionpartindex) {
+        switch (sessionpartindex) {
             case 0: return PresessionGoals;
             case 1: return RinGoals;
             case 2: return KyoGoals;
@@ -68,8 +68,8 @@ public class Goals {
             default: return null;
         }
     }
-    public void setMeditatableGoalList(int meditatableindex, List<Goal> goallist) {
-        switch (meditatableindex) {
+    public void setSessionPartGoalList(int sessionpartindex, List<Goal> goallist) {
+        switch (sessionpartindex) {
             case 0: PresessionGoals = goallist; return;
             case 1: RinGoals = goallist; return;
             case 2: KyoGoals = goallist; return;
@@ -115,7 +115,7 @@ public class Goals {
                 PostsessionGoals = currentGoals.PostsessionGoals;
                 TotalGoals = currentGoals.TotalGoals;
             } catch (JAXBException e) {
-                Root.dialog_Information("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+                Root.dialog_displayInformation("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -126,7 +126,7 @@ public class Goals {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.GOALSXMLFILE);
         } catch (JAXBException e) {
-            Root.dialog_Information("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+            Root.dialog_displayInformation("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
         }
     }
 
@@ -153,7 +153,7 @@ public class Goals {
 
         public Goal() {}
 
-        public Goal(Double goalhours, Meditatable meditatable) {
+        public Goal(Double goalhours, SessionPart sessionPart) {
             setGoal_Hours(goalhours);
             setDate_Set(Util.convert_localdatetostring(LocalDate.now()));
             setCompleted(false);

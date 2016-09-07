@@ -14,7 +14,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Label>
-                  <ChoiceBox fx:id="MeditatableNamesChoiceBox" onAction="#newmeditatableselected" prefHeight="26.0" prefWidth="150.0">
+                  <ChoiceBox fx:id="SessionPartNamesChoiceBox" onAction="#newsessionpartselected" prefHeight="26.0" prefWidth="150.0">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>

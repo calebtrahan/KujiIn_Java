@@ -78,17 +78,17 @@ public class Entrainments {
             createMarshaller.marshal(this, Options.ENTRAINMENTXMLFILE);
         } catch (JAXBException e) {
             e.printStackTrace();
-            Root.dialog_Information("Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+            Root.dialog_displayInformation("Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
         }
     }
 
 // Other Methods
-    public Entrainment getmeditatableEntrainment(int index) {
+    public Entrainment getsessionpartEntrainment(int index) {
         Entrainment entrainment = AllEntrainment.get(index);
         if (entrainment == null) {return new Entrainment();}
         else {return entrainment;}
     }
-    public void setmeditatableEntrainment(int index, Entrainment entrainment) {
+    public void setsessionpartEntrainment(int index, Entrainment entrainment) {
         switch (index) {
             case 0: Presession = entrainment; break;
             case 1: Rin = entrainment; break;

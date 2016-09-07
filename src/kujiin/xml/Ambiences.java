@@ -69,11 +69,11 @@ public class Ambiences {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.AMBIENCEXMLFILE);
         } catch (JAXBException ignored) {
-            Root.dialog_Information("Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
+            Root.dialog_displayInformation("Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
     }
 
 // Other Methods
-    public Ambience getmeditatableAmbience(int index) {
+    public Ambience getsessionpartAmbience(int index) {
         switch (index) {
             case 0:
                 if (Presession != null) {return Presession;} else {return new Ambience();}
@@ -111,7 +111,7 @@ public class Ambiences {
                 return null;
         }
     }
-    public void setmeditatableAmbience(int index, Ambience ambience) {
+    public void setsessionpartAmbience(int index, Ambience ambience) {
         switch (index) {
             case 0:
                 Presession = ambience;

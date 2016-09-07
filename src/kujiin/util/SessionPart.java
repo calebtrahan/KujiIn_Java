@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import static kujiin.xml.Options.DEFAULT_FADERESUMEANDPAUSEDURATION;
 
-public class Meditatable {
+public class SessionPart {
 // GUI Fields
     protected ToggleButton Switch;
     protected TextField Value;
@@ -48,13 +48,13 @@ public class Meditatable {
     protected Animation fade_ambience_pause;
     protected Animation fade_ambience_stop;
     protected Animation timeline_fadeout_timer;
-    protected Animation timeline_progresstonextmeditatable;
+    protected Animation timeline_progresstonextsessionpart;
     protected Animation timeline_start_ramp;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     private ArrayList<SoundFile> ambienceplayhistory;
     public Duration elapsedtime;
-    protected List<Meditatable> allmeditatablestoplay;
+    protected List<SessionPart> allsessionpartstoplay;
     protected List<kujiin.xml.Goals.Goal> goalscompletedthissession;
 // Goal Fields
     protected Goals GoalsController;
@@ -72,8 +72,8 @@ public class Meditatable {
     private MediaPlayer ambiencechecker_calculateplayer;
     private boolean ambienceready = false;
 
-    public Meditatable() {}
-    public Meditatable(int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
+    public SessionPart() {}
+    public SessionPart(int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
         this.duration = Duration.ZERO;
@@ -92,10 +92,10 @@ public class Meditatable {
             Switch.setOnAction(event -> gui_toggleswitch());
             gui_toggleswitch();
         }
-        entrainment = thissession.Root.getEntrainments().getmeditatableEntrainment(number);
+        entrainment = thissession.Root.getEntrainments().getsessionpartEntrainment(number);
         entrainmentchecker_partcount = 0;
         entrainment_populate();
-        ambience = thissession.Root.getAmbiences().getmeditatableAmbience(number);
+        ambience = thissession.Root.getAmbiences().getsessionpartAmbience(number);
         ambience_cleanupexistingambience();
         ambience_addnewfromdirectory();
     //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
@@ -166,7 +166,7 @@ public class Meditatable {
                     ambience_addnewfromdirectory();
                 });
             } catch (IndexOutOfBoundsException ignored) {
-                thisession.Root.getAmbiences().setmeditatableAmbience(number, ambience);
+                thisession.Root.getAmbiences().setsessionpartAmbience(number, ambience);
                 ambienceready = true;
             }
         }
@@ -228,8 +228,8 @@ public class Meditatable {
     public Duration getelapsedtime() {return elapsedtime;}
 
 // Creation
-    public boolean creation_build(List<Meditatable> allmeditatables) {
-        allmeditatablestoplay = allmeditatables;
+    public boolean creation_build(List<SessionPart> sessionpartstoplay) {
+        allsessionpartstoplay = sessionpartstoplay;
         if (thisession.Root.AmbienceSwitch.isSelected()) {return creation_buildEntrainment() && creation_buildAmbience();}
         else {return creation_buildEntrainment();}
     }
@@ -260,8 +260,8 @@ public class Meditatable {
         entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
-        timeline_progresstonextmeditatable = new Timeline(new KeyFrame(getduration(), ae -> thisession.player_progresstonextmeditatable()));
-        timeline_progresstonextmeditatable.play();
+        timeline_progresstonextsessionpart = new Timeline(new KeyFrame(getduration(), ae -> thisession.player_progresstonextsessionpart()));
+        timeline_progresstonextsessionpart.play();
         currententrainmentvolume = thisession.getCurrententrainmentvolume();
         if (! ramponly && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
             timeline_start_ramp = new Timeline(new KeyFrame(getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
@@ -337,7 +337,7 @@ public class Meditatable {
             }
         }
         toggleplayerbuttons();
-        thisession.Root.sessionandgoals_forceselectmeditatable(number);
+        thisession.Root.sessionandgoals_forceselectsessionpart(number);
         goalscompletedthissession = new ArrayList<>();
     }
     public void resume() {
@@ -353,7 +353,7 @@ public class Meditatable {
             entrainmentplayer.setVolume(currententrainmentvolume);
             volume_bindentrainment();
             thisession.playerState = This_Session.PlayerState.PLAYING;
-            timeline_progresstonextmeditatable.play();
+            timeline_progresstonextsessionpart.play();
             if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();}
         }
@@ -387,7 +387,7 @@ public class Meditatable {
         } else {
             thisession.playerState = This_Session.PlayerState.PAUSED;
             entrainmentplayer.pause();
-            timeline_progresstonextmeditatable.pause();
+            timeline_progresstonextsessionpart.pause();
             if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.pause();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
             if (thisession.Root.AmbienceSwitch.isSelected()) {
@@ -413,7 +413,7 @@ public class Meditatable {
             thisession.playerState = This_Session.PlayerState.STOPPED;
             entrainmentplayer.stop();
             entrainmentplayer.dispose();
-            timeline_progresstonextmeditatable.stop();
+            timeline_progresstonextsessionpart.stop();
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
             if (thisession.Root.AmbienceSwitch.isSelected()) {
                 volume_unbindambience();
@@ -480,7 +480,7 @@ public class Meditatable {
                 }
             }
         };
-        fade_entrainment_resume.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; timeline_progresstonextmeditatable.play(); if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
+        fade_entrainment_resume.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; timeline_progresstonextsessionpart.play(); if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();} toggleplayerbuttons(); volume_bindentrainment();});
         if (thisession.Root.AmbienceSwitch.isSelected()) {
             fade_ambience_resume = new Transition() {
@@ -518,7 +518,7 @@ public class Meditatable {
                 }
             }
         };
-        fade_entrainment_pause.setOnFinished(event -> {entrainmentplayer.pause(); timeline_progresstonextmeditatable.pause();
+        fade_entrainment_pause.setOnFinished(event -> {entrainmentplayer.pause(); timeline_progresstonextsessionpart.pause();
             if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.pause();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();} thisession.playerState = This_Session.PlayerState.PAUSED; toggleplayerbuttons();});
         if (thisession.Root.AmbienceSwitch.isSelected()) {
@@ -560,7 +560,7 @@ public class Meditatable {
             };
             fade_entrainment_stop.setOnFinished(event -> {entrainmentplayer.stop(); entrainmentplayer.dispose();
                 if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.stop();}
-                timeline_progresstonextmeditatable.stop(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();} thisession.playerState = This_Session.PlayerState.STOPPED; toggleplayerbuttons();});
+                timeline_progresstonextsessionpart.stop(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();} thisession.playerState = This_Session.PlayerState.STOPPED; toggleplayerbuttons();});
             if (thisession.Root.AmbienceSwitch.isSelected()) {
                 fade_ambience_stop = new Transition() {
                     {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration()));}
@@ -652,7 +652,7 @@ public class Meditatable {
             if (fade_ambience_pause != null) {fade_ambience_pause.stop();}
             if (fade_ambience_resume != null) {fade_ambience_resume.stop();}
             if (fade_ambience_stop != null) {fade_ambience_stop.stop();}
-            if (timeline_progresstonextmeditatable != null) {timeline_progresstonextmeditatable.stop();}
+            if (timeline_progresstonextsessionpart != null) {timeline_progresstonextsessionpart.stop();}
             if (timeline_start_ramp != null) {timeline_fadeout_timer.stop();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
             volume_unbindentrainment();
@@ -685,9 +685,9 @@ public class Meditatable {
         String pausebuttontext;
         String stopbuttontext;
         String statusbartext;
-        String meditatablename;
-        if (thisession.getCurrentmeditatable() != null) {meditatablename = thisession.getCurrentmeditatable().name;}
-        else {meditatablename = "Session";}
+        String sessionpartname;
+        if (thisession.getCurrentsessionpart() != null) {sessionpartname = thisession.getCurrentsessionpart().name;}
+        else {sessionpartname = "Session";}
         switch (thisession.playerState) {
             case IDLE:
                 playbuttontext = "Start";
@@ -699,13 +699,13 @@ public class Meditatable {
                 playbuttontext = "Playing";
                 pausebuttontext = "Pause";
                 stopbuttontext = "Stop";
-                statusbartext = meditatablename + " Playing";
+                statusbartext = sessionpartname + " Playing";
                 break;
             case PAUSED:
                 playbuttontext = "Resume";
                 pausebuttontext = "Paused";
                 stopbuttontext = "Stop";
-                statusbartext = meditatablename + " Paused";
+                statusbartext = sessionpartname + " Paused";
                 break;
             case STOPPED:
                 playbuttontext = "Play";
@@ -723,25 +723,25 @@ public class Meditatable {
                 playbuttontext = "Starting";
                 pausebuttontext = "Starting";
                 stopbuttontext = "Starting";
-                statusbartext = "Fading In To " + meditatablename ;
+                statusbartext = "Fading In To " + sessionpartname ;
                 break;
             case FADING_RESUME:
                 playbuttontext = "Resuming";
                 pausebuttontext = "Resuming";
                 stopbuttontext = "Resuming";
-                statusbartext = "Resuming " + meditatablename ;
+                statusbartext = "Resuming " + sessionpartname ;
                 break;
             case FADING_PAUSE:
                 playbuttontext = "Pausing";
                 pausebuttontext = "Pausing";
                 stopbuttontext = "Pausing";
-                statusbartext = "Pausing " + meditatablename;
+                statusbartext = "Pausing " + sessionpartname;
                 break;
             case FADING_STOP:
                 playbuttontext = "Stopping";
                 pausebuttontext = "Stopping";
                 stopbuttontext = "Stopping";
-                statusbartext = "Stopping " + meditatablename;
+                statusbartext = "Stopping " + sessionpartname;
                 break;
             default:
                 playbuttontext = "";
@@ -934,15 +934,45 @@ public class Meditatable {
     public void tick() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             try {
-                thisession.Root.getSessions().getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatemeditatableduration(number, new Double(elapsedtime.toMinutes()).intValue());
+                thisession.Root.getSessions().getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatesessionpartduration(number, new Double(elapsedtime.toMinutes()).intValue());
                 goals_updateduringplayback();
             } catch (NullPointerException ignored) {}
         }
     }
     // Error Handling
-    protected void entrainmenterror() {}
+    protected void entrainmenterror() {
+        System.out.println("Entrainment Error");
+        // Pause Ambience If Exists
+        switch (thisession.Root.dialog_getAnswer("Entrainment Playback Error", null, "An Error Occured While Playing " + name +
+                        "'s Entrainment. Problem File Is: '" + entrainmentplayer.getMedia().getSource() + "'",
+                "Retry Playback", "Mute Entrainment", "Stop Session Playback")) {
+            case YES:
+                entrainmentplayer.stop();
+                entrainmentplayer.play();
+                entrainmentplayer.setOnError(this::entrainmenterror);
+                break;
+            case CANCEL:
+                thisession.player_error();
+                break;
+        }
+    }
     protected void ambienceerror() {
-        System.out.println(name + "Ambience Error!");
+        System.out.println("Ambience Error!");
+        // Pause Entrainment
+        switch (thisession.Root.dialog_getAnswer("Ambience Playback Error", null, "An Error Occured While Playing " + name +
+                        "'s Ambience. Problem File Is: '" + ambienceplayer.getMedia().getSource() + "'",
+                "Retry Playback", "Mute Ambience", "Stop Session Playback")) {
+            case YES:
+                ambienceplayer.stop();
+                ambienceplayer.play();
+                ambienceplayer.setOnError(this::ambienceerror);
+                break;
+            case NO:
+                ambienceplayer.stop();
+            case CANCEL:
+                thisession.player_error();
+                break;
+        }
     }
 
 // Export
@@ -1024,8 +1054,8 @@ public class Meditatable {
 
 // Goals
     // Goals XML
-    public void goals_unmarshall() {Goals = thisession.Root.getGoals().getMeditatableGoalList(number);}
-    public void goals_marshall() {thisession.Root.getGoals().setMeditatableGoalList(number, Goals);}
+    public void goals_unmarshall() {Goals = thisession.Root.getGoals().getSessionPartGoalList(number);}
+    public void goals_marshall() {thisession.Root.getGoals().setSessionPartGoalList(number, Goals);}
     // List Methods
     public void goals_add(kujiin.xml.Goals.Goal newgoal) {
         if (Goals == null) {Goals = new ArrayList<>();}
@@ -1106,7 +1136,7 @@ public class Meditatable {
         Goals = goallist;
     }
     public void goals_transitioncheck() {
-        if (goalscompletedthissession.size() > 0) {thisession.MeditatableswithGoalsCompletedThisSession.add(this);}
+        if (goalscompletedthissession.size() > 0) {thisession.sessionpartswithGoalsCompletedThisSession.add(this);}
     }
     // UI
     public boolean goals_ui_currentgoalisset() {return goals_getCurrent() != null;}

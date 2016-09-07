@@ -4,7 +4,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.util.Duration;
 
-public class Total extends Meditatable {
+public class Total extends SessionPart {
 
 
     public Total(int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
@@ -20,7 +20,7 @@ public class Total extends Meditatable {
         if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
         else {includepreandpost = sessions_includepreandpost();}
         Duration duration = Duration.ZERO;
-        for (Meditatable i : thisession.getAllMeditatables()) {
+        for (SessionPart i : thisession.getAllSessionParts()) {
             if (! includepreandpost && i instanceof Qi_Gong) {continue;}
             duration = duration.add(thisession.Root.getSessions().gettotalpracticedtime(number, false));
         }

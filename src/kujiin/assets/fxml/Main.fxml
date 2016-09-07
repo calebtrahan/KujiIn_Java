@@ -48,7 +48,7 @@
          <font>
             <Font size="10.0" />
          </font></Label>
-      <ComboBox fx:id="GoalMeditatableComboBox" layoutX="725.0" layoutY="68.0" prefHeight="26.0" prefWidth="146.0" promptText="Select..." onAction="#sessionsandgoals_meditatableselectionchanged">
+      <ComboBox fx:id="GoalSessionPartComboBox" layoutX="725.0" layoutY="68.0" prefHeight="26.0" prefWidth="146.0" promptText="Select..." onAction="#sessionsandgoals_sessionpartselectionchanged">
          <cursor>
             <Cursor fx:constant="OPEN_HAND" />
          </cursor></ComboBox>

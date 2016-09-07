@@ -122,7 +122,7 @@
                                                                   </VBox>
                                                                   <VBox alignment="TOP_CENTER" prefHeight="96.0" prefWidth="496.0">
                                                                      <children>
-                                                                        <CheckBox fx:id="FilterBySelectedSwitch" mnemonicParsing="false" onAction="#populatetable" text="Filter By Selected Meditatable(s) / Duration Practiced">
+                                                                        <CheckBox fx:id="FilterBySelectedSwitch" mnemonicParsing="false" onAction="#populatetable" text="Filter By Selected Session Part(s) / Duration Practiced">
                                                                            <VBox.margin>
                                                                               <Insets bottom="2.0" />
                                                                            </VBox.margin>
