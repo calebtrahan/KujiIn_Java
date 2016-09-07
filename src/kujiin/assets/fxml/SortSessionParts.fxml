@@ -1,34 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="381.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="433.0" prefWidth="488.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TableView fx:id="SessionItemsTable" layoutX="14.0" layoutY="30.0" prefHeight="318.0" prefWidth="352.0">
-        <columns>
-          <TableColumn fx:id="NumberColumn" prefWidth="30.0" text="#" />
-          <TableColumn fx:id="NameColumn" prefWidth="120.0" text="Name" />
-            <TableColumn fx:id="DurationColumn" prefWidth="201.0" text="Duration" />
-        </columns>
-      </TableView>
-      <HBox layoutX="14.0" layoutY="351.0" prefHeight="29.0" prefWidth="97.0">
+      <VBox alignment="TOP_CENTER" prefHeight="539.0" prefWidth="787.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Button fx:id="UpButton" mnemonicParsing="false" onAction="#moveitemup" text="Up" />
-            <Button fx:id="DownButton" mnemonicParsing="false" onAction="#moveitemdown" text="Down" />
+            <Label alignment="CENTER" prefHeight="20.0" prefWidth="352.0" text="Session Overview" textAlignment="CENTER">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" top="5.0" />
+               </VBox.margin>
+            </Label>
+            <TableView fx:id="SessionItemsTable" prefHeight="318.0" prefWidth="327.0">
+              <columns>
+                <TableColumn fx:id="NumberColumn" prefWidth="30.0" text="#" />
+                <TableColumn fx:id="NameColumn" prefWidth="150.0" text="Name" />
+                  <TableColumn fx:id="DurationColumn" prefWidth="150.0" text="Practice Time" />
+                  <TableColumn fx:id="GoalColumn" prefWidth="150.0" text="Current Goal" />
+              </columns>
+               <VBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </VBox.margin>
+            </TableView>
+            <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="352.0">
+               <children>
+                  <Button fx:id="UpButton" mnemonicParsing="false" onAction="#moveitemup" text="Move Up" />
+                  <Button fx:id="DownButton" mnemonicParsing="false" onAction="#moveitemdown" text="Move Down" />
+                  <Button fx:id="AdjustDurationButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="108.0" text="Adjust Duration" />
+                  <Button fx:id="SetGoalButton" mnemonicParsing="false" text="Set Goal" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="2.0" right="5.0" top="2.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="376.0">
+               <children>
+                  <Label alignment="CENTER" prefHeight="16.0" prefWidth="93.0" text="Total Duration:">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="TotalSessionTime" prefHeight="26.0" prefWidth="128.0" />
+                  <Label alignment="CENTER" prefHeight="16.0" prefWidth="111.0" text="Completion Time:">
+                     <HBox.margin>
+                        <Insets left="3.0" right="3.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="CompletionTime" prefHeight="26.0" prefWidth="128.0" />
+               </children>
+               <VBox.margin>
+                  <Insets right="5.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="TOP_RIGHT" prefHeight="29.0" prefWidth="141.0">
+               <children>
+                  <Button fx:id="PlaySessionButton" mnemonicParsing="false" onAction="#accept" text="Play Session" />
+                  <Button fx:id="CancelButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="3.0" right="5.0" top="3.0" />
+               </VBox.margin>
+            </HBox>
          </children>
-      </HBox>
-      <Label alignment="CENTER" layoutX="13.0" layoutY="4.0" prefHeight="20.0" prefWidth="352.0" text="Set Session Playback Order" textAlignment="CENTER">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Label>
-      <HBox alignment="TOP_RIGHT" layoutX="225.0" layoutY="351.0" prefHeight="29.0" prefWidth="141.0">
-         <children>
-            <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#accept" text="Accept" />
-            <Button fx:id="CancelButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
-         </children>
-      </HBox>
+      </VBox>
    </children>
 </AnchorPane>

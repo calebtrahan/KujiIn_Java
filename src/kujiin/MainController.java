@@ -44,13 +44,15 @@ import static kujiin.util.Util.AnswerType.YES;
 // TODO Test
 
 // TODO Additional Features To Definitely Add
-    // TODO Add Ramp Only As An Option To Invocation Dialog (Also Implement In Cut/Element Logic)
+    // TODO Work All Sesion Well Formedness Checks + Goals Into SessionPlaybackOverview Class
+        // TODO Add Ramp Only As An Option To Invocation Dialog (Also Implement In Cut/Element Logic)
+
+
     // TODO Make A Loading/Initializing Dialog Performing Startup Checks Before Setting Up First Scene
         // Populate Entrainment
         // Populate Ambience
     // TODO Refactor Ramp Animations So Ramp Can Be At The Start, End Or Both Of A Session Part (Use enum RampType)
     // TODO Make A Goal Set Dialog For All Session Parts To Be Used Directly Before Playback
-
     // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
     // TODO Create A Custom Ambience Selection Wizard To Add Ambience Individually To Each Session Part In Session
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog

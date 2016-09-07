@@ -227,6 +227,10 @@ public class SessionPart {
     }
 // Duration
     public Duration getduration() {return duration;}
+    public String getdurationasString(double maxchars) {
+        if (duration == null || duration.equals(Duration.ZERO)) {return "No Duration Set";}
+        else {return Util.formatdurationtoStringSpelledOut(duration, maxchars);}
+    }
     public Duration getelapsedtime() {return elapsedtime;}
 
 // Creation
@@ -1094,6 +1098,11 @@ public class SessionPart {
             uncompletedgoals = kujiin.xml.Goals.sortgoalsbyHours(uncompletedgoals);
             return uncompletedgoals.get(0);
         } else {return null;}
+    }
+    public String goals_getCurrentAsString(double maxchars) {
+        kujiin.xml.Goals.Goal currentgoal = goals_getCurrent();
+        if (currentgoal == null || currentgoal.getGoal_Hours() == 0.0) {return "No Goal Set";}
+        else {return Util.formatdurationtoStringSpelledOut(Duration.hours(currentgoal.getGoal_Hours()), maxchars);}
     }
     public Duration goals_getCurrentDuration() {
         if (goals_ui_currentgoalisset()) {

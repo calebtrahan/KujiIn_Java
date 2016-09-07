@@ -264,11 +264,11 @@ public class This_Session {
             }
         }
         if (! cutsinsession.isEmpty() && ! elementsinsession.isEmpty()) {
-            SortSessionItems sortSessionItems = new SortSessionItems(Root, getallitemsinSession());
-            sortSessionItems.showAndWait();
-            switch (sortSessionItems.getResult()) {
+            SessionPlaybackOverview sessionPlaybackOverview = new SessionPlaybackOverview(Root, getallitemsinSession());
+            sessionPlaybackOverview.showAndWait();
+            switch (sessionPlaybackOverview.getResult()) {
                 case YES:
-                    setItemsinsession(sortSessionItems.getorderedsessionitems());
+                    setItemsinsession(sessionPlaybackOverview.getorderedsessionitems());
                     break;
                 case NO:
                     break;
@@ -842,26 +842,31 @@ public class This_Session {
             this.close();
         }
     }
-    public class SortSessionItems extends Stage {
+    public class SessionPlaybackOverview extends Stage {
         public TableView<SessionItem> SessionItemsTable;
         public TableColumn<SessionItem, Integer> NumberColumn;
         public TableColumn<SessionItem, String> NameColumn;
         public TableColumn<SessionItem, String> DurationColumn;
+        public TableColumn<SessionItem, String> GoalColumn;
         public Button UpButton;
         public Button DownButton;
-        public Button AcceptButton;
         public Button CancelButton;
+        public Button AdjustDurationButton;
+        public Button SetGoalButton;
+        public TextField TotalSessionTime;
+        public Button PlaySessionButton;
+        public TextField CompletionTime;
         private List<SessionPart> sessionitems;
         private ObservableList<SessionItem> tableitems;
         private MainController Root;
         private Util.AnswerType result;
 
-        public SortSessionItems(MainController Root, List<SessionPart> sessionitems) {
+        public SessionPlaybackOverview(MainController Root, List<SessionPart> sessionitems) {
             this.sessionitems = sessionitems;
             this.Root = Root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SortSessionParts.fxml"));
-            fxmlLoader.setController(this);
             try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SortSessionParts.fxml"));
+                fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
@@ -894,7 +899,7 @@ public class This_Session {
             tableitems.clear();
             int count = 1;
             for (SessionPart i : sessionitems) {
-                tableitems.add(new SessionItem(count, i.name, Util.formatdurationtoStringDecimalWithColons(i.getduration())));
+                tableitems.add(new SessionItem(count, i.name, Util.formatdurationtoStringDecimalWithColons(i.getduration()), i.goals_getCurrentAsString(150)));
                 count++;
             }
             SessionItemsTable.setItems(tableitems);
@@ -973,13 +978,16 @@ public class This_Session {
             private IntegerProperty number;
             private StringProperty name;
             private StringProperty duration;
+            private StringProperty goal;
 
-            public SessionItem(int number, String name, String duration) {
+            public SessionItem(int number, String name, String duration, String goal) {
                 this.number = new SimpleIntegerProperty(number);
                 this.name = new SimpleStringProperty(name);
                 this.duration = new SimpleStringProperty(duration);
+                this.goal = new SimpleStringProperty(goal);
             }
         }
+
     }
     public class PlayerUI extends Stage {
         public Button PlayButton;
