@@ -552,7 +552,7 @@ public class This_Session {
             currentsessionpart.stop();
             updateuitimeline.stop();
         } catch (NullPointerException ignored) {}
-        player_reset();
+        player_reset(false);
     }
     public void player_updateui() {
         try {
@@ -624,24 +624,25 @@ public class This_Session {
         playerUI.CurrentSessionPartTopLabel.setText(currentsessionpart.name + " Completed");
         playerUI.TotalSessionLabel.setText("Session Completed");
         updateuitimeline.stop();
+        playerUI.PlayButton.setText("Replay");
         playerState = PlayerState.STOPPED;
+
         Root.getSessions().deletenonvalidsessions();
-        // TODO Some Animation Is Still Running At End Of Session. Find It And Stop It Then Change Session Finsished Dialog To Showandwait
         Root.session_gui_opensessiondetailsdialog();
         // TODO Prompt For Export
 //        if (Util.dialog_OKCancelConfirmation(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
 //            exporter_getsessionexporter();}
         Root.sessions_gui_updateui();
         Root.goals_gui_updateui();
-        player_reset();
+        player_reset(true);
     }
-    public void player_reset() {
+    public void player_reset(boolean endofsession) {
         updateuitimeline = null;
         Root.getSessions().deletenonvalidsessions();
         sessionpartcount = 0;
         totalsessiondurationelapsed = Duration.ZERO;
         totalsessionduration = Duration.ZERO;
-        playerUI.reset();
+        playerUI.reset(endofsession);
     }
     public void player_transition() {
         Session currentsession =  Root.getSessions().getspecificsession( Root.getSessions().totalsessioncount() - 1);
@@ -1014,7 +1015,7 @@ public class This_Session {
                 setScene(defaultscene);
                 options.setStyle(this);
                 setTitle("Session Player");
-                reset();
+                reset(false);
                 boolean referenceoption = Root.getOptions().getSessionOptions().getReferenceoption();
                 if (referenceoption && referenceType != null && creation_checkreferencefiles(false)) {ReferenceToggleButton.setSelected(true);}
                 else {ReferenceToggleButton.setSelected(false);}
@@ -1089,7 +1090,7 @@ public class This_Session {
             } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
         }
         public void cleanupPlayer() {}
-        public void reset() {
+        public void reset(boolean endofsession) {
             SessionPartCurrentTimeLabel.setText("--:--");
             CurrentSessionPartProgress.setProgress(0.0);
             SessionPartTotalTimeLabel.setText("--:--");
@@ -1097,11 +1098,14 @@ public class This_Session {
             TotalProgress.setProgress(0.0);
             TotalTotalTimeLabel.setText("--:--");
             EntrainmentVolume.setDisable(true);
+            EntrainmentVolume.setValue(0.0);
             EntrainmentVolumePercentage.setText("0%");
             AmbienceVolume.setDisable(true);
+            AmbienceVolume.setValue(0.0);
             AmbienceVolumePercentage.setText("0%");
             // TODO Reset Goal UI Here
-            PlayButton.setText("Start");
+            if (endofsession) {PlayButton.setText("Replay");}
+            else {PlayButton.setText("Start");}
             PauseButton.setDisable(true);
             StopButton.setDisable(true);
         }

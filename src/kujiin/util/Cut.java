@@ -5,7 +5,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
@@ -75,21 +74,17 @@ public class Cut extends SessionPart {
 // Creation
     @Override
     public boolean creation_buildEntrainment() {
-        if (duration.equals(Duration.ZERO)) {return false;}
-        int index = allsessionpartstoplay.indexOf(this);
-        SessionPart partafter = null;
-        if (index != allsessionpartstoplay.size() - 1) {partafter = allsessionpartstoplay.get(index + 1);}
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && partafter != null) {
-            if (partafter.getNameForFiles().equals("qi")) {entrainment.setRampfile(entrainment.ramp_get(1));}
-            else {entrainment.setRampfile(entrainment.ramp_get(0));}
-            return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+            try {
+                int index = allsessionpartstoplay.indexOf(this);
+                SessionPart partafter = allsessionpartstoplay.get(index + 1);
+                if (partafter instanceof Qi_Gong || partafter instanceof Element) {entrainment.setRampfile(entrainment.ramp_get(1));}
+                else {entrainment.setRampfile(entrainment.ramp_get(0));}
+                System.out.println(name + "'s Ramp File Is: " + entrainment.getRampfile().getFile().getAbsolutePath());
+                return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+            } catch (IndexOutOfBoundsException ignored) {return false;}
         }
         return super.creation_buildEntrainment();
     }
-
-
-// Goals
-
-// Export
 
 }

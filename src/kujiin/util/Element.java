@@ -19,11 +19,9 @@ public class Element extends SessionPart {
         else {Value.setTooltip(null);}
     }
 
-// Getters For Playback
     @Override
     public String getNameForFiles() {return "qi";}
 
-// Entrainment
     @Override
     public void entrainment_populate() {
         File expectedentrainmentfile;
@@ -65,34 +63,20 @@ public class Element extends SessionPart {
         }
     }
 
-// GUI
-//    public boolean hasValidValue() {
-//        if (Switch.isSelected()) {
-//            Value.setText("0");
-//            Value.setDisable(false);
-//            Value.setTooltip(new Tooltip("Practice Time For " + name + " (In Minutes)"));
-//        } else {
-//            Value.setText("0");
-//            Value.setDisable(true);
-//            Value.setTooltip(new Tooltip(name + " Is Disabled. Click " + name + " Button Above To Enable"));
-//        }
-//    }
-
     @Override
     public boolean creation_buildEntrainment() {
-        int index = allsessionpartstoplay.indexOf(this);
-        SessionPart partafter = null;
-        if (index != allsessionpartstoplay.size() - 1) {partafter = allsessionpartstoplay.get(index + 1);}
-        // rin kyo toh sha kai jin retsu zai zen
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && partafter != null && ! partafter.getNameForFiles().equals("qi")) {
-            entrainment.setRampfile(entrainment.ramp_get(partafter.number - 1));
-            return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
-        }
-        return super.creation_buildEntrainment();
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+            try {
+                int index = allsessionpartstoplay.indexOf(this);
+                SessionPart parttotest = allsessionpartstoplay.get(index + 1);
+                SoundFile rampfile;
+                if (parttotest instanceof  Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
+                else {rampfile = entrainment.ramp_get(Options.CUTNAMES.indexOf(parttotest.name.toUpperCase()));}
+                entrainment.setRampfile(rampfile);
+                System.out.println(name + "'s Ramp File Is: " + rampfile.getFile().getAbsolutePath());
+                return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+            } catch (IndexOutOfBoundsException ignored) {return super.creation_buildEntrainment();}
+        } else {return super.creation_buildEntrainment();}
     }
-
-// Goals
-
-// Export
 
 }

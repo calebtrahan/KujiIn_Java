@@ -32,6 +32,10 @@ public class Entrainment {
     public void ramp_add(SoundFile soundFile) {ramp_initialize(); rampfiles.add(soundFile);}
     public void ramp_add(int index, SoundFile soundFile) {ramp_initialize(); rampfiles.add(index, soundFile);}
     public SoundFile ramp_get(int index) {
+//        try {
+//            int count = 0;
+//            for (SoundFile i : rampfiles) {System.out.println(count + ": " + i.getFile().getAbsolutePath());}
+//        } catch (NullPointerException ignored) {}
         try {return rampfiles.get(index);}
         catch (Exception e) {return null;}
     }

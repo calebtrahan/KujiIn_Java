@@ -51,7 +51,6 @@ public class SessionPart {
     protected Animation timeline_progresstonextsessionpart;
     protected Animation timeline_start_ending_ramp;
     protected Animation timeline_end_starting_ramp;
-    protected RampType rampType;
     protected FreqType freqType;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
@@ -237,7 +236,7 @@ public class SessionPart {
         else {return creation_buildEntrainment();}
     }
     protected boolean creation_buildEntrainment() {
-        return entrainment.getFreq().isValid();
+        return ! duration.equals(Duration.ZERO) && entrainment.getFreq().isValid();
     }
     protected boolean creation_buildAmbience() {
         return ambience.hasAnyAmbience();
@@ -251,6 +250,8 @@ public class SessionPart {
 
 // Playback
     public void start() {
+        // TODO On Last Session Part:
+            // Do NOT Play Ramp (If Enabled For Session)
         System.out.println("Starting " + name);
         boolean ramponly = getramponly();
         elapsedtime = Duration.ZERO;
@@ -268,9 +269,9 @@ public class SessionPart {
         timeline_progresstonextsessionpart.play();
         currententrainmentvolume = thisession.getCurrententrainmentvolume();
         thisession.player_displayreferencefile();
-        if (! ramponly && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+        boolean isLastSessionPart = allsessionpartstoplay.indexOf(this) == allsessionpartstoplay.size() - 1;
+        if (! ramponly && ! isLastSessionPart && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
             timeline_start_ending_ramp = new Timeline(new KeyFrame(getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
-                System.out.println("Timeline Start Ramp Called!");
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
@@ -1228,9 +1229,6 @@ public class SessionPart {
         }
     }
 
-    enum RampType {
-        STARTING, ENDING, BOTH
-    }
     enum FreqType {
         LOW, MEDIUM, HIGH
     }

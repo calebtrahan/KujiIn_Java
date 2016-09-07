@@ -44,6 +44,7 @@ import static kujiin.util.Util.AnswerType.YES;
 // TODO Test
 
 // TODO Additional Features To Definitely Add
+    // TODO Add Ramp Only As An Option To Invocation Dialog (Also Implement In Cut/Element Logic)
     // TODO Make A Loading/Initializing Dialog Performing Startup Checks Before Setting Up First Scene
         // Populate Entrainment
         // Populate Ambience

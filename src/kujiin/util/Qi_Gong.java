@@ -81,24 +81,27 @@ public class Qi_Gong extends SessionPart {
 // Creation
     @Override
     public boolean creation_buildEntrainment() {
-        int index = allsessionpartstoplay.indexOf(this);
-        SessionPart parttotest;
-        switch (number) {
-            case 0:
-                parttotest = allsessionpartstoplay.get(index + 1);
-                if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && parttotest.number != 15) {
-                    entrainment.setRampfile(entrainment.ramp_get(parttotest.number + 1));
-                }
-                break;
-            case 15:
-                parttotest = allsessionpartstoplay.get(index - 1);
-                if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && parttotest.number != 0) {
-                    entrainment.setRampfile(entrainment.ramp_get(parttotest.number - 1));
-                }
-                break;
-        }
-        if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
-        return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+            int index = allsessionpartstoplay.indexOf(this);
+            SessionPart parttotest;
+            switch (number) {
+                case 0:
+                    parttotest = allsessionpartstoplay.get(index + 1);
+                    break;
+                case 15:
+                    parttotest = allsessionpartstoplay.get(index - 1);
+                    break;
+                default:
+                    parttotest = null;
+            }
+            SoundFile rampfile;
+            if (parttotest instanceof  Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
+            else {rampfile = entrainment.ramp_get(Options.CUTNAMES.indexOf(parttotest.name.toUpperCase()));}
+            entrainment.setRampfile(rampfile);
+            System.out.println(name + "'s Ramp File Is: " + rampfile.getFile().getAbsolutePath());
+            if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
+            return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+        } else {return super.creation_buildEntrainment();}
     }
 
 }
