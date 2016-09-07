@@ -36,41 +36,34 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static kujiin.util.Util.AnswerType.YES;
-// Bugs
-// TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
-// TODO Make A Loading/Initializing Dialog While Entrainment And Ambience Checks Before Setting Up First Scene
+// TODO Bugs To Fix
+    // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
+    // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified
+    // TODO Closing Reference Display With 'ESC' Is Crashing The Whole App
 
-// Refactor
-// TODO Refactor Player
-    // Use Animations To Fire Off Ramp In And Ramp Out
-    // Repeat Entrainment File Indefinitely In Between Ramps (Use Animations To Terminate Entrainment And Start Ramp Or New Session)
-    // Use 5 Minute Entrainment Freq Files And Kill 1 Minute Entrainment Freq Files
-    // Maybe Use Random To Pull Next Random Ambience File Directly During Playback Instead Of Creating A List Beforehand
-// TODO Place Ramps In Entrainment Duration (Don't Add On Like In Existing Qi-Gong)
+// TODO Test
 
-// TODO Dialog Before Session Playback If Actual Ambience < Practiced Duration
-    // Ambience Is Not Long Enough Select How You Would Like Me To Play Ambience
-    // (Shuffle)    (Repeat, Back To Back In Order) {These Are Buttons}
+// TODO Additional Features To Definitely Add
+    // TODO Make A Loading/Initializing Dialog Performing Startup Checks Before Setting Up First Scene
+        // Populate Entrainment
+        // Populate Ambience
+    // TODO Refactor Ramp Animations So Ramp Can Be At The Start, End Or Both Of A Session Part (Use enum RampType)
+    // TODO Make A Goal Set Dialog For All Session Parts To Be Used Directly Before Playback
 
-// Mind Workstation
-// TODO (MWS) ReCreate Ramps To 30 Seconds Across The Board (To Save Disk Space)
-// TODO (MWS) ReCreate Ramps For All Cuts Connecting All Cuts And Elements
+    // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
+    // TODO Create A Custom Ambience Selection Wizard To Add Ambience Individually To Each Session Part In Session
+    // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
+    // TODO Exporter
 
-// Additional Features
-// TODO Add Custom To Ambience Playback Type (And Create Wizard To Add Ambience Individually To Each SessionPart In Session)
-// TODO Confirmation -> Alert File On LONG Sessions (Deep In Trance)
-// TODO Design A 'Select Your Own Ambience' Wizard As An Alternative To Randomized Ambience During Session Creation
-// TODO Redesign Goals Completed Dialog Using Bar Charts/Graphs
-// TODO If Ramp Disabled (And No Pre/PostSession Set) Ask User If They Want TO Add A Ramp Into 1st Practiced Cut (2/3/5) Min, Then Update UI And Create Session
-// TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
-// TODO Select Button On Options -> ChangeAlertFileDialog Instead Of Just A File Chooser
-// TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
+// TODO Optional Additional Features
+    // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
+    // TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
+    // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
+    // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
 
-// Optional Features
-// TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
-// TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
-// TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
-// TODO Fix Set Multiple Goal Minutes (And Add Check If Long Enough Logic On Accepting)
+// TODO Mind Workstation
+    // TODO Add Low (And Possibly Medium) Variations Of All Session Parts
+    // TODO Add Ramps To Connect Low (And Possibly Medium) Variations Of Session Parts With Each Other
 
 public class MainController implements Initializable {
     public Label CreatorStatusBar;
@@ -151,7 +144,6 @@ public class MainController implements Initializable {
         getOptions().unmarshall();
     }
     public boolean cleanup() {
-        System.out.println("Cleaning Up Program");
         Ambiences.marshall();
         Entrainments.marshall();
         Options.marshall();
@@ -428,7 +420,8 @@ public class MainController implements Initializable {
             }
         }
     // Check Goals
-        return Session.creation_checkgoals();
+        Session.creation_checkgoals();
+        return true;
     }
     public void creation_util_createsession() {
         Session.creation_createsession();
@@ -729,7 +722,6 @@ public class MainController implements Initializable {
     }
 
 // Gui Methods
-    // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified (When It's Supposed To Be)
     public void dialog_displayInformation(String titletext, String headertext, String contexttext) {
     Alert a = new Alert(Alert.AlertType.INFORMATION);
     a.setTitle(titletext);

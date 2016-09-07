@@ -49,7 +49,10 @@ public class SessionPart {
     protected Animation fade_ambience_stop;
     protected Animation timeline_fadeout_timer;
     protected Animation timeline_progresstonextsessionpart;
-    protected Animation timeline_start_ramp;
+    protected Animation timeline_start_ending_ramp;
+    protected Animation timeline_end_starting_ramp;
+    protected RampType rampType;
+    protected FreqType freqType;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     private ArrayList<SoundFile> ambienceplayhistory;
@@ -248,6 +251,7 @@ public class SessionPart {
 
 // Playback
     public void start() {
+        System.out.println("Starting " + name);
         boolean ramponly = getramponly();
         elapsedtime = Duration.ZERO;
         entrainmentplaycount = 0;
@@ -263,8 +267,9 @@ public class SessionPart {
         timeline_progresstonextsessionpart = new Timeline(new KeyFrame(getduration(), ae -> thisession.player_progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
         currententrainmentvolume = thisession.getCurrententrainmentvolume();
+        thisession.player_displayreferencefile();
         if (! ramponly && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            timeline_start_ramp = new Timeline(new KeyFrame(getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
+            timeline_start_ending_ramp = new Timeline(new KeyFrame(getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
                 System.out.println("Timeline Start Ramp Called!");
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
@@ -275,9 +280,9 @@ public class SessionPart {
                 entrainmentplayer.play();
                 entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
             }));
-            timeline_start_ramp.play();
+            timeline_start_ending_ramp.play();
         }
-        if (fade_entrainment_stop != null && ! ramponly) {
+        if (fade_entrainment_stop != null) {
             timeline_fadeout_timer = new Timeline(new KeyFrame(duration.subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration())), ae -> {
                 volume_unbindentrainment();
                 fade_entrainment_stop.play();
@@ -288,8 +293,7 @@ public class SessionPart {
             }));
             timeline_fadeout_timer.play();
         }
-        thisession.player_displayreferencefile();
-        if (fade_entrainment_play != null && ! ramponly) {
+        if (fade_entrainment_play != null) {
             if (fade_entrainment_play.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.playerState = This_Session.PlayerState.FADING_PLAY;
             fade_entrainment_play.play();
@@ -341,10 +345,9 @@ public class SessionPart {
         goalscompletedthissession = new ArrayList<>();
     }
     public void resume() {
-        boolean ramponly = getramponly();
         volume_unbindentrainment();
         entrainmentplayer.play();
-        if (fade_entrainment_resume != null && ! ramponly) {
+        if (fade_entrainment_resume != null) {
             entrainmentplayer.setVolume(0.0);
             if (fade_entrainment_resume.getStatus() == Animation.Status.RUNNING) {return;}
             thisession.playerState = This_Session.PlayerState.FADING_RESUME;
@@ -354,13 +357,14 @@ public class SessionPart {
             volume_bindentrainment();
             thisession.playerState = This_Session.PlayerState.PLAYING;
             timeline_progresstonextsessionpart.play();
-            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
+            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
+                timeline_start_ending_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();}
         }
         if (thisession.Root.AmbienceSwitch.isSelected()) {
             volume_unbindambience();
             ambienceplayer.play();
-            if (fade_ambience_resume != null && ! ramponly) {
+            if (fade_ambience_resume != null) {
                 ambienceplayer.setVolume(0.0);
                 if (fade_ambience_resume.getStatus() == Animation.Status.RUNNING) {return;}
                 fade_ambience_resume.play();
@@ -372,9 +376,8 @@ public class SessionPart {
         toggleplayerbuttons();
     }
     public void pause() {
-        boolean ramponly = getramponly();
         volume_unbindentrainment();
-        if (fade_entrainment_pause != null && ! ramponly) {
+        if (fade_entrainment_pause != null) {
             if (fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
             // Open Loading Dialog
             thisession.playerState = This_Session.PlayerState.FADING_PAUSE;
@@ -388,7 +391,8 @@ public class SessionPart {
             thisession.playerState = This_Session.PlayerState.PAUSED;
             entrainmentplayer.pause();
             timeline_progresstonextsessionpart.pause();
-            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.pause();}
+            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
+                timeline_start_ending_ramp.pause();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
             if (thisession.Root.AmbienceSwitch.isSelected()) {
                 volume_unbindambience();
@@ -398,13 +402,12 @@ public class SessionPart {
         toggleplayerbuttons();
     }
     public void stop() {
-        boolean ramponly = getramponly();
         thisession.player_closereferencefile();
         volume_unbindentrainment();
-        if (fade_ambience_stop != null && ! ramponly) {
-            if (fade_ambience_stop.getStatus() == Animation.Status.RUNNING) {return;}
-            thisession.playerState = This_Session.PlayerState.FADING_STOP;
+        if (fade_entrainment_stop != null) {
+            if (fade_entrainment_stop.getStatus() == Animation.Status.RUNNING) {return;}
             fade_entrainment_stop.play();
+            thisession.playerState = This_Session.PlayerState.FADING_STOP;
             if (thisession.Root.AmbienceSwitch.isSelected()) {
                 volume_unbindambience();
                 fade_ambience_stop.play();
@@ -425,6 +428,7 @@ public class SessionPart {
     }
     private void setupfadeanimations() {
         // PLAY
+        if (getramponly()) {return;}
         if (thisession.Root.getOptions().getSessionOptions().getFadeinduration() > 0.0) {
             fade_entrainment_play = new Transition() {
                 {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeinduration()));}
@@ -480,7 +484,8 @@ public class SessionPart {
                 }
             }
         };
-        fade_entrainment_resume.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; timeline_progresstonextsessionpart.play(); if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.PAUSED) {timeline_start_ramp.play();}
+        fade_entrainment_resume.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; timeline_progresstonextsessionpart.play(); if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
+            timeline_start_ending_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();} toggleplayerbuttons(); volume_bindentrainment();});
         if (thisession.Root.AmbienceSwitch.isSelected()) {
             fade_ambience_resume = new Transition() {
@@ -519,7 +524,8 @@ public class SessionPart {
             }
         };
         fade_entrainment_pause.setOnFinished(event -> {entrainmentplayer.pause(); timeline_progresstonextsessionpart.pause();
-            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.pause();}
+            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
+                timeline_start_ending_ramp.pause();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();} thisession.playerState = This_Session.PlayerState.PAUSED; toggleplayerbuttons();});
         if (thisession.Root.AmbienceSwitch.isSelected()) {
             fade_ambience_pause = new Transition() {
@@ -559,7 +565,8 @@ public class SessionPart {
                 }
             };
             fade_entrainment_stop.setOnFinished(event -> {entrainmentplayer.stop(); entrainmentplayer.dispose();
-                if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ramp.stop();}
+                if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
+                    timeline_start_ending_ramp.stop();}
                 timeline_progresstonextsessionpart.stop(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();} thisession.playerState = This_Session.PlayerState.STOPPED; toggleplayerbuttons();});
             if (thisession.Root.AmbienceSwitch.isSelected()) {
                 fade_ambience_stop = new Transition() {
@@ -653,7 +660,7 @@ public class SessionPart {
             if (fade_ambience_resume != null) {fade_ambience_resume.stop();}
             if (fade_ambience_stop != null) {fade_ambience_stop.stop();}
             if (timeline_progresstonextsessionpart != null) {timeline_progresstonextsessionpart.stop();}
-            if (timeline_start_ramp != null) {timeline_fadeout_timer.stop();}
+            if (timeline_start_ending_ramp != null) {timeline_fadeout_timer.stop();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
             volume_unbindentrainment();
             volume_unbindambience();
@@ -1221,4 +1228,10 @@ public class SessionPart {
         }
     }
 
+    enum RampType {
+        STARTING, ENDING, BOTH
+    }
+    enum FreqType {
+        LOW, MEDIUM, HIGH
+    }
 }

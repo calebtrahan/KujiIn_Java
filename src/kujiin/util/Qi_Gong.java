@@ -23,9 +23,6 @@ public class Qi_Gong extends SessionPart {
     }
 
     // Getters & Setters
-    public boolean isRamponly() {
-        return ramponly;
-    }
     public void setRamponly(boolean ramponly) {
         this.ramponly = ramponly;
     }
@@ -85,15 +82,23 @@ public class Qi_Gong extends SessionPart {
     @Override
     public boolean creation_buildEntrainment() {
         int index = allsessionpartstoplay.indexOf(this);
-        SessionPart partafter = null;
-        if (index != allsessionpartstoplay.size() - 1) {partafter = allsessionpartstoplay.get(index + 1);}
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && partafter != null && ! partafter.getNameForFiles().equals("qi")) {
-            entrainment.setRampfile(entrainment.ramp_get(partafter.number - 1));
-            if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
-            return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+        SessionPart parttotest;
+        switch (number) {
+            case 0:
+                parttotest = allsessionpartstoplay.get(index + 1);
+                if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && parttotest.number != 15) {
+                    entrainment.setRampfile(entrainment.ramp_get(parttotest.number + 1));
+                }
+                break;
+            case 15:
+                parttotest = allsessionpartstoplay.get(index - 1);
+                if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && parttotest.number != 0) {
+                    entrainment.setRampfile(entrainment.ramp_get(parttotest.number - 1));
+                }
+                break;
         }
-        return super.creation_buildEntrainment();
+        if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
+        return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
     }
-
 
 }

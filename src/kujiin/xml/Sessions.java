@@ -2,6 +2,7 @@ package kujiin.xml;
 
 import javafx.util.Duration;
 import kujiin.MainController;
+import kujiin.lib.BeanComparator;
 import kujiin.util.Qi_Gong;
 import kujiin.util.SessionPart;
 
@@ -14,6 +15,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
@@ -92,7 +94,9 @@ public class Sessions {
         } catch (NullPointerException | ConcurrentModificationException ignored) {}
     }
     public void sort() {
-        // TODO Sort Sessions By Practice Date
+        List<Session> sessions = getSession();
+        Collections.sort(sessions, new BeanComparator(Session.class, "getDate_Practiced"));
+        setSession(sessions);
     }
 
 // Session Information Getters

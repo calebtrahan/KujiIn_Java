@@ -16,7 +16,6 @@ import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
-// TODO Add Ramp Functionality To Entrainment
 public class Entrainments {
     private Entrainment Presession;
     private Entrainment Rin;

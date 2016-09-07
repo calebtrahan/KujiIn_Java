@@ -199,11 +199,14 @@ public class This_Session {
 
 // Creation
     public void creation_createsession() {
+        int count = 1;
         for (SessionPart i : getallitemsinSession()) {
+            System.out.println(count + ": " + i.name + " With Duration: " + i.getduration().toSeconds() + " Seconds");
             if (! i.creation_build(getallitemsinSession())) {
                 creation_reset(false);
                 return;
             }
+            count++;
         }
         creatorState = CreatorState.CREATED;
     }
@@ -276,7 +279,7 @@ public class This_Session {
         }
         return true;
     }
-    public boolean creation_checkgoals() {
+    public void creation_checkgoals() {
         ArrayList<SessionPart> sessionpartswithoutlongenoughgoals = Root.goals_util_getsessionpartswithoutlongenoughgoals(getallitemsinSession());
         List<Integer>  notgooddurations = new ArrayList<>();
         if (! sessionpartswithoutlongenoughgoals.isEmpty()) {
@@ -298,31 +301,32 @@ public class This_Session {
             if (cutcount > 0) {notgoodtext.append(cutcount).append(" Cut(s)\n");}
             if (elementcount > 0) {notgoodtext.append(elementcount).append(" Element(s)\n");}
             if (postsessionmissinggoals) {notgoodtext.append("Postsession\n");}
-            // TODO Make A Goal Set Dialog Before Playback Here
-// Was last parameter-> Util.list_getmaxintegervalue(notgooddurations)
-/*ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, sessionpartswithoutlongenoughgoals);
-s.showAndWait();
-if (s.isAccepted()) {
-    List<Integer> cutindexes = s.getSelectedCutIndexes();
-    Double goalhours = s.getGoalhours();
-    LocalDate goaldate = s.getGoaldate();
-    boolean goalssetsuccessfully = true;
-    for (Integer i : cutindexes) {
-        try {
-            SessionPart x = getAllSessionPartsincludingTotal().get(i);
-            x.goals_add(new Goals.Goal(goalhours, x.name));
-        } catch (JAXBException ignored) {
-            goalssetsuccessfully = false;
-            Util.dialog_displayError(Root, "Error", "Couldn't Add Goal For " + getAllSessionPartsincludingTotal().get(i).name, "Check File Permissions");
+            if (Root.dialog_getConfirmation("Confirmation", "Goals Are Missing/Not Long Enough For:", notgoodtext.toString(), "Set Goal And Play", "Play Anyway")) {
+                // TODO Make A Goal Set Dialog Before Playback Here
+                // Was last parameter-> Util.list_getmaxintegervalue(notgooddurations)
+                /*ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, sessionpartswithoutlongenoughgoals);
+                s.showAndWait();
+                if (s.isAccepted()) {
+                    List<Integer> cutindexes = s.getSelectedCutIndexes();
+                    Double goalhours = s.getGoalhours();
+                    LocalDate goaldate = s.getGoaldate();
+                    boolean goalssetsuccessfully = true;
+                    for (Integer i : cutindexes) {
+                        try {
+                            SessionPart x = getAllSessionPartsincludingTotal().get(i);
+                            x.goals_add(new Goals.Goal(goalhours, x.name));
+                        } catch (JAXBException ignored) {
+                            goalssetsuccessfully = false;
+                            Util.dialog_displayError(Root, "Error", "Couldn't Add Goal For " + getAllSessionPartsincludingTotal().get(i).name, "Check File Permissions");
+                        }
+                    }
+                    if (goalssetsuccessfully) {
+                        Util.dialog_displayInformation(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
+                    }
+                }
+                break;*/
+            }
         }
-    }
-    if (goalssetsuccessfully) {
-        Util.dialog_displayInformation(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
-    }
-}
-break;*/
-            return Root.dialog_getConfirmation("Confirmation", null, "Goals Are Missing/Not Long Enough For \n" + notgoodtext.toString() + ". Set A Goal Before Playback?", null, null);
-        } else {return true;}
     }
     public void creation_checkprepostramp() {
         if (Root.getOptions().getSessionOptions().getRampenabled()) {
@@ -677,7 +681,7 @@ break;*/
     public boolean player_endsessionprematurely() {
         if (playerState == PlayerState.PLAYING || playerState == PlayerState.PAUSED || playerState == PlayerState.TRANSITIONING) {
             player_pause();
-            if (Root.dialog_getConfirmation("End Session Early", null, "Session Is Not Completed.", "End Session Prematurely", "Continue Session")) {return true;}
+            if (Root.dialog_getConfirmation("End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue")) {return true;}
             else {player_play(); return false;}
         } else {return true;}
     }
@@ -1171,7 +1175,6 @@ break;*/
                 addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                     switch (event.getCode()) {
                         case ESCAPE:
-                            // TODO Closing Reference Display On Escape Is Crashing The Whole App
 //                                hide();
 //                                untoggleplayerreference();
 //                                break;
