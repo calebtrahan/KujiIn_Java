@@ -401,29 +401,31 @@ public class MainController implements Initializable {
             for (SessionPart i : Session.getAllSessionParts()) {if (! i.ambience_isReady()) {
                 dialog_displayInformation("Cannot Play Session Yet", "Still Background Checking Ambience", "Please Try Again In A Few Moments"); return false;}}
         }
-    // Add Pre/Post Ramp If Duration Is Zero || Ramp Is Disabled
+
         Session.creation_populateitemsinsession();
         Session.creation_checkprepostramp();
-    // Check Session Well Formed
-        if (! Session.creation_checksessionwellformed()) {return false;}
-    // Check Alert File Needed/Not Needed
-        boolean longsession = false;
-        for (Integer i : Session.gui_getallsessionvalues()) {if (i >= kujiin.xml.Options.DEFAULT_LONG_SESSIONPART_DURATION) {longsession = true; break;}}
-        if (longsession && ! getOptions().getSessionOptions().getAlertfunction()) {
-            switch (dialog_getAnswer("Add Alert File", null, "I've Detected A Long Session. Add Alert File In Between Session Parts?",
-                    "Add Alert File", "Continue Without Alert File", "Cancel Playback")) {
-                case YES: new ChangeAlertFile().showAndWait(); break;
-                case CANCEL: return false;
-            }
-        } else if (getOptions().getSessionOptions().getAlertfunction()) {
-            switch (dialog_getAnswer("Disable Alert File", null, "I've Detected A Relatively Short Session With Alert File Enabled",
-                    "Disable Alert File", "Leave Alert File Enabled", "Cancel Playback")) {
-                case YES: getOptions().getSessionOptions().setAlertfunction(false); break;
-                case CANCEL: return false;
-            }
-        }
-    // Check Goals
-        Session.creation_checkgoals();
+        Session.player_confirmOverview();
+        // Add Pre/Post Ramp If Duration Is Zero || Ramp Is Disabled
+//    // Check Session Well Formed
+//        if (! Session.creation_checksessionwellformed()) {return false;}
+//    // Check Alert File Needed/Not Needed
+//        boolean longsession = false;
+//        for (Integer i : Session.gui_getallsessionvalues()) {if (i >= kujiin.xml.Options.DEFAULT_LONG_SESSIONPART_DURATION) {longsession = true; break;}}
+//        if (longsession && ! getOptions().getSessionOptions().getAlertfunction()) {
+//            switch (dialog_getAnswer("Add Alert File", null, "I've Detected A Long Session. Add Alert File In Between Session Parts?",
+//                    "Add Alert File", "Continue Without Alert File", "Cancel Playback")) {
+//                case YES: new ChangeAlertFile().showAndWait(); break;
+//                case CANCEL: return false;
+//            }
+//        } else if (getOptions().getSessionOptions().getAlertfunction()) {
+//            switch (dialog_getAnswer("Disable Alert File", null, "I've Detected A Relatively Short Session With Alert File Enabled",
+//                    "Disable Alert File", "Leave Alert File Enabled", "Cancel Playback")) {
+//                case YES: getOptions().getSessionOptions().setAlertfunction(false); break;
+//                case CANCEL: return false;
+//            }
+//        }
+//    // Check Goals
+//        Session.creation_checkgoals();
         return true;
     }
     public void creation_util_createsession() {
@@ -1756,6 +1758,31 @@ public class MainController implements Initializable {
                 HoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
                 MinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
                 practicedduration = sessionsAndGoalsSelectedSessionPart.sessions_getPracticedDuration(false);
+                HoursSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() / 60);
+                MinutesSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() % 60);
+                Util.custom_spinner_integer(HoursSpinner, 0, Integer.MAX_VALUE, 1, false);
+                Util.custom_spinner_integer(MinutesSpinner, 0, 59, 1, false);
+                PracticedDurationTextField.setText(Util.formatdurationtoStringSpelledOut(practicedduration, PracticedDurationTextField.getLayoutBounds().getWidth()));
+                setOnCloseRequest(event -> {
+                    if (getPotentialGoalDuration().lessThanOrEqualTo(practicedduration)) {
+                        dialog_displayInformation("Cannot Accept", "Goal Is Less Than Or Equal To Practiced Minutes", "Goal Must Be Greater Than Practiced Minutes");
+                        event.consume();
+                    }
+                });
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
+        }
+        public SimpleGoalSetDialog(SessionPart sessionPart) {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SetGoalDialog_Simple.fxml"));
+                fxmlLoader.setController(this);
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                Root.getOptions().setStyle(this);
+                this.setResizable(false);
+                setTitle("Set A New Goal");
+                HoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
+                MinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
+                practicedduration = sessionPart.sessions_getPracticedDuration(false);
                 HoursSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() / 60);
                 MinutesSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() % 60);
                 Util.custom_spinner_integer(HoursSpinner, 0, Integer.MAX_VALUE, 1, false);

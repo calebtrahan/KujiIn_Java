@@ -20,7 +20,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Screen;
@@ -241,42 +240,42 @@ public class This_Session {
         } catch (NullPointerException | IndexOutOfBoundsException ignored) {return false;}
     }
     public boolean creation_checksessionwellformed() {
-        List<Cut> cutsinsession = creation_getCutsInSession();
-        List<Element> elementsinsession = creation_getElementsInSession();
-        if (! cutsinsession.isEmpty()) {
-            boolean rinisfirstcutinsession = cutsinsession.get(0).number == 1;
-            if (! rinisfirstcutinsession) {
-                rinisfirstcutinsession = ! Root.dialog_getConfirmation("Practiced Cuts Do Not Connect To RIN", null,
-                        "Cuts In Session Not Connected To RIN. Connect " + cutsinsession.get(0).name + " Back To RIN?", null, null);}
-            if (! rinisfirstcutinsession || ! creation_checkfirstandlastcutsconnect(cutsinsession)) {
-                CutsMissingDialog cutsMissingDialog = new CutsMissingDialog(Root, cutsinsession);
-                cutsMissingDialog.showAndWait();
-                switch (cutsMissingDialog.getResult()) {
-                    case YES:
-                        creation_populateitemsinsession();
-                        cutsinsession = creation_getCutsInSession();
-                        break;
-                    case NO:
-                        break;
-                    case CANCEL:
-                        return false;
-                }
-            }
-        }
-        if (! cutsinsession.isEmpty() && ! elementsinsession.isEmpty()) {
-            SessionPlaybackOverview sessionPlaybackOverview = new SessionPlaybackOverview(Root, getallitemsinSession());
-            sessionPlaybackOverview.showAndWait();
-            switch (sessionPlaybackOverview.getResult()) {
-                case YES:
-                    setItemsinsession(sessionPlaybackOverview.getorderedsessionitems());
-                    break;
-                case NO:
-                    break;
-                case CANCEL:
-                    return false;
-            }
-            // Sort Session Parts
-        }
+//        List<Cut> cutsinsession = creation_getCutsInSession();
+//        List<Element> elementsinsession = creation_getElementsInSession();
+//        if (! cutsinsession.isEmpty()) {
+//            boolean rinisfirstcutinsession = cutsinsession.get(0).number == 1;
+//            if (! rinisfirstcutinsession) {
+//                rinisfirstcutinsession = ! Root.dialog_getConfirmation("Practiced Cuts Do Not Connect To RIN", null,
+//                        "Cuts In Session Not Connected To RIN. Connect " + cutsinsession.get(0).name + " Back To RIN?", null, null);}
+//            if (! rinisfirstcutinsession || ! creation_checkfirstandlastcutsconnect(cutsinsession)) {
+//                CutsMissingDialog cutsMissingDialog = new CutsMissingDialog(Root, cutsinsession);
+//                cutsMissingDialog.showAndWait();
+//                switch (cutsMissingDialog.getResult()) {
+//                    case YES:
+//                        creation_populateitemsinsession();
+//                        cutsinsession = creation_getCutsInSession();
+//                        break;
+//                    case NO:
+//                        break;
+//                    case CANCEL:
+//                        return false;
+//                }
+//            }
+//        }
+//        if (! cutsinsession.isEmpty() && ! elementsinsession.isEmpty()) {
+//            SessionPlaybackOverview sessionPlaybackOverview = new SessionPlaybackOverview(Root, getallitemsinSession());
+//            sessionPlaybackOverview.showAndWait();
+//            switch (sessionPlaybackOverview.getResult()) {
+//                case YES:
+//                    setItemsinsession(sessionPlaybackOverview.getorderedsessionitems());
+//                    break;
+//                case NO:
+//                    break;
+//                case CANCEL:
+//                    return false;
+//            }
+//            // Sort Session Parts
+//        }
         return true;
     }
     public void creation_checkgoals() {
@@ -505,6 +504,11 @@ public class This_Session {
     }
 
 // Playback
+    public boolean player_confirmOverview() {
+        SessionPlaybackOverview sessionPlaybackOverview = new SessionPlaybackOverview();
+        sessionPlaybackOverview.showAndWait();
+        return true;
+    }
     public void player_openplayer() {
         playerUI = new PlayerUI();
         playerUI.setOnShowing(event -> Root.getStage().setIconified(true));
@@ -750,98 +754,6 @@ public class This_Session {
             } catch (IOException ignored) {}
         }
     }
-    public class CutsMissingDialog extends Stage {
-        public Button AddMissingSessionPartsButton;
-        public ListView<Text> SessionListView;
-        public Button CreateAnywayButton;
-        public Button CancelCreationButton;
-        private List<Cut> allcuts;
-        private List<Cut> missingsessionparts;
-        private Util.AnswerType result;
-        private MainController Root;
-
-        public CutsMissingDialog(MainController root, List<Cut> allcuts) {
-            Root = root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/CutsOutOfOrderOrMissing.fxml"));
-            fxmlLoader.setController(this);
-            try {
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-                this.setOnCloseRequest(event -> {
-                    if (result == null && Root.dialog_getConfirmation("Confirmation", "Close Without Creating", "This Will Return To The Creator",
-                            "", "")) {
-                        setResult(Util.AnswerType.CANCEL);
-                        close();
-                    }
-                });
-            } catch (IOException e) {
-    //            new MainController.ExceptionDialog(Root, e).showAndWait();
-            }
-            setTitle("Session Parts Missing");
-            this.allcuts = allcuts;
-            populatelistview();
-            Root.dialog_displayInformation("Cuts Missing", "Each Cut Should Connect From RIN Up", "Use This Dialog To Connect Cuts");
-        }
-
-        public int getlastworkingcutindex() {
-            int lastcutindex = 0;
-            for (Cut i : allcuts) {
-                if (i.getduration().greaterThan(Duration.ZERO)) {lastcutindex = i.number;}
-            }
-            return lastcutindex;
-        }
-        public void populatelistview() {
-            ObservableList<Text> sessionitems = FXCollections.observableArrayList();
-            for (int i=0; i<getlastworkingcutindex(); i++) {
-                Text item = new Text();
-                StringBuilder currentcuttext = new StringBuilder();
-                Cut selectedcut = allcuts.get(i);
-                currentcuttext.append(selectedcut.number).append(". ").append(selectedcut.name);
-                if (selectedcut.getduration().greaterThan(Duration.ZERO)) {
-                    currentcuttext.append(" (").append(Util.formatdurationtoStringSpelledOut(selectedcut.getduration(), SessionListView.getLayoutBounds().getWidth() - (currentcuttext.length() + 1)));
-                    currentcuttext.append(")");
-                } else {
-                    if (missingsessionparts == null) {
-                        missingsessionparts = new ArrayList<>();}
-                    missingsessionparts.add(selectedcut);
-                    currentcuttext.append(" (Missing Value!)");
-                    item.setStyle("-fx-font-weight:bold; -fx-font-style: italic;");
-                }
-                item.setText(currentcuttext.toString());
-                sessionitems.add(item);
-            }
-            SessionListView.setItems(sessionitems);
-        }
-        public void addmissingcutstoSession(Event event) {
-            if (missingsessionparts != null && missingsessionparts.size() > 0) {
-                SessionPartsInvocationDialog sessionpartsdurationdialog = new SessionPartsInvocationDialog();
-                sessionpartsdurationdialog.showAndWait();
-                missingsessionparts.stream().filter(i -> sessionpartsdurationdialog.getDuration() != 0).forEach(i -> {
-                    i.changevalue(sessionpartsdurationdialog.getDuration());
-                });
-            }
-            setResult(Util.AnswerType.YES);
-            this.close();
-        }
-        public void createSessionwithoutmissingsessionparts(Event event) {
-            if (Root.dialog_getConfirmation("Confirmation", null, "Session Not Well-Formed", "Create Anyway", "Cancel")) {
-                setResult(Util.AnswerType.YES);
-                close();
-            }
-        }
-        public Util.AnswerType getResult() {
-            return result;
-        }
-        public void setResult(Util.AnswerType result) {
-            this.result = result;
-        }
-        public void cancelcreation(ActionEvent actionEvent) {
-            setResult(Util.AnswerType.CANCEL);
-            this.close();
-        }
-    }
     public class SessionPlaybackOverview extends Stage {
         public TableView<SessionItem> SessionItemsTable;
         public TableColumn<SessionItem, Integer> NumberColumn;
@@ -856,15 +768,13 @@ public class This_Session {
         public TextField TotalSessionTime;
         public Button PlaySessionButton;
         public TextField CompletionTime;
-        private List<SessionPart> sessionitems;
-        private ObservableList<SessionItem> tableitems;
-        private MainController Root;
-        private Util.AnswerType result;
+        private List<SessionPart> alladjustedsessionitems;
+        private SessionPart selectedsessionpart;
+        private ObservableList<SessionItem> tableitems = FXCollections.observableArrayList();
 
-        public SessionPlaybackOverview(MainController Root, List<SessionPart> sessionitems) {
-            this.sessionitems = sessionitems;
-            this.Root = Root;
+        public SessionPlaybackOverview() {
             try {
+                alladjustedsessionitems = itemsinsession;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SortSessionParts.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -872,38 +782,47 @@ public class This_Session {
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
                 this.setOnCloseRequest(event -> {
-                    if (Root.dialog_getConfirmation("Cancel Creation", null, "This Will Return To The Creator Main Window", "", "")) {
-                        setResult(Util.AnswerType.CANCEL);
-                        close();
-                    }
+//                    if (Root.dialog_getConfirmation("Cancel Session Playback", null, "This Will Cancel Session Playback", "Cancel Playback", "Continue")) {
+//                        close();
+//                    }
                 });
+                NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
+                NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+                DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
+                SessionItemsTable.setOnMouseClicked(event -> itemselected());
+                tableitems = FXCollections.observableArrayList();
+                UpButton.setDisable(true);
+                DownButton.setDisable(true);
+                populatetable();
             } catch (IOException ignored) {}
-            NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
-            NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
-            DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
-            SessionItemsTable.setOnMouseClicked(event -> itemselected());
-            tableitems = FXCollections.observableArrayList();
-            UpButton.setDisable(true);
-            DownButton.setDisable(true);
-            populatetable();
         }
 
+        // Table Methods
         public void itemselected() {
             int index = SessionItemsTable.getSelectionModel().getSelectedIndex();
             boolean validitemselected = index != -1;
             UpButton.setDisable(! validitemselected && index == 0);
             DownButton.setDisable(! validitemselected && index != SessionItemsTable.getItems().size() - 1);
+            if (index != -1) {selectedsessionpart = alladjustedsessionitems.get(index);}
         }
         public void populatetable() {
-            SessionItemsTable.getItems().clear();
+            System.out.println("Populating Table");
             tableitems.clear();
+            if (alladjustedsessionitems == null) {alladjustedsessionitems = new ArrayList<>();}
+            else {alladjustedsessionitems.clear();}
             int count = 1;
-            for (SessionPart i : sessionitems) {
-                tableitems.add(new SessionItem(count, i.name, Util.formatdurationtoStringDecimalWithColons(i.getduration()), i.goals_getCurrentAsString(150)));
-                count++;
+            for (SessionPart x : getAllSessionParts()) {
+                if ((alladjustedsessionitems.contains(x)) || (!getwellformedcuts().isEmpty() && x instanceof Cut && (!alladjustedsessionitems.contains(x) && getwellformedcuts().contains(x)))) {
+                    tableitems.add(new SessionItem(count, x.name, x.getdurationasString(150.0), x.goals_getCurrentAsString(150.0)));
+                    alladjustedsessionitems.add(x);
+                    count++;
+                }
             }
+            System.out.println("Table Has " + tableitems.size() + " Items");
             SessionItemsTable.setItems(tableitems);
         }
+
+    // Order/Sort Session Parts
         public void moveitemup(ActionEvent actionEvent) {
             int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
             if (selectedindex == -1) {return;}
@@ -912,8 +831,8 @@ public class This_Session {
                 return;
             }
             if (selectedindex == 0) {return;}
-            SessionPart selecteditem = sessionitems.get(selectedindex);
-            SessionPart oneitemup = sessionitems.get(selectedindex - 1);
+            SessionPart selecteditem = alladjustedsessionitems.get(selectedindex);
+            SessionPart oneitemup = alladjustedsessionitems.get(selectedindex - 1);
             if (selecteditem instanceof Cut && oneitemup instanceof Cut) {
                 if (selecteditem.number > oneitemup.number) {
                     Root.dialog_displayInformation("Cannot Move", selecteditem.name + " Cannot Be Moved Before " + oneitemup.name + ". Cuts Would Be Out Of Order", "Cannot Move");
@@ -924,7 +843,7 @@ public class This_Session {
                 Root.dialog_displayInformation("Cannot Move", "Cannot Replace Presession", "Cannot Move");
                 return;
             }
-            Collections.swap(sessionitems, selectedindex, selectedindex - 1);
+            Collections.swap(alladjustedsessionitems, selectedindex, selectedindex - 1);
             populatetable();
         }
         public void moveitemdown(ActionEvent actionEvent) {
@@ -935,8 +854,8 @@ public class This_Session {
                 return;
             }
             if (selectedindex == tableitems.size() - 1) {return;}
-            SessionPart selecteditem = sessionitems.get(selectedindex);
-            SessionPart oneitemdown = sessionitems.get(selectedindex + 1);
+            SessionPart selecteditem = alladjustedsessionitems.get(selectedindex);
+            SessionPart oneitemdown = alladjustedsessionitems.get(selectedindex + 1);
             if (selecteditem instanceof Cut && oneitemdown instanceof Cut) {
                 if (selecteditem.number < oneitemdown.number) {
                     Root.dialog_displayInformation("Cannot Move", selecteditem.name + " Cannot Be Moved After " + oneitemdown.name + ". Cuts Would Be Out Of Order", "Cannot Move");
@@ -947,32 +866,54 @@ public class This_Session {
                 Root.dialog_displayInformation("Cannot Move", "Cannot Replace Postsession", "Cannot Move");
                 return;
             }
-            Collections.swap(sessionitems, selectedindex, selectedindex + 1);
+            Collections.swap(alladjustedsessionitems, selectedindex, selectedindex + 1);
             populatetable();
         }
-        public void cutcheck() {
 
+    // Session Parts Missing/ Out Of Order
+        public List<Cut> getwellformedcuts() {
+            List<Cut> wellformedcuts = new ArrayList<>();
+            for (int i=0; i<getlastworkingcutindex(); i++) {
+                wellformedcuts.add(getallCuts().get(i));
+            }
+            return wellformedcuts;
         }
-        public List<SessionPart> getorderedsessionitems() {
-            return sessionitems;
+        public void adjustduration(ActionEvent actionEvent) {
+            if (selectedsessionpart != null) {
+                SessionOverviewChangeDuration changedurationdialog = new SessionOverviewChangeDuration();
+                changedurationdialog.showAndWait();
+                selectedsessionpart.changevalue(changedurationdialog.getDuration());
+                populatetable();
+            }
         }
-        public void accept(ActionEvent actionEvent) {
+        public int getlastworkingcutindex() {
+            int lastcutindex = 0;
+            for (SessionPart i : itemsinsession) {
+                if (i instanceof Cut && i.getduration().greaterThan(Duration.ZERO)) {lastcutindex = i.number;}
+            }
+            return lastcutindex;
+        }
+
+    // Pre/Post Addition If Missing
+
+    // Alert File
+
+
+    // Dialog Methods
+        public void playsession(ActionEvent actionEvent) {
+            itemsinsession = alladjustedsessionitems;
             close();
         }
         public void cancel(ActionEvent actionEvent) {
-            sessionitems = null;
+            alladjustedsessionitems = null;
             close();
         }
-        public void dialogClosed() {
+
+    // Goal Methods
+        public void setgoal(ActionEvent actionEvent) {
 
         }
 
-        public Util.AnswerType getResult() {
-            return result;
-        }
-        public void setResult(Util.AnswerType result) {
-            this.result = result;
-        }
 
         class SessionItem {
             private IntegerProperty number;
@@ -989,6 +930,57 @@ public class This_Session {
         }
 
     }
+    public class SessionOverviewChangeDuration extends Stage {
+        public Button CancelButton;
+        public Button OKButton;
+        public TextField MinutesTextField;
+        private int duration;
+
+        public SessionOverviewChangeDuration() {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPartInvocationDialog.fxml"));
+            fxmlLoader.setController(this);
+            try {
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                options.setStyle(this);
+                this.setResizable(false);
+            } catch (IOException ignored) {}
+            setTitle("SessionPart Invocation");
+            MinutesTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+                try {if (newValue.matches("\\d*")) {
+                    MinutesTextField.setText(Integer.toString(Integer.parseInt(newValue)));}  else {
+                    MinutesTextField.setText(oldValue);}}
+                catch (Exception e) {MinutesTextField.setText("");}
+            });
+            MinutesTextField.setText("0");
+        }
+        public int getDuration() {
+            return duration;
+        }
+        public void setDuration(int duration) {
+            this.duration = duration;
+        }
+        public void CancelButtonPressed(Event event) {
+            setDuration(0);
+            this.close();
+        }
+        public void OKButtonPressed(Event event) {
+            try {
+                int value = Integer.parseInt(MinutesTextField.getText());
+                if (value != 0) {
+                    setDuration(value);
+                    this.close();
+                } else {
+                    if (Root.dialog_getConfirmation("Confirmation", null, "Continue With Zero Value (These Session Parts Won't Be Included)", "Continue", "Cancel")) {
+                        setDuration(0);
+                        this.close();
+                    }
+                }
+            } catch (NumberFormatException e) {
+                Root.dialog_displayError("Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
+        }
+    }
+    public class SessionOverviewSetGoal extends Stage {}
     public class PlayerUI extends Stage {
         public Button PlayButton;
         public Button PauseButton;
@@ -1277,56 +1269,6 @@ public class This_Session {
             player_stop();}
 
 }
-    public class SessionPartsInvocationDialog extends Stage {
-        public Button CancelButton;
-        public Button OKButton;
-        public TextField MinutesTextField;
-        private int duration;
-
-        public SessionPartsInvocationDialog() {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPartInvocationDialog.fxml"));
-            fxmlLoader.setController(this);
-            try {
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                options.setStyle(this);
-                this.setResizable(false);
-            } catch (IOException ignored) {}
-            setTitle("SessionPart Invocation");
-            MinutesTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-                try {if (newValue.matches("\\d*")) {
-                    MinutesTextField.setText(Integer.toString(Integer.parseInt(newValue)));}  else {
-                    MinutesTextField.setText(oldValue);}}
-                catch (Exception e) {MinutesTextField.setText("");}
-            });
-            MinutesTextField.setText("0");
-        }
-        public int getDuration() {
-            return duration;
-        }
-        public void setDuration(int duration) {
-            this.duration = duration;
-        }
-        public void CancelButtonPressed(Event event) {
-            setDuration(0);
-            this.close();
-        }
-        public void OKButtonPressed(Event event) {
-            try {
-                int value = Integer.parseInt(MinutesTextField.getText());
-                if (value != 0) {
-                    setDuration(value);
-                    this.close();
-                } else {
-                    if (Root.dialog_getConfirmation("Confirmation", null, "Continue With Zero Value (These Session Parts Won't Be Included)", "Continue", "Cancel")) {
-                        setDuration(0);
-                        this.close();
-                    }
-                }
-            } catch (NumberFormatException e) {
-                Root.dialog_displayError("Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
-        }
-    }
     public class ExportDialog extends Stage {
         private File finalexportfile;
         private File tempentrainmenttextfile;

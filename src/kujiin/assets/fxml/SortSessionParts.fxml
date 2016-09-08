@@ -31,8 +31,8 @@
                <children>
                   <Button fx:id="UpButton" mnemonicParsing="false" onAction="#moveitemup" text="Move Up" />
                   <Button fx:id="DownButton" mnemonicParsing="false" onAction="#moveitemdown" text="Move Down" />
-                  <Button fx:id="AdjustDurationButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="108.0" text="Adjust Duration" />
-                  <Button fx:id="SetGoalButton" mnemonicParsing="false" text="Set Goal" />
+                  <Button fx:id="AdjustDurationButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="108.0" text="Adjust Duration" onAction="#adjustduration"/>
+                  <Button fx:id="SetGoalButton" mnemonicParsing="false" text="Set Goal" onAction="#setgoal"/>
                </children>
                <VBox.margin>
                   <Insets bottom="2.0" right="5.0" top="2.0" />
@@ -59,7 +59,7 @@
             </HBox>
             <HBox alignment="TOP_RIGHT" prefHeight="29.0" prefWidth="141.0">
                <children>
-                  <Button fx:id="PlaySessionButton" mnemonicParsing="false" onAction="#accept" text="Play Session" />
+                  <Button fx:id="PlaySessionButton" mnemonicParsing="false" onAction="#playsession" text="Play Session" />
                   <Button fx:id="CancelButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
                </children>
                <VBox.margin>

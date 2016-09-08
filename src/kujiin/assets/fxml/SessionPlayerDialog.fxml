@@ -4,14 +4,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="254.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label alignment="CENTER" layoutX="35.0" layoutY="3.0" prefHeight="22.0" prefWidth="498.0" text="Session Player" textAlignment="CENTER">
          <font>
             <Font name="System Bold" size="19.0" />
          </font>
       </Label>
-      <HBox alignment="TOP_RIGHT" layoutX="356.0" layoutY="224.0" prefHeight="23.0" prefWidth="198.0">
+      <HBox alignment="TOP_RIGHT" layoutX="356.0" layoutY="189.0" prefHeight="23.0" prefWidth="198.0">
          <children>
             <Button fx:id="PlayButton" minWidth="51.0" mnemonicParsing="false" onAction="#play" text="Play">
                <font>
@@ -81,75 +81,80 @@
             </HBox>
          </children>
       </VBox>
-      <VBox alignment="CENTER" layoutX="40.0" layoutY="136.0" prefHeight="85.0" prefWidth="291.0">
+      <Label fx:id="StatusBar" layoutX="12.0" layoutY="193.0" prefHeight="16.0" prefWidth="387.0" />
+      <Label fx:id="GoalPercentageLabel" alignment="CENTER" layoutX="238.0" layoutY="165.0" prefHeight="16.0" prefWidth="151.0" />
+      <HBox layoutX="12.0" layoutY="132.0" prefHeight="55.0" prefWidth="544.0">
          <children>
-            <Label fx:id="GoalTopLabel" alignment="CENTER" prefHeight="16.0" prefWidth="298.0" text="Goal Progress">
-               <VBox.margin>
-                  <Insets bottom="10.0" />
-               </VBox.margin>
-               <font>
-                  <Font name="System Bold" size="15.0" />
-               </font></Label>
-            <ProgressBar fx:id="GoalProgressBar" prefHeight="27.0" prefWidth="287.0" progress="0.0" />
-         </children>
-      </VBox>
-      <VBox alignment="CENTER" layoutX="332.0" layoutY="127.0" prefHeight="56.0" prefWidth="226.0">
-         <children>
-            <Label text="Volume Control">
-               <font>
-                  <Font name="System Bold" size="15.0" />
-               </font>
-            </Label>
-            <HBox alignment="CENTER_RIGHT" prefHeight="22.0" prefWidth="229.0">
+            <VBox alignment="CENTER" prefHeight="55.0" prefWidth="226.0">
                <children>
-                  <Label alignment="CENTER_RIGHT" minWidth="75.0" text="Entrainment">
-                     <HBox.margin>
-                        <Insets right="5.0" />
-                     </HBox.margin></Label>
-                  <Slider fx:id="EntrainmentVolume" max="1.0" minWidth="100.0" prefHeight="16.0" prefWidth="100.0">
-                     <HBox.margin>
-                        <Insets right="2.0" />
-                     </HBox.margin>
-                  </Slider>
-                  <Label fx:id="EntrainmentVolumePercentage" minWidth="35.0" text="100%" />
+                  <HBox alignment="CENTER_RIGHT" prefHeight="22.0" prefWidth="229.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" minWidth="75.0" text="Entrainment">
+                           <HBox.margin>
+                              <Insets right="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Slider fx:id="EntrainmentVolume" max="1.0" minWidth="100.0" prefHeight="16.0" prefWidth="100.0">
+                           <HBox.margin>
+                              <Insets right="2.0" />
+                           </HBox.margin>
+                        </Slider>
+                        <Label fx:id="EntrainmentVolumePercentage" minWidth="35.0" text="100%" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="22.0" prefWidth="229.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" minWidth="75.0" text="Ambience">
+                           <HBox.margin>
+                              <Insets right="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Slider fx:id="AmbienceVolume" max="1.0" minWidth="100.0" prefHeight="16.0" prefWidth="100.0">
+                           <HBox.margin>
+                              <Insets right="2.0" />
+                           </HBox.margin>
+                        </Slider>
+                        <Label fx:id="AmbienceVolumePercentage" minWidth="35.0" text="100%" />
+                     </children>
+                  </HBox>
                </children>
-            </HBox>
-            <HBox alignment="CENTER_RIGHT" prefHeight="22.0" prefWidth="229.0">
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="48.0" prefWidth="166.0">
                <children>
-                  <Label alignment="CENTER_RIGHT" minWidth="75.0" text="Ambience">
-                     <HBox.margin>
-                        <Insets right="5.0" />
-                     </HBox.margin></Label>
-                  <Slider fx:id="AmbienceVolume" max="1.0" minWidth="100.0" prefHeight="16.0" prefWidth="100.0">
-                     <HBox.margin>
-                        <Insets right="2.0" />
-                     </HBox.margin>
-                  </Slider>
-                  <Label fx:id="AmbienceVolumePercentage" minWidth="35.0" text="100%" />
+                  <Label fx:id="GoalTopLabel" alignment="CENTER" prefHeight="16.0" prefWidth="298.0" text="Goal Progress">
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <ProgressBar fx:id="GoalProgressBar" prefHeight="21.0" prefWidth="161.0" progress="0.0">
+                     <VBox.margin>
+                        <Insets left="5.0" right="5.0" />
+                     </VBox.margin></ProgressBar>
                </children>
-            </HBox>
-         </children>
-      </VBox>
-      <Label fx:id="StatusBar" layoutX="40.0" layoutY="228.0" prefHeight="16.0" prefWidth="338.0" />
-      <HBox layoutX="289.0" layoutY="188.0" prefHeight="30.0" prefWidth="265.0">
-         <children>
-            <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="263.0">
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="61.0" prefWidth="166.0">
                <children>
                   <ToggleButton fx:id="ReferenceToggleButton" mnemonicParsing="false" onAction="#togglereference" text="Reference" />
-                  <RadioButton fx:id="ReferenceHTMLButton" mnemonicParsing="false" onAction="#htmlreferenceoptionselected" text="HTML">
-                     <HBox.margin>
-                        <Insets left="5.0" right="5.0" />
-                     </HBox.margin>
-                  </RadioButton>
-                  <RadioButton fx:id="ReferenceTXTButton" mnemonicParsing="false" onAction="#txtreferenceoptionselected" text="TXT">
-                     <HBox.margin>
-                        <Insets left="5.0" right="5.0" />
-                     </HBox.margin>
-                  </RadioButton>
+                  <HBox alignment="CENTER" prefHeight="30.0" prefWidth="138.0">
+                     <children>
+                        <RadioButton fx:id="ReferenceHTMLButton" mnemonicParsing="false" onAction="#htmlreferenceoptionselected" text="HTML">
+                           <HBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </HBox.margin>
+                        </RadioButton>
+                        <RadioButton fx:id="ReferenceTXTButton" mnemonicParsing="false" onAction="#txtreferenceoptionselected" text="TXT">
+                           <HBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </HBox.margin>
+                        </RadioButton>
+                     </children>
+                  </HBox>
                </children>
-            </HBox>
+            </VBox>
          </children>
       </HBox>
-      <Label fx:id="GoalPercentageLabel" alignment="CENTER" layoutX="42.0" layoutY="184.0" prefHeight="16.0" prefWidth="287.0" />
    </children>
 </AnchorPane>

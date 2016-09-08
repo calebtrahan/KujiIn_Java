@@ -229,6 +229,7 @@ public class SessionPart {
     public Duration getduration() {return duration;}
     public String getdurationasString(double maxchars) {
         if (duration == null || duration.equals(Duration.ZERO)) {return "No Duration Set";}
+        else if (this instanceof Qi_Gong && ((Qi_Gong) this).ramponly) {return "Ramp Only";}
         else {return Util.formatdurationtoStringSpelledOut(duration, maxchars);}
     }
     public Duration getelapsedtime() {return elapsedtime;}
