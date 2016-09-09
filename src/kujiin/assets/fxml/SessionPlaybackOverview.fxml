@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="445.0" prefWidth="642.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="TOP_CENTER" prefHeight="651.0" prefWidth="683.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <MenuBar>
+              <menus>
+                <Menu mnemonicParsing="false" text="File">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="Close" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Tools">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="Delete" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="About" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <TableView fx:id="SessionItemsTable" prefHeight="318.0" prefWidth="327.0">
+              <columns>
+                <TableColumn fx:id="NumberColumn" prefWidth="30.0" text="#" />
+                <TableColumn fx:id="NameColumn" prefWidth="150.0" text="Name" />
+                  <TableColumn fx:id="DurationColumn" prefWidth="150.0" text="Practice Time" />
+                  <TableColumn prefWidth="150.0" text="Ambience" />
+                  <TableColumn fx:id="GoalColumn" prefWidth="150.0" text="Current Goal" />
+              </columns>
+               <VBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </VBox.margin>
+            </TableView>
+            <HBox prefHeight="30.0" prefWidth="683.0">
+               <children>
+                  <HBox alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="340.0">
+                     <children>
+                        <Button fx:id="UpButton" mnemonicParsing="false" onAction="#moveitemup" text="Move Up" />
+                        <Button fx:id="DownButton" mnemonicParsing="false" onAction="#moveitemdown" text="Move Down" />
+                     </children>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="348.0">
+                     <children>
+                        <Button fx:id="AdjustDurationButton" mnemonicParsing="false" onAction="#adjustduration" prefHeight="26.0" prefWidth="108.0" text="Adjust Duration" />
+                        <Button fx:id="SetAmbienceButton" mnemonicParsing="false" onAction="#setambience" text="Set Ambience" />
+                        <Button fx:id="SetGoalButton" mnemonicParsing="false" onAction="#setgoal" text="Set Goal" />
+                     </children>
+                     <padding>
+                        <Insets right="5.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="376.0">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="32.0" prefWidth="212.0">
+                     <children>
+                        <CheckBox fx:id="AmbienceSwitch" mnemonicParsing="false" text="Ambience">
+                           <HBox.margin>
+                              <Insets right="5.0" />
+                           </HBox.margin>
+                        </CheckBox>
+                        <ComboBox fx:id="AmbienceTypeComboBox" prefHeight="26.0" prefWidth="114.0" />
+                     </children>
+                  </HBox>
+                  <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="106.0" text="Session Duration">
+                     <HBox.margin>
+                        <Insets right="3.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="TotalSessionTime" prefHeight="26.0" prefWidth="100.0" />
+                  <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="103.0" text="Completion Time">
+                     <HBox.margin>
+                        <Insets right="3.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="CompletionTime" prefHeight="26.0" prefWidth="100.0" />
+               </children>
+               <VBox.margin>
+                  <Insets right="5.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="141.0">
+               <children>
+                  <Label fx:id="StatusBar" prefHeight="16.0" prefWidth="476.0" textAlignment="RIGHT">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Button fx:id="PlaySessionButton" mnemonicParsing="false" onAction="#playsession" text="Play Session" />
+                  <Button fx:id="CancelButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="3.0" right="5.0" top="3.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

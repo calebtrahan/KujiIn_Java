@@ -44,6 +44,7 @@ import static kujiin.util.Util.AnswerType.YES;
 // TODO Test
 
 // TODO Additional Features To Definitely Add
+    // TODO Add Ramp Only Fade In/ Fade Out Animations (Only 1-5 Seconds Long (or use math depending on ramp duration)
     // TODO Work All Sesion Well Formedness Checks + Goals Into SessionPlaybackOverview Class
         // TODO Add Ramp Only As An Option To Invocation Dialog (Also Implement In Cut/Element Logic)
 

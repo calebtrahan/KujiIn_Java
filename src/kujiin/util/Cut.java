@@ -80,7 +80,6 @@ public class Cut extends SessionPart {
                 SessionPart partafter = allsessionpartstoplay.get(index + 1);
                 if (partafter instanceof Qi_Gong || partafter instanceof Element) {entrainment.setRampfile(entrainment.ramp_get(1));}
                 else {entrainment.setRampfile(entrainment.ramp_get(0));}
-                System.out.println(name + "'s Ramp File Is: " + entrainment.getRampfile().getFile().getAbsolutePath());
                 return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
             } catch (IndexOutOfBoundsException ignored) {return false;}
         }

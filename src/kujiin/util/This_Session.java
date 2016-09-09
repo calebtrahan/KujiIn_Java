@@ -198,14 +198,11 @@ public class This_Session {
 
 // Creation
     public void creation_createsession() {
-        int count = 1;
         for (SessionPart i : getallitemsinSession()) {
-            System.out.println(count + ": " + i.name + " With Duration: " + i.getduration().toSeconds() + " Seconds");
             if (! i.creation_build(getallitemsinSession())) {
                 creation_reset(false);
                 return;
             }
-            count++;
         }
         creatorState = CreatorState.CREATED;
     }
@@ -400,6 +397,9 @@ public class This_Session {
     }
 
 // Export
+    public boolean exporter_confirmOverview() {
+        return true;
+    }
     public Service<Boolean> exporter_getsessionexporter() {
 //        CreatorAndExporterUI.ExporterUI exportingSessionDialog = new CreatorAndExporterUI.ExporterUI(this);
         return new Service<Boolean>() {
@@ -634,8 +634,6 @@ public class This_Session {
         Root.getSessions().deletenonvalidsessions();
         Root.session_gui_opensessiondetailsdialog();
         // TODO Prompt For Export
-//        if (Util.dialog_OKCancelConfirmation(Root, "Confirmation", "Session Completed", "Export This Session For Later Use?")) {
-//            exporter_getsessionexporter();}
         Root.sessions_gui_updateui();
         Root.goals_gui_updateui();
         player_reset(true);
@@ -768,6 +766,10 @@ public class This_Session {
         public TextField TotalSessionTime;
         public Button PlaySessionButton;
         public TextField CompletionTime;
+        public Button SetAmbienceButton;
+        public CheckBox AmbienceSwitch;
+        public ComboBox AmbienceTypeComboBox;
+        public Label StatusBar;
         private List<SessionPart> alladjustedsessionitems;
         private SessionPart selectedsessionpart;
         private ObservableList<SessionItem> tableitems = FXCollections.observableArrayList();
@@ -775,7 +777,7 @@ public class This_Session {
         public SessionPlaybackOverview() {
             try {
                 alladjustedsessionitems = itemsinsession;
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SortSessionParts.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlaybackOverview.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
@@ -878,14 +880,6 @@ public class This_Session {
             }
             return wellformedcuts;
         }
-        public void adjustduration(ActionEvent actionEvent) {
-            if (selectedsessionpart != null) {
-                SessionOverviewChangeDuration changedurationdialog = new SessionOverviewChangeDuration();
-                changedurationdialog.showAndWait();
-                selectedsessionpart.changevalue(changedurationdialog.getDuration());
-                populatetable();
-            }
-        }
         public int getlastworkingcutindex() {
             int lastcutindex = 0;
             for (SessionPart i : itemsinsession) {
@@ -894,10 +888,22 @@ public class This_Session {
             return lastcutindex;
         }
 
+    // Adjust Duration Methods
+        public void adjustduration(ActionEvent actionEvent) {
+        if (selectedsessionpart != null) {
+            SessionOverviewChangeDuration changedurationdialog = new SessionOverviewChangeDuration();
+            changedurationdialog.showAndWait();
+            selectedsessionpart.changevalue(changedurationdialog.getDuration());
+            populatetable();
+        }
+}
+
+    //
+
+
     // Pre/Post Addition If Missing
 
     // Alert File
-
 
     // Dialog Methods
         public void playsession(ActionEvent actionEvent) {
@@ -911,6 +917,10 @@ public class This_Session {
 
     // Goal Methods
         public void setgoal(ActionEvent actionEvent) {
+
+        }
+
+        public void setambience(ActionEvent actionEvent) {
 
         }
 

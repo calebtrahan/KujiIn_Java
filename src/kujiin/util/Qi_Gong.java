@@ -98,7 +98,6 @@ public class Qi_Gong extends SessionPart {
             if (parttotest instanceof  Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
             else {rampfile = entrainment.ramp_get(Options.CUTNAMES.indexOf(parttotest.name.toUpperCase()));}
             entrainment.setRampfile(rampfile);
-            System.out.println(name + "'s Ramp File Is: " + rampfile.getFile().getAbsolutePath());
             if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
             return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
         } else {return super.creation_buildEntrainment();}

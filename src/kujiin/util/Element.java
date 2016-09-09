@@ -48,6 +48,7 @@ public class Element extends SessionPart {
                     if (this.entrainmentchecker_partcount == 0) {entrainment.setFreq(soundFile);}
                     else {entrainment.ramp_add(soundFile);}
                     entrainmentchecker_calculateplayer.dispose();
+                    entrainmentchecker_calculateplayer = null;
                     entrainmentchecker_partcount++;
                     entrainment_populate();
                 });
@@ -73,7 +74,6 @@ public class Element extends SessionPart {
                 if (parttotest instanceof  Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
                 else {rampfile = entrainment.ramp_get(Options.CUTNAMES.indexOf(parttotest.name.toUpperCase()));}
                 entrainment.setRampfile(rampfile);
-                System.out.println(name + "'s Ramp File Is: " + rampfile.getFile().getAbsolutePath());
                 return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
             } catch (IndexOutOfBoundsException ignored) {return super.creation_buildEntrainment();}
         } else {return super.creation_buildEntrainment();}
