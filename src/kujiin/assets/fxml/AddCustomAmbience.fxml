@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="335.0" prefWidth="349.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="TOP_CENTER" layoutX="112.0" layoutY="136.0" prefHeight="367.0" prefWidth="423.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label fx:id="TopLabel" alignment="CENTER" prefHeight="16.0" prefWidth="331.0">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+            </Label>
+            <TableView prefHeight="231.0" prefWidth="329.0">
+              <columns>
+                  <TableColumn fx:id="NumberColumn" prefWidth="32.0" text="#" />
+                <TableColumn fx:id="NameColumn" prefWidth="217.0" text="Name" />
+                <TableColumn fx:id="DurationColumn" prefWidth="79.0" text="Duration" />
+              </columns>
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </TableView>
+            <HBox alignment="CENTER_RIGHT" prefHeight="38.0" prefWidth="349.0">
+               <children>
+                  <Label alignment="CENTER_RIGHT" prefHeight="33.0" prefWidth="64.0" text="Needed Duration" textAlignment="CENTER" wrapText="true" />
+                  <TextField fx:id="NeededDurationTextField" prefHeight="26.0" prefWidth="70.0" />
+                  <Label fx:id="CurrentDurationTextField" alignment="CENTER_RIGHT" prefHeight="33.0" prefWidth="64.0" text="Current Duration" textAlignment="CENTER" wrapText="true" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets left="10.0" right="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField prefHeight="26.0" prefWidth="70.0">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="39.0" prefWidth="349.0">
+               <children>
+                  <Button fx:id="AcceptButton" mnemonicParsing="false" text="Accept" />
+                  <Button fx:id="CancelButton" mnemonicParsing="false" text="Cancel" />
+               </children>
+               <VBox.margin>
+                  <Insets right="10.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

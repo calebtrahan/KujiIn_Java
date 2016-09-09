@@ -404,7 +404,7 @@ public class MainController implements Initializable {
 
         Session.creation_populateitemsinsession();
         Session.creation_checkprepostramp();
-        Session.player_confirmOverview();
+//        Session.player_confirmOverview();
         // Add Pre/Post Ramp If Duration Is Zero || Ramp Is Disabled
 //    // Check Session Well Formed
 //        if (! Session.creation_checksessionwellformed()) {return false;}

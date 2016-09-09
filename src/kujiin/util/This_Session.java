@@ -981,6 +981,30 @@ public class This_Session {
         }
     }
     public class SessionOverviewSetGoal extends Stage {}
+    public class SessionOverviewAddCustomAmbience extends Stage {
+        public Label TopLabel;
+        public TableColumn NumberColumn;
+        public TableColumn NameColumn;
+        public TableColumn DurationColumn;
+        public TextField NeededDurationTextField;
+        public Label CurrentDurationTextField;
+        public Button AcceptButton;
+        public Button CancelButton;
+
+        public SessionOverviewAddCustomAmbience(SessionPart sessionPart) {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AddCustomAmbience.fxml"));
+                fxmlLoader.setController(this);
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                options.setStyle(this);
+                this.setResizable(false);
+                setTitle("SessionPart Invocation");
+            } catch (IOException ignored) {}
+
+        }
+
+    }
     public class PlayerUI extends Stage {
         public Button PlayButton;
         public Button PauseButton;
