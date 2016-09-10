@@ -14,6 +14,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,21 +23,21 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.MainController;
 import kujiin.xml.Options;
 import kujiin.xml.Session;
+import kujiin.xml.SoundFile;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.net.URL;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class This_Session {
@@ -78,7 +79,6 @@ public class This_Session {
     private Integer exportserviceindex;
     private ArrayList<Service<Boolean>> exportservices;
     private Service<Boolean> currentexporterservice;
-    public boolean ambienceenabled;
 
     public This_Session(MainController mainController) {
         Root = mainController;
@@ -768,14 +768,17 @@ public class This_Session {
         public TextField CompletionTime;
         public Button SetAmbienceButton;
         public CheckBox AmbienceSwitch;
-        public ComboBox AmbienceTypeComboBox;
+        public ComboBox<String> AmbienceTypeComboBox;
         public Label StatusBar;
         private List<SessionPart> alladjustedsessionitems;
         private SessionPart selectedsessionpart;
         private ObservableList<SessionItem> tableitems = FXCollections.observableArrayList();
+        private final ObservableList<String> ambiencetypes = FXCollections.observableArrayList();
+        private boolean ambienceenabled;
 
         public SessionPlaybackOverview() {
             try {
+                ambienceenabled = Root.AmbienceSwitch.isSelected();
                 alladjustedsessionitems = itemsinsession;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlaybackOverview.fxml"));
                 fxmlLoader.setController(this);
@@ -783,11 +786,9 @@ public class This_Session {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
-                this.setOnCloseRequest(event -> {
-//                    if (Root.dialog_getConfirmation("Cancel Session Playback", null, "This Will Cancel Session Playback", "Cancel Playback", "Continue")) {
-//                        close();
-//                    }
-                });
+                this.setOnCloseRequest(event -> {});
+                AmbienceTypeComboBox.setOnAction(event -> ambiencetypechanged());
+                AmbienceSwitch.setOnAction(event -> ambienceswitchchanged());
                 NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
                 NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
                 DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
@@ -815,8 +816,8 @@ public class This_Session {
             int count = 1;
             for (SessionPart x : getAllSessionParts()) {
                 if ((alladjustedsessionitems.contains(x)) || (!getwellformedcuts().isEmpty() && x instanceof Cut && (!alladjustedsessionitems.contains(x) && getwellformedcuts().contains(x)))) {
-                    tableitems.add(new SessionItem(count, x.name, x.getdurationasString(150.0), x.goals_getCurrentAsString(150.0)));
-                    alladjustedsessionitems.add(x);
+                    tableitems.add(new SessionItem(count, x.name, x.getdurationasString(150.0), getambiencetext(x), x.goals_getCurrentAsString(150.0)));
+                    if (! alladjustedsessionitems.contains(x)) {alladjustedsessionitems.add(x);}
                     count++;
                 }
             }
@@ -889,6 +890,7 @@ public class This_Session {
         }
 
     // Adjust Duration Methods
+        public boolean alldurationsset() {return true;}
         public void adjustduration(ActionEvent actionEvent) {
         if (selectedsessionpart != null) {
             SessionOverviewChangeDuration changedurationdialog = new SessionOverviewChangeDuration();
@@ -897,13 +899,6 @@ public class This_Session {
             populatetable();
         }
 }
-
-    //
-
-
-    // Pre/Post Addition If Missing
-
-    // Alert File
 
     // Dialog Methods
         public void playsession(ActionEvent actionEvent) {
@@ -920,22 +915,50 @@ public class This_Session {
 
         }
 
+    // Ambience Methods
+        public String getambiencetext(SessionPart sessionPart) {
+            if (! Root.AmbienceSwitch.isSelected()) {return "Ambience Disabled";}
+            else {
+                switch (ambiencePlaybackType) {
+                    case REPEAT:
+                        return "Ambience Will Repeat";
+                    case SHUFFLE:
+                        return "Ambience Will Shuffle";
+                    case CUSTOM:
+                        if (! sessionPart.getAmbience().getCustomAmbience().isEmpty()) {return "Custom Ambience Enabled";}
+                        else {return "Custom Ambience Not Set";}
+                    default:
+                        return null;
+                }
+            }
+        }
+        public void ambiencetypechanged() {
+            populatetable();
+        }
         public void setambience(ActionEvent actionEvent) {
+            SessionOverviewAddCustomAmbience addCustomAmbience = new SessionOverviewAddCustomAmbience(selectedsessionpart);
+            addCustomAmbience.showAndWait();
+            if (addCustomAmbience.getResult() == Util.AnswerType.YES) {
+                List<SoundFile> customambiencelist = addCustomAmbience.getCustomAmbienceList();
+            }
+        }
+        public void ambienceswitchchanged() {
 
         }
-
 
         class SessionItem {
             private IntegerProperty number;
             private StringProperty name;
             private StringProperty duration;
-            private StringProperty goal;
+            private StringProperty ambiencesummary;
+            private StringProperty goalsummary;
 
-            public SessionItem(int number, String name, String duration, String goal) {
+            public SessionItem(int number, String name, String duration, String ambiencesummary, String goalsummary) {
                 this.number = new SimpleIntegerProperty(number);
                 this.name = new SimpleStringProperty(name);
                 this.duration = new SimpleStringProperty(duration);
-                this.goal = new SimpleStringProperty(goal);
+                this.ambiencesummary = new SimpleStringProperty(ambiencesummary);
+                this.goalsummary = new SimpleStringProperty(goalsummary);
             }
         }
 
@@ -990,30 +1013,178 @@ public class This_Session {
                 Root.dialog_displayError("Error", "Value Is Empty", "Enter A Numeric Value Then Press OK");}
         }
     }
-    public class SessionOverviewSetGoal extends Stage {}
-    public class SessionOverviewAddCustomAmbience extends Stage {
-        public Label TopLabel;
-        public TableColumn NumberColumn;
-        public TableColumn NameColumn;
-        public TableColumn DurationColumn;
-        public TextField NeededDurationTextField;
-        public Label CurrentDurationTextField;
+    public class SessionOverviewSetGoal extends Stage {
+
+        public SessionOverviewSetGoal(SessionPart sessionPart) {
+
+        }
+
+    }
+    public class SessionOverviewAddCustomAmbience extends Stage implements Initializable {
+        public TableView<AmbienceSong> AmbienceItemsTable;
+        public TableColumn<AmbienceSong, Integer> NumberColumn;
+        public TableColumn<AmbienceSong, String> NameColumn;
+        public TableColumn<AmbienceSong, String> DurationColumn;
+        public Label TotalDurationTextField;
         public Button AcceptButton;
         public Button CancelButton;
+        public Button AddButton;
+        public Button RemoveButton;
+        public Button MoveUpButton;
+        public Button MoveDownButton;
+        public Button PreviewButton;
+        private AmbienceSong selectedtableitem;
+        private ObservableList<AmbienceSong> TableItems = FXCollections.observableArrayList();
+        private List<SoundFile> CustomAmbienceList;
+        private SessionPart sessionPart;
+        private Util.AnswerType result = Util.AnswerType.CANCEL;
 
+        @Override
+        public void initialize(URL location, ResourceBundle resources) {
+            NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
+            NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+            DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
+            AmbienceItemsTable.getSelectionModel().selectedItemProperty().addListener(
+                    (observable, oldValue, newValue) -> tableselectionchanged(newValue));
+        }
         public SessionOverviewAddCustomAmbience(SessionPart sessionPart) {
             try {
+                this.sessionPart = sessionPart;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AddCustomAmbience.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 options.setStyle(this);
                 this.setResizable(false);
-                setTitle("SessionPart Invocation");
+                RemoveButton.setDisable(true);
+                MoveUpButton.setDisable(true);
+                MoveDownButton.setDisable(true);
+                setTitle("Set Custom Ambience");
             } catch (IOException ignored) {}
-
         }
 
+        private void tableselectionchanged(AmbienceSong newValue) {
+            int index = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
+            if (index != -1) {selectedtableitem = AmbienceItemsTable.getItems().get(index);}
+            else {selectedtableitem = null;}
+            RemoveButton.setDisable(index == -1);
+            MoveUpButton.setDisable(index == -1 || index == 0);
+            MoveDownButton.setDisable(index == -1 || index == AmbienceItemsTable.getItems().size() - 1);
+            PreviewButton.setDisable(index == -1);
+        }
+        public boolean ambiencealreadyadded(File file) {
+            for (SoundFile i : CustomAmbienceList) {
+                if (file.equals(i.getFile())) {return true;}
+            }
+            return false;
+        }
+        public void addambience(ActionEvent actionEvent) {
+            List<File> filesselected = new FileChooser().showOpenMultipleDialog(null);
+            if (filesselected == null || filesselected.isEmpty()) {return;}
+            // TODO Remove Duplicate Files (If Any Here)
+            for (File i : filesselected) {
+                if (ambiencealreadyadded(i)) {continue;}
+                String suffix = i.getName().substring(i.getName().lastIndexOf("."));
+                if (Util.SUPPORTEDAUDIOFORMATS.contains(suffix)) {
+                    MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(i.toURI().toString()));
+                    calculatedurationplayer.setOnReady(() -> {
+                        SoundFile x = new SoundFile(i);
+                        x.setDuration(calculatedurationplayer.getTotalDuration().toMillis());
+                        CustomAmbienceList.add(x);
+                        TableItems.add(new AmbienceSong(filesselected.indexOf(i), x));
+                        AmbienceItemsTable.setItems(TableItems);
+                        calculatetotal();
+                        calculatedurationplayer.dispose();
+                    });
+                }
+            }
+        }
+        public void removeambience(ActionEvent actionEvent) {
+            if (selectedtableitem != null) {
+                if (Root.dialog_getConfirmation("Remove Ambience", "Really Remove '" + selectedtableitem.getName() + "'?", "", "Remove", "Cancel")) {
+                    int index = TableItems.indexOf(selectedtableitem);
+                    TableItems.remove(index);
+                    CustomAmbienceList.remove(index);
+                    AmbienceItemsTable.setItems(TableItems);
+                    calculatetotal();
+                }
+            }
+        }
+
+        public Duration getcurrenttotal() {
+            Duration duration = Duration.ZERO;
+            for (SoundFile i : CustomAmbienceList) {
+                duration = duration.add(Duration.millis(i.getDuration()));
+            }
+            return duration;
+        }
+        public void calculatetotal() {
+            TotalDurationTextField.setText(Util.formatdurationtoStringSpelledOut(getcurrenttotal(), TotalDurationTextField.getLayoutBounds().getWidth()));
+        }
+        public void moveupintable(ActionEvent actionEvent) {
+            int selectedindex = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
+            if (selectedindex > 0) {
+                Collections.swap(TableItems, selectedindex, selectedindex - 1);
+                Collections.swap(CustomAmbienceList, selectedindex, selectedindex - 1);
+                AmbienceItemsTable.setItems(TableItems);
+                calculatetotal();
+            }
+        }
+        public void movedownintable(ActionEvent actionEvent) {
+            int selectedindex = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
+            if (selectedindex != -1 && selectedindex != TableItems.size() - 1) {
+                Collections.swap(TableItems, selectedindex, selectedindex + 1);
+                Collections.swap(CustomAmbienceList, selectedindex, selectedindex + 1);
+                AmbienceItemsTable.setItems(TableItems);
+                calculatetotal();
+            }
+        }
+        public void preview(ActionEvent actionEvent) {
+            if (selectedtableitem != null) {
+                MainController.PreviewFile previewFile = new MainController.PreviewFile(selectedtableitem.getFile(), Root);
+                previewFile.showAndWait();
+            }
+        }
+
+        public List<SoundFile> getCustomAmbienceList() {
+            return CustomAmbienceList;
+        }
+        public Util.AnswerType getResult() {
+            return result;
+        }
+
+        public void accept(ActionEvent actionEvent) {
+            if (getcurrenttotal().lessThan(sessionPart.getduration())) {
+                Root.dialog_displayInformation("Ambience Too Short", "Need At Least " + sessionPart.getdurationasString(50) + " To Set This As Custom Ambience", "");
+            } else {
+                result = Util.AnswerType.YES;
+                close();
+            }
+        }
+
+        public class AmbienceSong {
+            private IntegerProperty number;
+            private StringProperty name;
+            private StringProperty length;
+            private File file;
+            private double duration;
+
+            public AmbienceSong(int id, SoundFile soundFile) {
+                number = new SimpleIntegerProperty(id);
+                name = new SimpleStringProperty(soundFile.getName());
+                file = soundFile.getFile();
+                duration = soundFile.getDuration();
+                length = new SimpleStringProperty(Util.formatdurationtoStringDecimalWithColons(Duration.millis(duration)));
+            }
+
+            public String getName() {
+                return name.getValue();
+            }
+            public File getFile() {
+                return file;
+            }
+            public double getDuration() {return duration;}
+        }
     }
     public class PlayerUI extends Stage {
         public Button PlayButton;

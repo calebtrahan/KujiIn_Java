@@ -38,8 +38,7 @@ public class Ambience {
         } catch (NullPointerException ignored) {return new ArrayList<>();}
     }
 
-    // Ambience Editing Methods
-    // Actual Ambience
+// Actual Ambience
     private void initialize() {
         if (Ambience == null) Ambience = new ArrayList<>();
     }
@@ -123,11 +122,11 @@ public class Ambience {
         System.out.println("Existing Ambience: " + exitstingcount);
     }
 
-
-    // Custom Ambience
+// Custom Ambience
     public void setCustomAmbience(List<SoundFile> customAmbience) {CustomAmbience = customAmbience;}
+    public List<SoundFile> getCustomAmbience() {return CustomAmbience;}
 
-    // Validation Methods
+// Validation Methods
     public Duration gettotalDuration() {
         Duration duration = new Duration(0);
         if (Ambience != null) {

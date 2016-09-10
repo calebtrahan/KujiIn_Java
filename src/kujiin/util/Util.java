@@ -28,7 +28,7 @@ import java.util.*;
 
 public class Util {
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-    public static final String[] SUPPORTEDAUDIOFORMATS = {"mp3", "aac", "wav", "aif", "aiff", "m4a"};
+    public static final ArrayList<String> SUPPORTEDAUDIOFORMATS = new ArrayList<>(Arrays.asList("mp3", "aac", "wav", "aif", "aiff", "m4a"));
 
 // Menu Methods
     public static void menu_howtouse(MainController root) {}
@@ -485,7 +485,7 @@ public class Util {
         StringBuilder s = new StringBuilder();
         for (String i : SUPPORTEDAUDIOFORMATS) {
             s.append(".").append(i);
-            if (! Objects.equals(i, SUPPORTEDAUDIOFORMATS[SUPPORTEDAUDIOFORMATS.length - 1])) {
+            if (! Objects.equals(i, SUPPORTEDAUDIOFORMATS.get(SUPPORTEDAUDIOFORMATS.size() - 1))) {
                 s.append(", ");
             }
         }

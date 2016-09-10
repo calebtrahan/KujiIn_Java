@@ -846,7 +846,7 @@ public class MainController implements Initializable {
         }
         public void preview(ActionEvent actionEvent) {
             if (alertfile != null && alertfile.exists()) {
-                PreviewFile previewFile = new PreviewFile(alertfile);
+                PreviewFile previewFile = new PreviewFile(alertfile, MainController.this);
                 previewFile.showAndWait();
             }
         }
@@ -1166,7 +1166,7 @@ public class MainController implements Initializable {
     }
 
     }
-    public class PreviewFile extends Stage {
+    public static class PreviewFile extends Stage {
         public Label CurrentTime;
         public Slider ProgressSlider;
         public Label TotalTime;
@@ -1180,7 +1180,7 @@ public class MainController implements Initializable {
         private File Filetopreview;
         private MediaPlayer PreviewPlayer;
 
-        public PreviewFile(File filetopreview) {
+        public PreviewFile(File filetopreview, MainController Root) {
             if (Util.audio_isValid(filetopreview)) {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/PreviewAudioDialog.fxml"));
                 fxmlLoader.setController(this);
@@ -1191,7 +1191,7 @@ public class MainController implements Initializable {
                 try {
                     Scene defaultscene = new Scene(fxmlLoader.load());
                     setScene(defaultscene);
-                    getOptions().setStyle(this);
+                    Root.getOptions().setStyle(this);
                     this.setResizable(false);
                     Filetopreview = filetopreview;
                     TopLabel.setText(Filetopreview.getName().substring(0, Filetopreview.getName().lastIndexOf(".")));
@@ -1214,7 +1214,7 @@ public class MainController implements Initializable {
                     VolumePercentage.setText("0%");
                 } catch (IOException ignored) {}
             } else {
-                dialog_displayInformation("Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+                Root.dialog_displayInformation("Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
         }
 
         public void play(ActionEvent actionEvent) {
@@ -2350,7 +2350,7 @@ public class MainController implements Initializable {
         private void preview(AmbienceSong selectedsong) {
             if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
                 if (previewdialog == null || !previewdialog.isShowing()) {
-                    previewdialog = new PreviewFile(selectedsong.getFile());
+                    previewdialog = new PreviewFile(selectedsong.getFile(), MainController.this);
                     previewdialog.showAndWait();
                 }
             }
@@ -2494,7 +2494,7 @@ public class MainController implements Initializable {
         public void add() {
             List<File> filesselected = new FileChooser().showOpenMultipleDialog(null);
             List<File> notvalidfilenames = new ArrayList<>();
-            if (filesselected == null || filesselected.size() == 0) {return;}
+            if (filesselected == null || filesselected.isEmpty()) {return;}
             for (File i : filesselected) {
                 for (String x : Util.SUPPORTEDAUDIOFORMATS) {
                     if (i.getName().endsWith(x)) {
@@ -2558,7 +2558,7 @@ public class MainController implements Initializable {
         public void preview(ActionEvent actionEvent) {
             if (selectedambiencesong != null && selectedambiencesong.getFile() != null && selectedambiencesong.getFile().exists()) {
                 if (previewdialog == null || !previewdialog.isShowing()) {
-                    previewdialog = new PreviewFile(selectedambiencesong.getFile());
+                    previewdialog = new PreviewFile(selectedambiencesong.getFile(), MainController.this);
                     previewdialog.showAndWait();
                 }
             }
@@ -2810,72 +2810,4 @@ public class MainController implements Initializable {
 
     }
 
-// TESTING
-    public class ShuffleSongs {
-        List<Song> songsList;
-
-        private void initSongsList() {
-            songsList = new LinkedList<>();
-            songsList.add(new Song("Moon Light", "Nature", "AL"));
-            songsList.add(new Song("Go Next", "Future", "B. J"));
-            songsList.add(new Song("Realllllly", "K", "CCC"));
-            songsList.add(new Song("Fear", "Hell G.", "SD"));
-            songsList.add(new Song("My Dear", "Future", "B. J"));
-            songsList.add(new Song("To the School", "K", "Mike"));
-            songsList.add(new Song("My name is", "Future", "Khan"));
-            songsList.add(new Song("How want some", "Hell G.", "S.Fire"));
-            songsList.add(new Song("My Lord", "K", "Ali"));
-        }
-
-        private void printSongsList(List<Song> list) {
-            for (int i = 0; i < list.size(); i++) {
-                Song song = list.get(i);
-                System.out.printf("# %d - Title: %13s | Album: %10s | Artist: %10s\n", i + 1, song.title, song.album, song.artist);
-            }
-            System.out.println("--------------------------------------------------------");
-        }
-
-        private List shuffle1(List list) {
-            List res = new LinkedList();
-            int size = list.size();
-            int rand = 0;
-            Object[] temp = list.toArray();
-            int count = 0;
-            while (count != size) {
-                rand = (int) (Math.random() * list.size());
-                if (!res.contains(temp[rand])) {
-                    res.add(temp[rand]);
-                    count++;
-                }
-            }
-            return res;
-        }
-        private List shuffle2(List list) {
-            if (list.size() == 1) {
-                return list;
-            } else {
-                int rand = (int) (Math.random() * list.size());
-                Object o = list.get(rand);
-                list.remove(rand);
-                list = shuffle2(list);
-                list.add(o);
-                return list;
-            }
-        }
-
-        private class Song {
-            private String title;
-            private String album;
-            private String artist;
-
-            public Song() {
-            }
-
-            public Song(String title, String album, String artist) {
-                this.title = title;
-                this.album = album;
-                this.artist = artist;
-            }
-        }
-    }
 }
