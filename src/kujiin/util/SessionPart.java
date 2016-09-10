@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import static kujiin.xml.Options.DEFAULT_FADERESUMEANDPAUSEDURATION;
@@ -35,8 +34,6 @@ public class SessionPart {
     protected Ambience ambience;
     protected Entrainment entrainment;
 // Playback Fields
-    protected int entrainmentplaycount;
-    protected int ambienceplaycount;
     protected MediaPlayer entrainmentplayer;
     protected MediaPlayer ambienceplayer;
     protected Animation fade_entrainment_play;
@@ -50,11 +47,11 @@ public class SessionPart {
     protected Animation timeline_fadeout_timer;
     protected Animation timeline_progresstonextsessionpart;
     protected Animation timeline_start_ending_ramp;
-    protected Animation timeline_end_starting_ramp;
     protected FreqType freqType;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     private ArrayList<SoundFile> ambienceplayhistory;
+    private SoundFile currentambiencesoundfile;
     public Duration elapsedtime;
     protected List<SessionPart> allsessionpartstoplay;
     protected List<kujiin.xml.Goals.Goal> goalscompletedthissession;
@@ -117,12 +114,12 @@ public class SessionPart {
         return entrainmentmissingfiles;
     }
     public List<File> entrainment_getMissingFiles() {return entrainmentchecker_missingfiles;}
-    public Duration ambience_getTotalActualDuration() {return ambience.gettotalActualDuration();}
+    public Duration ambience_getTotalActualDuration() {return ambience.gettotalDuration();}
 
 // Ambience Methods
     public void ambience_cleanupexistingambience() {
         if (ambience.getAmbience() != null) {
-            ambience.getAmbience().stream().filter(i -> i.getFile() == null || !i.getFile().exists()).forEach(i -> ambience.actual_remove(i));
+            ambience.getAmbience().stream().filter(i -> i.getFile() == null || !i.getFile().exists()).forEach(i -> ambience.remove(i));
         } else {}
     }
     public void ambience_addnewfromdirectory() {
@@ -146,7 +143,10 @@ public class SessionPart {
                     }
                 }
                 if (! ambiencechecker_soundfilestoaddtoambience.isEmpty()) {ambience_addnewfromdirectory();}
-                else {ambienceready = true;}
+                else {
+                    System.out.println(name + "'s Ambience Is Ready");
+                    ambienceready = true;
+                }
             } catch (NullPointerException ignored) {
                 // TODO Change This To Reflect No Ambience Files In Directory
                 ambienceready= true;
@@ -158,7 +158,7 @@ public class SessionPart {
                 ambiencechecker_calculateplayer.setOnReady(() -> {
                     SoundFile soundFile = new SoundFile(actualfile);
                     soundFile.setDuration(ambiencechecker_calculateplayer.getTotalDuration().toMillis());
-                    ambience.actual_add(soundFile);
+                    ambience.add(soundFile);
                     ambiencechecker_soundfilestoaddcount++;
                     ambiencechecker_calculateplayer.dispose();
                     ambience_addnewfromdirectory();
@@ -170,6 +170,7 @@ public class SessionPart {
                 });
             } catch (IndexOutOfBoundsException ignored) {
                 thisession.Root.getAmbiences().setsessionpartAmbience(number, ambience);
+                System.out.println(name + "'s Ambience Is Ready");
                 ambienceready = true;
             }
         }
@@ -261,8 +262,6 @@ public class SessionPart {
         System.out.println("Starting " + name);
         boolean ramponly = getramponly();
         elapsedtime = Duration.ZERO;
-        entrainmentplaycount = 0;
-        ambienceplaycount = 0;
         setupfadeanimations();
         volume_unbindentrainment();
         if (! ramponly || number == 15) {entrainmentplayer = new MediaPlayer(new Media(entrainment.getFreq().getFile().toURI().toString()));}
@@ -318,19 +317,10 @@ public class SessionPart {
             ambienceplayhistory = new ArrayList<>();
             currentambiencevolume = thisession.getCurrentambiencevolume();
             volume_unbindambience();
-            File ambiencefile = null;
-            switch (thisession.ambiencePlaybackType) {
-                case REPEAT:
-                    ambiencefile = ambience.actual_get(0).getFile();
-                    break;
-                case SHUFFLE:
-                    Random random = new Random();
-                    SoundFile selectedsoundfile = ambience.actual_get(random.nextInt(ambience.getAmbience().size() - 1));
-                    ambiencefile = selectedsoundfile.getFile();
-                    ambienceplayhistory.add(selectedsoundfile);
-                    break;
-            }
-            ambienceplayer = new MediaPlayer(new Media(ambiencefile.toURI().toString()));
+            currentambiencesoundfile = ambience.getnextSoundFile(thisession.ambiencePlaybackType, ambienceplayhistory, currentambiencesoundfile);
+            System.out.println(name + "'s Current Ambience File: " + currentambiencesoundfile.getFile().getAbsolutePath());
+            ambienceplayhistory.add(currentambiencesoundfile);
+            ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setVolume(0.0);
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
@@ -614,10 +604,9 @@ public class SessionPart {
     }
     private void playnextentrainment() {
         try {
-            System.out.println(name + "Called Play Next Entrainment Method");
             volume_unbindentrainment();
-            entrainmentplaycount++;
             entrainmentplayer.dispose();
+            entrainmentplayer = null;
             entrainmentplayer = new MediaPlayer(new Media(entrainment.getFreq().getFile().toURI().toString()));
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
@@ -632,38 +621,12 @@ public class SessionPart {
     private void playnextambience() {
         try {
             volume_unbindambience();
-            ambienceplaycount++;
-            File ambiencefile = null;
-            File previousambiencefile = new File(ambienceplayer.getMedia().getSource());
-            switch (thisession.ambiencePlaybackType) {
-                case REPEAT:
-                    int currentambienceindex = ambience.getAmbienceFiles().indexOf(previousambiencefile);
-                    if (currentambienceindex < ambience.getAmbience().size()) {ambiencefile = ambience.actual_get(currentambienceindex + 1).getFile();}
-                    else {ambiencefile = ambience.actual_get(0).getFile();}
-                    break;
-                case SHUFFLE:
-                    Random random = new Random();
-                    int sizetotest;
-                    File filetotest;
-                    if (ambienceplayhistory.size() >= ambience.getAmbience().size()) {sizetotest = (ambience.getAmbience().size() - 1) - ambienceplayhistory.size() % ambience.getAmbience().size();}
-                    else {sizetotest = ambienceplayhistory.size() - 1;}
-                    if (ambience.getAmbience().size() == 1) {ambiencefile = ambience.actual_get(0).getFile(); break;}
-                    else {
-                        while (true) {
-                            filetotest = ambience.actual_get(random.nextInt(ambience.getAmbience().size() - 1)).getFile();
-                            // TODO Optimize Shuffle Algorithm For Ambience Here
-                            boolean includefile = false;
-                            for (int i = sizetotest; i > 0; i--) {
-                                if (! ambience.actual_get(i).getFile().equals(filetotest)) {includefile = true; break;}
-                            }
-                            if (includefile) {ambiencefile = filetotest; break;}
-                        }
-                    }
-                    break;
-            }
             ambienceplayer.dispose();
-            System.out.println("Next Ambience File Is " + ambiencefile.getAbsolutePath());
-            ambienceplayer = new MediaPlayer(new Media(ambiencefile.toURI().toString()));
+            ambienceplayer = null;
+            currentambiencesoundfile = ambience.getnextSoundFile(thisession.ambiencePlaybackType, ambienceplayhistory, currentambiencesoundfile);
+            System.out.println(name + "'s Current Ambience File: " + currentambiencesoundfile.getFile().getAbsolutePath());
+            ambienceplayhistory.add(currentambiencesoundfile);
+            ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.setVolume(currentambiencevolume);

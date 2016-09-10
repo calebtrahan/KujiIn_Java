@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static kujiin.util.Util.AnswerType.YES;
 // TODO Bugs To Fix
+    // TODO Ambience Shuffle Algorithm Doesn't Add Last Actual Ambience File
     // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
     // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified
     // TODO Closing Reference Display With 'ESC' Is Crashing The Whole App
@@ -52,6 +53,7 @@ import static kujiin.util.Util.AnswerType.YES;
     // TODO Make A Loading/Initializing Dialog Performing Startup Checks Before Setting Up First Scene
         // Populate Entrainment
         // Populate Ambience
+        // Maybe Populate ALL Logic Into One Single Service And Tie To 'Startup Checks Dialog', So It Isn't So Damn Confusing
     // TODO Refactor Ramp Animations So Ramp Can Be At The Start, End Or Both Of A Session Part (Use enum RampType)
     // TODO Make A Goal Set Dialog For All Session Parts To Be Used Directly Before Playback
     // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
@@ -128,6 +130,8 @@ public class MainController implements Initializable {
     public Button ChangeAllElementsButton;
     public Button ResetCreatorButton;
     public Label GoalProgressPercentageLabel;
+    private SoundFile ambiencetestsoundfile;
+    private List<SoundFile> ambienceplaybackhistory = new ArrayList<>();
     private Scene Scene;
     private Stage Stage;
 
@@ -233,15 +237,23 @@ public class MainController implements Initializable {
         Util.menu_howtouse(this);
     }
     public void menu_aboutthisprogram(ActionEvent actionEvent) {
-        List<Integer> numbers = new ArrayList<>();
-        numbers.addAll(Arrays.asList(0, 1, 2, 3, 4, 5));
-        System.out.println(numbers);
-        numbers.set(2, 10);
-        System.out.println(numbers);
+        for (SessionPart x : Session.getAllSessionParts()) {
+            if (x instanceof Cut || x instanceof Qi_Gong) {
+                Ambience ambience = x.getAmbience();
+                int count = 1;
+                for (int i = 0; i < 100; i++) {
+                    ambiencetestsoundfile = ambience.getnextSoundFile(This_Session.AmbiencePlaybackType.SHUFFLE, ambienceplaybackhistory, ambiencetestsoundfile);
+                    ambienceplaybackhistory.add(ambiencetestsoundfile);
+//                System.out.println(count + ": Sound File: " + ambiencetestsoundfile.getFile().getAbsolutePath());
+                    count++;
+                }
+            }
+        }
 //        Util.menu_aboutthisprogram();
     }
     public void menu_contactme(ActionEvent actionEvent) {
-        Util.menu_contactme();}
+        Util.menu_contactme();
+    }
 
 // Presets
     public void preset_initialize() {Preset = new Preset(this);}
@@ -2379,7 +2391,7 @@ public class MainController implements Initializable {
         public void save(ActionEvent actionEvent) {
             int index = SessionPartSelectionBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
-                actual_soundfilelist.stream().filter(i -> !selectedsessionpart.getAmbience().ambienceexistsinActual(i)).forEach(i -> selectedsessionpart.getAmbience().actual_add(i));
+                actual_soundfilelist.stream().filter(i -> !selectedsessionpart.getAmbience().ambienceexistsinActual(i)).forEach(i -> selectedsessionpart.getAmbience().add(i));
                 Ambiences.setsessionpartAmbience(selectedsessionpart.number, selectedsessionpart.getAmbience());
                 Ambiences.marshall();
                 dialog_displayInformation("Saved", "Ambience Saved To " + selectedsessionpart, "");
@@ -2521,7 +2533,7 @@ public class MainController implements Initializable {
                 AmbienceSong tempsong = new AmbienceSong(soundFile);
                 AmbienceList.add(tempsong);
                 AmbienceTable.getItems().add(tempsong);
-                selectedsessionpart.getAmbience().actual_add(soundFile);
+                selectedsessionpart.getAmbience().add(soundFile);
                 calculatetotalduration();
             });
         }
@@ -2529,7 +2541,7 @@ public class MainController implements Initializable {
             int index = AmbienceTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {
                 SoundFile soundFile = SoundList.get(index);
-                selectedsessionpart.getAmbience().actual_remove(soundFile);
+                selectedsessionpart.getAmbience().remove(soundFile);
                 if (dialog_getConfirmation("Confirmation", null, "Also Delete File " + soundFile.getName() + " From Hard Drive? This Cannot Be Undone", "Delete File", "Keep File")) {
                     if (! soundFile.getFile().delete()) {
                         dialog_displayError("Couldn't Delete", null, "Couldn't Delete " + soundFile.getFile().getAbsolutePath() + " Check File Permissions");
@@ -2605,7 +2617,7 @@ public class MainController implements Initializable {
             if (index != -1) {
                 for (SoundFile i : SoundList) {
                     if (! selectedsessionpart.getAmbience().ambienceexistsinActual(i)) {
-                        selectedsessionpart.getAmbience().actual_add(i);}
+                        selectedsessionpart.getAmbience().add(i);}
                 }
                 Ambiences.setsessionpartAmbience(selectedsessionpart.number, selectedsessionpart.getAmbience());
                 Ambiences.marshall();
@@ -2798,4 +2810,72 @@ public class MainController implements Initializable {
 
     }
 
+// TESTING
+    public class ShuffleSongs {
+        List<Song> songsList;
+
+        private void initSongsList() {
+            songsList = new LinkedList<>();
+            songsList.add(new Song("Moon Light", "Nature", "AL"));
+            songsList.add(new Song("Go Next", "Future", "B. J"));
+            songsList.add(new Song("Realllllly", "K", "CCC"));
+            songsList.add(new Song("Fear", "Hell G.", "SD"));
+            songsList.add(new Song("My Dear", "Future", "B. J"));
+            songsList.add(new Song("To the School", "K", "Mike"));
+            songsList.add(new Song("My name is", "Future", "Khan"));
+            songsList.add(new Song("How want some", "Hell G.", "S.Fire"));
+            songsList.add(new Song("My Lord", "K", "Ali"));
+        }
+
+        private void printSongsList(List<Song> list) {
+            for (int i = 0; i < list.size(); i++) {
+                Song song = list.get(i);
+                System.out.printf("# %d - Title: %13s | Album: %10s | Artist: %10s\n", i + 1, song.title, song.album, song.artist);
+            }
+            System.out.println("--------------------------------------------------------");
+        }
+
+        private List shuffle1(List list) {
+            List res = new LinkedList();
+            int size = list.size();
+            int rand = 0;
+            Object[] temp = list.toArray();
+            int count = 0;
+            while (count != size) {
+                rand = (int) (Math.random() * list.size());
+                if (!res.contains(temp[rand])) {
+                    res.add(temp[rand]);
+                    count++;
+                }
+            }
+            return res;
+        }
+        private List shuffle2(List list) {
+            if (list.size() == 1) {
+                return list;
+            } else {
+                int rand = (int) (Math.random() * list.size());
+                Object o = list.get(rand);
+                list.remove(rand);
+                list = shuffle2(list);
+                list.add(o);
+                return list;
+            }
+        }
+
+        private class Song {
+            private String title;
+            private String album;
+            private String artist;
+
+            public Song() {
+            }
+
+            public Song(String title, String album, String artist) {
+                this.title = title;
+                this.album = album;
+                this.artist = artist;
+            }
+        }
+    }
 }

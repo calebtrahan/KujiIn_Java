@@ -369,7 +369,7 @@ public class This_Session {
                 for (int i = 0; i < sessionpartswithreducedambience.size(); i++) {
                     a.append("\n");
                     SessionPart thissessionpart = sessionpartswithreducedambience.get(i);
-                    String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(thissessionpart.getAmbience().gettotalActualDuration(), null);
+                    String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(thissessionpart.getAmbience().gettotalDuration(), null);
                     String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(thissessionpart.getduration(), null);
                     a.append(count + 1).append(". ").append(thissessionpart.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                     count++;
