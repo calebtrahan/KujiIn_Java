@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="73.0" prefWidth="258.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="CENTER" layoutX="11.0" layoutY="14.0" prefHeight="93.0" prefWidth="272.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="26.0" prefWidth="235.0">
+               <children>
+                  <TextField fx:id="HoursTextField" prefHeight="26.0" prefWidth="49.0">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Label text="hr(s)">
+                     <HBox.margin>
+                        <Insets right="20.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="MinutesTextField" prefHeight="26.0" prefWidth="49.0">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Label text="min(s)" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="26.0" prefWidth="253.0">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="36.0" prefWidth="131.0">
+                     <children>
+                        <CheckBox fx:id="RampOnlyCheckBox" mnemonicParsing="false" text="Ramp Only" onAction="#ramponlyselected"/>
+                     </children>
+                  </HBox>
+                  <Button fx:id="SetButton" mnemonicParsing="false" onAction="#OKButtonPressed" prefHeight="26.0" prefWidth="59.0" text="Set" />
+                  <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#close" text="Cancel">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

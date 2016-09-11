@@ -48,6 +48,7 @@ public class SessionPart {
     protected Animation timeline_progresstonextsessionpart;
     protected Animation timeline_start_ending_ramp;
     protected FreqType freqType;
+    protected boolean ramponly;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     private ArrayList<SoundFile> ambienceplayhistory;
@@ -144,7 +145,6 @@ public class SessionPart {
                 }
                 if (! ambiencechecker_soundfilestoaddtoambience.isEmpty()) {ambience_addnewfromdirectory();}
                 else {
-                    System.out.println(name + "'s Ambience Is Ready");
                     ambienceready = true;
                 }
             } catch (NullPointerException ignored) {
@@ -170,7 +170,6 @@ public class SessionPart {
                 });
             } catch (IndexOutOfBoundsException ignored) {
                 thisession.Root.getAmbiences().setsessionpartAmbience(number, ambience);
-                System.out.println(name + "'s Ambience Is Ready");
                 ambienceready = true;
             }
         }
@@ -210,10 +209,7 @@ public class SessionPart {
     public List<kujiin.xml.Goals.Goal> getGoalscompletedthissession() {
         return goalscompletedthissession;
     }
-    public boolean getramponly() {
-        try {return ((Qi_Gong) this).ramponly;}
-        catch (ClassCastException ignored) {return false;}
-    }
+    public boolean getramponly() {return ramponly;}
     public String getNameForFiles() {return name.toLowerCase();}
     public String getNameForChart() {return name;}
     private void setDuration(double newduration) {
@@ -228,11 +224,17 @@ public class SessionPart {
         GoalsController = goals;
     }
 // Duration
+    public void setRamponly(boolean ramponly) {
+    this.ramponly = ramponly;
+}
+    public void setDuration(Duration duration) {this.duration = duration;}
     public Duration getduration() {return duration;}
-    public String getdurationasString(double maxchars) {
-        if (duration == null || duration.equals(Duration.ZERO)) {return "No Duration Set";}
-        else if (this instanceof Qi_Gong && ((Qi_Gong) this).ramponly) {return "Ramp Only";}
-        else {return Util.formatdurationtoStringSpelledOut(duration, maxchars);}
+    public String getdurationasString(boolean includeramp, double maxchars) {
+        if ((duration == null || duration.equals(Duration.ZERO)) && ! ramponly) {return "No Duration Set";}
+        else {
+            if (duration.equals(Duration.ZERO) && includeramp && ramponly) {return "Ramp Only";}
+            else {return Util.formatdurationtoStringSpelledOut(duration, maxchars);}
+        }
     }
     public Duration getelapsedtime() {return elapsedtime;}
 
@@ -259,7 +261,6 @@ public class SessionPart {
     public void start() {
         // TODO On Last Session Part:
             // Do NOT Play Ramp (If Enabled For Session)
-        System.out.println("Starting " + name);
         boolean ramponly = getramponly();
         elapsedtime = Duration.ZERO;
         setupfadeanimations();
@@ -318,7 +319,6 @@ public class SessionPart {
             currentambiencevolume = thisession.getCurrentambiencevolume();
             volume_unbindambience();
             currentambiencesoundfile = ambience.getnextSoundFile(thisession.ambiencePlaybackType, ambienceplayhistory, currentambiencesoundfile);
-            System.out.println(name + "'s Current Ambience File: " + currentambiencesoundfile.getFile().getAbsolutePath());
             ambienceplayhistory.add(currentambiencesoundfile);
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setVolume(0.0);
@@ -388,7 +388,7 @@ public class SessionPart {
             thisession.playerState = This_Session.PlayerState.PAUSED;
             entrainmentplayer.pause();
             timeline_progresstonextsessionpart.pause();
-            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
+            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
                 timeline_start_ending_ramp.pause();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
             if (thisession.Root.AmbienceSwitch.isSelected()) {
@@ -624,7 +624,6 @@ public class SessionPart {
             ambienceplayer.dispose();
             ambienceplayer = null;
             currentambiencesoundfile = ambience.getnextSoundFile(thisession.ambiencePlaybackType, ambienceplayhistory, currentambiencesoundfile);
-            System.out.println(name + "'s Current Ambience File: " + currentambiencesoundfile.getFile().getAbsolutePath());
             ambienceplayhistory.add(currentambiencesoundfile);
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);

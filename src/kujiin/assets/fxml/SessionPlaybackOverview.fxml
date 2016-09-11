@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="445.0" prefWidth="642.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
@@ -31,7 +32,7 @@
                 <TableColumn fx:id="NumberColumn" prefWidth="30.0" text="#" />
                 <TableColumn fx:id="NameColumn" prefWidth="150.0" text="Name" />
                   <TableColumn fx:id="DurationColumn" prefWidth="150.0" text="Practice Time" />
-                  <TableColumn prefWidth="150.0" text="Ambience" />
+                  <TableColumn fx:id="AmbienceColumn" prefWidth="150.0" text="Ambience" />
                   <TableColumn fx:id="GoalColumn" prefWidth="150.0" text="Current Goal" />
               </columns>
                <VBox.margin>
@@ -54,9 +55,9 @@
                   </HBox>
                   <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="348.0">
                      <children>
-                        <Button fx:id="AdjustDurationButton" mnemonicParsing="false" onAction="#adjustduration" prefHeight="26.0" prefWidth="108.0" text="Adjust Duration" />
-                        <Button fx:id="SetAmbienceButton" mnemonicParsing="false" onAction="#setambience" text="Set Ambience" />
-                        <Button fx:id="SetGoalButton" mnemonicParsing="false" onAction="#setgoal" text="Set Goal" />
+                        <Button fx:id="AdjustDurationButton" disable="true" mnemonicParsing="false" onAction="#adjustduration" prefHeight="26.0" prefWidth="108.0" text="Adjust Duration" />
+                        <Button fx:id="SetAmbienceButton" disable="true" mnemonicParsing="false" onAction="#setambience" text="Set Ambience" />
+                        <Button fx:id="SetGoalButton" disable="true" mnemonicParsing="false" onAction="#setgoal" text="Set Goal" />
                      </children>
                      <padding>
                         <Insets right="5.0" />
@@ -68,12 +69,18 @@
                <children>
                   <HBox alignment="CENTER" prefHeight="32.0" prefWidth="212.0">
                      <children>
-                        <CheckBox fx:id="AmbienceSwitch" mnemonicParsing="false" text="Ambience">
+                        <CheckBox fx:id="AmbienceSwitch" mnemonicParsing="false" onAction="#ambienceswitchtoggled" text="Ambience">
                            <HBox.margin>
                               <Insets right="5.0" />
                            </HBox.margin>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
                         </CheckBox>
-                        <ComboBox fx:id="AmbienceTypeComboBox" prefHeight="26.0" prefWidth="114.0" />
+                        <ComboBox fx:id="AmbienceTypeComboBox" prefHeight="26.0" prefWidth="114.0" onAction="#ambiencetypechanged">
+                           <cursor>
+                              <Cursor fx:constant="OPEN_HAND" />
+                           </cursor></ComboBox>
                      </children>
                   </HBox>
                   <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="106.0" text="Session Duration">
@@ -81,13 +88,19 @@
                         <Insets right="3.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField fx:id="TotalSessionTime" prefHeight="26.0" prefWidth="100.0" />
+                  <TextField fx:id="TotalSessionTime" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="100.0">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor></TextField>
                   <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="103.0" text="Completion Time">
                      <HBox.margin>
                         <Insets right="3.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField fx:id="CompletionTime" prefHeight="26.0" prefWidth="100.0" />
+                  <TextField fx:id="CompletionTime" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="100.0">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor></TextField>
                </children>
                <VBox.margin>
                   <Insets right="5.0" />

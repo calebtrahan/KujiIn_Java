@@ -12,7 +12,6 @@ import kujiin.xml.SoundFile;
 import java.io.File;
 
 public class Qi_Gong extends SessionPart {
-    protected boolean ramponly = false;
 
     public Qi_Gong (int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
         super(number, name, briefsummary, thissession, aSwitch, value);
@@ -22,11 +21,6 @@ public class Qi_Gong extends SessionPart {
         } else {Value.setTooltip(null);}
     }
 
-    // Getters & Setters
-    public void setRamponly(boolean ramponly) {
-        this.ramponly = ramponly;
-    }
-    public void setDuration(Duration duration) {this.duration = duration;}
     @Override
     public String getNameForFiles() {return "qi";}
     @Override

@@ -406,18 +406,19 @@ public class MainController implements Initializable {
         if (! creation_gui_allvaluesnotzero()) {
             dialog_displayError("Error Creating Session", "At Least One SessionPart's Value Must Not Be 0", "Cannot Create Session"); return false;}
     // Check Entrainment Ready
-        for (SessionPart i : Session.getAllSessionParts()) {if (! i.entrainment_isReady()) {
-            System.out.println(i.name + "'s Entrainment Isn't Ready");
-            dialog_displayInformation("Cannot Play Session Yet", "Still Background Checking Entrainment", "Please Try Again In A Few Moments"); return false;}}
-    // Check Ambience Ready
-        if (AmbienceSwitch.isSelected()) {
-            for (SessionPart i : Session.getAllSessionParts()) {if (! i.ambience_isReady()) {
-                dialog_displayInformation("Cannot Play Session Yet", "Still Background Checking Ambience", "Please Try Again In A Few Moments"); return false;}}
-        }
+//        for (SessionPart i : Session.getAllSessionParts()) {if (! i.entrainment_isReady()) {
+//            System.out.println(i.name + "'s Entrainment Isn't Ready");
+//            dialog_displayInformation("Cannot Play Session Yet", "Still Background Checking Entrainment", "Please Try Again In A Few Moments"); return false;}}
+//    // Check Ambience Ready
+//        if (AmbienceSwitch.isSelected()) {
+//            for (SessionPart i : Session.getAllSessionParts()) {if (! i.ambience_isReady()) {
+//                dialog_displayInformation("Cannot Play Session Yet", "Still Background Checking Ambience", "Please Try Again In A Few Moments"); return false;}}
+//        }
 
         Session.creation_populateitemsinsession();
         Session.creation_checkprepostramp();
-//        Session.player_confirmOverview();
+        if (Session.player_confirmOverview()) {return true;
+        } else {Session.creation_clearitemsinsession(); return false;}
         // Add Pre/Post Ramp If Duration Is Zero || Ramp Is Disabled
 //    // Check Session Well Formed
 //        if (! Session.creation_checksessionwellformed()) {return false;}
@@ -439,7 +440,6 @@ public class MainController implements Initializable {
 //        }
 //    // Check Goals
 //        Session.creation_checkgoals();
-        return true;
     }
     public void creation_util_createsession() {
         Session.creation_createsession();
@@ -709,6 +709,14 @@ public class MainController implements Initializable {
             new GoalPacingDialog().showAndWait();
         }
     }
+    public void goals_gui_setnewgoal(SessionPart sessionPart) {
+        SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog(sessionPart);
+        simpleGoalSetDialog.showAndWait();
+        if (simpleGoalSetDialog.shouldSetgoal()) {
+            sessionPart.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalHours(), sessionPart));
+        }
+    }
+
     public void goals_gui_viewcurrentgoals(Event event) {
         if (sessionsAndGoalsSelectedSessionPart.getGoals() == null || sessionsAndGoalsSelectedSessionPart.getGoals().isEmpty()) {
             dialog_displayInformation("Information", "No Goals Exist For " + sessionsAndGoalsSelectedSessionPart.name, "Please Add A Goal For " + sessionsAndGoalsSelectedSessionPart.name);
@@ -1792,7 +1800,7 @@ public class MainController implements Initializable {
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
-                setTitle("Set A New Goal");
+                setTitle("Set A New Goal For " + sessionPart.name);
                 HoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
                 MinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
                 practicedduration = sessionPart.sessions_getPracticedDuration(false);

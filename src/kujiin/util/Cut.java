@@ -5,6 +5,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
@@ -80,6 +81,7 @@ public class Cut extends SessionPart {
                 SessionPart partafter = allsessionpartstoplay.get(index + 1);
                 if (partafter instanceof Qi_Gong || partafter instanceof Element) {entrainment.setRampfile(entrainment.ramp_get(1));}
                 else {entrainment.setRampfile(entrainment.ramp_get(0));}
+                if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
                 return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
             } catch (IndexOutOfBoundsException ignored) {return false;}
         }

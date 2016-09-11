@@ -5,6 +5,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
@@ -74,6 +75,7 @@ public class Element extends SessionPart {
                 if (parttotest instanceof  Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
                 else {rampfile = entrainment.ramp_get(Options.CUTNAMES.indexOf(parttotest.name.toUpperCase()));}
                 entrainment.setRampfile(rampfile);
+                if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
                 return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
             } catch (IndexOutOfBoundsException ignored) {return super.creation_buildEntrainment();}
         } else {return super.creation_buildEntrainment();}
