@@ -199,7 +199,8 @@ public class Util {
             }
         });
     }
-    public static void custom_spinner_integer(Spinner<Integer> spinner, int minvalue, int maxvalue, double increment, boolean roundtomultipleof5) {
+    public static void custom_spinner_integer(Spinner<Integer> spinner, int minvalue, int maxvalue, int increment, int initialvalue, boolean roundtomultipleof5) {
+        spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(minvalue, maxvalue, initialvalue, increment));
         spinner.setOnKeyPressed(event -> {
             int newvalue = spinner.getValue();
             boolean validvalue;
@@ -255,17 +256,6 @@ public class Util {
     }
     public static String convert_localdatetostring(LocalDate localdate) {
         return localdate.format(dateFormat);
-    }
-    public static Double convert_minstodecimalhours(int mins, int decimalplaces) {
-        double hours = mins / 60;
-        double minutes = mins % 60;
-        double decimalminutes = minutes / 60;
-        decimalminutes += hours;
-        return rounddouble(decimalminutes, 2);
-    }
-    public static int convert_decimalhourstominutes(double decimalhours) {
-        Double minutes = 60 * decimalhours;
-        return minutes.intValue();
     }
     // String Time Formatting
     public static String formatdurationtoStringDecimalWithColons(Duration duration) {

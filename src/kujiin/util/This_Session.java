@@ -861,7 +861,7 @@ public class This_Session {
             } catch (IOException ignored) {}
         }
 
-        // Table Methods
+    // Table Methods
         public void itemselected() {
             int index = SessionItemsTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {selectedsessionpart = alladjustedsessionitems.get(index);}
@@ -874,7 +874,7 @@ public class This_Session {
             List<SessionPart> newsessionitems = new ArrayList<>();
             for (SessionPart x : getAllSessionParts()) {
                 if ((alladjustedsessionitems.contains(x)) || (!getwellformedcuts().isEmpty() && x instanceof Cut && (!alladjustedsessionitems.contains(x) && getwellformedcuts().contains(x)))) {
-                    tableitems.add(new SessionItem(count, x.name, x.getdurationasString(true, 150.0), getambiencetext(x), x.goals_getCurrentAsString(150.0)));
+                    tableitems.add(new SessionItem(count, x.name, x.getdurationasString(true, 150.0), getambiencetext(x), x.goals_getCurrentAsString(true, 150.0)));
                     newsessionitems.add(x);
                     count++;
                 }
@@ -944,7 +944,7 @@ public class This_Session {
             populatetable();
         }
 
-    // Session Parts Missing/ Out Of Order
+    // Session Parts Missing / Out Of Order
         public List<Cut> getwellformedcuts() {
             List<Cut> wellformedcuts = new ArrayList<>();
             for (int i=0; i<getlastworkingcutindex(); i++) {
@@ -1025,6 +1025,7 @@ public class This_Session {
             if (selectedsessionpart != null) {
                 Root.goals_gui_setnewgoal(selectedsessionpart);
             }
+            populatetable();
         }
 
     // Ambience Methods
@@ -1519,15 +1520,15 @@ public class This_Session {
                 setScene(scene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
+                setTitle("Reference File Preview");
+                fullscreenoption = false;
+                setsizing();
+                WebView browser = new WebView();
+                WebEngine webEngine = browser.getEngine();
+                webEngine.setUserStyleSheetLocation(new File(kujiin.xml.Options.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
+                webEngine.loadContent(htmlcontent);
+                ContentPane.setContent(browser);
             } catch (IOException ignored) {}
-            setTitle("Reference File Preview");
-            fullscreenoption = false;
-            setsizing();
-            WebView browser = new WebView();
-            WebEngine webEngine = browser.getEngine();
-            webEngine.setUserStyleSheetLocation(new File(kujiin.xml.Options.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
-            webEngine.loadContent(htmlcontent);
-            ContentPane.setContent(browser);
         }
 
         public void setsizing() {
@@ -1607,22 +1608,23 @@ public class This_Session {
         public Button ShuffleButton;
 
         public SelectAmbiencePlaybackType(int sessionpartswithoutsufficientambience) {
-            ambiencePlaybackType = null;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AmbiencePlaybackType.fxml"));
-            fxmlLoader.setController(this);
             try {
+                ambiencePlaybackType = null;
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AmbiencePlaybackType.fxml"));
+                fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 options.setStyle(this);
                 setResizable(false);
                 TopLabel.setText("Ambience Is Not Long Enough For " + sessionpartswithoutsufficientambience +  " Session Parts");
+                setTitle("Select Ambience Playback Type");
                 setOnCloseRequest(event -> {
                     if (ambiencePlaybackType == null) {
                         if (! Root.dialog_getConfirmation("Disable Ambience", null, "No Ambience Playback Type Selected", "Disable Ambience", "Cancel")) {event.consume();}
                     }
                 });
             } catch (IOException ignored) {}
-            setTitle("Select Ambience Playback Type");
+
         }
 
         public void repeatbuttonpressed(ActionEvent actionEvent) {

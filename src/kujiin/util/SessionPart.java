@@ -1084,10 +1084,23 @@ public class SessionPart {
             return uncompletedgoals.get(0);
         } else {return null;}
     }
-    public String goals_getCurrentAsString(double maxchars) {
+    public String goals_getCurrentAsString(boolean includepercentage, double maxchars) {
         kujiin.xml.Goals.Goal currentgoal = goals_getCurrent();
         if (currentgoal == null || currentgoal.getGoal_Hours() == 0.0) {return "No Goal Set";}
-        else {return Util.formatdurationtoStringSpelledOut(Duration.hours(currentgoal.getGoal_Hours()), maxchars);}
+        else {
+            Duration goal = Duration.hours(currentgoal.getGoal_Hours());
+            if (includepercentage) {
+                StringBuilder text = new StringBuilder();
+                Duration practiced = sessions_getPracticedDuration(false);
+                try {
+                    int percentage = new Double((practiced.toHours() / goal.toHours()) * 100).intValue();
+                    String percentagetext =  " (" + percentage + "%)";
+                    text.append(Util.formatdurationtoStringSpelledOut(goal, maxchars - percentagetext.length()));
+                    text.append(percentagetext);
+                } catch (ArithmeticException ignored) {text.append(Util.formatdurationtoStringSpelledOut(goal, maxchars));}
+                return text.toString();
+            } else {return Util.formatdurationtoStringSpelledOut(goal, maxchars);}
+        }
     }
     public Duration goals_getCurrentDuration() {
         if (goals_ui_currentgoalisset()) {
@@ -1147,9 +1160,12 @@ public class SessionPart {
         Duration goalduration = Duration.hours(goals_getCurrent().getGoal_Hours());
         return sessions_getPracticedDuration(false).toMillis() / goalduration.toMillis();
     }
-    public String goals_ui_getcurrentgoalpercentage() {
-        int percentage = new Double(goals_ui_getcurrentgoalprogress() * 100).intValue();
-        if (percentage > 0) {return String.valueOf(percentage) + "%";}
+    public String goals_ui_getcurrentgoalpercentage(int decimalplaces) {
+        Double rawpercentage = goals_ui_getcurrentgoalprogress();
+        String percentage;
+        if (decimalplaces == 0) {percentage =  String.valueOf(rawpercentage.intValue() * 100);}
+        else {percentage = String.valueOf(Util.rounddouble(goals_ui_getcurrentgoalprogress() * 100, decimalplaces));}
+        if (rawpercentage > 0.0) {return String.valueOf(percentage) + "%";}
         else {return "";}
     }
     public String goals_ui_getcurrentgoalDuration(Double maxchars) {

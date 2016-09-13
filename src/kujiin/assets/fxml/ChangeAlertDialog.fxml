@@ -29,7 +29,7 @@
                   <Insets right="5.0" />
                </HBox.margin>
             </CheckBox>
-            <TextField fx:id="alertfileTextField" prefHeight="26.0" prefWidth="277.0" text="Please Select...">
+            <TextField fx:id="alertfileTextField" editable="false" prefHeight="26.0" prefWidth="277.0" text="Please Select...">
                <HBox.margin>
                   <Insets right="2.0" />
                </HBox.margin>

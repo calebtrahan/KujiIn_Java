@@ -20,6 +20,7 @@ import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -660,14 +661,14 @@ public class MainController implements Initializable {
         } else if (sessionsAndGoalsSelectedSessionPart.goals_getCurrent() == null || sessionsAndGoalsSelectedSessionPart.sessions_getPracticedDuration(null).lessThanOrEqualTo(Duration.ZERO)) {
             // No Current Goal Set
             toptext = "No Current Goal";
-            percentage = sessionsAndGoalsSelectedSessionPart.goals_ui_getcurrentgoalpercentage();
+            percentage = sessionsAndGoalsSelectedSessionPart.goals_ui_getcurrentgoalpercentage(2);
             progress = sessionsAndGoalsSelectedSessionPart.goals_ui_getcurrentgoalprogress();
             goalprogresstooltip = new Tooltip("No Current Goal Set For " + sessionsAndGoalsSelectedSessionPart.name);
             newgoalbuttontext = kujiin.xml.Options.NEWGOALTEXT;
             newgoalbuttontooltip = new Tooltip("Set A New Goal");
         } else {
             toptext = "Current Goal Progress";
-            percentage = sessionsAndGoalsSelectedSessionPart.goals_ui_getcurrentgoalpercentage();
+            percentage = sessionsAndGoalsSelectedSessionPart.goals_ui_getcurrentgoalpercentage(2);
             progress = sessionsAndGoalsSelectedSessionPart.goals_ui_getcurrentgoalprogress();
             goalprogresstooltip = new Tooltip(String.format("Currently Practiced: %s -> Goal: %s",
                     Util.formatdurationtoStringSpelledOut(sessionsAndGoalsSelectedSessionPart.sessions_getPracticedDuration(null), null),
@@ -676,6 +677,7 @@ public class MainController implements Initializable {
             newgoalbuttontext = kujiin.xml.Options.GOALPACINGTEXT;
             newgoalbuttontooltip = new Tooltip("Calculate Goal Pacing For This Goal");
         }
+        System.out.println("Should Be Setting Percentage To " + percentage);
         GoalProgressPercentageLabel.setText(percentage);
         goalsprogressbar.setProgress(progress);
         GoalTopLabel.setText(toptext);
@@ -699,7 +701,7 @@ public class MainController implements Initializable {
     }
     public void goals_gui_setnewgoal(Event event) {
         if (newgoalButton.getText().equals(kujiin.xml.Options.NEWGOALTEXT)) {
-            SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog();
+            SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog(sessionsAndGoalsSelectedSessionPart);
             simpleGoalSetDialog.showAndWait();
             if (simpleGoalSetDialog.shouldSetgoal()) {
                 sessionsAndGoalsSelectedSessionPart.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalHours(), sessionsAndGoalsSelectedSessionPart));
@@ -812,9 +814,7 @@ public class MainController implements Initializable {
         public Button openFileButton;
         public Button PreviewButton;
         private File alertfile;
-        private final static String NO_ALERT_FILE_SELECTED_TEXT = "No Alert File Selected";
-        private final static int SUGGESTED_ALERT_FILE_MAX_LENGTH = 10;
-        private final static int ABSOLUTE_ALERT_FILE_MAX_LENGTH = 30;
+
 
         public ChangeAlertFile() {
             try {
@@ -824,7 +824,6 @@ public class MainController implements Initializable {
                 setScene(defaultscene);
                 getOptions().setStyle(this);
                 setTitle("Alert File Editor");
-                alertfileTextField.setEditable(false);
                 AlertFileToggleButton.setSelected(getOptions().getSessionOptions().getAlertfunction());
                 String alertfilelocation = getOptions().getSessionOptions().getAlertfilelocation();
                 if (alertfilelocation != null) {alertfile = new File(getOptions().getSessionOptions().getAlertfilelocation());}
@@ -867,11 +866,11 @@ public class MainController implements Initializable {
             if (alertfile != null && alertfile.exists()) {
                 Double duration = Util.audio_getduration(alertfile);
                 Duration alertfileduration = new Duration(duration * 1000);
-                if (duration >= SUGGESTED_ALERT_FILE_MAX_LENGTH && duration < ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
+                if (duration >= kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH && duration < kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
                     switch (dialog_getAnswer("Alert File Longer Than Suggested Duration", null,
                             String.format("Alert File Is %s Which Is Longer Than Suggested Duration: %s And May Break Immersion",
                             Util.formatdurationtoStringDecimalWithColons(alertfileduration),
-                            Util.formatdurationtoStringDecimalWithColons(new Duration(SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000))),
+                            Util.formatdurationtoStringDecimalWithColons(new Duration(kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000))),
                             "Use As Alert File", "Don't Use As Alert File", "Cancel"
                     )) {
                         case YES:
@@ -879,7 +878,7 @@ public class MainController implements Initializable {
                             else {return;}
                         case CANCEL: return;
                     }
-                } else if (duration >= ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
+                } else if (duration >= kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
                     dialog_displayInformation("Cannot Add Alert File", null,
                             String.format("Alert File Is %s Which Is Too Long And Will Break Immersion", Util.formatdurationtoStringDecimalWithColons(alertfileduration)));
                     return;
@@ -889,7 +888,7 @@ public class MainController implements Initializable {
                 alertfileTextField.setText(text);
             } else {
                 if (alertfile != null) {alertfile = null; alertfiletoggled(null);}
-                alertfileTextField.setText(NO_ALERT_FILE_SELECTED_TEXT);
+                alertfileTextField.setText(kujiin.xml.Options.NO_ALERT_FILE_SELECTED_TEXT);
             }
         }
         public void help(ActionEvent actionEvent) {
@@ -906,12 +905,12 @@ public class MainController implements Initializable {
             Double duration = Util.audio_getduration(testfile);
             if (duration == 0.0) {
                 dialog_displayInformation("Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
-            else if (duration >= (SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
+            else if (duration >= (kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
                 String confirmationtext = String.format("%s Is %s Which Is Longer Than The Suggested Maximum Duration %s. This May Break Session Immersion", testfile.getName(),
-                        Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), null));
+                        Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), null));
                 return dialog_getConfirmation("Alert File Too Long", null, confirmationtext, "Use As Alert File", "Cancel");
-            } else if (duration >= ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), null));
+            } else if (duration >= kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
+                String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), null));
                 dialog_displayInformation("Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
                 return false;
             } else {return true;}
@@ -980,48 +979,47 @@ public class MainController implements Initializable {
         public RadioButton TEXTVariation;
         private File selectedfile;
         private String selectedsessionpart;
-        private MainController Root;
         private ArrayList<Integer> userselectedindexes;
         private This_Session.ReferenceType referenceType;
 
         public EditReferenceFiles(This_Session.ReferenceType referenceType) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/EditReferenceFiles.fxml"));
-            fxmlLoader.setController(this);
             try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/EditReferenceFiles.fxml"));
+                fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
-            setTitle("Reference Files Editor");
-            ObservableList<String> sessionpartnames = FXCollections.observableArrayList();
-            sessionpartnames.addAll(kujiin.xml.Options.ALLNAMES);
-            userselectedindexes = new ArrayList<>();
-            SessionPartNamesChoiceBox.setItems(sessionpartnames);
-            MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
-            SessionPartNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {if (oldValue != null) userselectedindexes.add(oldValue.intValue());});
-            HTMLVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
-            TEXTVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
-            if (referenceType == null) {referenceType = kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION;}
-            HTMLVariation.setSelected(referenceType == This_Session.ReferenceType.html);
-            TEXTVariation.setSelected(referenceType == This_Session.ReferenceType.txt);
-            this.referenceType = referenceType;
-            PreviewButton.setDisable(true);
-            SaveButton.setDisable(true);
-            String referencename = referenceType.name();
-            this.setOnCloseRequest(event -> {
-                if (unsavedchanges()) {
-                    switch (dialog_getAnswer("Confirmation", null, SessionPartNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes",
-                            "Save And Close", "Close Without Saving", "Cancel")) {
-                        case YES:
-                            saveselectedfile(null);
-                            break;
-                        case NO:
-                            break;
-                        case CANCEL:
-                            event.consume();
+                getOptions().setStyle(this);
+                setTitle("Reference Files Editor");
+                ObservableList<String> sessionpartnames = FXCollections.observableArrayList();
+                sessionpartnames.addAll(kujiin.xml.Options.ALLNAMES);
+                userselectedindexes = new ArrayList<>();
+                SessionPartNamesChoiceBox.setItems(sessionpartnames);
+                MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
+                SessionPartNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {if (oldValue != null) userselectedindexes.add(oldValue.intValue());});
+                HTMLVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
+                TEXTVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
+                if (referenceType == null) {referenceType = kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION;}
+                HTMLVariation.setSelected(referenceType == This_Session.ReferenceType.html);
+                TEXTVariation.setSelected(referenceType == This_Session.ReferenceType.txt);
+                this.referenceType = referenceType;
+                PreviewButton.setDisable(true);
+                SaveButton.setDisable(true);
+                String referencename = referenceType.name();
+                this.setOnCloseRequest(event -> {
+                    if (unsavedchanges()) {
+                        switch (dialog_getAnswer("Confirmation", null, SessionPartNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes",
+                                "Save And Close", "Close Without Saving", "Cancel")) {
+                            case YES:
+                                saveselectedfile(null);
+                                break;
+                            case NO:
+                                break;
+                            case CANCEL:
+                                event.consume();
+                        }
                     }
-                }
-            });
+                });
+            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
         }
 
     // Getters And Setters
@@ -1190,13 +1188,13 @@ public class MainController implements Initializable {
 
         public PreviewFile(File filetopreview, MainController Root) {
             if (Util.audio_isValid(filetopreview)) {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/PreviewAudioDialog.fxml"));
-                fxmlLoader.setController(this);
-                setOnHidden(event -> {
-                    if (PreviewPlayer != null) {PreviewPlayer.dispose();}
-                    close();
-                });
                 try {
+                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/PreviewAudioDialog.fxml"));
+                    fxmlLoader.setController(this);
+                    setOnHidden(event -> {
+                        if (PreviewPlayer != null) {PreviewPlayer.dispose();}
+                        close();
+                    });
                     Scene defaultscene = new Scene(fxmlLoader.load());
                     setScene(defaultscene);
                     Root.getOptions().setStyle(this);
@@ -1699,7 +1697,7 @@ public class MainController implements Initializable {
                 String percentcompleted ;
                 if (i.goals_ui_currentgoalisset()) {
                     currentgoaltime = i.goals_ui_getcurrentgoalDuration(null);
-                    percentcompleted = i.goals_ui_getcurrentgoalpercentage();
+                    percentcompleted = i.goals_ui_getcurrentgoalpercentage(0);
                 } else  {
                     currentgoaltime = "No Goal Set";
                     percentcompleted = "No Goal Set";
@@ -1725,7 +1723,7 @@ public class MainController implements Initializable {
         }
         public void setcurrentgoal(ActionEvent actionEvent) {
             if (sessionsAndGoalsSelectedSessionPart != null) {
-                SimpleGoalSetDialog setDialog = new SimpleGoalSetDialog();
+                SimpleGoalSetDialog setDialog = new SimpleGoalSetDialog(sessionsAndGoalsSelectedSessionPart);
                 setDialog.showAndWait();
                 if (setDialog.shouldSetgoal()) {
                     sessionsAndGoalsSelectedSessionPart.goals_add(new Goals.Goal(setDialog.getNewGoalHours(), sessionsAndGoalsSelectedSessionPart));
@@ -1756,85 +1754,54 @@ public class MainController implements Initializable {
         }
     }
     public class SimpleGoalSetDialog extends Stage {
-        public MainController Root;
         public Label TopLabel;
-        public Spinner<Integer> HoursSpinner;
-        public Spinner<Integer> MinutesSpinner;
+        public TextField HoursSpinner;
+        public TextField MinutesSpinner;
         public Label StatusBar;
         public Button AcceptButton;
         public Button CancelButton;
-        public TextField PracticedDurationTextField;
         private boolean setgoal = false;
         private Duration practicedduration;
 
-        public SimpleGoalSetDialog() {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SetGoalDialog_Simple.fxml"));
-                fxmlLoader.setController(this);
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-                setTitle("Set A New Goal");
-                HoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
-                MinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
-                practicedduration = sessionsAndGoalsSelectedSessionPart.sessions_getPracticedDuration(false);
-                HoursSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() / 60);
-                MinutesSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() % 60);
-                Util.custom_spinner_integer(HoursSpinner, 0, Integer.MAX_VALUE, 1, false);
-                Util.custom_spinner_integer(MinutesSpinner, 0, 59, 1, false);
-                PracticedDurationTextField.setText(Util.formatdurationtoStringSpelledOut(practicedduration, PracticedDurationTextField.getLayoutBounds().getWidth()));
-                setOnCloseRequest(event -> {
-                    if (getPotentialGoalDuration().lessThanOrEqualTo(practicedduration)) {
-                        dialog_displayInformation("Cannot Accept", "Goal Is Less Than Or Equal To Practiced Minutes", "Goal Must Be Greater Than Practiced Minutes");
-                        event.consume();
-                    }
-                });
-            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
-        }
         public SimpleGoalSetDialog(SessionPart sessionPart) {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SetGoalDialog_Simple.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
+                getOptions().setStyle(this);
+                setResizable(false);
                 setTitle("Set A New Goal For " + sessionPart.name);
-                HoursSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
-                MinutesSpinner.valueProperty().addListener((observable, oldValue, newValue) -> checkvalue());
                 practicedduration = sessionPart.sessions_getPracticedDuration(false);
-                HoursSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() / 60);
-                MinutesSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() % 60);
-                Util.custom_spinner_integer(HoursSpinner, 0, Integer.MAX_VALUE, 1, false);
-                Util.custom_spinner_integer(MinutesSpinner, 0, 59, 1, false);
-                PracticedDurationTextField.setText(Util.formatdurationtoStringSpelledOut(practicedduration, PracticedDurationTextField.getLayoutBounds().getWidth()));
-                setOnCloseRequest(event -> {
-                    if (getPotentialGoalDuration().lessThanOrEqualTo(practicedduration)) {
-                        dialog_displayInformation("Cannot Accept", "Goal Is Less Than Or Equal To Practiced Minutes", "Goal Must Be Greater Than Practiced Minutes");
-                        event.consume();
-                    }
-                });
+                HoursSpinner.setText(String.valueOf((int) practicedduration.toMinutes() / 60));
+                MinutesSpinner.setText(String.valueOf((int) practicedduration.toMinutes() % 60));
+                Util.custom_textfield_integer(HoursSpinner, 0, Integer.MAX_VALUE, 1);
+                Util.custom_textfield_integer(MinutesSpinner, 0, 59, 5);
+                HoursSpinner.textProperty().addListener((observable, oldValue, newValue) -> checkvalue());
+                MinutesSpinner.textProperty().addListener((observable, oldValue, newValue) -> checkvalue());
             } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
         }
 
         private Duration getPotentialGoalDuration() {
-            try {return Duration.hours(HoursSpinner.getValue()).add(Duration.minutes(MinutesSpinner.getValue()));}
-            catch (Exception e) {return Duration.ZERO;}
+            try {return Duration.hours(Integer.parseInt(HoursSpinner.getText())).add(Duration.minutes(Integer.parseInt(MinutesSpinner.getText())));}
+            catch (NumberFormatException | NullPointerException ignored) {return Duration.ZERO;}
         }
         private void checkvalue() {
-            try {
-                if (getPotentialGoalDuration().lessThanOrEqualTo(practicedduration)) {
-                    HoursSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() / 60);
-                    MinutesSpinner.getValueFactory().setValue((int) practicedduration.toMinutes() % 60);
-                    StatusBar.setText("Goal Must Be Greater Than Practiced Time");
-                } else {StatusBar.setText("");}
-                PracticedDurationTextField.setText(Util.formatdurationtoStringSpelledOut(practicedduration, PracticedDurationTextField.getLayoutBounds().getWidth()));
-            } catch (NullPointerException ignored) {}
-        }
-        private void accept(ActionEvent actionEvent) {
-            setgoal = true;
-            close();
+            Paint color;
+            String text;
+            boolean disabled;
+            if (getPotentialGoalDuration().lessThanOrEqualTo(practicedduration)) {
+                color = Color.RED;
+                text = "Goal Value Less Than Practiced";
+                disabled = true;
+            } else {
+                color = Color.BLACK;
+                text = "";
+                disabled = false;
+            }
+            StatusBar.setTextFill(color);
+            StatusBar.setText(text);
+            AcceptButton.setDisable(disabled);
         }
 
         public boolean shouldSetgoal() {
@@ -1842,8 +1809,14 @@ public class MainController implements Initializable {
         }
         public Double getNewGoalHours() {
             try {
-                return Util.convert_minstodecimalhours((HoursSpinner.getValue() * 60) + MinutesSpinner.getValue(), 2);
+                Duration duration = Duration.hours(Double.parseDouble(HoursSpinner.getText())).add(Duration.minutes(Double.parseDouble(MinutesSpinner.getText())));
+                return duration.toHours();
             } catch (NullPointerException e) {return null;}
+        }
+
+        public void accept(ActionEvent actionEvent) {
+            setgoal = true;
+            close();
         }
     }
     public class GoalPacingDialog extends Stage {
@@ -1865,7 +1838,7 @@ public class MainController implements Initializable {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 getOptions().setStyle(this);
-                this.setResizable(false);
+                setResizable(false);
                 setTitle("Goal Pacing");
                 practicedduration = sessionsAndGoalsSelectedSessionPart.sessions_getPracticedDuration(false);
                 goalduration = Duration.hours(sessionsAndGoalsSelectedSessionPart.goals_getCurrent().getGoal_Hours());
@@ -1873,7 +1846,7 @@ public class MainController implements Initializable {
                 TotalPracticedTime.setText(Util.formatdurationtoStringSpelledOut(practicedduration, TotalPracticedTime.getLayoutBounds().getWidth()));
                 durationleft = goalduration.subtract(practicedduration);
                 GoalTimeLeft.setText(Util.formatdurationtoStringSpelledOut(durationleft, GoalTimeLeft.getLayoutBounds().getWidth()));
-                Util.custom_spinner_integer(PracticeDays, 1, Integer.MAX_VALUE, 1, false);
+                Util.custom_spinner_integer(PracticeDays, 1, Integer.MAX_VALUE, 1, 1, false);
                 PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> calculate());
                 PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
                 TopLabel.setText("Goal Pacing For " + sessionsAndGoalsSelectedSessionPart.name + " Current Goal");
@@ -1884,7 +1857,7 @@ public class MainController implements Initializable {
         public void calculate() {
             Double days = (double) PracticeDays.getValue();
             Float hourstopractice = (float) durationleft.toHours() / days.floatValue();
-            int minsaday = Util.convert_decimalhourstominutes(hourstopractice.doubleValue());
+            int minsaday = (int) Duration.hours(hourstopractice.doubleValue()).toMinutes();
             PracticeTimeADay.setText(Util.formatdurationtoStringSpelledOut(new Duration((minsaday * 60) * 1000), PracticeTimeADay.getLayoutBounds().getWidth()));
         }
     }
@@ -1960,33 +1933,33 @@ public class MainController implements Initializable {
                 setScene(defaultscene);
                 getOptions().setStyle(this);
                 this.setResizable(false);
+                setTitle("Session List");
+                DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
+                DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
+                RinColumn.setCellValueFactory(cellData -> cellData.getValue().rin);
+                KyoColumn.setCellValueFactory(cellData -> cellData.getValue().kyo);
+                TohColumn.setCellValueFactory(cellData -> cellData.getValue().toh);
+                ShaColumn.setCellValueFactory(cellData -> cellData.getValue().sha);
+                KaiColumn.setCellValueFactory(cellData -> cellData.getValue().kai);
+                JinColumn.setCellValueFactory(cellData -> cellData.getValue().jin);
+                RetsuColumn.setCellValueFactory(cellData -> cellData.getValue().retsu);
+                ZaiColumn.setCellValueFactory(cellData -> cellData.getValue().zai);
+                ZenColumn.setCellValueFactory(cellData -> cellData.getValue().zen);
+                EarthColumn.setCellValueFactory(cellData -> cellData.getValue().earth);
+                AirColumn.setCellValueFactory(cellData -> cellData.getValue().air);
+                FireColumn.setCellValueFactory(cellData -> cellData.getValue().fire);
+                WaterColumn.setCellValueFactory(cellData -> cellData.getValue().water);
+                VoidColumn.setCellValueFactory(cellData -> cellData.getValue().Void);
+                PostColumn.setCellValueFactory(cellData -> cellData.getValue().postsession);
+                TotalColumn.setCellValueFactory(cellData -> cellData.getValue().total);
+                NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+                CurrentPracticeTimeColumn.setCellValueFactory(cellData -> cellData.getValue().formattedduration);
+                ViewDetailsButton.setDisable(true);
+                sessionsTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> ViewDetailsButton.setDisable(sessionsTableView.getSelectionModel().getSelectedIndex() == -1));
+                Util.custom_textfield_integer(Filter_ThresholdMinutesTextField, 0, Integer.MAX_VALUE, 1);
+                populatetotalsbargraphandtable();
+                populatetable(null);
             } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
-            setTitle("Session List");
-            DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
-            DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
-            RinColumn.setCellValueFactory(cellData -> cellData.getValue().rin);
-            KyoColumn.setCellValueFactory(cellData -> cellData.getValue().kyo);
-            TohColumn.setCellValueFactory(cellData -> cellData.getValue().toh);
-            ShaColumn.setCellValueFactory(cellData -> cellData.getValue().sha);
-            KaiColumn.setCellValueFactory(cellData -> cellData.getValue().kai);
-            JinColumn.setCellValueFactory(cellData -> cellData.getValue().jin);
-            RetsuColumn.setCellValueFactory(cellData -> cellData.getValue().retsu);
-            ZaiColumn.setCellValueFactory(cellData -> cellData.getValue().zai);
-            ZenColumn.setCellValueFactory(cellData -> cellData.getValue().zen);
-            EarthColumn.setCellValueFactory(cellData -> cellData.getValue().earth);
-            AirColumn.setCellValueFactory(cellData -> cellData.getValue().air);
-            FireColumn.setCellValueFactory(cellData -> cellData.getValue().fire);
-            WaterColumn.setCellValueFactory(cellData -> cellData.getValue().water);
-            VoidColumn.setCellValueFactory(cellData -> cellData.getValue().Void);
-            PostColumn.setCellValueFactory(cellData -> cellData.getValue().postsession);
-            TotalColumn.setCellValueFactory(cellData -> cellData.getValue().total);
-            NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
-            CurrentPracticeTimeColumn.setCellValueFactory(cellData -> cellData.getValue().formattedduration);
-            ViewDetailsButton.setDisable(true);
-            sessionsTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> ViewDetailsButton.setDisable(sessionsTableView.getSelectionModel().getSelectedIndex() == -1));
-            Util.custom_textfield_integer(Filter_ThresholdMinutesTextField, 0, Integer.MAX_VALUE, 1);
-            populatetotalsbargraphandtable();
-            populatetable(null);
         }
 
         public CheckBox getcheckbox(int sessionpartindex) {

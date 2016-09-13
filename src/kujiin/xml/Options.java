@@ -75,6 +75,9 @@ public class Options {
     public static final String NEWGOALTEXT = "New Goal";
     public static final String GOALPACINGTEXT = "Goal Pacing";
     public static final Image PROGRAM_ICON = new Image(new File(Options.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString());
+    public final static String NO_ALERT_FILE_SELECTED_TEXT = "No Alert File Selected";
+    public final static int SUGGESTED_ALERT_FILE_MAX_LENGTH = 10;
+    public final static int ABSOLUTE_ALERT_FILE_MAX_LENGTH = 30;
     // Files
     private ProgramOptions ProgramOptions;
     private SessionOptions SessionOptions;
