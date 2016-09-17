@@ -72,6 +72,7 @@ public class Options {
     public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
     public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
     public static final Integer DEFAULT_LONG_SESSIONPART_DURATION = 10;
+    public static final Double DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION = 3.0;
     public static final String NEWGOALTEXT = "New Goal";
     public static final String GOALPACINGTEXT = "Goal Pacing";
     public static final Image PROGRAM_ICON = new Image(new File(Options.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString());
@@ -144,6 +145,7 @@ public class Options {
         setProgramOptions(programOptions);
         kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
         sessionOptions.setFadeoutduration(DEFAULT_FADEOUTDURATION);
+        sessionOptions.setRamponlyfadeduration(DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION);
         sessionOptions.setAmbiencevolume(DEFAULT_AMBIENCEVOLUME);
         sessionOptions.setAlertfunction(DEFAULT_ALERTFUNCTION_OPTION);
         sessionOptions.setAlertfilelocation(DEFAULT_ALERTFILELOCATION);
@@ -207,6 +209,7 @@ public class Options {
         private Double ambiencevolume;
         private Double fadeinduration;
         private Double fadeoutduration;
+        private Double ramponlyfadeduration;
         private String alertfilelocation;
         private Boolean rampenabled;
         private Boolean prerampenabled;
@@ -243,6 +246,12 @@ public class Options {
         }
         public void setFadeoutduration(Double fadeoutduration) {
             this.fadeoutduration = fadeoutduration;
+        }
+        public Double getRamponlyfadeduration() {
+            return ramponlyfadeduration;
+        }
+        public void setRamponlyfadeduration(Double ramponlyfadeduration) {
+            this.ramponlyfadeduration = ramponlyfadeduration;
         }
         public String getAlertfilelocation() {
             return alertfilelocation;

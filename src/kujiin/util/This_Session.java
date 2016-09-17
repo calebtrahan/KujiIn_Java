@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -69,6 +70,7 @@ public class This_Session {
     public List<SessionPart> sessionpartswithGoalsCompletedThisSession;
     private List<SessionPart> itemsinsession;
     public PlayerUI playerUI;
+    public SessionPlaybackOverview sessionPlaybackOverview;
     public DisplayReference displayReference;
     public Options options;
     public PlayerState playerState;
@@ -79,6 +81,7 @@ public class This_Session {
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     private Integer exportserviceindex;
+    private boolean ambienceenabled = false;
     private ArrayList<Service<Boolean>> exportservices;
     private Service<Boolean> currentexporterservice;
 
@@ -141,8 +144,11 @@ public class This_Session {
     public void setCurrentambiencevolume(Double currentambiencevolume) {
         this.currentambiencevolume = currentambiencevolume;
     }
+    public boolean isAmbienceenabled() {
+        return ambienceenabled;
+    }
 
-    // Cut And Element Getters
+// Cut And Element Getters
     public Qi_Gong getPresession() {
         return Presession;
     }
@@ -347,41 +353,42 @@ public class This_Session {
         creation_populateitemsinsession();
     }
     public void creation_checkambience(CheckBox ambiencecheckbox) {
-        ArrayList<SessionPart> sessionpartswithnoambience = new ArrayList<>();
-        ArrayList<SessionPart> sessionpartswithreducedambience = new ArrayList<>();
-        getAllSessionParts().stream().filter(i -> i.getduration().greaterThan(Duration.ZERO)).forEach(i -> {
-            Root.CreatorStatusBar.setText(String.format("Checking Ambience. Currently Checking %s...", i.name));
-            if (!i.getAmbience().hasAnyAmbience()) {sessionpartswithnoambience.add(i);}
-            else if (!i.getAmbience().hasEnoughAmbience(i.getduration())) {sessionpartswithreducedambience.add(i);}
-        });
-        Root.CreatorStatusBar.setText("");
-        if (! sessionpartswithnoambience.isEmpty()) {
-            StringBuilder a = new StringBuilder();
-            for (int i = 0; i < sessionpartswithnoambience.size(); i++) {
-                a.append(sessionpartswithnoambience.get(i).name);
-                if (i != sessionpartswithnoambience.size() - 1) {a.append(", ");}
-            }
-            if (Root.dialog_getConfirmation("Missing Ambience", null, "Missing Ambience For " + a.toString() + ". Ambience Cannot Be Enabled For Session Without At Least One Working Ambience File" +
-                            " Per Session Part", "Add Ambience", "Disable Ambience")) {
-                if (sessionpartswithnoambience.size() == 1) {Root.menu_openadvancedambienceeditor(sessionpartswithnoambience.get(0));}
-                else {Root.menu_openadvancedambienceeditor();}
-            } else {ambiencecheckbox.setSelected(false);}
-        } else if (! sessionpartswithreducedambience.isEmpty()) {
+        if (sessionPlaybackOverview != null && sessionPlaybackOverview.isShowing() && sessionPlaybackOverview.AmbienceSwitch.isSelected()) {
+            ArrayList<SessionPart> sessionpartswithnoambience = new ArrayList<>();
+            ArrayList<SessionPart> sessionpartswithreducedambience = new ArrayList<>();
+            getAllSessionParts().stream().filter(i -> i.getduration().greaterThan(Duration.ZERO)).forEach(i -> {
+                Root.CreatorStatusBar.setText(String.format("Checking Ambience. Currently Checking %s...", i.name));
+                if (!i.getAmbience().hasAnyAmbience()) {sessionpartswithnoambience.add(i);}
+                else if (!i.getAmbience().hasEnoughAmbience(i.getduration())) {sessionpartswithreducedambience.add(i);}
+            });
+            Root.CreatorStatusBar.setText("");
+            if (! sessionpartswithnoambience.isEmpty()) {
+                StringBuilder a = new StringBuilder();
+                for (int i = 0; i < sessionpartswithnoambience.size(); i++) {
+                    a.append(sessionpartswithnoambience.get(i).name);
+                    if (i != sessionpartswithnoambience.size() - 1) {a.append(", ");}
+                }
+                if (Root.dialog_getConfirmation("Missing Ambience", null, "Missing Ambience For " + a.toString() + ". Ambience Cannot Be Enabled For Session Without At Least One Working Ambience File" +
+                        " Per Session Part", "Add Ambience", "Disable Ambience")) {
+                    if (sessionpartswithnoambience.size() == 1) {Root.menu_openadvancedambienceeditor(sessionpartswithnoambience.get(0));}
+                    else {Root.menu_openadvancedambienceeditor();}
+                } else {ambiencecheckbox.setSelected(false);}
+            } else if (! sessionpartswithreducedambience.isEmpty()) {
                 StringBuilder a = new StringBuilder();
                 int count = 0;
-                for (int i = 0; i < sessionpartswithreducedambience.size(); i++) {
+                for (SessionPart aSessionpartswithreducedambience : sessionpartswithreducedambience) {
                     a.append("\n");
-                    SessionPart thissessionpart = sessionpartswithreducedambience.get(i);
-                    String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(thissessionpart.getAmbience().gettotalDuration(), null);
-                    String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(thissessionpart.getduration(), null);
-                    a.append(count + 1).append(". ").append(thissessionpart.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
+                    String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(aSessionpartswithreducedambience.getAmbience().gettotalDuration(), null);
+                    String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(aSessionpartswithreducedambience.getduration(), null);
+                    a.append(count + 1).append(". ").append(aSessionpartswithreducedambience.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
                     count++;
                 }
                 new SelectAmbiencePlaybackType(count).showAndWait();
                 if (ambiencePlaybackType == null) {ambiencecheckbox.setSelected(false);}
-        } else {
-            ambiencecheckbox.setSelected(true);
-            ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();
+            } else {
+                ambiencecheckbox.setSelected(true);
+                ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();
+            }
         }
     }
     public boolean creation_checkreferencefiles(boolean enableprompt) {
@@ -508,7 +515,7 @@ public class This_Session {
 
 // Playback
     public boolean player_confirmOverview() {
-        SessionPlaybackOverview sessionPlaybackOverview = new SessionPlaybackOverview();
+        sessionPlaybackOverview = new SessionPlaybackOverview();
         sessionPlaybackOverview.showAndWait();
         return sessionPlaybackOverview.getResult();
     }
@@ -608,6 +615,7 @@ public class This_Session {
         try {
             switch (playerState) {
                 case TRANSITIONING:
+                    System.out.println("In Transition Clause");
                     try {
                         currentsessionpart.goals_transitioncheck();
                         currentsessionpart.cleanupPlayersandAnimations();
@@ -621,6 +629,7 @@ public class This_Session {
                     }
                     break;
                 case PLAYING:
+                    System.out.println("In Playing Clause");
                     player_closereferencefile();
                     player_transition();
                     break;
@@ -642,12 +651,15 @@ public class This_Session {
         player_reset(true);
     }
     public void player_reset(boolean endofsession) {
+        getAllSessionParts().forEach(SessionPart::cleanupPlayersandAnimations);
         updateuitimeline = null;
         Root.getSessions().deletenonvalidsessions();
         sessionpartcount = 0;
         totalsessiondurationelapsed = Duration.ZERO;
         totalsessionduration = Duration.ZERO;
-        playerUI.reset(endofsession);
+        playerState = PlayerState.IDLE;
+        if (endofsession) {playerUI.reset(true);}
+        else {itemsinsession.clear();}
     }
     public void player_transition() {
         Session currentsession =  Root.getSessions().getspecificsession( Root.getSessions().totalsessioncount() - 1);
@@ -686,7 +698,8 @@ public class This_Session {
     }
     public boolean player_endsessionprematurely() {
         if (playerState == PlayerState.PLAYING || playerState == PlayerState.PAUSED || playerState == PlayerState.TRANSITIONING) {
-            player_pause();
+            currentsessionpart.pausewithoutanimation();
+            updateuitimeline.pause();
             if (Root.dialog_getConfirmation("End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue")) {return true;}
             else {player_play(); return false;}
         } else {return true;}
@@ -694,8 +707,7 @@ public class This_Session {
     public void player_togglevolumebinding() {
         if (playerState == PlayerState.IDLE || playerState == PlayerState.STOPPED) {
             currentsessionpart.volume_rebindentrainment();
-            if (Root.AmbienceSwitch.isSelected()) {
-                currentsessionpart.volume_rebindambience();}
+            if (isAmbienceenabled()) {currentsessionpart.volume_rebindambience();}
         }
     }
     public void player_displayreferencefile() {
@@ -707,7 +719,7 @@ public class This_Session {
             displayReference.show();
             displayReference.setOnHidden(event -> {
                 currentsessionpart.volume_rebindentrainment();
-                if (Root.AmbienceSwitch.isSelected()) {
+                if (isAmbienceenabled()) {
                     currentsessionpart.volume_rebindambience();
                 }
             });
@@ -778,12 +790,10 @@ public class This_Session {
         private SessionPart selectedsessionpart;
         private ObservableList<SessionItem> tableitems = FXCollections.observableArrayList();
         private final ObservableList<String> ambiencetypes = FXCollections.observableArrayList("Repeat", "Shuffle", "Custom");
-        private boolean ambienceenabled;
         private boolean result;
 
         public SessionPlaybackOverview() {
             try {
-                ambienceenabled = Root.AmbienceSwitch.isSelected();
                 alladjustedsessionitems = itemsinsession;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlaybackOverview.fxml"));
                 fxmlLoader.setController(this);
@@ -848,15 +858,15 @@ public class This_Session {
                 SessionItemsTable.setOnMouseClicked(event -> itemselected());
                 tableitems = FXCollections.observableArrayList();
                 AmbienceTypeComboBox.setItems(ambiencetypes);
-                AmbienceSwitch.setSelected(Root.AmbienceSwitch.isSelected());
-                if (ambiencePlaybackType != null) {
-                    switch (ambiencePlaybackType) {
+                AmbienceSwitch.setSelected(false);
+                if (Root.getOptions().getSessionOptions().getAmbiencePlaybackType() != null) {
+                    switch (Root.getOptions().getSessionOptions().getAmbiencePlaybackType()) {
                         case REPEAT: AmbienceTypeComboBox.getSelectionModel().select(0); break;
                         case SHUFFLE: AmbienceTypeComboBox.getSelectionModel().select(1); break;
                         case CUSTOM: AmbienceTypeComboBox.getSelectionModel().select(2); break;
                     }
                 }
-                AmbienceTypeComboBox.setDisable(! Root.AmbienceSwitch.isSelected());
+                AmbienceTypeComboBox.setDisable(true);
                 populatetable();
             } catch (IOException ignored) {}
         }
@@ -1029,11 +1039,14 @@ public class This_Session {
         }
 
     // Ambience Methods
-        public void ambienceswitchtoggled(ActionEvent actionEvent) {
+        public void ambienceswitchtoggled(Event event) {
+            creation_checkambience(AmbienceSwitch);
+            ambienceenabled = AmbienceSwitch.isSelected();
             AmbienceTypeComboBox.setDisable(! AmbienceSwitch.isSelected());
+            populatetable();
         }
         public String getambiencetext(SessionPart sessionPart) {
-            if (! Root.AmbienceSwitch.isSelected()) {return "Disabled";}
+            if (! isAmbienceenabled()) {return "Disabled";}
             else {
                 if (! sessionPart.getAmbience().hasAnyAmbience()) {return "Has No Ambience";}
                 switch (ambiencePlaybackType) {
@@ -1302,9 +1315,6 @@ public class This_Session {
         public Button PlayButton;
         public Button PauseButton;
         public Button StopButton;
-        public Label StatusBar;
-        public RadioButton ReferenceHTMLButton;
-        public RadioButton ReferenceTXTButton;
         public Slider EntrainmentVolume;
         public Label EntrainmentVolumePercentage;
         public Slider AmbienceVolume;
@@ -1319,10 +1329,9 @@ public class This_Session {
         public Label TotalSessionLabel;
         public Label GoalTopLabel;
         public ProgressBar GoalProgressBar;
-        public ToggleButton ReferenceToggleButton;
         public Label GoalPercentageLabel;
         public boolean displaynormaltime = true;
-
+        public CheckBox ReferenceCheckBox;
 
         public PlayerUI() {
             try {
@@ -1334,18 +1343,18 @@ public class This_Session {
                 setTitle("Session Player");
                 reset(false);
                 boolean referenceoption = Root.getOptions().getSessionOptions().getReferenceoption();
-                if (referenceoption && referenceType != null && creation_checkreferencefiles(false)) {ReferenceToggleButton.setSelected(true);}
-                else {ReferenceToggleButton.setSelected(false);}
+                if (referenceoption && referenceType != null && creation_checkreferencefiles(false)) {ReferenceCheckBox.setSelected(true);}
+                else {ReferenceCheckBox.setSelected(false);}
                 togglereference(null);
-                ReferenceToggleButton.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
+                ReferenceCheckBox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
                 setResizable(false);
-                SessionPartTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
-                TotalTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = !displaynormaltime);
+                SessionPartTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
+                TotalTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
                 setOnCloseRequest(event -> {
                     if (playerState == PlayerState.PLAYING || playerState == PlayerState.STOPPED || playerState == PlayerState.PAUSED || playerState == PlayerState.IDLE) {
-                        if (player_endsessionprematurely()) {close(); cleanupPlayer();} else {play(); event.consume();}
+                        if (player_endsessionprematurely()) {close();} else {play(); event.consume();}
                     } else {
-                        Util.gui_showtimedmessageonlabel(StatusBar, "Cannot Close Player During Fade Animation", 400);
+//                        Util.gui_showtimedmessageonlabel(StatusBar, "Cannot Close Player During Fade Animation", 400);
                         new Timeline(new KeyFrame(Duration.millis(400), ae -> currentsessionpart.toggleplayerbuttons()));
                         event.consume();
                     }
@@ -1353,60 +1362,37 @@ public class This_Session {
             } catch (Exception ignored) {}
         }
 
-        // Button Actions
+    // Button Actions
         public void play() {player_play();}
         public void pause() {
             player_pause();}
         public void stop() {
             player_stop();}
         public void togglereference(ActionEvent actionEvent) {
-            boolean buttontoggled = ReferenceToggleButton.isSelected();
+            boolean buttontoggled = ReferenceCheckBox.isSelected();
             Root.getOptions().getSessionOptions().setReferenceoption(buttontoggled);
-            ReferenceHTMLButton.setDisable(! buttontoggled);
-            ReferenceTXTButton.setDisable(! buttontoggled);
             if (! buttontoggled) {
-                ReferenceHTMLButton.setSelected(false);
-                ReferenceTXTButton.setSelected(false);
                 Root.getOptions().getSessionOptions().setReferencetype(null);
                 player_closereferencefile();
                 player_togglevolumebinding();
             } else {
+                System.out.println("Should be Selecting Reference Type");
                 if (Root.getOptions().getSessionOptions().getReferencetype() == null) {Root.getOptions().getSessionOptions().setReferencetype(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);}
-                switch (Root.getOptions().getSessionOptions().getReferencetype()) {
-                    case html:
-                        ReferenceHTMLButton.setSelected(true);
-                        htmlreferenceoptionselected(null);
-                        break;
-                    case txt:
-                        ReferenceTXTButton.setSelected(true);
-                        txtreferenceoptionselected(null);
-                        break;
-                }
-                if (! creation_checkreferencefiles(true)) {
-                    ReferenceToggleButton.setSelected(false);
-                    togglereference(null);
-                }
-                if (playerState == PlayerState.PLAYING) {
-                    player_displayreferencefile();
-                    player_togglevolumebinding();
-                }
+                SelectReferenceType selectReferenceType = new SelectReferenceType();
+                selectReferenceType.show();
+                selectReferenceType.setOnHidden(event -> {
+                    if (selectReferenceType.getResult()) {
+                        if (! creation_checkreferencefiles(true)) {
+                            ReferenceCheckBox.setSelected(false);
+                        }
+                        if (playerState == PlayerState.PLAYING) {
+                            player_displayreferencefile();
+                            player_togglevolumebinding();
+                        }
+                    }
+                });
             }
         }
-        public void htmlreferenceoptionselected(ActionEvent actionEvent) {
-            if (ReferenceToggleButton.isSelected()) {
-                ReferenceTXTButton.setSelected(! ReferenceHTMLButton.isSelected());
-                if (ReferenceHTMLButton.isSelected()) {referenceType = ReferenceType.html;}
-                else {referenceType = ReferenceType.txt;}
-            } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
-        }
-        public void txtreferenceoptionselected(ActionEvent actionEvent) {
-            if (ReferenceToggleButton.isSelected()) {
-                ReferenceHTMLButton.setSelected(! ReferenceTXTButton.isSelected());
-                if (ReferenceTXTButton.isSelected()) {referenceType = ReferenceType.txt;}
-                else {referenceType = ReferenceType.html;}
-            } else {Root.getOptions().getSessionOptions().setReferencetype(null);}
-        }
-        public void cleanupPlayer() {}
         public void reset(boolean endofsession) {
             SessionPartCurrentTimeLabel.setText("--:--");
             CurrentSessionPartProgress.setProgress(0.0);
@@ -1426,7 +1412,11 @@ public class This_Session {
             PauseButton.setDisable(true);
             StopButton.setDisable(true);
         }
-
+        @Override
+        public void close() {
+            super.close();
+            player_reset(false);
+        }
     }
     public class ExporterUI extends Stage {
         public Button CancelButton;
@@ -1437,7 +1427,7 @@ public class This_Session {
         public Label CurrentLabel;
 
         public ExporterUI() {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ExportingSessionDialog.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ExportingSessionDialog.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -1575,7 +1565,7 @@ public class This_Session {
             } else {System.out.println("Reference File Is Null");}
         }
         public void untoggleplayerreference() {
-            playerUI.ReferenceToggleButton.setSelected(false);
+            playerUI.ReferenceCheckBox.setSelected(false);
             playerUI.togglereference(null);
         }
 
@@ -1636,6 +1626,69 @@ public class This_Session {
             close();
         }
 
+    }
+    public class SelectReferenceType extends Stage {
+        public RadioButton HTMLRadioButton;
+        public RadioButton TextRadioButton;
+        public TextArea Description;
+        public CheckBox FullScreenCheckbox;
+        public Button AcceptButton;
+        public Button CancelButton;
+        private ArrayList<String> descriptions = new ArrayList<>();
+        private boolean result = false;
+
+        public SelectReferenceType() {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SelectReferenceType.fxml"));
+                fxmlLoader.setController(this);
+                Scene defaultscene = new Scene(fxmlLoader.load());
+                setScene(defaultscene);
+                setTitle("Select Reference Type");
+                Root.getOptions().setStyle(this);
+                this.setResizable(false);
+                setOnCloseRequest(event -> {});
+                descriptions.add("Display HTML Variation Of Reference Files During Session Playback. This Is Stylized Code That Allows You To Color/Format Your Reference In A Way Plain Text Cannot");
+                descriptions.add("Display Text Variation Of Reference Files During Session Playback. This Is Just Plain Text So It Won't Be Formatted Or Styled");
+                HTMLRadioButton.setOnMouseEntered(event -> Description.setText(descriptions.get(0)));
+                HTMLRadioButton.setOnMouseExited(event -> Description.clear());
+                HTMLRadioButton.setOnAction(event ->  htmlButtonselected());
+                TextRadioButton.setOnMouseEntered(event -> Description.setText(descriptions.get(1)));
+                TextRadioButton.setOnMouseExited(event -> Description.clear());
+                TextRadioButton.setOnAction(event ->  textButtonselected());
+                switch (Root.getOptions().getSessionOptions().getReferencetype()) {
+                    case html:
+                        HTMLRadioButton.setSelected(true);
+                        break;
+                    case txt:
+                        TextRadioButton.setSelected(true);
+                        break;
+                }
+            } catch (IOException ignored) {}
+        }
+
+        private void htmlButtonselected() {
+            TextRadioButton.setSelected(false);
+            Description.setText(descriptions.get(0));
+        }
+        private void textButtonselected() {
+            HTMLRadioButton.setSelected(false);
+            Description.setText(descriptions.get(1));
+        }
+        public ReferenceType getReferenceType() {
+            if (HTMLRadioButton.isSelected()) {return ReferenceType.html;}
+            else if (TextRadioButton.isSelected()) {return ReferenceType.txt;}
+            else {return null;}
+        }
+        public boolean getFullScreen() {return FullScreenCheckbox.isSelected();}
+        public boolean getResult() {return result;}
+
+        public void accept(ActionEvent actionEvent) {
+            if (HTMLRadioButton.isSelected() || TextRadioButton.isSelected()) {result = true;  close();}
+            else {
+                Root.dialog_displayInformation("Cannot Accept", "No Reference Type Selected", null);
+                result = false;
+            }
+        }
     }
     public enum ExporterState {
         NOT_EXPORTED, WORKING, COMPLETED, FAILED, CANCELLED

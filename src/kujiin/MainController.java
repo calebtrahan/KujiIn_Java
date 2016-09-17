@@ -98,7 +98,6 @@ public class MainController implements Initializable {
     public CheckBox PrePostSwitch;
     public Button LoadPresetButton;
     public Button SavePresetButton;
-    public CheckBox AmbienceSwitch;
     public TextField ApproximateEndTime;
     public Button ChangeAllCutsButton;
     public TextField TotalSessionTime;
@@ -298,7 +297,6 @@ public class MainController implements Initializable {
         if (getOptions().getProgramOptions().getTooltips()) {
             TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
             ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
-            AmbienceSwitch.setTooltip(new Tooltip("Check This After You Set All Values To Check For And Enable Ambience For This Session"));
             ChangeAllCutsButton.setTooltip(new Tooltip("Change All Cut Values Simultaneously"));
             ChangeAllElementsButton.setTooltip(new Tooltip("Change All Element Values Simultaneously"));
             LoadPresetButton.setTooltip(new Tooltip("Load A Saved Preset"));
@@ -307,7 +305,6 @@ public class MainController implements Initializable {
         } else {
             TotalSessionTime.setTooltip(null);
             ApproximateEndTime.setTooltip(null);
-            AmbienceSwitch.setTooltip(null);
             ChangeAllCutsButton.setTooltip(null);
             ChangeAllElementsButton.setTooltip(null);
             LoadPresetButton.setTooltip(null);
@@ -320,10 +317,8 @@ public class MainController implements Initializable {
         ChangeAllElementsButton.setDisable(disabled);
         LoadPresetButton.setDisable(disabled);
         SavePresetButton.setDisable(disabled);
-        AmbienceSwitch.setDisable(disabled);
         ApproximateEndTime.setDisable(disabled);
         TotalSessionTime.setDisable(disabled);
-        AmbienceSwitch.setDisable(disabled);
         PlayButton.setDisable(disabled);
         ExportButton.setDisable(disabled);
         ResetCreatorButton.setDisable(disabled);
@@ -352,24 +347,6 @@ public class MainController implements Initializable {
             TotalSessionTime.setText("-");
             ApproximateEndTime.setText("-");
         }
-    }
-    public void creation_gui_toggleambience(ActionEvent actionEvent) {
-        if (AmbienceSwitch.isSelected()) {
-            if (creation_gui_allvaluesnotzero()) {
-                for (SessionPart i : Session.getAllSessionParts()) {
-                    if (i.gui_getvalue() > 0 && ! i.ambience_isReady()) {
-                        dialog_displayInformation("Cannot Add Ambience", "Still Background Checking Existing Ambience", "Please Try Again In A Few Moments");
-                        Session.creation_reset(false);
-                        AmbienceSwitch.setSelected(false);
-                        return;
-                    }
-                }
-                Session.creation_checkambience(AmbienceSwitch);
-            } else {
-                dialog_displayInformation("Cannot Add Ambience", "All Durations Are Zero", "Nothing To Add Ambience For");
-                AmbienceSwitch.setSelected(false);
-            }
-        } else {Session.creation_reset(false);}
     }
     public void creation_gui_resetallvalues(ActionEvent actionEvent) {
         Session.creation_reset(true);
@@ -677,7 +654,6 @@ public class MainController implements Initializable {
             newgoalbuttontext = kujiin.xml.Options.GOALPACINGTEXT;
             newgoalbuttontooltip = new Tooltip("Calculate Goal Pacing For This Goal");
         }
-        System.out.println("Should Be Setting Percentage To " + percentage);
         GoalProgressPercentageLabel.setText(percentage);
         goalsprogressbar.setProgress(progress);
         GoalTopLabel.setText(toptext);
@@ -2168,7 +2144,7 @@ public class MainController implements Initializable {
         }
 
         public AdvancedAmbienceEditor() {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Advanced.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxmldd/AmbienceEditor_Advanced.fxml"));
             fxmlLoader.setController(this);
             try {
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -2185,7 +2161,8 @@ public class MainController implements Initializable {
                         }
                     }
                 });
-            } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
+
+            } catch (IOException e) {new org.controlsfx.dialog.ExceptionDialog(e).showAndWait();}
             setTitle("Advanced Ambience Editor");
             SessionPartSelectionBox.setOnAction(event -> selectandloadsessionpart());
             tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");

@@ -78,27 +78,29 @@ public class SessionPart {
         this.name = name;
         this.duration = Duration.ZERO;
         this.thisession = thissession;
-        if (aSwitch != null && value != null) {
-            Switch = aSwitch;
-            Value = value;
-            Util.custom_textfield_integer(Value, Switch, 0, 600, 1);
-            Value.textProperty().addListener((observable, oldValue, newValue) -> {
-                try {
-                    changevalue(Integer.parseInt(Value.getText()));
-                    thissession.Root.creation_gui_update();
-                } catch (NumberFormatException ignored) {setDuration(0);}
-            });
-            if (briefsummary != null) {Switch.setTooltip(new Tooltip(briefsummary));}
-            Switch.setOnAction(event -> gui_toggleswitch());
-            gui_toggleswitch();
+        if (this instanceof Cut || this instanceof Element || this instanceof Qi_Gong) {
+            if (aSwitch != null && value != null) {
+                Switch = aSwitch;
+                Value = value;
+                Util.custom_textfield_integer(Value, Switch, 0, 600, 1);
+                Value.textProperty().addListener((observable, oldValue, newValue) -> {
+                    try {
+                        changevalue(Integer.parseInt(Value.getText()));
+                        thissession.Root.creation_gui_update();
+                    } catch (NumberFormatException ignored) {setDuration(0);}
+                });
+                if (briefsummary != null) {Switch.setTooltip(new Tooltip(briefsummary));}
+                Switch.setOnAction(event -> gui_toggleswitch());
+                gui_toggleswitch();
+            }
+            entrainment = thissession.Root.getEntrainments().getsessionpartEntrainment(number);
+            entrainmentchecker_partcount = 0;
+            entrainment_populate();
+            ambience = thissession.Root.getAmbiences().getsessionpartAmbience(number);
+            ambience_cleanupexistingambience();
+            ambience_addnewfromdirectory();
         }
-        entrainment = thissession.Root.getEntrainments().getsessionpartEntrainment(number);
-        entrainmentchecker_partcount = 0;
-        entrainment_populate();
-        ambience = thissession.Root.getAmbiences().getsessionpartAmbience(number);
-        ambience_cleanupexistingambience();
-        ambience_addnewfromdirectory();
-    //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
+        //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
 //        finalentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
 //        tempambiencetextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Amb.txt");
@@ -209,7 +211,6 @@ public class SessionPart {
     public List<kujiin.xml.Goals.Goal> getGoalscompletedthissession() {
         return goalscompletedthissession;
     }
-    public boolean getramponly() {return ramponly;}
     public String getNameForFiles() {return name.toLowerCase();}
     public String getNameForChart() {return name;}
     private void setDuration(double newduration) {
@@ -241,7 +242,7 @@ public class SessionPart {
 // Creation
     public boolean creation_build(List<SessionPart> sessionpartstoplay) {
         allsessionpartstoplay = sessionpartstoplay;
-        if (thisession.Root.AmbienceSwitch.isSelected()) {return creation_buildEntrainment() && creation_buildAmbience();}
+        if (thisession.isAmbienceenabled()) {return creation_buildEntrainment() && creation_buildAmbience();}
         else {return creation_buildEntrainment();}
     }
     protected boolean creation_buildEntrainment() {
@@ -261,7 +262,6 @@ public class SessionPart {
     public void start() {
         // TODO On Last Session Part:
             // Do NOT Play Ramp (If Enabled For Session)
-        boolean ramponly = getramponly();
         elapsedtime = Duration.ZERO;
         setupfadeanimations();
         volume_unbindentrainment();
@@ -277,7 +277,7 @@ public class SessionPart {
         thisession.player_displayreferencefile();
         boolean isLastSessionPart = allsessionpartstoplay.indexOf(this) == allsessionpartstoplay.size() - 1;
         if (! ramponly && ! isLastSessionPart && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
-            timeline_start_ending_ramp = new Timeline(new KeyFrame(getduration().subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
+            timeline_start_ending_ramp = new Timeline(new KeyFrame(duration.subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
@@ -290,7 +290,10 @@ public class SessionPart {
             timeline_start_ending_ramp.play();
         }
         if (fade_entrainment_stop != null) {
-            timeline_fadeout_timer = new Timeline(new KeyFrame(duration.subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration())), ae -> {
+            Duration startfadeout = duration;
+            if (ramponly) {startfadeout = startfadeout.subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
+            else {startfadeout = startfadeout.subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration()));}
+            timeline_fadeout_timer = new Timeline(new KeyFrame(startfadeout, ae -> {
                 volume_unbindentrainment();
                 fade_entrainment_stop.play();
                 if (fade_ambience_stop != null) {
@@ -314,7 +317,7 @@ public class SessionPart {
                 thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
             }
             volume_bindentrainment();}
-        if (thisession.Root.AmbienceSwitch.isSelected() && thisession.ambiencePlaybackType != null) {
+        if (thisession.isAmbienceenabled() && thisession.ambiencePlaybackType != null) {
             ambienceplayhistory = new ArrayList<>();
             currentambiencevolume = thisession.getCurrentambiencevolume();
             volume_unbindambience();
@@ -325,7 +328,7 @@ public class SessionPart {
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
             ambienceplayer.play();
-            if (fade_ambience_play != null && ! ramponly) {fade_ambience_play.play();}
+            if (fade_ambience_play != null) {fade_ambience_play.play();}
             else {
                 ambienceplayer.setVolume(currentambiencevolume);
                 String percentage = new Double(currentambiencevolume * 100).intValue() + "%";
@@ -358,7 +361,7 @@ public class SessionPart {
                 timeline_start_ending_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();}
         }
-        if (thisession.Root.AmbienceSwitch.isSelected()) {
+        if (thisession.isAmbienceenabled()) {
             volume_unbindambience();
             ambienceplayer.play();
             if (fade_ambience_resume != null) {
@@ -379,24 +382,25 @@ public class SessionPart {
             // Open Loading Dialog
             thisession.playerState = This_Session.PlayerState.FADING_PAUSE;
             fade_entrainment_pause.play();
-            if (thisession.Root.AmbienceSwitch.isSelected()) {
+            if (thisession.isAmbienceenabled()) {
                 volume_unbindambience();
                 fade_ambience_pause.play();
             }
             // Close Loading Dialog
-        } else {
-            thisession.playerState = This_Session.PlayerState.PAUSED;
-            entrainmentplayer.pause();
-            timeline_progresstonextsessionpart.pause();
-            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
-                timeline_start_ending_ramp.pause();}
-            if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
-            if (thisession.Root.AmbienceSwitch.isSelected()) {
-                volume_unbindambience();
-                ambienceplayer.pause();
-            }
-        }
+        } else {pausewithoutanimation();}
         toggleplayerbuttons();
+    }
+    public void pausewithoutanimation() {
+        thisession.playerState = This_Session.PlayerState.PAUSED;
+        entrainmentplayer.pause();
+        timeline_progresstonextsessionpart.pause();
+        if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
+            timeline_start_ending_ramp.pause();}
+        if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
+        if (thisession.isAmbienceenabled()) {
+            volume_unbindambience();
+            ambienceplayer.pause();
+        }
     }
     public void stop() {
         thisession.player_closereferencefile();
@@ -405,7 +409,7 @@ public class SessionPart {
             if (fade_entrainment_stop.getStatus() == Animation.Status.RUNNING) {return;}
             fade_entrainment_stop.play();
             thisession.playerState = This_Session.PlayerState.FADING_STOP;
-            if (thisession.Root.AmbienceSwitch.isSelected()) {
+            if (thisession.isAmbienceenabled()) {
                 volume_unbindambience();
                 fade_ambience_stop.play();
             }
@@ -415,7 +419,7 @@ public class SessionPart {
             entrainmentplayer.dispose();
             timeline_progresstonextsessionpart.stop();
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
-            if (thisession.Root.AmbienceSwitch.isSelected()) {
+            if (thisession.isAmbienceenabled()) {
                 volume_unbindambience();
                 ambienceplayer.stop();
                 ambienceplayer.dispose();
@@ -425,10 +429,10 @@ public class SessionPart {
     }
     private void setupfadeanimations() {
         // PLAY
-        if (getramponly()) {return;}
-        if (thisession.Root.getOptions().getSessionOptions().getFadeinduration() > 0.0) {
+        if (thisession.Root.getOptions().getSessionOptions().getFadeinduration() > 0.0 || ramponly) {
             fade_entrainment_play = new Transition() {
-                {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeinduration()));}
+                {if (ramponly) {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
+                 else {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeinduration()));}}
 
                 @Override
                 protected void interpolate(double frac) {
@@ -445,10 +449,15 @@ public class SessionPart {
                     }
                 }
             };
-            fade_entrainment_play.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; toggleplayerbuttons(); volume_bindentrainment();});
-            if (thisession.Root.AmbienceSwitch.isSelected()) {
+            fade_entrainment_play.setOnFinished(event -> {
+                thisession.playerState = This_Session.PlayerState.PLAYING;
+                toggleplayerbuttons();
+                volume_bindentrainment();
+            });
+            if (thisession.isAmbienceenabled()) {
                 fade_ambience_play = new Transition() {
-                    {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeinduration()));}
+                    {if (ramponly) {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
+                    else {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeinduration()));}}
 
                     @Override
                     protected void interpolate(double frac) {
@@ -470,7 +479,9 @@ public class SessionPart {
         }
         // RESUME
         fade_entrainment_resume = new Transition() {
-            {setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));}
+            {
+                setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));
+            }
 
             @Override
             protected void interpolate(double frac) {
@@ -487,12 +498,23 @@ public class SessionPart {
                 }
             }
         };
-        fade_entrainment_resume.setOnFinished(event -> {thisession.playerState = This_Session.PlayerState.PLAYING; timeline_progresstonextsessionpart.play(); if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
-            timeline_start_ending_ramp.play();}
-            if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();} toggleplayerbuttons(); volume_bindentrainment();});
-        if (thisession.Root.AmbienceSwitch.isSelected()) {
+        fade_entrainment_resume.setOnFinished(event -> {
+            thisession.playerState = This_Session.PlayerState.PLAYING;
+            timeline_progresstonextsessionpart.play();
+            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
+                timeline_start_ending_ramp.play();
+            }
+            if (timeline_fadeout_timer != null) {
+                timeline_fadeout_timer.play();
+            }
+            toggleplayerbuttons();
+            volume_bindentrainment();
+        });
+        if (thisession.isAmbienceenabled()) {
             fade_ambience_resume = new Transition() {
-                {setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));}
+                {
+                    setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));
+                }
 
                 @Override
                 protected void interpolate(double frac) {
@@ -513,7 +535,9 @@ public class SessionPart {
         }
         // PAUSE
         fade_entrainment_pause = new Transition() {
-            {setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));}
+            {
+                setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));
+            }
 
             @Override
             protected void interpolate(double frac) {
@@ -530,13 +554,23 @@ public class SessionPart {
                 }
             }
         };
-        fade_entrainment_pause.setOnFinished(event -> {entrainmentplayer.pause(); timeline_progresstonextsessionpart.pause();
+        fade_entrainment_pause.setOnFinished(event -> {
+            entrainmentplayer.pause();
+            timeline_progresstonextsessionpart.pause();
             if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
-                timeline_start_ending_ramp.pause();}
-            if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();} thisession.playerState = This_Session.PlayerState.PAUSED; toggleplayerbuttons();});
-        if (thisession.Root.AmbienceSwitch.isSelected()) {
+                timeline_start_ending_ramp.pause();
+            }
+            if (timeline_fadeout_timer != null) {
+                timeline_fadeout_timer.pause();
+            }
+            thisession.playerState = This_Session.PlayerState.PAUSED;
+            toggleplayerbuttons();
+        });
+        if (thisession.isAmbienceenabled()) {
             fade_ambience_pause = new Transition() {
-                {setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));}
+                {
+                    setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));
+                }
 
                 @Override
                 protected void interpolate(double frac) {
@@ -556,9 +590,10 @@ public class SessionPart {
             fade_ambience_pause.setOnFinished(event -> ambienceplayer.pause());
         }
         // STOP
-        if (thisession.Root.getOptions().getSessionOptions().getFadeoutduration() > 0.0) {
+        if (thisession.Root.getOptions().getSessionOptions().getFadeoutduration() > 0.0 || ramponly) {
             fade_entrainment_stop = new Transition() {
-                {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration()));}
+                {if (ramponly) {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
+                else {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration()));}}
 
                 @Override
                 protected void interpolate(double frac) {
@@ -575,13 +610,23 @@ public class SessionPart {
                     }
                 }
             };
-            fade_entrainment_stop.setOnFinished(event -> {entrainmentplayer.stop(); entrainmentplayer.dispose();
-                if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
-                    timeline_start_ending_ramp.stop();}
-                timeline_progresstonextsessionpart.stop(); if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();} thisession.playerState = This_Session.PlayerState.STOPPED; toggleplayerbuttons();});
-            if (thisession.Root.AmbienceSwitch.isSelected()) {
+            fade_entrainment_stop.setOnFinished(event -> {
+                entrainmentplayer.stop();
+                entrainmentplayer.dispose();
+                if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
+                    timeline_start_ending_ramp.stop();
+                }
+                timeline_progresstonextsessionpart.stop();
+                if (timeline_fadeout_timer != null) {
+                    timeline_fadeout_timer.stop();
+                }
+                thisession.playerState = This_Session.PlayerState.STOPPED;
+                toggleplayerbuttons();
+            });
+            if (thisession.isAmbienceenabled()) {
                 fade_ambience_stop = new Transition() {
-                    {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration()));}
+                    {if (ramponly) {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
+                    else {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration()));}}
 
                     @Override
                     protected void interpolate(double frac) {
@@ -598,7 +643,10 @@ public class SessionPart {
                         }
                     }
                 };
-                fade_ambience_stop.setOnFinished(event -> {ambienceplayer.stop(); ambienceplayer.dispose();});
+                fade_ambience_stop.setOnFinished(event -> {
+                    ambienceplayer.stop();
+                    ambienceplayer.dispose();
+                });
             }
         }
     }
@@ -668,9 +716,7 @@ public class SessionPart {
         thisession.playerUI.PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
         thisession.playerUI.PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
         thisession.playerUI.StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
-        thisession.playerUI.ReferenceToggleButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
-        thisession.playerUI.ReferenceHTMLButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
-        thisession.playerUI.ReferenceTXTButton.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
+        thisession.playerUI.ReferenceCheckBox.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
         if (thisession.player_isreferencecurrentlyDisplayed()) {
             thisession.displayReference.PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
             thisession.displayReference.PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
@@ -679,7 +725,6 @@ public class SessionPart {
         String playbuttontext;
         String pausebuttontext;
         String stopbuttontext;
-        String statusbartext;
         String sessionpartname;
         if (thisession.getCurrentsessionpart() != null) {sessionpartname = thisession.getCurrentsessionpart().name;}
         else {sessionpartname = "Session";}
@@ -688,67 +733,56 @@ public class SessionPart {
                 playbuttontext = "Start";
                 pausebuttontext = "Pause";
                 stopbuttontext = "Stop";
-                statusbartext = "";
                 break;
             case PLAYING:
                 playbuttontext = "Playing";
                 pausebuttontext = "Pause";
                 stopbuttontext = "Stop";
-                statusbartext = "Session Playing";
                 break;
             case PAUSED:
                 playbuttontext = "Resume";
                 pausebuttontext = "Paused";
                 stopbuttontext = "Stop";
-                statusbartext = "Session Paused";
                 break;
             case STOPPED:
                 playbuttontext = "Play";
                 pausebuttontext = "Stopped";
                 stopbuttontext = "Stopped";
-                statusbartext = "Session Stopped";
                 break;
             case TRANSITIONING:
                 playbuttontext = "Transitioning";
                 pausebuttontext = "Transitioning";
                 stopbuttontext = "Transitioning";
-                statusbartext = "Transitioning...Please Wait";
                 break;
             case FADING_PLAY:
                 playbuttontext = "Starting";
                 pausebuttontext = "Starting";
                 stopbuttontext = "Starting";
-                statusbartext = "Fading In To " + sessionpartname ;
                 break;
             case FADING_RESUME:
                 playbuttontext = "Resuming";
                 pausebuttontext = "Resuming";
                 stopbuttontext = "Resuming";
-                statusbartext = "Resuming " + sessionpartname ;
                 break;
             case FADING_PAUSE:
                 playbuttontext = "Pausing";
                 pausebuttontext = "Pausing";
                 stopbuttontext = "Pausing";
-                statusbartext = "Pausing " + sessionpartname;
                 break;
             case FADING_STOP:
                 playbuttontext = "Stopping";
                 pausebuttontext = "Stopping";
                 stopbuttontext = "Stopping";
-                statusbartext = "Stopping " + sessionpartname;
                 break;
             default:
                 playbuttontext = "";
                 pausebuttontext = "";
                 stopbuttontext = "";
-                statusbartext = "";
                 break;
         }
         thisession.playerUI.PlayButton.setText(playbuttontext);
         thisession.playerUI.PauseButton.setText(pausebuttontext);
         thisession.playerUI.StopButton.setText(stopbuttontext);
-        thisession.playerUI.StatusBar.setText(statusbartext);
         if (thisession.player_isreferencecurrentlyDisplayed()) {
             thisession.displayReference.PlayButton.setText(playbuttontext);
             thisession.displayReference.PauseButton.setText(pausebuttontext);
@@ -759,10 +793,10 @@ public class SessionPart {
     public void toggleplayervolumecontrols() {
         boolean enabled = thisession.playerState == This_Session.PlayerState.PLAYING;
         thisession.playerUI.EntrainmentVolume.setDisable(! enabled);
-        if (thisession.Root.AmbienceSwitch.isSelected()) {thisession.playerUI.AmbienceVolume.setDisable(! enabled);}
+        if (thisession.isAmbienceenabled()) {thisession.playerUI.AmbienceVolume.setDisable(! enabled);}
         if (thisession.player_isreferencecurrentlyDisplayed()) {
             thisession.displayReference.EntrainmentVolumeSlider.setDisable(! enabled);
-            if (thisession.Root.AmbienceSwitch.isSelected()) {thisession.displayReference.AmbienceVolumeSlider.setDisable(! enabled);}
+            if (thisession.isAmbienceenabled()) {thisession.displayReference.AmbienceVolumeSlider.setDisable(! enabled);}
         }
     }
     public void volume_bindentrainment() {

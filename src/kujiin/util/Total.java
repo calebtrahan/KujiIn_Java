@@ -8,6 +8,7 @@ public class Total extends SessionPart {
 
 
     public Total(int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
+        super(number, name, briefsummary, thissession, aSwitch, value);
         this.number = number;
         this.name = name;
         this.duration = Duration.ZERO;
@@ -22,7 +23,7 @@ public class Total extends SessionPart {
         Duration duration = Duration.ZERO;
         for (SessionPart i : thisession.getAllSessionParts()) {
             if (! includepreandpost && i instanceof Qi_Gong) {continue;}
-            duration = duration.add(thisession.Root.getSessions().gettotalpracticedtime(number, false));
+            duration = duration.add(i.sessions_getPracticedDuration(false));
         }
         return duration;
     }

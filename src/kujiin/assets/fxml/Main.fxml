@@ -68,13 +68,8 @@
          </font>
       </Button>
       <HBox alignment="TOP_RIGHT" layoutX="54.0" layoutY="565.0" prefHeight="28.0" prefWidth="377.0" />
-      <HBox alignment="CENTER_RIGHT" layoutX="351.0" layoutY="240.0" prefHeight="23.0" prefWidth="239.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="458.0" layoutY="240.0" prefHeight="23.0" prefWidth="132.0">
          <children>
-            <CheckBox fx:id="AmbienceSwitch" mnemonicParsing="false" onAction="#creation_gui_toggleambience" text="Ambience">
-               <HBox.margin>
-                  <Insets right="5.0" />
-               </HBox.margin>
-            </CheckBox>
             <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#player_playthisession" prefHeight="17.0" prefWidth="62.0" text="Play">
                <font>
                   <Font size="12.0" />
