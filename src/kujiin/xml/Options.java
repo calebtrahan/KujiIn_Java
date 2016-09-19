@@ -57,6 +57,7 @@ public class Options {
     public static final Double VOLUME_SLIDER_ADJUSTMENT_INCREMENT = 5.0;
     public static final Double DEFAULT_ENTRAINMENTVOLUME = 0.6;
     public static final Double DEFAULT_AMBIENCEVOLUME = 1.0;
+    public static final Boolean DEFAULT_FADE_ENABLED = true;
     public static final Double DEFAULT_FADEINDURATION = 10.0;
     public static final Double DEFAULT_FADEOUTDURATION = 10.0;
     public static final Double DEFAULT_FADERESUMEANDPAUSEDURATION = 2.0;
@@ -65,8 +66,7 @@ public class Options {
     public static final File DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "default.css");
     public static final File REFERENCE_THEMEFILE = new File(DIRECTORYSTYLES, "referencefile.css");
     public static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
-    public static final Boolean DEFAULT_PRE_RAMP_ENABLED_OPTION = false;
-    public static final Boolean DEFAULT_POST_RAMP_ENABLED_OPTION = false;
+    public static final Boolean DEFAULT_PREPOST_RAMP_ENABLED_OPTION = true;
     public static final This_Session.AmbiencePlaybackType DEFAULT_AMBIENCE_PLAYBACK_TYPE = This_Session.AmbiencePlaybackType.SHUFFLE;
     public static final This_Session.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = This_Session.ReferenceType.html;
     public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
@@ -149,11 +149,11 @@ public class Options {
         sessionOptions.setAmbiencevolume(DEFAULT_AMBIENCEVOLUME);
         sessionOptions.setAlertfunction(DEFAULT_ALERTFUNCTION_OPTION);
         sessionOptions.setAlertfilelocation(DEFAULT_ALERTFILELOCATION);
+        sessionOptions.setFadeenabled(DEFAULT_FADE_ENABLED);
         sessionOptions.setFadeinduration(DEFAULT_FADEINDURATION);
         sessionOptions.setEntrainmentvolume(DEFAULT_ENTRAINMENTVOLUME);
         sessionOptions.setRampenabled(DEFAULT_RAMP_ENABLED_OPTION);
-        sessionOptions.setPrerampenabled(DEFAULT_PRE_RAMP_ENABLED_OPTION);
-        sessionOptions.setPostrampenabled(DEFAULT_POST_RAMP_ENABLED_OPTION);
+        sessionOptions.setPrepostrampenabled(DEFAULT_PREPOST_RAMP_ENABLED_OPTION);
         sessionOptions.setReferenceoption(DEFAULT_REFERENCE_DISPLAY);
         sessionOptions.setReferencetype(DEFAULT_REFERENCE_TYPE_OPTION);
         sessionOptions.setReferencefullscreen(DEFAULT_REFERENCE_FULLSCREEN_OPTION);
@@ -179,6 +179,14 @@ public class Options {
         names.add(name);
         getAppearanceOptions().setThemefiles(files);
         getAppearanceOptions().setThemefilenames(names);
+    }
+    public boolean hasValidAlertFile() {
+        String location = getSessionOptions().getAlertfilelocation();
+        if (location == null || location.equals("")) {return false;}
+        else {
+            try {return new File(location).exists();}
+            catch (Exception e) {return false;}
+        }
     }
 
 // Subclasses
@@ -207,13 +215,13 @@ public class Options {
     public static class SessionOptions {
         private Double entrainmentvolume;
         private Double ambiencevolume;
+        private Boolean fadeenabled;
         private Double fadeinduration;
         private Double fadeoutduration;
         private Double ramponlyfadeduration;
         private String alertfilelocation;
         private Boolean rampenabled;
-        private Boolean prerampenabled;
-        private Boolean postrampenabled;
+        private Boolean prepostrampenabled;
         private Boolean alertfunction;
         private Boolean referenceoption;
         private This_Session.AmbiencePlaybackType ambiencePlaybackType;
@@ -234,6 +242,12 @@ public class Options {
         }
         public void setAmbiencevolume(Double ambiencevolume) {
             this.ambiencevolume = ambiencevolume;
+        }
+        public Boolean getFadeenabled() {
+            return fadeenabled;
+        }
+        public void setFadeenabled(Boolean fadeenabled) {
+            this.fadeenabled = fadeenabled;
         }
         public Double getFadeinduration() {
             return fadeinduration;
@@ -265,17 +279,11 @@ public class Options {
         public void setRampenabled(Boolean rampenabled) {
             this.rampenabled = rampenabled;
         }
-        public Boolean getPrerampenabled() {
-            return prerampenabled;
+        public Boolean getPrepostrampenabled() {
+            return prepostrampenabled;
         }
-        public void setPrerampenabled(Boolean prerampenabled) {
-            this.prerampenabled = prerampenabled;
-        }
-        public Boolean getPostrampenabled() {
-            return postrampenabled;
-        }
-        public void setPostrampenabled(Boolean postrampenabled) {
-            this.postrampenabled = postrampenabled;
+        public void setPrepostrampenabled(Boolean prepostrampenabled) {
+            this.prepostrampenabled = prepostrampenabled;
         }
         public Boolean getAlertfunction() {
             return alertfunction;

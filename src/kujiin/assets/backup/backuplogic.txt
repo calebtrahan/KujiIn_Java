@@ -1081,3 +1081,102 @@ public class Creator {
         //        for (SoundFile x : ambience.getCreatedAmbience()) {System.out.println("Ambience " + count + ": " + x.getName()); count++;}
         //        System.out.println("Total Ambience Duration: " + currentambienceduration.toMinutes() + " Minutes");
                 return ambience.getCreatedAmbience().size() > 0 && currentambienceduration.greaterThanOrEqualTo(getduration());
+                public boolean creation_checkfirstandlastcutsconnect(List<Cut> cutsinsession) {
+                        if (cutsinsession.size() == 1) {return true;}
+                        try {
+                            int count = cutsinsession.get(0).number;
+                            for (Cut i : cutsinsession) {
+                                if (i.number != count) {return false;}
+                                count++;
+                            }
+                            return true;
+                        } catch (NullPointerException | IndexOutOfBoundsException ignored) {return false;}
+                    }
+                    public boolean creation_checksessionwellformed() {
+                //        List<Cut> cutsinsession = creation_getCutsInSession();
+                //        List<Element> elementsinsession = creation_getElementsInSession();
+                //        if (! cutsinsession.isEmpty()) {
+                //            boolean rinisfirstcutinsession = cutsinsession.get(0).number == 1;
+                //            if (! rinisfirstcutinsession) {
+                //                rinisfirstcutinsession = ! Root.dialog_getConfirmation("Practiced Cuts Do Not Connect To RIN", null,
+                //                        "Cuts In Session Not Connected To RIN. Connect " + cutsinsession.get(0).name + " Back To RIN?", null, null);}
+                //            if (! rinisfirstcutinsession || ! creation_checkfirstandlastcutsconnect(cutsinsession)) {
+                //                CutsMissingDialog cutsMissingDialog = new CutsMissingDialog(Root, cutsinsession);
+                //                cutsMissingDialog.showAndWait();
+                //                switch (cutsMissingDialog.getResult()) {
+                //                    case YES:
+                //                        creation_populateitemsinsession();
+                //                        cutsinsession = creation_getCutsInSession();
+                //                        break;
+                //                    case NO:
+                //                        break;
+                //                    case CANCEL:
+                //                        return false;
+                //                }
+                //            }
+                //        }
+                //        if (! cutsinsession.isEmpty() && ! elementsinsession.isEmpty()) {
+                //            SessionPlaybackOverview sessionPlaybackOverview = new SessionPlaybackOverview(Root, getallitemsinSession());
+                //            sessionPlaybackOverview.showAndWait();
+                //            switch (sessionPlaybackOverview.getResult()) {
+                //                case YES:
+                //                    setItemsinsession(sessionPlaybackOverview.getorderedsessionitems());
+                //                    break;
+                //                case NO:
+                //                    break;
+                //                case CANCEL:
+                //                    return false;
+                //            }
+                //            // Sort Session Parts
+                //        }
+                        return true;
+                    }
+                    public void creation_checkgoals() {
+                        ArrayList<SessionPart> sessionpartswithoutlongenoughgoals = Root.goals_util_getsessionpartswithoutlongenoughgoals(getallitemsinSession());
+                        List<Integer>  notgooddurations = new ArrayList<>();
+                        if (! sessionpartswithoutlongenoughgoals.isEmpty()) {
+                            boolean presessionmissinggoals = false;
+                            int cutcount = 0;
+                            int elementcount = 0;
+                            boolean postsessionmissinggoals = false;
+                            for (SessionPart i : sessionpartswithoutlongenoughgoals) {
+                                if (i instanceof Cut) {cutcount++;}
+                                if (i instanceof Element) {elementcount++;}
+                                else {
+                                    if (i.name.equals("Presession")) {presessionmissinggoals = true;}
+                                    if (i.name.equals("Postsession")) {postsessionmissinggoals = true;}
+                                }
+                                notgooddurations.add(new Double(i.getduration().toMinutes()).intValue());
+                            }
+                            StringBuilder notgoodtext = new StringBuilder();
+                            if (presessionmissinggoals) {notgoodtext.append("Presession\n");}
+                            if (cutcount > 0) {notgoodtext.append(cutcount).append(" Cut(s)\n");}
+                            if (elementcount > 0) {notgoodtext.append(elementcount).append(" Element(s)\n");}
+                            if (postsessionmissinggoals) {notgoodtext.append("Postsession\n");}
+                            if (Root.dialog_getConfirmation("Confirmation", "Goals Are Missing/Not Long Enough For:", notgoodtext.toString(), "Set Goal And Play", "Play Anyway")) {
+                                // TODO Make A Goal Set Dialog Before Playback Here
+                                // Was last parameter-> Util.list_getmaxintegervalue(notgooddurations)
+                                /*ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, sessionpartswithoutlongenoughgoals);
+                                s.showAndWait();
+                                if (s.isAccepted()) {
+                                    List<Integer> cutindexes = s.getSelectedCutIndexes();
+                                    Double goalhours = s.getGoalhours();
+                                    LocalDate goaldate = s.getGoaldate();
+                                    boolean goalssetsuccessfully = true;
+                                    for (Integer i : cutindexes) {
+                                        try {
+                                            SessionPart x = getAllSessionPartsincludingTotal().get(i);
+                                            x.goals_add(new Goals.Goal(goalhours, x.name));
+                                        } catch (JAXBException ignored) {
+                                            goalssetsuccessfully = false;
+                                            Util.dialog_displayError(Root, "Error", "Couldn't Add Goal For " + getAllSessionPartsincludingTotal().get(i).name, "Check File Permissions");
+                                        }
+                                    }
+                                    if (goalssetsuccessfully) {
+                                        Util.dialog_displayInformation(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
+                                    }
+                                }
+                                break;*/
+                            }
+                        }
+                    }

@@ -394,7 +394,6 @@ public class MainController implements Initializable {
 //        }
 
         Session.creation_populateitemsinsession();
-        Session.creation_checkprepostramp();
         if (Session.player_confirmOverview()) {return true;
         } else {Session.creation_clearitemsinsession(); return false;}
         // Add Pre/Post Ramp If Duration Is Zero || Ramp Is Disabled
@@ -406,7 +405,7 @@ public class MainController implements Initializable {
 //        if (longsession && ! getOptions().getSessionOptions().getAlertfunction()) {
 //            switch (dialog_getAnswer("Add Alert File", null, "I've Detected A Long Session. Add Alert File In Between Session Parts?",
 //                    "Add Alert File", "Continue Without Alert File", "Cancel Playback")) {
-//                case YES: new ChangeAlertFile().showAndWait(); break;
+//                case YES: new SelectAlertFile().showAndWait(); break;
 //                case CANCEL: return false;
 //            }
 //        } else if (getOptions().getSessionOptions().getAlertfunction()) {
@@ -781,7 +780,7 @@ public class MainController implements Initializable {
     }
 
 // Dialogs
-    public class ChangeAlertFile extends Stage {
+    public class SelectAlertFile extends Stage {
         public Button HelpButton;
         public Button AcceptButton;
         public Button CancelButton;
@@ -791,8 +790,7 @@ public class MainController implements Initializable {
         public Button PreviewButton;
         private File alertfile;
 
-
-        public ChangeAlertFile() {
+        public SelectAlertFile() {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeAlertDialog.fxml"));
                 fxmlLoader.setController(this);
@@ -875,7 +873,7 @@ public class MainController implements Initializable {
         public boolean fileisgood(File testfile) {
         // Test If Valid Extension
             if (! Util.audio_isValid(testfile)) {
-                dialog_displayInformation("Information", "Invalid Audio Format", "Supported Audio Formats: " + Arrays.asList(Util.SUPPORTEDAUDIOFORMATS).toString());
+                dialog_displayInformation("Information", "Invalid Audio Format", "Supported Audio Formats: " + Collections.singletonList(Util.SUPPORTEDAUDIOFORMATS).toString());
                 return false;
             }
             Double duration = Util.audio_getduration(testfile);
@@ -1294,8 +1292,7 @@ public class MainController implements Initializable {
     public class ChangeProgramOptions extends Stage {
         public CheckBox TooltipsCheckBox;
         public CheckBox HelpDialogsCheckBox;
-        public TextField AlertFileTextField;
-        public Button AlertFileEditButton;
+        public CheckBox FadeSwitch;
         public TextField FadeInValue;
         public TextField FadeOutValue;
         public TextField EntrainmentVolumePercentage;
@@ -1306,16 +1303,14 @@ public class MainController implements Initializable {
         public Button DeleteAllSessionsProgressButton;
         public Button DefaultsButton;
         public CheckBox ReferenceSwitch;
-        public RadioButton ReferenceHTMLRadioButton;
-        public RadioButton ReferenceTXTRadioButton;
-        public CheckBox FullscreenCheckbox;
         public CheckBox RampSwitch;
         public Button AddNewThemeButton;
         public Label ProgramOptionsStatusBar;
         public Label DescriptionBoxTopLabel;
         public TextArea DescriptionTextField;
+        public CheckBox AlertFileSwitch;
+        public CheckBox PrePostRamp;
         private kujiin.xml.Options Options;
-        private This_Session.ReferenceType tempreferencetype;
         private ArrayList<ItemWithDescription> descriptionitems = new ArrayList<>();
 
         public ChangeProgramOptions() {
@@ -1328,7 +1323,6 @@ public class MainController implements Initializable {
                 getOptions().setStyle(this);
                 setResizable(false);
                 setTitle("Preferences");
-                AlertFileTextField.setEditable(false);
                 setuplisteners();
                 setuptooltips();
                 setupdescriptions();
@@ -1342,12 +1336,19 @@ public class MainController implements Initializable {
         // Program Options
             TooltipsCheckBox.setSelected(getOptions().getProgramOptions().getTooltips());
             HelpDialogsCheckBox.setSelected(getOptions().getProgramOptions().getHelpdialogs());
-        // Session Options
-            alertfiletoggled();
-        // Playback Options
+        // Session & Playback Options
+            if (getOptions().getSessionOptions().getAlertfunction()) {
+                AlertFileSwitch.setSelected(getOptions().hasValidAlertFile());
+                if (! AlertFileSwitch.isSelected()) {getOptions().getSessionOptions().setAlertfunction(false); getOptions().getSessionOptions().setAlertfilelocation(null);}
+            } else {AlertFileSwitch.setSelected(false);}
+            AlertFileSwitch.setOnAction(event -> alertfiletoggled());
             RampSwitch.setSelected(Options.getSessionOptions().getRampenabled());
+            PrePostRamp.setSelected(Options.getSessionOptions().getPrepostrampenabled());
+            FadeSwitch.setSelected(Options.getSessionOptions().getFadeenabled());
             FadeInValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeinduration()));
+            FadeInValue.setDisable(! FadeSwitch.isSelected());
             FadeOutValue.setText(String.format("%.2f", Options.getSessionOptions().getFadeoutduration()));
+            FadeOutValue.setDisable(! FadeSwitch.isSelected());
             EntrainmentVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getEntrainmentvolume() * 100).intValue()));
             AmbienceVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getAmbiencevolume() * 100).intValue()));
         // Appearance Options
@@ -1356,8 +1357,7 @@ public class MainController implements Initializable {
         public void setuptooltips() {
             TooltipsCheckBox.setTooltip(new Tooltip("Display Messages Like These When Hovering Over Program Controls"));
             HelpDialogsCheckBox.setTooltip(new Tooltip("Display Help Dialogs"));
-            AlertFileTextField.setTooltip(new Tooltip("Alert File Is A Sound File Played In Between Different Session Parts"));
-            AlertFileEditButton.setTooltip(new Tooltip("Edit Alert File"));
+            AlertFileSwitch.setTooltip(new Tooltip("Alert File Is A Sound File Played In Between Different Session Parts"));
             RampSwitch.setTooltip(new Tooltip("Enable A Ramp In Between Session Parts To Smooth Mental Transition"));
             FadeInValue.setTooltip(new Tooltip("Seconds To Fade In Audio Into Session Part"));
             FadeOutValue.setTooltip(new Tooltip("Seconds To Fade Out Audio Out Of Session Part"));
@@ -1371,10 +1371,11 @@ public class MainController implements Initializable {
             Util.custom_textfield_double(FadeOutValue, 0.0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1, 1);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
+            FadeSwitch.setOnAction(event -> togglefade());
+            RampSwitch.setOnAction(event -> toggleramp());
+            PrePostRamp.setOnAction(event -> toggleprepostramp());
             CloseButton.setOnAction(event -> close());
             ReferenceSwitch.setOnMouseClicked(event -> referencetoggle());
-            ReferenceHTMLRadioButton.setOnAction(event1 -> HTMLTypeSelected());
-            ReferenceTXTRadioButton.setOnAction(event1 -> TXTTypeSelected());
             ProgramThemeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectnewtheme());
         }
 
@@ -1382,16 +1383,15 @@ public class MainController implements Initializable {
         public void setupdescriptions() {
             descriptionitems.add(new ItemWithDescription("Tool Tips Checkbox", "Display/Don't Display Description Messages When Hovering Over Program Controls"));
             descriptionitems.add(new ItemWithDescription("Help Dialogs Checkbox", "Display/Don't Display Additional Dialogs Explaining Various Features Of The Program"));
+            descriptionitems.add(new ItemWithDescription("Fade Checkbox", "Fade In/Out Volume Of Each Session Part To Make For A Smoother Playback Experience"));
             descriptionitems.add(new ItemWithDescription("Fade In", "Seconds To Fade In From Silent Into Each Session Part"));
             descriptionitems.add(new ItemWithDescription("Fade Out", "Seconds To Fade Out To Silent Into Each Session Part"));
-            descriptionitems.add(new ItemWithDescription("Entrainment Volume", "Default Volume Percentage For Entrainment (Can Be Adjusted In Session)"));
-            descriptionitems.add(new ItemWithDescription("Ambience Volume", "Default Volume Percentage For Ambience (Can Be Adjusted In Session)"));
+            descriptionitems.add(new ItemWithDescription("Entrainment Volume", "Default Volume Percentage For Entrainment\n(Can Be Adjusted In Session)"));
+            descriptionitems.add(new ItemWithDescription("Ambience Volume", "Default Volume Percentage For Ambience\n(Can Be Adjusted In Session)"));
             descriptionitems.add(new ItemWithDescription("Alert File", "An Alert File Is An Optional Sound File Played In Between Session Elements"));
-            descriptionitems.add(new ItemWithDescription("Alert File Edit Button", "Add Or Edit Your Current Alert File"));
-            descriptionitems.add(new ItemWithDescription("Display Reference", "Default To Display/Don't Display Reference Files During Session Playback (Can Be Changed In Session)"));
-            descriptionitems.add(new ItemWithDescription("Display Reference Type 'HTML'", "Default To Display HTML Variation Of Reference Files During Session Playback (Can Be Changed In Session)"));
-            descriptionitems.add(new ItemWithDescription("Display Reference Type 'TXT'", "Default To Display HTML Variation Of Reference Files During Session Playback (Can Be Changed In Session)"));
-            descriptionitems.add(new ItemWithDescription("Ramp", "Enable/Disable A Ramp In Session Parts To Smooth Mental Transition"));
+            descriptionitems.add(new ItemWithDescription("Display Reference", "Default To Display/Don't Display Reference Files During Session Playback\n(Can Be Changed In Session)"));
+            descriptionitems.add(new ItemWithDescription("Ramp Checkbox", "Enable/Disable A Ramp In Session Parts To Smooth Mental Transition"));
+            descriptionitems.add(new ItemWithDescription("Pre/Post Ramp Checkbox", "Add A Ramp For Pre And Post Even If They Are Not In Session"));
             descriptionitems.add(new ItemWithDescription("Delete Session Button", "This Button Will Permanently Delete All Session Progress And Reset All Cut/Elements Progress"));
             descriptionitems.add(new ItemWithDescription("Delete Goal Button", "This Button Will Permanently Delete All Current And Completed Goals"));
             descriptionitems.add(new ItemWithDescription("Appearance Selection", "List Of The Available Appearance Themes For The Program"));
@@ -1400,33 +1400,31 @@ public class MainController implements Initializable {
             TooltipsCheckBox.setOnMouseExited(event -> cleardescription());
             HelpDialogsCheckBox.setOnMouseEntered(event -> populatedescriptionbox(1));
             HelpDialogsCheckBox.setOnMouseExited(event -> cleardescription());
-            FadeInValue.setOnMouseEntered(event -> populatedescriptionbox(2));
+            FadeSwitch.setOnMouseEntered(event -> populatedescriptionbox(2));
+            FadeSwitch.setOnMouseExited(event -> cleardescription());
+            FadeInValue.setOnMouseEntered(event -> populatedescriptionbox(3));
             FadeInValue.setOnMouseExited(event -> cleardescription());
-            FadeOutValue.setOnMouseEntered(event -> populatedescriptionbox(3));
+            FadeOutValue.setOnMouseEntered(event -> populatedescriptionbox(4));
             FadeOutValue.setOnMouseExited(event -> cleardescription());
-            EntrainmentVolumePercentage.setOnMouseEntered(event -> populatedescriptionbox(4));
+            EntrainmentVolumePercentage.setOnMouseEntered(event -> populatedescriptionbox(5));
             EntrainmentVolumePercentage.setOnMouseExited(event -> cleardescription());
-            AmbienceVolumePercentage.setOnMouseEntered(event -> populatedescriptionbox(5));
+            AmbienceVolumePercentage.setOnMouseEntered(event -> populatedescriptionbox(6));
             AmbienceVolumePercentage.setOnMouseExited(event -> cleardescription());
-            AlertFileTextField.setOnMouseEntered(event -> populatedescriptionbox(6));
-            AlertFileTextField.setOnMouseExited(event -> cleardescription());
-            AlertFileEditButton.setOnMouseEntered(event -> populatedescriptionbox(7));
-            AlertFileEditButton.setOnMouseExited(event -> cleardescription());
+            AlertFileSwitch.setOnMouseEntered(event -> populatedescriptionbox(6));
+            AlertFileSwitch.setOnMouseExited(event -> cleardescription());
             ReferenceSwitch.setOnMouseEntered(event -> populatedescriptionbox(8));
             ReferenceSwitch.setOnMouseExited(event -> cleardescription());
-            ReferenceHTMLRadioButton.setOnMouseEntered(event -> populatedescriptionbox(9));
-            ReferenceHTMLRadioButton.setOnMouseExited(event -> cleardescription());
-            ReferenceTXTRadioButton.setOnMouseEntered(event -> populatedescriptionbox(10));
-            ReferenceTXTRadioButton.setOnMouseExited(event -> cleardescription());
-            RampSwitch.setOnMouseEntered(event -> populatedescriptionbox(11));
+            RampSwitch.setOnMouseEntered(event -> populatedescriptionbox(9));
             RampSwitch.setOnMouseExited(event -> cleardescription());
-            DeleteAllSessionsProgressButton.setOnMouseEntered(event -> populatedescriptionbox(12));
+            PrePostRamp.setOnMouseEntered(event -> populatedescriptionbox(10));
+            PrePostRamp.setOnMouseExited(event -> cleardescription());
+            DeleteAllSessionsProgressButton.setOnMouseEntered(event -> populatedescriptionbox(11));
             DeleteAllSessionsProgressButton.setOnMouseExited(event -> cleardescription());
-            DeleteAllGoalsButton.setOnMouseEntered(event -> populatedescriptionbox(13));
+            DeleteAllGoalsButton.setOnMouseEntered(event -> populatedescriptionbox(12));
             DeleteAllGoalsButton.setOnMouseExited(event -> cleardescription());
-            ProgramThemeChoiceBox.setOnMouseEntered(event -> populatedescriptionbox(14));
+            ProgramThemeChoiceBox.setOnMouseEntered(event -> populatedescriptionbox(13));
             ProgramThemeChoiceBox.setOnMouseExited(event -> cleardescription());
-            AddNewThemeButton.setOnMouseEntered(event -> populatedescriptionbox(15));
+            AddNewThemeButton.setOnMouseEntered(event -> populatedescriptionbox(14));
             AddNewThemeButton.setOnMouseExited(event -> cleardescription());
         }
         public void populatedescriptionbox(int index) {
@@ -1440,54 +1438,42 @@ public class MainController implements Initializable {
         }
 
     // Alert File Methods
-        public void editalertfile(ActionEvent actionEvent) {
-            new ChangeAlertFile().showAndWait();
-            alertfiletoggled();
-        }
         public void alertfiletoggled() {
-            boolean enabled = getOptions().getSessionOptions().getAlertfunction();
-            if (enabled) {
-                if (Options.getSessionOptions().getAlertfilelocation() != null) {
-                    File alertfile = new File(Options.getSessionOptions().getAlertfilelocation());
-                    if (! alertfile.exists()) {Options.getSessionOptions().setAlertfilelocation(null); alertfiletoggled();}
-                    String duration = Util.formatdurationtoStringSpelledOut(new Duration(Util.audio_getduration(alertfile) * 1000), AlertFileTextField.getLayoutBounds().getWidth() - (alertfile.getName().length()) + 3);
-                    String text = String.format("%s (%s)", alertfile.getName(), duration);
-                    AlertFileTextField.setText(text);
-                    AlertFileTextField.setDisable(false);
-                    AlertFileEditButton.setText("Edit");
-                } else {
-                    AlertFileTextField.setText("Alert File Disabled");
-                    AlertFileTextField.setDisable(true);
-                    AlertFileEditButton.setText("Add");
-                }
-            } else {
-                AlertFileTextField.setText("Alert File Disabled");
-                AlertFileTextField.setDisable(true);
-                AlertFileEditButton.setText("Add");
+            if (AlertFileSwitch.isSelected()) {
+                SelectAlertFile selectAlertFile = new SelectAlertFile();
+                selectAlertFile.showAndWait();
+                AlertFileSwitch.setSelected(Options.getSessionOptions().getAlertfunction() && Options.hasValidAlertFile());
             }
         }
 
     // Reference Methods
         public void referencetoggle() {
-            boolean enabled = ReferenceSwitch.isSelected();
-            ReferenceHTMLRadioButton.setDisable(! enabled);
-            ReferenceTXTRadioButton.setDisable(! enabled);
-            FullscreenCheckbox.setDisable(! enabled);
-            if (! enabled) {
-                tempreferencetype = null;
-                ReferenceHTMLRadioButton.setSelected(false);
-                ReferenceTXTRadioButton.setSelected(false);
+            Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
+            if (ReferenceSwitch.isSelected()) {
+                This_Session.SelectReferenceType selectReferenceType = new This_Session.SelectReferenceType(MainController.this);
+                selectReferenceType.showAndWait();
+                if (selectReferenceType.getResult()) {
+                    Options.getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
+                    Options.getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
+                }
             }
         }
-        public void HTMLTypeSelected() {
-            ReferenceHTMLRadioButton.setSelected(true);
-            ReferenceTXTRadioButton.setSelected(false);
-            tempreferencetype = This_Session.ReferenceType.html;
+
+    // Ramp Methods
+        public void toggleramp() {
+            PrePostRamp.setSelected(RampSwitch.isSelected());
+            Options.getSessionOptions().setRampenabled(RampSwitch.isSelected());
+            if (RampSwitch.isSelected()) {toggleprepostramp();}
         }
-        public void TXTTypeSelected() {
-            ReferenceHTMLRadioButton.setSelected(false);
-            ReferenceTXTRadioButton.setSelected(true);
-            tempreferencetype = This_Session.ReferenceType.txt;
+        public void toggleprepostramp() {
+            Options.getSessionOptions().setPrepostrampenabled(PrePostSwitch.isSelected());
+        }
+
+    // Fade Methods
+        public void togglefade() {
+            Options.getSessionOptions().setFadeenabled(FadeSwitch.isSelected());
+            FadeInValue.setDisable(! FadeSwitch.isSelected());
+            FadeOutValue.setDisable(! FadeSwitch.isSelected());
         }
 
     // Appearance Methods
@@ -1543,8 +1529,6 @@ public class MainController implements Initializable {
             Options.getSessionOptions().setFadeinduration(new Double(FadeInValue.getText()));
             Options.getSessionOptions().setRampenabled(RampSwitch.isSelected());
             Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
-            Options.getSessionOptions().setReferencetype(tempreferencetype);
-            Options.getSessionOptions().setReferencefullscreen(FullscreenCheckbox.isSelected());
             Options.marshall();
             super.close();
         }
@@ -2689,26 +2673,26 @@ public class MainController implements Initializable {
 
 // Table Classes
     public class AmbienceSong {
-    private StringProperty name;
-    private StringProperty length;
-    private File file;
-    private double duration;
+        private StringProperty name;
+        private StringProperty length;
+        private File file;
+        private double duration;
 
-    public AmbienceSong(SoundFile soundFile) {
-        this.name = new SimpleStringProperty(soundFile.getName());
-        this.file = soundFile.getFile();
-        duration = soundFile.getDuration();
-        this.length = new SimpleStringProperty(Util.formatdurationtoStringSpelledOut(new Duration(duration), null));
-    }
+        public AmbienceSong(SoundFile soundFile) {
+            this.name = new SimpleStringProperty(soundFile.getName());
+            this.file = soundFile.getFile();
+            duration = soundFile.getDuration();
+            this.length = new SimpleStringProperty(Util.formatdurationtoStringSpelledOut(new Duration(duration), null));
+        }
 
-    public String getName() {
-        return name.getValue();
+        public String getName() {
+            return name.getValue();
+        }
+        public File getFile() {
+            return file;
+        }
+        public double getDuration() {return duration;}
     }
-    public File getFile() {
-        return file;
-    }
-    public double getDuration() {return duration;}
-}
 
 // Boilerplate Dialogs
     public static class SimpleTextDialogWithCancelButton extends Stage {

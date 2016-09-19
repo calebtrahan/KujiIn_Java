@@ -2,17 +2,138 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.*?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="279.0" prefWidth="430.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="351.0" prefWidth="430.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox layoutX="54.0" layoutY="57.0" prefHeight="501.0" prefWidth="717.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox layoutX="54.0" layoutY="57.0" prefHeight="589.0" prefWidth="430.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <TabPane prefHeight="194.0" prefWidth="430.0" tabClosingPolicy="UNAVAILABLE">
+            <TabPane prefHeight="216.0" prefWidth="430.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab text="General">
+                <Tab text="Session &amp; Playback">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox prefHeight="181.0" prefWidth="430.0" AnchorPane.bottomAnchor="-40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="537.0">
+                                       <children>
+                                          <CheckBox fx:id="AlertFileSwitch" mnemonicParsing="false" prefHeight="18.0" prefWidth="218.0" text="Alert File Between Session Parts" />
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets left="10.0" top="10.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="537.0">
+                                       <children>
+                                          <CheckBox fx:id="ReferenceSwitch" mnemonicParsing="false" text="Display Reference">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </CheckBox>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets left="10.0" top="10.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT">
+                                       <VBox.margin>
+                                          <Insets left="10.0" top="10.0" />
+                                       </VBox.margin>
+                                       <children>
+                                          <CheckBox fx:id="RampSwitch" mnemonicParsing="false" prefHeight="25.0" text="Ramp Between Session Parts">
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </CheckBox>
+                                          <CheckBox fx:id="PrePostRamp" mnemonicParsing="false" text="Pre/Post Ramp">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </CheckBox>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="404.0">
+                                       <children>
+                                          <CheckBox fx:id="FadeSwitch" mnemonicParsing="false" text="Fade In/Out">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </CheckBox>
+                                          <Label text="In:">
+                                             <HBox.margin>
+                                                <Insets left="72.0" right="12.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <TextField fx:id="FadeOutValue" alignment="CENTER" prefWidth="45.0">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </TextField>
+                                          <Label text="s">
+                                             <HBox.margin>
+                                                <Insets left="5.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <Label text="Out:">
+                                             <HBox.margin>
+                                                <Insets left="53.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <TextField fx:id="FadeInValue" alignment="CENTER" prefHeight="26.0" prefWidth="45.0">
+                                             <HBox.margin>
+                                                <Insets left="12.0" right="10.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                          <Label text="s" />
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets top="10.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="42.0" prefWidth="386.0">
+                                       <children>
+                                          <Label text="Volume Defaults:">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <Label text="Entrainment:">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <TextField fx:id="EntrainmentVolumePercentage" alignment="CENTER" prefWidth="45.0">
+                                             <HBox.margin>
+                                                <Insets left="10.0" right="2.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                          <Label text="\%" />
+                                          <Label text="Ambience:">
+                                             <HBox.margin>
+                                                <Insets left="15.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <TextField fx:id="AmbienceVolumePercentage" alignment="CENTER" prefHeight="26.0" prefWidth="45.0">
+                                             <HBox.margin>
+                                                <Insets left="10.0" right="2.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                          <Label text="\%" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                  <Tab text="General">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
                               <VBox prefHeight="167.0" prefWidth="558.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
@@ -32,184 +153,6 @@
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
                                     </CheckBox>
-                                    <HBox prefHeight="64.0" prefWidth="475.0">
-                                       <children>
-                                          <VBox alignment="CENTER" prefHeight="64.0" prefWidth="266.0">
-                                             <children>
-                                                <Label text="Fade Duration" />
-                                                <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="329.0">
-                                                   <children>
-                                                      <Label text="In">
-                                                         <HBox.margin>
-                                                            <Insets left="25.0" right="93.0" />
-                                                         </HBox.margin>
-                                                      </Label>
-                                                      <Label text="Out">
-                                                         <HBox.margin>
-                                                            <Insets />
-                                                         </HBox.margin>
-                                                      </Label>
-                                                   </children>
-                                                </HBox>
-                                                <HBox alignment="CENTER" prefHeight="34.0" prefWidth="312.0">
-                                                   <children>
-                                                      <HBox alignment="CENTER" prefHeight="34.0" prefWidth="130.0">
-                                                         <children>
-                                                            <TextField fx:id="FadeOutValue" alignment="CENTER" prefWidth="45.0">
-                                                               <HBox.margin>
-                                                                  <Insets right="10.0" />
-                                                               </HBox.margin>
-                                                            </TextField>
-                                                            <Label text="sec(s)" />
-                                                         </children>
-                                                      </HBox>
-                                                      <HBox alignment="CENTER" prefHeight="34.0" prefWidth="130.0">
-                                                         <children>
-                                                            <TextField fx:id="FadeInValue" alignment="CENTER" prefHeight="26.0" prefWidth="45.0">
-                                                               <HBox.margin>
-                                                                  <Insets right="10.0" />
-                                                               </HBox.margin>
-                                                            </TextField>
-                                                            <Label text="sec(s)" />
-                                                         </children>
-                                                      </HBox>
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </VBox>
-                                          <VBox alignment="CENTER" prefHeight="64.0" prefWidth="266.0">
-                                             <children>
-                                                <Label text="Volume Defaults" />
-                                                <HBox alignment="CENTER" prefHeight="34.0" prefWidth="329.0">
-                                                   <children>
-                                                      <Label text="Entrainment">
-                                                         <HBox.margin>
-                                                            <Insets right="40.0" />
-                                                         </HBox.margin>
-                                                      </Label>
-                                                      <Label text="Ambience" />
-                                                   </children>
-                                                </HBox>
-                                                <HBox alignment="CENTER" prefHeight="34.0" prefWidth="312.0">
-                                                   <children>
-                                                      <HBox alignment="CENTER" prefHeight="34.0" prefWidth="130.0">
-                                                         <children>
-                                                            <TextField fx:id="EntrainmentVolumePercentage" alignment="CENTER" prefWidth="45.0">
-                                                               <HBox.margin>
-                                                                  <Insets left="17.0" right="2.0" />
-                                                               </HBox.margin>
-                                                            </TextField>
-                                                            <Label text="\%" />
-                                                         </children>
-                                                      </HBox>
-                                                      <HBox alignment="CENTER" prefHeight="34.0" prefWidth="130.0">
-                                                         <children>
-                                                            <TextField fx:id="AmbienceVolumePercentage" alignment="CENTER" prefHeight="26.0" prefWidth="45.0">
-                                                               <HBox.margin>
-                                                                  <Insets left="10.0" right="2.0" />
-                                                               </HBox.margin>
-                                                            </TextField>
-                                                            <Label text="\%" />
-                                                         </children>
-                                                      </HBox>
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </VBox>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="10.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                 </children>
-                              </VBox>
-                           </children>
-                        </AnchorPane>
-                  </content>
-                </Tab>
-                <Tab text="Session &amp; Playback">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <VBox prefHeight="176.0" prefWidth="558.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <children>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="537.0">
-                                       <children>
-                                          <Label text="Alert File:">
-                                             <HBox.margin>
-                                                <Insets />
-                                             </HBox.margin>
-                                          </Label>
-                                          <TextField fx:id="AlertFileTextField" editable="false" prefHeight="26.0" prefWidth="238.0" text="Please Select...">
-                                             <HBox.margin>
-                                                <Insets left="10.0" right="10.0" />
-                                             </HBox.margin>
-                                          </TextField>
-                                          <Button fx:id="AlertFileEditButton" mnemonicParsing="false" onAction="#editalertfile" text="Edit" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="537.0">
-                                       <children>
-                                          <CheckBox fx:id="ReferenceSwitch" mnemonicParsing="false" text="Display Reference">
-                                             <HBox.margin>
-                                                <Insets />
-                                             </HBox.margin>
-                                             <cursor>
-                                                <Cursor fx:constant="HAND" />
-                                             </cursor>
-                                          </CheckBox>
-                                          <RadioButton fx:id="ReferenceHTMLRadioButton" mnemonicParsing="false" text="HTML">
-                                             <HBox.margin>
-                                                <Insets left="10.0" />
-                                             </HBox.margin>
-                                             <cursor>
-                                                <Cursor fx:constant="HAND" />
-                                             </cursor>
-                                          </RadioButton>
-                                          <RadioButton fx:id="ReferenceTXTRadioButton" mnemonicParsing="false" text="TXT">
-                                             <HBox.margin>
-                                                <Insets left="10.0" />
-                                             </HBox.margin>
-                                             <cursor>
-                                                <Cursor fx:constant="HAND" />
-                                             </cursor>
-                                          </RadioButton>
-                                          <CheckBox fx:id="FullscreenCheckbox" mnemonicParsing="false" text="Fullscreen">
-                                             <HBox.margin>
-                                                <Insets left="10.0" />
-                                             </HBox.margin>
-                                             <cursor>
-                                                <Cursor fx:constant="HAND" />
-                                             </cursor>
-                                          </CheckBox>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <CheckBox fx:id="RampSwitch" mnemonicParsing="false" prefHeight="25.0" text="Pre/Post Ramp">
-                                       <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
-                                       </VBox.margin>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
-                                    </CheckBox>
-                                 </children>
-                              </VBox>
-                           </children>
-                        </AnchorPane>
-                  </content>
-                </Tab>
-                  <Tab text="Advanced">
-                     <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <VBox prefHeight="167.0" prefWidth="558.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <children>
                                     <Button fx:id="DeleteAllSessionsProgressButton" mnemonicParsing="false" onAction="#deleteallsessions" text="Delete All Session Progress">
                                        <VBox.margin>
                                           <Insets left="10.0" top="10.0" />
@@ -250,7 +193,7 @@
                   </Tab>
               </tabs>
             </TabPane>
-            <HBox alignment="CENTER_LEFT" prefHeight="23.0" prefWidth="430.0">
+            <HBox alignment="CENTER_LEFT" prefHeight="17.0" prefWidth="430.0">
                <children>
                   <Label fx:id="DescriptionBoxTopLabel" prefHeight="16.0" prefWidth="414.0" text="Node Name Description">
                      <HBox.margin>

@@ -214,144 +214,11 @@ public class This_Session {
         }
         creatorState = CreatorState.CREATED;
     }
-    public List<Cut> creation_getCutsInSession() {return getallitemsinSession().stream().filter(i -> i instanceof Cut).map(i -> (Cut) i).collect(Collectors.toCollection(ArrayList::new));}
-    public List<Element> creation_getElementsInSession() {return getallitemsinSession().stream().filter(i -> i instanceof Element).map(i -> (Element) i).collect(Collectors.toCollection(ArrayList::new));}
     public void creation_populateitemsinsession() {
         itemsinsession = new ArrayList<>();
-        for (SessionPart i : getAllSessionParts()) {
-            if (i.getduration().greaterThan(Duration.ZERO)) {
-                itemsinsession.add(i);
-            } else if (i instanceof Qi_Gong) {
-                if (((Qi_Gong) i).ramponly) {itemsinsession.add(i);}
-                else {
-                    switch (i.number) {
-                        case 0: if (Root.getOptions().getSessionOptions().getPrerampenabled()) {itemsinsession.add(i);} break;
-                        case 15: if (Root.getOptions().getSessionOptions().getPostrampenabled()) {itemsinsession.add(i);} break;
-                    }
-                }
-            }
-        }
-//        for (SessionPart i : itemsinsession) {System.out.println(String.format("%s With A Duration Of %s", i.name, i.getduration().toSeconds()));}
+        itemsinsession.addAll(getAllSessionParts().stream().filter(i -> (i.getduration().greaterThan(Duration.ZERO) || i.ramponly) || (i instanceof Qi_Gong && Root.getOptions().getSessionOptions().getPrepostrampenabled())).collect(Collectors.toList()));
     }
     public void creation_clearitemsinsession() {itemsinsession.clear();}
-    public boolean creation_checkfirstandlastcutsconnect(List<Cut> cutsinsession) {
-        if (cutsinsession.size() == 1) {return true;}
-        try {
-            int count = cutsinsession.get(0).number;
-            for (Cut i : cutsinsession) {
-                if (i.number != count) {return false;}
-                count++;
-            }
-            return true;
-        } catch (NullPointerException | IndexOutOfBoundsException ignored) {return false;}
-    }
-    public boolean creation_checksessionwellformed() {
-//        List<Cut> cutsinsession = creation_getCutsInSession();
-//        List<Element> elementsinsession = creation_getElementsInSession();
-//        if (! cutsinsession.isEmpty()) {
-//            boolean rinisfirstcutinsession = cutsinsession.get(0).number == 1;
-//            if (! rinisfirstcutinsession) {
-//                rinisfirstcutinsession = ! Root.dialog_getConfirmation("Practiced Cuts Do Not Connect To RIN", null,
-//                        "Cuts In Session Not Connected To RIN. Connect " + cutsinsession.get(0).name + " Back To RIN?", null, null);}
-//            if (! rinisfirstcutinsession || ! creation_checkfirstandlastcutsconnect(cutsinsession)) {
-//                CutsMissingDialog cutsMissingDialog = new CutsMissingDialog(Root, cutsinsession);
-//                cutsMissingDialog.showAndWait();
-//                switch (cutsMissingDialog.getResult()) {
-//                    case YES:
-//                        creation_populateitemsinsession();
-//                        cutsinsession = creation_getCutsInSession();
-//                        break;
-//                    case NO:
-//                        break;
-//                    case CANCEL:
-//                        return false;
-//                }
-//            }
-//        }
-//        if (! cutsinsession.isEmpty() && ! elementsinsession.isEmpty()) {
-//            SessionPlaybackOverview sessionPlaybackOverview = new SessionPlaybackOverview(Root, getallitemsinSession());
-//            sessionPlaybackOverview.showAndWait();
-//            switch (sessionPlaybackOverview.getResult()) {
-//                case YES:
-//                    setItemsinsession(sessionPlaybackOverview.getorderedsessionitems());
-//                    break;
-//                case NO:
-//                    break;
-//                case CANCEL:
-//                    return false;
-//            }
-//            // Sort Session Parts
-//        }
-        return true;
-    }
-    public void creation_checkgoals() {
-        ArrayList<SessionPart> sessionpartswithoutlongenoughgoals = Root.goals_util_getsessionpartswithoutlongenoughgoals(getallitemsinSession());
-        List<Integer>  notgooddurations = new ArrayList<>();
-        if (! sessionpartswithoutlongenoughgoals.isEmpty()) {
-            boolean presessionmissinggoals = false;
-            int cutcount = 0;
-            int elementcount = 0;
-            boolean postsessionmissinggoals = false;
-            for (SessionPart i : sessionpartswithoutlongenoughgoals) {
-                if (i instanceof Cut) {cutcount++;}
-                if (i instanceof Element) {elementcount++;}
-                else {
-                    if (i.name.equals("Presession")) {presessionmissinggoals = true;}
-                    if (i.name.equals("Postsession")) {postsessionmissinggoals = true;}
-                }
-                notgooddurations.add(new Double(i.getduration().toMinutes()).intValue());
-            }
-            StringBuilder notgoodtext = new StringBuilder();
-            if (presessionmissinggoals) {notgoodtext.append("Presession\n");}
-            if (cutcount > 0) {notgoodtext.append(cutcount).append(" Cut(s)\n");}
-            if (elementcount > 0) {notgoodtext.append(elementcount).append(" Element(s)\n");}
-            if (postsessionmissinggoals) {notgoodtext.append("Postsession\n");}
-            if (Root.dialog_getConfirmation("Confirmation", "Goals Are Missing/Not Long Enough For:", notgoodtext.toString(), "Set Goal And Play", "Play Anyway")) {
-                // TODO Make A Goal Set Dialog Before Playback Here
-                // Was last parameter-> Util.list_getmaxintegervalue(notgooddurations)
-                /*ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements s = new ProgressAndGoalsUI.SetANewGoalForMultipleCutsOrElements(Root, sessionpartswithoutlongenoughgoals);
-                s.showAndWait();
-                if (s.isAccepted()) {
-                    List<Integer> cutindexes = s.getSelectedCutIndexes();
-                    Double goalhours = s.getGoalhours();
-                    LocalDate goaldate = s.getGoaldate();
-                    boolean goalssetsuccessfully = true;
-                    for (Integer i : cutindexes) {
-                        try {
-                            SessionPart x = getAllSessionPartsincludingTotal().get(i);
-                            x.goals_add(new Goals.Goal(goalhours, x.name));
-                        } catch (JAXBException ignored) {
-                            goalssetsuccessfully = false;
-                            Util.dialog_displayError(Root, "Error", "Couldn't Add Goal For " + getAllSessionPartsincludingTotal().get(i).name, "Check File Permissions");
-                        }
-                    }
-                    if (goalssetsuccessfully) {
-                        Util.dialog_displayInformation(Root, "Information", "Goals For " + notgoodtext.toString() + "Set Successfully", "Session Will Now Be Created");
-                    }
-                }
-                break;*/
-            }
-        }
-    }
-    public void creation_checkprepostramp() {
-        if (Root.getOptions().getSessionOptions().getRampenabled()) {
-            if (! itemsinsession.contains(Presession)) {Presession.setRamponly(true);}
-            if (! itemsinsession.contains(Postsession)) {Postsession.setRamponly(true);}
-        } else if (! itemsinsession.contains(Presession) || ! itemsinsession.contains(Postsession)) {
-            AddPrePostRampDialog addPrePostRampDialog = new AddPrePostRampDialog();
-            addPrePostRampDialog.showAndWait();
-            if (! addPrePostRampDialog.PresessionButton.isDisabled()) {
-                Presession.setRamponly(addPrePostRampDialog.PresessionButton.isSelected());
-                if (addPrePostRampDialog.MakeDefaultCheckbox.isSelected()) {Root.getOptions().getSessionOptions().setPrerampenabled(addPrePostRampDialog.PresessionButton.isSelected());}
-                if (addPrePostRampDialog.PresessionButton.isSelected()) {}
-            }
-            if (! addPrePostRampDialog.PostsessionButton.isDisabled()) {
-                Postsession.setRamponly(addPrePostRampDialog.PostsessionButton.isSelected());
-                if (addPrePostRampDialog.MakeDefaultCheckbox.isSelected()) {Root.getOptions().getSessionOptions().setPostrampenabled(addPrePostRampDialog.PostsessionButton.isSelected());}
-            }
-        }
-        creation_populateitemsinsession();
-    }
     public void creation_checkambience(CheckBox ambiencecheckbox) {
         if (sessionPlaybackOverview != null && sessionPlaybackOverview.isShowing() && sessionPlaybackOverview.AmbienceSwitch.isSelected()) {
             ArrayList<SessionPart> sessionpartswithnoambience = new ArrayList<>();
@@ -738,35 +605,6 @@ public class This_Session {
     }
 
 // Dialogs
-    public class AddPrePostRampDialog extends Stage {
-        public ToggleButton PresessionButton;
-        public ToggleButton PostsessionButton;
-        public CheckBox MakeDefaultCheckbox;
-        public Button CloseButton;
-
-        public AddPrePostRampDialog() {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/PrePostRampDialog.fxml"));
-                fxmlLoader.setController(this);
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                setTitle("Add Pre/Post Ramp To Session");
-                Root.getOptions().setStyle(this);
-                this.setResizable(false);
-                getallitemsinSession().stream().filter(i -> i instanceof Qi_Gong && i.getduration().greaterThan(Duration.ZERO)).forEach(i -> {
-                    if (i.number == 0) {
-                        PresessionButton.setSelected(true);
-                        PresessionButton.setDisable(true);
-                        PresessionButton.setTooltip(new Tooltip("Already A Part Of Session"));}
-                    if (i.number == 15) {
-                        PostsessionButton.setSelected(true);
-                        PostsessionButton.setDisable(true);
-                        PostsessionButton.setTooltip(new Tooltip("Already A Part Of Session"));}
-                });
-                setOnCloseRequest(event -> {});
-            } catch (IOException ignored) {}
-        }
-    }
     public class SessionPlaybackOverview extends Stage {
         public TableView<SessionItem> SessionItemsTable;
         public TableColumn<SessionItem, Integer> NumberColumn;
@@ -1378,7 +1216,7 @@ public class This_Session {
             } else {
                 System.out.println("Should be Selecting Reference Type");
                 if (Root.getOptions().getSessionOptions().getReferencetype() == null) {Root.getOptions().getSessionOptions().setReferencetype(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);}
-                SelectReferenceType selectReferenceType = new SelectReferenceType();
+                SelectReferenceType selectReferenceType = new SelectReferenceType(Root);
                 selectReferenceType.show();
                 selectReferenceType.setOnHidden(event -> {
                     if (selectReferenceType.getResult()) {
@@ -1627,7 +1465,7 @@ public class This_Session {
         }
 
     }
-    public class SelectReferenceType extends Stage {
+    public static class SelectReferenceType extends Stage {
         public RadioButton HTMLRadioButton;
         public RadioButton TextRadioButton;
         public TextArea Description;
@@ -1636,9 +1474,11 @@ public class This_Session {
         public Button CancelButton;
         private ArrayList<String> descriptions = new ArrayList<>();
         private boolean result = false;
+        private MainController Root;
 
-        public SelectReferenceType() {
+        public SelectReferenceType(MainController Root) {
             try {
+                this.Root = Root;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SelectReferenceType.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
