@@ -426,6 +426,9 @@ public class MainController implements Initializable {
                 break;
         }
     }
+    public void player_endofsession() {
+        new SessionDetails().show();
+    }
 
 // Export
     public void exporter_initialize() {}
@@ -2568,6 +2571,8 @@ public class MainController implements Initializable {
         public Button CloseButton;
         public Label GoalsCompletedTopLabel;
         public ListView<String> GoalsCompletedListView;
+        public TextField MostProgressTextField;
+        public TextField AverageDurationTextField;
 
         public SessionDetails() {
             try {
@@ -2581,10 +2586,12 @@ public class MainController implements Initializable {
                 setTitle("Session Details");
                 XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
                 Duration totalsessionduration = new Duration(0);
+                Duration highestduration = Duration.ZERO;
                 ObservableList<String> completedgoalsitems = FXCollections.observableArrayList();
                 for (SessionPart i : getSession().getallitemsinSession()) {
                     series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getduration().toMinutes()));
-                    totalsessionduration.add(i.getduration());
+                    totalsessionduration = totalsessionduration.add(i.getduration());
+                    if (i.getduration().greaterThan(highestduration)) {highestduration = i.getduration();}
                     completedgoalsitems.addAll(i.getGoalscompletedthissession().stream().map(x -> String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getduration().toHours())).collect(Collectors.toList()));
                 }
                 if (completedgoalsitems.size() > 0) {
@@ -2596,6 +2603,8 @@ public class MainController implements Initializable {
                 SessionBarChart.setLegendVisible(false);
                 SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(totalsessionduration, SessionDurationTextField.getLayoutBounds().getWidth()));
                 SessionDurationTextField.setEditable(false);
+                AverageDurationTextField.setText(Util.formatdurationtoStringSpelledOut(Duration.millis(highestduration.toMillis() / getSession().getallitemsinSession().size()), AverageSessionDuration.getLayoutBounds().getWidth()));
+                MostProgressTextField.setText(Util.formatdurationtoStringSpelledOut(highestduration, MostProgressTextField.getLayoutBounds().getWidth()));
                 SessionBarChart.requestFocus();
             } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
         }
@@ -2641,7 +2650,6 @@ public class MainController implements Initializable {
             private StringProperty goalhours;
             private StringProperty dateset;
             private IntegerProperty daysittooktocomplete;
-            private StringProperty datecompleted;
 
             public CompletedGoalsAtEndOfSessionBinding(String sessionpartname, String practicedhours, String goalhours, String dateset, int daysittooktocomplete, String datecompleted) {
                 this.sessionpartname = new SimpleStringProperty(sessionpartname);
@@ -2649,7 +2657,6 @@ public class MainController implements Initializable {
                 this.goalhours = new SimpleStringProperty(goalhours);
                 this.dateset = new SimpleStringProperty(dateset);
                 this.daysittooktocomplete = new SimpleIntegerProperty(daysittooktocomplete);
-                this.datecompleted = new SimpleStringProperty(datecompleted);
             }
         }
     }

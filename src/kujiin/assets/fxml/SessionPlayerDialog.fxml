@@ -79,14 +79,14 @@
             </HBox>
             <HBox prefHeight="30.0" prefWidth="544.0">
                <children>
-                  <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="270.0">
+                  <HBox alignment="CENTER_LEFT" prefHeight="23.0" prefWidth="196.0">
                      <children>
                         <Button fx:id="PlayButton" minWidth="51.0" mnemonicParsing="false" onAction="#play" text="Play">
                            <font>
                               <Font size="12.0" />
                            </font>
                            <HBox.margin>
-                              <Insets left="10.0" />
+                              <Insets left="40.0" />
                            </HBox.margin>
                         </Button>
                         <Button fx:id="PauseButton" minWidth="51.0" mnemonicParsing="false" onAction="#pause" text="Pause">

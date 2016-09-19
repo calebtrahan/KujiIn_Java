@@ -538,7 +538,6 @@ public class This_Session {
         try {
             switch (playerState) {
                 case TRANSITIONING:
-                    System.out.println("In Transition Clause");
                     try {
                         currentsessionpart.goals_transitioncheck();
                         currentsessionpart.cleanupPlayersandAnimations();
@@ -552,7 +551,6 @@ public class This_Session {
                     }
                     break;
                 case PLAYING:
-                    System.out.println("In Playing Clause");
                     player_closereferencefile();
                     player_transition();
                     break;
@@ -565,13 +563,14 @@ public class This_Session {
         updateuitimeline.stop();
         playerUI.PlayButton.setText("Replay");
         playerState = PlayerState.STOPPED;
-
         Root.getSessions().deletenonvalidsessions();
         Root.session_gui_opensessiondetailsdialog();
+        getallitemsinSession().forEach(SessionPart::cleanupPlayersandAnimations);
         // TODO Prompt For Export
         Root.sessions_gui_updateui();
         Root.goals_gui_updateui();
         player_reset(true);
+        Root.player_endofsession();
     }
     public void player_reset(boolean endofsession) {
         getAllSessionParts().forEach(SessionPart::cleanupPlayersandAnimations);

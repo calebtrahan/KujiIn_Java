@@ -726,9 +726,6 @@ public class SessionPart {
         String playbuttontext;
         String pausebuttontext;
         String stopbuttontext;
-        String sessionpartname;
-        if (thisession.getCurrentsessionpart() != null) {sessionpartname = thisession.getCurrentsessionpart().name;}
-        else {sessionpartname = "Session";}
         switch (thisession.playerState) {
             case IDLE:
                 playbuttontext = "Start";

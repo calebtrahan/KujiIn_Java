@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
@@ -24,23 +24,15 @@
                         <NumberAxis fx:id="SessionNumbersAxis" minorTickCount="0" side="LEFT" tickLength="0.0" tickUnit="1.0" upperBound="3.0" />
                     </yAxis>
                 </BarChart>
-            <HBox alignment="CENTER" prefHeight="79.0" prefWidth="714.0">
+            <HBox alignment="CENTER" prefHeight="81.0" prefWidth="714.0">
                <children>
-                      <HBox alignment="CENTER_LEFT" prefHeight="66.0" prefWidth="714.0">
+                      <HBox alignment="CENTER_LEFT" prefHeight="71.0" prefWidth="714.0">
                           <children>
                         <VBox alignment="TOP_CENTER" prefHeight="110.0" prefWidth="350.0">
                            <children>
-                              <Label alignment="TOP_CENTER" text="Session Details">
-                                 <font>
-                                    <Font size="15.0" />
-                                 </font>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <HBox alignment="CENTER" prefHeight="26.0" prefWidth="355.0">
+                              <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="355.0">
                                  <children>
-                                          <Label alignment="CENTER_RIGHT" text="Total Session Duration:">
+                                          <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="135.0" text="Total Duration:">
                                        <HBox.margin>
                                           <Insets right="5.0" />
                                        </HBox.margin></Label>
@@ -50,11 +42,35 @@
                                     <Insets />
                                  </VBox.margin>
                               </HBox>
+                              <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="355.0">
+                                 <children>
+                                    <Label alignment="CENTER_RIGHT" text="Average Session Part:">
+                                       <HBox.margin>
+                                          <Insets right="5.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="AverageDurationTextField" alignment="CENTER">
+                                       <HBox.margin>
+                                          <Insets left="6.0" />
+                                       </HBox.margin>
+                                    </TextField>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="355.0">
+                                 <children>
+                                    <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="136.0" text="Most Progress:">
+                                       <HBox.margin>
+                                          <Insets right="5.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="MostProgressTextField" alignment="CENTER" />
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
                         <VBox alignment="CENTER" prefHeight="79.0" prefWidth="365.0">
                            <children>
-                              <Label fx:id="GoalsCompletedTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="244.0">
+                              <Label fx:id="GoalsCompletedTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="244.0" text="Goals Completed This Session">
                                  <font>
                                     <Font size="15.0" />
                                  </font>
@@ -62,7 +78,10 @@
                                     <Insets bottom="5.0" />
                                  </VBox.margin>
                               </Label>
-                              <ListView fx:id="GoalsCompletedListView" prefHeight="87.0" prefWidth="236.0" />
+                              <ListView fx:id="GoalsCompletedListView" prefHeight="87.0" prefWidth="236.0">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" />
+                                 </VBox.margin></ListView>
                            </children>
                         </VBox>
                           </children>
