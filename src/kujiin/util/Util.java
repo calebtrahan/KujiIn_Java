@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import kujiin.MainController;
 import kujiin.xml.Options;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
@@ -30,12 +29,6 @@ public class Util {
     public static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     public static final ArrayList<String> SUPPORTEDAUDIOFORMATS = new ArrayList<>(Arrays.asList("mp3", "aac", "wav", "aif", "aiff", "m4a"));
 
-// Menu Methods
-    public static void menu_howtouse(MainController root) {}
-    public static void menu_aboutthisprogram() {}
-    public static void menu_contactme() {
-
-    }
     public static void gui_showtimedmessageonlabel(Label label, String text, double millis) {
         label.setText(text);
         new Timeline(new KeyFrame(Duration.millis(millis), ae -> label.setText(""))).play();
@@ -308,8 +301,7 @@ public class Util {
                     reallyshorttext.append(minutes);
                     reallyshorttext.append(" M");
                 }
-                if (reallyshorttext.toString().length() <= maxcharlength) {return reallyshorttext.toString();}
-                else {return formatdurationtoStringDecimalWithColons(duration);}
+                return reallyshorttext.toString();
             }
         }
     }

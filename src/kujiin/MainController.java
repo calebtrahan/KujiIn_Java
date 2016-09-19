@@ -46,23 +46,16 @@ import static kujiin.util.Util.AnswerType.YES;
 // TODO Test
 
 // TODO Additional Features To Definitely Add
-    // TODO Add Ramp Only Fade In/ Fade Out Animations (Only 1-5 Seconds Long (or use math depending on ramp duration)
-    // TODO Work All Sesion Well Formedness Checks + Goals Into SessionPlaybackOverview Class
-        // TODO Add Ramp Only As An Option To Invocation Dialog (Also Implement In Cut/Element Logic)
-
-
     // TODO Make A Loading/Initializing Dialog Performing Startup Checks Before Setting Up First Scene
         // Populate Entrainment
         // Populate Ambience
         // Maybe Populate ALL Logic Into One Single Service And Tie To 'Startup Checks Dialog', So It Isn't So Damn Confusing
-    // TODO Refactor Ramp Animations So Ramp Can Be At The Start, End Or Both Of A Session Part (Use enum RampType)
-    // TODO Make A Goal Set Dialog For All Session Parts To Be Used Directly Before Playback
-    // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
     // TODO Create A Custom Ambience Selection Wizard To Add Ambience Individually To Each Session Part In Session
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
     // TODO Exporter
 
 // TODO Optional Additional Features
+    // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
     // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
     // TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
     // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
@@ -233,9 +226,7 @@ public class MainController implements Initializable {
         new EditReferenceFiles(getSession().referenceType).showAndWait();
         getStage().setIconified(false);
     }
-    public void menu_howtouseprogram(ActionEvent actionEvent) {
-        Util.menu_howtouse(this);
-    }
+    public void menu_howtouseprogram(ActionEvent actionEvent) {}
     public void menu_aboutthisprogram(ActionEvent actionEvent) {
         for (SessionPart x : Session.getAllSessionParts()) {
             if (x instanceof Cut || x instanceof Qi_Gong) {
@@ -249,11 +240,8 @@ public class MainController implements Initializable {
                 }
             }
         }
-//        Util.menu_aboutthisprogram();
     }
-    public void menu_contactme(ActionEvent actionEvent) {
-        Util.menu_contactme();
-    }
+    public void menu_contactme(ActionEvent actionEvent) {}
 
 // Presets
     public void preset_initialize() {Preset = new Preset(this);}

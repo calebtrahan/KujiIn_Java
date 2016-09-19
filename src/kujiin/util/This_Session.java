@@ -216,7 +216,10 @@ public class This_Session {
     }
     public void creation_populateitemsinsession() {
         itemsinsession = new ArrayList<>();
-        itemsinsession.addAll(getAllSessionParts().stream().filter(i -> (i.getduration().greaterThan(Duration.ZERO) || i.ramponly) || (i instanceof Qi_Gong && Root.getOptions().getSessionOptions().getPrepostrampenabled())).collect(Collectors.toList()));
+        for (SessionPart i : getAllSessionParts()) {
+            if (i.getduration().greaterThan(Duration.ZERO) || i.ramponly) {itemsinsession.add(i);}
+            else if (i instanceof Qi_Gong && Root.getOptions().getSessionOptions().getPrepostrampenabled()) {i.setRamponly(true); itemsinsession.add(i);}
+        }
     }
     public void creation_clearitemsinsession() {itemsinsession.clear();}
     public void creation_checkambience(CheckBox ambiencecheckbox) {
@@ -264,7 +267,7 @@ public class This_Session {
             if (!i.reference_filevalid(referenceType)) invalidsessionpartcount++;
         }
         if (invalidsessionpartcount > 0 && enableprompt) {
-            return Root.dialog_getConfirmation("Confirmation", null, "There Are " + invalidsessionpartcount + " Session Parts With Empty/Invalid Reference Files", "Enable Reference Anyway", "Disable Reference");
+            return Root.dialog_getConfirmation("Confirmation", null, "There Are " + invalidsessionpartcount + " Session Parts With Empty/Invalid Reference Files", "Enable Reference", "Disable Reference");
         } else {return invalidsessionpartcount == 0;}
     }
     public void creation_reset(boolean setvaluetozero) {
@@ -638,8 +641,9 @@ public class This_Session {
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
-                this.setResizable(false);
-                this.setOnCloseRequest(event -> {});
+                setResizable(false);
+                setOnCloseRequest(event -> {});
+                setTitle("Session Playback Overview");
                 NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
                 NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
                 DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
@@ -1490,22 +1494,28 @@ public class This_Session {
                 descriptions.add("Display HTML Variation Of Reference Files During Session Playback. This Is Stylized Code That Allows You To Color/Format Your Reference In A Way Plain Text Cannot");
                 descriptions.add("Display Text Variation Of Reference Files During Session Playback. This Is Just Plain Text So It Won't Be Formatted Or Styled");
                 HTMLRadioButton.setOnMouseEntered(event -> Description.setText(descriptions.get(0)));
-                HTMLRadioButton.setOnMouseExited(event -> Description.clear());
+                HTMLRadioButton.setOnMouseExited(event -> setdescriptiontoselectedtype());
                 HTMLRadioButton.setOnAction(event ->  htmlButtonselected());
                 TextRadioButton.setOnMouseEntered(event -> Description.setText(descriptions.get(1)));
-                TextRadioButton.setOnMouseExited(event -> Description.clear());
+                TextRadioButton.setOnMouseExited(event -> setdescriptiontoselectedtype());
                 TextRadioButton.setOnAction(event ->  textButtonselected());
                 switch (Root.getOptions().getSessionOptions().getReferencetype()) {
                     case html:
                         HTMLRadioButton.setSelected(true);
+                        setdescriptiontoselectedtype();
                         break;
                     case txt:
                         TextRadioButton.setSelected(true);
+                        setdescriptiontoselectedtype();
                         break;
                 }
             } catch (IOException ignored) {}
         }
 
+        private void setdescriptiontoselectedtype() {
+            if (HTMLRadioButton.isSelected()) {Description.setText(descriptions.get(0));}
+            else if (TextRadioButton.isSelected()) {Description.setText(descriptions.get(1));}
+        }
         private void htmlButtonselected() {
             TextRadioButton.setSelected(false);
             Description.setText(descriptions.get(0));

@@ -21,8 +21,8 @@
                <children>
                   <Button fx:id="AddButton" mnemonicParsing="false" onAction="#addambience" text="Add" />
                   <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removeambience" prefHeight="26.0" prefWidth="67.0" text="Remove" />
-                  <Button fx:id="MoveUpButton" mnemonicParsing="false" text="Move Up" onAction="#moveupintable"/>
-                  <Button fx:id="MoveDownButton" mnemonicParsing="false" text="Move Down" onAction="#movedownintable"/>
+                  <Button fx:id="MoveUpButton" mnemonicParsing="false" text="Up" onAction="#moveupintable"/>
+                  <Button fx:id="MoveDownButton" mnemonicParsing="false" text="Down" onAction="#movedownintable"/>
                   <Button fx:id="PreviewButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="66.0" text="Preview" onAction="#preview"/>
                </children>
                <VBox.margin>
