@@ -14,15 +14,21 @@ import java.io.File;
 
 public class Element extends SessionPart {
 
-    public Element(int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
-        super(number, name, briefsummary, thissession, aSwitch, value);
+    public Element(int number, String name, This_Session thissession, ToggleButton aSwitch, TextField value) {
+        super(number, name, thissession, aSwitch, value);
         if (thissession.Root.getOptions().getProgramOptions().getTooltips()) {Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));}
         else {Value.setTooltip(null);}
     }
 
     @Override
+    public Tooltip getTooltip() {
+        return super.getTooltip();
+    }
+
+    @Override
     public String getNameForFiles() {return "qi";}
 
+// Entrainment
     @Override
     public void entrainment_populate() {
         File expectedentrainmentfile;
@@ -65,6 +71,7 @@ public class Element extends SessionPart {
         }
     }
 
+// Creation Methods
     @Override
     public boolean creation_buildEntrainment() {
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {

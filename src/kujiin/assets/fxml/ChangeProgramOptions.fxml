@@ -10,6 +10,51 @@
          <children>
             <TabPane prefHeight="216.0" prefWidth="430.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
+                  <Tab text="User Interface">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox layoutX="77.0" layoutY="-31.0" prefHeight="183.0" prefWidth="430.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <CheckBox fx:id="TooltipsCheckBox" mnemonicParsing="false" text="Show Tooltips">
+                                       <VBox.margin>
+                                          <Insets left="10.0" top="10.0" />
+                                       </VBox.margin>
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </CheckBox>
+                                    <CheckBox fx:id="HelpDialogsCheckBox" mnemonicParsing="false" text="Show Help Dialogs">
+                                       <VBox.margin>
+                                          <Insets left="10.0" top="10.0" />
+                                       </VBox.margin>
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </CheckBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="0.0" prefWidth="430.0">
+                                       <children>
+                                          <Label text="Scroll Incremement:">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <TextField fx:id="ScrollIncrement" prefHeight="26.0" prefWidth="33.0">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </TextField>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets top="10.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
                 <Tab text="Session &amp; Playback">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
@@ -131,28 +176,12 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                  <Tab text="General">
+                  <Tab text="Advanced">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
                               <VBox prefHeight="167.0" prefWidth="558.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <CheckBox fx:id="TooltipsCheckBox" mnemonicParsing="false" text="Show Tooltips">
-                                       <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
-                                       </VBox.margin>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
-                                    </CheckBox>
-                                    <CheckBox fx:id="HelpDialogsCheckBox" mnemonicParsing="false" text="Show Help Dialogs">
-                                       <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
-                                       </VBox.margin>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
-                                    </CheckBox>
                                     <Button fx:id="DeleteAllSessionsProgressButton" mnemonicParsing="false" onAction="#deleteallsessions" text="Delete All Session Progress">
                                        <VBox.margin>
                                           <Insets left="10.0" top="10.0" />

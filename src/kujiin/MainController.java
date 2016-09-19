@@ -1,6 +1,5 @@
 package kujiin;
 
-import com.sun.istack.internal.Nullable;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -313,7 +312,7 @@ public class MainController implements Initializable {
         for (SessionPart i : getSession().getAllSessionParts()) {i.gui_setDisable(disabled);}
         if (disabled) {
             creator_updateuitimeline.stop();
-            CreatorStatusBar.setText("Creator Disabled While Session Player Open");
+            CreatorStatusBar.setText("Creator Disabled While Playing A Session");
         } else {
             creator_updateuitimeline.play();
             CreatorStatusBar.setText("");
@@ -410,8 +409,23 @@ public class MainController implements Initializable {
         Session.creation_createsession();
         creation_gui_setDisable(Session.creatorState != This_Session.CreatorState.NOT_CREATED);
     }
-    public void creation_util_resetcreatedsession() {}
     public boolean creation_cleanup() {return true;}
+
+// Session Player Widget
+    public void player_playthisession(ActionEvent actionEvent) {
+        if (Session.playerUI != null && Session.playerUI.isShowing()) {return;}
+        switch (Session.creatorState) {
+            case CREATED:
+                Session.creation_reset(false);
+            case NOT_CREATED:
+                if (creation_prechecks()) {creation_util_createsession();}
+                if (Session.creatorState == This_Session.CreatorState.CREATED) {Session.player_openplayer();}
+                else {Session.creation_reset(false);}
+                break;
+            default:
+                break;
+        }
+    }
 
 // Export
     public void exporter_initialize() {}
@@ -691,26 +705,7 @@ public class MainController implements Initializable {
         goalsprogressbar.setProgress(0.0);
     }
         // Util
-    public ArrayList<SessionPart> goals_util_getsessionpartswithoutlongenoughgoals(List<SessionPart> partsinsession) {
-        return partsinsession.stream().filter(i -> i.getduration().greaterThan(Duration.ZERO) && !i.goals_arelongenough()).collect(Collectors.toCollection(ArrayList::new));
-    }
     public boolean goals_cleanup() {Goals.marshall(); return true;}
-
-// Session Player Widget
-    public void player_playthisession(ActionEvent actionEvent) {
-        if (Session.playerUI != null && Session.playerUI.isShowing()) {return;}
-        switch (Session.creatorState) {
-            case CREATED:
-                Session.creation_reset(false);
-            case NOT_CREATED:
-                if (creation_prechecks()) {creation_util_createsession();}
-                if (Session.creatorState == This_Session.CreatorState.CREATED) {Session.player_openplayer();}
-                else {Session.creation_reset(false);}
-                break;
-            default:
-                break;
-        }
-    }
 
 // Gui Methods
     public void dialog_displayInformation(String titletext, String headertext, String contexttext) {
@@ -746,7 +741,7 @@ public class MainController implements Initializable {
         Optional<ButtonType> answer = a.showAndWait();
         return answer.isPresent() && answer.get() == yes;
     }
-    public Util.AnswerType dialog_getAnswer(String titletext, @Nullable String headertext, String contenttext, @Nullable String yesbuttontext, @Nullable String nobuttontext, @Nullable String cancelbuttontext) {
+    public Util.AnswerType dialog_getAnswer(String titletext, String headertext, String contenttext, String yesbuttontext, String nobuttontext, String cancelbuttontext) {
         ButtonType yes;
         ButtonType no;
         ButtonType cancel;

@@ -43,6 +43,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// Description Format
+
 public class This_Session {
     private Qi_Gong Presession;
     private Cut Rin;
@@ -89,26 +91,77 @@ public class This_Session {
         Root = mainController;
         playerState = PlayerState.IDLE;
         options = Root.getOptions();
-        Presession =  new Qi_Gong(0, "Presession", "Gather Qi Before The Session Starts", this, Root.PreSwitch, Root.PreTime);
-        Rin = new Cut(1, "RIN", "Meet (Spirit & Invite Into The Body)", this, Root.RinSwitch, Root.RinTime);
-        Kyo = new Cut(2, "KYO", "Troops (Manage Internal Strategy/Tools)", this, Root.KyoSwitch, Root.KyoTime);
-        Toh = new Cut(3, "TOH", "Fighting (Against Myself To Attain Harmony)", this, Root.TohSwitch, Root.TohTime);
-        Sha = new Cut(4, "SHA", "Person (Meet & Become Person We Met In RIN)", this, Root.ShaSwitch, Root.ShaTime);
-        Kai = new Cut(5, "KAI", "All/Everything (Feeling Love & Compassion For Absolutely Everything)", this, Root.KaiSwitch, Root.KaiTime);
-        Jin = new Cut(6, "JIN", "Understanding", this, Root.JinSwitch, Root.JinTime);
-        Retsu = new Cut(7, "RETSU", "Dimension", this, Root.RetsuSwitch, Root.RetsuTime);
-        Zai = new Cut(8, "ZAI", "Creation", this, Root.ZaiSwitch, Root.ZaiTime);
-        Zen = new Cut(9, "ZEN", "Perfection", this, Root.ZenSwitch, Root.ZenTime);
-        Earth = new Element(10, "Earth", "", this, Root.EarthSwitch, Root.EarthTime);
-        Air = new Element(11, "Air", "", this, Root.AirSwitch, Root.AirTime);
-        Fire = new Element(12, "Fire", "", this, Root.FireSwitch, Root.FireTime);
-        Water = new Element(13, "Water", "", this, Root.WaterSwitch, Root.WaterTime);
-        Void = new Element(14, "Void", "", this, Root.VoidSwitch, Root.VoidTime);
-        Postsession = new Qi_Gong(15, "Postsession", "Gather Qi After The Session Ends", this, Root.PostSwitch, Root.PostTime);
-        Total = new Total(16, "Total", "", this, null, null);
+        setupSessionParts();
     }
 
 // Getters And Setters
+    private void setupSessionParts() {
+        Presession =  new Qi_Gong(0, "Presession", this, Root.PreSwitch, Root.PreTime);
+        Presession.setSummary("Gather Qi (Life Energy) Before The Session Starts");
+        Presession.setToolTip();
+        Rin = new Cut(1, "RIN", this, Root.RinSwitch, Root.RinTime);
+        Rin.setFocusPoint("Root Chakra");
+        Rin.setConcept("A Celebration Of The Spirit Coming Into The Body");
+        Rin.setMantra_Meaning("All/Everything/Vast As It Is Defined Now");
+        Rin.setSide_Effects("Increases The Bioelectric Output Of The Body");
+        Rin.setToolTip();
+        Kyo = new Cut(2, "KYO", this, Root.KyoSwitch, Root.KyoTime);
+        Kyo.setFocusPoint("Navel Chakra");
+        Kyo.setConcept("In Order To Become Powerful, Responsiblity Must Be Taken For All Actions");
+        Kyo.setMantra_Meaning("Use Your Tools/Manage Yourself Correctly");
+        Kyo.setSide_Effects("Increases The Healthy Flow Of Energy Leading To The Mastery Of The Control And Direction Of Energy");
+        Kyo.setToolTip();
+        Toh = new Cut(3, "TOH", this, Root.TohSwitch, Root.TohTime);
+        Toh.setFocusPoint("Dan-tian");
+        Toh.setConcept("Conscious Dissolement Of All Personal Fights In Order To Achieve Harmony");
+        Toh.setMantra_Meaning("Conquering Limiting Beliefs/Doubts Will Allow You To Get The Treasures Of Life");
+        Toh.setSide_Effects("Enhances Your Positive Relationship With The Universe, Resulting In Improved Harmony And Balance");
+        Toh.setToolTip();
+        Sha = new Cut(4, "SHA", this, Root.ShaSwitch, Root.ShaTime);
+        Sha.setFocusPoint("Solar Plexus Charkra");
+        Sha.setConcept("By Letting Go Of The Limits Of My Mind You Can Vibrate With The Power Of The Universe And Exist Fully Powerful");
+        Sha.setMantra_Meaning("Grounded, I Understand The Power That I Express");
+        Sha.setSide_Effects("Increases The Healing Ability Of The Body As A Result Of Higher Energy Levels Passing Through The Body");
+        Sha.setToolTip();
+        Kai = new Cut(5, "KAI", this, Root.KaiSwitch, Root.KaiTime);
+        Kai.setFocusPoint("Heart Chakra");
+        Kai.setConcept("Everything (Created Or Not) In The Universe Is One");
+        Kai.setMantra_Meaning("I Acknowledge The All Pervading Conscious State of Things As They Are, And I Live It [I Am Conscious Of EVERYTHING]");
+        Kai.setSide_Effects("Develops Foreknowledge, Premonition, Intuition And Feeling By Acknowlegding That Everything Is One");
+        Kai.setToolTip();
+        Jin = new Cut(6, "JIN", this, Root.JinSwitch, Root.JinTime);
+        Jin.setFocusPoint("Throat Chakra");
+        Jin.setConcept("An Observation Of The Universe And What Binds Every Part Of Us To Every Part Of Everything Else");
+        Jin.setMantra_Meaning("Conscious Experience Of The Fire That Everything Is Really Made Of");
+        Jin.setToolTip();
+        Retsu = new Cut(7, "RETSU", this, Root.RetsuSwitch, Root.RetsuTime);
+        Retsu.setFocusPoint("Jade Gate Chakra");
+        Retsu.setConcept("Transmute The Limits Of Perception By Remembering Our Wholeness As Spirit");
+        Retsu.setMantra_Meaning("Everything Flows/Is Elevated To The Divine");
+        Retsu.setSide_Effects("Enhances Your Perception And Mastery Of Space-Time Dimensions");
+        Retsu.setToolTip();
+        Zai = new Cut(8, "ZAI", this, Root.ZaiSwitch, Root.ZaiTime);
+        Zai.setFocusPoint("Third Eye Chakra");
+        Zai.setConcept("Works With Our Mind, Heart And Body In Order To Define Ourselves As A Spirit That Is Having A Human Experience, Rather Than A Human Being Sometimes Having A Spiritual Experience");
+        Zai.setMantra_Meaning("Everything Is Manifested In The Correct Way According To The Experience That I Live");
+        Zai.setSide_Effects("Increases My Power Of Manifestation By Fostering A Relationship With The Elements Of Creation");
+        Zai.setToolTip();
+        Zen = new Cut(9, "ZEN", this, Root.ZenSwitch, Root.ZenTime);
+        Zen.setFocusPoint("Crown Chakra");
+        Zen.setConcept("The Human Completely Relents Itself To The Spirit With Only The Consciousness Aspect Of The Human Remaining Active");
+        Zen.setMantra_Meaning("I am the void and the light");
+        Zen.setSide_Effects("Completely Relenting Into Spirit Results In Englightenment, Completeness, Suggestive Invisibility");
+        Zen.setToolTip();
+        Earth = new Element(10, "Earth", this, Root.EarthSwitch, Root.EarthTime);
+        Air = new Element(11, "Air", this, Root.AirSwitch, Root.AirTime);
+        Fire = new Element(12, "Fire", this, Root.FireSwitch, Root.FireTime);
+        Water = new Element(13, "Water", this, Root.WaterSwitch, Root.WaterTime);
+        Void = new Element(14, "Void", this, Root.VoidSwitch, Root.VoidTime);
+        Postsession = new Qi_Gong(15, "Postsession", this, Root.PostSwitch, Root.PostTime);
+        Postsession.setSummary("Gather Qi (Life Energy) Before The Session Starts");
+        Postsession.setToolTip();
+        Total = new Total(16, "Total", this, null, null);
+    }
     public ArrayList<SessionPart> getAllSessionParts() {return new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));}
     public static ArrayList<String> getAllSessionParts_Names() {
         return new ArrayList<>(Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "EARTH", "AIR", "FIRE", "WATER", "VOID", "Postsession"));

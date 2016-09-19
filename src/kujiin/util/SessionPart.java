@@ -73,7 +73,7 @@ public class SessionPart {
     private boolean ambienceready = false;
 
     public SessionPart() {}
-    public SessionPart(int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
+    public SessionPart(int number, String name, This_Session thissession, ToggleButton aSwitch, TextField value) {
         this.number = number;
         this.name = name;
         this.duration = Duration.ZERO;
@@ -89,7 +89,6 @@ public class SessionPart {
                         thissession.Root.creation_gui_update();
                     } catch (NumberFormatException ignored) {setDuration(0);}
                 });
-                if (briefsummary != null) {Switch.setTooltip(new Tooltip(briefsummary));}
                 Switch.setOnAction(event -> gui_toggleswitch());
                 gui_toggleswitch();
             }
@@ -179,6 +178,8 @@ public class SessionPart {
     public boolean ambience_isReady() {return ambienceready;}
 
 // GUI Methods
+    public void setToolTip() {Switch.setTooltip(getTooltip());}
+    public Tooltip getTooltip() {return new Tooltip("");}
     private void gui_toggleswitch() {
     if (Switch.isSelected()) {
         Value.setText("0");

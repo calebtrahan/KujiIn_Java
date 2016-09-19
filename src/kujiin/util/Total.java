@@ -7,8 +7,8 @@ import javafx.util.Duration;
 public class Total extends SessionPart {
 
 
-    public Total(int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
-        super(number, name, briefsummary, thissession, aSwitch, value);
+    public Total(int number, String name, This_Session thissession, ToggleButton aSwitch, TextField value) {
+        super(number, name, thissession, aSwitch, value);
         this.number = number;
         this.name = name;
         this.duration = Duration.ZERO;

@@ -12,9 +12,10 @@ import kujiin.xml.SoundFile;
 import java.io.File;
 
 public class Qi_Gong extends SessionPart {
+    private String Summary;
 
-    public Qi_Gong (int number, String name, String briefsummary, This_Session thissession, ToggleButton aSwitch, TextField value) {
-        super(number, name, briefsummary, thissession, aSwitch, value);
+    public Qi_Gong (int number, String name, This_Session thissession, ToggleButton aSwitch, TextField value) {
+        super(number, name, thissession, aSwitch, value);
         if (thissession.Root.getOptions().getProgramOptions().getTooltips()) {
             if (number == 0) {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Preceding The Session"));}
             else {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Following The Session"));}
@@ -29,8 +30,14 @@ public class Qi_Gong extends SessionPart {
         else return "Post";
     }
 
+// Description Setters
+    public void setSummary(String summary) {
+        Summary = summary;
+    }
+    @Override
+    public Tooltip getTooltip() {return new Tooltip(Summary);}
 
-// Entrainment
+// Entrainment Methods
     @Override
     public void entrainment_populate() {
         File expectedentrainmentfile;
@@ -72,7 +79,7 @@ public class Qi_Gong extends SessionPart {
         }
     }
 
-// Creation
+// Creation Methods
     @Override
     public boolean creation_buildEntrainment() {
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
