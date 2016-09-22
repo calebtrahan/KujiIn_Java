@@ -28,16 +28,17 @@ public class Entrainment {
     }
 
 // Ramp Methods
+    public int ramp_count() {return rampfiles.size();}
     public void ramp_initialize() {if (rampfiles == null) {rampfiles = new ArrayList<>();}}
     public void ramp_add(SoundFile soundFile) {ramp_initialize(); rampfiles.add(soundFile);}
     public void ramp_add(int index, SoundFile soundFile) {ramp_initialize(); rampfiles.add(index, soundFile);}
-    public SoundFile ramp_get(int index) {
+    public SoundFile ramp_get(int index) throws IndexOutOfBoundsException {
 //        try {
 //            int count = 0;
 //            for (SoundFile i : rampfiles) {System.out.println(count + ": " + i.getFile().getAbsolutePath());}
 //        } catch (NullPointerException ignored) {}
         try {return rampfiles.get(index);}
-        catch (Exception e) {return null;}
+        catch (NullPointerException e) {return null;}
     }
 
 // Other Methods

@@ -56,7 +56,7 @@ public class Ambience {
             Ambience.add(soundFile);
         }
     }
-    public SoundFile get(int index) {
+    public SoundFile get(int index) throws IndexOutOfBoundsException {
         return Ambience.get(index);
     }
     public SoundFile getnextSoundFile(This_Session.AmbiencePlaybackType ambiencePlaybackType, List<SoundFile> playbackhistory, SoundFile currentsoundfile) {

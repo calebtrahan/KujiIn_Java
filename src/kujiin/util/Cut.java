@@ -99,6 +99,51 @@ public class Cut extends SessionPart {
             entrainment_populate();
         }
     }
+    @Override
+    public void entraiment_populatewithffmpeg() {
+//        System.out.println("Looping Through " + name + " " + entrainmentchecker_partcount);
+        File expectedentrainmentfile;
+        SoundFile actualsoundfile;
+        switch (entrainmentchecker_partcount) {
+            case 0:
+                actualsoundfile = entrainment.getFreq();
+                expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
+                break;
+            case 1:
+                actualsoundfile = entrainment.ramp_get(0);
+                try {
+                    expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
+                            entrainmentchecker_partcutnames.get(entrainmentchecker_partcutnames.indexOf(getNameForFiles()) + 1) + ".mp3");
+                } catch (IndexOutOfBoundsException ignored) {expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");}
+                break;
+            case 2:
+                actualsoundfile = entrainment.ramp_get(1);
+                expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");
+                break;
+            default:
+                entrainmentready = true;
+                thisession.Root.getEntrainments().setsessionpartEntrainment(number, entrainment);
+                return;
+        }
+        if (expectedentrainmentfile.exists()) {
+            if (actualsoundfile == null || ! actualsoundfile.isValid()) {
+                SoundFile soundFile = new SoundFile(expectedentrainmentfile);
+                soundFile.setDuration(Util.audio_getduration(expectedentrainmentfile));
+                if (entrainmentchecker_partcount == 0) {entrainment.setFreq(soundFile);}
+                else {entrainment.ramp_add(soundFile);}
+                entrainmentchecker_partcount++;
+                entrainment_populate();
+            } else {
+                entrainmentchecker_partcount++;
+                entrainment_populate();
+            }
+        } else {
+            entrainmentmissingfiles = true;
+            entrainmentchecker_missingfiles.add(expectedentrainmentfile);
+            entrainmentchecker_partcount++;
+            entrainment_populate();
+        }
+    }
 
 // Creation
     @Override

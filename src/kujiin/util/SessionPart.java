@@ -63,7 +63,7 @@ public class SessionPart {
     protected boolean entrainmentready = false;
     protected boolean entrainmentmissingfiles = false;
     protected int entrainmentchecker_partcount;
-    protected final ArrayList<String> entrainmentchecker_partcutnames = new ArrayList<>(Arrays.asList("rin", "kyo", "toh", "sha", "kai", "jin", "retsu", "zai", "zen"));
+    public final ArrayList<String> entrainmentchecker_partcutnames = new ArrayList<>(Arrays.asList("rin", "kyo", "toh", "sha", "kai", "jin", "retsu", "zai", "zen"));
     public MediaPlayer entrainmentchecker_calculateplayer;
     public List<File> entrainmentchecker_missingfiles = new ArrayList<>();
 // Ambience Fields
@@ -93,11 +93,12 @@ public class SessionPart {
                 gui_toggleswitch();
             }
             entrainment = thissession.Root.getEntrainments().getsessionpartEntrainment(number);
+            System.out.println("Set Entrainment For " + name);
             entrainmentchecker_partcount = 0;
-            entrainment_populate();
+//            entrainment_populate();
             ambience = thissession.Root.getAmbiences().getsessionpartAmbience(number);
-            ambience_cleanupexistingambience();
-            ambience_addnewfromdirectory();
+//            ambience_cleanupexistingambience();
+//            ambience_populate();
         }
         //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
@@ -111,6 +112,7 @@ public class SessionPart {
 // Entrainment Methods
     public void entrainment_populate() {
     }
+    public void entraiment_populatewithffmpeg() {}
     public boolean entrainment_isReady() {return entrainmentready;}
     public boolean entrainment_missingfiles() {
         return entrainmentmissingfiles;
@@ -124,7 +126,7 @@ public class SessionPart {
             ambience.getAmbience().stream().filter(i -> i.getFile() == null || !i.getFile().exists()).forEach(i -> ambience.remove(i));
         } else {}
     }
-    public void ambience_addnewfromdirectory() {
+    public void ambience_populate() {
         // TODO Fix This So It Checks Existing Ambience If Existing (Deleting Non Existing), And Adds New From Ambience Directory If Valid
         if (ambiencechecker_soundfilestoaddtoambience.isEmpty()) {
             File ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
@@ -144,7 +146,8 @@ public class SessionPart {
                         }
                     }
                 }
-                if (! ambiencechecker_soundfilestoaddtoambience.isEmpty()) {ambience_addnewfromdirectory();}
+                if (! ambiencechecker_soundfilestoaddtoambience.isEmpty()) {
+                    ambience_populate();}
                 else {
                     ambienceready = true;
                 }
@@ -162,13 +165,57 @@ public class SessionPart {
                     ambience.add(soundFile);
                     ambiencechecker_soundfilestoaddcount++;
                     ambiencechecker_calculateplayer.dispose();
-                    ambience_addnewfromdirectory();
+                    ambience_populate();
                 });
                 ambiencechecker_calculateplayer.setOnError(() -> {
                     ambiencechecker_soundfilestoaddcount++;
                     ambiencechecker_calculateplayer.dispose();
-                    ambience_addnewfromdirectory();
+                    ambience_populate();
                 });
+            } catch (IndexOutOfBoundsException ignored) {
+                thisession.Root.getAmbiences().setsessionpartAmbience(number, ambience);
+                ambienceready = true;
+            }
+        }
+    }
+    public void ambience_populatewithfffmpeg() {
+        // TODO Fix This So It Checks Existing Ambience If Existing (Deleting Non Existing), And Adds New From Ambience Directory If Valid
+        if (ambiencechecker_soundfilestoaddtoambience.isEmpty()) {
+            File ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
+            ambiencechecker_soundfilestoaddcount = 0;
+            try {
+                for (File i : ambiencedirectory.listFiles()) {
+                    if (Util.audio_isValid(i)) {
+                        if (! ambience.getAmbienceFiles().contains(i)) {
+                            ambiencechecker_soundfilestoaddtoambience.add(i);}
+                        else {
+                            try {
+                                Double duration = ambience.getAmbience().get(ambience.getAmbienceFiles().indexOf(i)).getDuration();
+                                if (duration == null || duration == 0.0) {
+                                    ambiencechecker_soundfilestoaddtoambience.add(i);}
+                            } catch (ArrayIndexOutOfBoundsException ignored) {
+                                ambiencechecker_soundfilestoaddtoambience.add(i);}
+                        }
+                    }
+                }
+                if (! ambiencechecker_soundfilestoaddtoambience.isEmpty()) {
+                    ambience_populate();}
+                else {
+                    ambienceready = true;
+                }
+            } catch (NullPointerException ignored) {
+                // TODO Change This To Reflect No Ambience Files In Directory
+                ambienceready= true;
+            }
+        } else {
+            try {
+                File actualfile = ambiencechecker_soundfilestoaddtoambience.get(ambiencechecker_soundfilestoaddcount);
+                SoundFile soundFile = new SoundFile(actualfile);
+                soundFile.setDuration(Util.audio_getduration(actualfile));
+                ambience.add(soundFile);
+                ambiencechecker_soundfilestoaddcount++;
+                ambiencechecker_calculateplayer.dispose();
+                ambience_populate();
             } catch (IndexOutOfBoundsException ignored) {
                 thisession.Root.getAmbiences().setsessionpartAmbience(number, ambience);
                 ambienceready = true;
@@ -206,6 +253,11 @@ public class SessionPart {
     }
     public int gui_getvalue() {return Integer.parseInt(Value.getText());}
 // Getters And Setters
+
+    public This_Session getThisession() {
+        return thisession;
+    }
+
     public List<kujiin.xml.Goals.Goal> getGoals() {
         return Goals;
     }
