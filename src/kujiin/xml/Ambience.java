@@ -1,9 +1,9 @@
 package kujiin.xml;
 
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import kujiin.util.SessionPart;
 import kujiin.util.This_Session;
+import kujiin.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -38,28 +38,38 @@ public class Ambience {
         } catch (NullPointerException ignored) {return new ArrayList<>();}
     }
 
+// Utility Methods
+    public void startup_addambiencefromdirectory(SessionPart selectedsessionpart) {
+        try {
+            File ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, selectedsessionpart.name);
+            for (File i : ambiencedirectory.listFiles()) {
+                if (Util.audio_isValid(i) && ! selectedsessionpart.getAmbience().getAmbienceFiles().contains(i)) {add(new SoundFile(i));}
+            }
+        } catch (NullPointerException ignored) {
+            // TODO Change This To Reflect No Ambience Files In Directory
+        }
+    }
+    public void startup_checkfordeletedfiles() {
+        if (Ambience != null) {
+            Ambience.stream().filter(i -> !i.getFile().exists()).forEach(this::remove);
+        }
+    }
+
 // Actual Ambience
     private void initialize() {
         if (Ambience == null) Ambience = new ArrayList<>();
     }
     public void add(SoundFile soundFile) {
         initialize();
-        if (soundFile.getDuration() == null) {
-            System.out.println("Trying To Calculate Duration For " + soundFile.getFile().getName());
-            MediaPlayer calcdurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
-            calcdurationplayer.setOnReady(() -> {
-                soundFile.setDuration(calcdurationplayer.getTotalDuration().toMillis());
-                Ambience.add(soundFile);
-                calcdurationplayer.dispose();
-            });
-        } else {
-            Ambience.add(soundFile);
-        }
+        Ambience.add(soundFile);
     }
-    public SoundFile get(int index) throws IndexOutOfBoundsException {
-        return Ambience.get(index);
+    public void set(SoundFile soundFile) {
+        int index = getAmbienceFiles().indexOf(soundFile.getFile());
+        if (index != -1) {Ambience.set(index, soundFile);}
+        else {add(soundFile);}
     }
-    public SoundFile getnextSoundFile(This_Session.AmbiencePlaybackType ambiencePlaybackType, List<SoundFile> playbackhistory, SoundFile currentsoundfile) {
+    public SoundFile get(int index) throws IndexOutOfBoundsException {return Ambience.get(index);}
+    public SoundFile ambiencegenerator(This_Session.AmbiencePlaybackType ambiencePlaybackType, List<SoundFile> playbackhistory, SoundFile currentsoundfile) {
         switch (ambiencePlaybackType) {
             case REPEAT:
                 if (currentsoundfile != null) {
@@ -98,28 +108,15 @@ public class Ambience {
         }
     }
     public SoundFile get(String name) {
-        for (SoundFile i : Ambience) {
-            if (i.getName().equals(name)) return i;
-        }
+        for (SoundFile i : Ambience) {if (i.getName().equals(name)) return i;}
         return null;
     }
     public SoundFile get(File file) {
-        for (SoundFile i : Ambience) {
-            if (i.getFile().equals(file)) return i;
-        }
+        for (SoundFile i : Ambience) {if (i.getFile().equals(file)) return i;}
         return null;
     }
     public void remove(SoundFile soundFile) {
         Ambience.remove(soundFile);
-    }
-    public void actual_testifallexisting() {
-        if (Ambience == null) {return;}
-        int exitstingcount = 0;
-        for (SoundFile i : Ambience) {
-            if (i.getFile().exists()) {exitstingcount++;}
-            else {System.out.println(String.format("%s Does Not Exist", i.getFile().getAbsolutePath()));}
-        }
-        System.out.println("Existing Ambience: " + exitstingcount);
     }
 
 // Custom Ambience

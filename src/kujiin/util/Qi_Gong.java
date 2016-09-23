@@ -3,13 +3,9 @@ package kujiin.util;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
-
-import java.io.File;
 
 public class Qi_Gong extends SessionPart {
     private String Summary;
@@ -37,130 +33,10 @@ public class Qi_Gong extends SessionPart {
     @Override
     public Tooltip getTooltip() {return new Tooltip(Summary);}
 
-// Entrainment Methods
-//    public Task<Boolean> entrainment_populatetask() {
-//        return new Task<Boolean>() {
-//            @Override
-//            protected Boolean call() throws Exception {
-//
-//                while (true) {
-//                    System.out.println("Called The Thread");
-//                    File expectedentrainmentfile;
-//                    SoundFile actualsoundfile;
-//                    if (entrainmentchecker_partcount[0] == 0) {
-//                        actualsoundfile = sessionPart.getEntrainment().getFreq();
-//                        expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, sessionPart.getNameForFiles().toUpperCase() + ".mp3");
-//                    } else {
-//                        try {
-//                            actualsoundfile = sessionPart.getEntrainment().ramp_get(entrainmentchecker_partcount[0]);
-//                            expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + sessionPart.getNameForFiles() + "to" + sessionPart.entrainmentchecker_partcutnames.get(entrainmentchecker_partcount[0] - 1) + ".mp3");
-//                        } catch (IndexOutOfBoundsException ignored) {
-//                            sessionPart.getThisession().Root.getEntrainments().setsessionpartEntrainment(sessionPart.number, sessionPart.getEntrainment());
-//                            return false;
-//                        }
-//                    }
-//                    System.out.println("Testing " + actualsoundfile.getName());
-//                    if (expectedentrainmentfile.exists()) {
-//                        if (actualsoundfile == null || ! actualsoundfile.isValid()) {
-//                            entrainmentplayer = new MediaPlayer(new Media(expectedentrainmentfile.toURI().toString()));
-//                            entrainmentplayer.setOnReady(() -> {
-//                                SoundFile soundFile = new SoundFile(expectedentrainmentfile);
-//                                soundFile.setDuration(entrainmentplayer.getTotalDuration().toMillis());
-//                                if ( entrainmentchecker_partcount[0] == 0) {sessionPart.getEntrainment().setFreq(soundFile);}
-//                                else {sessionPart.getEntrainment().ramp_add(soundFile);}
-//                                entrainmentplayer.dispose();
-//                                entrainmentchecker_partcount[0]++;
-//                                notify();
-//                            });
-//                            try {wait();}
-//                            catch (InterruptedException e) {}
-//                        } else {entrainmentchecker_partcount[0]++;}
-//                    } else {
-////                    entrainmentmissingfiles = true;
-////                    entrainmentchecker_missingfiles.add(expectedentrainmentfile);
-//                        entrainmentchecker_partcount[0]++;
-//                    }
-//                }
-//                return null;
-//            }
-//        };
-//    }
-
-
-    public void entrainment_populate() {
-        File expectedentrainmentfile;
-        SoundFile actualsoundfile;
-        if (entrainmentchecker_partcount == 0) {
-            actualsoundfile = entrainment.getFreq();
-            expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
-        } else {
-            try {
-                actualsoundfile = entrainment.ramp_get(entrainmentchecker_partcount);
-                expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + entrainmentchecker_partcutnames.get(entrainmentchecker_partcount - 1) + ".mp3");
-            } catch (IndexOutOfBoundsException ignored) {
-                entrainmentready = true;
-                thisession.Root.getEntrainments().setsessionpartEntrainment(number, entrainment);
-                return;
-            }
-        }
-        if (expectedentrainmentfile.exists()) {
-            if (actualsoundfile == null || ! actualsoundfile.isValid()) {
-                entrainmentchecker_calculateplayer = new MediaPlayer(new Media(expectedentrainmentfile.toURI().toString()));
-                entrainmentchecker_calculateplayer.setOnReady(() -> {
-                    SoundFile soundFile = new SoundFile(expectedentrainmentfile);
-                    soundFile.setDuration(entrainmentchecker_calculateplayer.getTotalDuration().toMillis());
-                    if (this.entrainmentchecker_partcount == 0) {entrainment.setFreq(soundFile);}
-                    else {entrainment.ramp_add(soundFile);}
-                    entrainmentchecker_calculateplayer.dispose();
-                    entrainmentchecker_partcount++;
-                    entrainment_populate();
-                });
-            } else {
-                entrainmentchecker_partcount++;
-                entrainment_populate();
-            }
-        } else {
-            entrainmentmissingfiles = true;
-            entrainmentchecker_missingfiles.add(expectedentrainmentfile);
-            entrainmentchecker_partcount++;
-            entrainment_populate();
-        }
-    }
-    public void entraiment_populatewithffmpeg() {
-        File expectedentrainmentfile;
-        SoundFile actualsoundfile;
-        if (entrainmentchecker_partcount == 0) {
-            actualsoundfile = entrainment.getFreq();
-            expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
-        } else {
-            try {
-                actualsoundfile = entrainment.ramp_get(entrainmentchecker_partcount);
-                expectedentrainmentfile = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + entrainmentchecker_partcutnames.get(entrainmentchecker_partcount - 1) + ".mp3");
-            } catch (IndexOutOfBoundsException ignored) {
-                entrainmentready = true;
-                thisession.Root.getEntrainments().setsessionpartEntrainment(number, entrainment);
-                return;
-            }
-        }
-        if (expectedentrainmentfile.exists()) {
-            if (actualsoundfile == null || ! actualsoundfile.isValid()) {
-                SoundFile soundFile = new SoundFile(expectedentrainmentfile);
-                soundFile.setDuration(Util.audio_getduration(expectedentrainmentfile));
-                if (this.entrainmentchecker_partcount == 0) {entrainment.setFreq(soundFile);}
-                else {entrainment.ramp_add(soundFile);}
-                entrainmentchecker_calculateplayer.dispose();
-                entrainmentchecker_partcount++;
-                entrainment_populate();
-            } else {
-                entrainmentchecker_partcount++;
-                entrainment_populate();
-            }
-        } else {
-            entrainmentmissingfiles = true;
-            entrainmentchecker_missingfiles.add(expectedentrainmentfile);
-            entrainmentchecker_partcount++;
-            entrainment_populate();
-        }
+// Entrainment
+    @Override
+    public int partchecker_maxcount() {
+        return 10;
     }
 
 // Creation Methods

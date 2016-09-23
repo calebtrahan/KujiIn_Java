@@ -232,7 +232,7 @@ public class MainController implements Initializable {
                 Ambience ambience = x.getAmbience();
                 int count = 1;
                 for (int i = 0; i < 100; i++) {
-                    ambiencetestsoundfile = ambience.getnextSoundFile(This_Session.AmbiencePlaybackType.SHUFFLE, ambienceplaybackhistory, ambiencetestsoundfile);
+                    ambiencetestsoundfile = ambience.ambiencegenerator(This_Session.AmbiencePlaybackType.SHUFFLE, ambienceplaybackhistory, ambiencetestsoundfile);
                     ambienceplaybackhistory.add(ambiencetestsoundfile);
 //                System.out.println(count + ": Sound File: " + ambiencetestsoundfile.getFile().getAbsolutePath());
                     count++;

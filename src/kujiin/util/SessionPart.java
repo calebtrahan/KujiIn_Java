@@ -16,7 +16,6 @@ import kujiin.xml.*;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,18 +58,6 @@ public class SessionPart {
 // Goal Fields
     protected Goals GoalsController;
     protected List<kujiin.xml.Goals.Goal> Goals;
-// Entrainment Fields
-    protected boolean entrainmentready = false;
-    protected boolean entrainmentmissingfiles = false;
-    protected int entrainmentchecker_partcount;
-    public final ArrayList<String> entrainmentchecker_partcutnames = new ArrayList<>(Arrays.asList("rin", "kyo", "toh", "sha", "kai", "jin", "retsu", "zai", "zen"));
-    public MediaPlayer entrainmentchecker_calculateplayer;
-    public List<File> entrainmentchecker_missingfiles = new ArrayList<>();
-// Ambience Fields
-    private ArrayList<File> ambiencechecker_soundfilestoaddtoambience = new ArrayList<>();
-    private int ambiencechecker_soundfilestoaddcount = 0;
-    private MediaPlayer ambiencechecker_calculateplayer;
-    private boolean ambienceready = false;
 
     public SessionPart() {}
     public SessionPart(int number, String name, This_Session thissession, ToggleButton aSwitch, TextField value) {
@@ -93,12 +80,7 @@ public class SessionPart {
                 gui_toggleswitch();
             }
             entrainment = thissession.Root.getEntrainments().getsessionpartEntrainment(number);
-            System.out.println("Set Entrainment For " + name);
-            entrainmentchecker_partcount = 0;
-//            entrainment_populate();
             ambience = thissession.Root.getAmbiences().getsessionpartAmbience(number);
-//            ambience_cleanupexistingambience();
-//            ambience_populate();
         }
         //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
@@ -110,119 +92,10 @@ public class SessionPart {
     }
 
 // Entrainment Methods
-    public void entrainment_populate() {
-    }
-    public void entraiment_populatewithffmpeg() {}
-    public boolean entrainment_isReady() {return entrainmentready;}
-    public boolean entrainment_missingfiles() {
-        return entrainmentmissingfiles;
-    }
-    public List<File> entrainment_getMissingFiles() {return entrainmentchecker_missingfiles;}
-    public Duration ambience_getTotalActualDuration() {return ambience.gettotalDuration();}
+    public int partchecker_maxcount() {return 0;}
 
 // Ambience Methods
-    public void ambience_cleanupexistingambience() {
-        if (ambience.getAmbience() != null) {
-            ambience.getAmbience().stream().filter(i -> i.getFile() == null || !i.getFile().exists()).forEach(i -> ambience.remove(i));
-        } else {}
-    }
-    public void ambience_populate() {
-        // TODO Fix This So It Checks Existing Ambience If Existing (Deleting Non Existing), And Adds New From Ambience Directory If Valid
-        if (ambiencechecker_soundfilestoaddtoambience.isEmpty()) {
-            File ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
-            ambiencechecker_soundfilestoaddcount = 0;
-            try {
-                for (File i : ambiencedirectory.listFiles()) {
-                    if (Util.audio_isValid(i)) {
-                        if (! ambience.getAmbienceFiles().contains(i)) {
-                            ambiencechecker_soundfilestoaddtoambience.add(i);}
-                        else {
-                            try {
-                                Double duration = ambience.getAmbience().get(ambience.getAmbienceFiles().indexOf(i)).getDuration();
-                                if (duration == null || duration == 0.0) {
-                                    ambiencechecker_soundfilestoaddtoambience.add(i);}
-                            } catch (ArrayIndexOutOfBoundsException ignored) {
-                                ambiencechecker_soundfilestoaddtoambience.add(i);}
-                        }
-                    }
-                }
-                if (! ambiencechecker_soundfilestoaddtoambience.isEmpty()) {
-                    ambience_populate();}
-                else {
-                    ambienceready = true;
-                }
-            } catch (NullPointerException ignored) {
-                // TODO Change This To Reflect No Ambience Files In Directory
-                ambienceready= true;
-            }
-        } else {
-            try {
-                File actualfile = ambiencechecker_soundfilestoaddtoambience.get(ambiencechecker_soundfilestoaddcount);
-                ambiencechecker_calculateplayer = new MediaPlayer(new Media(actualfile.toURI().toString()));
-                ambiencechecker_calculateplayer.setOnReady(() -> {
-                    SoundFile soundFile = new SoundFile(actualfile);
-                    soundFile.setDuration(ambiencechecker_calculateplayer.getTotalDuration().toMillis());
-                    ambience.add(soundFile);
-                    ambiencechecker_soundfilestoaddcount++;
-                    ambiencechecker_calculateplayer.dispose();
-                    ambience_populate();
-                });
-                ambiencechecker_calculateplayer.setOnError(() -> {
-                    ambiencechecker_soundfilestoaddcount++;
-                    ambiencechecker_calculateplayer.dispose();
-                    ambience_populate();
-                });
-            } catch (IndexOutOfBoundsException ignored) {
-                thisession.Root.getAmbiences().setsessionpartAmbience(number, ambience);
-                ambienceready = true;
-            }
-        }
-    }
-    public void ambience_populatewithfffmpeg() {
-        // TODO Fix This So It Checks Existing Ambience If Existing (Deleting Non Existing), And Adds New From Ambience Directory If Valid
-        if (ambiencechecker_soundfilestoaddtoambience.isEmpty()) {
-            File ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, name);
-            ambiencechecker_soundfilestoaddcount = 0;
-            try {
-                for (File i : ambiencedirectory.listFiles()) {
-                    if (Util.audio_isValid(i)) {
-                        if (! ambience.getAmbienceFiles().contains(i)) {
-                            ambiencechecker_soundfilestoaddtoambience.add(i);}
-                        else {
-                            try {
-                                Double duration = ambience.getAmbience().get(ambience.getAmbienceFiles().indexOf(i)).getDuration();
-                                if (duration == null || duration == 0.0) {
-                                    ambiencechecker_soundfilestoaddtoambience.add(i);}
-                            } catch (ArrayIndexOutOfBoundsException ignored) {
-                                ambiencechecker_soundfilestoaddtoambience.add(i);}
-                        }
-                    }
-                }
-                if (! ambiencechecker_soundfilestoaddtoambience.isEmpty()) {
-                    ambience_populate();}
-                else {
-                    ambienceready = true;
-                }
-            } catch (NullPointerException ignored) {
-                // TODO Change This To Reflect No Ambience Files In Directory
-                ambienceready= true;
-            }
-        } else {
-            try {
-                File actualfile = ambiencechecker_soundfilestoaddtoambience.get(ambiencechecker_soundfilestoaddcount);
-                SoundFile soundFile = new SoundFile(actualfile);
-                soundFile.setDuration(Util.audio_getduration(actualfile));
-                ambience.add(soundFile);
-                ambiencechecker_soundfilestoaddcount++;
-                ambiencechecker_calculateplayer.dispose();
-                ambience_populate();
-            } catch (IndexOutOfBoundsException ignored) {
-                thisession.Root.getAmbiences().setsessionpartAmbience(number, ambience);
-                ambienceready = true;
-            }
-        }
-    }
-    public boolean ambience_isReady() {return ambienceready;}
+    public Duration ambience_getTotalActualDuration() {return ambience.gettotalDuration();}
 
 // GUI Methods
     public void setToolTip() {Switch.setTooltip(getTooltip());}
@@ -374,7 +247,7 @@ public class SessionPart {
             ambienceplayhistory = new ArrayList<>();
             currentambiencevolume = thisession.getCurrentambiencevolume();
             volume_unbindambience();
-            currentambiencesoundfile = ambience.getnextSoundFile(thisession.ambiencePlaybackType, ambienceplayhistory, currentambiencesoundfile);
+            currentambiencesoundfile = ambience.ambiencegenerator(thisession.ambiencePlaybackType, ambienceplayhistory, currentambiencesoundfile);
             ambienceplayhistory.add(currentambiencesoundfile);
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setVolume(0.0);
@@ -724,7 +597,7 @@ public class SessionPart {
             volume_unbindambience();
             ambienceplayer.dispose();
             ambienceplayer = null;
-            currentambiencesoundfile = ambience.getnextSoundFile(thisession.ambiencePlaybackType, ambienceplayhistory, currentambiencesoundfile);
+            currentambiencesoundfile = ambience.ambiencegenerator(thisession.ambiencePlaybackType, ambienceplayhistory, currentambiencesoundfile);
             ambienceplayhistory.add(currentambiencesoundfile);
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);

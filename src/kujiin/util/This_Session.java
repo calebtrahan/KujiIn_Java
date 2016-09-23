@@ -171,6 +171,9 @@ public class This_Session {
         return getAllSessionPartsincludingTotal().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
     }
     public ArrayList<Cut> getallCuts()  {return new ArrayList<>(Arrays.asList(Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen));}
+    public ArrayList<String> getallCutNames() {
+        return getallCuts().stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
+    }
     public ArrayList<Element> getallElements() {return new ArrayList<>(Arrays.asList(Earth, Air, Fire, Water, Void));}
     public List<SessionPart> getallitemsinSession() {
         return itemsinsession;

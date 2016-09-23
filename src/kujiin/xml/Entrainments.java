@@ -37,8 +37,6 @@ public class Entrainments {
     private final List<Entrainment> AllEntrainment = new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));
     @XmlTransient
     private MainController Root;
-    @XmlTransient
-    public static final List<Integer> DURATIONSVARIATIONS = Arrays.asList(1, 5);
 
     public Entrainments() {}
     public Entrainments(MainController Root) {this.Root = Root; unmarshall();}
