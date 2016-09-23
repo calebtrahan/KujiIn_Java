@@ -454,7 +454,7 @@ public class This_Session {
         });
         playerUI.setOnHidden(event -> {if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}});
         playerUI.showAndWait();
-        Root.creation_gui_setDisable(false);
+        Root.creation_gui_setDisable(false, "Creator Disabled While Playing Session");
     }
     public void player_play() {
         switch (playerState) {

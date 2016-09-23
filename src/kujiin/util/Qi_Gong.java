@@ -35,7 +35,7 @@ public class Qi_Gong extends SessionPart {
 
 // Entrainment
     @Override
-    public int partchecker_maxcount() {
+    public int entrainmentpartcount() {
         return 10;
     }
 

@@ -26,7 +26,7 @@ public class Element extends SessionPart {
 
 // Entrainment
     @Override
-    public int partchecker_maxcount() {
+    public int entrainmentpartcount() {
         return 10;
     }
 

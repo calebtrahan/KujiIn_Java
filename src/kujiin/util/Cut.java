@@ -44,7 +44,7 @@ public class Cut extends SessionPart {
 
 // Entrainment
     @Override
-    public int partchecker_maxcount() {
+    public int entrainmentpartcount() {
         return 3;
     }
 

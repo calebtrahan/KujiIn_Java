@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
@@ -126,6 +127,7 @@ public class MainController implements Initializable {
     private List<SoundFile> ambienceplaybackhistory = new ArrayList<>();
     private Scene Scene;
     private Stage Stage;
+    private StartupChecks startupChecks;
 
 // My Fields
     private This_Session Session;
@@ -140,8 +142,23 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("Initializing");
         setOptions(new Options(this));
         getOptions().unmarshall();
+    }
+    public void startupchecks() {
+        creation_gui_setDisable(true, "");
+        startupChecks = new StartupChecks(getSession().getAllSessionParts());
+        startupChecks.run();
+        startupChecks.setOnRunning(event -> CreatorStatusBar.textProperty().bind(startupChecks.messageProperty()));
+    }
+    public void startupcheckscompleted() {
+        CreatorStatusBar.textProperty().unbind();
+        creation_gui_setDisable(false, "");
+        Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Startup Checks Completed", 3000);
+    }
+    public boolean startupchecksfinished() {
+        return startupChecks.isComplete();
     }
     public boolean cleanup() {
         Ambiences.marshall();
@@ -299,7 +316,7 @@ public class MainController implements Initializable {
             ExportButton.setTooltip(null);
         }
     }
-    public void creation_gui_setDisable(boolean disabled) {
+    public void creation_gui_setDisable(boolean disabled, String msg) {
         ChangeAllCutsButton.setDisable(disabled);
         ChangeAllElementsButton.setDisable(disabled);
         LoadPresetButton.setDisable(disabled);
@@ -310,13 +327,9 @@ public class MainController implements Initializable {
         ExportButton.setDisable(disabled);
         ResetCreatorButton.setDisable(disabled);
         for (SessionPart i : getSession().getAllSessionParts()) {i.gui_setDisable(disabled);}
-        if (disabled) {
-            creator_updateuitimeline.stop();
-            CreatorStatusBar.setText("Creator Disabled While Playing A Session");
-        } else {
-            creator_updateuitimeline.play();
-            CreatorStatusBar.setText("");
-        }
+        if (disabled) {creator_updateuitimeline.stop();}
+        else {creator_updateuitimeline.play();}
+        CreatorStatusBar.setText(msg);
     }
     public void creation_gui_update() {
         boolean notallzero = false;
@@ -407,7 +420,7 @@ public class MainController implements Initializable {
     }
     public void creation_util_createsession() {
         Session.creation_createsession();
-        creation_gui_setDisable(Session.creatorState != This_Session.CreatorState.NOT_CREATED);
+        creation_gui_setDisable(Session.creatorState != This_Session.CreatorState.NOT_CREATED, "Creator Disabled While Playing A Session");
     }
     public boolean creation_cleanup() {return true;}
 
@@ -2661,8 +2674,6 @@ public class MainController implements Initializable {
         }
     }
 
-
-
 // Table Classes
     public class AmbienceSong {
         private StringProperty name;
@@ -2740,6 +2751,185 @@ public class MainController implements Initializable {
                 this.setResizable(false);
                 this.setOnCloseRequest(Event::consume);
             } catch (IOException e) {}
+        }
+
+    }
+
+// Startup
+    class StartupChecks extends Task {
+        private SessionPart selectedsessionpart;
+        private List<SessionPart> sessionPartList;
+        private final int[] startupcheck_count = {0, 0, 0};
+        private MediaPlayer startupcheckplayer;
+        private ArrayList<SessionPart> partswithnoambience = new ArrayList<>();
+        private ArrayList<SessionPart> partswithmissingentrainment = new ArrayList<>();
+        private boolean firstcall = true;
+        private final double[] workcount = {0, 0};
+        private boolean complete = false;
+
+        public StartupChecks(List<SessionPart> allsessionparts) {
+            sessionPartList = allsessionparts;
+        }
+
+        // Getters And Setters
+        public ArrayList<SessionPart> getPartswithnoambience() {
+            return partswithnoambience;
+        }
+        public ArrayList<SessionPart> getPartswithmissingentrainment() {
+            return partswithmissingentrainment;
+        }
+        public boolean isComplete() {
+            return complete;
+        }
+
+        // Method Overrides
+        @Override
+        protected Object call() throws Exception {
+            if (firstcall) {populateambiencefromfiles(); calculatetotalworktodo(); firstcall = false;}
+            if (selectedsessionpart == null) {selectedsessionpart = getnextsessionpart();}
+            File file = null;
+            SoundFile soundFile = null;
+            try {
+                file = getnextentrainmentfile();
+                soundFile = getnextentraimentsoundfile();
+                if (soundFile == null) {soundFile = new SoundFile(file);}
+            } catch (IndexOutOfBoundsException ignored) {
+                try {
+                    if (selectedsessionpart.getAmbience().hasAnyAmbience()) {
+                        if (startupcheck_count[1] == 0) {
+                            selectedsessionpart.getAmbience().startup_addambiencefromdirectory(selectedsessionpart);
+                            selectedsessionpart.getAmbience().startup_checkfordeletedfiles();
+                        }
+                        soundFile = getnextambiencesoundfile();
+                        file = soundFile.getFile();
+                    } else {
+                        partswithnoambience.add(selectedsessionpart);
+                        throw new IndexOutOfBoundsException();}
+                } catch (IndexOutOfBoundsException ignore) {
+                    try {
+                        selectedsessionpart.getThisession().Root.getEntrainments().setsessionpartEntrainment(selectedsessionpart.number, selectedsessionpart.getEntrainment());
+                        selectedsessionpart.getThisession().Root.getAmbiences().setsessionpartAmbience(selectedsessionpart.number, selectedsessionpart.getAmbience());
+                        selectedsessionpart = getnextsessionpart();
+                        startupcheck_count[0] = 0;
+                        startupcheck_count[1] = 0;
+                        call();
+                    } catch (IndexOutOfBoundsException e) {
+                        // End Of Startup Checks
+                        complete = true;
+                        startupcheckscompleted();
+                        return null;
+                    }
+                }
+            }
+            if (file != null && file.exists()) {
+                if (soundFile == null) {soundFile = new SoundFile(file);}
+                if (soundFile.getDuration() == null || soundFile.getDuration() == 0.0) {
+                    startupcheckplayer = new MediaPlayer(new Media(file.toURI().toString()));
+                    SoundFile finalSoundFile = soundFile;
+                    startupcheckplayer.setOnReady(() -> {
+                        finalSoundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
+                        startupcheckplayer.dispose();
+                        if (startupcheck_count[1] == 0) {
+                            if (startupcheck_count[0] == 0) {selectedsessionpart.getEntrainment().setFreq(finalSoundFile);}
+                            else {selectedsessionpart.getEntrainment().ramp_add(finalSoundFile);}
+                            startupcheck_count[0]++;
+                        } else {
+                            selectedsessionpart.getAmbience().set(finalSoundFile);
+                            startupcheck_count[1]++;
+                        }
+                        workcount[0]++;
+                        updateProgress(workcount[0], workcount[1]);
+                        updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
+                        try {call();} catch (Exception ignored) {ignored.printStackTrace();}
+                    });
+                } else {
+                    if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
+                        if (startupcheck_count[0] == 0) {selectedsessionpart.getEntrainment().setFreq(soundFile);}
+                        else {selectedsessionpart.getEntrainment().ramp_add(soundFile);}
+                        startupcheck_count[0]++;
+                    } else {startupcheck_count[1]++;}
+                    workcount[0]++;
+                    updateProgress(workcount[0], workcount[1]);
+                    updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
+                    try {call();} catch (Exception ignored) {ignored.printStackTrace();}
+                }
+            } else {
+                if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
+                    if (! partswithmissingentrainment.contains(selectedsessionpart)) {partswithmissingentrainment.add(selectedsessionpart);}
+                    startupcheck_count[0]++;
+                }
+                else {startupcheck_count[1]++;}
+                workcount[0]++;
+                updateProgress(workcount[0], workcount[1]);
+                updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
+                try {call();} catch (Exception ignored) {}
+            }
+            return null;
+        }
+
+        // Generators
+        protected void calculatetotalworktodo() {
+            for (SessionPart i : sessionPartList) {
+                workcount[1] += i.entrainmentpartcount();
+                if (i.getAmbience().hasAnyAmbience()) {workcount[1] += i.getAmbience().getAmbience().size();}
+            }
+        }
+        protected void populateambiencefromfiles() {
+            for (SessionPart sessionPart : sessionPartList) {
+                sessionPart.getAmbience().startup_addambiencefromdirectory(sessionPart);
+                sessionPart.getAmbience().startup_checkfordeletedfiles();
+            }
+        }
+        protected SoundFile getnextentraimentsoundfile() throws IndexOutOfBoundsException {
+            if (selectedsessionpart instanceof Qi_Gong || selectedsessionpart instanceof Element) {
+                try {
+                    if (startupcheck_count[0] == 0) {
+                        return selectedsessionpart.getEntrainment().getFreq();
+                    } else {
+                        return selectedsessionpart.getEntrainment().ramp_get(startupcheck_count[0]);
+                    }
+                } catch (Exception i) {i.printStackTrace(); return null;}
+            } else {
+                switch (startupcheck_count[0]) {
+                    case 0:
+                        return selectedsessionpart.getEntrainment().getFreq();
+                    case 1:
+                        return selectedsessionpart.getEntrainment().ramp_get(0);
+                    case 2:
+                        return selectedsessionpart.getEntrainment().ramp_get(1);
+                    default:
+                        throw new IndexOutOfBoundsException();
+                }
+            }
+        }
+        protected File getnextentrainmentfile() throws IndexOutOfBoundsException {
+            if (selectedsessionpart instanceof Qi_Gong || selectedsessionpart instanceof Element) {
+                if (startupcheck_count[0] == 0) {return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, selectedsessionpart.getNameForFiles().toUpperCase() + ".mp3");}
+                else {return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + selectedsessionpart.getNameForFiles() + "to" + selectedsessionpart.getThisession().getallCutNames().get(startupcheck_count[0] - 1).toLowerCase() + ".mp3");}
+            } else {
+                switch (startupcheck_count[0]) {
+                    case 0:
+                        return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, selectedsessionpart.getNameForFiles().toUpperCase() + ".mp3");
+                    case 1:
+                        return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + selectedsessionpart.getNameForFiles() + "to" +
+                                selectedsessionpart.getThisession().getallCutNames().get(selectedsessionpart.getThisession().getallCutNames().
+                                        indexOf(selectedsessionpart.name) + 1) + ".mp3");
+                    case 2:
+                        return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + selectedsessionpart.getNameForFiles() + "toqi.mp3");
+                    default:
+                        throw new IndexOutOfBoundsException();
+                }
+            }
+        }
+        protected SoundFile getnextambiencesoundfile() throws IndexOutOfBoundsException {
+            return selectedsessionpart.getAmbience().get(startupcheck_count[1]);
+        }
+        protected SessionPart getnextsessionpart() throws IndexOutOfBoundsException {
+            if (selectedsessionpart == null) {return sessionPartList.get(0);}
+            else {
+                startupcheck_count[2] = sessionPartList.indexOf(selectedsessionpart) + 1;
+                return sessionPartList.get(startupcheck_count[2]);
+            }
         }
 
     }

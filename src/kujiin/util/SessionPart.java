@@ -92,7 +92,7 @@ public class SessionPart {
     }
 
 // Entrainment Methods
-    public int partchecker_maxcount() {return 0;}
+    public int entrainmentpartcount() {return 0;}
 
 // Ambience Methods
     public Duration ambience_getTotalActualDuration() {return ambience.gettotalDuration();}
@@ -122,7 +122,10 @@ public class SessionPart {
     }
     public void gui_setDisable(boolean disabled) {
         Switch.setDisable(disabled);
-        Value.setDisable(disabled);
+        if (! disabled) {
+            if (Integer.parseInt(Value.getText()) > 0) {Value.setDisable(false);}
+            else {Value.setDisable(true);}
+        } else {Value.setDisable(true);}
     }
     public int gui_getvalue() {return Integer.parseInt(Value.getText());}
 // Getters And Setters
