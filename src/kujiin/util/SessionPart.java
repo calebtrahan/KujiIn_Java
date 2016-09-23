@@ -129,11 +129,9 @@ public class SessionPart {
     }
     public int gui_getvalue() {return Integer.parseInt(Value.getText());}
 // Getters And Setters
-
     public This_Session getThisession() {
         return thisession;
     }
-
     public List<kujiin.xml.Goals.Goal> getGoals() {
         return Goals;
     }

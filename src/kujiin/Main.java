@@ -24,7 +24,6 @@ public class Main extends Application {
         Root.setStage(primaryStage);
         Root.getOptions().setStyle(primaryStage);
         primaryStage.setOnShowing(event -> {
-            System.out.println("Showing");
             Root.setEntrainments(new Entrainments(Root));
             Root.setAmbiences(new Ambiences(Root));
             Root.setSession(new This_Session(Root));

@@ -46,10 +46,6 @@ import static kujiin.util.Util.AnswerType.YES;
 // TODO Test
 
 // TODO Additional Features To Definitely Add
-    // TODO Make A Loading/Initializing Dialog Performing Startup Checks Before Setting Up First Scene
-        // Populate Entrainment
-        // Populate Ambience
-        // Maybe Populate ALL Logic Into One Single Service And Tie To 'Startup Checks Dialog', So It Isn't So Damn Confusing
     // TODO Create A Custom Ambience Selection Wizard To Add Ambience Individually To Each Session Part In Session
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
     // TODO Exporter
@@ -142,7 +138,6 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("Initializing");
         setOptions(new Options(this));
         getOptions().unmarshall();
     }

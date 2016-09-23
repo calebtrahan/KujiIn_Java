@@ -38,7 +38,6 @@ public class Ambiences {
 
 // XML Processing
     public void unmarshall() {
-        System.out.println("Unmarshalled Ambiene");
         if (Options.AMBIENCEXMLFILE.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Ambiences.class);
