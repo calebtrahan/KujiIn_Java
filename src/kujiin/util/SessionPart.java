@@ -146,8 +146,15 @@ public class SessionPart {
     public Ambience getAmbience() {
         return ambience;
     }
+    public void setAmbience(Ambience ambience) {
+        this.ambience = ambience;
+        thisession.Root.getAmbiences().setsessionpartAmbience(number, ambience);
+    }
     public Entrainment getEntrainment() {return entrainment;}
-    public void setEntrainment(Entrainment entrainment) {this.entrainment = entrainment;}
+    public void setEntrainment(Entrainment entrainment) {
+        this.entrainment = entrainment;
+        thisession.Root.getEntrainments().setsessionpartEntrainment(number, entrainment);
+    }
     public void setGoalsController(Goals goals) {
         GoalsController = goals;
     }

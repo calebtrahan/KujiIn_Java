@@ -152,9 +152,6 @@ public class MainController implements Initializable {
         creation_gui_setDisable(false, "");
         Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Startup Checks Completed", 3000);
     }
-    public boolean startupchecksfinished() {
-        return startupChecks.isComplete();
-    }
     public boolean cleanup() {
         Ambiences.marshall();
         Entrainments.marshall();
@@ -2753,6 +2750,8 @@ public class MainController implements Initializable {
 // Startup
     class StartupChecks extends Task {
         private SessionPart selectedsessionpart;
+        private Entrainment selectedentrainment;
+        private Ambience selectedambience;
         private List<SessionPart> sessionPartList;
         private final int[] startupcheck_count = {0, 0, 0};
         private MediaPlayer startupcheckplayer;
@@ -2760,7 +2759,6 @@ public class MainController implements Initializable {
         private ArrayList<SessionPart> partswithmissingentrainment = new ArrayList<>();
         private boolean firstcall = true;
         private final double[] workcount = {0, 0};
-        private boolean complete = false;
 
         public StartupChecks(List<SessionPart> allsessionparts) {
             sessionPartList = allsessionparts;
@@ -2772,9 +2770,6 @@ public class MainController implements Initializable {
         }
         public ArrayList<SessionPart> getPartswithmissingentrainment() {
             return partswithmissingentrainment;
-        }
-        public boolean isComplete() {
-            return complete;
         }
 
         // Method Overrides
@@ -2802,15 +2797,13 @@ public class MainController implements Initializable {
                         throw new IndexOutOfBoundsException();}
                 } catch (IndexOutOfBoundsException ignore) {
                     try {
-                        selectedsessionpart.getThisession().Root.getEntrainments().setsessionpartEntrainment(selectedsessionpart.number, selectedsessionpart.getEntrainment());
-                        selectedsessionpart.getThisession().Root.getAmbiences().setsessionpartAmbience(selectedsessionpart.number, selectedsessionpart.getAmbience());
+                        selectedsessionpart.setEntrainment(selectedsessionpart.getEntrainment());
+                        selectedsessionpart.setAmbience(selectedsessionpart.getAmbience());
                         selectedsessionpart = getnextsessionpart();
                         startupcheck_count[0] = 0;
                         startupcheck_count[1] = 0;
                         call();
                     } catch (IndexOutOfBoundsException e) {
-                        // End Of Startup Checks
-                        complete = true;
                         startupcheckscompleted();
                         return null;
                     }
@@ -2822,27 +2815,56 @@ public class MainController implements Initializable {
                     startupcheckplayer = new MediaPlayer(new Media(file.toURI().toString()));
                     SoundFile finalSoundFile = soundFile;
                     startupcheckplayer.setOnReady(() -> {
-                        finalSoundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
-                        startupcheckplayer.dispose();
-                        if (startupcheck_count[1] == 0) {
-                            if (startupcheck_count[0] == 0) {selectedsessionpart.getEntrainment().setFreq(finalSoundFile);}
-                            else {selectedsessionpart.getEntrainment().ramp_add(finalSoundFile);}
-                            startupcheck_count[0]++;
+                        if (startupcheckplayer.getTotalDuration().greaterThan(Duration.ZERO)) {
+                            finalSoundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
+                            startupcheckplayer.dispose();
+                            startupcheckplayer = null;
+                            if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
+                                if (startupcheck_count[0] == 0) {
+                                    Entrainment entrainment = selectedsessionpart.getEntrainment();
+                                    entrainment.setFreq(finalSoundFile);
+                                    selectedsessionpart.setEntrainment(entrainment);
+                                } else {
+                                    Entrainment entrainment = selectedsessionpart.getEntrainment();
+                                    entrainment.ramp_add(finalSoundFile);
+                                    selectedsessionpart.setEntrainment(entrainment);
+                                }
+                                startupcheck_count[0]++;
+                            } else {
+                                selectedsessionpart.getAmbience().set(finalSoundFile);
+                                startupcheck_count[1]++;
+                            }
+                            workcount[0]++;
+                            updateProgress(workcount[0], workcount[1]);
+                            updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
+                            try {
+                                call();
+                            } catch (Exception ignored) {
+                                ignored.printStackTrace();
+                            }
                         } else {
-                            selectedsessionpart.getAmbience().set(finalSoundFile);
-                            startupcheck_count[1]++;
+                            startupcheckplayer.dispose();
+                            startupcheckplayer = null;
+                            try {call();} catch (Exception ignored) {ignored.printStackTrace();}
                         }
-                        workcount[0]++;
-                        updateProgress(workcount[0], workcount[1]);
-                        updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
-                        try {call();} catch (Exception ignored) {ignored.printStackTrace();}
                     });
                 } else {
                     if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
-                        if (startupcheck_count[0] == 0) {selectedsessionpart.getEntrainment().setFreq(soundFile);}
-                        else {selectedsessionpart.getEntrainment().ramp_add(soundFile);}
+                        if (startupcheck_count[0] == 0) {
+                            Entrainment entrainment = selectedsessionpart.getEntrainment();
+                            entrainment.setFreq(soundFile);
+                            selectedsessionpart.setEntrainment(entrainment);
+                        }
+                        else {
+                            Entrainment entrainment = selectedsessionpart.getEntrainment();
+                            entrainment.ramp_add(soundFile);
+                            selectedsessionpart.setEntrainment(entrainment);
+                        }
                         startupcheck_count[0]++;
-                    } else {startupcheck_count[1]++;}
+                    } else {
+
+                        startupcheck_count[1]++;
+                    }
                     workcount[0]++;
                     updateProgress(workcount[0], workcount[1]);
                     updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
