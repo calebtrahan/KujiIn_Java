@@ -26,9 +26,11 @@ public class Entrainment {
     public void setRampfile(SoundFile rampfile) {
         this.rampfile = rampfile;
     }
+    public List<SoundFile> getRampfiles() {
+        return rampfiles;
+    }
 
-
-// Ramp Methods
+    // Ramp Methods
     public int ramp_count() {return rampfiles.size();}
     public void ramp_initialize() {if (rampfiles == null) {rampfiles = new ArrayList<>();}}
     public void ramp_add(SoundFile soundFile) {ramp_initialize(); rampfiles.add(soundFile);}
@@ -43,5 +45,4 @@ public class Entrainment {
     }
 
 // Other Methods
-
 }

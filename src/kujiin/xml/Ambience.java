@@ -38,7 +38,7 @@ public class Ambience {
         } catch (NullPointerException ignored) {return new ArrayList<>();}
     }
 
-// Utility Methods
+    // Utility Methods
     public void startup_addambiencefromdirectory(SessionPart selectedsessionpart) {
         try {
             File ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, selectedsessionpart.name);
@@ -63,7 +63,7 @@ public class Ambience {
         initialize();
         Ambience.add(soundFile);
     }
-    public void set(SoundFile soundFile) {
+    public void setoraddsoundfile(SoundFile soundFile) {
         int index = getAmbienceFiles().indexOf(soundFile.getFile());
         if (index != -1) {Ambience.set(index, soundFile);}
         else {add(soundFile);}

@@ -2787,8 +2787,8 @@ public class MainController implements Initializable {
                 try {
                     if (selectedsessionpart.getAmbience().hasAnyAmbience()) {
                         if (startupcheck_count[1] == 0) {
-                            selectedsessionpart.getAmbience().startup_addambiencefromdirectory(selectedsessionpart);
-                            selectedsessionpart.getAmbience().startup_checkfordeletedfiles();
+                            selectedambience.startup_addambiencefromdirectory(selectedsessionpart);
+                            selectedambience.startup_checkfordeletedfiles();
                         }
                         soundFile = getnextambiencesoundfile();
                         file = soundFile.getFile();
@@ -2797,90 +2797,78 @@ public class MainController implements Initializable {
                         throw new IndexOutOfBoundsException();}
                 } catch (IndexOutOfBoundsException ignore) {
                     try {
-                        selectedsessionpart.setEntrainment(selectedsessionpart.getEntrainment());
-                        selectedsessionpart.setAmbience(selectedsessionpart.getAmbience());
+                        selectedsessionpart.setEntrainment(selectedentrainment);
+                        selectedsessionpart.setAmbience(selectedambience);
                         selectedsessionpart = getnextsessionpart();
                         startupcheck_count[0] = 0;
                         startupcheck_count[1] = 0;
                         call();
                     } catch (IndexOutOfBoundsException e) {
+                        getEntrainments().marshall();
+                        getAmbiences().marshall();
                         startupcheckscompleted();
                         return null;
                     }
                 }
             }
-            if (file != null && file.exists()) {
-                if (soundFile == null) {soundFile = new SoundFile(file);}
-                if (soundFile.getDuration() == null || soundFile.getDuration() == 0.0) {
-                    startupcheckplayer = new MediaPlayer(new Media(file.toURI().toString()));
-                    SoundFile finalSoundFile = soundFile;
-                    startupcheckplayer.setOnReady(() -> {
-                        if (startupcheckplayer.getTotalDuration().greaterThan(Duration.ZERO)) {
-                            finalSoundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
-                            startupcheckplayer.dispose();
-                            startupcheckplayer = null;
-                            if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
-                                if (startupcheck_count[0] == 0) {
-                                    Entrainment entrainment = selectedsessionpart.getEntrainment();
-                                    entrainment.setFreq(finalSoundFile);
-                                    selectedsessionpart.setEntrainment(entrainment);
+            if (file != null) {
+                if (file.exists()) {
+                    if (soundFile == null) {soundFile = new SoundFile(file);}
+                    if (! soundFile.isValid()) {
+                        startupcheckplayer = new MediaPlayer(new Media(file.toURI().toString()));
+                        SoundFile finalSoundFile = soundFile;
+                        startupcheckplayer.setOnReady(() -> {
+                            if (startupcheckplayer.getTotalDuration().greaterThan(Duration.ZERO)) {
+                                finalSoundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
+                                startupcheckplayer.dispose();
+                                startupcheckplayer = null;
+                                if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
+                                    if (startupcheck_count[0] == 0) {selectedentrainment.setFreq(finalSoundFile);}
+                                    else {selectedentrainment.ramp_add(finalSoundFile);}
+                                    startupcheck_count[0]++;
                                 } else {
-                                    Entrainment entrainment = selectedsessionpart.getEntrainment();
-                                    entrainment.ramp_add(finalSoundFile);
-                                    selectedsessionpart.setEntrainment(entrainment);
+                                    selectedambience.setoraddsoundfile(finalSoundFile);
+                                    startupcheck_count[1]++;
                                 }
-                                startupcheck_count[0]++;
+                                workcount[0]++;
+                                updateProgress(workcount[0], workcount[1]);
+                                updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
+                                try {call();} catch (Exception ignored) {ignored.printStackTrace();}
                             } else {
-                                selectedsessionpart.getAmbience().set(finalSoundFile);
-                                startupcheck_count[1]++;
+                                startupcheckplayer.dispose();
+                                startupcheckplayer = null;
+                                try {call();} catch (Exception ignored) {ignored.printStackTrace();}
                             }
-                            workcount[0]++;
-                            updateProgress(workcount[0], workcount[1]);
-                            updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
-                            try {
-                                call();
-                            } catch (Exception ignored) {
-                                ignored.printStackTrace();
+                        });
+                    } else {
+                        if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
+                            if (startupcheck_count[0] == 0) {
+                                selectedentrainment.setFreq(soundFile);}
+                            else {
+                                selectedentrainment.ramp_add(soundFile);
                             }
+                            startupcheck_count[0]++;
                         } else {
-                            startupcheckplayer.dispose();
-                            startupcheckplayer = null;
-                            try {call();} catch (Exception ignored) {ignored.printStackTrace();}
+                            selectedambience.setoraddsoundfile(soundFile);
+                            startupcheck_count[1]++;
                         }
-                    });
+                        workcount[0]++;
+                        updateProgress(workcount[0], workcount[1]);
+                        updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
+                        try {call();} catch (Exception ignored) {ignored.printStackTrace();}
+                    }
                 } else {
                     if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
-                        if (startupcheck_count[0] == 0) {
-                            Entrainment entrainment = selectedsessionpart.getEntrainment();
-                            entrainment.setFreq(soundFile);
-                            selectedsessionpart.setEntrainment(entrainment);
-                        }
-                        else {
-                            Entrainment entrainment = selectedsessionpart.getEntrainment();
-                            entrainment.ramp_add(soundFile);
-                            selectedsessionpart.setEntrainment(entrainment);
-                        }
+                        if (! partswithmissingentrainment.contains(selectedsessionpart)) {partswithmissingentrainment.add(selectedsessionpart);}
                         startupcheck_count[0]++;
-                    } else {
-
-                        startupcheck_count[1]++;
                     }
+                    else {startupcheck_count[1]++;}
                     workcount[0]++;
                     updateProgress(workcount[0], workcount[1]);
                     updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
-                    try {call();} catch (Exception ignored) {ignored.printStackTrace();}
+                    try {call();} catch (Exception ignored) {}
                 }
-            } else {
-                if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
-                    if (! partswithmissingentrainment.contains(selectedsessionpart)) {partswithmissingentrainment.add(selectedsessionpart);}
-                    startupcheck_count[0]++;
-                }
-                else {startupcheck_count[1]++;}
-                workcount[0]++;
-                updateProgress(workcount[0], workcount[1]);
-                updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
-                try {call();} catch (Exception ignored) {}
-            }
+            } else {try {call();} catch (Exception ignored) {ignored.printStackTrace();}}
             return null;
         }
 
@@ -2930,7 +2918,7 @@ public class MainController implements Initializable {
                     case 1:
                         return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + selectedsessionpart.getNameForFiles() + "to" +
                                 selectedsessionpart.getThisession().getallCutNames().get(selectedsessionpart.getThisession().getallCutNames().
-                                        indexOf(selectedsessionpart.name) + 1) + ".mp3");
+                                        indexOf(selectedsessionpart.name) + 1).toLowerCase() + ".mp3");
                     case 2:
                         return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + selectedsessionpart.getNameForFiles() + "toqi.mp3");
                     default:
@@ -2942,13 +2930,16 @@ public class MainController implements Initializable {
             return selectedsessionpart.getAmbience().get(startupcheck_count[1]);
         }
         protected SessionPart getnextsessionpart() throws IndexOutOfBoundsException {
-            if (selectedsessionpart == null) {return sessionPartList.get(0);}
+            SessionPart sessionpart;
+            if (selectedsessionpart == null) {sessionpart = sessionPartList.get(0);}
             else {
                 startupcheck_count[2] = sessionPartList.indexOf(selectedsessionpart) + 1;
-                return sessionPartList.get(startupcheck_count[2]);
+                sessionpart = sessionPartList.get(startupcheck_count[2]);
             }
+            selectedentrainment = sessionpart.getEntrainment();
+            selectedambience = sessionpart.getAmbience();
+            return sessionpart;
         }
-
     }
 
 }

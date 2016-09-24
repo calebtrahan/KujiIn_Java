@@ -93,9 +93,24 @@ public class SessionPart {
 
 // Entrainment Methods
     public int entrainmentpartcount() {return 0;}
+    public void entrainmenttest() {
+        System.out.println(name + "'s Entrainment:");
+        System.out.println(" - Freq: " + entrainment.getFreq().toString());
+        for (SoundFile i : entrainment.getRampfiles()) {
+            System.out.println(" - Ramp: " + i.toString());
+        }
+    }
 
 // Ambience Methods
     public Duration ambience_getTotalActualDuration() {return ambience.gettotalDuration();}
+    public void ambiencetest() {
+        System.out.println(name + "'s Ambience:");
+        if (ambience.hasAnyAmbience()) {
+            for (SoundFile i : ambience.getAmbience()) {
+                System.out.println(" - " + i.toString());
+            }
+        } else {System.out.println(name + " Has No Ambience");}
+    }
 
 // GUI Methods
     public void setToolTip() {Switch.setTooltip(getTooltip());}

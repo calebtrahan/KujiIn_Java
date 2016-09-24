@@ -58,11 +58,21 @@
         </rampfiles>
     </Presession>
     <Rin>
+        <freq>
+            <duration>299726.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/RIN.mp3</file>
+            <name>RIN</name>
+        </freq>
         <rampfile>
             <duration>30040.816326</duration>
-            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/rintoqi.mp3</file>
-            <name>rintoqi</name>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/rintokyo.mp3</file>
+            <name>rintokyo</name>
         </rampfile>
+        <rampfiles>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/rintokyo.mp3</file>
+            <name>rintokyo</name>
+        </rampfiles>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/rintoqi.mp3</file>
@@ -70,6 +80,21 @@
         </rampfiles>
     </Rin>
     <Kyo>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/KYO.mp3</file>
+            <name>KYO</name>
+        </freq>
+        <rampfile>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/kyotoqi.mp3</file>
+            <name>kyotoqi</name>
+        </rampfile>
+        <rampfiles>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/kyototoh.mp3</file>
+            <name>kyototoh</name>
+        </rampfiles>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/kyotoqi.mp3</file>
@@ -77,6 +102,16 @@
         </rampfiles>
     </Kyo>
     <Toh>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/TOH.mp3</file>
+            <name>TOH</name>
+        </freq>
+        <rampfiles>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/tohtosha.mp3</file>
+            <name>tohtosha</name>
+        </rampfiles>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/tohtoqi.mp3</file>
@@ -84,6 +119,16 @@
         </rampfiles>
     </Toh>
     <Sha>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/SHA.mp3</file>
+            <name>SHA</name>
+        </freq>
+        <rampfiles>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/shatokai.mp3</file>
+            <name>shatokai</name>
+        </rampfiles>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/shatoqi.mp3</file>
@@ -91,6 +136,16 @@
         </rampfiles>
     </Sha>
     <Kai>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/KAI.mp3</file>
+            <name>KAI</name>
+        </freq>
+        <rampfiles>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/kaitojin.mp3</file>
+            <name>kaitojin</name>
+        </rampfiles>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/kaitoqi.mp3</file>
@@ -98,6 +153,16 @@
         </rampfiles>
     </Kai>
     <Jin>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/JIN.mp3</file>
+            <name>JIN</name>
+        </freq>
+        <rampfiles>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/jintoretsu.mp3</file>
+            <name>jintoretsu</name>
+        </rampfiles>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/jintoqi.mp3</file>
@@ -105,6 +170,16 @@
         </rampfiles>
     </Jin>
     <Retsu>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/RETSU.mp3</file>
+            <name>RETSU</name>
+        </freq>
+        <rampfiles>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/retsutozai.mp3</file>
+            <name>retsutozai</name>
+        </rampfiles>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/retsutoqi.mp3</file>
@@ -112,6 +187,16 @@
         </rampfiles>
     </Retsu>
     <Zai>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ZAI.mp3</file>
+            <name>ZAI</name>
+        </freq>
+        <rampfiles>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/zaitozen.mp3</file>
+            <name>zaitozen</name>
+        </rampfiles>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/zaitoqi.mp3</file>
@@ -119,6 +204,11 @@
         </rampfiles>
     </Zai>
     <Zen>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ZEN.mp3</file>
+            <name>ZEN</name>
+        </freq>
         <rampfiles>
             <duration>214538.0</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/01-Angel's Breath-Paul Avgerinos_.mp3</file>
@@ -131,6 +221,11 @@
         </rampfiles>
     </Zen>
     <Earth>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/QI.mp3</file>
+            <name>QI</name>
+        </freq>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/qitorin.mp3</file>
@@ -178,6 +273,11 @@
         </rampfiles>
     </Earth>
     <Air>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/QI.mp3</file>
+            <name>QI</name>
+        </freq>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/qitorin.mp3</file>
@@ -225,10 +325,15 @@
         </rampfiles>
     </Air>
     <Fire>
-        <rampfiles>
-            <duration>30040.816326</duration>
+        <freq>
+            <duration>299622.0</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/QI.mp3</file>
             <name>QI</name>
+        </freq>
+        <rampfiles>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/qitorin.mp3</file>
+            <name>qitorin</name>
         </rampfiles>
         <rampfiles>
             <duration>30040.816326</duration>
@@ -272,6 +377,11 @@
         </rampfiles>
     </Fire>
     <Water>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/QI.mp3</file>
+            <name>QI</name>
+        </freq>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/qitorin.mp3</file>
@@ -319,6 +429,11 @@
         </rampfiles>
     </Water>
     <Void>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/QI.mp3</file>
+            <name>QI</name>
+        </freq>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/qitorin.mp3</file>
@@ -366,6 +481,16 @@
         </rampfiles>
     </Void>
     <Postsession>
+        <freq>
+            <duration>299622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/QI.mp3</file>
+            <name>QI</name>
+        </freq>
+        <rampfile>
+            <duration>30040.816326</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/qitokyo.mp3</file>
+            <name>qitokyo</name>
+        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/qitorin.mp3</file>

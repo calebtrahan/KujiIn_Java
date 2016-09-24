@@ -17,6 +17,7 @@ public class SoundFile {
         if (file != null) {
             this.file = file;
             this.name = file.getName().substring(0, file.getName().lastIndexOf("."));
+            duration = null;
         }
     }
 
@@ -43,5 +44,10 @@ public class SoundFile {
     // Utility Methods
     public boolean isValid() {
         return name != null && file != null && duration != null && duration > 0.0;
+    }
+
+    @Override
+    public String toString() {
+        return "Name: " + getName() + ". File: " + file.getAbsolutePath() + ". Duration: " + getDuration() + " Milliseconds";
     }
 }
