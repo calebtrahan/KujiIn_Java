@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="318.0" prefWidth="422.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="TOP_CENTER" layoutX="112.0" layoutY="136.0" prefHeight="318.0" prefWidth="416.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <TableView fx:id="AmbienceItemsTable" prefHeight="231.0" prefWidth="340.0">
+              <columns>
+                  <TableColumn fx:id="NumberColumn" prefWidth="32.0" text="#" />
+                <TableColumn fx:id="NameColumn" prefWidth="229.0" text="Name" />
+                <TableColumn fx:id="DurationColumn" prefWidth="139.0" text="Duration" />
+              </columns>
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </TableView>
+            <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="349.0">
+               <children>
+                  <Button fx:id="AddFilesButton" mnemonicParsing="false" onAction="#addfiles" text="Add File(s)" />
+                  <Button fx:id="AddAmbienceButton" mnemonicParsing="false" text="Add Ambience" onAction="#addambience"/>
+                  <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removeambience" prefHeight="26.0" prefWidth="67.0" text="Remove" />
+                  <Button fx:id="MoveUpButton" mnemonicParsing="false" onAction="#moveupintable" text="Up" />
+                  <Button fx:id="MoveDownButton" mnemonicParsing="false" onAction="#movedownintable" text="Down" />
+                  <Button fx:id="PreviewButton" mnemonicParsing="false" onAction="#preview" prefHeight="26.0" prefWidth="66.0" text="Preview" />
+               </children>
+               <VBox.margin>
+                  <Insets top="3.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="39.0" prefWidth="349.0">
+               <children>
+                  <Label fx:id="TotalDurationTextField" alignment="CENTER_RIGHT" prefHeight="33.0" prefWidth="103.0" text="Current Duration" textAlignment="CENTER" wrapText="true">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField prefHeight="26.0" prefWidth="152.0">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin></TextField>
+                  <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#accept" text="Accept" />
+                  <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#close" text="Cancel" />
+               </children>
+               <VBox.margin>
+                  <Insets right="10.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

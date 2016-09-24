@@ -69,7 +69,7 @@
                <children>
                   <HBox alignment="CENTER" prefHeight="50.0" prefWidth="212.0">
                      <children>
-                        <CheckBox fx:id="AmbienceSwitch" onMouseClicked="#ambienceswitchtoggled" text="Ambience">
+                        <CheckBox fx:id="AmbienceSwitch" onAction="#ambienceswitchtoggled" text="Ambience">
                            <HBox.margin>
                               <Insets right="5.0" />
                            </HBox.margin>

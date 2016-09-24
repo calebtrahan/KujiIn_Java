@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static kujiin.util.Util.AnswerType.YES;
 // TODO Bugs To Fix
+    // TODO Entrainment Always Calculates Duration Instead Of Just Using Previously Calculated XML Values
     // TODO Ambience Shuffle Algorithm Doesn't Add Last Actual Ambience File
     // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
     // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified
@@ -2687,64 +2688,6 @@ public class MainController implements Initializable {
             return file;
         }
         public double getDuration() {return duration;}
-    }
-
-// Boilerplate Dialogs
-    public static class SimpleTextDialogWithCancelButton extends Stage {
-        public Button CancelButton;
-        public Label Message;
-        public Label TopTitle;
-
-        public SimpleTextDialogWithCancelButton(Options options, String titletext, String toptitletext, String message) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SimpleTextDialogWithCancelButton.fxml"));
-            fxmlLoader.setController(this);
-            try {
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                options.setStyle(this);
-                this.setResizable(false);
-            } catch (IOException ignored) {}
-            setTitle(titletext);
-            Message.setText(message);
-            TopTitle.setText(toptitletext);
-        }
-    }
-    public static class LoadingDialog extends Stage {
-        public Label Message;
-        public ProgressIndicator Progress;
-
-        public LoadingDialog(Options options, String titletext, String message) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/LoadingDialog.fxml"));
-                fxmlLoader.setController(this);
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                options.setStyle(this);
-                this.setResizable(false);
-                this.setOnCloseRequest(Event::consume);
-            } catch (IOException e) {}
-            setTitle(titletext);
-            Message.setText(message);
-        }
-    }
-    public static class TaskProgressDialog extends Stage {
-        public Label TopLabel;
-        public Label ProgressLabel;
-        public ProgressBar Progress;
-        public Button CancelButton;
-
-        public TaskProgressDialog(Options options) {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ComplexTaskProgressDialog.fxml"));
-                fxmlLoader.setController(this);
-                Scene defaultscene = new Scene(fxmlLoader.load());
-                setScene(defaultscene);
-                options.setStyle(this);
-                this.setResizable(false);
-                this.setOnCloseRequest(Event::consume);
-            } catch (IOException e) {}
-        }
-
     }
 
 // Startup
