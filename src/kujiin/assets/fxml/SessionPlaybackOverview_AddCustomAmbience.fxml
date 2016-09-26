@@ -20,7 +20,7 @@
             <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="349.0">
                <children>
                   <Button fx:id="AddFilesButton" mnemonicParsing="false" onAction="#addfiles" text="Add File(s)" />
-                  <Button fx:id="AddAmbienceButton" mnemonicParsing="false" text="Add Ambience" onAction="#addambience"/>
+                  <Button fx:id="AddAmbienceButton" mnemonicParsing="false" onAction="#addambience" text="Add Ambience" />
                   <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removeambience" prefHeight="26.0" prefWidth="67.0" text="Remove" />
                   <Button fx:id="MoveUpButton" mnemonicParsing="false" onAction="#moveupintable" text="Up" />
                   <Button fx:id="MoveDownButton" mnemonicParsing="false" onAction="#movedownintable" text="Down" />
@@ -35,12 +35,7 @@
             </HBox>
             <HBox alignment="CENTER_RIGHT" prefHeight="39.0" prefWidth="349.0">
                <children>
-                  <Label fx:id="TotalDurationTextField" alignment="CENTER_RIGHT" prefHeight="33.0" prefWidth="103.0" text="Current Duration" textAlignment="CENTER" wrapText="true">
-                     <HBox.margin>
-                        <Insets right="5.0" />
-                     </HBox.margin>
-                  </Label>
-                  <TextField prefHeight="26.0" prefWidth="152.0">
+                  <TextField fx:id="TotalDurationTextField" editable="false" prefHeight="29.0" prefWidth="276.0">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin></TextField>

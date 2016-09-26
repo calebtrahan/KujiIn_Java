@@ -1045,7 +1045,7 @@ public class This_Session {
         public TableColumn<AmbienceSongWithNumber, Integer> NumberColumn;
         public TableColumn<AmbienceSongWithNumber, String> NameColumn;
         public TableColumn<AmbienceSongWithNumber, String> DurationColumn;
-        public Label TotalDurationTextField;
+        public TextField TotalDurationTextField;
         public Button AcceptButton;
         public Button CancelButton;
         public Button RemoveButton;
@@ -1059,6 +1059,7 @@ public class This_Session {
         private List<SoundFile> CustomAmbienceList = new ArrayList<>();
         private SessionPart sessionPart;
         private boolean result = false;
+        private boolean longenough = false;
 
         public SessionPlaybackOverview_AddCustomAmbience(SessionPart sessionPart) {
             try {
@@ -1078,6 +1079,7 @@ public class This_Session {
                 DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
                 AmbienceItemsTable.getSelectionModel().selectedItemProperty().addListener(
                         (observable, oldValue, newValue) -> tableselectionchanged(newValue));
+                calculatetotal();
             } catch (IOException ignored) {}
         }
 
@@ -1129,6 +1131,7 @@ public class This_Session {
                 TableItems.addAll(selectAmbience.getSoundfiles());
                 orderambience();
                 AmbienceItemsTable.setItems(TableItems);
+                calculatetotal();
             }
         }
         public void orderambience() {
@@ -1159,9 +1162,20 @@ public class This_Session {
             return duration;
         }
         public void calculatetotal() {
-            if (getcurrenttotal().greaterThanOrEqualTo(sessionPart.getduration())) {TotalDurationTextField.setStyle("-fx-text-fill: red;");}
-            else {TotalDurationTextField.setStyle("-fx-text-fill: black;");}
-            TotalDurationTextField.setText(Util.formatdurationtoStringSpelledOut(getcurrenttotal(), TotalDurationTextField.getLayoutBounds().getWidth()));
+            if (getcurrenttotal().lessThan(sessionPart.getduration())) {
+                Duration timeleft = sessionPart.getduration().subtract(getcurrenttotal());
+                TotalDurationTextField.setStyle("-fx-text-fill: red;");
+                String str = "Ambience Is Not Long Enough (" +
+                        Util.formatdurationtoStringSpelledOut(timeleft, TotalDurationTextField.getLayoutBounds().getWidth()) +
+                        " Left)";
+                TotalDurationTextField.setText(str);
+                longenough = false;
+            }
+            else {
+                TotalDurationTextField.setStyle("-fx-text-fill: white;");
+                TotalDurationTextField.setText("Ambience Is Long Enough");
+                longenough = true;
+            }
         }
         public void moveupintable(ActionEvent actionEvent) {
             int selectedindex = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
