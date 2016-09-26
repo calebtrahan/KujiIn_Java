@@ -40,8 +40,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-// Description Format
-
 public class This_Session {
     private Qi_Gong Presession;
     private Cut Rin;
@@ -79,8 +77,8 @@ public class This_Session {
     public AmbiencePlaybackType ambiencePlaybackType;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
-    private Integer exportserviceindex;
     private boolean ambienceenabled = false;
+    private Integer exportserviceindex;
     private ArrayList<Service<Boolean>> exportservices;
     private Service<Boolean> currentexporterservice;
 
@@ -771,6 +769,7 @@ public class This_Session {
             syncbuttons();
         }
         public void populatetable() {
+            SessionItemsTable.getItems().clear();
             tableitems.clear();
             if (alladjustedsessionitems == null) {alladjustedsessionitems = new ArrayList<>();}
             int count = 1;
@@ -1057,7 +1056,7 @@ public class This_Session {
         public Button AddAmbienceButton;
         private AmbienceSongWithNumber selectedtableitem;
         private ObservableList<AmbienceSongWithNumber> TableItems = FXCollections.observableArrayList();
-        private List<SoundFile> CustomAmbienceList;
+        private List<SoundFile> CustomAmbienceList = new ArrayList<>();
         private SessionPart sessionPart;
         private boolean result = false;
 
@@ -1092,25 +1091,30 @@ public class This_Session {
             PreviewButton.setDisable(index == -1);
         }
         public boolean ambiencealreadyadded(File file) {
-            for (SoundFile i : CustomAmbienceList) {
-                if (file.equals(i.getFile())) {return true;}
+            if (CustomAmbienceList != null) {
+                for (SoundFile i : CustomAmbienceList) {if (file.equals(i.getFile())) {return true;}}
             }
             return false;
         }
         public void addfiles(ActionEvent actionEvent) {
             List<File> filesselected = new FileChooser().showOpenMultipleDialog(null);
             if (filesselected == null || filesselected.isEmpty()) {return;}
-            // TODO Remove Duplicate Files (If Any Here)
+            if (Util.list_hasduplicates(filesselected)) {
+                if (! Root.dialog_getConfirmation("Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard")) {
+                    filesselected = Util.list_removeduplicates(filesselected);
+                }
+            }
             for (File i : filesselected) {
                 if (ambiencealreadyadded(i)) {continue;}
-                String suffix = i.getName().substring(i.getName().lastIndexOf("."));
-                if (Util.SUPPORTEDAUDIOFORMATS.contains(suffix)) {
+                if (Util.audio_isValid(i)) {
                     MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(i.toURI().toString()));
+                    List<File> finalFilesselected = filesselected;
                     calculatedurationplayer.setOnReady(() -> {
                         SoundFile x = new SoundFile(i);
                         x.setDuration(calculatedurationplayer.getTotalDuration().toMillis());
                         CustomAmbienceList.add(x);
-                        TableItems.add(new AmbienceSongWithNumber(filesselected.indexOf(i), x));
+                        TableItems.add(new AmbienceSongWithNumber(finalFilesselected.indexOf(i), x));
+                        orderambience();
                         AmbienceItemsTable.setItems(TableItems);
                         calculatetotal();
                         calculatedurationplayer.dispose();
@@ -1122,21 +1126,25 @@ public class This_Session {
             SessionPlaybackOverview_SelectAmbience selectAmbience = new SessionPlaybackOverview_SelectAmbience(sessionPart);
             selectAmbience.showAndWait();
             if (selectAmbience.getResult()) {
-                int count = TableItems.size() + 1;
-                for (SoundFile i : selectAmbience.getSoundfiles()) {
-                    TableItems.add(new AmbienceSongWithNumber(count, i));
-                    count++;
-                }
+                TableItems.addAll(selectAmbience.getSoundfiles());
+                orderambience();
                 AmbienceItemsTable.setItems(TableItems);
             }
         }
-
+        public void orderambience() {
+            int count = 1;
+            for (AmbienceSongWithNumber i : TableItems) {
+                i.setNumber(count);
+                count++;
+            }
+        }
         public void removeambience(ActionEvent actionEvent) {
             if (selectedtableitem != null) {
                 if (Root.dialog_getConfirmation("Remove Ambience", "Really Remove '" + selectedtableitem.getName() + "'?", "", "Remove", "Cancel")) {
                     int index = TableItems.indexOf(selectedtableitem);
                     TableItems.remove(index);
                     CustomAmbienceList.remove(index);
+                    orderambience();
                     AmbienceItemsTable.setItems(TableItems);
                     calculatetotal();
                 }
@@ -1203,7 +1211,7 @@ public class This_Session {
         public Button CancelButton;
         private SessionPart sessionPart;
         private boolean result = false;
-        private List<SoundFile> soundfiles = new ArrayList<>();
+        private List<AmbienceSongWithNumber> soundfiles = new ArrayList<>();
         private ObservableList<AmbienceSong> ambienceSongs = FXCollections.observableArrayList();
 
         public SessionPlaybackOverview_SelectAmbience(SessionPart SessionPart) {
@@ -1238,16 +1246,14 @@ public class This_Session {
             }
         }
         public void addfiles(ActionEvent actionEvent) {
-            for (AmbienceSong i : AmbienceTable.getSelectionModel().getSelectedItems()) {
-                soundfiles.add(sessionPart.getAmbience().getAmbience().get(ambienceSongs.indexOf(i)));
-            }
+            soundfiles.addAll(AmbienceTable.getSelectionModel().getSelectedItems().stream().map(i -> new AmbienceSongWithNumber(0, i)).collect(Collectors.toList()));
             result = true;
             close();
         }
         public boolean getResult() {
             return result;
         }
-        public List<SoundFile> getSoundfiles() {
+        public List<AmbienceSongWithNumber> getSoundfiles() {
             return soundfiles;
         }
     }
@@ -1619,6 +1625,13 @@ public class This_Session {
             duration = soundFile.getDuration();
             length = new SimpleStringProperty(Util.formatdurationtoStringDecimalWithColons(Duration.millis(duration)));
         }
+        public AmbienceSongWithNumber(int id, AmbienceSong ambienceSong) {
+            number = new SimpleIntegerProperty(id);
+            name = new SimpleStringProperty(ambienceSong.getName());
+            file = ambienceSong.getFile();
+            duration = ambienceSong.getDuration();
+            length = new SimpleStringProperty(Util.formatdurationtoStringDecimalWithColons(Duration.millis(duration)));
+        }
 
         public String getName() {
             return name.getValue();
@@ -1627,7 +1640,10 @@ public class This_Session {
             return file;
         }
         public double getDuration() {return duration;}
-    }
+        public void setNumber(int number) {
+            this.number.set(number);
+        }
+}
     public class AmbienceSong {
         private StringProperty name;
         private StringProperty length;

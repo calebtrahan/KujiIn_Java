@@ -461,7 +461,7 @@ public class Util {
         } catch (IOException | InterruptedException e) {return null;}
     }
     public static boolean audio_isValid(File file) {
-        return Arrays.asList(Util.SUPPORTEDAUDIOFORMATS).contains(file.getName().substring(file.getName().lastIndexOf(".") + 1));
+        return file.exists() && Util.SUPPORTEDAUDIOFORMATS.contains(file.getName().substring(file.getName().lastIndexOf(".") + 1));
     }
     public static String audio_getsupportedText() {
         StringBuilder s = new StringBuilder();
@@ -589,11 +589,18 @@ public class Util {
     }
 
 // List Methods
-    public static List<?> list_shuffle(List<?> list, int times) {
-        for (int i = 0; i < times; i++) {
-            Collections.shuffle(list);
-        }
-        return list;
+    public static ArrayList<File> list_removeduplicates(List<File> list) {
+        Set<File> lump = new HashSet<>();
+        list.stream().filter(i -> ! lump.contains(i)).forEach(lump::add);
+        return new ArrayList<>(lump);
+    }
+    public static boolean list_hasduplicates(List<File> list) {
+        Set<File> lump = new HashSet<>();
+       for (File i : list) {
+           if (lump.contains(i)) {return true;}
+           lump.add(i);
+       }
+        return false;
     }
     public static int list_getmaxintegervalue(List<Integer> list) {
         List<Integer> listcopy = list;

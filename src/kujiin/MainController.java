@@ -1147,7 +1147,6 @@ public class MainController implements Initializable {
         public Button StopButton;
         public Slider VolumeSlider;
         public Label VolumePercentage;
-        public Label TopLabel;
         private Media Mediatopreview;
         private File Filetopreview;
         private MediaPlayer PreviewPlayer;
@@ -1166,31 +1165,27 @@ public class MainController implements Initializable {
                     Root.getOptions().setStyle(this);
                     this.setResizable(false);
                     Filetopreview = filetopreview;
-                    TopLabel.setText(Filetopreview.getName().substring(0, Filetopreview.getName().lastIndexOf(".")));
+                    setTitle("Preview: " + Filetopreview.getName().substring(0, Filetopreview.getName().lastIndexOf(".")));
                     Mediatopreview = new Media(Filetopreview.toURI().toString());
                     PreviewPlayer = new MediaPlayer(Mediatopreview);
                     PlayButton.setDisable(true);
                     PauseButton.setDisable(true);
                     StopButton.setDisable(true);
                     PreviewPlayer.setOnReady(() -> {
+                        System.out.println("Preview Player Ready");
                         CurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(0)));
                         TotalTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(PreviewPlayer.getTotalDuration().toSeconds() * 1000)));
                         PlayButton.setDisable(false);
-                        PlayButton.setOnAction(event -> syncbuttons());
-                        PauseButton.setDisable(false);
-                        PauseButton.setOnAction(event -> syncbuttons());
-                        StopButton.setDisable(false);
-                        StopButton.setOnAction(event -> syncbuttons());
                     });
                     VolumeSlider.setValue(0.0);
                     VolumePercentage.setText("0%");
                 } catch (IOException ignored) {}
-            } else {
-                Root.dialog_displayInformation("Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+            } else {Root.dialog_displayInformation("Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
         }
 
         public void play(ActionEvent actionEvent) {
             if (PreviewPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+                System.out.println("Should Be Playing");
                 PreviewPlayer.play();
                 VolumeSlider.setValue(1.0);
                 VolumePercentage.setText("100%");
@@ -1211,6 +1206,7 @@ public class MainController implements Initializable {
                 PreviewPlayer.setOnPlaying(this::syncbuttons);
                 PreviewPlayer.setOnPaused(this::syncbuttons);
                 PreviewPlayer.setOnStopped(this::syncbuttons);
+                PreviewPlayer.setOnEndOfMedia(this::reset);
             }
         }
         public void updatePositionSlider(Duration currenttime) {
@@ -1230,17 +1226,23 @@ public class MainController implements Initializable {
             syncbuttons();
         }
         public void syncbuttons() {
-            PlayButton.setDisable(PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING);
-            PauseButton.setDisable(PreviewPlayer.getStatus() == MediaPlayer.Status.PAUSED || PreviewPlayer.getStatus() == MediaPlayer.Status.STOPPED);
-            StopButton.setDisable(PreviewPlayer.getStatus() == MediaPlayer.Status.STOPPED);
+            MediaPlayer.Status status = PreviewPlayer.getStatus();
+            PlayButton.setDisable(status == MediaPlayer.Status.PLAYING);
+            PauseButton.setDisable(status == MediaPlayer.Status.PAUSED || status == MediaPlayer.Status.STOPPED || status == MediaPlayer.Status.READY);
+            StopButton.setDisable(status == MediaPlayer.Status.STOPPED || status == MediaPlayer.Status.READY);
+            ProgressSlider.setDisable(status != MediaPlayer.Status.PLAYING);
+            CurrentTime.setDisable(status != MediaPlayer.Status.PLAYING);
+            TotalTime.setDisable(status != MediaPlayer.Status.PLAYING);
+            VolumeSlider.setDisable(status != MediaPlayer.Status.PLAYING);
+            VolumePercentage.setDisable(status != MediaPlayer.Status.PLAYING);
         }
         public void reset() {
             if (Mediatopreview != null) {PreviewPlayer.stop(); PreviewPlayer.dispose();}
-            TopLabel.setText("No File Selected");
             TotalTime.setText("--:--");
             CurrentTime.setText("--:--");
             ProgressSlider.setValue(0);
             VolumeSlider.setValue(0);
+            syncbuttons();
         }
     }
     public class ExceptionDialog extends Stage {
@@ -2238,17 +2240,25 @@ public class MainController implements Initializable {
         }
         private void addto(TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
             List<File> files = Util.filechooser_multiple(getScene(), "Add Files", null);
-            ArrayList<File> notvalidfilenames = new ArrayList<>();
-            if (files != null) {
-                for (File i : files) {
-                    SoundFile soundFile = new SoundFile(i);
-                    if (soundFile.isValid()) {
-                        addandcalculateduration(soundFile, table, soundfilelist, songlist);
-                    } else {notvalidfilenames.add(i);}
-                }
-                if (notvalidfilenames.size() > 0) {
-                    dialog_displayInformation("Files Couldn't Be Added", "These Files Couldn't Be Added", notvalidfilenames.toString());}
+            if (files == null || files.isEmpty()) {return;}
+            int notvalidfilecount = 0;
+            int validfilecount = 0;
+            for (File t : files) {
+                if (! Util.audio_isValid(t)) {notvalidfilecount++;}
+                else {validfilecount++;}
             }
+            if (validfilecount > 0) {
+                if (Util.list_hasduplicates(files)) {
+                    if (! dialog_getConfirmation("Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard")) {
+                        files = Util.list_removeduplicates(files);
+                    }
+                }
+            }
+            for (File i : files) {
+                SoundFile soundFile = new SoundFile(i);
+                addandcalculateduration(soundFile, table, soundfilelist, songlist);
+            }
+            if (notvalidfilecount > 0) {dialog_displayInformation("Information", notvalidfilecount + " Files Were Not Valid And Weren't Added", "");}
         }
         public void addandcalculateduration(SoundFile soundFile, TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
             MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
@@ -2425,38 +2435,27 @@ public class MainController implements Initializable {
                 calculatetotalduration();
             }
         }
-        public void add() {
-            List<File> filesselected = new FileChooser().showOpenMultipleDialog(null);
-            List<File> notvalidfilenames = new ArrayList<>();
-            if (filesselected == null || filesselected.isEmpty()) {return;}
-            for (File i : filesselected) {
-                for (String x : Util.SUPPORTEDAUDIOFORMATS) {
-                    if (i.getName().endsWith(x)) {
-                        if (Util.audio_getduration(i) != 0.0) {AmbienceList.add(new AmbienceSong(new SoundFile(i))); break;}
-                    }
-                }
-                if (! i.equals(AmbienceList.get(AmbienceList.size() - 1).getFile())) {notvalidfilenames.add(i);}
-            }
-            if (notvalidfilenames.size() > 0) {
-                dialog_displayInformation("Information", notvalidfilenames.size() + " Files Weren't Added Because They Are Unsupported", "");
-            }
-        }
         public void addfiles(ActionEvent actionEvent) {
             List<File> files = Util.filechooser_multiple(getScene(), "Add Files", null);
-            ArrayList<File> notvalidfilenames = new ArrayList<>();
-            if (files != null) {
-                for (File i : files) {
-                    SoundFile soundFile = new SoundFile(i);
-                    if (soundFile.isValid()) {
-                        addandcalculateduration(soundFile);
+            if (files == null || files.isEmpty()) {return;}
+            int notvalidfilecount = 0;
+            int validfilecount = 0;
+            for (File t : files) {
+                if (! Util.audio_isValid(t)) {notvalidfilecount++;}
+                else {validfilecount++;}
+            }
+            if (validfilecount > 0) {
+                if (Util.list_hasduplicates(files)) {
+                    if (! dialog_getConfirmation("Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard")) {
+                        files = Util.list_removeduplicates(files);
                     }
-                    else {notvalidfilenames.add(i);}
-                }
-                if (notvalidfilenames.size() > 0) {
-                    dialog_displayInformation("Couldn't Add Files", "Supported Audio Formats: " + Util.audio_getsupportedText(), "Couldn't Add " + notvalidfilenames.size() + "Files");
                 }
             }
-            if (AmbienceList.size() > 0) {AmbienceTable.setItems(AmbienceList);}
+            for (File i : files) {
+                SoundFile soundFile = new SoundFile(i);
+                addandcalculateduration(soundFile);
+            }
+            if (notvalidfilecount > 0) {dialog_displayInformation("Information", notvalidfilecount + " Files Were Not Valid And Weren't Added", "");}
         }
         public void addandcalculateduration(SoundFile soundFile) {
             MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));

@@ -27,7 +27,6 @@ public class Main extends Application {
             Root.setEntrainments(new Entrainments(Root));
             Root.setAmbiences(new Ambiences(Root));
             Root.setSession(new This_Session(Root));
-            primaryStage.setIconified(false);
             Root.creation_initialize();
             Root.exporter_initialize();
             Root.sessions_initialize();
