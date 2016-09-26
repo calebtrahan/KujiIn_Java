@@ -754,7 +754,7 @@ public class SessionPart {
             thisession.setCurrententrainmentvolume(currententrainmentvolume);
             thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
             if (thisession.player_isreferencecurrentlyDisplayed()) {
-                thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbind();
+                thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
                 thisession.displayReference.EntrainmentVolumeSlider.setValue(currententrainmentvolume);
                 thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
                 thisession.displayReference.EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
@@ -769,12 +769,12 @@ public class SessionPart {
                 String percentage = roundedvalue.intValue() + "%";
                 currententrainmentvolume = roundedvalue / 100;
                 thisession.setCurrententrainmentvolume(currententrainmentvolume);
-                thisession.playerUI.EntrainmentVolume.valueProperty().unbind();
+                thisession.playerUI.EntrainmentVolume.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
                 thisession.playerUI.EntrainmentVolume.setValue(currententrainmentvolume);
                 thisession.playerUI.EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
                 thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
                 if (thisession.player_isreferencecurrentlyDisplayed()) {
-                    thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbind();
+                    thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
                     thisession.displayReference.EntrainmentVolumeSlider.setValue(currententrainmentvolume);
                     thisession.displayReference.EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
                     thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
@@ -789,7 +789,7 @@ public class SessionPart {
                 currententrainmentvolume = thisession.playerUI.EntrainmentVolume.getValue();
                 thisession.setCurrententrainmentvolume(currententrainmentvolume);
                 thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
-                thisession.playerUI.EntrainmentVolume.valueProperty().unbind();
+                thisession.playerUI.EntrainmentVolume.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
                 thisession.playerUI.EntrainmentVolume.setValue(currententrainmentvolume);
                 thisession.playerUI.EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
                 thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
@@ -803,11 +803,11 @@ public class SessionPart {
                     String percentage = roundedvalue.intValue() + "%";
                     currententrainmentvolume = roundedvalue / 100;
                     thisession.setCurrententrainmentvolume(currententrainmentvolume);
-                    thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbind();
+                    thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
                     thisession.displayReference.EntrainmentVolumeSlider.setValue(currententrainmentvolume);
                     thisession.displayReference.EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
                     thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
-                    thisession.playerUI.EntrainmentVolume.valueProperty().unbind();
+                    thisession.playerUI.EntrainmentVolume.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
                     thisession.playerUI.EntrainmentVolume.setValue(currententrainmentvolume);
                     thisession.playerUI.EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
                     thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
@@ -835,7 +835,7 @@ public class SessionPart {
             thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
             thisession.playerUI.AmbienceVolume.setTooltip(new Tooltip(percentage));
             if (thisession.player_isreferencecurrentlyDisplayed()) {
-                thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbind();
+                thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
                 thisession.displayReference.AmbienceVolumeSlider.setValue(currentambiencevolume);
                 thisession.displayReference.AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
                 thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
@@ -854,7 +854,7 @@ public class SessionPart {
                 thisession.playerUI.AmbienceVolume.setTooltip(new Tooltip(percentage));
                 thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
                 if (thisession.player_isreferencecurrentlyDisplayed()) {
-                    thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbind();
+                    thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
                     thisession.displayReference.AmbienceVolumeSlider.setValue(currentambiencevolume);
                     thisession.displayReference.AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
                     thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
@@ -869,7 +869,7 @@ public class SessionPart {
                 currentambiencevolume = thisession.playerUI.AmbienceVolume.getValue();
                 thisession.setCurrentambiencevolume(currentambiencevolume);
                 thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
-                thisession.playerUI.AmbienceVolume.valueProperty().unbind();
+                thisession.playerUI.AmbienceVolume.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
                 thisession.playerUI.AmbienceVolume.setValue(currentambiencevolume);
                 thisession.playerUI.AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
                 thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
@@ -883,12 +883,12 @@ public class SessionPart {
                     String percentage = roundedvalue.intValue() + "%";
                     currentambiencevolume = roundedvalue / 100;
                     thisession.setCurrentambiencevolume(roundedvalue / 100);
-                    thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbind();
+                    thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
                     thisession.displayReference.AmbienceVolumeSlider.setValue(roundedvalue / 100);
                     thisession.displayReference.AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
                     thisession.displayReference.AmbienceVolumeSlider.setTooltip(new Tooltip(percentage));
                     thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
-                    thisession.playerUI.AmbienceVolume.valueProperty().unbind();
+                    thisession.playerUI.AmbienceVolume.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
                     thisession.playerUI.AmbienceVolume.setValue(currentambiencevolume);
                     thisession.playerUI.AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
                     thisession.playerUI.AmbienceVolumePercentage.setText(percentage);

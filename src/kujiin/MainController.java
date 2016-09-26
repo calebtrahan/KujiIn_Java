@@ -250,7 +250,10 @@ public class MainController implements Initializable {
             }
         }
     }
-    public void menu_contactme(ActionEvent actionEvent) {}
+    public void menu_contactme(ActionEvent actionEvent) {
+        PreviewFile previewFile = new PreviewFile(kujiin.xml.Options.TESTFILE, this);
+        previewFile.showAndWait();
+    }
 
 // Presets
     public void preset_initialize() {Preset = new Preset(this);}
@@ -1156,10 +1159,6 @@ public class MainController implements Initializable {
                 try {
                     FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/PreviewAudioDialog.fxml"));
                     fxmlLoader.setController(this);
-                    setOnHidden(event -> {
-                        if (PreviewPlayer != null) {PreviewPlayer.dispose();}
-                        close();
-                    });
                     Scene defaultscene = new Scene(fxmlLoader.load());
                     setScene(defaultscene);
                     Root.getOptions().setStyle(this);
@@ -1172,11 +1171,11 @@ public class MainController implements Initializable {
                     PauseButton.setDisable(true);
                     StopButton.setDisable(true);
                     PreviewPlayer.setOnReady(() -> {
-                        System.out.println("Preview Player Ready");
                         CurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(0)));
                         TotalTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(PreviewPlayer.getTotalDuration().toSeconds() * 1000)));
                         PlayButton.setDisable(false);
                     });
+                    setOnHidden(event -> {if (PreviewPlayer != null) {PreviewPlayer.dispose();}});
                     VolumeSlider.setValue(0.0);
                     VolumePercentage.setText("0%");
                 } catch (IOException ignored) {}
@@ -1185,7 +1184,6 @@ public class MainController implements Initializable {
 
         public void play(ActionEvent actionEvent) {
             if (PreviewPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
-                System.out.println("Should Be Playing");
                 PreviewPlayer.play();
                 VolumeSlider.setValue(1.0);
                 VolumePercentage.setText("100%");
@@ -1197,12 +1195,24 @@ public class MainController implements Initializable {
                     CurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(newValue));
                     updatePositionSlider(PreviewPlayer.getCurrentTime());
                 });
-                VolumeSlider.valueChangingProperty().unbind();
+                VolumeSlider.valueProperty().bindBidirectional(PreviewPlayer.volumeProperty());
                 VolumeSlider.setOnMouseDragged(event -> {
                     Double value = VolumeSlider.getValue() * 100;
                     VolumePercentage.setText(value.intValue() + "%");
                 });
-                VolumeSlider.valueProperty().bindBidirectional(PreviewPlayer.volumeProperty());
+                VolumeSlider.setOnScroll(event -> {
+                    double newvalue = PreviewPlayer.getVolume();
+                    if (event.getDeltaY() < 0) {newvalue -= (5.0 / 100.0);}
+                    else {newvalue += (5.0 / 100.0);}
+                    if (newvalue <= 1.0 && newvalue >= 0.0) {
+                        Double roundedvalue = Util.round_nearestmultipleof5(newvalue * 100);
+                        VolumePercentage.setText(roundedvalue.intValue() + "%");
+                        VolumeSlider.valueProperty().unbindBidirectional(PreviewPlayer.volumeProperty());
+                        VolumeSlider.setValue(roundedvalue / 100);
+                        PreviewPlayer.setVolume(roundedvalue / 100);
+                        VolumeSlider.valueProperty().bindBidirectional(PreviewPlayer.volumeProperty());
+                    }
+                });
                 PreviewPlayer.setOnPlaying(this::syncbuttons);
                 PreviewPlayer.setOnPaused(this::syncbuttons);
                 PreviewPlayer.setOnStopped(this::syncbuttons);
@@ -1237,8 +1247,8 @@ public class MainController implements Initializable {
             VolumePercentage.setDisable(status != MediaPlayer.Status.PLAYING);
         }
         public void reset() {
-            if (Mediatopreview != null) {PreviewPlayer.stop(); PreviewPlayer.dispose();}
-            TotalTime.setText("--:--");
+            if (Mediatopreview != null) {PreviewPlayer.stop();}
+            VolumeSlider.valueProperty().unbindBidirectional(PreviewPlayer.volumeProperty());
             CurrentTime.setText("--:--");
             ProgressSlider.setValue(0);
             VolumeSlider.setValue(0);

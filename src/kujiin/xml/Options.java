@@ -42,6 +42,7 @@ public class Options {
     public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");
     public static final File ENTRAINMENTXMLFILE = new File(XMLDIRECTORY, "entrainment.xml");
     public static final File AMBIENCEXMLFILE = new File(XMLDIRECTORY, "ambience.xml");
+    public final static File TESTFILE = new File(SOUNDDIRECTORY, "Test.mp3");
 
     // Name Constants
     public static final ArrayList<String> QIGONGNAMES = new ArrayList<>(Arrays.asList("Presession", "Postsession"));
