@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import kujiin.util.This_Session;
+import kujiin.util.enums.ProgramState;
 import kujiin.xml.Ambiences;
 import kujiin.xml.Entrainments;
 
@@ -35,7 +36,10 @@ public class Main extends Application {
             Root.startupchecks_start();
         });
         primaryStage.setOnCloseRequest(event -> {
-            if (Root.dialog_getConfirmation("Confirmation", null, "Really Exit?", "Exit", "Cancel")) {Root.close(null);}
+            if (Root.getProgramState() == ProgramState.IDLE &&
+                    Root.dialog_getConfirmation("Confirmation", null, "Really Exit?", "Exit", "Cancel")) {
+                Root.close(null);
+            }
             else {event.consume();}
         });
         primaryStage.show();

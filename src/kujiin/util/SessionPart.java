@@ -770,10 +770,9 @@ public class SessionPart {
                 Double roundedvalue = Util.round_nearestmultipleof5(newvalue * 100);
                 String percentage = roundedvalue.intValue() + "%";
                 currententrainmentvolume = roundedvalue / 100;
-                thisession.setCurrententrainmentvolume(currententrainmentvolume);
-                thisession.playerUI.EntrainmentVolume.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
-                thisession.playerUI.EntrainmentVolume.setValue(currententrainmentvolume);
-                thisession.playerUI.EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+                thisession.setCurrententrainmentvolume(roundedvalue / 100);
+                thisession.playerUI.EntrainmentVolume.setValue(roundedvalue / 100);
+                thisession.playerUI.EntrainmentVolume.setTooltip(new Tooltip(percentage));
                 thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
                 if (thisession.player_isreferencecurrentlyDisplayed()) {
                     thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());

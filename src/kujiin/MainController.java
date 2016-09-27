@@ -134,7 +134,7 @@ public class MainController implements Initializable {
     private Scene Scene;
     private Stage Stage;
     private StartupChecks startupChecks;
-    private ProgramState programState;
+    private ProgramState programState = ProgramState.IDLE;
 
     // My Fields
     private This_Session Session;
@@ -167,6 +167,9 @@ public class MainController implements Initializable {
     }
 
     // Getters And Setters
+    public ProgramState getProgramState() {
+        return programState;
+    }
     public Entrainments getEntrainments() {
         return Entrainments;
     }

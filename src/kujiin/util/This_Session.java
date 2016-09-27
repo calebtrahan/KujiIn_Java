@@ -46,6 +46,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// Add RequestFocus Once Reference Type Is Embedded
+
 public class This_Session {
     private Qi_Gong Presession;
     private Cut Rin;
@@ -624,7 +626,7 @@ public class This_Session {
         } else {return true;}
     }
     public void player_togglevolumebinding() {
-        if (playerState == PlayerState.IDLE || playerState == PlayerState.STOPPED) {
+        if (currentsessionpart != null && playerState == PlayerState.IDLE || playerState == PlayerState.STOPPED) {
             currentsessionpart.volume_rebindentrainment();
             if (isAmbienceenabled()) {currentsessionpart.volume_rebindambience();}
         }
@@ -1478,8 +1480,9 @@ public class This_Session {
         public Label GoalTopLabel;
         public ProgressBar GoalProgressBar;
         public Label GoalPercentageLabel;
-        public boolean displaynormaltime = true;
+        public Boolean displaynormaltime = true;
         public CheckBox ReferenceCheckBox;
+        public ComboBox<String> ReferenceTypeComboBox;
 
         public Player() {
             try {
@@ -1498,6 +1501,24 @@ public class This_Session {
                 setResizable(false);
                 SessionPartTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
                 TotalTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
+                ObservableList<String> referencetypes = FXCollections.observableArrayList();
+                for (ReferenceType i : ReferenceType.values()) {referencetypes.add(i.toString());}
+                ReferenceTypeComboBox.setItems(referencetypes);
+                ReferenceTypeComboBox.setOnAction(event -> {
+                    int index = ReferenceTypeComboBox.getSelectionModel().getSelectedIndex();
+                    if (index == 0) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
+                    else if (index == 1) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
+                });
+                if (referenceType != null) {
+                    switch (referenceType) {
+                        case html:
+                            ReferenceTypeComboBox.getSelectionModel().select(0);
+                            break;
+                        case txt:
+                            ReferenceTypeComboBox.getSelectionModel().select(1);
+                            break;
+                    }
+                }
                 setOnCloseRequest(event -> {
                     if (playerState == PlayerState.PLAYING || playerState == PlayerState.STOPPED || playerState == PlayerState.PAUSED || playerState == PlayerState.IDLE) {
                         if (player_endsessionprematurely()) {close();} else {play(); event.consume();}
@@ -1507,10 +1528,10 @@ public class This_Session {
                         event.consume();
                     }
                 });
-            } catch (Exception ignored) {}
+            } catch (IOException ignored) {}
         }
 
-        // Button Actions
+    // Button Actions
         public void play() {player_play();}
         public void pause() {
             player_pause();}
@@ -1524,21 +1545,41 @@ public class This_Session {
                 player_closereferencefile();
                 player_togglevolumebinding();
             } else {
-                System.out.println("Should be Selecting Reference Type");
-                if (Root.getOptions().getSessionOptions().getReferencetype() == null) {Root.getOptions().getSessionOptions().setReferencetype(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);}
-                SelectReferenceType selectReferenceType = new SelectReferenceType(Root);
-                selectReferenceType.show();
-                selectReferenceType.setOnHidden(event -> {
-                    if (selectReferenceType.getResult()) {
-                        if (! creation_checkreferencefiles(true)) {
-                            ReferenceCheckBox.setSelected(false);
+                if (Root.getOptions().getSessionOptions().getReferencetype() == null) {
+                    Root.getOptions().getSessionOptions().setReferencetype(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);
+                    SelectReferenceType selectReferenceType = new SelectReferenceType(Root);
+                    selectReferenceType.show();
+                    selectReferenceType.setOnHidden(event -> {
+                        if (selectReferenceType.getResult()) {
+                            if (! creation_checkreferencefiles(true)) {ReferenceCheckBox.setSelected(false);}
+                            else {
+                                switch (Root.getOptions().getSessionOptions().getReferencetype()) {
+                                    case html:
+                                        ReferenceTypeComboBox.getSelectionModel().select(0);
+                                        break;
+                                    case txt:
+                                        ReferenceTypeComboBox.getSelectionModel().select(1);
+                                        break;
+                                }
+                            }
+                            if (playerState == PlayerState.PLAYING) {player_displayreferencefile(); player_togglevolumebinding();}
+                        } else {
+                            switch (Root.getOptions().getSessionOptions().getReferencetype()) {
+                                case html:
+                                    ReferenceTypeComboBox.getSelectionModel().select(0);
+                                    break;
+                                case txt:
+                                    ReferenceTypeComboBox.getSelectionModel().select(1);
+                                    break;
+                            }
                         }
-                        if (playerState == PlayerState.PLAYING) {
-                            player_displayreferencefile();
-                            player_togglevolumebinding();
-                        }
+                    });
+                } else {
+                    if (playerState == PlayerState.PLAYING) {
+                        player_displayreferencefile();
+                        player_togglevolumebinding();
                     }
-                });
+                }
             }
         }
         public void reset(boolean endofsession) {

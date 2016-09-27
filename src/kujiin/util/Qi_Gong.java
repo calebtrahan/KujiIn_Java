@@ -4,8 +4,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
+import kujiin.util.enums.ReferenceType;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
+
+import java.io.File;
 
 public class Qi_Gong extends SessionPart {
     private String Summary;
@@ -64,4 +67,21 @@ public class Qi_Gong extends SessionPart {
         } else {return super.creation_buildEntrainment();}
     }
 
+    @Override
+    public File reference_getFile() {
+        ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
+        if (referenceType == null) {return null;}
+        switch (referenceType) {
+            case html: {
+                String name = "Qi-Gong.html";
+                return new File(Options.DIRECTORYREFERENCE, "html/" + name);
+            }
+            case txt: {
+                String name = "Qi-Gong.txt";
+                return new File(Options.DIRECTORYREFERENCE, "txt/" + name);
+            }
+            default:
+                return null;
+        }
+    }
 }
