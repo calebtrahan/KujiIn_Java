@@ -11,6 +11,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import kujiin.util.enums.PlayerState;
+import kujiin.util.enums.ReferenceType;
 import kujiin.xml.*;
 
 import java.io.File;
@@ -254,13 +256,13 @@ public class SessionPart {
         }
         if (fade_entrainment_play != null) {
             if (fade_entrainment_play.getStatus() == Animation.Status.RUNNING) {return;}
-            thisession.playerState = This_Session.PlayerState.FADING_PLAY;
+            thisession.playerState = PlayerState.FADING_PLAY;
             fade_entrainment_play.play();
         } else {
             entrainmentplayer.setVolume(currententrainmentvolume);
             String percentage = new Double(currententrainmentvolume * 100).intValue() + "%";
             thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
-            thisession.playerState = This_Session.PlayerState.PLAYING;
+            thisession.playerState = PlayerState.PLAYING;
             if (thisession.player_isreferencecurrentlyDisplayed()) {
                 thisession.displayReference.EntrainmentVolumeSlider.setValue(currententrainmentvolume);
                 thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
@@ -299,12 +301,12 @@ public class SessionPart {
         if (fade_entrainment_resume != null) {
             entrainmentplayer.setVolume(0.0);
             if (fade_entrainment_resume.getStatus() == Animation.Status.RUNNING) {return;}
-            thisession.playerState = This_Session.PlayerState.FADING_RESUME;
+            thisession.playerState = PlayerState.FADING_RESUME;
             fade_entrainment_resume.play();
         } else {
             entrainmentplayer.setVolume(currententrainmentvolume);
             volume_bindentrainment();
-            thisession.playerState = This_Session.PlayerState.PLAYING;
+            thisession.playerState = PlayerState.PLAYING;
             timeline_progresstonextsessionpart.play();
             if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
                 timeline_start_ending_ramp.play();}
@@ -329,7 +331,7 @@ public class SessionPart {
         if (fade_entrainment_pause != null) {
             if (fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
             // Open Loading Dialog
-            thisession.playerState = This_Session.PlayerState.FADING_PAUSE;
+            thisession.playerState = PlayerState.FADING_PAUSE;
             fade_entrainment_pause.play();
             if (thisession.isAmbienceenabled()) {
                 volume_unbindambience();
@@ -340,7 +342,7 @@ public class SessionPart {
         toggleplayerbuttons();
     }
     public void pausewithoutanimation() {
-        thisession.playerState = This_Session.PlayerState.PAUSED;
+        thisession.playerState = PlayerState.PAUSED;
         entrainmentplayer.pause();
         timeline_progresstonextsessionpart.pause();
         if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
@@ -357,13 +359,13 @@ public class SessionPart {
         if (fade_entrainment_stop != null) {
             if (fade_entrainment_stop.getStatus() == Animation.Status.RUNNING) {return;}
             fade_entrainment_stop.play();
-            thisession.playerState = This_Session.PlayerState.FADING_STOP;
+            thisession.playerState = PlayerState.FADING_STOP;
             if (thisession.isAmbienceenabled()) {
                 volume_unbindambience();
                 fade_ambience_stop.play();
             }
         } else {
-            thisession.playerState = This_Session.PlayerState.STOPPED;
+            thisession.playerState = PlayerState.STOPPED;
             entrainmentplayer.stop();
             entrainmentplayer.dispose();
             timeline_progresstonextsessionpart.stop();
@@ -399,7 +401,7 @@ public class SessionPart {
                 }
             };
             fade_entrainment_play.setOnFinished(event -> {
-                thisession.playerState = This_Session.PlayerState.PLAYING;
+                thisession.playerState = PlayerState.PLAYING;
                 toggleplayerbuttons();
                 volume_bindentrainment();
             });
@@ -448,7 +450,7 @@ public class SessionPart {
             }
         };
         fade_entrainment_resume.setOnFinished(event -> {
-            thisession.playerState = This_Session.PlayerState.PLAYING;
+            thisession.playerState = PlayerState.PLAYING;
             timeline_progresstonextsessionpart.play();
             if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
                 timeline_start_ending_ramp.play();
@@ -512,7 +514,7 @@ public class SessionPart {
             if (timeline_fadeout_timer != null) {
                 timeline_fadeout_timer.pause();
             }
-            thisession.playerState = This_Session.PlayerState.PAUSED;
+            thisession.playerState = PlayerState.PAUSED;
             toggleplayerbuttons();
         });
         if (thisession.isAmbienceenabled()) {
@@ -569,7 +571,7 @@ public class SessionPart {
                 if (timeline_fadeout_timer != null) {
                     timeline_fadeout_timer.stop();
                 }
-                thisession.playerState = This_Session.PlayerState.STOPPED;
+                thisession.playerState = PlayerState.STOPPED;
                 toggleplayerbuttons();
             });
             if (thisession.isAmbienceenabled()) {
@@ -654,14 +656,14 @@ public class SessionPart {
     }
     public void toggleplayerbuttons() {
         if (thisession.playerState == null) {return;}
-        boolean idle = thisession.playerState == This_Session.PlayerState.IDLE;
-        boolean playing = thisession.playerState == This_Session.PlayerState.PLAYING;
-        boolean paused = thisession.playerState == This_Session.PlayerState.PAUSED;
-        boolean stopped = thisession.playerState == This_Session.PlayerState.STOPPED;
-        boolean fade_play = thisession.playerState == This_Session.PlayerState.FADING_PLAY;
-        boolean fade_resume = thisession.playerState == This_Session.PlayerState.FADING_RESUME;
-        boolean fade_pause = thisession.playerState == This_Session.PlayerState.FADING_PAUSE;
-        boolean fade_stop = thisession.playerState == This_Session.PlayerState.FADING_STOP;
+        boolean idle = thisession.playerState == PlayerState.IDLE;
+        boolean playing = thisession.playerState == PlayerState.PLAYING;
+        boolean paused = thisession.playerState == PlayerState.PAUSED;
+        boolean stopped = thisession.playerState == PlayerState.STOPPED;
+        boolean fade_play = thisession.playerState == PlayerState.FADING_PLAY;
+        boolean fade_resume = thisession.playerState == PlayerState.FADING_RESUME;
+        boolean fade_pause = thisession.playerState == PlayerState.FADING_PAUSE;
+        boolean fade_stop = thisession.playerState == PlayerState.FADING_STOP;
         thisession.playerUI.PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
         thisession.playerUI.PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
         thisession.playerUI.StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
@@ -737,7 +739,7 @@ public class SessionPart {
         toggleplayervolumecontrols();
     }
     public void toggleplayervolumecontrols() {
-        boolean enabled = thisession.playerState == This_Session.PlayerState.PLAYING;
+        boolean enabled = thisession.playerState == PlayerState.PLAYING;
         thisession.playerUI.EntrainmentVolume.setDisable(! enabled);
         if (thisession.isAmbienceenabled()) {thisession.playerUI.AmbienceVolume.setDisable(! enabled);}
         if (thisession.player_isreferencecurrentlyDisplayed()) {
@@ -1188,7 +1190,7 @@ public class SessionPart {
 
 // Reference Files
     public File reference_getFile() {
-        This_Session.ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
+        ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
         if (referenceType == null) {return null;}
         switch (referenceType) {
             case html: {
@@ -1203,7 +1205,7 @@ public class SessionPart {
                 return null;
         }
     }
-    public boolean reference_filevalid(This_Session.ReferenceType referenceType) {
+    public boolean reference_filevalid(ReferenceType referenceType) {
         if (referenceType == null) {return false;}
         if (! reference_getFile().exists()) {return false;}
         String contents = Util.file_getcontents(reference_getFile());

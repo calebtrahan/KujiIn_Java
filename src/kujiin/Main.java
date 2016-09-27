@@ -32,7 +32,7 @@ public class Main extends Application {
             Root.sessions_initialize();
             Root.goals_initialize();
             Root.preset_initialize();
-            Root.startupchecks();
+            Root.startupchecks_start();
         });
         primaryStage.setOnCloseRequest(event -> {
             if (Root.dialog_getConfirmation("Confirmation", null, "Really Exit?", "Exit", "Cancel")) {Root.close(null);}

@@ -4,7 +4,8 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kujiin.MainController;
-import kujiin.util.This_Session;
+import kujiin.util.enums.AmbiencePlaybackType;
+import kujiin.util.enums.ReferenceType;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -68,8 +69,8 @@ public class Options {
     public static final File REFERENCE_THEMEFILE = new File(DIRECTORYSTYLES, "referencefile.css");
     public static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
     public static final Boolean DEFAULT_PREPOST_RAMP_ENABLED_OPTION = true;
-    public static final This_Session.AmbiencePlaybackType DEFAULT_AMBIENCE_PLAYBACK_TYPE = This_Session.AmbiencePlaybackType.SHUFFLE;
-    public static final This_Session.ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = This_Session.ReferenceType.html;
+    public static final AmbiencePlaybackType DEFAULT_AMBIENCE_PLAYBACK_TYPE = AmbiencePlaybackType.SHUFFLE;
+    public static final ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = ReferenceType.html;
     public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
     public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
     public static final Integer DEFAULT_LONG_SESSIONPART_DURATION = 10;
@@ -225,8 +226,8 @@ public class Options {
         private Boolean prepostrampenabled;
         private Boolean alertfunction;
         private Boolean referenceoption;
-        private This_Session.AmbiencePlaybackType ambiencePlaybackType;
-        private This_Session.ReferenceType referencetype;
+        private AmbiencePlaybackType ambiencePlaybackType;
+        private ReferenceType referencetype;
         private Boolean referencefullscreen;
 
         public SessionOptions() {}
@@ -298,10 +299,10 @@ public class Options {
         public void setReferenceoption(Boolean referenceoption) {
             this.referenceoption = referenceoption;
         }
-        public This_Session.ReferenceType getReferencetype() {
+        public ReferenceType getReferencetype() {
             return referencetype;
         }
-        public void setReferencetype(This_Session.ReferenceType referencetype) {
+        public void setReferencetype(ReferenceType referencetype) {
             this.referencetype = referencetype;
         }
         public Boolean getReferencefullscreen() {
@@ -310,10 +311,10 @@ public class Options {
         public void setReferencefullscreen(Boolean referencefullscreen) {
             this.referencefullscreen = referencefullscreen;
         }
-        public This_Session.AmbiencePlaybackType getAmbiencePlaybackType() {
+        public AmbiencePlaybackType getAmbiencePlaybackType() {
             return ambiencePlaybackType;
         }
-        public void setAmbiencePlaybackType(This_Session.AmbiencePlaybackType ambiencePlaybackType) {
+        public void setAmbiencePlaybackType(AmbiencePlaybackType ambiencePlaybackType) {
             this.ambiencePlaybackType = ambiencePlaybackType;
         }
 

@@ -2,8 +2,8 @@ package kujiin.xml;
 
 import javafx.util.Duration;
 import kujiin.util.SessionPart;
-import kujiin.util.This_Session;
 import kujiin.util.Util;
+import kujiin.util.enums.AmbiencePlaybackType;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -69,7 +69,7 @@ public class Ambience {
         else {add(soundFile);}
     }
     public SoundFile get(int index) throws IndexOutOfBoundsException {return Ambience.get(index);}
-    public SoundFile ambiencegenerator(This_Session.AmbiencePlaybackType ambiencePlaybackType, List<SoundFile> playbackhistory, SoundFile currentsoundfile) {
+    public SoundFile ambiencegenerator(AmbiencePlaybackType ambiencePlaybackType, List<SoundFile> playbackhistory, SoundFile currentsoundfile) {
         switch (ambiencePlaybackType) {
             case REPEAT:
                 if (currentsoundfile != null) {
