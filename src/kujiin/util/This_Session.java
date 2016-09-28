@@ -3,10 +3,6 @@ package kujiin.util;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -34,6 +30,7 @@ import kujiin.ui.SelectReferenceType;
 import kujiin.util.enums.*;
 import kujiin.util.table.AmbienceSong;
 import kujiin.util.table.AmbienceSongWithNumber;
+import kujiin.util.table.SessionItem;
 import kujiin.xml.Options;
 import kujiin.xml.Session;
 import kujiin.xml.SoundFile;
@@ -997,21 +994,6 @@ public class This_Session {
             }
         }
 
-        class SessionItem {
-            private IntegerProperty number;
-            private StringProperty name;
-            private StringProperty duration;
-            private StringProperty ambiencesummary;
-            private StringProperty goalsummary;
-
-            public SessionItem(int number, String name, String duration, String ambiencesummary, String goalsummary) {
-                this.number = new SimpleIntegerProperty(number);
-                this.name = new SimpleStringProperty(name);
-                this.duration = new SimpleStringProperty(duration);
-                this.ambiencesummary = new SimpleStringProperty(ambiencesummary);
-                this.goalsummary = new SimpleStringProperty(goalsummary);
-            }
-        }
         class SessionPlaybackOverview_ChangeDuration extends Stage {
             public TextField HoursTextField;
             public TextField MinutesTextField;
@@ -1503,6 +1485,7 @@ public class This_Session {
                 TotalTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
                 ObservableList<String> referencetypes = FXCollections.observableArrayList();
                 for (ReferenceType i : ReferenceType.values()) {referencetypes.add(i.toString());}
+                referencetypes.add("Help");
                 ReferenceTypeComboBox.setItems(referencetypes);
                 ReferenceTypeComboBox.setOnAction(event -> {
                     int index = ReferenceTypeComboBox.getSelectionModel().getSelectedIndex();
@@ -1541,11 +1524,10 @@ public class This_Session {
             boolean buttontoggled = ReferenceCheckBox.isSelected();
             Root.getOptions().getSessionOptions().setReferenceoption(buttontoggled);
             if (! buttontoggled) {
-                Root.getOptions().getSessionOptions().setReferencetype(null);
                 player_closereferencefile();
                 player_togglevolumebinding();
             } else {
-                if (Root.getOptions().getSessionOptions().getReferencetype() == null) {
+                if (Root.getOptions().getSessionOptions().getReferencetype() == null || ReferenceTypeComboBox.getSelectionModel().getSelectedIndex() == -1) {
                     Root.getOptions().getSessionOptions().setReferencetype(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);
                     SelectReferenceType selectReferenceType = new SelectReferenceType(Root);
                     selectReferenceType.show();

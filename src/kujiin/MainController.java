@@ -3,10 +3,6 @@ package kujiin;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -34,6 +30,9 @@ import kujiin.util.enums.CreatorState;
 import kujiin.util.enums.ProgramState;
 import kujiin.util.enums.ReferenceType;
 import kujiin.util.table.AmbienceSong;
+import kujiin.util.table.GoalProgressBinding;
+import kujiin.util.table.SessionRow;
+import kujiin.util.table.TotalProgressRow;
 import kujiin.xml.*;
 import org.apache.commons.io.FileUtils;
 
@@ -152,14 +151,12 @@ public class MainController implements Initializable {
         setOptions(new Options(this));
         getOptions().unmarshall();
     }
-
     public boolean cleanup() {
         Ambiences.marshall();
         Entrainments.marshall();
         Options.marshall();
         return creation_cleanup() && exporter_cleanup() && sessions_cleanup() && goals_cleanup();
     }
-
     public void close(ActionEvent actionEvent) {
         if (cleanup()) {
             System.exit(0);
@@ -986,22 +983,6 @@ public class MainController implements Initializable {
             }
         }
 
-        class GoalProgressBinding {
-            private StringProperty name;
-            private StringProperty practicedtime;
-            private StringProperty currentgoaltime;
-            private StringProperty percentcompleted;
-            private StringProperty numbergoalscompleted;
-
-            public GoalProgressBinding(String name, String practicedtime, String currentgoaltime, String percentcompleted, int numbergoalscompleted) {
-                this.name = new SimpleStringProperty(name);
-                this.practicedtime = new SimpleStringProperty(practicedtime);
-                this.currentgoaltime = new SimpleStringProperty(currentgoaltime);
-                this.percentcompleted = new SimpleStringProperty(percentcompleted);
-                this.numbergoalscompleted = new SimpleStringProperty(String.valueOf(numbergoalscompleted));
-            }
-        }
-
     }
     public class AllSessionDetails extends Stage {
         // All Session Totals Tab Fields
@@ -1232,70 +1213,6 @@ public class MainController implements Initializable {
             }
         }
 
-        public class SessionRow {
-            public IntegerProperty id;
-            public StringProperty datepracticed;
-            public StringProperty presession;
-            public StringProperty rin;
-            public StringProperty kyo;
-            public StringProperty toh;
-            public StringProperty sha;
-            public StringProperty kai;
-            public StringProperty jin;
-            public StringProperty retsu;
-            public StringProperty zai;
-            public StringProperty zen;
-            public StringProperty earth;
-            public StringProperty air;
-            public StringProperty fire;
-            public StringProperty water;
-            public StringProperty Void;
-            public StringProperty postsession;
-            public StringProperty total;
-
-            public SessionRow(int id, String datepracticed, int presession, int rin, int kyo, int toh, int sha, int kai, int jin, int retsu,
-                              int zai, int zen, int postsession, int earth, int air, int fire, int water, int Void, int total) {
-                this.id = new SimpleIntegerProperty(id);
-                this.datepracticed = new SimpleStringProperty(datepracticed);
-                this.presession = new SimpleStringProperty(String.valueOf(presession));
-                this.rin = new SimpleStringProperty(String.valueOf(rin));
-                this.kyo = new SimpleStringProperty(String.valueOf(kyo));
-                this.toh = new SimpleStringProperty(String.valueOf(toh));
-                this.sha = new SimpleStringProperty(String.valueOf(sha));
-                this.kai = new SimpleStringProperty(String.valueOf(kai));
-                this.jin = new SimpleStringProperty(String.valueOf(jin));
-                this.retsu = new SimpleStringProperty(String.valueOf(retsu));
-                this.zai = new SimpleStringProperty(String.valueOf(zai));
-                this.zen = new SimpleStringProperty(String.valueOf(zen));
-                this.earth = new SimpleStringProperty(String.valueOf(earth));
-                this.air = new SimpleStringProperty(String.valueOf(air));
-                this.fire = new SimpleStringProperty(String.valueOf(fire));
-                this.water = new SimpleStringProperty(String.valueOf(water));
-                this.Void = new SimpleStringProperty(String.valueOf(Void));
-                this.postsession = new SimpleStringProperty(String.valueOf(postsession));
-                this.total = new SimpleStringProperty(Util.formatdurationtoStringDecimalWithColons(new Duration(total * 1000)));
-            }
-
-            public String toString() {
-                return String.format("%s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s",
-                        id.getValue(), datepracticed.getValue(), presession.getValue(), rin.getValue(), kyo.getValue(),
-                        toh.getValue(), sha.getValue(), kai.getValue(), jin.getValue(), retsu.getValue(), zai.getValue(),
-                        zen.getValue(), postsession.getValue(), total.getValue());
-            }
-
-            public StringProperty getDatepracticed() {
-                return datepracticed;
-            }
-        }
-        public class TotalProgressRow {
-            private StringProperty name;
-            private StringProperty formattedduration;
-
-            public TotalProgressRow(String name, String formattedduration) {
-                this.name = new SimpleStringProperty(name);
-                this.formattedduration = new SimpleStringProperty(formattedduration);
-            }
-        }
     }
     public class ChangeProgramOptions extends Stage {
         public CheckBox TooltipsCheckBox;
