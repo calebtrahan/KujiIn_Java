@@ -1,4 +1,4 @@
-package kujiin.ui;
+package kujiin.ui.dialogs;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -10,7 +10,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import kujiin.MainController;
+import kujiin.ui.MainController;
 import kujiin.util.Util;
 
 import java.io.File;
@@ -54,7 +54,7 @@ public class PreviewFile extends Stage {
                 VolumeSlider.setValue(0.0);
                 VolumePercentage.setText("0%");
             } catch (IOException ignored) {}
-        } else {Root.dialog_displayInformation("Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+        } else {new InformationDialog(Root.getOptions(), "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
     }
 
     public void play(ActionEvent actionEvent) {

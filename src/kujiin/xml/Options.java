@@ -3,7 +3,8 @@ package kujiin.xml;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import kujiin.MainController;
+import kujiin.ui.MainController;
+import kujiin.ui.dialogs.InformationDialog;
 import kujiin.util.enums.AmbiencePlaybackType;
 import kujiin.util.enums.ReferenceType;
 
@@ -123,7 +124,7 @@ public class Options {
                 setSessionOptions(options.getSessionOptions());
                 setAppearanceOptions(options.getAppearanceOptions());
             } catch (JAXBException ignored) {
-                Platform.runLater(() -> Root.dialog_displayInformation("Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
+                Platform.runLater(() -> new InformationDialog(this, "Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
             }
         } else {
@@ -137,7 +138,7 @@ public class Options {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, OPTIONSXMLFILE);
         } catch (JAXBException e) {
-            Root.dialog_displayInformation("Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
+            new InformationDialog(this, "Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
         }
     }
     public void resettodefaults() {

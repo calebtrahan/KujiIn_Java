@@ -4,6 +4,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
+import kujiin.ui.MainController;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
@@ -13,9 +14,9 @@ import java.io.File;
 public class Qi_Gong extends SessionPart {
     private String Summary;
 
-    public Qi_Gong (int number, String name, This_Session thissession, ToggleButton aSwitch, TextField value) {
-        super(number, name, thissession, aSwitch, value);
-        if (thissession.Root.getOptions().getProgramOptions().getTooltips()) {
+    public Qi_Gong (int number, String name, MainController Root,  ToggleButton aSwitch, TextField value) {
+        super(number, name, Root, aSwitch, value);
+        if (Root.getOptions().getProgramOptions().getTooltips()) {
             if (number == 0) {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Preceding The Session"));}
             else {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Following The Session"));}
         } else {Value.setTooltip(null);}
@@ -45,7 +46,7 @@ public class Qi_Gong extends SessionPart {
 // Creation Methods
     @Override
     public boolean creation_buildEntrainment() {
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+        if (root.getOptions().getSessionOptions().getRampenabled()) {
             int index = allsessionpartstoplay.indexOf(this);
             SessionPart parttotest;
             switch (number) {
@@ -69,7 +70,7 @@ public class Qi_Gong extends SessionPart {
 
     @Override
     public File reference_getFile() {
-        ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
+        ReferenceType referenceType = root.getOptions().getSessionOptions().getReferencetype();
         if (referenceType == null) {return null;}
         switch (referenceType) {
             case html: {

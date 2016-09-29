@@ -4,15 +4,16 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
+import kujiin.ui.MainController;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
 
 public class Element extends SessionPart {
 
-    public Element(int number, String name, This_Session thissession, ToggleButton aSwitch, TextField value) {
-        super(number, name, thissession, aSwitch, value);
-        if (thissession.Root.getOptions().getProgramOptions().getTooltips()) {Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));}
+    public Element(int number, String name, MainController Root, ToggleButton aSwitch, TextField value) {
+        super(number, name, Root, aSwitch, value);
+        if (Root.getOptions().getProgramOptions().getTooltips()) {Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));}
         else {Value.setTooltip(null);}
     }
 
@@ -33,7 +34,7 @@ public class Element extends SessionPart {
 // Creation Methods
     @Override
     public boolean creation_buildEntrainment() {
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+        if (root.getOptions().getSessionOptions().getRampenabled()) {
             try {
                 int index = allsessionpartstoplay.indexOf(this);
                 SessionPart parttotest = allsessionpartstoplay.get(index + 1);

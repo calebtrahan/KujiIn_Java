@@ -1,4 +1,4 @@
-package kujiin.ui;
+package kujiin.ui.dialogs;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -8,7 +8,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import kujiin.MainController;
+import kujiin.ui.MainController;
 import kujiin.util.Util;
 
 import java.io.File;
@@ -45,7 +45,7 @@ public class SelectAlertFile extends Stage {
     // Button Actions
     public void accept(ActionEvent actionEvent) {
         if (AlertFileToggleButton.isSelected() && alertfile == null) {
-            Root.dialog_displayInformation("No Alert File Selected", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
+            new InformationDialog(Root.getOptions(), "No Alert File Selected", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
             return;
         }
         Root.getOptions().getSessionOptions().setAlertfunction(AlertFileToggleButton.isSelected());
@@ -78,19 +78,19 @@ public class SelectAlertFile extends Stage {
             Double duration = Util.audio_getduration(alertfile);
             Duration alertfileduration = new Duration(duration * 1000);
             if (duration >= kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH && duration < kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                switch (Root.dialog_getAnswer("Alert File Longer Than Suggested Duration", null,
+                switch (new AnswerDialog(Root.getOptions(), "Alert File Longer Than Suggested Duration", null,
                         String.format("Alert File Is %s Which Is Longer Than Suggested Duration: %s And May Break Immersion",
                                 Util.formatdurationtoStringDecimalWithColons(alertfileduration),
                                 Util.formatdurationtoStringDecimalWithColons(new Duration(kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000))),
                         "Use As Alert File", "Don't Use As Alert File", "Cancel"
-                )) {
+                ).getResult()) {
                     case YES:
-                        if (Root.dialog_getConfirmation("Really Use " + alertfile.getName() + " As Your Alert File?", null, "Really Use This As Your Alert File? This May Break Immersion", null, null)) {break;}
+                        if (new ConfirmationDialog(Root.getOptions(), "Really Use " + alertfile.getName() + " As Your Alert File?", null, "Really Use This As Your Alert File? This May Break Immersion", null, null).getResult()) {break;}
                         else {return;}
                     case CANCEL: return;
                 }
             } else if (duration >= kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                Root.dialog_displayInformation("Cannot Add Alert File", null,
+                new InformationDialog(Root.getOptions(), "Cannot Add Alert File", null,
                         String.format("Alert File Is %s Which Is Too Long And Will Break Immersion", Util.formatdurationtoStringDecimalWithColons(alertfileduration)));
                 return;
             }
@@ -103,26 +103,26 @@ public class SelectAlertFile extends Stage {
         }
     }
     public void help(ActionEvent actionEvent) {
-        Root.dialog_displayInformation("What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to player_transition to the next\npart of the session");
+        new InformationDialog(Root.getOptions(), "What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to player_transition to the next\npart of the session");
     }
 
     // Utility Methods
     public boolean fileisgood(File testfile) {
         // Test If Valid Extension
         if (! Util.audio_isValid(testfile)) {
-            Root.dialog_displayInformation("Information", "Invalid Audio Format", "Supported Audio Formats: " + Collections.singletonList(Util.SUPPORTEDAUDIOFORMATS).toString());
+            new InformationDialog(Root.getOptions(), "Information", "Invalid Audio Format", "Supported Audio Formats: " + Collections.singletonList(Util.SUPPORTEDAUDIOFORMATS).toString());
             return false;
         }
         Double duration = Util.audio_getduration(testfile);
         if (duration == 0.0) {
-            Root.dialog_displayInformation("Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
+            new InformationDialog(Root.getOptions(), "Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
         else if (duration >= (kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
             String confirmationtext = String.format("%s Is %s Which Is Longer Than The Suggested Maximum Duration %s. This May Break Session Immersion", testfile.getName(),
                     Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), null));
-            return Root.dialog_getConfirmation("Alert File Too Long", null, confirmationtext, "Use As Alert File", "Cancel");
+            return new ConfirmationDialog(Root.getOptions(), "Alert File Too Long", null, confirmationtext, "Use As Alert File", "Cancel").getResult();
         } else if (duration >= kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
             String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), null));
-            Root.dialog_displayInformation("Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
+            new InformationDialog(Root.getOptions(), "Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
             return false;
         } else {return true;}
     }

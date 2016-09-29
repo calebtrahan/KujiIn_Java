@@ -1,7 +1,8 @@
 package kujiin.xml;
 
-import kujiin.MainController;
 import kujiin.lib.BeanComparator;
+import kujiin.ui.MainController;
+import kujiin.ui.dialogs.InformationDialog;
 import kujiin.util.SessionPart;
 import kujiin.util.Util;
 
@@ -115,7 +116,7 @@ public class Goals {
                 PostsessionGoals = currentGoals.PostsessionGoals;
                 TotalGoals = currentGoals.TotalGoals;
             } catch (JAXBException e) {
-                Root.dialog_displayInformation("Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+                new InformationDialog(Root.getOptions(), "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -126,7 +127,7 @@ public class Goals {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.GOALSXMLFILE);
         } catch (JAXBException e) {
-            Root.dialog_displayInformation("Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+            new InformationDialog(Root.getOptions(), "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
         }
     }
 

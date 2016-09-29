@@ -11,6 +11,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import kujiin.ui.MainController;
+import kujiin.ui.dialogs.AnswerDialog;
 import kujiin.util.enums.PlayerState;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.*;
@@ -27,11 +29,11 @@ public class SessionPart {
 // GUI Fields
     protected ToggleButton Switch;
     protected TextField Value;
-// Data Fields
+    protected MainController root;
+    // Data Fields
     public int number;
     public String name;
     public Duration duration;
-    protected This_Session thisession;
     protected Ambience ambience;
     protected Entrainment entrainment;
 // Playback Fields
@@ -49,7 +51,7 @@ public class SessionPart {
     protected Animation timeline_progresstonextsessionpart;
     protected Animation timeline_start_ending_ramp;
     protected FreqType freqType;
-    protected boolean ramponly;
+    public boolean ramponly;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     private ArrayList<SoundFile> ambienceplayhistory;
@@ -57,16 +59,17 @@ public class SessionPart {
     public Duration elapsedtime;
     protected List<SessionPart> allsessionpartstoplay;
     protected List<kujiin.xml.Goals.Goal> goalscompletedthissession;
+
 // Goal Fields
     protected Goals GoalsController;
     protected List<kujiin.xml.Goals.Goal> Goals;
 
     public SessionPart() {}
-    public SessionPart(int number, String name, This_Session thissession, ToggleButton aSwitch, TextField value) {
+    public SessionPart(int number, String name, MainController Root,  ToggleButton aSwitch, TextField value) {
+        root = Root;
         this.number = number;
         this.name = name;
         this.duration = Duration.ZERO;
-        this.thisession = thissession;
         if (this instanceof Cut || this instanceof Element || this instanceof Qi_Gong) {
             if (aSwitch != null && value != null) {
                 Switch = aSwitch;
@@ -75,14 +78,14 @@ public class SessionPart {
                 Value.textProperty().addListener((observable, oldValue, newValue) -> {
                     try {
                         changevalue(Integer.parseInt(Value.getText()));
-                        thissession.Root.creation_gui_update();
+                        root.getSessionCreator().updategui();
                     } catch (NumberFormatException ignored) {setDuration(0);}
                 });
                 Switch.setOnAction(event -> gui_toggleswitch());
                 gui_toggleswitch();
             }
-            entrainment = thissession.Root.getEntrainments().getsessionpartEntrainment(number);
-            ambience = thissession.Root.getAmbiences().getsessionpartAmbience(number);
+            entrainment = root.getEntrainments().getsessionpartEntrainment(number);
+            ambience = root.getAmbiences().getsessionpartAmbience(number);
         }
         //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
@@ -146,9 +149,6 @@ public class SessionPart {
     }
     public int gui_getvalue() {return Integer.parseInt(Value.getText());}
 // Getters And Setters
-    public This_Session getThisession() {
-        return thisession;
-    }
     public List<kujiin.xml.Goals.Goal> getGoals() {
         return Goals;
     }
@@ -165,12 +165,12 @@ public class SessionPart {
     }
     public void setAmbience(Ambience ambience) {
         this.ambience = ambience;
-        thisession.Root.getAmbiences().setsessionpartAmbience(number, ambience);
+        root.getAmbiences().setsessionpartAmbience(number, ambience);
     }
     public Entrainment getEntrainment() {return entrainment;}
     public void setEntrainment(Entrainment entrainment) {
         this.entrainment = entrainment;
-        thisession.Root.getEntrainments().setsessionpartEntrainment(number, entrainment);
+        root.getEntrainments().setsessionpartEntrainment(number, entrainment);
     }
     public void setGoalsController(Goals goals) {
         GoalsController = goals;
@@ -193,7 +193,7 @@ public class SessionPart {
 // Creation
     public boolean creation_build(List<SessionPart> sessionpartstoplay) {
         allsessionpartstoplay = sessionpartstoplay;
-        if (thisession.isAmbienceenabled()) {return creation_buildEntrainment() && creation_buildAmbience();}
+        if (root.getSessionCreator().isAmbienceenabled()) {return creation_buildEntrainment() && creation_buildAmbience();}
         else {return creation_buildEntrainment();}
     }
     protected boolean creation_buildEntrainment() {
@@ -222,12 +222,11 @@ public class SessionPart {
         if (! ramponly) {entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);}
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
-        timeline_progresstonextsessionpart = new Timeline(new KeyFrame(getduration(), ae -> thisession.player_progresstonextsessionpart()));
+        timeline_progresstonextsessionpart = new Timeline(new KeyFrame(getduration(), ae -> root.getSessionCreator().getPlayer().progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
-        currententrainmentvolume = thisession.getCurrententrainmentvolume();
-        thisession.player_displayreferencefile();
+        currententrainmentvolume = root.getSessionCreator().getPlayer().getCurrententrainmentvolume();
         boolean isLastSessionPart = allsessionpartstoplay.indexOf(this) == allsessionpartstoplay.size() - 1;
-        if (! ramponly && ! isLastSessionPart && thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+        if (! ramponly && ! isLastSessionPart && root.getOptions().getSessionOptions().getRampenabled()) {
             timeline_start_ending_ramp = new Timeline(new KeyFrame(duration.subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
@@ -242,8 +241,8 @@ public class SessionPart {
         }
         if (fade_entrainment_stop != null) {
             Duration startfadeout = duration;
-            if (ramponly) {startfadeout = startfadeout.subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
-            else {startfadeout = startfadeout.subtract(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration()));}
+            if (ramponly) {startfadeout = startfadeout.subtract(Duration.seconds(root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
+            else {startfadeout = startfadeout.subtract(Duration.seconds(root.getOptions().getSessionOptions().getFadeoutduration()));}
             timeline_fadeout_timer = new Timeline(new KeyFrame(startfadeout, ae -> {
                 volume_unbindentrainment();
                 fade_entrainment_stop.play();
@@ -256,23 +255,23 @@ public class SessionPart {
         }
         if (fade_entrainment_play != null) {
             if (fade_entrainment_play.getStatus() == Animation.Status.RUNNING) {return;}
-            thisession.playerState = PlayerState.FADING_PLAY;
+            root.getSessionCreator().setPlayerState(PlayerState.FADING_PLAY);
             fade_entrainment_play.play();
         } else {
             entrainmentplayer.setVolume(currententrainmentvolume);
             String percentage = new Double(currententrainmentvolume * 100).intValue() + "%";
-            thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
-            thisession.playerState = PlayerState.PLAYING;
-            if (thisession.player_isreferencecurrentlyDisplayed()) {
-                thisession.displayReference.EntrainmentVolumeSlider.setValue(currententrainmentvolume);
-                thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
+            root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
+            root.getSessionCreator().setPlayerState(PlayerState.PLAYING);
+            if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(currententrainmentvolume);
+                root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
             }
             volume_bindentrainment();}
-        if (thisession.isAmbienceenabled() && thisession.ambiencePlaybackType != null) {
+        if (root.getSessionCreator().isAmbienceenabled() && root.getSessionCreator().getAmbiencePlaybackType() != null) {
             ambienceplayhistory = new ArrayList<>();
-            currentambiencevolume = thisession.getCurrentambiencevolume();
+            currentambiencevolume = root.getSessionCreator().getPlayer().getCurrentambiencevolume();
             volume_unbindambience();
-            currentambiencesoundfile = ambience.ambiencegenerator(thisession.ambiencePlaybackType, ambienceplayhistory, currentambiencesoundfile);
+            currentambiencesoundfile = ambience.ambiencegenerator(root.getSessionCreator().getAmbiencePlaybackType(), ambienceplayhistory, currentambiencesoundfile);
             ambienceplayhistory.add(currentambiencesoundfile);
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setVolume(0.0);
@@ -283,16 +282,16 @@ public class SessionPart {
             else {
                 ambienceplayer.setVolume(currentambiencevolume);
                 String percentage = new Double(currentambiencevolume * 100).intValue() + "%";
-                thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
-                if (thisession.player_isreferencecurrentlyDisplayed()) {
-                    thisession.displayReference.AmbienceVolumeSlider.setValue(currentambiencevolume);
-                    thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
+                root.getSessionCreator().getPlayer().AmbienceVolumePercentage.setText(percentage);
+                if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(currentambiencevolume);
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
                 }
                 volume_bindambience();
             }
         }
         toggleplayerbuttons();
-        thisession.Root.sessionandgoals_forceselectsessionpart(number);
+        root.getProgressTracker().sessionpart_forceselect(number);
         goalscompletedthissession = new ArrayList<>();
     }
     public void resume() {
@@ -301,18 +300,18 @@ public class SessionPart {
         if (fade_entrainment_resume != null) {
             entrainmentplayer.setVolume(0.0);
             if (fade_entrainment_resume.getStatus() == Animation.Status.RUNNING) {return;}
-            thisession.playerState = PlayerState.FADING_RESUME;
+            root.getSessionCreator().setPlayerState(PlayerState.FADING_RESUME);
             fade_entrainment_resume.play();
         } else {
             entrainmentplayer.setVolume(currententrainmentvolume);
             volume_bindentrainment();
-            thisession.playerState = PlayerState.PLAYING;
+            root.getSessionCreator().setPlayerState(PlayerState.PLAYING);
             timeline_progresstonextsessionpart.play();
-            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
+            if (root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
                 timeline_start_ending_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();}
         }
-        if (thisession.isAmbienceenabled()) {
+        if (root.getSessionCreator().isAmbienceenabled()) {
             volume_unbindambience();
             ambienceplayer.play();
             if (fade_ambience_resume != null) {
@@ -331,9 +330,9 @@ public class SessionPart {
         if (fade_entrainment_pause != null) {
             if (fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
             // Open Loading Dialog
-            thisession.playerState = PlayerState.FADING_PAUSE;
+            root.getSessionCreator().setPlayerState(PlayerState.FADING_PAUSE);
             fade_entrainment_pause.play();
-            if (thisession.isAmbienceenabled()) {
+            if (root.getSessionCreator().isAmbienceenabled()) {
                 volume_unbindambience();
                 fade_ambience_pause.play();
             }
@@ -342,35 +341,35 @@ public class SessionPart {
         toggleplayerbuttons();
     }
     public void pausewithoutanimation() {
-        thisession.playerState = PlayerState.PAUSED;
+        root.getSessionCreator().setPlayerState(PlayerState.PAUSED);
         entrainmentplayer.pause();
         timeline_progresstonextsessionpart.pause();
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
+        if (root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
             timeline_start_ending_ramp.pause();}
         if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
-        if (thisession.isAmbienceenabled()) {
+        if (root.getSessionCreator().isAmbienceenabled()) {
             volume_unbindambience();
             ambienceplayer.pause();
         }
     }
     public void stop() {
-        thisession.player_closereferencefile();
+        root.getSessionCreator().getPlayer().closereferencefile();
         volume_unbindentrainment();
         if (fade_entrainment_stop != null) {
             if (fade_entrainment_stop.getStatus() == Animation.Status.RUNNING) {return;}
             fade_entrainment_stop.play();
-            thisession.playerState = PlayerState.FADING_STOP;
-            if (thisession.isAmbienceenabled()) {
+            root.getSessionCreator().setPlayerState(PlayerState.FADING_STOP);
+            if (root.getSessionCreator().isAmbienceenabled()) {
                 volume_unbindambience();
                 fade_ambience_stop.play();
             }
         } else {
-            thisession.playerState = PlayerState.STOPPED;
+            root.getSessionCreator().setPlayerState(PlayerState.STOPPED);
             entrainmentplayer.stop();
             entrainmentplayer.dispose();
             timeline_progresstonextsessionpart.stop();
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
-            if (thisession.isAmbienceenabled()) {
+            if (root.getSessionCreator().isAmbienceenabled()) {
                 volume_unbindambience();
                 ambienceplayer.stop();
                 ambienceplayer.dispose();
@@ -380,10 +379,10 @@ public class SessionPart {
     }
     private void setupfadeanimations() {
         // PLAY
-        if (thisession.Root.getOptions().getSessionOptions().getFadeinduration() > 0.0 || ramponly) {
+        if (root.getOptions().getSessionOptions().getFadeinduration() > 0.0 || ramponly) {
             fade_entrainment_play = new Transition() {
-                {if (ramponly) {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
-                 else {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeinduration()));}}
+                {if (ramponly) {setCycleDuration(Duration.seconds(root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
+                 else {setCycleDuration(Duration.seconds(root.getOptions().getSessionOptions().getFadeinduration()));}}
 
                 @Override
                 protected void interpolate(double frac) {
@@ -391,24 +390,24 @@ public class SessionPart {
                         double entrainmentvolume = frac * currententrainmentvolume;
                         String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
                         entrainmentplayer.setVolume(entrainmentvolume);
-                        thisession.playerUI.EntrainmentVolume.setValue(entrainmentvolume);
-                        thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
-                        if (thisession.player_isreferencecurrentlyDisplayed()) {
-                            thisession.displayReference.EntrainmentVolumeSlider.setValue(entrainmentvolume);
-                            thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
+                       root.getSessionCreator().getPlayer().EntrainmentVolume.setValue(entrainmentvolume);
+                       root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
+                        if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
+                            root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
                         }
                     }
                 }
             };
             fade_entrainment_play.setOnFinished(event -> {
-                thisession.playerState = PlayerState.PLAYING;
+                root.getSessionCreator().setPlayerState(PlayerState.PLAYING);
                 toggleplayerbuttons();
                 volume_bindentrainment();
             });
-            if (thisession.isAmbienceenabled()) {
+            if (root.getSessionCreator().isAmbienceenabled()) {
                 fade_ambience_play = new Transition() {
-                    {if (ramponly) {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
-                    else {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeinduration()));}}
+                    {if (ramponly) {setCycleDuration(Duration.seconds(root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
+                    else {setCycleDuration(Duration.seconds(root.getOptions().getSessionOptions().getFadeinduration()));}}
 
                     @Override
                     protected void interpolate(double frac) {
@@ -416,11 +415,11 @@ public class SessionPart {
                             double ambiencevolume = frac * currentambiencevolume;
                             String percentage = new Double(ambiencevolume * 100).intValue() + "%";
                             ambienceplayer.setVolume(ambiencevolume);
-                            thisession.playerUI.AmbienceVolume.setValue(ambiencevolume);
-                            thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
-                            if (thisession.player_isreferencecurrentlyDisplayed()) {
-                                thisession.displayReference.AmbienceVolumeSlider.setValue(ambiencevolume);
-                                thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
+                           root.getSessionCreator().getPlayer().AmbienceVolume.setValue(ambiencevolume);
+                           root.getSessionCreator().getPlayer().AmbienceVolumePercentage.setText(percentage);
+                            if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
+                                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
                             }
                         }
                     }
@@ -440,19 +439,19 @@ public class SessionPart {
                     double entrainmentvolume = frac * currententrainmentvolume;
                     String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
                     entrainmentplayer.setVolume(entrainmentvolume);
-                    thisession.playerUI.EntrainmentVolume.setValue(entrainmentvolume);
-                    thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
-                    if (thisession.player_isreferencecurrentlyDisplayed()) {
-                        thisession.displayReference.EntrainmentVolumeSlider.setValue(entrainmentvolume);
-                        thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
+                   root.getSessionCreator().getPlayer().EntrainmentVolume.setValue(entrainmentvolume);
+                   root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
+                    if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                        root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
+                        root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
                     }
                 }
             }
         };
         fade_entrainment_resume.setOnFinished(event -> {
-            thisession.playerState = PlayerState.PLAYING;
+            root.getSessionCreator().setPlayerState(PlayerState.PLAYING);
             timeline_progresstonextsessionpart.play();
-            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
+            if (root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
                 timeline_start_ending_ramp.play();
             }
             if (timeline_fadeout_timer != null) {
@@ -461,7 +460,7 @@ public class SessionPart {
             toggleplayerbuttons();
             volume_bindentrainment();
         });
-        if (thisession.isAmbienceenabled()) {
+        if (root.getSessionCreator().isAmbienceenabled()) {
             fade_ambience_resume = new Transition() {
                 {
                     setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));
@@ -473,11 +472,11 @@ public class SessionPart {
                         double ambiencevolume = frac * currentambiencevolume;
                         String percentage = new Double(ambiencevolume * 100).intValue() + "%";
                         ambienceplayer.setVolume(ambiencevolume);
-                        thisession.playerUI.AmbienceVolume.setValue(ambiencevolume);
-                        thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
-                        if (thisession.player_isreferencecurrentlyDisplayed()) {
-                            thisession.displayReference.AmbienceVolumeSlider.setValue(ambiencevolume);
-                            thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
+                       root.getSessionCreator().getPlayer().AmbienceVolume.setValue(ambiencevolume);
+                       root.getSessionCreator().getPlayer().AmbienceVolumePercentage.setText(percentage);
+                        if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                            root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
+                            root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
                         }
                     }
                 }
@@ -496,11 +495,11 @@ public class SessionPart {
                     double fadeoutvolume = currententrainmentvolume - (frac * currententrainmentvolume);
                     String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
                     entrainmentplayer.setVolume(fadeoutvolume);
-                    thisession.playerUI.EntrainmentVolume.setValue(fadeoutvolume);
-                    thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
-                    if (thisession.player_isreferencecurrentlyDisplayed()) {
-                        thisession.displayReference.EntrainmentVolumeSlider.setValue(fadeoutvolume);
-                        thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
+                   root.getSessionCreator().getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
+                   root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
+                    if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                        root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
+                        root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
                     }
                 }
             }
@@ -508,16 +507,16 @@ public class SessionPart {
         fade_entrainment_pause.setOnFinished(event -> {
             entrainmentplayer.pause();
             timeline_progresstonextsessionpart.pause();
-            if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
+            if (root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
                 timeline_start_ending_ramp.pause();
             }
             if (timeline_fadeout_timer != null) {
                 timeline_fadeout_timer.pause();
             }
-            thisession.playerState = PlayerState.PAUSED;
+            root.getSessionCreator().setPlayerState(PlayerState.PAUSED);
             toggleplayerbuttons();
         });
-        if (thisession.isAmbienceenabled()) {
+        if (root.getSessionCreator().isAmbienceenabled()) {
             fade_ambience_pause = new Transition() {
                 {
                     setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));
@@ -529,11 +528,11 @@ public class SessionPart {
                         double fadeoutvolume = currentambiencevolume - (frac * currentambiencevolume);
                         String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
                         ambienceplayer.setVolume(fadeoutvolume);
-                        thisession.playerUI.AmbienceVolume.setValue(fadeoutvolume);
-                        thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
-                        if (thisession.player_isreferencecurrentlyDisplayed()) {
-                            thisession.displayReference.AmbienceVolumeSlider.setValue(fadeoutvolume);
-                            thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
+                       root.getSessionCreator().getPlayer().AmbienceVolume.setValue(fadeoutvolume);
+                       root.getSessionCreator().getPlayer().AmbienceVolumePercentage.setText(percentage);
+                        if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                            root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(fadeoutvolume);
+                            root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
                         }
                     }
                 }
@@ -541,10 +540,10 @@ public class SessionPart {
             fade_ambience_pause.setOnFinished(event -> ambienceplayer.pause());
         }
         // STOP
-        if (thisession.Root.getOptions().getSessionOptions().getFadeoutduration() > 0.0 || ramponly) {
+        if (root.getOptions().getSessionOptions().getFadeoutduration() > 0.0 || ramponly) {
             fade_entrainment_stop = new Transition() {
-                {if (ramponly) {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
-                else {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration()));}}
+                {if (ramponly) {setCycleDuration(Duration.seconds(root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
+                else {setCycleDuration(Duration.seconds(root.getOptions().getSessionOptions().getFadeoutduration()));}}
 
                 @Override
                 protected void interpolate(double frac) {
@@ -552,11 +551,11 @@ public class SessionPart {
                         double fadeoutvolume = currententrainmentvolume - (frac * currententrainmentvolume);
                         String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
                         entrainmentplayer.setVolume(fadeoutvolume);
-                        thisession.playerUI.EntrainmentVolume.setValue(fadeoutvolume);
-                        thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
-                        if (thisession.player_isreferencecurrentlyDisplayed()) {
-                            thisession.displayReference.EntrainmentVolumeSlider.setValue(fadeoutvolume);
-                            thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
+                       root.getSessionCreator().getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
+                       root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
+                        if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
+                            root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
                         }
                     }
                 }
@@ -564,20 +563,20 @@ public class SessionPart {
             fade_entrainment_stop.setOnFinished(event -> {
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
-                if (thisession.Root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
+                if (root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
                     timeline_start_ending_ramp.stop();
                 }
                 timeline_progresstonextsessionpart.stop();
                 if (timeline_fadeout_timer != null) {
                     timeline_fadeout_timer.stop();
                 }
-                thisession.playerState = PlayerState.STOPPED;
+                root.getSessionCreator().setPlayerState(PlayerState.STOPPED);
                 toggleplayerbuttons();
             });
-            if (thisession.isAmbienceenabled()) {
+            if (root.getSessionCreator().isAmbienceenabled()) {
                 fade_ambience_stop = new Transition() {
-                    {if (ramponly) {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
-                    else {setCycleDuration(Duration.seconds(thisession.Root.getOptions().getSessionOptions().getFadeoutduration()));}}
+                    {if (ramponly) {setCycleDuration(Duration.seconds(root.getOptions().getSessionOptions().getRamponlyfadeduration()));}
+                    else {setCycleDuration(Duration.seconds(root.getOptions().getSessionOptions().getFadeoutduration()));}}
 
                     @Override
                     protected void interpolate(double frac) {
@@ -585,11 +584,11 @@ public class SessionPart {
                             double fadeoutvolume = currentambiencevolume - (frac * currentambiencevolume);
                             String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
                             ambienceplayer.setVolume(fadeoutvolume);
-                            thisession.playerUI.AmbienceVolume.setValue(fadeoutvolume);
-                            thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
-                            if (thisession.player_isreferencecurrentlyDisplayed()) {
-                                thisession.displayReference.AmbienceVolumeSlider.setValue(fadeoutvolume);
-                                thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
+                           root.getSessionCreator().getPlayer().AmbienceVolume.setValue(fadeoutvolume);
+                           root.getSessionCreator().getPlayer().AmbienceVolumePercentage.setText(percentage);
+                            if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(fadeoutvolume);
+                                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
                             }
                         }
                     }
@@ -622,7 +621,7 @@ public class SessionPart {
             volume_unbindambience();
             ambienceplayer.dispose();
             ambienceplayer = null;
-            currentambiencesoundfile = ambience.ambiencegenerator(thisession.ambiencePlaybackType, ambienceplayhistory, currentambiencesoundfile);
+            currentambiencesoundfile = ambience.ambiencegenerator(root.getSessionCreator().getAmbiencePlaybackType(), ambienceplayhistory, currentambiencesoundfile);
             ambienceplayhistory.add(currentambiencesoundfile);
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
@@ -655,28 +654,28 @@ public class SessionPart {
         } catch (Exception ignored) {}
     }
     public void toggleplayerbuttons() {
-        if (thisession.playerState == null) {return;}
-        boolean idle = thisession.playerState == PlayerState.IDLE;
-        boolean playing = thisession.playerState == PlayerState.PLAYING;
-        boolean paused = thisession.playerState == PlayerState.PAUSED;
-        boolean stopped = thisession.playerState == PlayerState.STOPPED;
-        boolean fade_play = thisession.playerState == PlayerState.FADING_PLAY;
-        boolean fade_resume = thisession.playerState == PlayerState.FADING_RESUME;
-        boolean fade_pause = thisession.playerState == PlayerState.FADING_PAUSE;
-        boolean fade_stop = thisession.playerState == PlayerState.FADING_STOP;
-        thisession.playerUI.PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
-        thisession.playerUI.PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
-        thisession.playerUI.StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
-        thisession.playerUI.ReferenceCheckBox.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
-        if (thisession.player_isreferencecurrentlyDisplayed()) {
-            thisession.displayReference.PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
-            thisession.displayReference.PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
-            thisession.displayReference.StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
+        if (root.getSessionCreator().getPlayerState() == null) {return;}
+        boolean idle = root.getSessionCreator().getPlayerState() == PlayerState.IDLE;
+        boolean playing = root.getSessionCreator().getPlayerState() == PlayerState.PLAYING;
+        boolean paused = root.getSessionCreator().getPlayerState() == PlayerState.PAUSED;
+        boolean stopped = root.getSessionCreator().getPlayerState() == PlayerState.STOPPED;
+        boolean fade_play = root.getSessionCreator().getPlayerState() == PlayerState.FADING_PLAY;
+        boolean fade_resume = root.getSessionCreator().getPlayerState() == PlayerState.FADING_RESUME;
+        boolean fade_pause = root.getSessionCreator().getPlayerState() == PlayerState.FADING_PAUSE;
+        boolean fade_stop = root.getSessionCreator().getPlayerState() == PlayerState.FADING_STOP;
+       root.getSessionCreator().getPlayer().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
+       root.getSessionCreator().getPlayer().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
+       root.getSessionCreator().getPlayer().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
+       root.getSessionCreator().getPlayer().ReferenceCheckBox.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
+        if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+            root.getSessionCreator().getDisplayReference().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
+            root.getSessionCreator().getDisplayReference().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
+            root.getSessionCreator().getDisplayReference().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
         }
         String playbuttontext;
         String pausebuttontext;
         String stopbuttontext;
-        switch (thisession.playerState) {
+        switch (root.getSessionCreator().getPlayerState()) {
             case IDLE:
                 playbuttontext = "Start";
                 pausebuttontext = "Pause";
@@ -728,182 +727,182 @@ public class SessionPart {
                 stopbuttontext = "";
                 break;
         }
-        thisession.playerUI.PlayButton.setText(playbuttontext);
-        thisession.playerUI.PauseButton.setText(pausebuttontext);
-        thisession.playerUI.StopButton.setText(stopbuttontext);
-        if (thisession.player_isreferencecurrentlyDisplayed()) {
-            thisession.displayReference.PlayButton.setText(playbuttontext);
-            thisession.displayReference.PauseButton.setText(pausebuttontext);
-            thisession.displayReference.StopButton.setText(stopbuttontext);
+       root.getSessionCreator().getPlayer().PlayButton.setText(playbuttontext);
+       root.getSessionCreator().getPlayer().PauseButton.setText(pausebuttontext);
+       root.getSessionCreator().getPlayer().StopButton.setText(stopbuttontext);
+        if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+            root.getSessionCreator().getDisplayReference().PlayButton.setText(playbuttontext);
+            root.getSessionCreator().getDisplayReference().PauseButton.setText(pausebuttontext);
+            root.getSessionCreator().getDisplayReference().StopButton.setText(stopbuttontext);
         }
         toggleplayervolumecontrols();
     }
     public void toggleplayervolumecontrols() {
-        boolean enabled = thisession.playerState == PlayerState.PLAYING;
-        thisession.playerUI.EntrainmentVolume.setDisable(! enabled);
-        if (thisession.isAmbienceenabled()) {thisession.playerUI.AmbienceVolume.setDisable(! enabled);}
-        if (thisession.player_isreferencecurrentlyDisplayed()) {
-            thisession.displayReference.EntrainmentVolumeSlider.setDisable(! enabled);
-            if (thisession.isAmbienceenabled()) {thisession.displayReference.AmbienceVolumeSlider.setDisable(! enabled);}
+        boolean enabled = root.getSessionCreator().getPlayerState() == PlayerState.PLAYING;
+       root.getSessionCreator().getPlayer().EntrainmentVolume.setDisable(! enabled);
+        if (root.getSessionCreator().isAmbienceenabled()) {root.getSessionCreator().getPlayer().AmbienceVolume.setDisable(! enabled);}
+        if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setDisable(! enabled);
+            if (root.getSessionCreator().isAmbienceenabled()) {root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setDisable(! enabled);}
         }
     }
     public void volume_bindentrainment() {
-        thisession.playerUI.EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
-        thisession.playerUI.EntrainmentVolume.setDisable(false);
-        thisession.playerUI.EntrainmentVolume.setOnMouseDragged(event1 -> {
-            String percentage = new Double(thisession.playerUI.EntrainmentVolume.getValue() * 100).intValue() + "%";
-            currententrainmentvolume = thisession.playerUI.EntrainmentVolume.getValue();
-            thisession.setCurrententrainmentvolume(currententrainmentvolume);
-            thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
-            if (thisession.player_isreferencecurrentlyDisplayed()) {
-                thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
-                thisession.displayReference.EntrainmentVolumeSlider.setValue(currententrainmentvolume);
-                thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
-                thisession.displayReference.EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+       root.getSessionCreator().getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+       root.getSessionCreator().getPlayer().EntrainmentVolume.setDisable(false);
+       root.getSessionCreator().getPlayer().EntrainmentVolume.setOnMouseDragged(event1 -> {
+            String percentage = new Double(root.getSessionCreator().getPlayer().EntrainmentVolume.getValue() * 100).intValue() + "%";
+            currententrainmentvolume =root.getSessionCreator().getPlayer().EntrainmentVolume.getValue();
+            root.getSessionCreator().getPlayer().setCurrententrainmentvolume(currententrainmentvolume);
+           root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
+            if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
+                root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(currententrainmentvolume);
+                root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
+                root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
             }
         });
-        thisession.playerUI.EntrainmentVolume.setOnScroll(event -> {
-            Double newvalue = thisession.playerUI.EntrainmentVolume.getValue();
+       root.getSessionCreator().getPlayer().EntrainmentVolume.setOnScroll(event -> {
+            Double newvalue =root.getSessionCreator().getPlayer().EntrainmentVolume.getValue();
             if (event.getDeltaY() < 0) {newvalue -= Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
             else {newvalue += Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
             if (newvalue <= 1.0 && newvalue >= 0.0) {
                 Double roundedvalue = Util.round_nearestmultipleof5(newvalue * 100);
                 String percentage = roundedvalue.intValue() + "%";
                 currententrainmentvolume = roundedvalue / 100;
-                thisession.setCurrententrainmentvolume(roundedvalue / 100);
-                thisession.playerUI.EntrainmentVolume.setValue(roundedvalue / 100);
-                thisession.playerUI.EntrainmentVolume.setTooltip(new Tooltip(percentage));
-                thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
-                if (thisession.player_isreferencecurrentlyDisplayed()) {
-                    thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
-                    thisession.displayReference.EntrainmentVolumeSlider.setValue(currententrainmentvolume);
-                    thisession.displayReference.EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
-                    thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
+                root.getSessionCreator().getPlayer().setCurrententrainmentvolume(roundedvalue / 100);
+               root.getSessionCreator().getPlayer().EntrainmentVolume.setValue(roundedvalue / 100);
+               root.getSessionCreator().getPlayer().EntrainmentVolume.setTooltip(new Tooltip(percentage));
+               root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
+                if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                    root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
+                    root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(currententrainmentvolume);
+                    root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+                    root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
                 }
             }
         });
-        if (thisession.player_isreferencecurrentlyDisplayed()) {
-            thisession.displayReference.EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
-            thisession.displayReference.EntrainmentVolumeSlider.setDisable(false);
-            thisession.displayReference.EntrainmentVolumeSlider.setOnMouseDragged(event1 -> {
-                String percentage = new Double(thisession.displayReference.EntrainmentVolumeSlider.getValue() * 100).intValue() + "%";
-                currententrainmentvolume = thisession.playerUI.EntrainmentVolume.getValue();
-                thisession.setCurrententrainmentvolume(currententrainmentvolume);
-                thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
-                thisession.playerUI.EntrainmentVolume.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
-                thisession.playerUI.EntrainmentVolume.setValue(currententrainmentvolume);
-                thisession.playerUI.EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
-                thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
+        if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setDisable(false);
+            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setOnMouseDragged(event1 -> {
+                String percentage = new Double(root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.getValue() * 100).intValue() + "%";
+                currententrainmentvolume =root.getSessionCreator().getPlayer().EntrainmentVolume.getValue();
+                root.getSessionCreator().getPlayer().setCurrententrainmentvolume(currententrainmentvolume);
+                root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
+               root.getSessionCreator().getPlayer().EntrainmentVolume.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
+               root.getSessionCreator().getPlayer().EntrainmentVolume.setValue(currententrainmentvolume);
+               root.getSessionCreator().getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+               root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
             });
-            thisession.displayReference.EntrainmentVolumeSlider.setOnScroll(event -> {
-                Double newvalue = thisession.displayReference.EntrainmentVolumeSlider.getValue();
+            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setOnScroll(event -> {
+                Double newvalue = root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.getValue();
                 if (event.getDeltaY() < 0) {newvalue -= Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
                 else {newvalue += Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
                 if (newvalue <= 1.0 && newvalue >= 0.0) {
                     Double roundedvalue = Util.round_nearestmultipleof5(newvalue * 100);
                     String percentage = roundedvalue.intValue() + "%";
                     currententrainmentvolume = roundedvalue / 100;
-                    thisession.setCurrententrainmentvolume(currententrainmentvolume);
-                    thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
-                    thisession.displayReference.EntrainmentVolumeSlider.setValue(currententrainmentvolume);
-                    thisession.displayReference.EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
-                    thisession.displayReference.EntrainmentVolumePercentage.setText(percentage);
-                    thisession.playerUI.EntrainmentVolume.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
-                    thisession.playerUI.EntrainmentVolume.setValue(currententrainmentvolume);
-                    thisession.playerUI.EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
-                    thisession.playerUI.EntrainmentVolumePercentage.setText(percentage);
+                    root.getSessionCreator().getPlayer().setCurrententrainmentvolume(currententrainmentvolume);
+                    root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
+                    root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(currententrainmentvolume);
+                    root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+                    root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
+                   root.getSessionCreator().getPlayer().EntrainmentVolume.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
+                   root.getSessionCreator().getPlayer().EntrainmentVolume.setValue(currententrainmentvolume);
+                   root.getSessionCreator().getPlayer().EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
+                   root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
                 }
             });
         }
     }
     public void volume_unbindentrainment() {
         try {
-            thisession.playerUI.EntrainmentVolume.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
-            thisession.playerUI.EntrainmentVolume.setDisable(true);
-            if (thisession.player_isreferencecurrentlyDisplayed()) {
-                thisession.displayReference.EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
-                thisession.displayReference.EntrainmentVolumeSlider.setDisable(true);
+           root.getSessionCreator().getPlayer().EntrainmentVolume.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
+           root.getSessionCreator().getPlayer().EntrainmentVolume.setDisable(true);
+            if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
+                root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setDisable(true);
             }
         } catch (NullPointerException ignored) {}
     }
     public void volume_bindambience() {
-        thisession.playerUI.AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
-        thisession.playerUI.AmbienceVolume.setDisable(false);
-        thisession.playerUI.AmbienceVolume.setOnMouseDragged(event1 -> {
-            String percentage = new Double(thisession.playerUI.AmbienceVolume.getValue() * 100).intValue() + "%";
-            currentambiencevolume = thisession.playerUI.AmbienceVolume.getValue();
-            thisession.setCurrentambiencevolume(currentambiencevolume);
-            thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
-            thisession.playerUI.AmbienceVolume.setTooltip(new Tooltip(percentage));
-            if (thisession.player_isreferencecurrentlyDisplayed()) {
-                thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
-                thisession.displayReference.AmbienceVolumeSlider.setValue(currentambiencevolume);
-                thisession.displayReference.AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
-                thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
+       root.getSessionCreator().getPlayer().AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
+       root.getSessionCreator().getPlayer().AmbienceVolume.setDisable(false);
+       root.getSessionCreator().getPlayer().AmbienceVolume.setOnMouseDragged(event1 -> {
+            String percentage = new Double(root.getSessionCreator().getPlayer().AmbienceVolume.getValue() * 100).intValue() + "%";
+            currentambiencevolume =root.getSessionCreator().getPlayer().AmbienceVolume.getValue();
+            root.getSessionCreator().getPlayer().setCurrentambiencevolume(currentambiencevolume);
+           root.getSessionCreator().getPlayer().AmbienceVolumePercentage.setText(percentage);
+           root.getSessionCreator().getPlayer().AmbienceVolume.setTooltip(new Tooltip(percentage));
+            if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
+                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(currentambiencevolume);
+                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
+                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
             }
         });
-        thisession.playerUI.AmbienceVolume.setOnScroll(event -> {
-            Double newvalue = thisession.playerUI.AmbienceVolume.getValue();
+       root.getSessionCreator().getPlayer().AmbienceVolume.setOnScroll(event -> {
+            Double newvalue =root.getSessionCreator().getPlayer().AmbienceVolume.getValue();
             if (event.getDeltaY() < 0) {newvalue -= Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
             else {newvalue += Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
             if (newvalue <= 1.0 && newvalue >= 0.0) {
                 Double roundedvalue = Util.round_nearestmultipleof5(newvalue * 100);
                 String percentage = roundedvalue.intValue() + "%";
                 currentambiencevolume = roundedvalue / 100;
-                thisession.setCurrentambiencevolume(roundedvalue / 100);
-                thisession.playerUI.AmbienceVolume.setValue(roundedvalue / 100);
-                thisession.playerUI.AmbienceVolume.setTooltip(new Tooltip(percentage));
-                thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
-                if (thisession.player_isreferencecurrentlyDisplayed()) {
-                    thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
-                    thisession.displayReference.AmbienceVolumeSlider.setValue(currentambiencevolume);
-                    thisession.displayReference.AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
-                    thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
+                root.getSessionCreator().getPlayer().setCurrentambiencevolume(roundedvalue / 100);
+               root.getSessionCreator().getPlayer().AmbienceVolume.setValue(roundedvalue / 100);
+               root.getSessionCreator().getPlayer().AmbienceVolume.setTooltip(new Tooltip(percentage));
+               root.getSessionCreator().getPlayer().AmbienceVolumePercentage.setText(percentage);
+                if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(currentambiencevolume);
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
                 }
             }
         });
-        if (thisession.player_isreferencecurrentlyDisplayed()) {
-            thisession.displayReference.AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
-            thisession.displayReference.AmbienceVolumeSlider.setDisable(false);
-            thisession.displayReference.AmbienceVolumeSlider.setOnMouseDragged(event1 -> {
-                String percentage = new Double(thisession.displayReference.AmbienceVolumeSlider.getValue() * 100).intValue() + "%";
-                currentambiencevolume = thisession.playerUI.AmbienceVolume.getValue();
-                thisession.setCurrentambiencevolume(currentambiencevolume);
-                thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
-                thisession.playerUI.AmbienceVolume.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
-                thisession.playerUI.AmbienceVolume.setValue(currentambiencevolume);
-                thisession.playerUI.AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
-                thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
+        if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+            root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
+            root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setDisable(false);
+            root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setOnMouseDragged(event1 -> {
+                String percentage = new Double(root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.getValue() * 100).intValue() + "%";
+                currentambiencevolume =root.getSessionCreator().getPlayer().AmbienceVolume.getValue();
+                root.getSessionCreator().getPlayer().setCurrentambiencevolume(currentambiencevolume);
+                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
+               root.getSessionCreator().getPlayer().AmbienceVolume.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
+               root.getSessionCreator().getPlayer().AmbienceVolume.setValue(currentambiencevolume);
+               root.getSessionCreator().getPlayer().AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
+               root.getSessionCreator().getPlayer().AmbienceVolumePercentage.setText(percentage);
             });
-            thisession.displayReference.AmbienceVolumeSlider.setOnScroll(event -> {
-                Double newvalue = thisession.displayReference.AmbienceVolumeSlider.getValue();
+            root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setOnScroll(event -> {
+                Double newvalue = root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.getValue();
                 if (event.getDeltaY() < 0) {newvalue -= Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
                 else {newvalue += Options.VOLUME_SLIDER_ADJUSTMENT_INCREMENT / 100;}
                 if (newvalue <= 1.0 && newvalue >= 0.0) {
                     Double roundedvalue = Util.round_nearestmultipleof5(newvalue * 100);
                     String percentage = roundedvalue.intValue() + "%";
                     currentambiencevolume = roundedvalue / 100;
-                    thisession.setCurrentambiencevolume(roundedvalue / 100);
-                    thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
-                    thisession.displayReference.AmbienceVolumeSlider.setValue(roundedvalue / 100);
-                    thisession.displayReference.AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
-                    thisession.displayReference.AmbienceVolumeSlider.setTooltip(new Tooltip(percentage));
-                    thisession.displayReference.AmbienceVolumePercentage.setText(percentage);
-                    thisession.playerUI.AmbienceVolume.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
-                    thisession.playerUI.AmbienceVolume.setValue(currentambiencevolume);
-                    thisession.playerUI.AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
-                    thisession.playerUI.AmbienceVolumePercentage.setText(percentage);
+                    root.getSessionCreator().getPlayer().setCurrentambiencevolume(roundedvalue / 100);
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(roundedvalue / 100);
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setTooltip(new Tooltip(percentage));
+                    root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
+                   root.getSessionCreator().getPlayer().AmbienceVolume.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
+                   root.getSessionCreator().getPlayer().AmbienceVolume.setValue(currentambiencevolume);
+                   root.getSessionCreator().getPlayer().AmbienceVolume.valueProperty().bindBidirectional(ambienceplayer.volumeProperty());
+                   root.getSessionCreator().getPlayer().AmbienceVolumePercentage.setText(percentage);
                 }
             });
         }
     }
     public void volume_unbindambience() {
         try {
-            thisession.playerUI.AmbienceVolume.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
-            thisession.playerUI.AmbienceVolume.setDisable(true);
-            if (thisession.player_isreferencecurrentlyDisplayed()) {
-                thisession.displayReference.AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
-                thisession.displayReference.AmbienceVolumeSlider.setDisable(true);
+           root.getSessionCreator().getPlayer().AmbienceVolume.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
+           root.getSessionCreator().getPlayer().AmbienceVolume.setDisable(true);
+            if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
+                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.valueProperty().unbindBidirectional(ambienceplayer.volumeProperty());
+                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setDisable(true);
             }
         } catch (NullPointerException ignored) {}
     }
@@ -912,7 +911,7 @@ public class SessionPart {
     public void tick() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             try {
-                thisession.Root.getSessions().getspecificsession(thisession.Root.getSessions().getSession().size() - 1).updatesessionpartduration(number, new Double(elapsedtime.toMinutes()).intValue());
+                root.getProgressTracker().getSessions().getspecificsession(root.getProgressTracker().getSessions().getSession().size() - 1).updatesessionpartduration(number, new Double(elapsedtime.toMinutes()).intValue());
                 goals_updateduringplayback();
             } catch (NullPointerException ignored) {}
         }
@@ -921,25 +920,25 @@ public class SessionPart {
     protected void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists
-        switch (thisession.Root.dialog_getAnswer("Entrainment Playback Error", null, "An Error Occured While Playing " + name +
+        switch (new AnswerDialog(root.getOptions(), "Entrainment Playback Error", null, "An Error Occured While Playing " + name +
                         "'s Entrainment. Problem File Is: '" + entrainmentplayer.getMedia().getSource() + "'",
-                "Retry Playback", "Mute Entrainment", "Stop Session Playback")) {
+                "Retry Playback", "Mute Entrainment", "Stop Session Playback").getResult()) {
             case YES:
                 entrainmentplayer.stop();
                 entrainmentplayer.play();
                 entrainmentplayer.setOnError(this::entrainmenterror);
                 break;
             case CANCEL:
-                thisession.player_error();
+//                root.getSessionCreator().getPlayer().player_error();
                 break;
         }
     }
     protected void ambienceerror() {
         System.out.println("Ambience Error!");
         // Pause Entrainment
-        switch (thisession.Root.dialog_getAnswer("Ambience Playback Error", null, "An Error Occured While Playing " + name +
+        switch (new AnswerDialog(root.getOptions(), "Ambience Playback Error", null, "An Error Occured While Playing " + name +
                         "'s Ambience. Problem File Is: '" + ambienceplayer.getMedia().getSource() + "'",
-                "Retry Playback", "Mute Ambience", "Stop Session Playback")) {
+                "Retry Playback", "Mute Ambience", "Stop Session Playback").getResult()) {
             case YES:
                 ambienceplayer.stop();
                 ambienceplayer.play();
@@ -948,7 +947,7 @@ public class SessionPart {
             case NO:
                 ambienceplayer.stop();
             case CANCEL:
-                thisession.player_error();
+//                root.getSessionCreator().getPlayer().player_error();
                 break;
         }
     }
@@ -1032,8 +1031,8 @@ public class SessionPart {
 
 // Goals
     // Goals XML
-    public void goals_unmarshall() {Goals = thisession.Root.getGoals().getSessionPartGoalList(number);}
-    public void goals_marshall() {thisession.Root.getGoals().setSessionPartGoalList(number, Goals);}
+    public void goals_unmarshall() {Goals = root.getProgressTracker().getGoals().getSessionPartGoalList(number);}
+    public void goals_marshall() {root.getProgressTracker().getGoals().setSessionPartGoalList(number, Goals);}
     // List Methods
     public void goals_add(kujiin.xml.Goals.Goal newgoal) {
         if (Goals == null) {Goals = new ArrayList<>();}
@@ -1114,7 +1113,7 @@ public class SessionPart {
     public boolean goals_arelongenough() {
         try {
             Duration goalduration = Duration.hours(goals_getCurrent().getGoal_Hours());
-            Duration practiceddurationplusthissession = thisession.Root.getSessions().gettotalpracticedtime(number, false).add(getduration());
+            Duration practiceddurationplusthissession = root.getProgressTracker().getSessions().gettotalpracticedtime(number, false).add(getduration());
             return goalduration.greaterThanOrEqualTo(practiceddurationplusthissession);
         } catch (NullPointerException e) {return true;}
     }
@@ -1132,7 +1131,7 @@ public class SessionPart {
         Goals = goallist;
     }
     public void goals_transitioncheck() {
-        if (goalscompletedthissession.size() > 0) {thisession.sessionpartswithGoalsCompletedThisSession.add(this);}
+        if (goalscompletedthissession.size() > 0) {root.getSessionCreator().getPlayer().sessionpartswithGoalsCompletedThisSession.add(this);}
     }
     // UI
     public boolean goals_ui_currentgoalisset() {return goals_getCurrent() != null;}
@@ -1156,40 +1155,40 @@ public class SessionPart {
 // Session Tracking
     // UI
     public String sessions_ui_getPracticedDuration() {
-        return Util.formatdurationtoStringSpelledOut(sessions_getPracticedDuration(null), thisession.Root.TotalTimePracticed.getLayoutBounds().getWidth());
+        return Util.formatdurationtoStringSpelledOut(sessions_getPracticedDuration(null), root.TotalTimePracticed.getLayoutBounds().getWidth());
     }
     public String sessions_ui_getPracticedSessionCount() {
         return String.valueOf(sessions_getPracticedSessionCount(null));
     }
     public String sessions_ui_getAverageSessionLength() {
-        return Util.formatdurationtoStringSpelledOut(sessions_getAverageSessionLength(null), thisession.Root.AverageSessionDuration.getLayoutBounds().getWidth());
+        return Util.formatdurationtoStringSpelledOut(sessions_getAverageSessionLength(null), root.AverageSessionDuration.getLayoutBounds().getWidth());
     }
     // Utility
     public boolean sessions_includepreandpost() {
-        return ! thisession.Root.PrePostSwitch.isDisabled() && thisession.Root.PrePostSwitch.isSelected();
+        return ! root.PrePostSwitch.isDisabled() && root.PrePostSwitch.isSelected();
     }
     public Duration sessions_getPracticedDuration(Boolean includepreandpostoverride) {
         boolean includepreandpost;
         if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
         else {includepreandpost = sessions_includepreandpost();}
-        return thisession.Root.getSessions().gettotalpracticedtime(number, includepreandpost);
+        return root.getProgressTracker().getSessions().gettotalpracticedtime(number, includepreandpost);
     }
     public int sessions_getPracticedSessionCount(Boolean includepreandpostoverride) {
         boolean includepreandpost;
         if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
         else {includepreandpost = sessions_includepreandpost();}
-        return thisession.Root.getSessions().getsessioncount(number, includepreandpost);
+        return root.getProgressTracker().getSessions().getsessioncount(number, includepreandpost);
     }
     public Duration sessions_getAverageSessionLength(Boolean includepreandpostoverride) {
         boolean includepreandpost;
         if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
         else {includepreandpost = sessions_includepreandpost();}
-        return thisession.Root.getSessions().getaveragepracticedurationforallsessions(number,  includepreandpost);
+        return root.getProgressTracker().getSessions().getaveragepracticedurationforallsessions(number,  includepreandpost);
     }
 
 // Reference Files
     public File reference_getFile() {
-        ReferenceType referenceType = thisession.Root.getOptions().getSessionOptions().getReferencetype();
+        ReferenceType referenceType = root.getOptions().getSessionOptions().getReferencetype();
         if (referenceType == null) {return null;}
         switch (referenceType) {
             case html: {

@@ -1,4 +1,4 @@
-package kujiin.ui;
+package kujiin.ui.dialogs;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;

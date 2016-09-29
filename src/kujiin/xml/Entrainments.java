@@ -1,6 +1,7 @@
 package kujiin.xml;
 
-import kujiin.MainController;
+import kujiin.ui.MainController;
+import kujiin.ui.dialogs.InformationDialog;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -75,7 +76,7 @@ public class Entrainments {
             createMarshaller.marshal(this, Options.ENTRAINMENTXMLFILE);
         } catch (JAXBException e) {
             e.printStackTrace();
-            Root.dialog_displayInformation("Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+            new InformationDialog(Root.getOptions(), "Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
         }
     }
 

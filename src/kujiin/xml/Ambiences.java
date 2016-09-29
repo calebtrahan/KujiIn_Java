@@ -1,6 +1,7 @@
 package kujiin.xml;
 
-import kujiin.MainController;
+import kujiin.ui.MainController;
+import kujiin.ui.dialogs.InformationDialog;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -69,7 +70,7 @@ public class Ambiences {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.AMBIENCEXMLFILE);
         } catch (JAXBException ignored) {
-            Root.dialog_displayInformation("Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
+            new InformationDialog(Root.getOptions(), "Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
     }
 
 // Other Methods

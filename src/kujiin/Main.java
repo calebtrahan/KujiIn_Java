@@ -4,7 +4,10 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import kujiin.util.This_Session;
+import kujiin.ui.MainController;
+import kujiin.ui.ProgressTracker;
+import kujiin.ui.SessionCreator;
+import kujiin.ui.dialogs.ConfirmationDialog;
 import kujiin.util.enums.ProgramState;
 import kujiin.xml.Ambiences;
 import kujiin.xml.Entrainments;
@@ -27,17 +30,14 @@ public class Main extends Application {
         primaryStage.setOnShowing(event -> {
             Root.setEntrainments(new Entrainments(Root));
             Root.setAmbiences(new Ambiences(Root));
-            Root.setSession(new This_Session(Root));
-            Root.creation_initialize();
-            Root.exporter_initialize();
-            Root.sessions_initialize();
-            Root.goals_initialize();
-            Root.preset_initialize();
+            Root.setProgressTracker(new ProgressTracker(Root));
+            Root.setupSessionParts();
+            Root.setSessionCreator(new SessionCreator(Root));
             Root.startupchecks_start();
         });
         primaryStage.setOnCloseRequest(event -> {
             if (Root.getProgramState() == ProgramState.IDLE &&
-                    Root.dialog_getConfirmation("Confirmation", null, "Really Exit?", "Exit", "Cancel")) {
+                    new ConfirmationDialog(Root.getOptions(), "Confirmation", null, "Really Exit?", "Exit", "Cancel").getResult()) {
                 Root.close(null);
             }
             else {event.consume();}

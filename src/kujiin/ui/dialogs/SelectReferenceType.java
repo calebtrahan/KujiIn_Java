@@ -1,4 +1,4 @@
-package kujiin.ui;
+package kujiin.ui.dialogs;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -8,7 +8,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
-import kujiin.MainController;
+import kujiin.ui.MainController;
 import kujiin.util.enums.ReferenceType;
 
 import java.io.IOException;
@@ -80,7 +80,7 @@ public class SelectReferenceType extends Stage {
     public void accept(ActionEvent actionEvent) {
         if (HTMLRadioButton.isSelected() || TextRadioButton.isSelected()) {result = true;  close();}
         else {
-            Root.dialog_displayInformation("Cannot Accept", "No Reference Type Selected", null);
+            new InformationDialog(Root.getOptions(), "Cannot Accept", "No Reference Type Selected", null);
             result = false;
         }
     }

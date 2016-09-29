@@ -4,6 +4,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
+import kujiin.ui.MainController;
 
 public class Cut extends SessionPart {
     private String FocusPoint;
@@ -11,9 +12,9 @@ public class Cut extends SessionPart {
     private String Mantra_Meaning;
     private String Side_Effects;
 
-    public Cut(int number, String name, This_Session thisession, ToggleButton aSwitch, TextField value) {
-        super(number, name, thisession, aSwitch, value);
-        if (thisession.Root.getOptions().getProgramOptions().getTooltips()) {
+    public Cut(int number, String name, MainController Root, ToggleButton aSwitch, TextField value) {
+        super(number, name, Root, aSwitch, value);
+        if (root.getOptions().getProgramOptions().getTooltips()) {
             Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
         }
     }
@@ -51,7 +52,7 @@ public class Cut extends SessionPart {
 // Creation
     @Override
     public boolean creation_buildEntrainment() {
-        if (thisession.Root.getOptions().getSessionOptions().getRampenabled()) {
+        if (root.getOptions().getSessionOptions().getRampenabled()) {
             try {
                 int index = allsessionpartstoplay.indexOf(this);
                 SessionPart partafter = allsessionpartstoplay.get(index + 1);

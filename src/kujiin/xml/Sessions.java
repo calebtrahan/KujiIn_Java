@@ -1,8 +1,10 @@
 package kujiin.xml;
 
 import javafx.util.Duration;
-import kujiin.MainController;
 import kujiin.lib.BeanComparator;
+import kujiin.ui.MainController;
+import kujiin.ui.dialogs.ErrorDialog;
+import kujiin.ui.dialogs.InformationDialog;
 import kujiin.util.Qi_Gong;
 import kujiin.util.SessionPart;
 
@@ -44,7 +46,7 @@ public class Sessions {
                 Sessions noises1 = (Sessions) createMarshaller.unmarshal(Options.SESSIONSXMLFILE);
                 setSession(noises1.getSession());
             } catch (JAXBException e) {
-                Root.dialog_displayInformation("Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
+                new InformationDialog(Root.getOptions(), "Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -55,13 +57,13 @@ public class Sessions {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Options.SESSIONSXMLFILE);
         } catch (JAXBException e) {
-            Root.dialog_displayInformation("Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
+            new InformationDialog(Root.getOptions(), "Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
     }
     public void createnew() {
         try {
             add(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
         catch (JAXBException ignored) {
-            Root.dialog_displayError("Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
+            new ErrorDialog(Root.getOptions(), "Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
     public void add(Session session) throws JAXBException {
         if (Options.SESSIONSXMLFILE.exists()) {unmarshall();}
@@ -105,7 +107,7 @@ public class Sessions {
             Duration totalduration = Duration.ZERO;
             for (kujiin.xml.Session i : getSession()) {totalduration = totalduration.add(i.getsessionpartdurationasObject(index));}
             if (includepreandpost) {
-                for (SessionPart i : Root.getSession().getAllSessionPartsincludingTotal()) {
+                for (SessionPart i : Root.getAllSessionParts(true)) {
                     if (i instanceof Qi_Gong) {
                         for (kujiin.xml.Session x : getSession()) {totalduration = totalduration.add(x.getsessionpartdurationasObject(i.number));}
                     }
