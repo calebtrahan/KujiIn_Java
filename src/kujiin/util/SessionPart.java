@@ -193,10 +193,15 @@ public class SessionPart {
 // Creation
     public boolean creation_build(List<SessionPart> sessionpartstoplay) {
         allsessionpartstoplay = sessionpartstoplay;
-        if (root.getSessionCreator().isAmbienceenabled()) {return creation_buildEntrainment() && creation_buildAmbience();}
+        if (root.
+                getSessionCreator().
+                isAmbienceenabled()) {return
+                creation_buildEntrainment() &&
+                        creation_buildAmbience();}
         else {return creation_buildEntrainment();}
     }
     protected boolean creation_buildEntrainment() {
+//        System.out.println(Boolean.toString(duration == null));
         return ! duration.equals(Duration.ZERO) && entrainment.getFreq().isValid();
     }
     protected boolean creation_buildAmbience() {

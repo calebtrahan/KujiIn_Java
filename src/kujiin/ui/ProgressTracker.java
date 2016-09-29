@@ -60,6 +60,7 @@ public class ProgressTracker implements UI {
         Sessions.unmarshall();
         Goals = new Goals(Root);
         Goals.unmarshall();
+        setupListeners(Root);
         GoalSessionPartComboBox = Root.GoalSessionPartComboBox;
         AverageSessionDuration = Root.AverageSessionDuration;
         TotalTimePracticed = Root.TotalTimePracticed;
@@ -79,12 +80,12 @@ public class ProgressTracker implements UI {
         return SelectedSessionPart;
     }
 
-    public void setupListeners() {
-        GoalSessionPartComboBox.setOnAction(event -> sessionpartchanged());
-        PrePostSwitch.setOnAction(event -> updateui_sessions());
-        ListOfSessionsButton.setOnAction(event -> displaysessionlist());
-        NewGoalButton.setOnAction(event -> setnewgoal());
-        ViewCurrentGoalsButton.setOnAction(event -> viewcurrentgoals());
+    public void setupListeners(MainController Root) {
+        Root.GoalSessionPartComboBox.setOnAction(event -> sessionpartchanged());
+        Root.PrePostSwitch.setOnAction(event -> updateui_sessions());
+        Root.ListOfSessionsButton.setOnAction(event -> displaysessionlist());
+        Root.newgoalButton.setOnAction(event -> setnewgoal());
+        Root.viewcurrrentgoalsButton.setOnAction(event -> viewcurrentgoals());
     }
     public void setupTooltips() {}
     public void setDisable(boolean disable) {}
@@ -162,7 +163,7 @@ public class ProgressTracker implements UI {
         new SessionDetails(Options, individualsession).showAndWait();
     }
     public void displaysessiondetails(List<SessionPart> itemsinsession) {
-        new SessionDetails(Options, itemsinsession).showAndWait();
+        new SessionDetails(Options, itemsinsession).show();
     }
 
 // Goals

@@ -5,6 +5,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -43,6 +45,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static kujiin.util.enums.PlayerState.IDLE;
 import static kujiin.util.enums.PlayerState.TRANSITIONING;
 
 public class SessionCreator implements UI {
@@ -63,7 +66,7 @@ public class SessionCreator implements UI {
     private MainController Root;
     private Player Player;
     private ProgressTracker progressTracker;
-    private PlayerState playerState;
+    private PlayerState playerState = IDLE;
     private CreatorState creatorState = CreatorState.NOT_CREATED;
     private ExporterState exporterState;
     private SessionPlaybackOverview sessionPlaybackOverview;
@@ -76,6 +79,7 @@ public class SessionCreator implements UI {
     public SessionCreator(MainController Root) {
         this.Root = Root;
         Preset = new Preset(Root);
+        setupListeners(Root);
         LoadPresetButton = Root.LoadPresetButton;
         SavePresetButton = Root.SavePresetButton;
         ApproximateEndTime = Root.ApproximateEndTime;
@@ -92,13 +96,13 @@ public class SessionCreator implements UI {
         updateuitimeline.setCycleCount(Animation.INDEFINITE);
     }
 
-    public void setupListeners() {
-        LoadPresetButton.setOnAction(event -> loadPreset());
-        SavePresetButton.setOnAction(event -> savePreset());
-        ChangeAllCutsButton.setOnAction(event -> changeallcutvalues());
-        ChangeAllElementsButton.setOnAction(event -> changeallelementvalues());
-        ResetButton.setOnAction(event -> reset(true));
-        PlayButton.setOnAction(event -> playsession());
+    public void setupListeners(MainController Root) {
+        Root.LoadPresetButton.setOnAction(event -> loadPreset());
+        Root.SavePresetButton.setOnAction(event -> savePreset());
+        Root.ChangeAllCutsButton.setOnAction(event -> changeallcutvalues());
+        Root.ChangeAllElementsButton.setOnAction(event -> changeallelementvalues());
+        Root.ResetCreatorButton.setOnAction(event -> reset(true));
+        Root.PlayButton.setOnAction(event -> playsession());
     }
     public void setupTooltips() {
         if (options.getProgramOptions().getTooltips()) {
@@ -225,7 +229,7 @@ public class SessionCreator implements UI {
     public boolean creationprechecks() {
         if (Root.getProgramState() == ProgramState.IDLE) {
             if (!allvaluesnotzero()) {
-                new ErrorDialog(options, "Error Creating Session", "At Least One SessionPart's Value Must Not Be 0", "Cannot Create Session");
+                new ErrorDialog(options, "Error", "All Values Are 0", "Cannot Play Session");
                 return false;
             }
             populateitemsinsession();
@@ -250,13 +254,13 @@ public class SessionCreator implements UI {
 
 // Playback
     public void playsession() {
+        System.out.println("Called Play Session");
         if (creationprechecks() && create()) {
             setDisable(true, "Creator Disabled During Session Playback");
             Player = new Player();
             Player.setOnShowing(event -> Root.getStage().setIconified(true));
             Player.showAndWait();
             if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
-            progressTracker.displaysessiondetails(itemsinsession);
             setDisable(false, "");
         }
     }
@@ -323,7 +327,7 @@ public class SessionCreator implements UI {
 
         public ChangeAllValuesDialog(String toptext) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeAllValuesDialog.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ChangeAllValuesDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
@@ -1078,7 +1082,7 @@ public class SessionCreator implements UI {
             } catch (IOException ignored) {}
         }
         public DisplayReference(String htmlcontent) {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ReferencePreview.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ReferencePreview.fxml"));
             fxmlLoader.setController(this);
             try {
                 scene = new Scene(fxmlLoader.load());
@@ -1162,6 +1166,9 @@ public class SessionCreator implements UI {
         private File tempambiencefile;
         private File finalentrainmentfile;
         private File finalambiencefile;
+        private Integer exportserviceindex;
+        private ArrayList<Service<Boolean>> exportservices;
+        private Service<Boolean> currentexporterservice;
 
         public Exporter() {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ExportingSessionDialog.fxml"));
@@ -1182,6 +1189,111 @@ public class SessionCreator implements UI {
             CurrentLabel.textProperty().unbind();
         }
 
+        public boolean exporter_confirmOverview() {
+            return true;
+        }
+        public Service<Boolean> exporter_getsessionexporter() {
+//        CreatorAndExporterUI.ExporterUI exportingSessionDialog = new CreatorAndExporterUI.ExporterUI(this);
+            return new Service<Boolean>() {
+                @Override
+                protected Task<Boolean> createTask() {
+                    return new Task<Boolean>() {
+                        @Override
+                        protected Boolean call() throws Exception {
+                            updateTitle("Finalizing Session");
+//                        int taskcount = cutsinsession.size() + 2;
+//                        // TODO Mix Entrainment And Ambience
+//                        for (Cut i : cutsinsession) {
+//                            updateMessage("Combining Entrainment And Ambience For " + i.name);
+//                            if (! i.mixentrainmentandambience()) {cancel();}
+//                            if (isCancelled()) {return false;}
+//                            updateProgress((double) (cutsinsession.indexOf(i) / taskcount), 1.0);
+//                            updateMessage("Finished Combining " + i.name);
+//                        }
+                            updateMessage("Creating Final Session File (May Take A While)");
+                            exporter_export();
+                            if (isCancelled()) {return false;}
+//                        updateProgress(taskcount - 1, 1.0);
+                            updateMessage("Double-Checking Final Session File");
+                            boolean success = exporter_testfile();
+                            if (isCancelled()) {return false;}
+                            updateProgress(1.0, 1.0);
+                            return success;
+                        }
+                    };
+                }
+            };
+//        exportingSessionDialog.creatingsessionProgressBar.progressProperty().bind(exporterservice.progressProperty());
+//        exportingSessionDialog.creatingsessionTextStatusBar.textProperty().bind(exporterservice.messageProperty());
+//        exportingSessionDialog.CancelButton.setOnAction(event -> exporterservice.cancel());
+//        exporterservice.setOnSucceeded(event -> {
+//            if (exporterservice.getValue()) {Util.dialog_displayInformation("Information", "Export Succeeded", "File Saved To: ");}
+//            else {Util.dialog_displayError("Error", "Errors Occured During Export", "Please Try Again Or Contact Me For Support");}
+//            exportingSessionDialog.close();
+//        });
+//        exporterservice.setOnFailed(event -> {
+//            String v = exporterservice.getException().getMessage();
+//            Util.dialog_displayError("Error", "Errors Occured While Trying To Create The This_Session. The Main Exception I Encoured Was " + v,
+//                    "Please Try Again Or Contact Me For Support");
+//            This_Session.exporter_deleteprevioussession();
+//            exportingSessionDialog.close();
+//        });
+//        exporterservice.setOnCancelled(event -> {
+//            Util.dialog_displayInformation("Cancelled", "Export Cancelled", "You Cancelled Export");
+//            This_Session.exporter_deleteprevioussession();
+//            exportingSessionDialog.close();
+//        });
+//        return false;
+        }
+        public void exporter_getnewexportsavefile() {
+//        File tempfile = Util.filechooser_save(Root.getScene(), "Save Export File As", null);
+//        if (tempfile != null && Util.audio_isValid(tempfile)) {
+//            setExportfile(tempfile);
+//        } else {
+//            if (tempfile == null) {return;}
+//            if (Util.dialog_OKCancelConfirmation(Root, "Confirmation", "Invalid Audio File Extension", "Save As .mp3?")) {
+//                String file = tempfile.getAbsolutePath();
+//                int index = file.lastIndexOf(".");
+//                String firstpart = file.substring(0, index - 1);
+//                setExportfile(new File(firstpart.concat(".mp3")));
+//            }
+//        }
+        }
+        public boolean exporter_export() {
+            ArrayList<File> filestoexport = new ArrayList<>();
+//        for (int i=0; i < cutsinsession.size(); i++) {
+//            filestoexport.add(cutsinsession.get(i).getFinalexportfile());
+//            if (i != cutsinsession.size() - 1) {
+//                filestoexport.add(new File(Root.getOptions().getSessionOptions().getAlertfilelocation()));
+//            }
+//        }
+            return filestoexport.size() != 0;
+        }
+        public boolean exporter_testfile() {
+//        try {
+//            MediaPlayer test = new MediaPlayer(new Media(getExportfile().toURI().toString()));
+//            test.setOnReady(test::dispose);
+//            return true;
+//        } catch (MediaException ignored) {return false;}
+            return false;
+        }
+        public void exporter_deleteprevioussession() {
+            ArrayList<File> folders = new ArrayList<>();
+            folders.add(new File(Options.DIRECTORYTEMP, "Ambience"));
+            folders.add(new File(Options.DIRECTORYTEMP, "Entrainment"));
+            folders.add(new File(Options.DIRECTORYTEMP, "txt"));
+            folders.add(new File(Options.DIRECTORYTEMP, "Export"));
+            for (File i : folders) {
+                try {
+                    for (File x : i.listFiles()) {x.delete();}
+                } catch (NullPointerException ignored) {}
+            }
+            try {
+                for (File x : Options.DIRECTORYTEMP.listFiles()) {
+                    if (! x.isDirectory()) {x.delete();}
+                }
+            } catch (NullPointerException ignored) {}
+        }
     }
     public class Player extends Stage {
         public Button PlayButton;
@@ -1215,9 +1327,9 @@ public class SessionCreator implements UI {
         public int sessionpartcount;
         public List<SessionPart> sessionpartswithGoalsCompletedThisSession;
 
-
         public Player() {
             try {
+                progressTracker = Root.getProgressTracker();
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -1342,7 +1454,6 @@ public class SessionCreator implements UI {
                 try {SessionPartCurrentTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentsessionpart.elapsedtime));}
                 catch (NullPointerException ignored) {SessionPartCurrentTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(Duration.ZERO));}
                 TotalCurrentTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessiondurationelapsed));
-                boolean displaynormaltime = false;
                 if (displaynormaltime) {SessionPartTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentsessionpart.getduration()));}
                 else {SessionPartTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentsessionpart.getduration().subtract(currentsessionpart.elapsedtime)));}
                 if (displaynormaltime) {TotalTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));}
@@ -1385,9 +1496,9 @@ public class SessionCreator implements UI {
             } catch (Exception ignored) {}
         }
         public void transition() {
-            kujiin.xml.Session currentsession =  Root.getProgressTracker().getSessions().getspecificsession( Root.getProgressTracker().getSessions().totalsessioncount() - 1);
+            kujiin.xml.Session currentsession =  progressTracker.getSessions().getspecificsession(progressTracker.getSessions().totalsessioncount() - 1);
             currentsession.updatesessionpartduration(currentsessionpart.number, new Double(currentsessionpart.getduration().toMinutes()).intValue());
-            Root.getProgressTracker().getSessions().marshall();
+            progressTracker.getSessions().marshall();
             progressTracker.updateui_goals(this);
             currentsessionpart.stop();
             if (Root.getOptions().getSessionOptions().getAlertfunction()) {
@@ -1446,6 +1557,7 @@ public class SessionCreator implements UI {
             progressTracker.updateui_sessions();
             progressTracker.updateui_goals(this);
             reset(true);
+            progressTracker.displaysessiondetails(itemsinsession);
         }
         public boolean endsessionprematurely() {
             if (playerState == PlayerState.PLAYING || playerState == PlayerState.PAUSED || playerState == TRANSITIONING) {

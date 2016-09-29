@@ -52,13 +52,15 @@ public class Cut extends SessionPart {
 // Creation
     @Override
     public boolean creation_buildEntrainment() {
+        System.out.println("Building Entrainment For " + name);
         if (root.getOptions().getSessionOptions().getRampenabled()) {
             try {
                 int index = allsessionpartstoplay.indexOf(this);
                 SessionPart partafter = allsessionpartstoplay.get(index + 1);
-                if (partafter instanceof Qi_Gong || partafter instanceof Element) {entrainment.setRampfile(entrainment.ramp_get(1));}
+                if ((partafter instanceof Qi_Gong || partafter instanceof Element) && ! name.equals("ZEN")) {entrainment.setRampfile(entrainment.ramp_get(1));}
                 else {entrainment.setRampfile(entrainment.ramp_get(0));}
                 if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
+                System.out.println(name + "'s Entrainment: " + entrainment.toString());
                 return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
             } catch (IndexOutOfBoundsException ignored) {return false;}
         }

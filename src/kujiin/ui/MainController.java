@@ -560,10 +560,9 @@ public class MainController implements Initializable {
             SoundFile soundFile = null;
             try {
                 file = getnextentrainmentfile();
+                System.out.println(selectedsessionpart.name + "'s Next Entrainment File Is: " + file.getAbsolutePath());
                 soundFile = getnextentraimentsoundfile();
-                if (soundFile == null) {
-                    soundFile = new SoundFile(file);
-                }
+                if (soundFile == null) {soundFile = new SoundFile(file);}
             } catch (IndexOutOfBoundsException ignored) {
                 try {
                     if (selectedsessionpart.getAmbience().hasAnyAmbience()) {

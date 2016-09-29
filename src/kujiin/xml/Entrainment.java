@@ -44,5 +44,11 @@ public class Entrainment {
         catch (NullPointerException | IndexOutOfBoundsException ignored) {return null;}
     }
 
-// Other Methods
+    @Override
+    public String toString() {
+        System.out.println("Freq: " + freq.getName() + " Ramp: " + rampfile.getName());
+        return super.toString();
+    }
+
+    // Other Methods
 }
