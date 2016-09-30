@@ -218,6 +218,7 @@ public class MainController implements Initializable {
             i.setGoalsController(getProgressTracker().getGoals());
             i.goals_unmarshall();
         }
+        getProgressTracker().setSessionParts(getAllSessionParts(true));
     }
     public boolean cleanup() {
         Ambiences.marshall();
@@ -560,7 +561,7 @@ public class MainController implements Initializable {
             SoundFile soundFile = null;
             try {
                 file = getnextentrainmentfile();
-                System.out.println(selectedsessionpart.name + "'s Next Entrainment File Is: " + file.getAbsolutePath());
+//                System.out.println(selectedsessionpart.name + "'s Next Entrainment File Is: " + file.getAbsolutePath());
                 soundFile = getnextentraimentsoundfile();
                 if (soundFile == null) {soundFile = new SoundFile(file);}
             } catch (IndexOutOfBoundsException ignored) {

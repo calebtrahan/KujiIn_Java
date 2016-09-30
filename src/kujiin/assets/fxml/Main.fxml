@@ -296,7 +296,7 @@
                      <VBox.margin>
                         <Insets bottom="2.0" />
                      </VBox.margin></Label>
-                  <TextField fx:id="ApproximateEndTime" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="98.0">
+                  <TextField fx:id="ApproximateEndTime" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="98.0" text="-">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor></TextField>
@@ -308,7 +308,7 @@
                      <VBox.margin>
                         <Insets bottom="2.0" />
                      </VBox.margin></Label>
-                  <TextField fx:id="TotalSessionTime" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="121.0">
+                  <TextField fx:id="TotalSessionTime" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="121.0" text="-">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor></TextField>
@@ -351,15 +351,15 @@
             </HBox>
             <HBox prefHeight="32.0" prefWidth="339.0">
                <children>
-                  <TextField fx:id="TotalTimePracticed" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="113.0" text="99 Hrs 99 Mins">
+                  <TextField fx:id="TotalTimePracticed" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="113.0">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor></TextField>
-                  <TextField fx:id="NumberOfSessionsPracticed" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="113.0" text="125">
+                  <TextField fx:id="NumberOfSessionsPracticed" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="113.0">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor></TextField>
-                  <TextField fx:id="AverageSessionDuration" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="113.0" text="99 Hrs 99 Mins">
+                  <TextField fx:id="AverageSessionDuration" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="113.0">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor></TextField>
@@ -390,7 +390,7 @@
                   <Insets bottom="6.0" />
                </VBox.margin>
             </Label>
-            <ProgressBar fx:id="goalsprogressbar" prefHeight="27.0" prefWidth="316.0" progress="0.59">
+            <ProgressBar fx:id="goalsprogressbar" prefHeight="27.0" prefWidth="316.0" progress="0.0">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
@@ -423,6 +423,6 @@
             </Label>
          </children>
       </VBox>
-      <Label fx:id="GoalProgressPercentageLabel" alignment="CENTER" layoutX="609.0" layoutY="214.0" prefHeight="16.0" prefWidth="316.0" text="100%" />
+      <Label fx:id="GoalProgressPercentageLabel" alignment="CENTER" layoutX="609.0" layoutY="214.0" prefHeight="16.0" prefWidth="316.0" />
    </children>
 </AnchorPane>

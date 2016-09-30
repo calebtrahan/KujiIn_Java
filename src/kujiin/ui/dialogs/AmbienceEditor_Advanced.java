@@ -78,7 +78,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
 
     public AmbienceEditor_Advanced(MainController Root) {
         this.Root = Root;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxmldd/AmbienceEditor_Advanced.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxmldd/AmbienceEditor_Advanced.fxml"));
         fxmlLoader.setController(this);
         try {
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -102,7 +102,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
     }
     public AmbienceEditor_Advanced(MainController Root, SessionPart sessionPart) {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Advanced.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Advanced.fxml"));
         fxmlLoader.setController(this);
         try {
             Scene defaultscene = new Scene(fxmlLoader.load());

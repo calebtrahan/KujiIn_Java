@@ -57,7 +57,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
 
     public AmbienceEditor_Simple(MainController Root) {
         this.Root = Root;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Simple.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Simple.fxml"));
         fxmlLoader.setController(this);
         try {
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -71,7 +71,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
     }
     public AmbienceEditor_Simple(MainController Root, SessionPart sessionPart) {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AmbienceEditor_Simple.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Simple.fxml"));
         fxmlLoader.setController(this);
         try {
             Scene defaultscene = new Scene(fxmlLoader.load());

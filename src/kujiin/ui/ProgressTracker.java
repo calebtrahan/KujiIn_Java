@@ -18,6 +18,7 @@ import kujiin.ui.dialogs.ConfirmationDialog;
 import kujiin.ui.dialogs.ExceptionDialog;
 import kujiin.ui.dialogs.InformationDialog;
 import kujiin.ui.dialogs.SessionDetails;
+import kujiin.util.Qi_Gong;
 import kujiin.util.SessionPart;
 import kujiin.util.Total;
 import kujiin.util.Util;
@@ -72,12 +73,15 @@ public class ProgressTracker implements UI {
         GoalPercentageLabel = Root.GoalProgressPercentageLabel;
         NewGoalButton = Root.newgoalButton;
         ViewCurrentGoalsButton = Root.viewcurrrentgoalsButton;
+        NewGoalButton.setDisable(true);
         GoalSessionPartComboBox.setItems(FXCollections.observableArrayList(MainController.getAllSessionPartsNames(true)));
-        SessionParts = Root.getAllSessionParts(true);
     }
 
     public SessionPart getSelectedSessionPart() {
         return SelectedSessionPart;
+    }
+    public void setSessionParts(ArrayList<SessionPart> sessionParts) {
+        SessionParts = sessionParts;
     }
 
     public void setupListeners(MainController Root) {
@@ -102,6 +106,7 @@ public class ProgressTracker implements UI {
     // Sessions Part Selection
     private void sessionpartchanged() {
         int index = GoalSessionPartComboBox.getSelectionModel().getSelectedIndex();
+        NewGoalButton.setDisable(index == -1);
         if (index != -1) {
             SelectedSessionPart = SessionParts.get(index);
             if (SelectedSessionPart instanceof Total) {PrePostSwitch.setSelected(true);}
@@ -122,8 +127,7 @@ public class ProgressTracker implements UI {
         String totalminutespracticedtext;
         String numberofsessionspracticedtext;
         boolean disabled;
-        int selectionindex = GoalSessionPartComboBox.getSelectionModel().getSelectedIndex();
-        if (selectionindex == -1 || SelectedSessionPart == null) {
+        if (SelectedSessionPart == null) {
             averagesessiondurationtext = "No Sessions";
             totalminutespracticedtext = "No Sessions";
             numberofsessionspracticedtext = "No Sessions";
@@ -147,7 +151,7 @@ public class ProgressTracker implements UI {
         TotalTimePracticed.setDisable(disabled);
         NumberOfSessionPracticed.setDisable(disabled);
         AverageSessionDuration.setDisable(disabled);
-        if (selectionindex == 0 || selectionindex == 15) {
+        if (SelectedSessionPart instanceof Qi_Gong) {
             PrePostSwitch.setDisable(true);
             PrePostSwitch.setSelected(false);
         } else {
@@ -244,6 +248,7 @@ public class ProgressTracker implements UI {
         simpleGoalSetDialog.showAndWait();
         if (simpleGoalSetDialog.shouldSetgoal()) {
             sessionPart.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalHours(), sessionPart));
+            sessionPart.goals_marshall();
         }
     }
     public void viewcurrentgoals() {
@@ -610,7 +615,7 @@ public class ProgressTracker implements UI {
 
         public GoalPacingDialog() {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/GoalPacingDialog.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/GoalPacingDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
@@ -627,6 +632,7 @@ public class ProgressTracker implements UI {
                 PracticeDays.valueProperty().addListener((observable, oldValue, newValue) -> calculate());
                 PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
                 TopLabel.setText("Goal Pacing For " + SelectedSessionPart.name + " Current Goal");
+                calculate();
             } catch (IOException e) {new ExceptionDialog(Options, e).showAndWait();}
         }
 
@@ -650,7 +656,7 @@ public class ProgressTracker implements UI {
 
         public SimpleGoalSetDialog(SessionPart sessionPart) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SetGoalDialog_Simple.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SetGoalDialog_Simple.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
