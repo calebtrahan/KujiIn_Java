@@ -58,7 +58,7 @@ public class SessionDetails extends Stage {
                 series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getduration().toMinutes()));
                 totalsessionduration = totalsessionduration.add(i.getduration());
                 if (i.getduration().greaterThan(highestduration)) {highestduration = i.getduration();}
-                completedgoalsitems.addAll(i.getGoalscompletedthissession().stream().map(x -> String.format("%s: %s Hours Completed (%s Current)", i.name, x.getGoal_Hours(), i.getduration().toHours())).collect(Collectors.toList()));
+                completedgoalsitems.addAll(i.getGoalscompletedthissession().stream().map(x -> String.format("%s: %s Hours Completed (%s Current)", i.name, x.getDuration(), i.getduration().toHours())).collect(Collectors.toList()));
             }
             if (completedgoalsitems.size() > 0) {
                 GoalsCompletedTopLabel.setText(completedgoalsitems.size() + " Goals Completed This Session");
@@ -84,7 +84,7 @@ public class SessionDetails extends Stage {
             this.setResizable(false);
             SessionNumbersAxis.setLabel("Minutes");
             setTitle("Session Details");
-            DatePracticedTextField.setText(session.getDate_Practiced());
+            DatePracticedTextField.setText(session.getDate_Practiced().format(Util.dateFormat));
             DatePracticedTextField.setEditable(false);
             XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
             List<Integer> values = new ArrayList<>();

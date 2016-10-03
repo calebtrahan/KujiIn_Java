@@ -500,7 +500,7 @@ public class SessionCreator implements UI {
             DownButton.setDisable(! itemselected && index != SessionItemsTable.getItems().size() - 1);
             AdjustDurationButton.setDisable(selectedsessionpart == null);
             if (selectedsessionpart != null) {
-                SetGoalButton.setDisable(selectedsessionpart.goals_ui_currentgoalisset());
+                SetGoalButton.setDisable(selectedsessionpart.goals_ui_hascurrentgoal());
                 SetAmbienceButton.setDisable(ambiencePlaybackType == null || ambiencePlaybackType != AmbiencePlaybackType.CUSTOM);
             }
         }
@@ -608,7 +608,7 @@ public class SessionCreator implements UI {
             List<Integer>  indexesmissinggoals = new ArrayList<>();
             for (SessionPart i : alladjustedsessionitems) {
                 if (i.getduration() == Duration.ZERO && ! i.ramponly) {indexesmissingduration.add(alladjustedsessionitems.indexOf(i));}
-                if (! i.goals_ui_currentgoalisset()) {indexesmissinggoals.add(alladjustedsessionitems.indexOf(i));}
+                if (! i.goals_ui_hascurrentgoal()) {indexesmissinggoals.add(alladjustedsessionitems.indexOf(i));}
             }
             // Add Ramp Option For Missing Durations
             if (! indexesmissingduration.isEmpty()) {

@@ -20,8 +20,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -244,12 +242,6 @@ public class Util {
         NumberFormat numberFormat = new DecimalFormat("#0.00");
         return Double.parseDouble(numberFormat.format(newval));
     }
-    public static LocalDate convert_stringtolocaldate(String dateformatted) {
-        return LocalDate.parse(dateformatted, dateFormat);
-    }
-    public static String convert_localdatetostring(LocalDate localdate) {
-        return localdate.format(dateFormat);
-    }
     // String Time Formatting
     public static String formatdurationtoStringDecimalWithColons(Duration duration) {
         int seconds = new Double(duration.toSeconds()).intValue();
@@ -304,13 +296,6 @@ public class Util {
                 return reallyshorttext.toString();
             }
         }
-    }
-
-// Date Methods
-    public static String gettodaysdate() {
-        Calendar currentDate = Calendar.getInstance();
-        SimpleDateFormat formatter= new SimpleDateFormat("MM/dd/yyyy");
-        return formatter.format(currentDate.getTime());
     }
 
 // File Methods

@@ -1,10 +1,9 @@
 package kujiin.xml;
 
+import javafx.util.Duration;
 import kujiin.lib.BeanComparator;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.InformationDialog;
-import kujiin.util.SessionPart;
-import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -17,6 +16,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+
+import static kujiin.util.Util.dateFormat;
 
 @XmlRootElement(name = "Goals")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -132,8 +133,8 @@ public class Goals {
     }
 
 // Utility
-    public static List<Goal> sortgoalsbyHours(List<Goal> listtosort) {
-        BeanComparator bc = new BeanComparator(kujiin.xml.Goals.Goal.class, "getGoal_Hours");
+    public static List<Goal> sortgoalsbyDuration(List<Goal> listtosort) {
+        BeanComparator bc = new BeanComparator(kujiin.xml.Goals.Goal.class, "getDuration");
         Collections.sort(listtosort, bc);
         return listtosort;
     }
@@ -143,38 +144,50 @@ public class Goals {
         return listtosort;
     }
 
-    @XmlAccessorType(XmlAccessType.PROPERTY)
+    @XmlAccessorType(XmlAccessType.FIELD)
     public static class Goal {
         private Integer ID;
         private String Date_Set;
         private String Date_Due;
         private String Date_Completed;
-        private Double Goal_Hours;
+        private Double Duration; // Stored As Minutes
         private Boolean Completed;
 
         public Goal() {}
 
-        public Goal(Double goalhours, SessionPart sessionPart) {
-            setGoal_Hours(goalhours);
-            setDate_Set(Util.convert_localdatetostring(LocalDate.now()));
+        public Goal(Duration goalduration) {
+            setDuration(goalduration);
+            setDate_Set(LocalDate.now());
             setCompleted(false);
             setDate_Completed(null);
         }
 
-        // Getters And Setters
-        public String getDate_Set() {return Date_Set;}
-        public void setDate_Set(String date_Set) {Date_Set = date_Set;}
-        public String getDate_Due() {return Date_Due;}
-        public void setDate_Due(String date_Due) {Date_Due = date_Due;}
-        public Double getGoal_Hours() {return Goal_Hours;}
-        public void setGoal_Hours(Double goal_Hours) {Goal_Hours = goal_Hours;}
+    // Getters And Setters
+        public LocalDate getDate_Set() {
+            return LocalDate.parse(Date_Set, dateFormat);
+        }
+        public void setDate_Set(LocalDate date_Set) {
+            Date_Set = date_Set.format(dateFormat);
+        }
+        public void setDate_Due(LocalDate date_Due) {
+            Date_Due = date_Due.format(dateFormat);
+        }
+        public LocalDate getDate_Due() {
+            return LocalDate.parse(Date_Due, dateFormat);
+        }
+        public Duration getDuration() {
+            return javafx.util.Duration.minutes(Duration);
+        }
+        public void setDuration(Duration duration) {
+            Duration = duration.toMinutes();
+        }
         public Integer getID() {return ID;}
         public void setID(Integer ID) {this.ID = ID;}
-        public String getDate_Completed() {
-            return Date_Completed;
+        public LocalDate getDate_Completed() {
+            return LocalDate.parse(Date_Completed, dateFormat);
         }
-        public void setDate_Completed(String date_Completed) {
-            Date_Completed = date_Completed;
+        public void setDate_Completed(LocalDate date_Completed) {
+            Date_Completed = date_Completed.format(dateFormat);
         }
         public Boolean getCompleted() {
             return Completed;
@@ -183,21 +196,21 @@ public class Goals {
             Completed = completed;
         }
 
-        // Other Methods
-        public boolean isCompleted(Integer currenthours) {
-            try {return currenthours >= getGoal_Hours();}
+    // Other Methods
+        public boolean isCompleted(Duration currentduration) {
+            try {return currentduration.greaterThanOrEqualTo(getDuration());}
             catch (NullPointerException | ArithmeticException ignored) {return false;}
         }
-        public String getpercentagecompleted(double currenthours) {
-            float percent = (float) currenthours / getGoal_Hours().floatValue();
-            percent *= 100;
-            if (percent >= 100) {percent = 100;}
+        public String getpercentagecompleted(Duration currentduration) {
+            Double percent = currentduration.toMillis() / getDuration().toMillis();
+            percent *= 100.0;
+            if (percent >= 100.0) {percent = 100.0;}
             return String.format("%.2f", percent) + "%";
         }
 
         @Override
         public String toString() {
-            return String.format("Set Date: %s Goal Hours: %s Is Completed: %s Date Completed: %s", getDate_Set(), getGoal_Hours(), getCompleted(), getDate_Completed());
+            return String.format("Set Date: %s Goal Hours: %s Is Completed: %s Date Completed: %s", getDate_Set(), getDuration(), getCompleted(), getDate_Completed());
         }
     }
 

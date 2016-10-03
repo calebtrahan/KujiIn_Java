@@ -1048,7 +1048,7 @@ public class SessionPart {
         List<kujiin.xml.Goals.Goal> goallist = Goals;
         if (goallist != null && ! goallist.isEmpty()) {
             try {
-                goallist = kujiin.xml.Goals.sortgoalsbyHours(goallist);
+                goallist = kujiin.xml.Goals.sortgoalsbyDuration(goallist);
                 int count = 1;
                 for (kujiin.xml.Goals.Goal i : goallist) {
                     i.setID(count);
@@ -1061,19 +1061,28 @@ public class SessionPart {
     public void goals_remove(kujiin.xml.Goals.Goal currentgoal) {Goals.remove(currentgoal);}
     // Getters
     // Current Goal
+    public List<kujiin.xml.Goals.Goal> goals_get(boolean includecurrent, boolean includecompleted) {
+        List<kujiin.xml.Goals.Goal> goals = new ArrayList<>();
+        for (kujiin.xml.Goals.Goal i : Goals) {
+            if (includecurrent && includecompleted) {goals.add(i);}
+            else if (includecompleted) {if (! i.getCompleted()) goals.add(i);}
+            else {if (i.getCompleted()) goals.add(i);}
+        }
+        return goals;
+    }
     public kujiin.xml.Goals.Goal goals_getCurrent() {
         if (Goals == null || Goals.isEmpty()) {return null;}
         List<kujiin.xml.Goals.Goal> uncompletedgoals = goals_getAllCurrent();
         if (! uncompletedgoals.isEmpty()) {
-            uncompletedgoals = kujiin.xml.Goals.sortgoalsbyHours(uncompletedgoals);
+            uncompletedgoals = kujiin.xml.Goals.sortgoalsbyDuration(uncompletedgoals);
             return uncompletedgoals.get(0);
         } else {return null;}
     }
     public String goals_getCurrentAsString(boolean includepercentage, double maxchars) {
         kujiin.xml.Goals.Goal currentgoal = goals_getCurrent();
-        if (currentgoal == null || currentgoal.getGoal_Hours() == 0.0) {return "No Goal Set";}
+        if (currentgoal == null || currentgoal.getDuration().lessThanOrEqualTo(Duration.ZERO)) {return "No Goal Set";}
         else {
-            Duration goal = Duration.hours(currentgoal.getGoal_Hours());
+            Duration goal = currentgoal.getDuration();
             if (includepercentage) {
                 StringBuilder text = new StringBuilder();
                 Duration practiced = sessions_getPracticedDuration(false);
@@ -1085,13 +1094,6 @@ public class SessionPart {
                 } catch (ArithmeticException ignored) {text.append(Util.formatdurationtoStringSpelledOut(goal, maxchars));}
                 return text.toString();
             } else {return Util.formatdurationtoStringSpelledOut(goal, maxchars);}
-        }
-    }
-    public Duration goals_getCurrentDuration() {
-        if (goals_ui_currentgoalisset()) {
-            return Duration.hours(goals_getCurrent().getGoal_Hours());
-        } else {
-            return Duration.ZERO;
         }
     }
     // Current And Future Goals
@@ -1109,7 +1111,7 @@ public class SessionPart {
             List<kujiin.xml.Goals.Goal> goalslist = new ArrayList<>();
             for (kujiin.xml.Goals.Goal i : Goals) {
                 if (i.getDate_Completed() == null || ! i.getCompleted()) {continue;}
-                if (Util.convert_stringtolocaldate(i.getDate_Completed()).equals(localDate)) {goalslist.add(i);}
+                if (i.getDate_Completed().isEqual(localDate)) {goalslist.add(i);}
             }
             return goalslist;
         } catch (Exception ignored) {return new ArrayList<>();}
@@ -1117,7 +1119,7 @@ public class SessionPart {
     // Validation Methods
     public boolean goals_arelongenough() {
         try {
-            Duration goalduration = Duration.hours(goals_getCurrent().getGoal_Hours());
+            Duration goalduration = goals_getCurrent().getDuration();
             Duration practiceddurationplusthissession = root.getProgressTracker().getSessions().gettotalpracticedtime(number, false).add(getduration());
             return goalduration.greaterThanOrEqualTo(practiceddurationplusthissession);
         } catch (NullPointerException e) {return true;}
@@ -1126,9 +1128,9 @@ public class SessionPart {
     private void goals_updateduringplayback() {
         List<kujiin.xml.Goals.Goal> goallist = new ArrayList<>();
         for (kujiin.xml.Goals.Goal i : Goals) {
-            if (i.getCompleted() != null && ! i.getCompleted() && sessions_getPracticedDuration(false).greaterThanOrEqualTo(Duration.hours(i.getGoal_Hours()))) {
+            if (i.getCompleted() != null && ! i.getCompleted() && sessions_getPracticedDuration(false).greaterThanOrEqualTo(i.getDuration())) {
                 i.setCompleted(true);
-                i.setDate_Completed(Util.gettodaysdate());
+                i.setDate_Completed(LocalDate.now());
                 goalscompletedthissession.add(i);
             }
             goallist.add(i);
@@ -1139,10 +1141,10 @@ public class SessionPart {
         if (goalscompletedthissession.size() > 0) {root.getSessionCreator().getPlayer().sessionpartswithGoalsCompletedThisSession.add(this);}
     }
     // UI
-    public boolean goals_ui_currentgoalisset() {return goals_getCurrent() != null;}
+    public boolean goals_ui_hascurrentgoal() {return goals_getCurrent() != null;}
     public double goals_ui_getcurrentgoalprogress() {
-        if (goals_getCurrent() == null || goals_getCurrent().getGoal_Hours() == 0.0) {return 0.0;}
-        Duration goalduration = Duration.hours(goals_getCurrent().getGoal_Hours());
+        if (goals_getCurrent() == null || goals_getCurrent().getDuration().lessThanOrEqualTo(Duration.ZERO)) {return 0.0;}
+        Duration goalduration = goals_getCurrent().getDuration();
         return sessions_getPracticedDuration(false).toMillis() / goalduration.toMillis();
     }
     public String goals_ui_getcurrentgoalpercentage(int decimalplaces) {
@@ -1154,7 +1156,9 @@ public class SessionPart {
         else {return "";}
     }
     public String goals_ui_getcurrentgoalDuration(Double maxchars) {
-        return Util.formatdurationtoStringSpelledOut(goals_getCurrentDuration(), maxchars);
+        if (goals_getCurrent() != null) {
+            return Util.formatdurationtoStringSpelledOut(goals_getCurrent().getDuration(), maxchars);
+        } else {return null;}
     }
 
 // Session Tracking

@@ -1,14 +1,16 @@
 package kujiin.xml;
 
 import javafx.util.Duration;
-import kujiin.util.Util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
-@XmlAccessorType(XmlAccessType.PROPERTY)
+import static kujiin.util.Util.dateFormat;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 //@XmlType(propOrder = "Name", "Presession_Duration"...)
 public class Session {
     private String Date_Practiced;
@@ -68,9 +70,9 @@ public class Session {
         Void_Duration = void_duration;
         Postsession_Duration = postsession_duration;
         Total_Session_Duration = total_session_duration;
-        setDate_Practiced(Util.gettodaysdate());
+        setDate_Practiced(LocalDate.now());
     }
-    public Session() {setDate_Practiced(Util.gettodaysdate());}
+    public Session() {setDate_Practiced(LocalDate.now());}
 
 // Getters And Setters
     public Integer getPresession_Duration() {
@@ -265,8 +267,8 @@ public class Session {
     public void setPostsession_Ambience(ArrayList<File> postsession_Ambience) {
         Postsession_Ambience = postsession_Ambience;
     }
-    public String getDate_Practiced() {return Date_Practiced;}
-    public void setDate_Practiced(String date_Practiced) {Date_Practiced = date_Practiced;}
+    public LocalDate getDate_Practiced() {return LocalDate.parse(Date_Practiced, dateFormat);}
+    public void setDate_Practiced(LocalDate date_Practiced) {Date_Practiced = date_Practiced.format(dateFormat);}
 
 // Other Methods
     public void updatesessionpartduration(int sessionpartindex, int duration) {

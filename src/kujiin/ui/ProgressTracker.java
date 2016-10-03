@@ -103,7 +103,7 @@ public class ProgressTracker implements UI {
         return Goals;
     }
 
-    // Sessions Part Selection
+// Sessions Part Selection
     private void sessionpartchanged() {
         int index = GoalSessionPartComboBox.getSelectionModel().getSelectedIndex();
         NewGoalButton.setDisable(index == -1);
@@ -116,9 +116,6 @@ public class ProgressTracker implements UI {
     }
     public void sessionpart_forceselect(int sessionpartindex) {
         GoalSessionPartComboBox.getSelectionModel().select(sessionpartindex);
-    }
-    public void sessionpart_forceselect(SessionPart sessionPart) {
-        GoalSessionPartComboBox.getSelectionModel().select(sessionPart.number);
     }
 
 // Sessions
@@ -205,7 +202,7 @@ public class ProgressTracker implements UI {
             progress = SelectedSessionPart.goals_ui_getcurrentgoalprogress();
             goalprogresstooltip = new Tooltip(String.format("Currently Practiced: %s -> Goal: %s",
                     Util.formatdurationtoStringSpelledOut(SelectedSessionPart.sessions_getPracticedDuration(null), null),
-                    Util.formatdurationtoStringSpelledOut(Duration.hours(SelectedSessionPart.goals_getCurrent().getGoal_Hours()), null))
+                    Util.formatdurationtoStringSpelledOut(SelectedSessionPart.goals_getCurrent().getDuration(), null))
             );
             newgoalbuttontext = kujiin.xml.Options.GOALPACINGTEXT;
             newgoalbuttontooltip = new Tooltip("Calculate Goal Pacing For This Goal");
@@ -236,7 +233,7 @@ public class ProgressTracker implements UI {
             SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog(SelectedSessionPart);
             simpleGoalSetDialog.showAndWait();
             if (simpleGoalSetDialog.shouldSetgoal()) {
-                SelectedSessionPart.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalHours(), SelectedSessionPart));
+                SelectedSessionPart.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalDuration()));
                 updateui_goals(null);
             }
         } else if (NewGoalButton.getText().equals(kujiin.xml.Options.GOALPACINGTEXT)) {
@@ -247,7 +244,7 @@ public class ProgressTracker implements UI {
         SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog(sessionPart);
         simpleGoalSetDialog.showAndWait();
         if (simpleGoalSetDialog.shouldSetgoal()) {
-            sessionPart.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalHours(), sessionPart));
+            sessionPart.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalDuration()));
             sessionPart.goals_marshall();
         }
     }
@@ -324,7 +321,7 @@ public class ProgressTracker implements UI {
                 }
                 String currentgoaltime;
                 String percentcompleted;
-                if (i.goals_ui_currentgoalisset()) {
+                if (i.goals_ui_hascurrentgoal()) {
                     currentgoaltime = i.goals_ui_getcurrentgoalDuration(null);
                     percentcompleted = i.goals_ui_getcurrentgoalpercentage(0);
                 } else {
@@ -359,7 +356,7 @@ public class ProgressTracker implements UI {
                 SimpleGoalSetDialog setDialog = new SimpleGoalSetDialog(SelectedSessionPart);
                 setDialog.showAndWait();
                 if (setDialog.shouldSetgoal()) {
-                    SelectedSessionPart.goals_add(new Goals.Goal(setDialog.getNewGoalHours(), SelectedSessionPart));
+                    SelectedSessionPart.goals_add(new Goals.Goal(setDialog.getNewGoalDuration()));
                     populatetable();
                 }
             }
@@ -533,7 +530,7 @@ public class ProgressTracker implements UI {
             int count = 1;
             for (Session i : allsessionslist) {
                 if (FilterByDateSwitch.isSelected()) {
-                    LocalDate sessiondate = Util.convert_stringtolocaldate(i.getDate_Practiced());
+                    LocalDate sessiondate = i.getDate_Practiced();
                     if (Filter_DateRange_From.getValue() != null) {
                         if (sessiondate.isBefore(Filter_DateRange_From.getValue())) {
                             continue;
@@ -571,7 +568,7 @@ public class ProgressTracker implements UI {
                         continue;
                     }
                 }
-                rowlist.add(new SessionRow(count, i.getDate_Practiced(), i.getPresession_Duration(), i.getRin_Duration(),
+                rowlist.add(new SessionRow(count, i.getDate_Practiced().format(Util.dateFormat), i.getPresession_Duration(), i.getRin_Duration(),
                         i.getKyo_Duration(), i.getToh_Duration(), i.getSha_Duration(), i.getKai_Duration(), i.getJin_Duration(),
                         i.getRetsu_Duration(), i.getZai_Duration(), i.getZen_Duration(), i.getEarth_Duration(), i.getAir_Duration(),
                         i.getFire_Duration(), i.getWater_Duration(), i.getVoid_Duration(), i.getPostsession_Duration(),
@@ -591,11 +588,8 @@ public class ProgressTracker implements UI {
                 Filter_DateRange_From.setValue(null);
                 Filter_DateRange_To.setValue(null);
             } else {
-                try {
-                    Filter_DateRange_From.setValue(Util.convert_stringtolocaldate(allsessionslist.get(0).getDate_Practiced()));
-                } catch (NullPointerException | IndexOutOfBoundsException ignored) {
-                    Filter_DateRange_From.setValue(LocalDate.now());
-                }
+                try {Filter_DateRange_From.setValue(allsessionslist.get(0).getDate_Practiced());}
+                catch (NullPointerException | IndexOutOfBoundsException ignored) {Filter_DateRange_From.setValue(LocalDate.now());}
                 Filter_DateRange_To.setValue(LocalDate.now());
             }
         }
@@ -623,7 +617,7 @@ public class ProgressTracker implements UI {
                 setResizable(false);
                 setTitle("Goal Pacing");
                 practicedduration = SelectedSessionPart.sessions_getPracticedDuration(false);
-                goalduration = Duration.hours(SelectedSessionPart.goals_getCurrent().getGoal_Hours());
+                goalduration = SelectedSessionPart.goals_getCurrent().getDuration();
                 GoalDuration.setText(Util.formatdurationtoStringSpelledOut(goalduration, GoalDuration.getLayoutBounds().getWidth()));
                 TotalPracticedTime.setText(Util.formatdurationtoStringSpelledOut(practicedduration, TotalPracticedTime.getLayoutBounds().getWidth()));
                 durationleft = goalduration.subtract(practicedduration);
@@ -698,10 +692,9 @@ public class ProgressTracker implements UI {
         public boolean shouldSetgoal() {
             return setgoal;
         }
-        public Double getNewGoalHours() {
+        public Duration getNewGoalDuration() {
             try {
-                Duration duration = Duration.hours(Double.parseDouble(HoursSpinner.getText())).add(Duration.minutes(Double.parseDouble(MinutesSpinner.getText())));
-                return duration.toHours();
+                return Duration.hours(Double.parseDouble(HoursSpinner.getText())).add(Duration.minutes(Double.parseDouble(MinutesSpinner.getText())));
             } catch (NullPointerException e) {return null;}
         }
 
