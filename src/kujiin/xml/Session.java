@@ -1,6 +1,7 @@
 package kujiin.xml;
 
 import javafx.util.Duration;
+import kujiin.util.SessionPart;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -48,28 +49,26 @@ public class Session {
     private ArrayList<File> Zen_Ambience;
     private ArrayList<File> Postsession_Ambience;
 
-    public Session(Integer presession_duration, Integer rin_duration, Integer kyo_duration, Integer toh_duration,
-                   Integer sha_duration, Integer kai_duration, Integer jin_duration, Integer retsu_duration,
-                   Integer zai_duration, Integer zen_duration, Integer earth_duration, Integer air_duration,
-                   Integer fire_duration, Integer water_duration, Integer void_duration,
-                   Integer postsession_duration, Integer total_session_duration) {
-        Presession_Duration = presession_duration;
-        Rin_Duration = rin_duration;
-        Kyo_Duration = kyo_duration;
-        Toh_Duration = toh_duration;
-        Sha_Duration = sha_duration;
-        Kai_Duration = kai_duration;
-        Jin_Duration = jin_duration;
-        Retsu_Duration = retsu_duration;
-        Zai_Duration = zai_duration;
-        Zen_Duration = zen_duration;
-        Earth_Duration = earth_duration;
-        Air_Duration = air_duration;
-        Fire_Duration = fire_duration;
-        Water_Duration = water_duration;
-        Void_Duration = void_duration;
-        Postsession_Duration = postsession_duration;
-        Total_Session_Duration = total_session_duration;
+    public Session(int[] durations) {
+        Presession_Duration = durations[0];
+        Rin_Duration = durations[1];
+        Kyo_Duration = durations[2];
+        Toh_Duration = durations[3];
+        Sha_Duration = durations[4];
+        Kai_Duration = durations[5];
+        Jin_Duration = durations[6];
+        Retsu_Duration = durations[7];
+        Zai_Duration = durations[8];
+        Zen_Duration = durations[9];
+        Earth_Duration = durations[10];
+        Air_Duration = durations[11];
+        Fire_Duration = durations[12];
+        Water_Duration = durations[13];
+        Void_Duration = durations[14];
+        Postsession_Duration = durations[15];
+        int totalduration = 0;
+        for (int i : durations) {totalduration += i;}
+        Total_Session_Duration = totalduration;
         setDate_Practiced(LocalDate.now());
     }
     public Session() {setDate_Practiced(LocalDate.now());}
@@ -271,27 +270,27 @@ public class Session {
     public void setDate_Practiced(LocalDate date_Practiced) {Date_Practiced = date_Practiced.format(dateFormat);}
 
 // Other Methods
-    public void updatesessionpartduration(int sessionpartindex, int duration) {
-        if (sessionpartindex == 0) {setPresession_Duration(duration);}
-        if (sessionpartindex == 1) {setRin_Duration(duration);}
-        if (sessionpartindex == 2) {setKyo_Duration(duration);}
-        if (sessionpartindex == 3) {setToh_Duration(duration);}
-        if (sessionpartindex == 4) {setSha_Duration(duration);}
-        if (sessionpartindex == 5) {setKai_Duration(duration);}
-        if (sessionpartindex == 6) {setJin_Duration(duration);}
-        if (sessionpartindex == 7) {setRetsu_Duration(duration);}
-        if (sessionpartindex == 8) {setZai_Duration(duration);}
-        if (sessionpartindex == 9) {setZen_Duration(duration);}
-        if (sessionpartindex == 10) {setEarth_Duration(duration);}
-        if (sessionpartindex == 11) {setAir_Duration(duration);}
-        if (sessionpartindex == 12) {setFire_Duration(duration);}
-        if (sessionpartindex == 13) {setWater_Duration(duration);}
-        if (sessionpartindex == 14) {setVoid_Duration(duration);}
-        if (sessionpartindex == 15) {setPostsession_Duration(duration);}
+    public void updatesessionpartduration(SessionPart sessionPart, int duration) {
+        if (sessionPart.number == 0) {setPresession_Duration(duration);}
+        if (sessionPart.number == 1) {setRin_Duration(duration);}
+        if (sessionPart.number == 2) {setKyo_Duration(duration);}
+        if (sessionPart.number == 3) {setToh_Duration(duration);}
+        if (sessionPart.number == 4) {setSha_Duration(duration);}
+        if (sessionPart.number == 5) {setKai_Duration(duration);}
+        if (sessionPart.number == 6) {setJin_Duration(duration);}
+        if (sessionPart.number == 7) {setRetsu_Duration(duration);}
+        if (sessionPart.number == 8) {setZai_Duration(duration);}
+        if (sessionPart.number == 9) {setZen_Duration(duration);}
+        if (sessionPart.number == 10) {setEarth_Duration(duration);}
+        if (sessionPart.number == 11) {setAir_Duration(duration);}
+        if (sessionPart.number == 12) {setFire_Duration(duration);}
+        if (sessionPart.number == 13) {setWater_Duration(duration);}
+        if (sessionPart.number == 14) {setVoid_Duration(duration);}
+        if (sessionPart.number == 15) {setPostsession_Duration(duration);}
         updatetotalsessionduration();
     }
-    public int getsessionpartduration(int sessionpartindex) {
-        switch (sessionpartindex) {
+    public int getsessionpartduration(SessionPart sessionpart) {
+        switch (sessionpart.number) {
             case 0:
                 return getPresession_Duration();
             case 1:
@@ -328,11 +327,11 @@ public class Session {
                 return 0;
         }
     }
-    public Duration getsessionpartdurationasObject(int sessionpartindex) {
-        return Duration.minutes(getsessionpartduration(sessionpartindex));
+    public Duration getsessionpartdurationasObject(SessionPart sessionPart) {
+        return Duration.minutes(getsessionpartduration(sessionPart));
     }
-    public void setsessionpartambience(int sessionpartindex, ArrayList<File> ambiencelist) {
-        switch (sessionpartindex) {
+    public void setsessionpartambience(SessionPart sessionpart, ArrayList<File> ambiencelist) {
+        switch (sessionpart.number) {
             case 0:
                 setPresession_Ambience(ambiencelist);
                 break;

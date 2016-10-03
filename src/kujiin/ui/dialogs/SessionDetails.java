@@ -19,6 +19,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import kujiin.ui.MainController;
 import kujiin.util.SessionPart;
 import kujiin.util.Util;
 import kujiin.xml.Options;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SessionDetails extends Stage {
+    private MainController Root;
     public BarChart<String, Number> SessionBarChart;
     public CategoryAxis SessionCategoryAxis;
     public NumberAxis SessionNumbersAxis;
@@ -40,13 +42,14 @@ public class SessionDetails extends Stage {
     public TextField MostProgressTextField;
     public TextField AverageDurationTextField;
 
-    public SessionDetails(Options options, List<SessionPart> itemsinsession) {
+    public SessionDetails(MainController Root, List<SessionPart> itemsinsession) {
+        this.Root = Root;
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionCompleteDialog.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            options.setStyle(this);
+            Root.getOptions().setStyle(this);
             this.setResizable(false);
             SessionNumbersAxis.setLabel("Minutes");
             setTitle("Session Details");
@@ -88,13 +91,13 @@ public class SessionDetails extends Stage {
             DatePracticedTextField.setEditable(false);
             XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
             List<Integer> values = new ArrayList<>();
-            for (int i = 0; i < 16; i++) {
+            for (SessionPart i : Root.getAllSessionParts(false)) {
                 int duration = session.getsessionpartduration(i);
                 values.add(duration);
                 String name;
-                if (i == 0) {name = "Pre";}
-                else if (i == 15) {name = "Post";}
-                else {name = kujiin.xml.Options.ALLNAMES.get(i);}
+                if (i.number == 0) {name = "Pre";}
+                else if (i.number == 15) {name = "Post";}
+                else {name = kujiin.xml.Options.ALLNAMES.get(i.number);}
                 series.getData().add(new XYChart.Data<>(name, duration));
             }
             SessionBarChart.getData().add(series);

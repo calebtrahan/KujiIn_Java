@@ -21,7 +21,6 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static kujiin.xml.Options.DEFAULT_FADERESUMEANDPAUSEDURATION;
 
@@ -175,7 +174,8 @@ public class SessionPart {
     public void setGoalsController(Goals goals) {
         GoalsController = goals;
     }
-// Duration
+
+    // Duration
     public void setRamponly(boolean ramponly) {
     this.ramponly = ramponly;
 }
@@ -916,8 +916,8 @@ public class SessionPart {
     public void tick() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             try {
-                root.getProgressTracker().getSessions().getspecificsession(root.getProgressTracker().getSessions().getSession().size() - 1).updatesessionpartduration(number, new Double(elapsedtime.toMinutes()).intValue());
-                goals_updateduringplayback();
+                root.getProgressTracker().getSessions().getspecificsession(root.getProgressTracker().getSessions().getSession().size() - 1).updatesessionpartduration(this, new Double(elapsedtime.toMinutes()).intValue());
+                goals_playbackupdate();
             } catch (NullPointerException ignored) {}
         }
     }
@@ -1039,44 +1039,9 @@ public class SessionPart {
     public void goals_unmarshall() {Goals = root.getProgressTracker().getGoals().getSessionPartGoalList(number);}
     public void goals_marshall() {root.getProgressTracker().getGoals().setSessionPartGoalList(number, Goals);}
     // List Methods
-    public void goals_add(kujiin.xml.Goals.Goal newgoal) {
-        if (Goals == null) {Goals = new ArrayList<>();}
-        Goals.add(newgoal);
-        goals_sort();
-    }
-    private void goals_sort() {
-        List<kujiin.xml.Goals.Goal> goallist = Goals;
-        if (goallist != null && ! goallist.isEmpty()) {
-            try {
-                goallist = kujiin.xml.Goals.sortgoalsbyDuration(goallist);
-                int count = 1;
-                for (kujiin.xml.Goals.Goal i : goallist) {
-                    i.setID(count);
-                    count++;
-                }
-                Goals = goallist;
-            } catch (Exception ignored) {}
-        }
-    }
-    public void goals_remove(kujiin.xml.Goals.Goal currentgoal) {Goals.remove(currentgoal);}
-    // Getters
-    // Current Goal
-    public List<kujiin.xml.Goals.Goal> goals_get(boolean includecurrent, boolean includecompleted) {
-        List<kujiin.xml.Goals.Goal> goals = new ArrayList<>();
-        for (kujiin.xml.Goals.Goal i : Goals) {
-            if (includecurrent && includecompleted) {goals.add(i);}
-            else if (includecompleted) {if (! i.getCompleted()) goals.add(i);}
-            else {if (i.getCompleted()) goals.add(i);}
-        }
-        return goals;
-    }
     public kujiin.xml.Goals.Goal goals_getCurrent() {
-        if (Goals == null || Goals.isEmpty()) {return null;}
-        List<kujiin.xml.Goals.Goal> uncompletedgoals = goals_getAllCurrent();
-        if (! uncompletedgoals.isEmpty()) {
-            uncompletedgoals = kujiin.xml.Goals.sortgoalsbyDuration(uncompletedgoals);
-            return uncompletedgoals.get(0);
-        } else {return null;}
+        if (Goals == null || Goals.isEmpty() || goals_get(true, false).isEmpty()) {return null;}
+        return goals_get(true, false).get(0);
     }
     public String goals_getCurrentAsString(boolean includepercentage, double maxchars) {
         kujiin.xml.Goals.Goal currentgoal = goals_getCurrent();
@@ -1096,36 +1061,55 @@ public class SessionPart {
             } else {return Util.formatdurationtoStringSpelledOut(goal, maxchars);}
         }
     }
-    // Current And Future Goals
-    public List<kujiin.xml.Goals.Goal> goals_getAllCurrent() {
-        return Goals.stream().filter(i -> i.getCompleted() != null && !i.getCompleted()).collect(Collectors.toList());
-    }
-    // Completed Goals
-    public List<kujiin.xml.Goals.Goal> goals_getCompleted() {
-        try {return Goals.stream().filter(i -> i.getCompleted() != null && i.getCompleted()).collect(Collectors.toList());}
-        catch (NullPointerException e) {return new ArrayList<>();}
-    }
-    public int goals_getCompletedCount() {return goals_getCompleted().size();}
-    public List<kujiin.xml.Goals.Goal> goals_getCompletedOn(LocalDate localDate) {
-        try {
-            List<kujiin.xml.Goals.Goal> goalslist = new ArrayList<>();
-            for (kujiin.xml.Goals.Goal i : Goals) {
-                if (i.getDate_Completed() == null || ! i.getCompleted()) {continue;}
-                if (i.getDate_Completed().isEqual(localDate)) {goalslist.add(i);}
+    public List<kujiin.xml.Goals.Goal> goals_get(boolean includecurrent, boolean includecompleted) {
+        List<kujiin.xml.Goals.Goal> goals = new ArrayList<>();
+        for (kujiin.xml.Goals.Goal i : Goals) {
+            if (includecurrent && includecompleted) {goals.add(i);}
+            else if (includecompleted) {if (! i.getCompleted()) goals.add(i);}
+            else {
+                if (i.getCompleted())
+                goals.add(i);
             }
-            return goalslist;
-        } catch (Exception ignored) {return new ArrayList<>();}
+        }
+        return goals;
     }
-    // Validation Methods
-    public boolean goals_arelongenough() {
-        try {
-            Duration goalduration = goals_getCurrent().getDuration();
-            Duration practiceddurationplusthissession = root.getProgressTracker().getSessions().gettotalpracticedtime(number, false).add(getduration());
-            return goalduration.greaterThanOrEqualTo(practiceddurationplusthissession);
-        } catch (NullPointerException e) {return true;}
+    public List<kujiin.xml.Goals.Goal> goals_get(boolean includecurrent, boolean includecompleted, LocalDate practicedorcompletedondate) {
+        List<kujiin.xml.Goals.Goal> goals = new ArrayList<>();
+        for (kujiin.xml.Goals.Goal i : Goals) {
+            boolean completedonselecteddate = i.getDate_Completed().isEqual(practicedorcompletedondate);
+            if (includecurrent && includecompleted && completedonselecteddate) {goals.add(i);}
+            else if (includecompleted && completedonselecteddate) {if (! i.getCompleted()) goals.add(i);}
+            else {if (i.getCompleted() && completedonselecteddate) goals.add(i);}
+        }
+        return goals;
     }
-    // Playback Methods
-    private void goals_updateduringplayback() {
+    public void goals_add(kujiin.xml.Goals.Goal newgoal) {
+        if (Goals == null) {Goals = new ArrayList<>();}
+        Goals.add(newgoal);
+        goals_sort();
+    }
+    public void goals_add(List<kujiin.xml.Goals.Goal> newgoals) {
+        if (Goals == null) {Goals = new ArrayList<>();}
+        Goals.addAll(newgoals);
+        goals_sort();
+    }
+    public void goals_sort() {
+        List<kujiin.xml.Goals.Goal> goallist = Goals;
+        if (goallist != null && ! goallist.isEmpty()) {
+            try {
+                goallist = kujiin.xml.Goals.sortgoalsbyDuration(goallist);
+                int count = 1;
+                for (kujiin.xml.Goals.Goal i : goallist) {
+                    i.setID(count);
+                    count++;
+                }
+                Goals = goallist;
+            } catch (Exception ignored) {}
+        }
+    }
+    public void goals_remove(kujiin.xml.Goals.Goal currentgoal) {Goals.remove(currentgoal);}
+    // Playback
+    private void goals_playbackupdate() {
         List<kujiin.xml.Goals.Goal> goallist = new ArrayList<>();
         for (kujiin.xml.Goals.Goal i : Goals) {
             if (i.getCompleted() != null && ! i.getCompleted() && sessions_getPracticedDuration(false).greaterThanOrEqualTo(i.getDuration())) {
@@ -1160,6 +1144,14 @@ public class SessionPart {
             return Util.formatdurationtoStringSpelledOut(goals_getCurrent().getDuration(), maxchars);
         } else {return null;}
     }
+    // Validation
+    public boolean goals_arelongenough() {
+        try {
+            Duration goalduration = goals_getCurrent().getDuration();
+            Duration practiceddurationplusthissession = root.getProgressTracker().getSessions().gettotalpracticedtime(this, false).add(getduration());
+            return goalduration.greaterThanOrEqualTo(practiceddurationplusthissession);
+        } catch (NullPointerException e) {return true;}
+    }
 
 // Session Tracking
     // UI
@@ -1180,19 +1172,19 @@ public class SessionPart {
         boolean includepreandpost;
         if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
         else {includepreandpost = sessions_includepreandpost();}
-        return root.getProgressTracker().getSessions().gettotalpracticedtime(number, includepreandpost);
+        return root.getProgressTracker().getSessions().gettotalpracticedtime(this, includepreandpost);
     }
     public int sessions_getPracticedSessionCount(Boolean includepreandpostoverride) {
         boolean includepreandpost;
         if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
         else {includepreandpost = sessions_includepreandpost();}
-        return root.getProgressTracker().getSessions().getsessioncount(number, includepreandpost);
+        return root.getProgressTracker().getSessions().getsessioncount(this, includepreandpost);
     }
     public Duration sessions_getAverageSessionLength(Boolean includepreandpostoverride) {
         boolean includepreandpost;
         if (includepreandpostoverride != null) {includepreandpost = includepreandpostoverride;}
         else {includepreandpost = sessions_includepreandpost();}
-        return root.getProgressTracker().getSessions().getaveragepracticedurationforallsessions(number,  includepreandpost);
+        return root.getProgressTracker().getSessions().getaveragepracticedurationforallsessions(this, includepreandpost);
     }
 
 // Reference Files

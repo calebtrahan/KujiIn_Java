@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @XmlRootElement(name = "Sessions")
 @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -61,8 +62,9 @@ public class Sessions {
     }
     public void createnew() {
         try {
-            add(new Session(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));}
-        catch (JAXBException ignored) {
+            int[] array = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            add(new Session(array));
+        } catch (JAXBException ignored) {
             new ErrorDialog(Root.getOptions(), "Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
     public void add(Session session) throws JAXBException {
@@ -102,32 +104,40 @@ public class Sessions {
     }
 
 // Session Information Getters
-    public Duration gettotalpracticedtime(int index, boolean includepreandpost) {
+    public List<Session> getsessionpartsessions(SessionPart sessionPart) {
+        return getSession().stream().filter(i -> i.getsessionpartduration(sessionPart) > 0).collect(Collectors.toList());
+    }
+
+
+
+
+
+    public Duration gettotalpracticedtime(SessionPart sessionpart, boolean includepreandpost) {
         try {
             Duration totalduration = Duration.ZERO;
-            for (kujiin.xml.Session i : getSession()) {totalduration = totalduration.add(i.getsessionpartdurationasObject(index));}
+            for (kujiin.xml.Session i : getSession()) {totalduration = totalduration.add(i.getsessionpartdurationasObject(sessionpart));}
             if (includepreandpost) {
                 for (SessionPart i : Root.getAllSessionParts(true)) {
                     if (i instanceof Qi_Gong) {
-                        for (kujiin.xml.Session x : getSession()) {totalduration = totalduration.add(x.getsessionpartdurationasObject(i.number));}
+                        for (kujiin.xml.Session x : getSession()) {totalduration = totalduration.add(x.getsessionpartdurationasObject(i));}
                     }
                 }
             }
             return totalduration;
         } catch (NullPointerException ignored) {return Duration.ZERO;}
     }
-    public Duration getaveragepracticedurationforallsessions(int index, boolean includepreandpost) {
+    public Duration getaveragepracticedurationforallsessions(SessionPart sessionpart, boolean includepreandpost) {
         try {
-            return new Duration(gettotalpracticedtime(index, includepreandpost).toMillis() / getsessioncount(index, includepreandpost));}
+            return new Duration(gettotalpracticedtime(sessionpart, includepreandpost).toMillis() / getsessioncount(sessionpart, includepreandpost));}
         catch (NullPointerException | ArithmeticException ignored) {return Duration.ZERO;}
     }
-    public int getsessioncount(int index, boolean includepreandpost) {
+    public int getsessioncount(SessionPart sessionpart, boolean includepreandpost) {
         try {
             int sessioncount = 0;
             for (kujiin.xml.Session i : getSession()) {
-                if (i.getsessionpartduration(index) != 0) {sessioncount++; continue;}
+                if (i.getsessionpartduration(sessionpart) != 0) {sessioncount++; continue;}
                 if (includepreandpost) {
-                    if (i.getsessionpartduration(0) != 0 || i.getsessionpartduration(15) != 0) {sessioncount++;}
+                    if (i.getsessionpartduration(Root.getPresession()) != 0 || i.getsessionpartduration(Root.getPostsession()) != 0) {sessioncount++;}
                 }
             }
             return sessioncount;

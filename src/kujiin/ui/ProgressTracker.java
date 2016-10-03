@@ -54,10 +54,12 @@ public class ProgressTracker implements UI {
     private SessionPart SelectedSessionPart;
     private ArrayList<SessionPart> SessionParts;
     private Options Options;
+    private MainController Root;
 
     public ProgressTracker(MainController Root) {
         Options = Root.getOptions();
         Sessions = new Sessions(Root);
+        this.Root = Root;
         Sessions.unmarshall();
         Goals = new Goals(Root);
         Goals.unmarshall();
@@ -164,7 +166,7 @@ public class ProgressTracker implements UI {
         new SessionDetails(Options, individualsession).showAndWait();
     }
     public void displaysessiondetails(List<SessionPart> itemsinsession) {
-        new SessionDetails(Options, itemsinsession).show();
+        new SessionDetails(Root, itemsinsession).show();
     }
 
 // Goals
@@ -328,7 +330,7 @@ public class ProgressTracker implements UI {
                     currentgoaltime = "No Goal Set";
                     percentcompleted = "No Goal Set";
                 }
-                allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtext, currentgoaltime, percentcompleted, i.goals_getCompletedCount()));
+                allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtext, currentgoaltime, percentcompleted, i.goals_get(false, true).size()));
             }
             GoalsTable.setItems(allgoalsdetails);
         }
@@ -348,7 +350,7 @@ public class ProgressTracker implements UI {
                 } else {
                     SetCurrentGoalButton.setText(goalpacingtext);
                 }
-                ViewCompletedGoalsButton.setDisable(SelectedSessionPart.goals_getCompletedCount() == 0);
+                ViewCompletedGoalsButton.setDisable(SelectedSessionPart.goals_get(false, true).size() == 0);
             }
         }
         public void setcurrentgoal(ActionEvent actionEvent) {
@@ -471,8 +473,8 @@ public class ProgressTracker implements UI {
             }
         }
 
-        public CheckBox getcheckbox(int sessionpartindex) {
-            switch (sessionpartindex) {
+        public CheckBox getcheckbox(SessionPart sessionpart) {
+            switch (sessionpart.number) {
                 case 0:
                     return Filter_PresessionCheckbox;
                 case 1:
@@ -544,10 +546,8 @@ public class ProgressTracker implements UI {
                 }
                 if (FilterBySelectedSwitch.isSelected()) {
                     boolean validsession = true;
-                    for (int j = 0; j < 16; j++) {
-                        if (!validsession) {
-                            break;
-                        }
+                    for (SessionPart j : Root.getAllSessionParts(false)) {
+                        if (! validsession) {break;}
                         if (getcheckbox(j).isSelected()) {
                             if (Filter_DurationThresholdCheckbox.isSelected()) {
                                 try {
@@ -656,8 +656,10 @@ public class ProgressTracker implements UI {
                 setScene(defaultscene);
                 Options.setStyle(this);
                 setResizable(false);
-                setTitle("Set A New Goal For " + sessionPart.name);
+                setTitle("Set A New Goal");
+                TopLabel.setText("Set A New Goal For " + sessionPart.name);
                 practicedduration = sessionPart.sessions_getPracticedDuration(false);
+                System.out.println(sessionPart.name + "'s Practiced Duration: " + practicedduration.toMinutes() + " Minutes");
                 HoursSpinner.setText(String.valueOf((int) practicedduration.toMinutes() / 60));
                 MinutesSpinner.setText(String.valueOf((int) practicedduration.toMinutes() % 60));
                 Util.custom_textfield_integer(HoursSpinner, 0, Integer.MAX_VALUE, 1);

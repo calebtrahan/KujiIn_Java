@@ -9,7 +9,7 @@
    <children>
       <VBox alignment="CENTER" layoutX="225.0" layoutY="110.0" prefHeight="139.0" prefWidth="325.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label fx:id="TopLabel" alignment="CENTER" prefHeight="34.0" prefWidth="322.0" text="Set A New Goal For Postsession">
+            <Label fx:id="TopLabel" alignment="CENTER" prefHeight="34.0" prefWidth="322.0">
                <font>
                   <Font size="16.0" />
                </font>
