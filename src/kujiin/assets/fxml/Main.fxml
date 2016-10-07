@@ -74,7 +74,7 @@
                <font>
                   <Font size="12.0" />
                </font></Button>
-            <Button fx:id="ExportButton" mnemonicParsing="false" onAction="#exporter_toggle" prefHeight="23.0" prefWidth="63.0" text="Export">
+            <Button fx:id="ExportButton" mnemonicParsing="false" prefHeight="23.0" prefWidth="63.0" text="Export">
                <font>
                   <Font size="12.0" />
                </font>

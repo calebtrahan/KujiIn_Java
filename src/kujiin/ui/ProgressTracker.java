@@ -275,7 +275,7 @@ public class ProgressTracker implements UI {
 
         public AllSessionPartGoalProgress() {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/AllSessionPartsGoalProgress.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/AllSessionPartsGoalProgress.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
@@ -436,7 +436,7 @@ public class ProgressTracker implements UI {
         public AllSessionDetails() {
             try {
                 allsessionslist = getSessions().getSession();
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails_All.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionDetails_All.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);

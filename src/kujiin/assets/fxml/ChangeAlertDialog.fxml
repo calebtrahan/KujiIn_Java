@@ -13,15 +13,15 @@
          </font></Label>
       <HBox alignment="CENTER_RIGHT" layoutX="50.0" layoutY="84.0" prefHeight="30.0" prefWidth="380.0">
          <children>
-            <Button fx:id="HelpButton" mnemonicParsing="false" onAction="#help" text="What's This?" />
-            <Button fx:id="PreviewButton" mnemonicParsing="false" onAction="#preview" text="Preview" />
-            <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#accept" text="Accept" />
-            <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+            <Button fx:id="HelpButton" mnemonicParsing="false" text="What's This?" />
+            <Button fx:id="PreviewButton" mnemonicParsing="false" text="Preview" />
+            <Button fx:id="AcceptButton" mnemonicParsing="false" text="Accept" />
+            <Button fx:id="CancelButton" mnemonicParsing="false" text="Cancel" />
          </children>
       </HBox>
       <HBox alignment="CENTER" layoutX="12.0" layoutY="46.0" prefHeight="30.0" prefWidth="423.0">
          <children>
-            <CheckBox fx:id="AlertFileToggleButton" minWidth="50.0" mnemonicParsing="false" onAction="#alertfiletoggled" text="OFF">
+            <CheckBox fx:id="AlertFileToggleButton" minWidth="50.0" mnemonicParsing="false" text="OFF">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font>
@@ -37,7 +37,7 @@
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
             </TextField>
-            <Button fx:id="openFileButton" mnemonicParsing="false" onAction="#openandtestnewfile" text="Select File" />
+            <Button fx:id="openFileButton" mnemonicParsing="false" text="Select File" />
          </children>
       </HBox>
    </children>

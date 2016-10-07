@@ -45,9 +45,9 @@
                         <Insets left="10.0" />
                      </HBox.margin>
                   </HBox>
-                  <Button fx:id="PlayButton" disable="true" mnemonicParsing="false" onAction="#play" text="Play" />
-                  <Button fx:id="PauseButton" disable="true" mnemonicParsing="false" onAction="#pause" text="Pause" />
-                  <Button fx:id="StopButton" disable="true" mnemonicParsing="false" onAction="#stop" text="Stop">
+                  <Button fx:id="PlayButton" disable="true" mnemonicParsing="false" text="Play" />
+                  <Button fx:id="PauseButton" disable="true" mnemonicParsing="false" text="Pause" />
+                  <Button fx:id="StopButton" disable="true" mnemonicParsing="false" text="Stop">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>

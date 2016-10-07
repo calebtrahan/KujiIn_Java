@@ -1,12 +1,7 @@
 package kujiin.ui.dialogs;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
@@ -43,8 +38,9 @@ public class SessionDetails extends Stage {
     public TextField AverageDurationTextField;
 
     public SessionDetails(MainController Root, List<SessionPart> itemsinsession) {
-        this.Root = Root;
         try {
+            this.Root = Root;
+            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionCompleteDialog.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -75,11 +71,13 @@ public class SessionDetails extends Stage {
             AverageDurationTextField.setText(Util.formatdurationtoStringSpelledOut(Duration.millis(highestduration.toMillis() / itemsinsession.size()), AverageDurationTextField.getLayoutBounds().getWidth()));
             MostProgressTextField.setText(Util.formatdurationtoStringSpelledOut(highestduration, MostProgressTextField.getLayoutBounds().getWidth()));
             SessionBarChart.requestFocus();
-        } catch (IOException e) {}
+            CloseButton.setOnAction(event -> close());
+        } catch (IOException ignored) {}
     }
     public SessionDetails(Options options, kujiin.xml.Session session) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/SessionDetails_Individual.fxml"));
+            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionDetails_Individual.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
@@ -106,26 +104,14 @@ public class SessionDetails extends Stage {
             SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((session.getTotal_Session_Duration() * 60) * 1000), SessionDurationTextField.getLayoutBounds().getWidth()));
             SessionDurationTextField.setEditable(false);
             SessionBarChart.requestFocus();
-        } catch (IOException | NullPointerException e) {}
+            CloseButton.setOnAction(event -> close());
+        } catch (IOException | NullPointerException ignored) {}
     }
 
-    public void closeDialog(ActionEvent actionEvent) {
-        close();
+    @Override
+    public void close() {
+        super.close();
+        if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
     }
 
-    class CompletedGoalsAtEndOfSessionBinding {
-        private StringProperty sessionpartname;
-        private StringProperty practicedhours;
-        private StringProperty goalhours;
-        private StringProperty dateset;
-        private IntegerProperty daysittooktocomplete;
-
-        public CompletedGoalsAtEndOfSessionBinding(String sessionpartname, String practicedhours, String goalhours, String dateset, int daysittooktocomplete, String datecompleted) {
-            this.sessionpartname = new SimpleStringProperty(sessionpartname);
-            this.practicedhours = new SimpleStringProperty(practicedhours);
-            this.goalhours = new SimpleStringProperty(goalhours);
-            this.dateset = new SimpleStringProperty(dateset);
-            this.daysittooktocomplete = new SimpleIntegerProperty(daysittooktocomplete);
-        }
-    }
 }

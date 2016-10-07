@@ -90,6 +90,6 @@
             </HBox>
             </children>
         </VBox>
-        <Button fx:id="CloseButton" layoutX="675.0" layoutY="399.0" mnemonicParsing="false" onAction="#closeDialog" text="Close" />
+        <Button fx:id="CloseButton" layoutX="675.0" layoutY="399.0" mnemonicParsing="false" text="Close" />
     </children>
 </AnchorPane>

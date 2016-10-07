@@ -16,6 +16,10 @@ import kujiin.xml.Entrainments;
 public class Main extends Application {
     private MainController Root;
 
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/Main.fxml"));
@@ -38,18 +42,12 @@ public class Main extends Application {
         primaryStage.setOnCloseRequest(event -> {
             if (Root.getProgramState() == ProgramState.IDLE &&
                     new ConfirmationDialog(Root.getOptions(), "Confirmation", null, "Really Exit?", "Exit", "Cancel").getResult()) {
-                Root.close(null);
+                Root.close();
             }
             else {event.consume();}
         });
         primaryStage.show();
     }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-
     @Override
     public void stop() throws Exception {
         if (Root.cleanup()) {
@@ -57,4 +55,5 @@ public class Main extends Application {
             System.exit(0);
         }
     }
+
 }

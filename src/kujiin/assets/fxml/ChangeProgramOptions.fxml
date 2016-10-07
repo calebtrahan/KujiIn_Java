@@ -182,12 +182,12 @@
                            <children>
                               <VBox prefHeight="167.0" prefWidth="558.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Button fx:id="DeleteAllSessionsProgressButton" mnemonicParsing="false" onAction="#deleteallsessions" text="Delete All Session Progress">
+                                    <Button fx:id="DeleteAllSessionsProgressButton" mnemonicParsing="false" text="Delete All Session Progress">
                                        <VBox.margin>
                                           <Insets left="10.0" top="10.0" />
                                        </VBox.margin>
                                     </Button>
-                                    <Button fx:id="DeleteAllGoalsButton" mnemonicParsing="false" onAction="#deleteallgoals" text="Delete All Goals">
+                                    <Button fx:id="DeleteAllGoalsButton" mnemonicParsing="false" text="Delete All Goals">
                                        <VBox.margin>
                                           <Insets left="10.0" top="10.0" />
                                        </VBox.margin>
@@ -204,7 +204,7 @@
                                                 <Insets left="10.0" />
                                              </HBox.margin>
                                           </ChoiceBox>
-                                          <Button fx:id="AddNewThemeButton" mnemonicParsing="false" onAction="#addnewtheme" text="Add New Theme">
+                                          <Button fx:id="AddNewThemeButton" mnemonicParsing="false" text="Add New Theme">
                                              <HBox.margin>
                                                 <Insets left="5.0" />
                                              </HBox.margin>
@@ -243,7 +243,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Label>
-                  <Button fx:id="DefaultsButton" mnemonicParsing="false" onAction="#resettodefaults" text="Reset To Defaults" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="DefaultsButton" mnemonicParsing="false" text="Reset To Defaults" HBox.hgrow="ALWAYS" />
                   <Button fx:id="CloseButton" mnemonicParsing="false" text="Close">
                      <HBox.margin>
                         <Insets right="5.0" />

@@ -29,8 +29,12 @@ public class Qi_Gong extends SessionPart {
         if (name.equals("Presession")) {return "Pre";}
         else return "Post";
     }
+    @Override
+    public String getNameForReference() {
+        return "Qi-Gong";
+    }
 
-// Description Setters
+    // Description Setters
     public void setSummary(String summary) {
         Summary = summary;
     }

@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -103,6 +104,7 @@ public class SessionCreator implements UI {
         Root.ChangeAllElementsButton.setOnAction(event -> changeallelementvalues());
         Root.ResetCreatorButton.setOnAction(event -> reset(true));
         Root.PlayButton.setOnAction(event -> playsession());
+        Root.ExportButton.setOnAction(event -> exportsession());
     }
     public void setupTooltips() {
         if (options.getProgramOptions().getTooltips()) {
@@ -254,13 +256,9 @@ public class SessionCreator implements UI {
 
 // Playback
     public void playsession() {
-        System.out.println("Called Play Session");
         if (creationprechecks() && create()) {
             setDisable(true, "Creator Disabled During Session Playback");
-            Player = new Player();
-            Player.setOnShowing(event -> Root.getStage().setIconified(true));
-            Player.showAndWait();
-            if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
+            new Player().showAndWait();
             setDisable(false, "");
         }
     }
@@ -275,6 +273,7 @@ public class SessionCreator implements UI {
     }
 
 // Export
+    public void exportsession() {}
 
 // Preset Methods
     public void loadPreset() {
@@ -1171,15 +1170,16 @@ public class SessionCreator implements UI {
         private Service<Boolean> currentexporterservice;
 
         public Exporter() {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ExportingSessionDialog.fxml"));
-            fxmlLoader.setController(this);
             try {
+                if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ExportingSessionDialog.fxml"));
+                fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 options.setStyle(this);
                 this.setResizable(false);
+                setTitle("Exporting Session");
             } catch (IOException ignored) {}
-            setTitle("Exporting Session");
         }
 
         public void unbindproperties() {
@@ -1188,6 +1188,105 @@ public class SessionCreator implements UI {
             StatusBar.textProperty().unbind();
             CurrentLabel.textProperty().unbind();
         }
+
+        public void exporter_initialize() {
+        }
+        public void exporter_toggle(ActionEvent actionEvent) {
+//        switch (Session.exporterState) {
+//            case NOT_EXPORTED:
+//                break;
+//            case WORKING:
+//                break;
+//            case FAILED:
+//                break;
+//            case COMPLETED:
+//                break;
+//            case CANCELLED:
+//                break;
+//            default:
+//                break;
+//        }
+        }
+        public void exporter_exportsession(Event event) {
+            //        CreatorAndExporter.startexport();}
+//            Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Exporter Is Broken. FFMPEG Is Being A Pain In The Ass", 3000);
+            //        if (creationchecks()) {
+//            if (getExporterState() == ExporterState.NOT_EXPORTED) {
+//                if (checkforffmpeg()) {
+//                    if (session.exportfile() == null) {
+//                        session.exporter_getnewexportsavefile();
+//                    } else {
+//                        if (session.getExportfile().exists()) {
+//                            if (!Util.dialog_OKCancelConfirmation(Root, "Confirmation", "Overwrite Saved Exported Session?", "Saved Session: " + session.getExportfile().getAbsolutePath())) {
+//                                session.exporter_getnewexportsavefile();
+//                            }
+//                        } else {session.exporter_getnewexportsavefile();}
+//                    }
+//                    if (session.getExportfile() == null) {Util.gui_showtimedmessageonlabel(StatusBar, "Export Session Cancelled", 3000); return;}
+//                    exportserviceindex = 0;
+//                    ArrayList<Cut> cutsinsession = session.getCutsinsession();
+//                    for (Cut i : cutsinsession) {
+//                        exportservices.add(i.getexportservice());
+//                    }
+//                    exportservices.add(session.exporter_getsessionexporter());
+//                    exporterUI = new ExporterUI(Root);
+//                    exporterUI.show();
+//                    setExporterState(ExporterState.WORKING);
+//                    exporter_util_movetonextexportservice();
+//                } else {
+//                    Util.dialog_displayError(Root, "Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
+//                    // TODO Open A Browser Showing How To Install FFMPEG
+//                }
+//            } else if (getExporterState() == ExporterState.WORKING) {
+//                Util.gui_showtimedmessageonlabel(StatusBar, "Session Currently Being Exported", 3000);
+//            } else {
+//                if (Util.dialog_OKCancelConfirmation(Root, "Confirmation", "Session Already Exported", "Export Again?")) {
+//                    setExporterState(ExporterState.NOT_EXPORTED);
+//                    startexport();
+//                }
+//            }
+//        } else {Util.dialog_displayInformation(Root, "Information", "Cannot Export", "No Cuts Selected");}
+        }
+        private void exporter_util_movetonextexportservice() {
+//        System.out.println("Starting Next Export Service");
+//        exporterUI.TotalProgress.setProgress((double) exportserviceindex / exportservices.size());
+//        try {
+//            currentexporterservice = exportservices.get(exportserviceindex);
+//            currentexporterservice.setOnRunning(event -> {
+//                exporterUI.CurrentProgress.progressProperty().bind(currentexporterservice.progressProperty());
+//                exporterUI.StatusBar.textProperty().bind(currentexporterservice.messageProperty());
+//                exporterUI.CurrentLabel.textProperty().bind(currentexporterservice.titleProperty());
+//            });
+//            currentexporterservice.setOnSucceeded(event -> {
+//                exporterUI.unbindproperties(); exportserviceindex++; exporter_util_movetonextexportservice();});
+//            currentexporterservice.setOnCancelled(event -> exporter_export_cancelled());
+//            currentexporterservice.setOnFailed(event -> exporter_export_failed());
+//            currentexporterservice.start();
+//        } catch (ArrayIndexOutOfBoundsException ignored) {
+//            exporter_export_finished();}
+        }
+        public void exporter_export_finished() {
+//        System.out.println("Export Finished!");
+//        exporterState = ExporterState.COMPLETED;
+        }
+        public void exporter_export_cancelled() {
+//        System.out.println("Cancelled!");
+//        exporterState = ExporterState.CANCELLED;}
+        }
+        public void exporter_export_failed() {
+//        System.out.println(currentexporterservice.getException().getMessage());
+//        System.out.println("Failed!");
+//        exporterState = ExporterState.FAILED;
+        }
+        public boolean exporter_cleanup() {
+//        boolean currentlyexporting = exporterState == ExporterState.WORKING;
+//        if (currentlyexporting) {
+//            dialog_displayInformation(this, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
+//        } else {This_Session.exporter_deleteprevioussession();}
+//        return ! currentlyexporting;
+            return true;
+        }
+
 
         public boolean exporter_confirmOverview() {
             return true;
@@ -1294,6 +1393,12 @@ public class SessionCreator implements UI {
                 }
             } catch (NullPointerException ignored) {}
         }
+
+        @Override
+        public void close() {
+            super.close();
+            if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
+        }
     }
     public class Player extends Stage {
         public Button PlayButton;
@@ -1329,6 +1434,7 @@ public class SessionCreator implements UI {
 
         public Player() {
             try {
+                if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
                 progressTracker = Root.getProgressTracker();
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
                 fxmlLoader.setController(this);
@@ -1642,6 +1748,7 @@ public class SessionCreator implements UI {
         public void close() {
             super.close();
             reset(false);
+            if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
         }
     }
 }

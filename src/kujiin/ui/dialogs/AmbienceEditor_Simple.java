@@ -2,7 +2,6 @@ package kujiin.ui.dialogs;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -41,7 +40,6 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
     private AmbienceSong selectedambiencesong;
     private SessionPart selectedsessionpart;
     private PreviewFile previewdialog;
-    private Duration totalselectedduration;
     private MainController Root;
 
     @Override
@@ -53,42 +51,49 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         ObservableList<String> allnames = FXCollections.observableArrayList();
         allnames.addAll(kujiin.xml.Options.ALLNAMES);
         SessionPartChoiceBox.setItems(allnames);
+        SaveButton.setOnAction(event -> save());
+        CloseButton.setOnAction(event -> closedialog());
+        AdvancedButton.setOnAction(event -> advancedmode());
+        AddButton.setOnAction(event -> addfiles());
+        RemoveButton.setOnAction(event -> remove());
+        PreviewButton.setOnAction(event -> preview());
     }
-
     public AmbienceEditor_Simple(MainController Root) {
-        this.Root = Root;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Simple.fxml"));
-        fxmlLoader.setController(this);
         try {
+            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
+            this.Root = Root;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Simple.fxml"));
+            fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             Root.getOptions().setStyle(this);
             this.setResizable(false);
             setTitle("Simple Ambience Editor");
-            setOnCloseRequest(event -> closedialog(null));
+            setOnCloseRequest(event -> closedialog());
+            SessionPartChoiceBox.setOnAction(event -> selectandloadsessionpart());
+            NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
         } catch (IOException ignored) {}
-        SessionPartChoiceBox.setOnAction(event -> selectandloadsessionpart());
-        NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
     }
     public AmbienceEditor_Simple(MainController Root, SessionPart sessionPart) {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Simple.fxml"));
-        fxmlLoader.setController(this);
         try {
+            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Simple.fxml"));
+            fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             Root.getOptions().setStyle(this);
             this.setResizable(false);
             setTitle("Simple Ambience Editor");
-            setOnCloseRequest(event -> closedialog(null));
+            setOnCloseRequest(event -> closedialog());
+            setOnShowing(event -> {
+                SessionPartChoiceBox.getSelectionModel().select(sessionPart.number);
+                selectandloadsessionpart();
+            });
+            SessionPartChoiceBox.setOnAction(event -> selectandloadsessionpart());
         } catch (IOException ignored) {}
-        setOnShowing(event -> {
-            SessionPartChoiceBox.getSelectionModel().select(sessionPart.number);
-            selectandloadsessionpart();
-        });
-        SessionPartChoiceBox.setOnAction(event -> selectandloadsessionpart());
     }
 
-    // Table Methods
+// Table Methods
     public void tableselectionchanged(AmbienceSong ambienceSong) {selectedambiencesong = ambienceSong;}
     public void selectandloadsessionpart() {
         int index = SessionPartChoiceBox.getSelectionModel().getSelectedIndex();
@@ -105,7 +110,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
             calculatetotalduration();
         }
     }
-    public void addfiles(ActionEvent actionEvent) {
+    public void addfiles() {
         List<File> files = Util.filechooser_multiple(getScene(), "Add Files", null);
         if (files == null || files.isEmpty()) {return;}
         int notvalidfilecount = 0;
@@ -140,7 +145,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
             calculatetotalduration();
         });
     }
-    public void remove(ActionEvent actionEvent) {
+    public void remove() {
         int index = AmbienceTable.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             SoundFile soundFile = SoundList.get(index);
@@ -158,7 +163,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         else {
             new InformationDialog(Root.getOptions(), "Information", "Nothing Selected", "Select A Table Item To Remove");}
     }
-    public void preview(ActionEvent actionEvent) {
+    public void preview() {
         if (selectedambiencesong != null && selectedambiencesong.getFile() != null && selectedambiencesong.getFile().exists()) {
             if (previewdialog == null || !previewdialog.isShowing()) {
                 previewdialog = new PreviewFile(selectedambiencesong.getFile(), Root);
@@ -187,7 +192,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         }
     }
     public void calculatetotalduration() {
-        totalselectedduration = Duration.ZERO;
+        Duration totalselectedduration = Duration.ZERO;
         for (AmbienceSong i : AmbienceTable.getItems()) {
             totalselectedduration = totalselectedduration.add(Duration.millis(i.getDuration()));
         }
@@ -205,17 +210,17 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         } catch (NullPointerException ignored) {return false;}
     }
 
-    // Dialog Methods
-    public void advancedmode(ActionEvent actionEvent) {
+// Dialog Methods
+    public void advancedmode() {
         if (unsavedchanges()) {
-            if (new ConfirmationDialog(Root.getOptions(), "Unsaved Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save Changes", "Discard").getResult()) {save(null);}
+            if (new ConfirmationDialog(Root.getOptions(), "Unsaved Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save Changes", "Discard").getResult()) {save();}
         }
         this.close();
         if (selectedsessionpart != null) {
             new AmbienceEditor_Advanced(Root, selectedsessionpart).show();
         } else {new AmbienceEditor_Advanced(Root).show();}
     }
-    public void save(ActionEvent actionEvent) {
+    public void save() {
         int index = SessionPartChoiceBox.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             for (SoundFile i : SoundList) {
@@ -228,12 +233,17 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         } else {
             new InformationDialog(Root.getOptions(), "Cannot Save", "No SessionPart Selected", "Cannot Save");}
     }
-    public void closedialog(ActionEvent actionEvent) {
+    public void closedialog() {
         if (unsavedchanges()) {
             switch (new AnswerDialog(Root.getOptions(), "Unsaved Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save", "Discard", "Cancel").getResult()) {
-                case YES: save(null);
+                case YES: save();
                 case NO: close(); break;
             }
         } else {close();}
+    }
+    @Override
+    public void close() {
+        super.close();
+        if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
     }
 }

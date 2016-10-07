@@ -1,6 +1,5 @@
 package kujiin.ui.dialogs;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -26,21 +25,23 @@ public class PreviewFile extends Stage {
     public Slider VolumeSlider;
     public Label VolumePercentage;
     private Media Mediatopreview;
-    private File Filetopreview;
     private MediaPlayer PreviewPlayer;
+    private MainController Root;
 
     public PreviewFile(File filetopreview, MainController Root) {
+        this.Root = Root;
         if (Util.audio_isValid(filetopreview)) {
             try {
+                if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/PreviewAudioDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 Root.getOptions().setStyle(this);
                 this.setResizable(false);
-                Filetopreview = filetopreview;
-                setTitle("Preview: " + Filetopreview.getName().substring(0, Filetopreview.getName().lastIndexOf(".")));
-                Mediatopreview = new Media(Filetopreview.toURI().toString());
+                File filetopreview1 = filetopreview;
+                setTitle("Preview: " + filetopreview1.getName().substring(0, filetopreview1.getName().lastIndexOf(".")));
+                Mediatopreview = new Media(filetopreview1.toURI().toString());
                 PreviewPlayer = new MediaPlayer(Mediatopreview);
                 PlayButton.setDisable(true);
                 PauseButton.setDisable(true);
@@ -53,11 +54,14 @@ public class PreviewFile extends Stage {
                 setOnHidden(event -> {if (PreviewPlayer != null) {PreviewPlayer.dispose();}});
                 VolumeSlider.setValue(0.0);
                 VolumePercentage.setText("0%");
+                PlayButton.setOnAction(event -> play());
+                PauseButton.setOnAction(event -> pause());
+                StopButton.setOnAction(event -> stop());
             } catch (IOException ignored) {}
         } else {new InformationDialog(Root.getOptions(), "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
     }
 
-    public void play(ActionEvent actionEvent) {
+    public void play() {
         if (PreviewPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
             PreviewPlayer.play();
             VolumeSlider.setValue(1.0);
@@ -100,11 +104,11 @@ public class PreviewFile extends Stage {
         if (total == null || currenttime == null) {ProgressSlider.setValue(0);}
         else {ProgressSlider.setValue(currenttime.toMillis() / total.toMillis());}
     }
-    public void pause(ActionEvent actionEvent) {
+    public void pause() {
         if (PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING) {PreviewPlayer.pause();}
         syncbuttons();
     }
-    public void stop(ActionEvent actionEvent) {
+    public void stop() {
         if (PreviewPlayer.getStatus() == MediaPlayer.Status.PLAYING || PreviewPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
             PreviewPlayer.stop();
         }
@@ -128,5 +132,11 @@ public class PreviewFile extends Stage {
         ProgressSlider.setValue(0);
         VolumeSlider.setValue(0);
         syncbuttons();
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
     }
 }

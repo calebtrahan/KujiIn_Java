@@ -4,18 +4,23 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="487.0" prefWidth="726.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="462.0" prefWidth="726.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox layoutX="388.0" layoutY="39.0" prefHeight="411.0" prefWidth="322.0">
+      <VBox layoutX="389.0" layoutY="8.0" prefHeight="411.0" prefWidth="322.0">
          <children>
-            <Label alignment="BOTTOM_CENTER" prefHeight="24.0" prefWidth="325.0" text="Actual Ambience" textAlignment="CENTER">
-               <font>
-                  <Font name="System Bold Italic" size="16.0" />
-               </font>
+            <HBox alignment="CENTER">
                <VBox.margin>
                   <Insets bottom="3.0" />
                </VBox.margin>
-            </Label>
+               <children>
+                  <Label alignment="BOTTOM_CENTER" prefHeight="24.0" prefWidth="174.0" text="Actual Ambience For:" textAlignment="CENTER">
+                     <font>
+                        <Font name="System Bold Italic" size="16.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="SessionPartSelectionBox" prefHeight="29.0" prefWidth="142.0" />
+               </children>
+            </HBox>
             <TableView fx:id="Actual_Table" prefHeight="364.0" prefWidth="322.0">
                <columns>
                   <TableColumn fx:id="Actual_NameColumn" prefWidth="227.0" text="Name" />
@@ -29,15 +34,15 @@
                         <Insets right="3.0" />
                      </HBox.margin>
                   </TextField>
-                  <Button fx:id="Actual_AddButton" mnemonicParsing="false" onAction="#addtoactualambience" text="Add">
+                  <Button fx:id="Actual_AddButton" mnemonicParsing="false" text="Add">
                      <font>
                         <Font size="12.0" />
                      </font></Button>
-                  <Button fx:id="Actual_RemoveButton" mnemonicParsing="false" onAction="#removeactualambience" text="Remove">
+                  <Button fx:id="Actual_RemoveButton" mnemonicParsing="false" text="Remove">
                      <font>
                         <Font size="12.0" />
                      </font></Button>
-                  <Button fx:id="Actual_PreviewButton" mnemonicParsing="false" onAction="#previewactualambience" text="Preview">
+                  <Button fx:id="Actual_PreviewButton" mnemonicParsing="false" text="Preview">
                      <font>
                         <Font size="12.0" />
                      </font></Button>
@@ -45,7 +50,7 @@
             </HBox>
          </children>
       </VBox>
-      <VBox layoutX="14.0" layoutY="39.0" prefHeight="411.0" prefWidth="322.0">
+      <VBox layoutX="15.0" layoutY="8.0" prefHeight="411.0" prefWidth="322.0">
          <children>
             <Label alignment="CENTER" prefHeight="24.0" prefWidth="326.0" text="Temporary Ambience" textAlignment="CENTER">
                <font>
@@ -68,15 +73,15 @@
                         <Insets right="3.0" />
                      </HBox.margin>
                   </TextField>
-                  <Button fx:id="Temp_AddButton" mnemonicParsing="false" onAction="#addtotempambience" text="Add">
+                  <Button fx:id="Temp_AddButton" mnemonicParsing="false" text="Add">
                      <font>
                         <Font size="12.0" />
                      </font></Button>
-                  <Button fx:id="Temp_RemoveButton" mnemonicParsing="false" onAction="#removefromtempambience" text="Remove">
+                  <Button fx:id="Temp_RemoveButton" mnemonicParsing="false" text="Remove">
                      <font>
                         <Font size="12.0" />
                      </font></Button>
-                  <Button fx:id="Temp_PreviewButton" mnemonicParsing="false" onAction="#previewtempambience" text="Preview">
+                  <Button fx:id="Temp_PreviewButton" mnemonicParsing="false" text="Preview">
                      <font>
                         <Font size="12.0" />
                      </font></Button>
@@ -84,39 +89,26 @@
             </HBox>
          </children>
       </VBox>
-      <VBox alignment="CENTER" layoutX="336.0" layoutY="64.0" prefHeight="353.0" prefWidth="52.0">
+      <VBox alignment="CENTER" layoutX="337.0" layoutY="33.0" prefHeight="353.0" prefWidth="52.0">
          <children>
-            <Button fx:id="RightArrow" mnemonicParsing="false" onAction="#rightarrowpressed" text="-&gt;">
+            <Button fx:id="RightArrow" mnemonicParsing="false" text="-&gt;">
                <VBox.margin>
                   <Insets bottom="25.0" />
                </VBox.margin>
             </Button>
-            <Button fx:id="LeftArrow" mnemonicParsing="false" onAction="#leftarrowpressed" text="&lt;-">
+            <Button fx:id="LeftArrow" mnemonicParsing="false" text="&lt;-">
                <VBox.margin>
                   <Insets top="25.0" />
                </VBox.margin>
             </Button>
          </children>
       </VBox>
-      <HBox alignment="CENTER" layoutX="14.0" layoutY="9.0" prefHeight="34.0" prefWidth="696.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="389.0" layoutY="424.0" prefHeight="26.0" prefWidth="322.0">
          <children>
-            <Label text="Ambience For:">
-               <HBox.margin>
-                  <Insets right="20.0" />
-               </HBox.margin>
-               <font>
-                  <Font name="System Bold" size="17.0" />
-               </font>
-            </Label>
-            <ChoiceBox fx:id="SessionPartSelectionBox" prefHeight="26.0" prefWidth="160.0" />
+            <Button fx:id="SaveButton" mnemonicParsing="false" text="Save" />
+            <Button fx:id="CloseButton" mnemonicParsing="false" text="Close" />
          </children>
       </HBox>
-      <HBox alignment="CENTER_RIGHT" layoutX="388.0" layoutY="455.0" prefHeight="26.0" prefWidth="322.0">
-         <children>
-            <Button fx:id="SaveButton" mnemonicParsing="false" onAction="#save" text="Save" />
-            <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#close" text="Close" />
-         </children>
-      </HBox>
-      <Button fx:id="SwitchToSimpleEditor" layoutX="14.0" layoutY="455.0" mnemonicParsing="false" onAction="#switchtosimple" text="Switch To Simple Editor" />
+      <Button fx:id="SwitchToSimpleEditor" layoutX="15.0" layoutY="424.0" mnemonicParsing="false" text="Switch To Simple Editor" />
    </children>
 </AnchorPane>

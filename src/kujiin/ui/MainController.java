@@ -226,14 +226,13 @@ public class MainController implements Initializable {
         Options.marshall();
         return sessionCreator.cleanup() && progressTracker.cleanup();
     }
-    public void close(ActionEvent actionEvent) {
+    public void close() {
         if (cleanup()) {
             System.exit(0);
         }
     }
 
-    // Getters And Setters
-
+// Getters And Setters
     public void setSessionCreator(SessionCreator sessionCreator) {
         this.sessionCreator = sessionCreator;
     }
@@ -352,21 +351,6 @@ public class MainController implements Initializable {
         Stage = stage;
     }
 
-// Startup Checks
-    public void startupchecks_start() {
-        programState = ProgramState.STARTING_UP;
-        sessionCreator.setDisable(true, "");
-        startupChecks = new StartupChecks(getAllSessionParts(false));
-        startupChecks.run();
-        startupChecks.setOnRunning(event -> CreatorStatusBar.textProperty().bind(startupChecks.messageProperty()));
-    }
-    public void startupchecks_finished() {
-        CreatorStatusBar.textProperty().unbind();
-        sessionCreator.setDisable(false, "");
-        Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Startup Checks Completed", 3000);
-        programState = ProgramState.IDLE;
-    }
-
 // Menu
     public void menu_changesessionoptions(ActionEvent actionEvent) {
         new ChangeProgramOptions().showAndWait();
@@ -376,9 +360,7 @@ public class MainController implements Initializable {
     }
     public void menu_editprogramsambience(ActionEvent actionEvent) {
         if (programState == ProgramState.IDLE) {
-            getStage().setIconified(true);
             new AmbienceEditor_Simple(this).showAndWait();
-            getStage().setIconified(false);
         } else {
             new InformationDialog(getOptions(), "Information", "Cannot Edit Ambience While Performing Startup Checks", "");
         }
@@ -396,9 +378,7 @@ public class MainController implements Initializable {
         sae.showAndWait();
     }
     public void menu_editreferencefiles(ActionEvent actionEvent) {
-        getStage().setIconified(true);
         new EditReferenceFiles(getOptions(), getSessionCreator().getReferenceType()).showAndWait();
-        getStage().setIconified(false);
     }
     public void menu_howtouseprogram(ActionEvent actionEvent) {
     }
@@ -421,106 +401,20 @@ public class MainController implements Initializable {
 //        previewFile.showAndWait();
     }
 
-
-// Export
-    public void exporter_initialize() {
+// Startup Checks
+    public void startupchecks_start() {
+        programState = ProgramState.STARTING_UP;
+        sessionCreator.setDisable(true, "");
+        startupChecks = new StartupChecks(getAllSessionParts(false));
+        startupChecks.run();
+        startupChecks.setOnRunning(event -> CreatorStatusBar.textProperty().bind(startupChecks.messageProperty()));
     }
-    public void exporter_toggle(ActionEvent actionEvent) {
-//        switch (Session.exporterState) {
-//            case NOT_EXPORTED:
-//                break;
-//            case WORKING:
-//                break;
-//            case FAILED:
-//                break;
-//            case COMPLETED:
-//                break;
-//            case CANCELLED:
-//                break;
-//            default:
-//                break;
-//        }
+    public void startupchecks_finished() {
+        CreatorStatusBar.textProperty().unbind();
+        sessionCreator.setDisable(false, "");
+        Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Startup Checks Completed", 3000);
+        programState = ProgramState.IDLE;
     }
-    public void exporter_exportsession(Event event) {
-        //        CreatorAndExporter.startexport();}
-        Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Exporter Is Broken. FFMPEG Is Being A Pain In The Ass", 3000);
-        //        if (creationchecks()) {
-//            if (getExporterState() == ExporterState.NOT_EXPORTED) {
-//                if (checkforffmpeg()) {
-//                    if (session.exportfile() == null) {
-//                        session.exporter_getnewexportsavefile();
-//                    } else {
-//                        if (session.getExportfile().exists()) {
-//                            if (!Util.dialog_OKCancelConfirmation(Root, "Confirmation", "Overwrite Saved Exported Session?", "Saved Session: " + session.getExportfile().getAbsolutePath())) {
-//                                session.exporter_getnewexportsavefile();
-//                            }
-//                        } else {session.exporter_getnewexportsavefile();}
-//                    }
-//                    if (session.getExportfile() == null) {Util.gui_showtimedmessageonlabel(StatusBar, "Export Session Cancelled", 3000); return;}
-//                    exportserviceindex = 0;
-//                    ArrayList<Cut> cutsinsession = session.getCutsinsession();
-//                    for (Cut i : cutsinsession) {
-//                        exportservices.add(i.getexportservice());
-//                    }
-//                    exportservices.add(session.exporter_getsessionexporter());
-//                    exporterUI = new ExporterUI(Root);
-//                    exporterUI.show();
-//                    setExporterState(ExporterState.WORKING);
-//                    exporter_util_movetonextexportservice();
-//                } else {
-//                    Util.dialog_displayError(Root, "Error", "Cannot Export. Missing FFMpeg", "Please Install FFMpeg To Use The Export Feature");
-//                    // TODO Open A Browser Showing How To Install FFMPEG
-//                }
-//            } else if (getExporterState() == ExporterState.WORKING) {
-//                Util.gui_showtimedmessageonlabel(StatusBar, "Session Currently Being Exported", 3000);
-//            } else {
-//                if (Util.dialog_OKCancelConfirmation(Root, "Confirmation", "Session Already Exported", "Export Again?")) {
-//                    setExporterState(ExporterState.NOT_EXPORTED);
-//                    startexport();
-//                }
-//            }
-//        } else {Util.dialog_displayInformation(Root, "Information", "Cannot Export", "No Cuts Selected");}
-    }
-    private void exporter_util_movetonextexportservice() {
-//        System.out.println("Starting Next Export Service");
-//        exporterUI.TotalProgress.setProgress((double) exportserviceindex / exportservices.size());
-//        try {
-//            currentexporterservice = exportservices.get(exportserviceindex);
-//            currentexporterservice.setOnRunning(event -> {
-//                exporterUI.CurrentProgress.progressProperty().bind(currentexporterservice.progressProperty());
-//                exporterUI.StatusBar.textProperty().bind(currentexporterservice.messageProperty());
-//                exporterUI.CurrentLabel.textProperty().bind(currentexporterservice.titleProperty());
-//            });
-//            currentexporterservice.setOnSucceeded(event -> {
-//                exporterUI.unbindproperties(); exportserviceindex++; exporter_util_movetonextexportservice();});
-//            currentexporterservice.setOnCancelled(event -> exporter_export_cancelled());
-//            currentexporterservice.setOnFailed(event -> exporter_export_failed());
-//            currentexporterservice.start();
-//        } catch (ArrayIndexOutOfBoundsException ignored) {
-//            exporter_export_finished();}
-    }
-    public void exporter_export_finished() {
-//        System.out.println("Export Finished!");
-//        exporterState = ExporterState.COMPLETED;
-    }
-    public void exporter_export_cancelled() {
-//        System.out.println("Cancelled!");
-//        exporterState = ExporterState.CANCELLED;}
-    }
-    public void exporter_export_failed() {
-//        System.out.println(currentexporterservice.getException().getMessage());
-//        System.out.println("Failed!");
-//        exporterState = ExporterState.FAILED;
-    }
-    public boolean exporter_cleanup() {
-//        boolean currentlyexporting = exporterState == ExporterState.WORKING;
-//        if (currentlyexporting) {
-//            dialog_displayInformation(this, "Information", "Currently Exporting", "Wait For The Export To Finish Before Exiting");
-//        } else {This_Session.exporter_deleteprevioussession();}
-//        return ! currentlyexporting;
-        return true;
-    }
-
     class StartupChecks extends Task {
         private SessionPart selectedsessionpart;
         private Entrainment selectedentrainment;
@@ -683,6 +577,8 @@ public class MainController implements Initializable {
             return null;
         }
 
+
+
         // Generators
         protected void calculatetotalworktodo() {
             for (SessionPart i : sessionPartList) {
@@ -692,14 +588,12 @@ public class MainController implements Initializable {
                 }
             }
         }
-
         protected void populateambiencefromfiles() {
             for (SessionPart sessionPart : sessionPartList) {
                 sessionPart.getAmbience().startup_addambiencefromdirectory(sessionPart);
                 sessionPart.getAmbience().startup_checkfordeletedfiles();
             }
         }
-
         protected SoundFile getnextentraimentsoundfile() throws IndexOutOfBoundsException {
             if (selectedsessionpart instanceof Qi_Gong || selectedsessionpart instanceof Element) {
                 try {
@@ -725,7 +619,6 @@ public class MainController implements Initializable {
                 }
             }
         }
-
         protected File getnextentrainmentfile() throws IndexOutOfBoundsException {
             if (selectedsessionpart instanceof Qi_Gong || selectedsessionpart instanceof Element) {
                 if (startupcheck_count[0] == 0) {
@@ -747,11 +640,9 @@ public class MainController implements Initializable {
                 }
             }
         }
-
         protected SoundFile getnextambiencesoundfile() throws IndexOutOfBoundsException {
             return selectedsessionpart.getAmbience().get(startupcheck_count[1]);
         }
-
         protected SessionPart getnextsessionpart() throws IndexOutOfBoundsException {
             SessionPart sessionpart;
             if (selectedsessionpart == null) {
@@ -765,6 +656,8 @@ public class MainController implements Initializable {
             return sessionpart;
         }
     }
+
+// Subclasses
     public class ChangeProgramOptions extends Stage {
         public CheckBox TooltipsCheckBox;
         public CheckBox HelpDialogsCheckBox;
@@ -786,12 +679,13 @@ public class MainController implements Initializable {
         public TextArea DescriptionTextField;
         public CheckBox AlertFileSwitch;
         public CheckBox PrePostRamp;
+        public TextField ScrollIncrement;
         private kujiin.xml.Options Options;
         private ArrayList<ItemWithDescription> descriptionitems = new ArrayList<>();
 
         public ChangeProgramOptions() {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeProgramOptions.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/ChangeProgramOptions.fxml"));
                 fxmlLoader.setController(this);
                 Options = getOptions();
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -807,7 +701,7 @@ public class MainController implements Initializable {
             } catch (IOException e) {new ExceptionDialog(getOptions(), e).showAndWait();}
         }
 
-        // Setup Methods
+    // Setup Methods
         public void populatefromxml() {
             // Program Options
             TooltipsCheckBox.setSelected(getOptions().getProgramOptions().getTooltips());
@@ -847,15 +741,19 @@ public class MainController implements Initializable {
             Util.custom_textfield_double(FadeOutValue, 0.0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1, 1);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
+            ProgramThemeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectnewtheme());
             FadeSwitch.setOnAction(event -> togglefade());
             RampSwitch.setOnAction(event -> toggleramp());
             PrePostRamp.setOnAction(event -> toggleprepostramp());
-            CloseButton.setOnAction(event -> close());
             ReferenceSwitch.setOnMouseClicked(event -> referencetoggle());
-            ProgramThemeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectnewtheme());
+            DeleteAllSessionsProgressButton.setOnAction(event -> deleteallsessions());
+            DeleteAllGoalsButton.setOnAction(event -> deleteallgoals());
+            AddNewThemeButton.setOnAction(event -> addnewtheme());
+            DefaultsButton.setOnAction(event -> resettodefaults());
+            CloseButton.setOnAction(event -> close());
         }
 
-        // Description Box Methods
+    // Description Box Methods
         public void setupdescriptions() {
             descriptionitems.add(new ItemWithDescription("Tool Tips Checkbox", "Display/Don't Display Description Messages When Hovering Over Program Controls"));
             descriptionitems.add(new ItemWithDescription("Help Dialogs Checkbox", "Display/Don't Display Additional Dialogs Explaining Various Features Of The Program"));
@@ -913,7 +811,7 @@ public class MainController implements Initializable {
             DescriptionTextField.setText("");
         }
 
-        // Alert File Methods
+    // Alert File Methods
         public void alertfiletoggled() {
             if (AlertFileSwitch.isSelected()) {
                 SelectAlertFile selectAlertFile = new SelectAlertFile(MainController.this);
@@ -922,7 +820,7 @@ public class MainController implements Initializable {
             }
         }
 
-        // Reference Methods
+    // Reference Methods
         public void referencetoggle() {
             Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
             if (ReferenceSwitch.isSelected()) {
@@ -935,7 +833,7 @@ public class MainController implements Initializable {
             }
         }
 
-        // Ramp Methods
+    // Ramp Methods
         public void toggleramp() {
             PrePostRamp.setSelected(RampSwitch.isSelected());
             Options.getSessionOptions().setRampenabled(RampSwitch.isSelected());
@@ -945,14 +843,14 @@ public class MainController implements Initializable {
             Options.getSessionOptions().setPrepostrampenabled(PrePostSwitch.isSelected());
         }
 
-        // Fade Methods
+    // Fade Methods
         public void togglefade() {
             Options.getSessionOptions().setFadeenabled(FadeSwitch.isSelected());
             FadeInValue.setDisable(! FadeSwitch.isSelected());
             FadeOutValue.setDisable(! FadeSwitch.isSelected());
         }
 
-        // Appearance Methods
+    // Appearance Methods
         public void populateappearancecheckbox() {
             ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(getOptions().getAppearanceOptions().getThemefilenames()));
             try {
@@ -960,7 +858,7 @@ public class MainController implements Initializable {
                 ProgramThemeChoiceBox.getSelectionModel().select(index);
             } catch (Exception ignored) {}
         }
-        public void addnewtheme(ActionEvent actionEvent) {
+        public void addnewtheme() {
             File newfile = new FileChooser().showOpenDialog(this);
             if (newfile == null) {return;}
             Options.addthemefile(newfile.getName().substring(0, newfile.getName().lastIndexOf(".")), newfile.toURI().toString());
@@ -975,20 +873,20 @@ public class MainController implements Initializable {
             }
         }
 
-        // Button Actions
-        public void resettodefaults(ActionEvent actionEvent) {
+    // Button Actions
+        public void resettodefaults() {
             if (new ConfirmationDialog(Options, "Reset To Defaults", null, "Reset All Values To Defaults? You Will Lose Any Unsaved Changes", "Reset", "Cancel").getResult()) {
                 Options.resettodefaults();
                 populatefromxml();
             }
         }
-        public void deleteallsessions(ActionEvent actionEvent) {
+        public void deleteallsessions() {
             if (new ConfirmationDialog(Options, "Confirmation", null, "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Delete?", "Cancel").getResult()) {
                 if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {new ErrorDialog(Options, "Error", "Couldn't Delete Sessions File", "Check File Permissions For: " + kujiin.xml.Options.SESSIONSXMLFILE.getAbsolutePath());}
                 else {new InformationDialog(Options, "Success", null, "Successfully Delete Sessions And Reset All Progress");}
             }
         }
-        public void deleteallgoals(ActionEvent actionEvent) {
+        public void deleteallgoals() {
             if (new ConfirmationDialog(Options, "Confirmation", null, "This Will Permanently And Irreversible Delete All Goals Completed And Current", "Delete", "Cancel").getResult()) {
                 if (! kujiin.xml.Options.SESSIONSXMLFILE.delete()) {new ErrorDialog(Options, "Error", "Couldn't Delete Goals File", "Check File Permissions For: " + kujiin.xml.Options.GOALSXMLFILE.getAbsolutePath());}
                 else {new InformationDialog(Options, "Success", null, "Successfully Deleted All Goals");}
@@ -1008,7 +906,6 @@ public class MainController implements Initializable {
             Options.marshall();
             super.close();
         }
-
         class ItemWithDescription {
             private final String name;
             private final String description;
@@ -1036,13 +933,13 @@ public class MainController implements Initializable {
         public RadioButton HTMLVariation;
         public RadioButton TEXTVariation;
         private File selectedfile;
-        private String selectedsessionpart;
+        private SessionPart selectedsessionpart;
         private ArrayList<Integer> userselectedindexes;
         private ReferenceType referenceType;
 
         public EditReferenceFiles(Options options, ReferenceType referenceType) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/EditReferenceFiles.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/EditReferenceFiles.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
@@ -1068,7 +965,7 @@ public class MainController implements Initializable {
                         switch (new AnswerDialog(Options, "Confirmation", null, SessionPartNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes",
                                 "Save And Close", "Close Without Saving", "Cancel").getResult()) {
                             case YES:
-                                saveselectedfile(null);
+                                saveselectedfile();
                                 break;
                             case NO:
                                 break;
@@ -1077,18 +974,22 @@ public class MainController implements Initializable {
                         }
                     }
                 });
+                SessionPartNamesChoiceBox.setOnAction(event -> newsessionpartselected());
+                HTMLVariation.setOnAction(event -> htmlselected());
+                TEXTVariation.setOnAction(event -> textselected());
+                PreviewButton.setOnAction(event -> preview());
+                SaveButton.setOnAction(event -> saveselectedfile());
+                CloseButton.setOnAction(event -> close());
             } catch (IOException e) {new ExceptionDialog(getOptions(), e).showAndWait();}
         }
 
-        // Getters And Setters
-
-        // Text Area Methods
+    // Text Area Methods
         private boolean unsavedchanges() {
             try {
                 return ! MainTextArea.getText().equals(Util.file_getcontents(selectedfile));
             } catch (Exception e) {return false;}
         }
-        public void newsessionpartselected(ActionEvent actionEvent) {
+        public void newsessionpartselected() {
             HTMLVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             TEXTVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             if (userselectedindexes.size() > 0 && selectedfile != null && unsavedchanges()) {
@@ -1096,7 +997,7 @@ public class MainController implements Initializable {
                         "Save And Close", "Close Without Saving", "Cancel").getResult();
                 switch (answerType) {
                     case YES:
-                        saveselectedfile(null);
+                        saveselectedfile();
                         break;
                     case NO:
                         break;
@@ -1129,8 +1030,63 @@ public class MainController implements Initializable {
             }
         }
 
-        // Other Methods
-        public void saveselectedfile(ActionEvent actionEvent) {
+    // Button Methods
+        public void htmlselected() {
+        if (unsavedchanges()) {
+            switch (new AnswerDialog(Options, "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+                    "Save And Close", "Close Without Saving", "Cancel").getResult()) {
+                case YES:
+                    saveselectedfile();
+                    break;
+                case NO:
+                    break;
+                case CANCEL:
+                    HTMLVariation.setSelected(false);
+                    TEXTVariation.setSelected(true);
+                    return;
+            }
+        }
+        // Test If Unsaved Changes Here
+        TEXTVariation.setSelected(false);
+        PreviewButton.setDisable(! HTMLVariation.isSelected());
+        referenceType = ReferenceType.html;
+        selectnewfile();
+        loadselectedfile();
+    }
+        public void textselected() {
+            if (unsavedchanges()) {
+                switch (new AnswerDialog(Options, "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+                        "Save And Close", "Close Without Saving", "Cancel").getResult()) {
+                    case YES:
+                        saveselectedfile();
+                        break;
+                    case NO:
+                        break;
+                    case CANCEL:
+                        HTMLVariation.setSelected(true);
+                        TEXTVariation.setSelected(false);
+                        return;
+                }
+            }
+            // Test If Unsaved Changes Here
+            HTMLVariation.setSelected(false);
+            PreviewButton.setDisable(! HTMLVariation.isSelected());
+            referenceType = ReferenceType.txt;
+            selectnewfile();
+            loadselectedfile();
+        }
+        public void preview() {
+            if (MainTextArea.getText().length() > 0 && HTMLVariation.isSelected() && referenceType == ReferenceType.html) {
+                if (! Util.String_validhtml(MainTextArea.getText())) {
+                    if (! new ConfirmationDialog(Options, "Confirmation", null, "Html Code In Text Area Is Not Valid HTML", "Preview Anyways", "Cancel").getResult()) {return;}
+                }
+                // TODO Fix Reference Display Preview
+//                new DisplayReference(MainTextArea.getText());
+            }
+        }
+
+    // Utility Methods
+        public void saveselectedfile() {
             if (Util.file_writecontents(selectedfile, MainTextArea.getText())) {
                 String text = selectedsessionpart + "'s Reference File (" + referenceType.toString() + " Variation) Has Been Saved";
                 new InformationDialog(Options, "Changes Saved", text, "");
@@ -1138,8 +1094,9 @@ public class MainController implements Initializable {
                 new ErrorDialog(Options, "Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
         }
         public void loadselectedfile() {
-            if (SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
-                selectedsessionpart = SessionPartNamesChoiceBox.getSelectionModel().getSelectedItem();
+            int index = SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex();
+            if (index != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
+                selectedsessionpart = getAllSessionParts(false).get(index);
                 selectnewfile();
                 String contents = Util.file_getcontents(selectedfile);
                 MainTextArea.setText(contents);
@@ -1159,75 +1116,22 @@ public class MainController implements Initializable {
             if (referenceType == null || selectedsessionpart == null) {selectedfile = null; return;}
             switch (referenceType) {
                 case html:
-                    selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html"), selectedsessionpart + ".html");
+                    selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html"), selectedsessionpart.getNameForReference() + ".html");
                     if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(getOptions(), e);}}
                     break;
                 case txt:
-                    selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt"), selectedsessionpart + ".txt");
+                    selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt"), selectedsessionpart.getNameForReference() + ".txt");
                     if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(getOptions(), e);}}
                     break;
             }
         }
-        public void htmlselected(ActionEvent actionEvent) {
-            if (unsavedchanges()) {
-                switch (new AnswerDialog(Options, "Confirmation", null, "Previous Reference File Has Unsaved Changes",
-                        "Save And Close", "Close Without Saving", "Cancel").getResult()) {
-                    case YES:
-                        saveselectedfile(null);
-                        break;
-                    case NO:
-                        break;
-                    case CANCEL:
-                        HTMLVariation.setSelected(false);
-                        TEXTVariation.setSelected(true);
-                        return;
-                }
-            }
-            // Test If Unsaved Changes Here
-            TEXTVariation.setSelected(false);
-            PreviewButton.setDisable(! HTMLVariation.isSelected());
-            referenceType = ReferenceType.html;
-            selectnewfile();
-            loadselectedfile();
-        }
-        public void textselected(ActionEvent actionEvent) {
-            if (unsavedchanges()) {
-                switch (new AnswerDialog(Options, "Confirmation", null, "Previous Reference File Has Unsaved Changes",
-                        "Save And Close", "Close Without Saving", "Cancel").getResult()) {
-                    case YES:
-                        saveselectedfile(null);
-                        break;
-                    case NO:
-                        break;
-                    case CANCEL:
-                        HTMLVariation.setSelected(true);
-                        TEXTVariation.setSelected(false);
-                        return;
-                }
-            }
-            // Test If Unsaved Changes Here
-            HTMLVariation.setSelected(false);
-            PreviewButton.setDisable(! HTMLVariation.isSelected());
-            referenceType = ReferenceType.txt;
-            selectnewfile();
-            loadselectedfile();
-        }
-        public void preview(ActionEvent actionEvent) {
-            if (MainTextArea.getText().length() > 0 && HTMLVariation.isSelected() && referenceType == ReferenceType.html) {
-                if (! Util.String_validhtml(MainTextArea.getText())) {
-                    if (! new ConfirmationDialog(Options, "Confirmation", null, "Html Code In Text Area Is Not Valid HTML", "Preview Anyways", "Cancel").getResult()) {return;}
-                }
-                // TODO Fix Reference Display Preview
-//                new DisplayReference(MainTextArea.getText());
-            }
-        }
-        public ReferenceType getReferenceType() {return referenceType;}
 
-        // Dialog Methods
+    // Dialog Methods
         public void closewindow(Event event) {
             // Check If Unsaved Text
             this.close();
         }
 
     }
+
 }

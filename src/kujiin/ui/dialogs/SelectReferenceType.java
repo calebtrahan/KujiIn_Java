@@ -1,6 +1,5 @@
 package kujiin.ui.dialogs;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -27,8 +26,9 @@ public class SelectReferenceType extends Stage {
 
     public SelectReferenceType(MainController Root) {
         try {
+            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             this.Root = Root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SelectReferenceType.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SelectReferenceType.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
@@ -44,6 +44,8 @@ public class SelectReferenceType extends Stage {
             TextRadioButton.setOnMouseEntered(event -> Description.setText(descriptions.get(1)));
             TextRadioButton.setOnMouseExited(event -> setdescriptiontoselectedtype());
             TextRadioButton.setOnAction(event ->  textButtonselected());
+            AcceptButton.setOnAction(event -> accept());
+            CancelButton.setOnAction(event -> close());
             switch (Root.getOptions().getSessionOptions().getReferencetype()) {
                 case html:
                     HTMLRadioButton.setSelected(true);
@@ -57,18 +59,7 @@ public class SelectReferenceType extends Stage {
         } catch (IOException ignored) {}
     }
 
-    private void setdescriptiontoselectedtype() {
-        if (HTMLRadioButton.isSelected()) {Description.setText(descriptions.get(0));}
-        else if (TextRadioButton.isSelected()) {Description.setText(descriptions.get(1));}
-    }
-    private void htmlButtonselected() {
-        TextRadioButton.setSelected(false);
-        Description.setText(descriptions.get(0));
-    }
-    private void textButtonselected() {
-        HTMLRadioButton.setSelected(false);
-        Description.setText(descriptions.get(1));
-    }
+// Getters
     public ReferenceType getReferenceType() {
         if (HTMLRadioButton.isSelected()) {return ReferenceType.html;}
         else if (TextRadioButton.isSelected()) {return ReferenceType.txt;}
@@ -77,11 +68,32 @@ public class SelectReferenceType extends Stage {
     public boolean getFullScreen() {return FullScreenCheckbox.isSelected();}
     public boolean getResult() {return result;}
 
-    public void accept(ActionEvent actionEvent) {
+// Button Methods
+    private void htmlButtonselected() {
+    TextRadioButton.setSelected(false);
+    Description.setText(descriptions.get(0));
+}
+    private void textButtonselected() {
+        HTMLRadioButton.setSelected(false);
+        Description.setText(descriptions.get(1));
+    }
+    public void accept() {
         if (HTMLRadioButton.isSelected() || TextRadioButton.isSelected()) {result = true;  close();}
         else {
             new InformationDialog(Root.getOptions(), "Cannot Accept", "No Reference Type Selected", null);
             result = false;
         }
+    }
+
+// Utility Methods
+    private void setdescriptiontoselectedtype() {
+    if (HTMLRadioButton.isSelected()) {Description.setText(descriptions.get(0));}
+    else if (TextRadioButton.isSelected()) {Description.setText(descriptions.get(1));}
+}
+
+    @Override
+    public void close() {
+        super.close();
+        if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
     }
 }

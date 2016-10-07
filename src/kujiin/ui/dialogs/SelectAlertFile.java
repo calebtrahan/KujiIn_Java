@@ -1,6 +1,5 @@
 package kujiin.ui.dialogs;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -28,8 +27,9 @@ public class SelectAlertFile extends Stage {
 
     public SelectAlertFile(MainController Root) {
         try {
+            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             this.Root = Root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ChangeAlertDialog.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ChangeAlertDialog.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             Root.setScene(defaultscene);
@@ -38,12 +38,18 @@ public class SelectAlertFile extends Stage {
             AlertFileToggleButton.setSelected(Root.getOptions().getSessionOptions().getAlertfunction());
             String alertfilelocation = Root.getOptions().getSessionOptions().getAlertfilelocation();
             if (alertfilelocation != null) {alertfile = new File(Root.getOptions().getSessionOptions().getAlertfilelocation());}
-            alertfiletoggled(null);
-        } catch (IOException e) {}
+            alertfiletoggled();
+            HelpButton.setOnAction(event -> help());
+            PreviewButton.setOnAction(event -> preview());
+            AcceptButton.setOnAction(event -> accept());
+            CancelButton.setOnAction(event -> cancel());
+            AlertFileToggleButton.setOnAction(event -> alertfiletoggled());
+            openFileButton.setOnAction(event -> openandtestnewfile());
+        } catch (IOException ignored) {}
     }
 
-    // Button Actions
-    public void accept(ActionEvent actionEvent) {
+// Button Actions
+    public void accept() {
         if (AlertFileToggleButton.isSelected() && alertfile == null) {
             new InformationDialog(Root.getOptions(), "No Alert File Selected", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
             return;
@@ -54,21 +60,21 @@ public class SelectAlertFile extends Stage {
         Root.getOptions().marshall();
         close();
     }
-    public void cancel(ActionEvent actionEvent) {
+    public void cancel() {
         close();
     }
-    public void openandtestnewfile(ActionEvent actionEvent) {
+    public void openandtestnewfile() {
         File testfile = Util.filechooser_single(getScene(), "Select A New Alert File", null);
         if (fileisgood(testfile)) {alertfile = testfile;}
-        alertfiletoggled(null);
+        alertfiletoggled();
     }
-    public void preview(ActionEvent actionEvent) {
+    public void preview() {
         if (alertfile != null && alertfile.exists()) {
             PreviewFile previewFile = new PreviewFile(alertfile, Root);
             previewFile.showAndWait();
         }
     }
-    public void alertfiletoggled(ActionEvent actionEvent) {
+    public void alertfiletoggled() {
         if (AlertFileToggleButton.isSelected()) {AlertFileToggleButton.setText("ON");}
         else {AlertFileToggleButton.setText("OFF");}
         PreviewButton.setDisable(! AlertFileToggleButton.isSelected() || alertfile == null);
@@ -98,15 +104,15 @@ public class SelectAlertFile extends Stage {
             String text = String.format("%s (%s)", alertfile.getName(), durationtext);
             alertfileTextField.setText(text);
         } else {
-            if (alertfile != null) {alertfile = null; alertfiletoggled(null);}
+            if (alertfile != null) {alertfile = null; alertfiletoggled();}
             alertfileTextField.setText(kujiin.xml.Options.NO_ALERT_FILE_SELECTED_TEXT);
         }
     }
-    public void help(ActionEvent actionEvent) {
+    public void help() {
         new InformationDialog(Root.getOptions(), "What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to player_transition to the next\npart of the session");
     }
 
-    // Utility Methods
+// Utility Methods
     public boolean fileisgood(File testfile) {
         // Test If Valid Extension
         if (! Util.audio_isValid(testfile)) {
@@ -126,8 +132,7 @@ public class SelectAlertFile extends Stage {
             return false;
         } else {return true;}
     }
-
-//        public void alertfiletoggle() {
+    //        public void alertfiletoggle() {
 //            if (AlertSwitch.isSelected()) {
 //                if (Options.getSessionOptions().getAlertfilelocation() == null) {
 //                    AlertFile = getnewalertfile();
@@ -178,4 +183,10 @@ public class SelectAlertFile extends Stage {
 //            return good;
 //        }
 
+
+    @Override
+    public void close() {
+        super.close();
+        if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
+    }
 }

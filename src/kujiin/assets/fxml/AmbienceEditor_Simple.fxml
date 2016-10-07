@@ -14,11 +14,11 @@
       </TableView>
       <HBox alignment="CENTER_RIGHT" layoutX="267.0" layoutY="327.0" prefHeight="26.0" prefWidth="147.0">
          <children>
-            <Button fx:id="SaveButton" mnemonicParsing="false" onAction="#save" text="Save" />
-            <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#closedialog" text="Close" />
+            <Button fx:id="SaveButton" mnemonicParsing="false" text="Save" />
+            <Button fx:id="CloseButton" mnemonicParsing="false" text="Close" />
          </children>
       </HBox>
-      <Button fx:id="AdvancedButton" layoutX="6.0" layoutY="327.0" mnemonicParsing="false" onAction="#advancedmode" text="Advanced Editor" />
+      <Button fx:id="AdvancedButton" layoutX="6.0" layoutY="327.0" mnemonicParsing="false" text="Advanced Editor" />
       <HBox alignment="CENTER" layoutX="6.0" layoutY="11.0" prefHeight="36.0" prefWidth="408.0">
          <children>
             <Label alignment="CENTER_RIGHT" text="Ambience For:" textAlignment="RIGHT">
@@ -34,9 +34,9 @@
       </HBox>
       <HBox layoutX="6.0" layoutY="297.0" prefHeight="26.0" prefWidth="408.0">
          <children>
-            <Button fx:id="AddButton" mnemonicParsing="false" onAction="#addfiles" text="Add File(s)" />
-            <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#remove" text="Remove" />
-            <Button fx:id="PreviewButton" mnemonicParsing="false" onAction="#preview" text="Preview">
+            <Button fx:id="AddButton" mnemonicParsing="false" text="Add File(s)" />
+            <Button fx:id="RemoveButton" mnemonicParsing="false" text="Remove" />
+            <Button fx:id="PreviewButton" mnemonicParsing="false" text="Preview">
                <HBox.margin>
                   <Insets right="5.0" />
                </HBox.margin>

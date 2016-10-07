@@ -58,8 +58,6 @@ public class SessionPart {
     public Duration elapsedtime;
     protected List<SessionPart> allsessionpartstoplay;
     protected List<kujiin.xml.Goals.Goal> goalscompletedthissession;
-
-// Goal Fields
     protected Goals GoalsController;
     protected List<kujiin.xml.Goals.Goal> Goals;
 
@@ -155,6 +153,7 @@ public class SessionPart {
         return goalscompletedthissession;
     }
     public String getNameForFiles() {return name.toLowerCase();}
+    public String getNameForReference() {return name;}
     public String getNameForChart() {return name;}
     private void setDuration(double newduration) {
         duration = Duration.minutes(newduration);
@@ -175,7 +174,7 @@ public class SessionPart {
         GoalsController = goals;
     }
 
-    // Duration
+// Duration
     public void setRamponly(boolean ramponly) {
     this.ramponly = ramponly;
 }

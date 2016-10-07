@@ -40,8 +40,8 @@
             <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="345.0">
                <children>
                   <CheckBox fx:id="FullScreenCheckbox" mnemonicParsing="false" prefHeight="18.0" prefWidth="209.0" text="Display Full Screen" />
-                  <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#accept" text="Accept" />
-                  <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#close" text="Cancel">
+                  <Button fx:id="AcceptButton" mnemonicParsing="false" text="Accept" />
+                  <Button fx:id="CancelButton" mnemonicParsing="false" text="Cancel">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
