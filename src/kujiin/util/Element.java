@@ -5,8 +5,13 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
+import kujiin.util.enums.StartupCheckType;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
+
+import java.io.File;
+
+import static kujiin.ui.MainController.getallCutNames;
 
 
 public class Element extends SessionPart {
@@ -27,8 +32,34 @@ public class Element extends SessionPart {
 
 // Entrainment
     @Override
-    public int entrainmentpartcount() {
+    public int startup_entrainmentpartcount() {
         return 10;
+    }
+    @Override
+    public SoundFile startup_getnextentrainment() throws IndexOutOfBoundsException {
+        SoundFile soundFile;
+        File file;
+        System.out.println("Startup Checks Count Is Now: " + startupchecks_entrainment_count);
+        switch (startupchecks_entrainment_count) {
+            case 0:
+                soundFile = entrainment.getFreq();
+                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
+                break;
+            default:
+                System.out.println(entrainment.getRampfiles().size());
+                if (entrainment.getRampfiles() != null && startupchecks_entrainment_count > entrainment.getRampfiles().size() - 1) {startupCheckType = StartupCheckType.AMBIENCE;return null;}
+                soundFile = entrainment.ramp_get(startupchecks_entrainment_count);
+                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + getallCutNames().get(startupchecks_entrainment_count - 1).toLowerCase() + ".mp3");
+                break;
+        }
+        if (soundFile == null) {
+            if (file.exists()) {soundFile = new SoundFile(file);}
+            else {
+                System.out.println(file.getAbsolutePath() + " Doesn't Exist");
+                return null;
+            }
+        }
+        return soundFile;
     }
 
 // Creation Methods

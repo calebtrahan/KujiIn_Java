@@ -13,8 +13,10 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.AnswerDialog;
+import kujiin.util.enums.FreqType;
 import kujiin.util.enums.PlayerState;
 import kujiin.util.enums.ReferenceType;
+import kujiin.util.enums.StartupCheckType;
 import kujiin.xml.*;
 
 import java.io.File;
@@ -50,6 +52,7 @@ public class SessionPart {
     protected Animation timeline_progresstonextsessionpart;
     protected Animation timeline_start_ending_ramp;
     protected FreqType freqType;
+    protected StartupCheckType startupCheckType = StartupCheckType.ENTRAINMENT;
     public boolean ramponly;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
@@ -60,6 +63,10 @@ public class SessionPart {
     protected List<kujiin.xml.Goals.Goal> goalscompletedthissession;
     protected Goals GoalsController;
     protected List<kujiin.xml.Goals.Goal> Goals;
+    protected int startupchecks_entrainment_count;
+    protected int startupchecks_ambience_count;
+    protected boolean Ambience_hasAny = true;
+    protected boolean Entrainment_Valid;
 
     public SessionPart() {}
     public SessionPart(int number, String name, MainController Root,  ToggleButton aSwitch, TextField value) {
@@ -93,19 +100,45 @@ public class SessionPart {
 //        setFinalexportfile(new File(Options.DIRECTORYTEMP, name + ".mp3"));
     }
 
-// Entrainment Methods
-    public int entrainmentpartcount() {return 0;}
-    public void entrainmenttest() {
+// Startup Methods
+    public StartupCheckType getStartupCheckType() {
+        return startupCheckType;
+    }
+
+    public SoundFile startup_getNext() throws IndexOutOfBoundsException {
+        if (startupCheckType == StartupCheckType.ENTRAINMENT) {return startup_getnextentrainment();}
+        else {return startup_getnextambience();}
+    }
+    // Entrainment
+    public void startup_setEntrainmentSoundFile(SoundFile soundFile) {entrainment.setFile(soundFile);}
+    public int startup_entrainmentpartcount() {return 0;}
+    public SoundFile startup_getnextentrainment() throws IndexOutOfBoundsException {
+       return null;
+    }
+    public void startup_incremententrainmentcount() {startupchecks_entrainment_count++;}
+    public void startup_entrainmenttest() {
         System.out.println(name + "'s Entrainment:");
         System.out.println(" - Freq: " + entrainment.getFreq().toString());
         for (SoundFile i : entrainment.getRampfiles()) {
             System.out.println(" - Ramp: " + i.toString());
         }
     }
-
-// Ambience Methods
-    public Duration ambience_getTotalActualDuration() {return ambience.gettotalDuration();}
-    public void ambiencetest() {
+    // Ambience
+    public void startup_setAmbienceSoundFile(SoundFile soundFile) {
+        ambience.setoraddsoundfile(soundFile);
+    }
+    public SoundFile startup_getnextambience() throws IndexOutOfBoundsException {
+        if (startupchecks_ambience_count == 0) {
+            ambience.startup_addambiencefromdirectory(this);
+            ambience.startup_checkfordeletedfiles();
+        }
+        if (! ambience.hasAnyAmbience()) {Ambience_hasAny = false; throw new IndexOutOfBoundsException();}
+        SoundFile soundFile = ambience.get(startupchecks_ambience_count);
+        startupchecks_ambience_count++;
+        return soundFile;
+    }
+    public void startup_incrementambiencecount() {startupchecks_ambience_count++;}
+    public void startup_ambiencetest() {
         System.out.println(name + "'s Ambience:");
         if (ambience.hasAnyAmbience()) {
             for (SoundFile i : ambience.getAmbience()) {
@@ -146,6 +179,10 @@ public class SessionPart {
     }
     public int gui_getvalue() {return Integer.parseInt(Value.getText());}
 // Getters And Setters
+    public boolean getAmbience_hasAny() {
+        return Ambience_hasAny;
+    }
+    public Duration getAmbience_TotalActualDuration() {return ambience.gettotalDuration();}
     public List<kujiin.xml.Goals.Goal> getGoals() {
         return Goals;
     }
@@ -228,7 +265,10 @@ public class SessionPart {
         entrainmentplayer.play();
         timeline_progresstonextsessionpart = new Timeline(new KeyFrame(getduration(), ae -> root.getSessionCreator().getPlayer().progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
-        currententrainmentvolume = root.getSessionCreator().getPlayer().getCurrententrainmentvolume();
+        currententrainmentvolume = root.
+                getSessionCreator().
+                getPlayer().
+                getCurrententrainmentvolume();
         boolean isLastSessionPart = allsessionpartstoplay.indexOf(this) == allsessionpartstoplay.size() - 1;
         if (! ramponly && ! isLastSessionPart && root.getOptions().getSessionOptions().getRampenabled()) {
             timeline_start_ending_ramp = new Timeline(new KeyFrame(duration.subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
@@ -1219,7 +1259,4 @@ public class SessionPart {
         }
     }
 
-    enum FreqType {
-        LOW, MEDIUM, HIGH
-    }
 }

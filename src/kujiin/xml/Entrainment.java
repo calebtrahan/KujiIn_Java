@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Entrainment {
@@ -12,6 +13,11 @@ public class Entrainment {
     private List<SoundFile> rampfiles;
 
     public Entrainment() {
+    }
+
+    public void setFile(SoundFile soundFile) {
+        if (! soundFile.getFile().getAbsolutePath().contains("ramp")) {freq = soundFile;}
+        else {ramp_set(soundFile);}
     }
 
     public SoundFile getFreq() {
@@ -31,24 +37,33 @@ public class Entrainment {
     }
 
     // Ramp Methods
-    public int ramp_count() {return rampfiles.size();}
     public void ramp_initialize() {if (rampfiles == null) {rampfiles = new ArrayList<>();}}
     public void ramp_add(SoundFile soundFile) {ramp_initialize(); rampfiles.add(soundFile);}
-    public void ramp_add(int index, SoundFile soundFile) {ramp_initialize(); rampfiles.add(index, soundFile);}
+    public void ramp_set(SoundFile soundFile) {
+        ramp_initialize();
+        int index = rampfiles.stream().map(SoundFile::getFile).collect(Collectors.toCollection(ArrayList::new)).indexOf(soundFile.getFile());
+        if (index == -1) {ramp_add(soundFile);}
+        else {rampfiles.set(index, soundFile);}
+    }
     public SoundFile ramp_get(int index) {
 //        try {
 //            int count = 0;
 //            for (SoundFile i : rampfiles) {System.out.println(count + ": " + i.getFile().getAbsolutePath());}
 //        } catch (NullPointerException ignored) {}
         try {return rampfiles.get(index);}
-        catch (NullPointerException | IndexOutOfBoundsException ignored) {return null;}
+        catch (NullPointerException | IndexOutOfBoundsException ignored) {
+            ramp_initialize();
+            return null;
+        }
     }
 
     @Override
     public String toString() {
-        System.out.println("Freq: " + freq.getName() + " Ramp: " + rampfile.getName());
+        System.out.println("Freq: " + freq.getName());
+        System.out.println("Rampfiles " + Boolean.toString(rampfiles == null));
         return super.toString();
     }
 
     // Other Methods
+
 }

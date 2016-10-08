@@ -5,6 +5,12 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
+import kujiin.util.enums.StartupCheckType;
+import kujiin.xml.SoundFile;
+
+import java.io.File;
+
+import static kujiin.ui.MainController.getallCutNames;
 
 public class Cut extends SessionPart {
     private String FocusPoint;
@@ -45,11 +51,42 @@ public class Cut extends SessionPart {
 
 // Entrainment
     @Override
-    public int entrainmentpartcount() {
+    public int startup_entrainmentpartcount() {
         return 3;
     }
+    @Override
+    public SoundFile startup_getnextentrainment() throws IndexOutOfBoundsException {
+        SoundFile soundFile;
+        File file;
+        switch (startupchecks_entrainment_count) {
+            case 0:
+                soundFile = entrainment.getFreq();
+                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
+                break;
+            case 1:
+                soundFile = entrainment.ramp_get(0);
+                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
+                        getallCutNames().get(getallCutNames().indexOf(name) + 1).toLowerCase() + ".mp3");
+                break;
+            case 2:
+                if (number == 9) {startupCheckType = StartupCheckType.AMBIENCE; throw new IndexOutOfBoundsException();}
+                else {
+                    soundFile = entrainment.ramp_get(1);
+                    file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");
+                    break;
+                }
+            default:
+                startupCheckType = StartupCheckType.AMBIENCE;
+                throw new IndexOutOfBoundsException();
+        }
+        if (soundFile == null) {
+            if (file.exists()) {soundFile = new SoundFile(file);}
+            else {return null;}
+        }
+        return soundFile;
+    }
 
-// Creation
+    // Creation
     @Override
     public boolean creation_buildEntrainment() {
         System.out.println("Building Entrainment For " + name);

@@ -19,7 +19,11 @@ import kujiin.ui.dialogs.*;
 import kujiin.util.*;
 import kujiin.util.enums.ProgramState;
 import kujiin.util.enums.ReferenceType;
-import kujiin.xml.*;
+import kujiin.util.enums.StartupCheckType;
+import kujiin.xml.Ambiences;
+import kujiin.xml.Entrainments;
+import kujiin.xml.Options;
+import kujiin.xml.SoundFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -417,244 +421,95 @@ public class MainController implements Initializable {
     }
     class StartupChecks extends Task {
         private SessionPart selectedsessionpart;
-        private Entrainment selectedentrainment;
-        private Ambience selectedambience;
         private List<SessionPart> sessionPartList;
-        private final int[] startupcheck_count = {0, 0, 0};
+        private int sessionpartcount = 0;
         private MediaPlayer startupcheckplayer;
         private ArrayList<SessionPart> partswithnoambience = new ArrayList<>();
         private ArrayList<SessionPart> partswithmissingentrainment = new ArrayList<>();
         private boolean firstcall = true;
         private final double[] workcount = {0, 0};
+        private boolean progresstonextsessionpart = true;
 
         public StartupChecks(List<SessionPart> allsessionparts) {
             sessionPartList = allsessionparts;
         }
 
-        // Getters And Setters
+    // Getters And Setters
         public ArrayList<SessionPart> getPartswithnoambience() {
             return partswithnoambience;
         }
-
         public ArrayList<SessionPart> getPartswithmissingentrainment() {
             return partswithmissingentrainment;
         }
 
-        // Method Overrides
+    // Method Overrides
         @Override
         protected Object call() throws Exception {
-            if (firstcall) {
-                populateambiencefromfiles();
-                calculatetotalworktodo();
-                firstcall = false;
-            }
-            if (selectedsessionpart == null) {
-                selectedsessionpart = getnextsessionpart();
-            }
-            File file = null;
-            SoundFile soundFile = null;
-            try {
-                file = getnextentrainmentfile();
-//                System.out.println(selectedsessionpart.name + "'s Next Entrainment File Is: " + file.getAbsolutePath());
-                soundFile = getnextentraimentsoundfile();
-                if (soundFile == null) {soundFile = new SoundFile(file);}
-            } catch (IndexOutOfBoundsException ignored) {
+            if (firstcall) {calculatetotalworktodo(); firstcall = false;}
+            if (progresstonextsessionpart) {
                 try {
-                    if (selectedsessionpart.getAmbience().hasAnyAmbience()) {
-                        if (startupcheck_count[1] == 0) {
-                            selectedambience.startup_addambiencefromdirectory(selectedsessionpart);
-                            selectedambience.startup_checkfordeletedfiles();
-                        }
-                        soundFile = getnextambiencesoundfile();
-                        file = soundFile.getFile();
-                    } else {
-                        partswithnoambience.add(selectedsessionpart);
-                        throw new IndexOutOfBoundsException();
+                    if (selectedsessionpart == null) {
+                        selectedsessionpart = sessionPartList.get(sessionpartcount);
+                        System.out.println("Session Part Is Now: " + selectedsessionpart.name);
                     }
-                } catch (IndexOutOfBoundsException ignore) {
-                    try {
-                        selectedsessionpart.setEntrainment(selectedentrainment);
-                        selectedsessionpart.setAmbience(selectedambience);
-                        selectedsessionpart = getnextsessionpart();
-                        startupcheck_count[0] = 0;
-                        startupcheck_count[1] = 0;
-                        call();
-                    } catch (IndexOutOfBoundsException e) {
-                        getEntrainments().marshall();
-                        getAmbiences().marshall();
-                        startupchecks_finished();
-                        return null;
-                    }
+                } catch (IndexOutOfBoundsException e) {
+                    // End Of Startup Checks
+                    getEntrainments().marshall();
+                    getAmbiences().marshall();
+                    startupchecks_finished();
+                    return null;
                 }
             }
-            if (file != null) {
-                if (file.exists()) {
-                    if (soundFile == null) {
-                        soundFile = new SoundFile(file);
-                    }
-                    if (!soundFile.isValid()) {
-                        startupcheckplayer = new MediaPlayer(new Media(file.toURI().toString()));
-                        SoundFile finalSoundFile = soundFile;
-                        startupcheckplayer.setOnReady(() -> {
-                            if (startupcheckplayer.getTotalDuration().greaterThan(Duration.ZERO)) {
-                                finalSoundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
-                                startupcheckplayer.dispose();
-                                startupcheckplayer = null;
-                                if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
-                                    if (startupcheck_count[0] == 0) {
-                                        selectedentrainment.setFreq(finalSoundFile);
-                                    } else {
-                                        selectedentrainment.ramp_add(finalSoundFile);
-                                    }
-                                    startupcheck_count[0]++;
-                                } else {
-                                    selectedambience.setoraddsoundfile(finalSoundFile);
-                                    startupcheck_count[1]++;
-                                }
-                                workcount[0]++;
-                                updateProgress(workcount[0], workcount[1]);
-                                updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
-                                try {
-                                    call();
-                                } catch (Exception ignored) {
-                                    ignored.printStackTrace();
-                                }
-                            } else {
-                                startupcheckplayer.dispose();
-                                startupcheckplayer = null;
-                                try {
-                                    call();
-                                } catch (Exception ignored) {
-                                    ignored.printStackTrace();
-                                }
-                            }
-                        });
-                    } else {
-                        if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
-                            if (startupcheck_count[0] == 0) {
-                                selectedentrainment.setFreq(soundFile);
-                            } else {
-                                selectedentrainment.ramp_add(soundFile);
-                            }
-                            startupcheck_count[0]++;
-                        } else {
-                            selectedambience.setoraddsoundfile(soundFile);
-                            startupcheck_count[1]++;
+            SoundFile soundFile;
+            try {soundFile = selectedsessionpart.startup_getNext();}
+            catch (IndexOutOfBoundsException ignored) {
+                System.out.println("Caught Index Out Of Bounds Exception");
+                if (! selectedsessionpart.getAmbience_hasAny() && ! partswithnoambience.contains(selectedsessionpart)) {partswithnoambience.add(selectedsessionpart);}
+                sessionpartcount++;
+                selectedsessionpart = null;
+                try {call();} catch (Exception ign) {ignored.printStackTrace();}
+                return null;
+            }
+            if (! soundFile.isValid()) {
+                startupcheckplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
+                SoundFile finalSoundFile = soundFile;
+                startupcheckplayer.setOnReady(() -> {
+                    if (startupcheckplayer.getTotalDuration().greaterThan(Duration.ZERO)) {
+                        finalSoundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
+                        startupcheckplayer.dispose();
+                        startupcheckplayer = null;
+                        if (selectedsessionpart.getStartupCheckType() == StartupCheckType.ENTRAINMENT) {
+                            selectedsessionpart.startup_setEntrainmentSoundFile(finalSoundFile);
+                            selectedsessionpart.startup_incremententrainmentcount();
+                        } else if (selectedsessionpart.getStartupCheckType() == StartupCheckType.AMBIENCE) {
+                            selectedsessionpart.startup_setAmbienceSoundFile(finalSoundFile);
+                            selectedsessionpart.startup_incrementambiencecount();
                         }
                         workcount[0]++;
                         updateProgress(workcount[0], workcount[1]);
                         updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
-                        try {
-                            call();
-                        } catch (Exception ignored) {
-                            ignored.printStackTrace();
-                        }
-                    }
-                } else {
-                    if (startupcheck_count[0] < selectedsessionpart.entrainmentpartcount()) {
-                        if (!partswithmissingentrainment.contains(selectedsessionpart)) {
-                            partswithmissingentrainment.add(selectedsessionpart);
-                        }
-                        startupcheck_count[0]++;
+                        progresstonextsessionpart = true;
+                        try {call();} catch (Exception ignored) {ignored.printStackTrace();}
                     } else {
-                        startupcheck_count[1]++;
+                        progresstonextsessionpart = false;
+                        startupcheckplayer.dispose();
+                        startupcheckplayer = null;
+                        try {call();} catch (Exception ignored) {ignored.printStackTrace();}
                     }
-                    workcount[0]++;
-                    updateProgress(workcount[0], workcount[1]);
-                    updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
-                    try {
-                        call();
-                    } catch (Exception ignored) {
-                    }
-                }
-            } else {
-                try {
-                    call();
-                } catch (Exception ignored) {
-                    ignored.printStackTrace();
-                }
-            }
+                });
+            } else {progresstonextsessionpart = true; try {call();} catch (Exception ignored) {ignored.printStackTrace();}}
             return null;
         }
 
-
-
-        // Generators
         protected void calculatetotalworktodo() {
             for (SessionPart i : sessionPartList) {
-                workcount[1] += i.entrainmentpartcount();
+                workcount[1] += i.startup_entrainmentpartcount();
                 if (i.getAmbience().hasAnyAmbience()) {
                     workcount[1] += i.getAmbience().getAmbience().size();
                 }
             }
         }
-        protected void populateambiencefromfiles() {
-            for (SessionPart sessionPart : sessionPartList) {
-                sessionPart.getAmbience().startup_addambiencefromdirectory(sessionPart);
-                sessionPart.getAmbience().startup_checkfordeletedfiles();
-            }
-        }
-        protected SoundFile getnextentraimentsoundfile() throws IndexOutOfBoundsException {
-            if (selectedsessionpart instanceof Qi_Gong || selectedsessionpart instanceof Element) {
-                try {
-                    if (startupcheck_count[0] == 0) {
-                        return selectedsessionpart.getEntrainment().getFreq();
-                    } else {
-                        return selectedsessionpart.getEntrainment().ramp_get(startupcheck_count[0]);
-                    }
-                } catch (Exception i) {
-                    i.printStackTrace();
-                    return null;
-                }
-            } else {
-                switch (startupcheck_count[0]) {
-                    case 0:
-                        return selectedsessionpart.getEntrainment().getFreq();
-                    case 1:
-                        return selectedsessionpart.getEntrainment().ramp_get(0);
-                    case 2:
-                        return selectedsessionpart.getEntrainment().ramp_get(1);
-                    default:
-                        throw new IndexOutOfBoundsException();
-                }
-            }
-        }
-        protected File getnextentrainmentfile() throws IndexOutOfBoundsException {
-            if (selectedsessionpart instanceof Qi_Gong || selectedsessionpart instanceof Element) {
-                if (startupcheck_count[0] == 0) {
-                    return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, selectedsessionpart.getNameForFiles().toUpperCase() + ".mp3");
-                } else {
-                    return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + selectedsessionpart.getNameForFiles() + "to" + getallCutNames().get(startupcheck_count[0] - 1).toLowerCase() + ".mp3");
-                }
-            } else {
-                switch (startupcheck_count[0]) {
-                    case 0:
-                        return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, selectedsessionpart.getNameForFiles().toUpperCase() + ".mp3");
-                    case 1:
-                        return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + selectedsessionpart.getNameForFiles() + "to" +
-                                getallCutNames().get(getallCutNames().indexOf(selectedsessionpart.name) + 1).toLowerCase() + ".mp3");
-                    case 2:
-                        return new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + selectedsessionpart.getNameForFiles() + "toqi.mp3");
-                    default:
-                        throw new IndexOutOfBoundsException();
-                }
-            }
-        }
-        protected SoundFile getnextambiencesoundfile() throws IndexOutOfBoundsException {
-            return selectedsessionpart.getAmbience().get(startupcheck_count[1]);
-        }
-        protected SessionPart getnextsessionpart() throws IndexOutOfBoundsException {
-            SessionPart sessionpart;
-            if (selectedsessionpart == null) {
-                sessionpart = sessionPartList.get(0);
-            } else {
-                startupcheck_count[2] = sessionPartList.indexOf(selectedsessionpart) + 1;
-                sessionpart = sessionPartList.get(startupcheck_count[2]);
-            }
-            selectedentrainment = sessionpart.getEntrainment();
-            selectedambience = sessionpart.getAmbience();
-            return sessionpart;
-        }
+
     }
 
 // Subclasses

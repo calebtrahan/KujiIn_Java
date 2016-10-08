@@ -6,10 +6,13 @@ import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.util.enums.ReferenceType;
+import kujiin.util.enums.StartupCheckType;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
 import java.io.File;
+
+import static kujiin.ui.MainController.getallCutNames;
 
 public class Qi_Gong extends SessionPart {
     private String Summary;
@@ -43,11 +46,38 @@ public class Qi_Gong extends SessionPart {
 
 // Entrainment
     @Override
-    public int entrainmentpartcount() {
+    public int startup_entrainmentpartcount() {
         return 10;
     }
+    @Override
+    public SoundFile startup_getnextentrainment() throws IndexOutOfBoundsException {
+        SoundFile soundFile;
+        File file;
+        switch (startupchecks_entrainment_count) {
+            case 0:
+                soundFile = entrainment.getFreq();
+                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
+                break;
+            default:
+                if (startupchecks_entrainment_count > startup_entrainmentpartcount()) {
+                    startupCheckType = StartupCheckType.AMBIENCE;
+                    System.out.println("Switched To Ambience At " + startupchecks_entrainment_count);
+                    throw new IndexOutOfBoundsException();
+                }
+                soundFile = entrainment.ramp_get(startupchecks_entrainment_count);
+                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + getallCutNames().get(startupchecks_entrainment_count - 1).toLowerCase() + ".mp3");
+                break;
+        }
+        if (soundFile == null) {
+            System.out.println("File Exists: " + Boolean.toString(file.exists()));
+            if (file.exists()) {
+                soundFile = new SoundFile(file);}
+            else {}
+        }
+        return soundFile;
+    }
 
-// Creation Methods
+    // Creation Methods
     @Override
     public boolean creation_buildEntrainment() {
         if (root.getOptions().getSessionOptions().getRampenabled()) {

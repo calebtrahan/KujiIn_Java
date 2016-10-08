@@ -256,9 +256,10 @@ public class SessionCreator implements UI {
 
 // Playback
     public void playsession() {
-        if (creationprechecks() && create()) {
+        if (creationprechecks() && create() && (Player == null || ! Player.isShowing())) {
             setDisable(true, "Creator Disabled During Session Playback");
-            new Player().showAndWait();
+            Player = new Player();
+            Player.showAndWait();
             setDisable(false, "");
         }
     }
