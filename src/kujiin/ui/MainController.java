@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 // TODO Bugs To Fix
     // TODO Entrainment Always Calculates Duration Instead Of Just Using Previously Calculated XML Values
     // TODO Ambience Shuffle Algorithm Doesn't Add Last Actual Ambience File
+    // TODO Session Playback Overview Set Dynamic Text Colors (It's All Fucked Up)
+
     // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
     // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified
     // TODO Closing Reference Display With 'ESC' Is Crashing The Whole App
@@ -260,7 +262,7 @@ public class MainController implements Initializable {
         return getAllSessionParts(false).stream().filter(i -> i instanceof Cut).map(i -> (Cut) i).collect(Collectors.toCollection(ArrayList::new));
     }
     public static List<String> getallCutNames() {
-        return getAllSessionPartsNames(false).subList(1, 9);
+        return getAllSessionPartsNames(false).subList(1, 10);
     }
     public ArrayList<Element> getAllElements() {
         return getAllSessionParts(false).stream().filter(i -> i instanceof Element).map(i -> (Element) i).collect(Collectors.toCollection(ArrayList::new));
@@ -461,7 +463,12 @@ public class MainController implements Initializable {
                 }
             }
             SoundFile soundFile;
-            try {soundFile = selectedsessionpart.startup_getNext();}
+            try {
+                soundFile = selectedsessionpart.startup_getNext();
+                if (soundFile != null) {
+                    System.out.println("Returned " + soundFile.getFile().getAbsolutePath());
+                } else {System.out.println("Returned Null");}
+            }
             catch (IndexOutOfBoundsException ignored) {
                 System.out.println("Caught Index Out Of Bounds Exception");
                 if (! selectedsessionpart.getAmbience_hasAny() && ! partswithnoambience.contains(selectedsessionpart)) {partswithnoambience.add(selectedsessionpart);}

@@ -69,7 +69,6 @@ public class Qi_Gong extends SessionPart {
                 break;
         }
         if (soundFile == null) {
-            System.out.println("File Exists: " + Boolean.toString(file.exists()));
             if (file.exists()) {
                 soundFile = new SoundFile(file);}
             else {}

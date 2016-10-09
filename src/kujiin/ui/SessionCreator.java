@@ -412,6 +412,8 @@ public class SessionCreator implements UI {
                                 super.updateItem(item, empty);
                                 if (! isEmpty()) {
                                     if (item.equals("No Duration Set")) {setTextFill(Color.RED);}
+                                    else if (item.equals("Ramp Only")) {setTextFill(Color.YELLOW);}
+                                    else {setTextFill(Color.BLACK);}
                                     setText(item);
                                 }
                             }

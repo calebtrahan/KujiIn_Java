@@ -6,6 +6,7 @@ import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.util.enums.StartupCheckType;
+import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
 import java.io.File;
@@ -65,8 +66,10 @@ public class Cut extends SessionPart {
                 break;
             case 1:
                 soundFile = entrainment.ramp_get(0);
-                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
-                        getallCutNames().get(getallCutNames().indexOf(name) + 1).toLowerCase() + ".mp3");
+                if (number != 9) {
+                    file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
+                            getallCutNames().get(getallCutNames().indexOf(name) + 1).toLowerCase() + ".mp3");
+                } else {file = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");}
                 break;
             case 2:
                 if (number == 9) {startupCheckType = StartupCheckType.AMBIENCE; throw new IndexOutOfBoundsException();}
