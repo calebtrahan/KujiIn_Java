@@ -4,46 +4,63 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0" prefWidth="455.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TableView fx:id="AmbienceTable" layoutX="6.0" layoutY="47.0" prefHeight="248.0" prefWidth="408.0">
-        <columns>
-          <TableColumn fx:id="NameColumn" prefWidth="253.0" text="Name" />
-          <TableColumn fx:id="DurationColumn" prefWidth="152.0" text="Duration" />
-        </columns>
-      </TableView>
-      <HBox alignment="CENTER_RIGHT" layoutX="267.0" layoutY="327.0" prefHeight="26.0" prefWidth="147.0">
+      <VBox alignment="CENTER" layoutX="6.0" layoutY="11.0" prefHeight="360.0" prefWidth="424.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Button fx:id="SaveButton" mnemonicParsing="false" text="Save" />
-            <Button fx:id="CloseButton" mnemonicParsing="false" text="Close" />
+            <HBox alignment="CENTER" prefHeight="36.0" prefWidth="408.0">
+               <children>
+                  <Label alignment="CENTER_RIGHT" text="Ambience For:" textAlignment="RIGHT">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="SessionPartChoiceBox" prefHeight="29.0" prefWidth="122.0" />
+               </children>
+            </HBox>
+            <TableView fx:id="AmbienceTable" prefHeight="248.0" prefWidth="408.0" VBox.vgrow="ALWAYS">
+              <columns>
+                <TableColumn fx:id="NameColumn" prefWidth="292.0" text="Name" />
+                <TableColumn fx:id="DurationColumn" prefWidth="142.0" text="Duration" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+            <HBox prefHeight="26.0" prefWidth="408.0">
+               <children>
+                  <Button fx:id="AddButton" mnemonicParsing="false" text="Add File(s)" />
+                  <Button fx:id="RemoveButton" mnemonicParsing="false" text="Remove" />
+                  <Button fx:id="PreviewButton" mnemonicParsing="false" text="Preview">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="207.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <TextField fx:id="TotalDuration" alignment="CENTER" prefHeight="26.0" prefWidth="173.0" />
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="26.0" prefWidth="147.0">
+               <children>
+                  <HBox prefHeight="29.0" prefWidth="325.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button fx:id="AdvancedButton" mnemonicParsing="false" text="Advanced Editor" />
+                     </children>
+                  </HBox>
+                  <Button fx:id="SaveButton" mnemonicParsing="false" text="Save" />
+                  <Button fx:id="CloseButton" mnemonicParsing="false" text="Close" />
+               </children>
+            </HBox>
          </children>
-      </HBox>
-      <Button fx:id="AdvancedButton" layoutX="6.0" layoutY="327.0" mnemonicParsing="false" text="Advanced Editor" />
-      <HBox alignment="CENTER" layoutX="6.0" layoutY="11.0" prefHeight="36.0" prefWidth="408.0">
-         <children>
-            <Label alignment="CENTER_RIGHT" text="Ambience For:" textAlignment="RIGHT">
-               <HBox.margin>
-                  <Insets right="5.0" />
-               </HBox.margin>
-               <font>
-                  <Font name="System Bold" size="15.0" />
-               </font>
-            </Label>
-            <ChoiceBox fx:id="SessionPartChoiceBox" prefHeight="26.0" prefWidth="147.0" />
-         </children>
-      </HBox>
-      <HBox layoutX="6.0" layoutY="297.0" prefHeight="26.0" prefWidth="408.0">
-         <children>
-            <Button fx:id="AddButton" mnemonicParsing="false" text="Add File(s)" />
-            <Button fx:id="RemoveButton" mnemonicParsing="false" text="Remove" />
-            <Button fx:id="PreviewButton" mnemonicParsing="false" text="Preview">
-               <HBox.margin>
-                  <Insets right="5.0" />
-               </HBox.margin>
-            </Button>
-            <TextField fx:id="TotalDuration" alignment="CENTER" prefHeight="26.0" prefWidth="173.0" />
-         </children>
-      </HBox>
-      <HBox layoutX="69.0" layoutY="271.0" prefHeight="26.0" prefWidth="120.0" />
+         <padding>
+            <Insets left="10.0" right="10.0" />
+         </padding>
+      </VBox>
    </children>
 </AnchorPane>

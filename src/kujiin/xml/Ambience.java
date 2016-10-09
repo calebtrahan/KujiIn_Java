@@ -120,6 +120,7 @@ public class Ambience {
     }
 
 // Custom Ambience
+    public boolean hasCustomAmbience() {return CustomAmbience != null && ! CustomAmbience.isEmpty();}
     public void setCustomAmbience(List<SoundFile> customAmbience) {CustomAmbience = customAmbience;}
     public List<SoundFile> getCustomAmbience() {return CustomAmbience;}
 

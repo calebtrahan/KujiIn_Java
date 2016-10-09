@@ -26,7 +26,7 @@ public class Cut extends SessionPart {
         }
     }
 
-// Description Methods
+// Description
     public void setFocusPoint(String focusPoint) {
         FocusPoint = focusPoint;
     }
@@ -40,6 +40,7 @@ public class Cut extends SessionPart {
         Side_Effects = side_Effects;
     }
 
+// Getters And Setters
     @Override
     public Tooltip getTooltip() {
         StringBuilder a = new StringBuilder();
@@ -89,10 +90,9 @@ public class Cut extends SessionPart {
         return soundFile;
     }
 
-    // Creation
+// Creation
     @Override
     public boolean creation_buildEntrainment() {
-        System.out.println("Building Entrainment For " + name);
         if (root.getOptions().getSessionOptions().getRampenabled()) {
             try {
                 int index = allsessionpartstoplay.indexOf(this);
@@ -100,7 +100,6 @@ public class Cut extends SessionPart {
                 if ((partafter instanceof Qi_Gong || partafter instanceof Element) && ! name.equals("ZEN")) {entrainment.setRampfile(entrainment.ramp_get(1));}
                 else {entrainment.setRampfile(entrainment.ramp_get(0));}
                 if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
-                System.out.println(name + "'s Entrainment: " + entrainment.toString());
                 return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
             } catch (IndexOutOfBoundsException ignored) {return false;}
         }

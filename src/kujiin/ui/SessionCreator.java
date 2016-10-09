@@ -8,7 +8,6 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -46,6 +45,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static kujiin.util.enums.AmbiencePlaybackType.CUSTOM;
+import static kujiin.util.enums.AmbiencePlaybackType.SHUFFLE;
 import static kujiin.util.enums.PlayerState.IDLE;
 import static kujiin.util.enums.PlayerState.TRANSITIONING;
 
@@ -68,10 +69,10 @@ public class SessionCreator implements UI {
     private Player Player;
     private ProgressTracker progressTracker;
     private PlayerState playerState = IDLE;
-    private CreatorState creatorState = CreatorState.NOT_CREATED;
-    private ExporterState exporterState;
     private SessionPlaybackOverview sessionPlaybackOverview;
     private DisplayReference displayReference;
+    private CreatorState creatorState = CreatorState.NOT_CREATED;
+    private ExporterState exporterState;
     private ReferenceType referenceType;
     private AmbiencePlaybackType ambiencePlaybackType;
     private List<SessionPart> itemsinsession;
@@ -365,6 +366,7 @@ public class SessionCreator implements UI {
         public boolean getincludepostsession() {return PostsessionCheckBox.isSelected();}
     }
     public class SessionPlaybackOverview extends Stage {
+        // TODO If has No Ambience -> Change Set Ambience Button To "Add Ambience"
         public TableView<SessionItem> SessionItemsTable;
         public TableColumn<SessionItem, Integer> NumberColumn;
         public TableColumn<SessionItem, String> NameColumn;
@@ -411,9 +413,17 @@ public class SessionCreator implements UI {
                             protected void updateItem(String item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (! isEmpty()) {
-                                    if (item.equals("No Duration Set")) {setTextFill(Color.RED);}
-                                    else if (item.equals("Ramp Only")) {setTextFill(Color.YELLOW);}
-                                    else {setTextFill(Color.BLACK);}
+                                    switch (item) {
+                                        case "No Duration Set":
+                                            getTableRow().setStyle("-fx-background-color:lightcoral");
+                                            break;
+                                        case "Ramp Only":
+                                            setTextFill(Color.YELLOW);
+                                            break;
+                                        default:
+                                            setTextFill(Color.DEEPPINK);
+                                            break;
+                                    }
                                     setText(item);
                                 }
                             }
@@ -430,8 +440,8 @@ public class SessionCreator implements UI {
                                 super.updateItem(item, empty);
                                 if (! isEmpty()) {
                                     if (item.equals("Ambience Not Set") || item.equals("Has No Ambience")) {
-                                        System.out.println("Should Be Red");
-                                        setTextFill(Color.RED);}
+                                        setTextFill(Color.RED);
+                                    }
                                     setText(item);
 
                                 }
@@ -471,15 +481,14 @@ public class SessionCreator implements UI {
             } catch (IOException ignored) {}
         }
 
-        // Table Methods
+    // Table
         public void itemselected() {
             int index = SessionItemsTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {selectedsessionpart = alladjustedsessionitems.get(index);}
             syncbuttons();
         }
         public void populatetable() {
-            SessionItemsTable.getItems().clear();
-            tableitems.clear();
+            SessionItemsTable.getItems().removeAll(tableitems);
             if (alladjustedsessionitems == null) {alladjustedsessionitems = new ArrayList<>();}
             int count = 1;
             List<SessionPart> newsessionitems = new ArrayList<>();
@@ -503,12 +512,21 @@ public class SessionCreator implements UI {
             AdjustDurationButton.setDisable(selectedsessionpart == null);
             if (selectedsessionpart != null) {
                 SetGoalButton.setDisable(selectedsessionpart.goals_ui_hascurrentgoal());
-                SetAmbienceButton.setDisable(ambiencePlaybackType == null || ambiencePlaybackType != AmbiencePlaybackType.CUSTOM);
+                SetAmbienceButton.setDisable(! AmbienceSwitch.isSelected() && ambiencePlaybackType == null);
+                if (isAmbienceenabled()) {
+                    if (ambiencePlaybackType == CUSTOM) {
+                        if (! selectedsessionpart.getAmbience().hasCustomAmbience()) {SetAmbienceButton.setDisable(false); SetAmbienceButton.setText("Set Ambience");}
+                        else {SetAmbienceButton.setDisable(false); SetAmbienceButton.setText("Edit Ambience");}
+                    } else {
+                        if (! selectedsessionpart.getAmbience_hasAny()) {SetAmbienceButton.setDisable(false); SetAmbienceButton.setText("Add Ambience");}
+                        else {SetAmbienceButton.setDisable(true); SetAmbienceButton.setText("");}
+                    }
+                }
             }
         }
 
-        // Order/Sort Session Parts
-        public void moveitemup(ActionEvent actionEvent) {
+    // Order/Sort Session Parts
+        public void moveitemup() {
             int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
             if (selectedindex == -1) {return;}
             if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
@@ -531,7 +549,7 @@ public class SessionCreator implements UI {
             Collections.swap(alladjustedsessionitems, selectedindex, selectedindex - 1);
             populatetable();
         }
-        public void moveitemdown(ActionEvent actionEvent) {
+        public void moveitemdown() {
             int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
             if (selectedindex == -1) {return;}
             if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
@@ -555,7 +573,7 @@ public class SessionCreator implements UI {
             populatetable();
         }
 
-        // Session Parts Missing / Out Of Order
+    // Session Parts Missing / Out Of Order
         public List<Cut> getwellformedcuts() {
             List<Cut> wellformedcuts = new ArrayList<>();
             for (int i=0; i<getlastworkingcutindex(); i++) {
@@ -571,8 +589,8 @@ public class SessionCreator implements UI {
             return lastcutindex;
         }
 
-        //  Duration Methods
-        public void adjustduration(ActionEvent actionEvent) {
+    //  Duration
+        public void adjustduration() {
             if (selectedsessionpart != null) {
                 SessionPlaybackOverview_ChangeDuration changedurationdialog = new SessionPlaybackOverview_ChangeDuration(selectedsessionpart);
                 changedurationdialog.showAndWait();
@@ -601,68 +619,14 @@ public class SessionCreator implements UI {
             CompletionTime.setText(sdf.format(cal.getTime()));
         }
 
-        // Dialog Methods
-        public boolean getResult() {
-            return result;
-        }
-        public void playsession(ActionEvent actionEvent) {
-            List<Integer> indexesmissingduration = new ArrayList<>();
-            List<Integer>  indexesmissinggoals = new ArrayList<>();
-            for (SessionPart i : alladjustedsessionitems) {
-                if (i.getduration() == Duration.ZERO && ! i.ramponly) {indexesmissingduration.add(alladjustedsessionitems.indexOf(i));}
-                if (! i.goals_ui_hascurrentgoal()) {indexesmissinggoals.add(alladjustedsessionitems.indexOf(i));}
-            }
-            // Add Ramp Option For Missing Durations
-            if (! indexesmissingduration.isEmpty()) {
-                if (new ConfirmationDialog(options, "Confirmation", indexesmissingduration.size() + " Session Parts Are Missing Durations", "Set Ramp Only For The Parts Missing Durations",
-                        "Set Ramp Only", "Cancel Playback").getResult()) {
-                    for (int x : indexesmissingduration) {alladjustedsessionitems.get(x).setRamponly(true);}
-                } else {return;}
-            }
-            // Check Goals
-            if (! indexesmissinggoals.isEmpty()) {
-                if (! new ConfirmationDialog(options, "Confirmation", indexesmissinggoals.size() + " Session Parts Are Missing Goals", "Continue Playing Session Without Goals?",
-                        "Yes", "No").getResult()) {return;}
-            }
-            // Check Alert File Needed/Not Needed
-            boolean longsession = false;
-            for (SessionPart i : alladjustedsessionitems) {
-                if (i.getduration().greaterThanOrEqualTo(Duration.minutes(kujiin.xml.Options.DEFAULT_LONG_SESSIONPART_DURATION))) {
-                    longsession = true;
-                    break;
-                }
-            }
-            if (longsession && ! Root.getOptions().getSessionOptions().getAlertfunction()) {
-                switch (new AnswerDialog(options, "Add Alert File", null, "I've Detected A Long Session. Add Alert File In Between Session Parts?",
-                        "Add Alert File", "Continue Without Alert File", "Cancel Playback").getResult()) {
-                    case YES: new SelectAlertFile(Root).showAndWait(); break;
-                    case CANCEL: return;
-                }
-            } else if (Root.getOptions().getSessionOptions().getAlertfunction()) {
-                switch (new AnswerDialog(options, "Disable Alert File", null, "I've Detected A Relatively Short Session With Alert File Enabled",
-                        "Disable Alert File", "Leave Alert File Enabled", "Cancel Playback").getResult()) {
-                    case YES: Root.getOptions().getSessionOptions().setAlertfunction(false); break;
-                    case CANCEL: return;
-                }
-            }
-            // Accepted
-            result = true;
-            itemsinsession = alladjustedsessionitems;
-            close();
-        }
-        public void cancel(ActionEvent actionEvent) {
-            alladjustedsessionitems = null;
-            close();
-        }
-
-        // Goal Methods
-        public void setgoal(ActionEvent actionEvent) {
+    // Goal
+        public void setgoal() {
             if (selectedsessionpart != null) {Root.getProgressTracker().setnewgoal(selectedsessionpart);}
             populatetable();
         }
 
-        // Ambience Methods
-        public void ambienceswitchtoggled(ActionEvent actionEvent) {
+    // Ambience
+        public void ambienceswitchtoggled() {
             checkambience();
             ambienceenabled = AmbienceSwitch.isSelected();
             AmbienceTypeComboBox.setDisable(! AmbienceSwitch.isSelected());
@@ -671,12 +635,13 @@ public class SessionCreator implements UI {
         public String getambiencetext(SessionPart sessionPart) {
             if (! isAmbienceenabled()) {return "Disabled";}
             else {
-                if (! sessionPart.getAmbience().hasAnyAmbience()) {return "Has No Ambience";}
                 switch (ambiencePlaybackType) {
                     case REPEAT:
-                        return "Will Repeat";
+                        if (! sessionPart.getAmbience().hasAnyAmbience()) {return "Has No Ambience";}
+                        else {return "Will Repeat";}
                     case SHUFFLE:
-                        return "Will Shuffle";
+                        if (! sessionPart.getAmbience().hasAnyAmbience()) {return "Has No Ambience";}
+                        else {return "Will Shuffle";}
                     case CUSTOM:
                         if (sessionPart.getAmbience().getCustomAmbience() == null || ! sessionPart.getAmbience().getCustomAmbience().isEmpty()) {return "Ambience Not Set";}
                         else {return "Custom Ambience Set";}
@@ -685,21 +650,32 @@ public class SessionCreator implements UI {
                 }
             }
         }
-        public void ambiencetypechanged(ActionEvent actionEvent) {
+        public void ambiencetypechanged() {
             int index = AmbienceTypeComboBox.getSelectionModel().getSelectedIndex();
             switch (index) {
                 case 0: ambiencePlaybackType = AmbiencePlaybackType.REPEAT; break;
-                case 1: ambiencePlaybackType = AmbiencePlaybackType.SHUFFLE; break;
+                case 1: ambiencePlaybackType = SHUFFLE; break;
                 case 2: ambiencePlaybackType = AmbiencePlaybackType.CUSTOM; break;
             }
             populatetable();
         }
-        public void setambience(ActionEvent actionEvent) {
-            SessionPlaybackOverview_AddCustomAmbience addCustomAmbience = new SessionPlaybackOverview_AddCustomAmbience(selectedsessionpart);
-            addCustomAmbience.showAndWait();
-            if (addCustomAmbience.getResult()) {
-                List<SoundFile> customambiencelist = addCustomAmbience.getCustomAmbienceList();
-                selectedsessionpart.getAmbience().setCustomAmbience(customambiencelist);
+        public void setoraddambience() {
+            switch (SetAmbienceButton.getText()) {
+                case "Set Ambience":
+                case "Edit Ambience":
+                    SessionPlaybackOverview_AddCustomAmbience addCustomAmbience = new SessionPlaybackOverview_AddCustomAmbience(selectedsessionpart);
+                    addCustomAmbience.showAndWait();
+                    if (addCustomAmbience.getResult()) {
+                        List<SoundFile> customambiencelist = addCustomAmbience.getCustomAmbienceList();
+                        selectedsessionpart.getAmbience().setCustomAmbience(customambiencelist);
+                    }
+                    break;
+                case "Add Ambience":
+                    new AmbienceEditor_Simple(Root, selectedsessionpart).showAndWait();
+                    populatetable();
+                    break;
+                default:
+                    break;
             }
         }
         public void checkambience() {
@@ -741,6 +717,79 @@ public class SessionCreator implements UI {
             }
         }
 
+    // Dialog
+        public boolean getResult() {
+            return result;
+        }
+        public void playsession() {
+            List<Integer> indexesmissingduration = new ArrayList<>();
+            List<Integer>  indexesmissinggoals = new ArrayList<>();
+            for (SessionPart i : alladjustedsessionitems) {
+                if (i.getduration() == Duration.ZERO && ! i.ramponly) {indexesmissingduration.add(alladjustedsessionitems.indexOf(i));}
+                if (! i.goals_ui_hascurrentgoal()) {indexesmissinggoals.add(alladjustedsessionitems.indexOf(i));}
+            }
+            // Add Ramp Option For Missing Durations
+            if (! indexesmissingduration.isEmpty()) {
+                if (new ConfirmationDialog(options, "Confirmation", indexesmissingduration.size() + " Session Parts Are Missing Durations", "Set Ramp Only For The Parts Missing Durations",
+                        "Set Ramp Only", "Cancel Playback").getResult()) {
+                    for (int x : indexesmissingduration) {alladjustedsessionitems.get(x).setRamponly(true);}
+                } else {return;}
+            }
+            // Check Ambience
+            if (AmbienceSwitch.isSelected() && ambiencePlaybackType != null) {
+                int count = 0;
+                switch (ambiencePlaybackType) {
+                    case REPEAT:
+                    case SHUFFLE:
+                        for (SessionPart i : alladjustedsessionitems) {if (! i.getAmbience_hasAny()) {count++;}}
+                        if (count > 0) {
+                            new InformationDialog(options, "Information", "Missing Ambience For " + count + " Session Parts", "Please Add Ambience Or Disable Ambience From Session");
+                            return;
+                        }
+                        break;
+                    case CUSTOM:
+                        for (SessionPart i : alladjustedsessionitems) {if (! i.getAmbience().hasCustomAmbience()) {count++;}}
+                        if (count > 0) {
+                            new InformationDialog(options, "Information", "Missing Ambience For " + count + " Session Parts", "Please Add Custom Ambience, Change Playback Type Or Disable Ambience From Session");
+                            return;
+                        }
+                        break;
+                }
+            }
+            // Check Goals
+            if (! indexesmissinggoals.isEmpty()) {
+                if (! new ConfirmationDialog(options, "Confirmation", indexesmissinggoals.size() + " Session Parts Are Missing Goals", "Continue Playing Session Without Goals?",
+                        "Yes", "No").getResult()) {return;}
+            }
+            // Check Alert File Needed/Not Needed
+            boolean longsession = false;
+            for (SessionPart i : alladjustedsessionitems) {
+                if (i.getduration().greaterThanOrEqualTo(Duration.minutes(kujiin.xml.Options.DEFAULT_LONG_SESSIONPART_DURATION))) {
+                    longsession = true;
+                    break;
+                }
+            }
+            if (longsession && ! Root.getOptions().getSessionOptions().getAlertfunction()) {
+                switch (new AnswerDialog(options, "Add Alert File", null, "I've Detected A Long Session. Add Alert File In Between Session Parts?",
+                        "Add Alert File", "Continue Without Alert File", "Cancel Playback").getResult()) {
+                    case YES: new SelectAlertFile(Root).showAndWait(); break;
+                    case CANCEL: return;
+                }
+            } else if (Root.getOptions().getSessionOptions().getAlertfunction()) {
+                switch (new AnswerDialog(options, "Disable Alert File", null, "I've Detected A Relatively Short Session With Alert File Enabled",
+                        "Disable Alert File", "Leave Alert File Enabled", "Cancel Playback").getResult()) {
+                    case YES: Root.getOptions().getSessionOptions().setAlertfunction(false); break;
+                    case CANCEL: return;
+                }
+            }
+            result = true;
+            itemsinsession = alladjustedsessionitems;
+            close();
+        }
+        public void cancel() {
+            alladjustedsessionitems = null;
+            close();
+        }
 
         class SessionPlaybackOverview_ChangeDuration extends Stage {
             public TextField HoursTextField;
@@ -776,11 +825,11 @@ public class SessionCreator implements UI {
             public void setDuration(Duration duration) {
                 this.duration = duration;
             }
-            public void ramponlyselected(ActionEvent actionEvent) {
+            public void ramponlyselected() {
                 HoursTextField.setDisable(RampOnlyCheckBox.isSelected());
                 MinutesTextField.setDisable(RampOnlyCheckBox.isSelected());
             }
-            public void OKButtonPressed(ActionEvent actionEvent) {
+            public void OKButtonPressed() {
                 try {
                     if (! RampOnlyCheckBox.isSelected()) {
                         Duration duration = Duration.hours(Double.parseDouble(HoursTextField.getText())).add(Duration.minutes(Double.parseDouble(MinutesTextField.getText())));
@@ -832,6 +881,14 @@ public class SessionCreator implements UI {
                     DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
                     AmbienceItemsTable.getSelectionModel().selectedItemProperty().addListener(
                             (observable, oldValue, newValue) -> tableselectionchanged(newValue));
+                    if (sessionPart.getAmbience().hasCustomAmbience()) {
+                        int count = 1;
+                        for (SoundFile i : sessionPart.getAmbience().getCustomAmbience()) {
+                            TableItems.add(new AmbienceSongWithNumber(count, i));
+                            count++;
+                        }
+                        AmbienceItemsTable.setItems(TableItems);
+                    }
                     calculatetotal();
                 } catch (IOException ignored) {}
             }
@@ -851,7 +908,7 @@ public class SessionCreator implements UI {
                 }
                 return false;
             }
-            public void addfiles(ActionEvent actionEvent) {
+            public void addfiles() {
                 List<File> filesselected = new FileChooser().showOpenMultipleDialog(null);
                 if (filesselected == null || filesselected.isEmpty()) {return;}
                 if (Util.list_hasduplicates(filesselected)) {
@@ -877,7 +934,7 @@ public class SessionCreator implements UI {
                     }
                 }
             }
-            public void addambience(ActionEvent actionEvent) {
+            public void addambience() {
                 SessionPlaybackOverview_SelectAmbience selectAmbience = new SessionPlaybackOverview_SelectAmbience(sessionPart);
                 selectAmbience.showAndWait();
                 if (selectAmbience.getResult()) {
@@ -894,7 +951,7 @@ public class SessionCreator implements UI {
                     count++;
                 }
             }
-            public void removeambience(ActionEvent actionEvent) {
+            public void removeambience() {
                 if (selectedtableitem != null) {
                     if (new ConfirmationDialog(options, "Remove Ambience", "Really Remove '" + selectedtableitem.getName() + "'?", "", "Remove", "Cancel").getResult()) {
                         int index = TableItems.indexOf(selectedtableitem);
@@ -930,7 +987,7 @@ public class SessionCreator implements UI {
                     longenough = true;
                 }
             }
-            public void moveupintable(ActionEvent actionEvent) {
+            public void moveupintable() {
                 int selectedindex = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
                 if (selectedindex > 0) {
                     Collections.swap(TableItems, selectedindex, selectedindex - 1);
@@ -939,7 +996,7 @@ public class SessionCreator implements UI {
                     calculatetotal();
                 }
             }
-            public void movedownintable(ActionEvent actionEvent) {
+            public void movedownintable() {
                 int selectedindex = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
                 if (selectedindex != -1 && selectedindex != TableItems.size() - 1) {
                     Collections.swap(TableItems, selectedindex, selectedindex + 1);
@@ -948,7 +1005,7 @@ public class SessionCreator implements UI {
                     calculatetotal();
                 }
             }
-            public void preview(ActionEvent actionEvent) {
+            public void preview() {
                 if (selectedtableitem != null) {
                     PreviewFile previewFile = new PreviewFile(selectedtableitem.getFile(), Root);
                     previewFile.showAndWait();
@@ -962,11 +1019,12 @@ public class SessionCreator implements UI {
                 return result;
             }
 
-            public void accept(ActionEvent actionEvent) {
+            public void accept() {
                 if (getcurrenttotal().lessThan(sessionPart.getduration())) {
                     new InformationDialog(options, "Ambience Too Short", "Need At Least " + sessionPart.getdurationasString(false, 50) + " To Set This As Custom Ambience", "");
                 } else {result = true; close();}
             }
+
         }
         class SessionPlaybackOverview_SelectAmbience extends Stage {
             public Label TopLabel;
@@ -1006,13 +1064,13 @@ public class SessionCreator implements UI {
                 AddButton.setDisable(AmbienceTable.getSelectionModel().getSelectedItems().isEmpty());
                 PreviewButton.setDisable(AmbienceTable.getSelectionModel().getSelectedItems().size() != 1);
             }
-            public void preview(ActionEvent actionEvent) {
+            public void preview() {
                 if (! PreviewButton.isDisabled()) {
                     File file = ambienceSongs.get(AmbienceTable.getSelectionModel().getSelectedIndex()).getFile();
                     new PreviewFile(file, Root).showAndWait();
                 }
             }
-            public void addfiles(ActionEvent actionEvent) {
+            public void addfiles() {
                 soundfiles.addAll(AmbienceTable.getSelectionModel().getSelectedItems().stream().map(i -> new AmbienceSongWithNumber(0, i)).collect(Collectors.toList()));
                 result = true;
                 close();
@@ -1146,12 +1204,12 @@ public class SessionCreator implements UI {
         }
         public void untoggleplayerreference() {
             getPlayer().ReferenceCheckBox.setSelected(false);
-            getPlayer().togglereference(null);
+            getPlayer().togglereference();
         }
 
-        public void play(ActionEvent actionEvent) {getPlayer().play();}
-        public void pause(ActionEvent actionEvent) {getPlayer().pause();}
-        public void stop(ActionEvent actionEvent) {getPlayer().stop();}
+        public void play() {getPlayer().play();}
+        public void pause() {getPlayer().pause();}
+        public void stop() {getPlayer().stop();}
 
     }
     public class Exporter extends Stage {
@@ -1194,7 +1252,7 @@ public class SessionCreator implements UI {
 
         public void exporter_initialize() {
         }
-        public void exporter_toggle(ActionEvent actionEvent) {
+        public void exporter_toggle() {
 //        switch (Session.exporterState) {
 //            case NOT_EXPORTED:
 //                break;
@@ -1210,7 +1268,7 @@ public class SessionCreator implements UI {
 //                break;
 //        }
         }
-        public void exporter_exportsession(Event event) {
+        public void exporter_exportsession() {
             //        CreatorAndExporter.startexport();}
 //            Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Exporter Is Broken. FFMPEG Is Being A Pain In The Ass", 3000);
             //        if (creationchecks()) {
@@ -1449,7 +1507,7 @@ public class SessionCreator implements UI {
                 boolean referenceoption = Root.getOptions().getSessionOptions().getReferenceoption();
                 if (referenceoption && referenceType != null) {ReferenceCheckBox.setSelected(true);}
                 else {ReferenceCheckBox.setSelected(false);}
-                togglereference(null);
+                togglereference();
                 ReferenceCheckBox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
                 setResizable(false);
                 SessionPartTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
@@ -1684,7 +1742,7 @@ public class SessionCreator implements UI {
         }
 
     // Reference
-        public void togglereference(ActionEvent actionEvent) {
+        public void togglereference() {
             boolean buttontoggled = ReferenceCheckBox.isSelected();
             Root.getOptions().getSessionOptions().setReferenceoption(buttontoggled);
             if (! buttontoggled) {
@@ -1754,4 +1812,5 @@ public class SessionCreator implements UI {
             if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
         }
     }
+
 }

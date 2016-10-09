@@ -59,8 +59,6 @@ public class Entrainment {
 
     @Override
     public String toString() {
-        System.out.println("Freq: " + freq.getName());
-        System.out.println("Rampfiles " + Boolean.toString(rampfiles == null));
         return super.toString();
     }
 

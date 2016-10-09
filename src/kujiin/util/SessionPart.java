@@ -100,11 +100,10 @@ public class SessionPart {
 //        setFinalexportfile(new File(Options.DIRECTORYTEMP, name + ".mp3"));
     }
 
-// Startup Methods
+// Startup
     public StartupCheckType getStartupCheckType() {
         return startupCheckType;
     }
-
     public SoundFile startup_getNext() throws IndexOutOfBoundsException {
         if (startupCheckType == StartupCheckType.ENTRAINMENT) {return startup_getnextentrainment();}
         else {return startup_getnextambience();}
@@ -147,7 +146,7 @@ public class SessionPart {
         } else {System.out.println(name + " Has No Ambience");}
     }
 
-// GUI Methods
+// GUI
     public void setToolTip() {Switch.setTooltip(getTooltip());}
     public Tooltip getTooltip() {return new Tooltip("");}
     private void gui_toggleswitch() {
@@ -1074,7 +1073,7 @@ public class SessionPart {
     }
 
 // Goals
-    // Goals XML
+    // XML
     public void goals_unmarshall() {Goals = root.getProgressTracker().getGoals().getSessionPartGoalList(number);}
     public void goals_marshall() {root.getProgressTracker().getGoals().setSessionPartGoalList(number, Goals);}
     // List Methods
@@ -1226,7 +1225,7 @@ public class SessionPart {
         return root.getProgressTracker().getSessions().getaveragepracticedurationforallsessions(this, includepreandpost);
     }
 
-// Reference Files
+// Reference Display
     public File reference_getFile() {
         ReferenceType referenceType = root.getOptions().getSessionOptions().getReferencetype();
         if (referenceType == null) {return null;}

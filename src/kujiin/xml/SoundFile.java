@@ -21,7 +21,7 @@ public class SoundFile {
         }
     }
 
-    // Getters And Setters
+// Getters And Setters
     public File getFile() {
         return file;
     }
@@ -41,11 +41,12 @@ public class SoundFile {
         this.duration = duration;
     }
 
-    // Utility Methods
+// Utility Methods
     public boolean isValid() {
         return name != null && file != null && duration != null && duration > 0.0;
     }
 
+// Method Overrides
     @Override
     public String toString() {
         return "Name: " + getName() + ". File: " + file.getAbsolutePath() + ". Duration: " + getDuration() + " Milliseconds";

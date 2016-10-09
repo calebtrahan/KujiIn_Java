@@ -38,6 +38,9 @@
                <VBox.margin>
                   <Insets left="5.0" right="5.0" />
                </VBox.margin>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
             </TableView>
             <HBox prefHeight="30.0" prefWidth="683.0">
                <children>
@@ -56,7 +59,7 @@
                   <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="348.0">
                      <children>
                         <Button fx:id="AdjustDurationButton" disable="true" mnemonicParsing="false" onAction="#adjustduration" prefHeight="26.0" prefWidth="108.0" text="Adjust Duration" />
-                        <Button fx:id="SetAmbienceButton" disable="true" mnemonicParsing="false" onAction="#setambience" text="Set Ambience" />
+                        <Button fx:id="SetAmbienceButton" disable="true" mnemonicParsing="false" onAction="#setoraddambience" text="Set Ambience" />
                         <Button fx:id="SetGoalButton" disable="true" mnemonicParsing="false" onAction="#setgoal" text="Set Goal" />
                      </children>
                      <padding>

@@ -450,10 +450,7 @@ public class MainController implements Initializable {
             if (firstcall) {calculatetotalworktodo(); firstcall = false;}
             if (progresstonextsessionpart) {
                 try {
-                    if (selectedsessionpart == null) {
-                        selectedsessionpart = sessionPartList.get(sessionpartcount);
-                        System.out.println("Session Part Is Now: " + selectedsessionpart.name);
-                    }
+                    if (selectedsessionpart == null) {selectedsessionpart = sessionPartList.get(sessionpartcount);}
                 } catch (IndexOutOfBoundsException e) {
                     // End Of Startup Checks
                     getEntrainments().marshall();
@@ -465,12 +462,8 @@ public class MainController implements Initializable {
             SoundFile soundFile;
             try {
                 soundFile = selectedsessionpart.startup_getNext();
-                if (soundFile != null) {
-                    System.out.println("Returned " + soundFile.getFile().getAbsolutePath());
-                } else {System.out.println("Returned Null");}
             }
             catch (IndexOutOfBoundsException ignored) {
-                System.out.println("Caught Index Out Of Bounds Exception");
                 if (! selectedsessionpart.getAmbience_hasAny() && ! partswithnoambience.contains(selectedsessionpart)) {partswithnoambience.add(selectedsessionpart);}
                 sessionpartcount++;
                 selectedsessionpart = null;
@@ -479,17 +472,16 @@ public class MainController implements Initializable {
             }
             if (! soundFile.isValid()) {
                 startupcheckplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
-                SoundFile finalSoundFile = soundFile;
                 startupcheckplayer.setOnReady(() -> {
                     if (startupcheckplayer.getTotalDuration().greaterThan(Duration.ZERO)) {
-                        finalSoundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
+                        soundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
                         startupcheckplayer.dispose();
                         startupcheckplayer = null;
                         if (selectedsessionpart.getStartupCheckType() == StartupCheckType.ENTRAINMENT) {
-                            selectedsessionpart.startup_setEntrainmentSoundFile(finalSoundFile);
+                            selectedsessionpart.startup_setEntrainmentSoundFile(soundFile);
                             selectedsessionpart.startup_incremententrainmentcount();
                         } else if (selectedsessionpart.getStartupCheckType() == StartupCheckType.AMBIENCE) {
-                            selectedsessionpart.startup_setAmbienceSoundFile(finalSoundFile);
+                            selectedsessionpart.startup_setAmbienceSoundFile(soundFile);
                             selectedsessionpart.startup_incrementambiencecount();
                         }
                         workcount[0]++;

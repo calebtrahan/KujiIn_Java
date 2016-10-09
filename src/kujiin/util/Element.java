@@ -22,11 +22,11 @@ public class Element extends SessionPart {
         else {Value.setTooltip(null);}
     }
 
+// Gettters And Setters
     @Override
     public Tooltip getTooltip() {
         return super.getTooltip();
     }
-
     @Override
     public String getNameForFiles() {return "qi";}
 
@@ -62,7 +62,7 @@ public class Element extends SessionPart {
         return soundFile;
     }
 
-// Creation Methods
+// Creation
     @Override
     public boolean creation_buildEntrainment() {
         if (root.getOptions().getSessionOptions().getRampenabled()) {

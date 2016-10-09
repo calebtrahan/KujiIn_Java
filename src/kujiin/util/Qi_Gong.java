@@ -25,6 +25,7 @@ public class Qi_Gong extends SessionPart {
         } else {Value.setTooltip(null);}
     }
 
+// Getters And Setters
     @Override
     public String getNameForFiles() {return "qi";}
     @Override
@@ -37,7 +38,7 @@ public class Qi_Gong extends SessionPart {
         return "Qi-Gong";
     }
 
-    // Description Setters
+// Description Setters
     public void setSummary(String summary) {
         Summary = summary;
     }
@@ -76,7 +77,7 @@ public class Qi_Gong extends SessionPart {
         return soundFile;
     }
 
-    // Creation Methods
+// Creation
     @Override
     public boolean creation_buildEntrainment() {
         if (root.getOptions().getSessionOptions().getRampenabled()) {
