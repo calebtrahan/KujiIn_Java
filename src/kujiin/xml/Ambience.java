@@ -56,11 +56,8 @@ public class Ambience {
     }
 
 // Actual Ambience
-    private void initialize() {
-        if (Ambience == null) Ambience = new ArrayList<>();
-    }
     public void add(SoundFile soundFile) {
-        initialize();
+        if (Ambience == null) Ambience = new ArrayList<>();
         Ambience.add(soundFile);
     }
     public void setoraddsoundfile(SoundFile soundFile) {

@@ -415,7 +415,7 @@ public class SessionCreator implements UI {
                                 if (! isEmpty()) {
                                     switch (item) {
                                         case "No Duration Set":
-                                            getTableRow().setStyle("-fx-background-color:lightcoral");
+                                            setTextFill(Color.RED);
                                             break;
                                         case "Ramp Only":
                                             setTextFill(Color.YELLOW);
@@ -425,7 +425,7 @@ public class SessionCreator implements UI {
                                             break;
                                     }
                                     setText(item);
-                                }
+                                } else {setText(null);}
                             }
                         };
                     }
@@ -439,12 +439,23 @@ public class SessionCreator implements UI {
                             protected void updateItem(String item, boolean empty) {
                                 super.updateItem(item, empty);
                                 if (! isEmpty()) {
-                                    if (item.equals("Ambience Not Set") || item.equals("Has No Ambience")) {
-                                        setTextFill(Color.RED);
+                                    switch (item) {
+                                        case "Ambience Not Set":
+                                            System.out.println("Text Should Be Red");
+                                            setTextFill(Color.YELLOW);
+                                            break;
+                                        case "Has No Ambience":
+                                            System.out.println("Color Should Be Blue");
+                                            setTextFill(Color.RED);
+                                            break;
+                                        case "Will Shuffle":
+                                        case "Will Repeat":
+                                            System.out.println("Color Should Be Black");
+                                            setTextFill(Color.BLACK);
+                                            break;
                                     }
                                     setText(item);
-
-                                }
+                                }  else {setText(null);}
                             }
                         };
                     }

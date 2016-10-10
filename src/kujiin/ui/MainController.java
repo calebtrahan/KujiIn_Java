@@ -34,7 +34,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 // TODO Bugs To Fix
-    // TODO Entrainment Always Calculates Duration Instead Of Just Using Previously Calculated XML Values
+    // TODO Ambience Is Broke Now. Doesn't Find And Populate From XML
+    // TODO Also Check Both Entrainment And Ambience To Make Sure They Use XML Values Instead Of Calculating Every Time
+
     // TODO Ambience Shuffle Algorithm Doesn't Add Last Actual Ambience File
     // TODO Session Playback Overview Set Dynamic Text Colors (It's All Fucked Up)
 
@@ -460,17 +462,19 @@ public class MainController implements Initializable {
                 }
             }
             SoundFile soundFile;
-            try {
-                soundFile = selectedsessionpart.startup_getNext();
-            }
+            try {soundFile = selectedsessionpart.startup_getNext();}
             catch (IndexOutOfBoundsException ignored) {
+                getEntrainments().setsessionpartEntrainment(selectedsessionpart.number, selectedsessionpart.getEntrainment());
                 if (! selectedsessionpart.getAmbience_hasAny() && ! partswithnoambience.contains(selectedsessionpart)) {partswithnoambience.add(selectedsessionpart);}
+                else { getAmbiences().setsessionpartAmbience(selectedsessionpart.number, selectedsessionpart.getAmbience());}
                 sessionpartcount++;
                 selectedsessionpart = null;
                 try {call();} catch (Exception ign) {ignored.printStackTrace();}
                 return null;
             }
+            System.out.println("Retrieved: " + soundFile.getFile().getAbsolutePath());
             if (! soundFile.isValid()) {
+                System.out.println("Sound File Isn't Valid");
                 startupcheckplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
                 startupcheckplayer.setOnReady(() -> {
                     if (startupcheckplayer.getTotalDuration().greaterThan(Duration.ZERO)) {
@@ -496,7 +500,17 @@ public class MainController implements Initializable {
                         try {call();} catch (Exception ignored) {ignored.printStackTrace();}
                     }
                 });
-            } else {progresstonextsessionpart = true; try {call();} catch (Exception ignored) {ignored.printStackTrace();}}
+            } else {
+                if (selectedsessionpart.getStartupCheckType() == StartupCheckType.ENTRAINMENT) {
+                    selectedsessionpart.startup_incremententrainmentcount();
+                } else if (selectedsessionpart.getStartupCheckType() == StartupCheckType.AMBIENCE) {
+                    selectedsessionpart.startup_incrementambiencecount();
+                }
+                progresstonextsessionpart = true;
+                workcount[0]++;
+                updateProgress(workcount[0], workcount[1]);
+                updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
+                try {call();} catch (Exception ignored) {ignored.printStackTrace();}}
             return null;
         }
 

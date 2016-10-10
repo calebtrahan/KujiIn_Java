@@ -105,8 +105,13 @@ public class SessionPart {
         return startupCheckType;
     }
     public SoundFile startup_getNext() throws IndexOutOfBoundsException {
-        if (startupCheckType == StartupCheckType.ENTRAINMENT) {return startup_getnextentrainment();}
-        else {return startup_getnextambience();}
+//        System.out.println("Startup Type Is: " + startupCheckType.toString());
+        if (startupCheckType == StartupCheckType.ENTRAINMENT) {
+            try {return startup_getnextentrainment();} catch (IndexOutOfBoundsException ignored) {
+                startupCheckType = StartupCheckType.AMBIENCE;
+                return startup_getnextambience();
+            }
+        } else {return startup_getnextambience();}
     }
     // Entrainment
     public void startup_setEntrainmentSoundFile(SoundFile soundFile) {entrainment.setFile(soundFile);}
@@ -133,7 +138,6 @@ public class SessionPart {
         }
         if (! ambience.hasAnyAmbience()) {Ambience_hasAny = false; throw new IndexOutOfBoundsException();}
         SoundFile soundFile = ambience.get(startupchecks_ambience_count);
-        startupchecks_ambience_count++;
         return soundFile;
     }
     public void startup_incrementambiencecount() {startupchecks_ambience_count++;}

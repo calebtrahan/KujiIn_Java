@@ -5,7 +5,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
-import kujiin.util.enums.StartupCheckType;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
@@ -45,11 +44,7 @@ public class Element extends SessionPart {
                 file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
                 break;
             default:
-                if (startupchecks_entrainment_count > startup_entrainmentpartcount()) {
-                    startupCheckType = StartupCheckType.AMBIENCE;
-                    System.out.println("Switched To Ambience At " + startupchecks_entrainment_count);
-                    throw new IndexOutOfBoundsException();
-                }
+                if (startupchecks_entrainment_count > startup_entrainmentpartcount() - 1) {throw new IndexOutOfBoundsException();}
                 soundFile = entrainment.ramp_get(startupchecks_entrainment_count);
                 file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + getallCutNames().get(startupchecks_entrainment_count - 1).toLowerCase() + ".mp3");
                 break;

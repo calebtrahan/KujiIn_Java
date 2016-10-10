@@ -80,7 +80,6 @@ public class Cut extends SessionPart {
                     break;
                 }
             default:
-                startupCheckType = StartupCheckType.AMBIENCE;
                 throw new IndexOutOfBoundsException();
         }
         if (soundFile == null) {
