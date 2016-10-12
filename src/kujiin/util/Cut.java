@@ -21,7 +21,7 @@ public class Cut extends SessionPart {
 
     public Cut(int number, String name, MainController Root, ToggleButton aSwitch, TextField value) {
         super(number, name, Root, aSwitch, value);
-        if (root.getOptions().getProgramOptions().getTooltips()) {
+        if (root.getOptions().getUserInterfaceOptions().getTooltips()) {
             Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
         }
     }

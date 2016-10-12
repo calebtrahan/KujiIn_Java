@@ -3,7 +3,6 @@ package kujiin.xml;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import kujiin.ui.MainController;
 import kujiin.ui.dialogs.InformationDialog;
 import kujiin.util.enums.AmbiencePlaybackType;
 import kujiin.util.enums.ReferenceType;
@@ -54,8 +53,11 @@ public class Options {
             Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Earth", "Air", "Fire", "Water", "Void", "Postsession")
     );
 /// Default Option Values
+    // Program Options
     public static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
     public static final Boolean DEFAULT_HELP_DIALOGS_OPTION = true;
+    public static final Integer DEFAULT_SCROLL_INCREMENT = 1;
+    // Session Options
     public static final Double FADE_VALUE_MAX_DURATION = 30.0;
     public static final Double VOLUME_SLIDER_ADJUSTMENT_INCREMENT = 5.0;
     public static final Double DEFAULT_ENTRAINMENTVOLUME = 0.6;
@@ -83,34 +85,30 @@ public class Options {
     public final static int SUGGESTED_ALERT_FILE_MAX_LENGTH = 10;
     public final static int ABSOLUTE_ALERT_FILE_MAX_LENGTH = 30;
     // Files
-    private ProgramOptions ProgramOptions;
+    private UserInterfaceOptions UserInterfaceOptions;
     private SessionOptions SessionOptions;
-    private AppearanceOptions AppearanceOptions;
-    private MainController Root;
+    private AdvancedOptions AdvancedOptions;
 
     public Options() {}
-    public Options(MainController root) {
-        Root = root;
-    }
 
 // Getters And Setters
-    public Options.ProgramOptions getProgramOptions() {
-    return ProgramOptions;
+    public UserInterfaceOptions getUserInterfaceOptions() {
+    return UserInterfaceOptions;
 }
-    public void setProgramOptions(Options.ProgramOptions programOptions) {
-        ProgramOptions = programOptions;
+    public void setUserInterfaceOptions(UserInterfaceOptions userInterfaceOptions) {
+        UserInterfaceOptions = userInterfaceOptions;
     }
-    public Options.SessionOptions getSessionOptions() {
+    public SessionOptions getSessionOptions() {
         return SessionOptions;
     }
-    public void setSessionOptions(Options.SessionOptions sessionOptions) {
+    public void setSessionOptions(SessionOptions sessionOptions) {
         SessionOptions = sessionOptions;
     }
-    public Options.AppearanceOptions getAppearanceOptions() {
-        return AppearanceOptions;
+    public AdvancedOptions getAdvancedOptions() {
+        return AdvancedOptions;
     }
-    public void setAppearanceOptions(Options.AppearanceOptions appearanceOptions) {
-        AppearanceOptions = appearanceOptions;
+    public void setAdvancedOptions(AdvancedOptions advancedOptions) {
+        AdvancedOptions = advancedOptions;
     }
 
 // XML Processing
@@ -120,9 +118,9 @@ public class Options {
                 JAXBContext context = JAXBContext.newInstance(kujiin.xml.Options.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
                 kujiin.xml.Options options = (kujiin.xml.Options) unmarshaller.unmarshal(OPTIONSXMLFILE);
-                setProgramOptions(options.getProgramOptions());
+                setUserInterfaceOptions(options.getUserInterfaceOptions());
                 setSessionOptions(options.getSessionOptions());
-                setAppearanceOptions(options.getAppearanceOptions());
+                setAdvancedOptions(options.getAdvancedOptions());
             } catch (JAXBException ignored) {
                 Platform.runLater(() -> new InformationDialog(this, "Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
@@ -142,11 +140,15 @@ public class Options {
         }
     }
     public void resettodefaults() {
-        kujiin.xml.Options.ProgramOptions programOptions = new ProgramOptions();
-        programOptions.setTooltips(DEFAULT_TOOLTIPS_OPTION);
-        programOptions.setHelpdialogs(DEFAULT_HELP_DIALOGS_OPTION);
-        setProgramOptions(programOptions);
+        UserInterfaceOptions userInterfaceOptions = new UserInterfaceOptions();
         kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
+        AdvancedOptions advancedOptions = new AdvancedOptions();
+        userInterfaceOptions.setTooltips(DEFAULT_TOOLTIPS_OPTION);
+        userInterfaceOptions.setHelpdialogs(DEFAULT_HELP_DIALOGS_OPTION);
+        userInterfaceOptions.setScrollincrement(DEFAULT_SCROLL_INCREMENT);
+        userInterfaceOptions.setThemefile(DEFAULT_THEMEFILE.toURI().toString());
+        userInterfaceOptions.setThemefiles(new ArrayList<>(Arrays.asList(DEFAULT_THEMEFILE.toURI().toString(), STYLESHEET_MODENA, STYLESHEET_CASPIAN)));
+        userInterfaceOptions.setThemefilenames(new ArrayList<>(Arrays.asList("Default (Dark)", "Default (Light)", "Default (Legacy)")));
         sessionOptions.setFadeoutduration(DEFAULT_FADEOUTDURATION);
         sessionOptions.setRamponlyfadeduration(DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION);
         sessionOptions.setAmbiencevolume(DEFAULT_AMBIENCEVOLUME);
@@ -161,27 +163,24 @@ public class Options {
         sessionOptions.setReferencetype(DEFAULT_REFERENCE_TYPE_OPTION);
         sessionOptions.setReferencefullscreen(DEFAULT_REFERENCE_FULLSCREEN_OPTION);
         sessionOptions.setAmbiencePlaybackType(DEFAULT_AMBIENCE_PLAYBACK_TYPE);
+        setUserInterfaceOptions(userInterfaceOptions);
         setSessionOptions(sessionOptions);
-        kujiin.xml.Options.AppearanceOptions appearanceOptions = new AppearanceOptions();
-        appearanceOptions.setThemefile(DEFAULT_THEMEFILE.toURI().toString());
-        appearanceOptions.setThemefiles(new ArrayList<>(Arrays.asList(DEFAULT_THEMEFILE.toURI().toString(), STYLESHEET_MODENA, STYLESHEET_CASPIAN)));
-        appearanceOptions.setThemefilenames(new ArrayList<>(Arrays.asList("Default (Dark)", "Default (Light)", "Default (Legacy)")));
-        setAppearanceOptions(appearanceOptions);
+        setAdvancedOptions(advancedOptions);
         marshall();
     }
     public void setStyle(Stage stage) {
         stage.getIcons().clear();
         stage.getIcons().add(PROGRAM_ICON);
-        String themefile = getAppearanceOptions().getThemefile();
+        String themefile = getUserInterfaceOptions().getThemefile();
         if (themefile != null) {stage.getScene().getStylesheets().add(themefile);}
     }
     public void addthemefile(String name, String file_location) {
-        ArrayList<String> files = getAppearanceOptions().getThemefiles();
-        ArrayList<String> names = getAppearanceOptions().getThemefilenames();
+        ArrayList<String> files = getUserInterfaceOptions().getThemefiles();
+        ArrayList<String> names =  getUserInterfaceOptions().getThemefilenames();
         files.add(file_location);
         names.add(name);
-        getAppearanceOptions().setThemefiles(files);
-        getAppearanceOptions().setThemefilenames(names);
+        getUserInterfaceOptions().setThemefiles(files);
+        getUserInterfaceOptions().setThemefilenames(names);
     }
     public boolean hasValidAlertFile() {
         String location = getSessionOptions().getAlertfilelocation();
@@ -194,16 +193,26 @@ public class Options {
 
 // Subclasses
     @XmlAccessorType(XmlAccessType.PROPERTY)
-    public static class ProgramOptions {
+    public static class UserInterfaceOptions {
         private Boolean tooltips; // Show Tooltips (Checkbox)
         private Boolean helpdialogs; // Show Help Dialogs (Checkbox)
+        private Integer scrollincrement; // Creator Scroll Increment
+        private String themefile;
+        private ArrayList<String> themefiles;
+        private ArrayList<String> themefilenames;
 
-        public ProgramOptions() {}
+        public UserInterfaceOptions() {}
 
     // Getters And Setters
-        public Boolean getTooltips() {
-            return tooltips;
+        public Integer getScrollincrement() {
+            return scrollincrement;
         }
+        public void setScrollincrement(Integer scrollincrement) {
+            this.scrollincrement = scrollincrement;
+        }
+        public Boolean getTooltips() {
+                return tooltips;
+            }
         public void setTooltips(Boolean tooltips) {
             this.tooltips = tooltips;
         }
@@ -213,7 +222,26 @@ public class Options {
         public void setHelpdialogs(Boolean helpdialogs) {
             this.helpdialogs = helpdialogs;
     }
-}
+        public String getThemefile() {
+            return themefile;
+        }
+        public void setThemefile(String themefile) {
+            this.themefile = themefile;
+        }
+        public ArrayList<String> getThemefiles() {
+            return themefiles;
+        }
+        public void setThemefiles(ArrayList<String> themefiles) {
+            this.themefiles = themefiles;
+        }
+        public ArrayList<String> getThemefilenames() {
+            return themefilenames;
+        }
+        public void setThemefilenames(ArrayList<String> themefilenames) {
+            this.themefilenames = themefilenames;
+        }
+
+    }
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class SessionOptions {
         private Double entrainmentvolume;
@@ -321,31 +349,10 @@ public class Options {
 
     }
     @XmlAccessorType(XmlAccessType.PROPERTY)
-    public static class AppearanceOptions {
-        private String themefile;
-        private ArrayList<String> themefiles;
-        private ArrayList<String> themefilenames;
+    public static class AdvancedOptions {
 
-        public AppearanceOptions() {}
 
-        public String getThemefile() {
-            return themefile;
-        }
-        public void setThemefile(String themefile) {
-            this.themefile = themefile;
-        }
-        public ArrayList<String> getThemefiles() {
-            return themefiles;
-        }
-        public void setThemefiles(ArrayList<String> themefiles) {
-            this.themefiles = themefiles;
-        }
-        public ArrayList<String> getThemefilenames() {
-            return themefilenames;
-        }
-        public void setThemefilenames(ArrayList<String> themefilenames) {
-            this.themefilenames = themefilenames;
-        }
+        public AdvancedOptions() {}
 
     }
 

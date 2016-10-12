@@ -108,7 +108,7 @@ public class SessionCreator implements UI {
         Root.ExportButton.setOnAction(event -> exportsession());
     }
     public void setupTooltips() {
-        if (options.getProgramOptions().getTooltips()) {
+        if (options.getUserInterfaceOptions().getTooltips()) {
             TotalSessionTime.setTooltip(new Tooltip("Total Session Time (Not Including Presession + Postsession Ramp, And Alert File)"));
             ApproximateEndTime.setTooltip(new Tooltip("Approximate Finish Time For This Session (Assuming You Start Now)"));
             ChangeAllCutsButton.setTooltip(new Tooltip("Change All Cut Values Simultaneously"));

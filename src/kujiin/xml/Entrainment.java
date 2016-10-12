@@ -16,7 +16,7 @@ public class Entrainment {
     }
 
     public void setFile(SoundFile soundFile) {
-        if (! soundFile.getFile().getAbsolutePath().contains("ramp")) {freq = soundFile;}
+        if (! soundFile.getFile().getAbsolutePath().contains("ramp")) {setFreq(soundFile);}
         else {ramp_set(soundFile);}
     }
 
@@ -51,10 +51,7 @@ public class Entrainment {
 //            for (SoundFile i : rampfiles) {System.out.println(count + ": " + i.getFile().getAbsolutePath());}
 //        } catch (NullPointerException ignored) {}
         try {return rampfiles.get(index);}
-        catch (NullPointerException | IndexOutOfBoundsException ignored) {
-            ramp_initialize();
-            return null;
-        }
+        catch (NullPointerException | IndexOutOfBoundsException ignored) {ramp_initialize(); return null;}
     }
 
     @Override

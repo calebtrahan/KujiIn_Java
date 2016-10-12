@@ -154,7 +154,6 @@ public class Goals {
         private Boolean Completed;
 
         public Goal() {}
-
         public Goal(Duration goalduration) {
             setDuration(goalduration);
             setDate_Set(LocalDate.now());

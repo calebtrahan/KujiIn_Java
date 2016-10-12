@@ -3,7 +3,6 @@ package kujiin.ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -34,27 +33,24 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 // TODO Bugs To Fix
-    // TODO Ambience Is Broke Now. Doesn't Find And Populate From XML
-    // TODO Also Check Both Entrainment And Ambience To Make Sure They Use XML Values Instead Of Calculating Every Time
-
+// Startup Checks
+    // TODO Entrainment Is Always Calculating Durations From Scratch (Ambience Is Good)
+// Playback
     // TODO Ambience Shuffle Algorithm Doesn't Add Last Actual Ambience File
+// GUI
     // TODO Session Playback Overview Set Dynamic Text Colors (It's All Fucked Up)
-
-    // TODO Preferences Dialog Doesn't Initially Populate With Options From XML (Check If It Saves As Well?)
     // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified
     // TODO Closing Reference Display With 'ESC' Is Crashing The Whole App
 
 // TODO Test
 
 // TODO Additional Features To Definitely Add
-    // TODO Create A Custom Ambience Selection Wizard To Add Ambience Individually To Each Session Part In Session
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
     // TODO Exporter
 
 // TODO Optional Additional Features
     // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
     // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
-    // TODO Add Tooltips To Cuts Saying A One Word Brief Summary (Rin -> Strength, Kyo -> Control, Toh->Harmony)
     // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
     // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
 
@@ -153,7 +149,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setOptions(new Options(this));
+        setOptions(new Options());
         getOptions().unmarshall();
     }
     public void setupSessionParts() {
@@ -360,13 +356,13 @@ public class MainController implements Initializable {
     }
 
 // Menu
-    public void menu_changesessionoptions(ActionEvent actionEvent) {
+    public void menu_changesessionoptions() {
         new ChangeProgramOptions().showAndWait();
         Options.marshall();
         getProgressTracker().updateui_sessions();
         getProgressTracker().updateui_goals(null);
     }
-    public void menu_editprogramsambience(ActionEvent actionEvent) {
+    public void menu_editprogramsambience() {
         if (programState == ProgramState.IDLE) {
             new AmbienceEditor_Simple(this).showAndWait();
         } else {
@@ -385,12 +381,12 @@ public class MainController implements Initializable {
         AmbienceEditor_Advanced sae = new AmbienceEditor_Advanced(this, sessionPart);
         sae.showAndWait();
     }
-    public void menu_editreferencefiles(ActionEvent actionEvent) {
+    public void menu_editreferencefiles() {
         new EditReferenceFiles(getOptions(), getSessionCreator().getReferenceType()).showAndWait();
     }
-    public void menu_howtouseprogram(ActionEvent actionEvent) {
+    public void menu_howtouseprogram() {
     }
-    public void menu_aboutthisprogram(ActionEvent actionEvent) {
+    public void menu_aboutthisprogram() {
 //        for (SessionPart x : getAllSessionParts(false)) {
 //            if (x instanceof Cut || x instanceof Qi_Gong) {
 //                Ambience ambience = x.getAmbience();
@@ -404,7 +400,7 @@ public class MainController implements Initializable {
 //            }
 //        }
     }
-    public void menu_contactme(ActionEvent actionEvent) {
+    public void menu_contactme() {
 //        PreviewFile previewFile = new PreviewFile(kujiin.xml.Options.TESTFILE, this);
 //        previewFile.showAndWait();
     }
@@ -571,10 +567,12 @@ public class MainController implements Initializable {
 
     // Setup Methods
         public void populatefromxml() {
-            // Program Options
-            TooltipsCheckBox.setSelected(getOptions().getProgramOptions().getTooltips());
-            HelpDialogsCheckBox.setSelected(getOptions().getProgramOptions().getHelpdialogs());
-            // Session & Playback Options
+            // User Interface Options
+            TooltipsCheckBox.setSelected(getOptions().getUserInterfaceOptions().getTooltips());
+            HelpDialogsCheckBox.setSelected(getOptions().getUserInterfaceOptions().getHelpdialogs());
+            ScrollIncrement.setText(getOptions().getUserInterfaceOptions().getScrollincrement().toString());
+            populateappearancecheckbox();
+            // Session Options
             if (getOptions().getSessionOptions().getAlertfunction()) {
                 AlertFileSwitch.setSelected(getOptions().hasValidAlertFile());
                 if (! AlertFileSwitch.isSelected()) {getOptions().getSessionOptions().setAlertfunction(false); getOptions().getSessionOptions().setAlertfilelocation(null);}
@@ -589,8 +587,7 @@ public class MainController implements Initializable {
             FadeOutValue.setDisable(! FadeSwitch.isSelected());
             EntrainmentVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getEntrainmentvolume() * 100).intValue()));
             AmbienceVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getAmbiencevolume() * 100).intValue()));
-            // Appearance Options
-            populateappearancecheckbox();
+
         }
         public void setuptooltips() {
             TooltipsCheckBox.setTooltip(new Tooltip("Display Messages Like These When Hovering Over Program Controls"));
@@ -609,6 +606,7 @@ public class MainController implements Initializable {
             Util.custom_textfield_double(FadeOutValue, 0.0, kujiin.xml.Options.FADE_VALUE_MAX_DURATION, 1, 1);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
             Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
+            Util.custom_textfield_integer(ScrollIncrement, 1, 10, 1);
             ProgramThemeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectnewtheme());
             FadeSwitch.setOnAction(event -> togglefade());
             RampSwitch.setOnAction(event -> toggleramp());
@@ -720,9 +718,9 @@ public class MainController implements Initializable {
 
     // Appearance Methods
         public void populateappearancecheckbox() {
-            ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(getOptions().getAppearanceOptions().getThemefilenames()));
+            ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(getOptions(). getUserInterfaceOptions().getThemefilenames()));
             try {
-                int index = getOptions().getAppearanceOptions().getThemefiles().indexOf(getOptions().getAppearanceOptions().getThemefile());
+                int index = getOptions(). getUserInterfaceOptions().getThemefiles().indexOf(getOptions(). getUserInterfaceOptions().getThemefile());
                 ProgramThemeChoiceBox.getSelectionModel().select(index);
             } catch (Exception ignored) {}
         }
@@ -735,9 +733,9 @@ public class MainController implements Initializable {
         public void selectnewtheme() {
             int index = ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex();
             if (index != -1) {
-                Options.getAppearanceOptions().setThemefile(getOptions().getAppearanceOptions().getThemefiles().get(index));
+                Options. getUserInterfaceOptions().setThemefile(getOptions(). getUserInterfaceOptions().getThemefiles().get(index));
                 getScene().getStylesheets().clear();
-                getScene().getStylesheets().add(Options.getAppearanceOptions().getThemefile());
+                getScene().getStylesheets().add(Options. getUserInterfaceOptions().getThemefile());
             }
         }
 
@@ -763,8 +761,9 @@ public class MainController implements Initializable {
 
         @Override
         public void close() {
-            Options.getProgramOptions().setTooltips(TooltipsCheckBox.isSelected());
-            Options.getProgramOptions().setHelpdialogs(HelpDialogsCheckBox.isSelected());
+            Options.getUserInterfaceOptions().setTooltips(TooltipsCheckBox.isSelected());
+            Options.getUserInterfaceOptions().setScrollincrement(Integer.parseInt(ScrollIncrement.getText()));
+            Options.getUserInterfaceOptions().setHelpdialogs(HelpDialogsCheckBox.isSelected());
             Options.getSessionOptions().setEntrainmentvolume(new Double(EntrainmentVolumePercentage.getText()) / 100);
             Options.getSessionOptions().setAmbiencevolume(new Double(AmbienceVolumePercentage.getText()) / 100);
             Options.getSessionOptions().setFadeoutduration(new Double(FadeOutValue.getText()));

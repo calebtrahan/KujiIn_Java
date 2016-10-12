@@ -18,7 +18,7 @@ public class Qi_Gong extends SessionPart {
 
     public Qi_Gong (int number, String name, MainController Root,  ToggleButton aSwitch, TextField value) {
         super(number, name, Root, aSwitch, value);
-        if (Root.getOptions().getProgramOptions().getTooltips()) {
+        if (Root.getOptions().getUserInterfaceOptions().getTooltips()) {
             if (number == 0) {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Preceding The Session"));}
             else {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Following The Session"));}
         } else {Value.setTooltip(null);}

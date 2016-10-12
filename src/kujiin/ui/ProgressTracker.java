@@ -225,7 +225,7 @@ public class ProgressTracker implements UI {
             playerUI.GoalPercentageLabel.setText(percentage);
             // String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue()) + "%)");
         }
-        if (SelectedSessionPart != null && Options.getProgramOptions().getTooltips()) {
+        if (SelectedSessionPart != null && Options.getUserInterfaceOptions().getTooltips()) {
             NewGoalButton.setTooltip(new Tooltip("Set A New Goal"));
             ViewCurrentGoalsButton.setTooltip(new Tooltip("Edit " + SelectedSessionPart.name + "'s Goals"));
         }

@@ -12,7 +12,7 @@ public class ErrorDialog {
         if (headertext != null) {a.setHeaderText(headertext);}
         a.setContentText(contenttext);
         DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(options.getAppearanceOptions().getThemefile());
+        dialogPane.getStylesheets().add(options. getUserInterfaceOptions().getThemefile());
         a.showAndWait();
     }
 

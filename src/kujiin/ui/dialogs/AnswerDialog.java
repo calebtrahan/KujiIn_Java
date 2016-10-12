@@ -33,7 +33,7 @@ public class AnswerDialog {
         a.setTitle(title);
         if (header != null) {a.setHeaderText(header);}
         DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(options.getAppearanceOptions().getThemefile());
+        dialogPane.getStylesheets().add(options. getUserInterfaceOptions().getThemefile());
         Optional<ButtonType> answer = a.showAndWait();
         if (answer.isPresent()) {
             if (answer.get() == yes) {

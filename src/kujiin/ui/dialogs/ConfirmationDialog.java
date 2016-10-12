@@ -32,7 +32,7 @@ public class ConfirmationDialog {
             a.setHeaderText(headertext);
         }
         DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(options.getAppearanceOptions().getThemefile());
+        dialogPane.getStylesheets().add(options. getUserInterfaceOptions().getThemefile());
         Optional<ButtonType> answer = a.showAndWait();
         result = answer.isPresent() && answer.get() == yes;
     }
@@ -42,7 +42,7 @@ public class ConfirmationDialog {
         if (header != null) {a.setHeaderText(header);}
         if (content != null) {a.setContentText(content);}
         DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(options.getAppearanceOptions().getThemefile());
+        dialogPane.getStylesheets().add(options. getUserInterfaceOptions().getThemefile());
         Optional<ButtonType> answer = a.showAndWait();
         result = answer.isPresent() && answer.get() == ButtonType.OK;
     }

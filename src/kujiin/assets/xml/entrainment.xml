@@ -6,11 +6,6 @@
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\QI.mp3</file>
             <name>QI</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\qitorin.mp3</file>
-            <name>qitorin</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\qitorin.mp3</file>
@@ -63,11 +58,6 @@
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\RIN.mp3</file>
             <name>RIN</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\rintokyo.mp3</file>
-            <name>rintokyo</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\rintokyo.mp3</file>
@@ -85,11 +75,6 @@
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\KYO.mp3</file>
             <name>KYO</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\kyototoh.mp3</file>
-            <name>kyototoh</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\kyototoh.mp3</file>
@@ -107,11 +92,6 @@
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\TOH.mp3</file>
             <name>TOH</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\tohtosha.mp3</file>
-            <name>tohtosha</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\tohtosha.mp3</file>
@@ -129,11 +109,6 @@
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\SHA.mp3</file>
             <name>SHA</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\shatokai.mp3</file>
-            <name>shatokai</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\shatokai.mp3</file>
@@ -147,15 +122,10 @@
     </Sha>
     <Kai>
         <freq>
-            <duration>299485.0</duration>
+            <duration>299622.0</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\KAI.mp3</file>
             <name>KAI</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\kaitojin.mp3</file>
-            <name>kaitojin</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\kaitojin.mp3</file>
@@ -173,11 +143,6 @@
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\JIN.mp3</file>
             <name>JIN</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\jintoretsu.mp3</file>
-            <name>jintoretsu</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\jintoretsu.mp3</file>
@@ -195,11 +160,6 @@
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\RETSU.mp3</file>
             <name>RETSU</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\retsutozai.mp3</file>
-            <name>retsutozai</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\retsutozai.mp3</file>
@@ -217,11 +177,6 @@
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ZAI.mp3</file>
             <name>ZAI</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\zaitozen.mp3</file>
-            <name>zaitozen</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\zaitozen.mp3</file>
@@ -239,11 +194,6 @@
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ZEN.mp3</file>
             <name>ZEN</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\zentoqi.mp3</file>
-            <name>zentoqi</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\zentoqi.mp3</file>
@@ -512,15 +462,10 @@
     </Void>
     <Postsession>
         <freq>
-            <duration>299485.0</duration>
+            <duration>299622.0</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\QI.mp3</file>
             <name>QI</name>
         </freq>
-        <rampfile>
-            <duration>30040.816326</duration>
-            <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\qitozen.mp3</file>
-            <name>qitozen</name>
-        </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
             <file>C:\Users\Caleb Trahan\Programming\Java\Kuji-In\src\kujiin\assets\sound\entrainment\ramp\qitorin.mp3</file>

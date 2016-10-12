@@ -17,7 +17,7 @@ public class Element extends SessionPart {
 
     public Element(int number, String name, MainController Root, ToggleButton aSwitch, TextField value) {
         super(number, name, Root, aSwitch, value);
-        if (Root.getOptions().getProgramOptions().getTooltips()) {Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));}
+        if (Root.getOptions().getUserInterfaceOptions().getTooltips()) {Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));}
         else {Value.setTooltip(null);}
     }
 
