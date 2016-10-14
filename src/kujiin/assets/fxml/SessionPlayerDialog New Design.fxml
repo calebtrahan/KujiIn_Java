@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="239.0" prefWidth="417.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="CENTER" layoutX="78.0" layoutY="151.0" prefHeight="199.0" prefWidth="417.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label alignment="TOP_CENTER" prefHeight="16.0" prefWidth="114.0" text="Session Player">
+               <font>
+                  <Font name="System Bold" size="17.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </Label>
+            <HBox alignment="CENTER" prefHeight="163.0" prefWidth="419.0">
+               <children>
+                  <VBox alignment="TOP_CENTER">
+                     <children>
+                        <Label fx:id="CurrentSessionPartTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="144.0" text="Postsession Progress" />
+                        <ProgressIndicator fx:id="CurrentSessionPartProgress" prefHeight="201.0" prefWidth="149.0" progress="0.72" />
+                        <Label fx:id="CurrentProgressDetails" alignment="CENTER" prefHeight="17.0" prefWidth="147.0" text="9:99:99 -&gt; 9:99:99" />
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                        <Label text="Volume Control" />
+                        <HBox>
+                           <children>
+                              <VBox alignment="CENTER" prefHeight="170.0" prefWidth="46.0">
+                                 <children>
+                                    <Label text="ENT" />
+                                    <Slider fx:id="EntrainmentVolume" orientation="VERTICAL" />
+                                    <Label fx:id="EntrainmentVolumePercentage" text="100%" />
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" prefHeight="170.0" prefWidth="40.0">
+                                 <children>
+                                    <Label text="AMB" />
+                                    <Slider fx:id="AmbienceVolume" orientation="VERTICAL" />
+                                    <Label fx:id="AmbienceVolumePercentage" text="100%" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" />
+                     </padding>
+                  </VBox>
+                  <VBox>
+                     <children>
+                        <Label fx:id="TotalSessionLabel" alignment="CENTER" prefHeight="17.0" prefWidth="144.0" text="Session Progress" />
+                        <ProgressIndicator fx:id="TotalProgress" prefHeight="201.0" prefWidth="149.0" progress="0.44" />
+                        <Label fx:id="TotalProgressDetails" alignment="CENTER" prefHeight="17.0" prefWidth="147.0" text="9:99:99 -&gt; 9:99:99" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="419.0">
+               <children>
+                  <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="242.0">
+                     <children>
+                        <CheckBox fx:id="ReferenceCheckBox" mnemonicParsing="false" onAction="#togglereference" prefHeight="20.0" prefWidth="93.0" text="Reference">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </CheckBox>
+                        <ComboBox fx:id="ReferenceTypeComboBox" prefHeight="29.0" prefWidth="104.0" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="158.0">
+                     <children>
+                        <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#play" text="Play" />
+                        <Button fx:id="PauseButton" mnemonicParsing="false" onAction="#pause" text="Pause" />
+                        <Button fx:id="StopButton" mnemonicParsing="false" onAction="#stop" text="Stop" />
+                     </children>
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </HBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

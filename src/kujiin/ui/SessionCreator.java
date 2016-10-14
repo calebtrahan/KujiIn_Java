@@ -710,18 +710,18 @@ public class SessionCreator implements UI {
                         if (sessionpartswithnoambience.size() == 1) {new AmbienceEditor_Simple(Root, sessionpartswithnoambience.get(0)).showAndWait();}
                         else {new AmbienceEditor_Simple(Root).showAndWait();}
                     } else {AmbienceSwitch.setSelected(false);}
-                } else if (! sessionpartswithreducedambience.isEmpty()) {
-                    StringBuilder a = new StringBuilder();
-                    int count = 0;
-                    for (SessionPart aSessionpartswithreducedambience : sessionpartswithreducedambience) {
-                        a.append("\n");
-                        String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(aSessionpartswithreducedambience.getAmbience().gettotalDuration(), null);
-                        String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(aSessionpartswithreducedambience.getduration(), null);
-                        a.append(count + 1).append(". ").append(aSessionpartswithreducedambience.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
-                        count++;
-                    }
-                    if (ambiencePlaybackType == null) {AmbienceSwitch.setSelected(false);}
                 } else {
+//                    if (! sessionpartswithreducedambience.isEmpty()) {
+//                        StringBuilder a = new StringBuilder();
+//                        int count = 0;
+//                        for (SessionPart aSessionpartswithreducedambience : sessionpartswithreducedambience) {
+//                            a.append("\n");
+//                            String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(aSessionpartswithreducedambience.getAmbience().gettotalDuration(), null);
+//                            String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(aSessionpartswithreducedambience.getduration(), null);
+//                            a.append(count + 1).append(". ").append(aSessionpartswithreducedambience.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
+//                            count++;
+//                        }
+//                    if (ambiencePlaybackType == null) {AmbienceSwitch.setSelected(false);}
                     AmbienceSwitch.setSelected(true);
                     ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();
                 }
@@ -1473,27 +1473,30 @@ public class SessionCreator implements UI {
         }
     }
     public class Player extends Stage {
-        public Button PlayButton;
-        public Button PauseButton;
-        public Button StopButton;
+        public Label CurrentSessionPartTopLabel;
+        public ProgressIndicator CurrentSessionPartProgress;
+        public Label CurrentProgressDetails;
+
         public Slider EntrainmentVolume;
         public Label EntrainmentVolumePercentage;
         public Slider AmbienceVolume;
         public Label AmbienceVolumePercentage;
-        public Label CurrentSessionPartTopLabel;
-        public Label SessionPartCurrentTimeLabel;
-        public ProgressBar CurrentSessionPartProgress;
-        public Label SessionPartTotalTimeLabel;
-        public Label TotalCurrentTimeLabel;
-        public ProgressBar TotalProgress;
-        public Label TotalTotalTimeLabel;
+
         public Label TotalSessionLabel;
-        public Label GoalTopLabel;
-        public ProgressBar GoalProgressBar;
-        public Label GoalPercentageLabel;
-        public Boolean displaynormaltime = true;
+        public ProgressIndicator TotalProgress;
+        public Label TotalProgressDetails;
+
         public CheckBox ReferenceCheckBox;
         public ComboBox<String> ReferenceTypeComboBox;
+
+        public Button PlayButton;
+        public Button PauseButton;
+        public Button StopButton;
+
+//        public Label GoalTopLabel;
+//        public ProgressBar GoalProgressBar;
+//        public Label GoalPercentageLabel;
+        public Boolean displaynormaltime = true;
         private Timeline player_updateuitimeline;
         // Playback Fields
         private Double currententrainmentvolume;
@@ -1508,7 +1511,8 @@ public class SessionCreator implements UI {
             try {
                 if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
                 progressTracker = Root.getProgressTracker();
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
+//                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog New Design.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
@@ -1521,8 +1525,8 @@ public class SessionCreator implements UI {
                 togglereference();
                 ReferenceCheckBox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
                 setResizable(false);
-                SessionPartTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
-                TotalTotalTimeLabel.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
+                CurrentProgressDetails.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
+                TotalProgressDetails.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
                 ObservableList<String> referencetypes = FXCollections.observableArrayList();
                 for (ReferenceType i : ReferenceType.values()) {referencetypes.add(i.toString());}
                 referencetypes.add("Help");
@@ -1577,7 +1581,7 @@ public class SessionCreator implements UI {
                     totalsessiondurationelapsed = Duration.ZERO;
                     totalsessionduration = Duration.ZERO;
                     for (SessionPart i : itemsinsession) {totalsessionduration = totalsessionduration.add(i.getduration());}
-                    TotalTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
+//                    TotalTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
                     player_updateuitimeline = new Timeline(new KeyFrame(Duration.millis(100), ae -> updateui()));
                     player_updateuitimeline.setCycleCount(Animation.INDEFINITE);
                     player_updateuitimeline.play();
@@ -1629,13 +1633,19 @@ public class SessionCreator implements UI {
                 totalprogress *= 100;
                 CurrentSessionPartTopLabel.setText(String.format("%s (%d", currentsessionpart.name, currentprogress.intValue()) + "%)");
                 TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
-                try {SessionPartCurrentTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentsessionpart.elapsedtime));}
-                catch (NullPointerException ignored) {SessionPartCurrentTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(Duration.ZERO));}
-                TotalCurrentTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessiondurationelapsed));
-                if (displaynormaltime) {SessionPartTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentsessionpart.getduration()));}
-                else {SessionPartTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(currentsessionpart.getduration().subtract(currentsessionpart.elapsedtime)));}
-                if (displaynormaltime) {TotalTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));}
-                else {TotalTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration.subtract(totalsessiondurationelapsed)));}
+                String currentparttime;
+                String totalparttime;
+                try {currentparttime = Util.formatdurationtoStringDecimalWithColons(currentsessionpart.elapsedtime);}
+                catch (NullPointerException ignored) {currentparttime = Util.formatdurationtoStringDecimalWithColons(Duration.ZERO);}
+                if (displaynormaltime) {totalparttime = Util.formatdurationtoStringDecimalWithColons(currentsessionpart.getduration());}
+                else {totalparttime = Util.formatdurationtoStringDecimalWithColons(currentsessionpart.getduration().subtract(currentsessionpart.elapsedtime));}
+                CurrentProgressDetails.setText(String.format("%s -> %s", currentparttime, totalparttime));
+                String currenttotaltime;
+                String totaltotaltime;
+                currenttotaltime = Util.formatdurationtoStringDecimalWithColons(totalsessiondurationelapsed);
+                if (displaynormaltime) {totaltotaltime = Util.formatdurationtoStringDecimalWithColons(totalsessionduration);}
+                else {totaltotaltime = Util.formatdurationtoStringDecimalWithColons(totalsessionduration.subtract(totalsessiondurationelapsed));}
+                TotalProgressDetails.setText(String.format("%s -> %s", currenttotaltime, totaltotaltime));
                 try {
                     if (displayReference != null && displayReference.isShowing()) {
                         displayReference.CurrentProgress.setProgress(currentprogress / 100);
@@ -1706,12 +1716,10 @@ public class SessionCreator implements UI {
             }
         }
         public void reset(boolean endofsession) {
-            SessionPartCurrentTimeLabel.setText("--:--");
             CurrentSessionPartProgress.setProgress(0.0);
-            SessionPartTotalTimeLabel.setText("--:--");
-            TotalCurrentTimeLabel.setText("--:--");
             TotalProgress.setProgress(0.0);
-            TotalTotalTimeLabel.setText("--:--");
+            CurrentProgressDetails.setText("");
+            TotalProgressDetails.setText("");
             EntrainmentVolume.setDisable(true);
             EntrainmentVolume.setValue(0.0);
             EntrainmentVolumePercentage.setText("0%");

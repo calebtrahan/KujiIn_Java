@@ -144,9 +144,7 @@ public class SessionPart {
     public void startup_ambiencetest() {
         System.out.println(name + "'s Ambience:");
         if (ambience.hasAnyAmbience()) {
-            for (SoundFile i : ambience.getAmbience()) {
-                System.out.println(" - " + i.toString());
-            }
+            for (SoundFile i : ambience.getAmbience()) {System.out.println(" - " + i.toString());}
         } else {System.out.println(name + " Has No Ambience");}
     }
 

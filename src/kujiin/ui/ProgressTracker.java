@@ -216,15 +216,15 @@ public class ProgressTracker implements UI {
         GoalProgressBar.setTooltip(goalprogresstooltip);
         NewGoalButton.setText(newgoalbuttontext);
         NewGoalButton.setTooltip(newgoalbuttontooltip);
-        if (playerUI != null && playerUI.isShowing()) {
-            playerUI.GoalTopLabel.setDisable(disabled);
-            playerUI.GoalPercentageLabel.setDisable(disabled);
-            playerUI.GoalProgressBar.setDisable(disabled);
-            playerUI.GoalTopLabel.setText(toptext);
-            playerUI.GoalProgressBar.setProgress(progress);
-            playerUI.GoalPercentageLabel.setText(percentage);
-            // String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue()) + "%)");
-        }
+//        if (playerUI != null && playerUI.isShowing()) {
+//            playerUI.GoalTopLabel.setDisable(disabled);
+//            playerUI.GoalPercentageLabel.setDisable(disabled);
+//            playerUI.GoalProgressBar.setDisable(disabled);
+//            playerUI.GoalTopLabel.setText(toptext);
+//            playerUI.GoalProgressBar.setProgress(progress);
+//            playerUI.GoalPercentageLabel.setText(percentage);
+//            // String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue()) + "%)");
+//        }
         if (SelectedSessionPart != null && Options.getUserInterfaceOptions().getTooltips()) {
             NewGoalButton.setTooltip(new Tooltip("Set A New Goal"));
             ViewCurrentGoalsButton.setTooltip(new Tooltip("Edit " + SelectedSessionPart.name + "'s Goals"));
