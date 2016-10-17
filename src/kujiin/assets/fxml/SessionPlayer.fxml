@@ -21,7 +21,7 @@
                   <VBox alignment="TOP_CENTER">
                      <children>
                         <Label fx:id="CurrentSessionPartTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="144.0" text="Postsession Progress" />
-                        <ProgressIndicator fx:id="CurrentSessionPartProgress" prefHeight="201.0" prefWidth="149.0" progress="0.72" />
+                        <ProgressIndicator fx:id="CurrentSessionPartProgress" prefHeight="201.0" prefWidth="149.0" progress="0.0" />
                         <Label fx:id="CurrentProgressDetails" alignment="CENTER" prefHeight="17.0" prefWidth="147.0" text="9:99:99 -&gt; 9:99:99" />
                      </children>
                   </VBox>
@@ -33,14 +33,14 @@
                               <VBox alignment="CENTER" prefHeight="170.0" prefWidth="46.0">
                                  <children>
                                     <Label text="ENT" />
-                                    <Slider fx:id="EntrainmentVolume" orientation="VERTICAL" />
+                                    <Slider fx:id="EntrainmentVolume" max="1.0" orientation="VERTICAL" />
                                     <Label fx:id="EntrainmentVolumePercentage" text="100%" />
                                  </children>
                               </VBox>
                               <VBox alignment="CENTER" prefHeight="170.0" prefWidth="40.0">
                                  <children>
                                     <Label text="AMB" />
-                                    <Slider fx:id="AmbienceVolume" orientation="VERTICAL" />
+                                    <Slider fx:id="AmbienceVolume" max="1.0" orientation="VERTICAL" />
                                     <Label fx:id="AmbienceVolumePercentage" text="100%" />
                                  </children>
                               </VBox>
@@ -69,10 +69,13 @@
                               <Font size="14.0" />
                            </font>
                         </CheckBox>
-                        <ComboBox fx:id="ReferenceTypeComboBox" prefHeight="29.0" prefWidth="104.0" />
+                        <ComboBox fx:id="ReferenceTypeComboBox" prefHeight="13.0" prefWidth="104.0" />
                      </children>
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding>
                   </HBox>
-                  <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="158.0">
+                  <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="217.0">
                      <children>
                         <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#play" text="Play" />
                         <Button fx:id="PauseButton" mnemonicParsing="false" onAction="#pause" text="Pause" />

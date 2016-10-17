@@ -1512,7 +1512,7 @@ public class SessionCreator implements UI {
                 if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
                 progressTracker = Root.getProgressTracker();
 //                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog New Design.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayer.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
