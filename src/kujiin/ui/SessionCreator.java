@@ -1615,8 +1615,7 @@ public class SessionCreator implements UI {
         public void updateui() {
             try {
                 totalsessiondurationelapsed = totalsessiondurationelapsed.add(Duration.millis(100));
-                try {
-                    currentsessionpart.elapsedtime = currentsessionpart.elapsedtime.add(Duration.millis(100));} catch (NullPointerException ignored) {}
+                try {currentsessionpart.elapsedtime = currentsessionpart.elapsedtime.add(Duration.millis(100));} catch (NullPointerException ignored) {}
                 Float currentprogress;
                 Float totalprogress;
                 try {
@@ -1629,10 +1628,8 @@ public class SessionCreator implements UI {
                 else {totalprogress = (float) 0.0;}
                 CurrentSessionPartProgress.setProgress(currentprogress);
                 TotalProgress.setProgress(totalprogress);
-                currentprogress *= 100;
-                totalprogress *= 100;
-                CurrentSessionPartTopLabel.setText(String.format("%s (%d", currentsessionpart.name, currentprogress.intValue()) + "%)");
-                TotalSessionLabel.setText(String.format("Session (%d", totalprogress.intValue()) + "%)");
+                CurrentSessionPartTopLabel.setText(currentsessionpart.name + " Progress");
+                TotalSessionLabel.setText("Session Progress");
                 String currentparttime;
                 String totalparttime;
                 try {currentparttime = Util.formatdurationtoStringDecimalWithColons(currentsessionpart.elapsedtime);}
