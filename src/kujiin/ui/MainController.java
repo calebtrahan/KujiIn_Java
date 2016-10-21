@@ -59,6 +59,7 @@ import java.util.stream.Collectors;
     // TODO Add Ramps To Connect Low (And Possibly Medium) Variations Of Session Parts With Each Other
 
 public class MainController implements Initializable {
+// GUI Fields
     public Label CreatorStatusBar;
     public Label PlayerStatusBar;
     public Button ExportButton;
@@ -125,7 +126,7 @@ public class MainController implements Initializable {
     private StartupChecks startupChecks;
     private ProgramState programState = ProgramState.IDLE;
 
-    // My Fields
+// My Fields
     private Qi_Gong Presession;
     private Cut Rin;
     private Cut Kyo;
@@ -403,6 +404,7 @@ public class MainController implements Initializable {
     public void menu_contactme() {
 //        PreviewFile previewFile = new PreviewFile(kujiin.xml.Options.TESTFILE, this);
 //        previewFile.showAndWait();
+        System.out.println(System.getProperty("os.name"));
     }
 
 // Startup Checks

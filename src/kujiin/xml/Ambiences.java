@@ -1,6 +1,7 @@
 package kujiin.xml;
 
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.ErrorDialog;
 import kujiin.ui.dialogs.InformationDialog;
 import kujiin.util.SessionPart;
 
@@ -36,7 +37,16 @@ public class Ambiences {
     private MainController Root;
 
     public Ambiences() {}
-    public Ambiences(MainController Root) {this.Root = Root; unmarshall();}
+    public Ambiences(MainController Root) {
+        this.Root = Root;
+        if (! Root.getOptions().getProgramOptions().getOS().equals(System.getProperty("os.name"))) {
+            if (! Options.AMBIENCEXMLFILE.delete()) {
+                new ErrorDialog(Root.getOptions(), "Error", "Cannot Write To Ambience's XML File",
+                        "Check Permissions For " + Options.AMBIENCEXMLFILE.getAbsolutePath());
+                return;
+            }
+        }
+        unmarshall();}
 
 // XML Processing
     public void unmarshall() {

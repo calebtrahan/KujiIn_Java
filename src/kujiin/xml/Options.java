@@ -49,9 +49,7 @@ public class Options {
     public static final ArrayList<String> QIGONGNAMES = new ArrayList<>(Arrays.asList("Presession", "Postsession"));
     public static final ArrayList<String> CUTNAMES = new ArrayList<>(Arrays.asList("RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN"));
     public static final ArrayList<String> ELEMENTNAMES = new ArrayList<>(Arrays.asList("Earth", "Air", "Fire", "Water", "Void"));
-    public static final ArrayList<String> ALLNAMES = new ArrayList<>(
-            Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Earth", "Air", "Fire", "Water", "Void", "Postsession")
-    );
+    public static final ArrayList<String> ALLNAMES = new ArrayList<>(Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Earth", "Air", "Fire", "Water", "Void", "Postsession"));
 /// Default Option Values
     // Program Options
     public static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
@@ -87,7 +85,7 @@ public class Options {
     // Files
     private UserInterfaceOptions UserInterfaceOptions;
     private SessionOptions SessionOptions;
-    private AdvancedOptions AdvancedOptions;
+    private ProgramOptions ProgramOptions;
 
     public Options() {}
 
@@ -104,11 +102,11 @@ public class Options {
     public void setSessionOptions(SessionOptions sessionOptions) {
         SessionOptions = sessionOptions;
     }
-    public AdvancedOptions getAdvancedOptions() {
-        return AdvancedOptions;
+    public ProgramOptions getProgramOptions() {
+        return ProgramOptions;
     }
-    public void setAdvancedOptions(AdvancedOptions advancedOptions) {
-        AdvancedOptions = advancedOptions;
+    public void setProgramOptions(ProgramOptions programOptions) {
+        ProgramOptions = programOptions;
     }
 
 // XML Processing
@@ -120,7 +118,7 @@ public class Options {
                 kujiin.xml.Options options = (kujiin.xml.Options) unmarshaller.unmarshal(OPTIONSXMLFILE);
                 setUserInterfaceOptions(options.getUserInterfaceOptions());
                 setSessionOptions(options.getSessionOptions());
-                setAdvancedOptions(options.getAdvancedOptions());
+                setProgramOptions(options.getProgramOptions());
             } catch (JAXBException ignored) {
                 Platform.runLater(() -> new InformationDialog(this, "Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
@@ -142,7 +140,7 @@ public class Options {
     public void resettodefaults() {
         UserInterfaceOptions userInterfaceOptions = new UserInterfaceOptions();
         kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
-        AdvancedOptions advancedOptions = new AdvancedOptions();
+        ProgramOptions programOptions = new ProgramOptions();
         userInterfaceOptions.setTooltips(DEFAULT_TOOLTIPS_OPTION);
         userInterfaceOptions.setHelpdialogs(DEFAULT_HELP_DIALOGS_OPTION);
         userInterfaceOptions.setScrollincrement(DEFAULT_SCROLL_INCREMENT);
@@ -163,9 +161,10 @@ public class Options {
         sessionOptions.setReferencetype(DEFAULT_REFERENCE_TYPE_OPTION);
         sessionOptions.setReferencefullscreen(DEFAULT_REFERENCE_FULLSCREEN_OPTION);
         sessionOptions.setAmbiencePlaybackType(DEFAULT_AMBIENCE_PLAYBACK_TYPE);
+        programOptions.setOS(System.getProperty("os.name"));
         setUserInterfaceOptions(userInterfaceOptions);
         setSessionOptions(sessionOptions);
-        setAdvancedOptions(advancedOptions);
+        setProgramOptions(programOptions);
         marshall();
     }
     public void setStyle(Stage stage) {
@@ -349,10 +348,18 @@ public class Options {
 
     }
     @XmlAccessorType(XmlAccessType.PROPERTY)
-    public static class AdvancedOptions {
+    public static class ProgramOptions {
+        private String OS;
 
+        public ProgramOptions() {}
 
-        public AdvancedOptions() {}
+    // Getters And Setters
+        public String getOS() {
+            return OS;
+        }
+        public void setOS(String OS) {
+            this.OS = OS;
+        }
 
     }
 

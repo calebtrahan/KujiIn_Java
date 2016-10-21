@@ -1,6 +1,7 @@
 package kujiin.xml;
 
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.ErrorDialog;
 import kujiin.ui.dialogs.InformationDialog;
 import kujiin.util.SessionPart;
 
@@ -38,6 +39,13 @@ public class Entrainments {
     public Entrainments() {}
     public Entrainments(MainController Root) {
         this.Root = Root;
+        if (! Root.getOptions().getProgramOptions().getOS().equals(System.getProperty("os.name"))) {
+            if (! Options.ENTRAINMENTXMLFILE.delete()) {
+                new ErrorDialog(Root.getOptions(), "Error", "Cannot Write To Entrainment's XML File",
+                        "Check Permissions For " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+                return;
+            }
+        }
         unmarshall();
     }
 
