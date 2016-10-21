@@ -44,9 +44,7 @@ public class SoundFile {
 // Utility Methods
     public boolean isValid() {
         boolean isvalid = name != null && file != null && duration != null && duration > 0.0;
-        if (! isvalid) {
-            System.out.println("Invalid File: Nane: " + name + " File: " + file.getAbsolutePath() + "Duration: " + duration);
-        }
+        if (! isvalid) {System.out.println("Invalid File: " + toString());}
         return isvalid;
     }
 
@@ -55,4 +53,5 @@ public class SoundFile {
     public String toString() {
         return "Name: " + getName() + ". File: " + file.getAbsolutePath() + ". Duration: " + getDuration() + " Milliseconds";
     }
+
 }

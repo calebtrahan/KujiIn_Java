@@ -49,11 +49,7 @@ public class Element extends SessionPart {
                 file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + getallCutNames().get(startupchecks_entrainment_count - 1).toLowerCase() + ".mp3");
                 break;
         }
-        if (soundFile == null) {
-            if (file.exists()) {
-                soundFile = new SoundFile(file);}
-            else {}
-        }
+        if (soundFile == null && file.exists()) {soundFile = new SoundFile(file);}
         return soundFile;
     }
 

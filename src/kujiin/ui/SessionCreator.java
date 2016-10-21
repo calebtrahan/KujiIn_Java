@@ -1493,9 +1493,6 @@ public class SessionCreator implements UI {
         public Button PauseButton;
         public Button StopButton;
 
-//        public Label GoalTopLabel;
-//        public ProgressBar GoalProgressBar;
-//        public Label GoalPercentageLabel;
         public Boolean displaynormaltime = true;
         private Timeline player_updateuitimeline;
         // Playback Fields
@@ -1628,8 +1625,8 @@ public class SessionCreator implements UI {
                 else {totalprogress = (float) 0.0;}
                 CurrentSessionPartProgress.setProgress(currentprogress);
                 TotalProgress.setProgress(totalprogress);
-                CurrentSessionPartTopLabel.setText(currentsessionpart.name + " Progress");
-                TotalSessionLabel.setText("Session Progress");
+                CurrentSessionPartTopLabel.setText(currentsessionpart.name + " (" + (itemsinsession.indexOf(currentsessionpart) + 1)  + "/" + itemsinsession.size() + ")");
+                TotalSessionLabel.setText("Session");
                 String currentparttime;
                 String totalparttime;
                 try {currentparttime = Util.formatdurationtoStringDecimalWithColons(currentsessionpart.elapsedtime);}

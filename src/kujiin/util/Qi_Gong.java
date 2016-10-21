@@ -60,15 +60,14 @@ public class Qi_Gong extends SessionPart {
                 break;
             default:
                 if (startupchecks_entrainment_count > startup_entrainmentpartcount() - 1) {throw new IndexOutOfBoundsException();}
-                soundFile = entrainment.ramp_get(startupchecks_entrainment_count);
+                try {
+                    soundFile = entrainment.ramp_get(startupchecks_entrainment_count);
+                } catch (IndexOutOfBoundsException ignored) {soundFile = null; ignored.printStackTrace();}
                 file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + getallCutNames().get(startupchecks_entrainment_count - 1).toLowerCase() + ".mp3");
                 break;
         }
-        if (soundFile == null) {
-            if (file.exists()) {
-                soundFile = new SoundFile(file);}
-            else {}
-        }
+        System.out.println(name + "'s SoundFile For File: " + file.getAbsolutePath() + " Is Null: " + Boolean.toString(soundFile == null));
+        if (soundFile == null && file.exists()) {soundFile = new SoundFile(file);}
         return soundFile;
     }
 

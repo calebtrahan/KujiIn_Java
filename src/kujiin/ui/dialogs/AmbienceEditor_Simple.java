@@ -222,11 +222,10 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
     public void save() {
         int index = SessionPartChoiceBox.getSelectionModel().getSelectedIndex();
         if (index != -1) {
-            for (SoundFile i : SoundList) {
-                if (! selectedsessionpart.getAmbience().ambienceexistsinActual(i)) {
-                    selectedsessionpart.getAmbience().add(i);}
-            }
-            Root.getAmbiences().setsessionpartAmbience(selectedsessionpart.number, selectedsessionpart.getAmbience());
+            SoundList.stream().filter(i -> !selectedsessionpart.getAmbience().ambienceexistsinActual(i)).forEach(i -> {
+                selectedsessionpart.getAmbience().add(i);
+            });
+            Root.getAmbiences().setsessionpartAmbience(selectedsessionpart, selectedsessionpart.getAmbience());
             Root.getAmbiences().marshall();
             new InformationDialog(Root.getOptions(), "Saved", "Ambience Saved To " + selectedsessionpart, "");
         } else {
@@ -245,4 +244,5 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         super.close();
         if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
     }
+
 }

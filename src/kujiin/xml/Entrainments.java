@@ -2,6 +2,7 @@ package kujiin.xml;
 
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.InformationDialog;
+import kujiin.util.SessionPart;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -11,9 +12,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
@@ -35,12 +33,13 @@ public class Entrainments {
     private Entrainment Void;
     private Entrainment Postsession;
     @XmlTransient
-    private final List<Entrainment> AllEntrainment = new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));
-    @XmlTransient
     private MainController Root;
 
     public Entrainments() {}
-    public Entrainments(MainController Root) {this.Root = Root; unmarshall();}
+    public Entrainments(MainController Root) {
+        this.Root = Root;
+        unmarshall();
+    }
 
 // XML Processing
     public void unmarshall() {
@@ -66,6 +65,23 @@ public class Entrainments {
                 Void = entrainments.Void;
                 Postsession = entrainments.Postsession;
             } catch (JAXBException ignored) {}
+        } else {
+            Presession = new Entrainment();
+            Rin = new Entrainment();
+            Kyo = new Entrainment();
+            Toh = new Entrainment();
+            Sha = new Entrainment();
+            Kai = new Entrainment();
+            Jin = new Entrainment();
+            Retsu = new Entrainment();
+            Zai = new Entrainment();
+            Zen = new Entrainment();
+            Earth = new Entrainment();
+            Air = new Entrainment();
+            Fire = new Entrainment();
+            Water = new Entrainment();
+            Void = new Entrainment();
+            Postsession = new Entrainment();
         }
     }
     public void marshall() {
@@ -81,13 +97,29 @@ public class Entrainments {
     }
 
 // Other Methods
-    public Entrainment getsessionpartEntrainment(int index) {
-        Entrainment entrainment = AllEntrainment.get(index);
-        if (entrainment == null) {return new Entrainment();}
-        else {return entrainment;}
+    public Entrainment getsessionpartEntrainment(SessionPart sessionPart) {
+        switch (sessionPart.number) {
+            case 0: return Presession;
+            case 1: return Rin;
+            case 2: return Kyo;
+            case 3: return Toh;
+            case 4: return Sha;
+            case 5: return Kai;
+            case 6: return Jin;
+            case 7: return Retsu;
+            case 8: return Zai;
+            case 9: return Zen;
+            case 10: return Earth;
+            case 11: return Air;
+            case 12: return Fire;
+            case 13: return Water;
+            case 14: return Void;
+            case 15: return Postsession;
+        }
+        return null;
     }
-    public void setsessionpartEntrainment(int index, Entrainment entrainment) {
-        switch (index) {
+    public void setsessionpartEntrainment(SessionPart sessionPart, Entrainment entrainment) {
+        switch (sessionPart.number) {
             case 0: Presession = entrainment; break;
             case 1: Rin = entrainment; break;
             case 2: Kyo = entrainment; break;

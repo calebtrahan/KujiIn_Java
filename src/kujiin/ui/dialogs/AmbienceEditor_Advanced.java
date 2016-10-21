@@ -301,7 +301,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         int index = SessionPartSelectionBox.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             actual_soundfilelist.stream().filter(i -> !selectedsessionpart.getAmbience().ambienceexistsinActual(i)).forEach(i -> selectedsessionpart.getAmbience().add(i));
-            Root.getAmbiences().setsessionpartAmbience(selectedsessionpart.number, selectedsessionpart.getAmbience());
+            Root.getAmbiences().setsessionpartAmbience(selectedsessionpart, selectedsessionpart.getAmbience());
             Root.getAmbiences().marshall();
             new InformationDialog(Root.getOptions(), "Saved", "Ambience Saved To " + selectedsessionpart, "");
         } else {

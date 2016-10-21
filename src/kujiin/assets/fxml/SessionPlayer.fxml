@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="239.0" prefWidth="417.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="239.0" prefWidth="417.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox alignment="CENTER" layoutX="78.0" layoutY="151.0" prefHeight="199.0" prefWidth="417.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -27,7 +27,10 @@
                   </VBox>
                   <VBox>
                      <children>
-                        <Label text="Volume Control" />
+                        <Label text="Volume Control">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin></Label>
                         <HBox>
                            <children>
                               <VBox alignment="CENTER" prefHeight="170.0" prefWidth="46.0">
@@ -48,7 +51,7 @@
                         </HBox>
                      </children>
                      <padding>
-                        <Insets bottom="15.0" />
+                        <Insets bottom="15.0" top="15.0" />
                      </padding>
                   </VBox>
                   <VBox>

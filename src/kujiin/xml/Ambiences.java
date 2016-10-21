@@ -2,6 +2,7 @@ package kujiin.xml;
 
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.InformationDialog;
+import kujiin.util.SessionPart;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -74,8 +75,8 @@ public class Ambiences {
     }
 
 // Other Methods
-    public Ambience getsessionpartAmbience(int index) {
-        switch (index) {
+    public Ambience getsessionpartAmbience(SessionPart sessionPart) {
+        switch (sessionPart.number) {
             case 0:
                 if (Presession != null) {return Presession;} else {return new Ambience();}
             case 1:
@@ -112,8 +113,8 @@ public class Ambiences {
                 return null;
         }
     }
-    public void setsessionpartAmbience(int index, Ambience ambience) {
-        switch (index) {
+    public void setsessionpartAmbience(SessionPart sessionPart, Ambience ambience) {
+        switch (sessionPart.number) {
             case 0:
                 Presession = ambience;
                 break;

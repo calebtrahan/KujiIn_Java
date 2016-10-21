@@ -82,10 +82,7 @@ public class Cut extends SessionPart {
             default:
                 throw new IndexOutOfBoundsException();
         }
-        if (soundFile == null) {
-            if (file.exists()) {soundFile = new SoundFile(file);}
-            else {return null;}
-        }
+        if (soundFile == null && file.exists()) {soundFile = new SoundFile(file);}
         return soundFile;
     }
 

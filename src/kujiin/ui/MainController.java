@@ -460,17 +460,15 @@ public class MainController implements Initializable {
             SoundFile soundFile;
             try {soundFile = selectedsessionpart.startup_getNext();}
             catch (IndexOutOfBoundsException ignored) {
-                getEntrainments().setsessionpartEntrainment(selectedsessionpart.number, selectedsessionpart.getEntrainment());
+                getEntrainments().setsessionpartEntrainment(selectedsessionpart, selectedsessionpart.getEntrainment());
                 if (! selectedsessionpart.getAmbience_hasAny() && ! partswithnoambience.contains(selectedsessionpart)) {partswithnoambience.add(selectedsessionpart);}
-                else { getAmbiences().setsessionpartAmbience(selectedsessionpart.number, selectedsessionpart.getAmbience());}
+                else { getAmbiences().setsessionpartAmbience(selectedsessionpart, selectedsessionpart.getAmbience());}
                 sessionpartcount++;
                 selectedsessionpart = null;
                 try {call();} catch (Exception ign) {ignored.printStackTrace();}
                 return null;
             }
-            System.out.println("Retrieved: " + soundFile.getFile().getAbsolutePath());
             if (! soundFile.isValid()) {
-                System.out.println("Sound File Isn't Valid");
                 startupcheckplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
                 startupcheckplayer.setOnReady(() -> {
                     if (startupcheckplayer.getTotalDuration().greaterThan(Duration.ZERO)) {

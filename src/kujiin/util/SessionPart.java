@@ -88,8 +88,8 @@ public class SessionPart {
                 Switch.setOnAction(event -> gui_toggleswitch());
                 gui_toggleswitch();
             }
-            entrainment = root.getEntrainments().getsessionpartEntrainment(number);
-            ambience = root.getAmbiences().getsessionpartAmbience(number);
+            entrainment = root.getEntrainments().getsessionpartEntrainment(this);
+            ambience = root.getAmbiences().getsessionpartAmbience(this);
         }
         //        tempentrainmenttextfile = new File(Options.DIRECTORYTEMP, "txt/" + name + "Ent.txt");
 //        tempentrainmentfile = new File(Options.DIRECTORYTEMP, "Entrainment/" + name + "Temp.mp3");
@@ -105,7 +105,6 @@ public class SessionPart {
         return startupCheckType;
     }
     public SoundFile startup_getNext() throws IndexOutOfBoundsException {
-//        System.out.println("Startup Type Is: " + startupCheckType.toString());
         if (startupCheckType == StartupCheckType.ENTRAINMENT) {
             try {return startup_getnextentrainment();} catch (IndexOutOfBoundsException ignored) {
                 startupCheckType = StartupCheckType.AMBIENCE;
@@ -201,12 +200,12 @@ public class SessionPart {
     }
     public void setAmbience(Ambience ambience) {
         this.ambience = ambience;
-        root.getAmbiences().setsessionpartAmbience(number, ambience);
+        root.getAmbiences().setsessionpartAmbience(this, ambience);
     }
     public Entrainment getEntrainment() {return entrainment;}
     public void setEntrainment(Entrainment entrainment) {
         this.entrainment = entrainment;
-        root.getEntrainments().setsessionpartEntrainment(number, entrainment);
+        root.getEntrainments().setsessionpartEntrainment(this, entrainment);
     }
     public void setGoalsController(Goals goals) {
         GoalsController = goals;
