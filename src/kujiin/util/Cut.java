@@ -54,7 +54,8 @@ public class Cut extends SessionPart {
 // Entrainment
     @Override
     public int startup_entrainmentpartcount() {
-        return 3;
+        if (number == 9) {return 2;}
+        else {return 3;}
     }
     @Override
     public SoundFile startup_getnextentrainment() throws IndexOutOfBoundsException {

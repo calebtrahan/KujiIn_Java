@@ -411,13 +411,11 @@ public class MainController implements Initializable {
         sessionCreator.setDisable(true, "");
         startupChecks = new StartupChecks(getAllSessionParts(false));
         startupChecks.run();
-        startupChecks.setOnRunning(event -> CreatorStatusBar.textProperty().bind(startupChecks.messageProperty()));
     }
     public void startupchecks_finished() {
-        CreatorStatusBar.textProperty().unbind();
         sessionCreator.setDisable(false, "");
-        Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Startup Checks Completed", 3000);
         programState = ProgramState.IDLE;
+        Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Startup Checks Completed", 3000);
     }
     class StartupChecks extends Task {
         private SessionPart selectedsessionpart;
@@ -445,12 +443,13 @@ public class MainController implements Initializable {
     // Method Overrides
         @Override
         protected Object call() throws Exception {
-            if (firstcall) {calculatetotalworktodo(); firstcall = false;}
+            if (firstcall) {CreatorStatusBar.textProperty().bind(messageProperty()); calculatetotalworktodo(); firstcall = false;}
             if (progresstonextsessionpart) {
                 try {
                     if (selectedsessionpart == null) {selectedsessionpart = sessionPartList.get(sessionpartcount);}
                 } catch (IndexOutOfBoundsException e) {
                     // End Of Startup Checks
+                    CreatorStatusBar.textProperty().unbind();
                     getEntrainments().marshall();
                     getAmbiences().marshall();
                     startupchecks_finished();

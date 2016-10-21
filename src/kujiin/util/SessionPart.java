@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static kujiin.ui.MainController.getallCutNames;
 import static kujiin.xml.Options.DEFAULT_FADERESUMEANDPAUSEDURATION;
 
 public class SessionPart {
@@ -113,10 +114,17 @@ public class SessionPart {
         } else {return startup_getnextambience();}
     }
     // Entrainment
-    public void startup_setEntrainmentSoundFile(SoundFile soundFile) {entrainment.setFile(soundFile);}
+    public void startup_setEntrainmentSoundFile(SoundFile soundFile) {entrainment.set(soundFile);}
     public int startup_entrainmentpartcount() {return 0;}
     public SoundFile startup_getnextentrainment() throws IndexOutOfBoundsException {
-       return null;
+        SoundFile soundFile;
+        if (startupchecks_entrainment_count > startup_entrainmentpartcount() - 1) {throw new IndexOutOfBoundsException();}
+        soundFile = entrainment.get(startupchecks_entrainment_count);
+        File file;
+        if (startupchecks_entrainment_count == 0) {file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");}
+        else {file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + getallCutNames().get(startupchecks_entrainment_count - 1).toLowerCase() + ".mp3");}
+        if (soundFile == null && file.exists()) {soundFile = new SoundFile(file);}
+        return soundFile;
     }
     public void startup_incremententrainmentcount() {startupchecks_entrainment_count++;}
     public void startup_entrainmenttest() {

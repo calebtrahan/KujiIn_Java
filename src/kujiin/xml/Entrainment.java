@@ -15,11 +15,18 @@ public class Entrainment {
     public Entrainment() {
     }
 
-    public void setFile(SoundFile soundFile) {
+    public void set(SoundFile soundFile) {
         if (! soundFile.getFile().getAbsolutePath().contains("ramp")) {setFreq(soundFile);}
-        else {ramp_set(soundFile);}
+        else {ramp_addorset(soundFile);}
+    }
+    public SoundFile get(int index) {
+        switch (index) {
+            case 0: return freq;
+            default: return ramp_get(index - 1);
+        }
     }
 
+// Getters And Setters
     public SoundFile getFreq() {
         return freq;
     }
@@ -36,20 +43,15 @@ public class Entrainment {
         return rampfiles;
     }
 
-    // Ramp Methods
+// Ramp Methods
     public void ramp_initialize() {if (rampfiles == null) {rampfiles = new ArrayList<>();}}
-    public void ramp_add(SoundFile soundFile) {ramp_initialize(); rampfiles.add(soundFile);}
-    public void ramp_set(SoundFile soundFile) {
+    public void ramp_addorset(SoundFile soundFile) {
         ramp_initialize();
         int index = rampfiles.stream().map(SoundFile::getFile).collect(Collectors.toCollection(ArrayList::new)).indexOf(soundFile.getFile());
-        if (index == -1) {ramp_add(soundFile);}
+        if (index == -1) {rampfiles.add(soundFile);}
         else {rampfiles.set(index, soundFile);}
     }
     public SoundFile ramp_get(int index) {
-//        try {
-//            int count = 0;
-//            for (SoundFile i : rampfiles) {System.out.println(count + ": " + i.getFile().getAbsolutePath());}
-//        } catch (NullPointerException ignored) {}
         try {return rampfiles.get(index);}
         catch (NullPointerException | IndexOutOfBoundsException ignored) {ramp_initialize(); return null;}
     }
@@ -58,7 +60,5 @@ public class Entrainment {
     public String toString() {
         return super.toString();
     }
-
-    // Other Methods
 
 }

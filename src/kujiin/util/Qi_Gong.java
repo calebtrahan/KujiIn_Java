@@ -11,8 +11,6 @@ import kujiin.xml.SoundFile;
 
 import java.io.File;
 
-import static kujiin.ui.MainController.getallCutNames;
-
 public class Qi_Gong extends SessionPart {
     private String Summary;
 
@@ -49,27 +47,6 @@ public class Qi_Gong extends SessionPart {
     public int startup_entrainmentpartcount() {
         return 10;
     }
-    @Override
-    public SoundFile startup_getnextentrainment() throws IndexOutOfBoundsException {
-        SoundFile soundFile;
-        File file;
-        switch (startupchecks_entrainment_count) {
-            case 0:
-                soundFile = entrainment.getFreq();
-                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
-                break;
-            default:
-                if (startupchecks_entrainment_count > startup_entrainmentpartcount() - 1) {throw new IndexOutOfBoundsException();}
-                try {
-                    soundFile = entrainment.ramp_get(startupchecks_entrainment_count);
-                } catch (IndexOutOfBoundsException ignored) {soundFile = null; ignored.printStackTrace();}
-                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + getallCutNames().get(startupchecks_entrainment_count - 1).toLowerCase() + ".mp3");
-                break;
-        }
-        System.out.println(name + "'s SoundFile For File: " + file.getAbsolutePath() + " Is Null: " + Boolean.toString(soundFile == null));
-        if (soundFile == null && file.exists()) {soundFile = new SoundFile(file);}
-        return soundFile;
-    }
 
 // Creation
     @Override
@@ -89,7 +66,7 @@ public class Qi_Gong extends SessionPart {
             }
             SoundFile rampfile;
             if (parttotest instanceof  Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
-            else {rampfile = entrainment.ramp_get(Options.CUTNAMES.indexOf(parttotest.name.toUpperCase()));}
+            else {rampfile = entrainment.ramp_get(Options.CUTNAMES.indexOf(parttotest.name.toUpperCase()) - 1);}
             entrainment.setRampfile(rampfile);
             if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
             return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();

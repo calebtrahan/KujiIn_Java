@@ -8,10 +8,6 @@ import kujiin.ui.MainController;
 import kujiin.xml.Options;
 import kujiin.xml.SoundFile;
 
-import java.io.File;
-
-import static kujiin.ui.MainController.getallCutNames;
-
 
 public class Element extends SessionPart {
 
@@ -33,24 +29,6 @@ public class Element extends SessionPart {
     @Override
     public int startup_entrainmentpartcount() {
         return 10;
-    }
-    @Override
-    public SoundFile startup_getnextentrainment() throws IndexOutOfBoundsException {
-        SoundFile soundFile;
-        File file;
-        switch (startupchecks_entrainment_count) {
-            case 0:
-                soundFile = entrainment.getFreq();
-                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
-                break;
-            default:
-                if (startupchecks_entrainment_count > startup_entrainmentpartcount() - 1) {throw new IndexOutOfBoundsException();}
-                soundFile = entrainment.ramp_get(startupchecks_entrainment_count);
-                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + getallCutNames().get(startupchecks_entrainment_count - 1).toLowerCase() + ".mp3");
-                break;
-        }
-        if (soundFile == null && file.exists()) {soundFile = new SoundFile(file);}
-        return soundFile;
     }
 
 // Creation
