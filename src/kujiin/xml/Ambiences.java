@@ -46,7 +46,8 @@ public class Ambiences {
                 return;
             }
         }
-        unmarshall();}
+        unmarshall();
+    }
 
 // XML Processing
     public void unmarshall() {
