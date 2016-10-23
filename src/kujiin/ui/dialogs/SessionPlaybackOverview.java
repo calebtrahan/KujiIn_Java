@@ -898,4 +898,5 @@ public class SessionPlaybackOverview extends Stage {
             return soundfiles;
         }
     }
+
 }
