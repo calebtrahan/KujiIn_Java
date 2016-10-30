@@ -49,11 +49,21 @@ public class Entrainment {
         ramp_initialize();
         int index = rampfiles.stream().map(SoundFile::getFile).collect(Collectors.toCollection(ArrayList::new)).indexOf(soundFile.getFile());
         if (index == -1) {rampfiles.add(soundFile);}
-        else {rampfiles.set(index, soundFile);}
+        else if (! soundFile.equals(rampfiles.get(index))) {rampfiles.set(index, soundFile);}
     }
     public SoundFile ramp_get(int index) {
-        try {return rampfiles.get(index);}
-        catch (NullPointerException | IndexOutOfBoundsException ignored) {ramp_initialize(); return null;}
+        System.out.println("Tried To Pull File " + index + " Out Of A Possible " + rampfiles.size());
+        try {
+            return rampfiles.get(index);
+        } catch (NullPointerException | IndexOutOfBoundsException ignored) {
+            if (ignored instanceof IndexOutOfBoundsException) {
+                System.out.println("Index Out Of Bounds");
+                ramp_initialize();
+                return null;
+            } else {
+                return null;
+            }
+        }
     }
 
     @Override

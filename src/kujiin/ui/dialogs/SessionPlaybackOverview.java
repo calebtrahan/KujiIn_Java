@@ -60,13 +60,12 @@ public class SessionPlaybackOverview extends Stage {
     private boolean result;
     private MainController Root;
     private AmbiencePlaybackType ambiencePlaybackType;
-    private List<SessionPart> itemsinsession;
 
     public SessionPlaybackOverview(MainController Root, List<SessionPart> itemsinsession) {
         try {
             this.Root = Root;
             alladjustedsessionitems = itemsinsession;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlaybackOverview.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionPlaybackOverview.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
@@ -176,6 +175,10 @@ public class SessionPlaybackOverview extends Stage {
             populatetable();
         } catch (IOException ignored) {
         }
+    }
+
+    public List<SessionPart> getAlladjustedsessionitems() {
+        return alladjustedsessionitems;
     }
 
     // Table
@@ -302,7 +305,7 @@ public class SessionPlaybackOverview extends Stage {
     }
     public int getlastworkingcutindex() {
         int lastcutindex = 0;
-        for (SessionPart i : itemsinsession) {
+        for (SessionPart i : alladjustedsessionitems) {
             if (i instanceof Cut && i.getduration().greaterThan(Duration.ZERO)) {
                 lastcutindex = i.number;
             }
@@ -485,12 +488,8 @@ public class SessionPlaybackOverview extends Stage {
         if (!indexesmissingduration.isEmpty()) {
             if (new ConfirmationDialog(Root.getOptions(), "Confirmation", indexesmissingduration.size() + " Session Parts Are Missing Durations", "Set Ramp Only For The Parts Missing Durations",
                     "Set Ramp Only", "Cancel Playback").getResult()) {
-                for (int x : indexesmissingduration) {
-                    alladjustedsessionitems.get(x).setRamponly(true);
-                }
-            } else {
-                return;
-            }
+                for (int x : indexesmissingduration) {alladjustedsessionitems.get(x).setRamponly(true);}
+            } else {return;}
         }
         // Check Ambience
         if (AmbienceSwitch.isSelected() && ambiencePlaybackType != null) {
@@ -556,11 +555,7 @@ public class SessionPlaybackOverview extends Stage {
             }
         }
         result = true;
-        itemsinsession = alladjustedsessionitems;
         close();
-    }
-    public List<SessionPart> getItemsinsession() {
-        return itemsinsession;
     }
     public void cancel() {
         alladjustedsessionitems = null;

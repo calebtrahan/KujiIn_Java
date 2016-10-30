@@ -221,8 +221,8 @@ public class SessionPart {
 
 // Duration
     public void setRamponly(boolean ramponly) {
-    this.ramponly = ramponly;
-}
+        this.ramponly = ramponly;
+    }
     public void setDuration(Duration duration) {this.duration = duration;}
     public Duration getduration() {return duration;}
     public String getdurationasString(boolean includeramp, double maxchars) {

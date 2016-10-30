@@ -215,7 +215,7 @@ public class SessionCreator implements UI {
     }
     public boolean creationprechecks() {
         if (Root.getProgramState() == ProgramState.IDLE) {
-            if (!allvaluesnotzero()) {
+            if (! allvaluesnotzero()) {
                 new ErrorDialog(options, "Error", "All Values Are 0", "Cannot Play Session");
                 return false;
             }
@@ -224,7 +224,10 @@ public class SessionCreator implements UI {
             SessionPlaybackOverview sessionPlaybackOverview = new SessionPlaybackOverview(Root, itemsinsession);
             sessionPlaybackOverview.showAndWait();
             setDisable(false, "");
-            if (sessionPlaybackOverview.getResult()) {return true;}
+            if (sessionPlaybackOverview.getResult()) {
+                itemsinsession = sessionPlaybackOverview.getAlladjustedsessionitems();
+                return true;
+            }
             else {reset(false); return false;}
         } else {return false;}
     }

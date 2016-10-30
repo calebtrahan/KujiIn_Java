@@ -51,6 +51,7 @@ public class Qi_Gong extends SessionPart {
 // Creation
     @Override
     public boolean creation_buildEntrainment() {
+        System.out.println("Called Build Entrainment For " + name);
         if (root.getOptions().getSessionOptions().getRampenabled()) {
             int index = allsessionpartstoplay.indexOf(this);
             SessionPart parttotest;
@@ -90,4 +91,5 @@ public class Qi_Gong extends SessionPart {
                 return null;
         }
     }
+
 }
