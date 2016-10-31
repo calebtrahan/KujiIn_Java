@@ -67,7 +67,10 @@ public class Qi_Gong extends SessionPart {
             }
             SoundFile rampfile;
             if (parttotest instanceof  Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
-            else {rampfile = entrainment.ramp_get(Options.CUTNAMES.indexOf(parttotest.name.toUpperCase()) - 1);}
+            else {
+                // TODO The Indexing Is Fucked Up Here!
+                rampfile = entrainment.ramp_get(Options.CUTNAMES.indexOf(parttotest.name.toUpperCase()) - 1);
+            }
             entrainment.setRampfile(rampfile);
             if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
             return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();

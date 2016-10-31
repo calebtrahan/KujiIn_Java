@@ -186,6 +186,7 @@ public class SessionPart {
         } else {Value.setDisable(true);}
     }
     public int gui_getvalue() {return Integer.parseInt(Value.getText());}
+
 // Getters And Setters
     public boolean getAmbience_hasAny() {
         return Ambience_hasAny;
