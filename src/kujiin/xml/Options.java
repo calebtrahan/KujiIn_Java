@@ -2,7 +2,6 @@ package kujiin.xml;
 
 import javafx.application.Platform;
 import javafx.scene.image.Image;
-import javafx.stage.Stage;
 import kujiin.ui.dialogs.InformationDialog;
 import kujiin.util.enums.AmbiencePlaybackType;
 import kujiin.util.enums.ReferenceType;
@@ -166,12 +165,6 @@ public class Options {
         setSessionOptions(sessionOptions);
         setProgramOptions(programOptions);
         marshall();
-    }
-    public void setStyle(Stage stage) {
-        stage.getIcons().clear();
-        stage.getIcons().add(PROGRAM_ICON);
-        String themefile = getUserInterfaceOptions().getThemefile();
-        if (themefile != null) {stage.getScene().getStylesheets().add(themefile);}
     }
     public void addthemefile(String name, String file_location) {
         ArrayList<String> files = getUserInterfaceOptions().getThemefiles();

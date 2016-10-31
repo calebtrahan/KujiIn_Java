@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 public class SelectAlertFile extends Stage {
     public Button HelpButton;
     public Button AcceptButton;
@@ -33,7 +35,10 @@ public class SelectAlertFile extends Stage {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             Root.setScene(defaultscene);
-            Root.getOptions().setStyle(this);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setTitle("Alert File Editor");
             AlertFileToggleButton.setSelected(Root.getOptions().getSessionOptions().getAlertfunction());
             String alertfilelocation = Root.getOptions().getSessionOptions().getAlertfilelocation();

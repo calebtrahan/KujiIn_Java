@@ -8,10 +8,14 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
+import kujiin.util.SessionPart;
 import kujiin.util.enums.ReferenceType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import static kujiin.xml.Options.PROGRAM_ICON;
 
 public class SelectReferenceType extends Stage {
     public RadioButton HTMLRadioButton;
@@ -23,17 +27,21 @@ public class SelectReferenceType extends Stage {
     private ArrayList<String> descriptions = new ArrayList<>();
     private boolean result = false;
     private MainController Root;
+    private List<SessionPart> itemsinsession;
 
-    public SelectReferenceType(MainController Root) {
+    public SelectReferenceType(MainController Root, List<SessionPart> itemsinsession) {
+        this.itemsinsession = itemsinsession;
         try {
-            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SelectReferenceType.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setTitle("Select Reference Type");
-            Root.getOptions().setStyle(this);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             this.setResizable(false);
             setOnCloseRequest(event -> {});
             descriptions.add("Display HTML Variation Of Reference Files During Session Playback. This Is Stylized Code That Allows You To Color/Format Your Reference In A Way Plain Text Cannot");
@@ -79,9 +87,32 @@ public class SelectReferenceType extends Stage {
         HTMLRadioButton.setSelected(false);
         Description.setText(descriptions.get(1));
     }
+    public boolean checkreferencefiles() {
+        int nonexisting = 0;
+        int empty = 0;
+        int invalid = 0;
+        for (SessionPart i : itemsinsession) {
+            if (! i.reference_exists(getReferenceType())) {nonexisting++;}
+            else if (i.reference_empty(getReferenceType())) {empty++;}
+            else if (i.reference_invalid(getReferenceType())) {invalid++;}
+        }
+        if (nonexisting > 0) {
+            new ErrorDialog(Root.getOptions(), "Missing Reference Files", "Missing Reference Files For " + nonexisting + " Session Parts", "Cannot Enable Reference");
+            return false;
+        }
+        if (empty > 0 || invalid > 0) {
+            StringBuilder msg = new StringBuilder();
+            if (empty > 0) {msg.append(empty).append(" Session Parts With Empty Reference Files");}
+            if (empty > 0 && invalid > 0) {msg.append("\n");}
+            if (invalid > 0) {msg.append(invalid).append(" Session Parts With Invalid .html Reference");}
+            return new ConfirmationDialog(Root.getOptions(), "Enable Reference Confirmation", "Reference Files Incomplete", msg.toString(), "Continue Anyway", "Cancel").getResult();
+        } else {return true;}
+    }
     public void accept() {
-        if (HTMLRadioButton.isSelected() || TextRadioButton.isSelected()) {result = true;  close();}
-else {
+        if (HTMLRadioButton.isSelected() || TextRadioButton.isSelected()) {
+            if (checkreferencefiles()) {result = true;  close();}
+        }
+        else {
             new InformationDialog(Root.getOptions(), "Cannot Accept", "No Reference Type Selected", null);
             result = false;
         }
@@ -89,13 +120,7 @@ else {
 
 // Utility Methods
     private void setdescriptiontoselectedtype() {
-    if (HTMLRadioButton.isSelected()) {Description.setText(descriptions.get(0));}
-    else if (TextRadioButton.isSelected()) {Description.setText(descriptions.get(1));}
-}
-
-    @Override
-    public void close() {
-        super.close();
-        if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
+        if (HTMLRadioButton.isSelected()) {Description.setText(descriptions.get(0));}
+        else if (TextRadioButton.isSelected()) {Description.setText(descriptions.get(1));}
     }
 }

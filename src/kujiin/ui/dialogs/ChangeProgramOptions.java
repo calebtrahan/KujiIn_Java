@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 public class ChangeProgramOptions extends Stage {
     public CheckBox TooltipsCheckBox;
     public CheckBox HelpDialogsCheckBox;
@@ -46,7 +48,10 @@ public class ChangeProgramOptions extends Stage {
             Options = Root.getOptions();
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            Options.setStyle(this);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             setTitle("Preferences");
             setuplisteners();
@@ -182,7 +187,7 @@ public class ChangeProgramOptions extends Stage {
     public void referencetoggle() {
         Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
         if (ReferenceSwitch.isSelected()) {
-            SelectReferenceType selectReferenceType = new SelectReferenceType(Root);
+            SelectReferenceType selectReferenceType = new SelectReferenceType(Root, Root.getAllSessionParts(false));
             selectReferenceType.showAndWait();
             if (selectReferenceType.getResult()) {
                 Options.getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());

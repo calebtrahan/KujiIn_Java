@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 public class SessionDetails extends Stage {
     private MainController Root;
     public BarChart<String, Number> SessionBarChart;
@@ -45,8 +47,11 @@ public class SessionDetails extends Stage {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            Root.getOptions().setStyle(this);
-            this.setResizable(false);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
+            setResizable(false);
             SessionNumbersAxis.setLabel("Minutes");
             setTitle("Session Details");
             XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
@@ -81,8 +86,11 @@ public class SessionDetails extends Stage {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            options.setStyle(this);
-            this.setResizable(false);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
+            setResizable(false);
             SessionNumbersAxis.setLabel("Minutes");
             setTitle("Session Details");
             DatePracticedTextField.setText(session.getDate_Practiced().format(Util.dateFormat));

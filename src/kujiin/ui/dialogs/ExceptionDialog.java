@@ -14,6 +14,8 @@ import kujiin.xml.Options;
 import java.io.IOException;
 import java.time.LocalDate;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 public class ExceptionDialog extends Stage {
     public TextArea StackTraceTextField;
     public Button CloseButton;
@@ -22,19 +24,23 @@ public class ExceptionDialog extends Stage {
     public Label TopText;
 
     public ExceptionDialog(Options options, Exception exception) {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ExceptionDialog.fxml"));
-        fxmlLoader.setController(this);
         try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ExceptionDialog.fxml"));
+            fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            options.setStyle(this);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = options.getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
+            System.out.println(String.format("Time %s Encountered: %s", exception.getClass().getName(), LocalDate.now()));
+            exception.printStackTrace();
+            setTitle("Program Error Occured");
+            TopText.setText(exception.getClass().getName() + " Occured");
+            StackTraceTextField.setText(exception.getMessage());
+            StackTraceTextField.setWrapText(true);
         } catch (IOException ignored) {}
-        System.out.println(String.format("Time %s Encountered: %s", exception.getClass().getName(), LocalDate.now()));
-        exception.printStackTrace();
-        setTitle("Program Error Occured");
-        TopText.setText(exception.getClass().getName() + " Occured");
-        StackTraceTextField.setText(exception.getMessage());
-        StackTraceTextField.setWrapText(true);
+
     }
 
     public void exit(ActionEvent actionEvent) {

@@ -77,9 +77,8 @@ public class Qi_Gong extends SessionPart {
     }
 
     @Override
-    public File reference_getFile() {
-        ReferenceType referenceType = root.getOptions().getSessionOptions().getReferencetype();
-        if (referenceType == null) {return null;}
+    public File reference_getFile(ReferenceType referenceType) {
+        if (referenceType == null) {referenceType = root.getOptions().getSessionOptions().getReferencetype();}
         switch (referenceType) {
             case html: {
                 String name = "Qi-Gong.html";

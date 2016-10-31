@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 public class DisplayReference extends Stage {
     public ScrollPane ContentPane;
     public Slider EntrainmentVolumeSlider;
@@ -48,11 +50,14 @@ public class DisplayReference extends Stage {
             fxmlLoader.setController(this);
             scene = new Scene(fxmlLoader.load());
             setScene(scene);
-            Root.getOptions().setStyle(this);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
 //                this.setResizable(false);
             setTitle(sessionPart.name + "'s Reference");
             setsizing();
-            loadcontent(sessionPart.reference_getFile());
+            loadcontent(sessionPart.reference_getFile(referenceType));
             AmbienceVolumeSlider.setValue(Root.getSessionCreator().getPlayer().AmbienceVolume.getValue());
             AmbienceVolumePercentage.setText(Root.getSessionCreator().getPlayer().AmbienceVolumePercentage.getText());
             EntrainmentVolumeSlider.setValue(Root.getSessionCreator().getPlayer().EntrainmentVolume.getValue());
@@ -86,7 +91,10 @@ public class DisplayReference extends Stage {
             fxmlLoader.setController(this);
             scene = new Scene(fxmlLoader.load());
             setScene(scene);
-            Root.getOptions().setStyle(this);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             this.setResizable(false);
             setTitle("Reference File Preview");
             fullscreenoption = false;
@@ -127,7 +135,10 @@ public class DisplayReference extends Stage {
                     ta.setText(sb.toString());
                     ta.setWrapText(true);
                     ContentPane.setContent(ta);
-                    Root.getOptions().setStyle(this);
+                    getIcons().clear();
+                    getIcons().add(PROGRAM_ICON);
+                    String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                    if (themefile != null) {getScene().getStylesheets().add(themefile);}
                     break;
                 case html:
                     WebView browser = new WebView();

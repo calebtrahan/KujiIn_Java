@@ -12,6 +12,8 @@ import kujiin.util.enums.ProgramState;
 import kujiin.xml.Ambiences;
 import kujiin.xml.Entrainments;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 
 public class Main extends Application {
     private MainController Root;
@@ -30,7 +32,10 @@ public class Main extends Application {
         primaryStage.setResizable(false);
         Root.setScene(Scene);
         Root.setStage(primaryStage);
-        Root.getOptions().setStyle(primaryStage);
+        primaryStage.getIcons().clear();
+        primaryStage.getIcons().add(PROGRAM_ICON);
+        String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+        if (themefile != null) {primaryStage.getScene().getStylesheets().add(themefile);}
         primaryStage.setOnShowing(event -> {
             Root.setEntrainments(new Entrainments(Root));
             Root.setAmbiences(new Ambiences(Root));

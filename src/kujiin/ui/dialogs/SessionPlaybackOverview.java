@@ -33,6 +33,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 public class SessionPlaybackOverview extends Stage {
     // TODO If has No Ambience -> Change Set Ambience Button To "Add Ambience"
     public TableView<SessionItem> SessionItemsTable;
@@ -69,7 +71,10 @@ public class SessionPlaybackOverview extends Stage {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            Root.getOptions().setStyle(this);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             setOnCloseRequest(event -> {
             });
@@ -572,7 +577,10 @@ public class SessionPlaybackOverview extends Stage {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                getIcons().clear();
+                getIcons().add(PROGRAM_ICON);
+                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
                 setTitle("Change " + sessionPart.name + " Duration");
                 HoursTextField.setText("0");
@@ -647,7 +655,10 @@ public class SessionPlaybackOverview extends Stage {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                getIcons().clear();
+                getIcons().add(PROGRAM_ICON);
+                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
                 RemoveButton.setDisable(true);
                 MoveUpButton.setDisable(true);
@@ -847,7 +858,10 @@ public class SessionPlaybackOverview extends Stage {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Root.getOptions().setStyle(this);
+                getIcons().clear();
+                getIcons().add(PROGRAM_ICON);
+                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
                 setTitle("Set Custom Ambience");
                 PreviewButton.setDisable(true);

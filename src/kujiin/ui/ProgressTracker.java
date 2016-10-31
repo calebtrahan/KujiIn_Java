@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 public class ProgressTracker implements UI {
     private ComboBox<String> GoalSessionPartComboBox;
     private TextField AverageSessionDuration;
@@ -279,7 +281,10 @@ public class ProgressTracker implements UI {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Options.setStyle(this);
+                getIcons().clear();
+                getIcons().add(PROGRAM_ICON);
+                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
                 setTitle("Goal Progress");
                 NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
@@ -440,7 +445,10 @@ public class ProgressTracker implements UI {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Options.setStyle(this);
+                getIcons().clear();
+                getIcons().add(PROGRAM_ICON);
+                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
                 setTitle("Session List");
                 DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
@@ -613,7 +621,10 @@ public class ProgressTracker implements UI {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Options.setStyle(this);
+                getIcons().clear();
+                getIcons().add(PROGRAM_ICON);
+                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
                 setTitle("Goal Pacing");
                 practicedduration = SelectedSessionPart.sessions_getPracticedDuration(false);
@@ -654,7 +665,10 @@ public class ProgressTracker implements UI {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                Options.setStyle(this);
+                getIcons().clear();
+                getIcons().add(PROGRAM_ICON);
+                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
                 setTitle("Set A New Goal");
                 TopLabel.setText("Set A New Goal For " + sessionPart.name);

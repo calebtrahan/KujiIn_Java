@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 public class AmbienceEditor_Simple extends Stage implements Initializable {
     public TableView<AmbienceSong> AmbienceTable;
     public TableColumn<AmbienceSong, String> NameColumn;
@@ -66,7 +68,10 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            Root.getOptions().setStyle(this);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setTitle("Simple Ambience Editor");
             setOnCloseRequest(event -> closedialog());
             SessionPartChoiceBox.setOnAction(event -> selectandloadsessionpart());
@@ -80,7 +85,10 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            Root.getOptions().setStyle(this);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             this.setResizable(false);
             setTitle("Simple Ambience Editor");
             setOnCloseRequest(event -> closedialog());

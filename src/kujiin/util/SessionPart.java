@@ -32,7 +32,7 @@ public class SessionPart {
     protected ToggleButton Switch;
     protected TextField Value;
     protected MainController root;
-    // Data Fields
+// Data Fields
     public int number;
     public String name;
     public Duration duration;
@@ -1226,9 +1226,8 @@ public class SessionPart {
     }
 
 // Reference Display
-    public File reference_getFile() {
-        ReferenceType referenceType = root.getOptions().getSessionOptions().getReferencetype();
-        if (referenceType == null) {return null;}
+    public File reference_getFile(ReferenceType referenceType) {
+        if (referenceType == null) {referenceType = root.getOptions().getSessionOptions().getReferencetype();}
         switch (referenceType) {
             case html: {
                 String name = this.name + ".html";
@@ -1242,15 +1241,15 @@ public class SessionPart {
                 return null;
         }
     }
-    public boolean reference_exists() {
-        return reference_getFile().exists();
+    public boolean reference_exists(ReferenceType referenceType) {
+        return reference_getFile(referenceType).exists();
     }
-    public boolean reference_empty() {
-        String filecontents = Util.file_getcontents(reference_getFile());
+    public boolean reference_empty(ReferenceType referenceType) {
+        String filecontents = Util.file_getcontents(reference_getFile(referenceType));
         return filecontents == null || filecontents.isEmpty();
     }
     public boolean reference_invalid(ReferenceType referenceType) {
-        String contents = Util.file_getcontents(reference_getFile());
+        String contents = Util.file_getcontents(reference_getFile(referenceType));
         switch (referenceType) {
             case html:
                 return ! contents.isEmpty() && Util.String_validhtml(contents);

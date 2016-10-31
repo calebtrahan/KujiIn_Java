@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 public class AmbienceEditor_Advanced extends Stage implements Initializable {
     public Button RightArrow;
     public Button LeftArrow;
@@ -90,9 +92,12 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            Root.getOptions().setStyle(this);
-            this.setResizable(false);
-            this.setOnCloseRequest(event -> {
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
+            setResizable(false);
+            setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
                     switch (new AnswerDialog(Root.getOptions(), "Save Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save And Close", "Close", "Cancel").getResult()) {
                         case YES:
@@ -114,8 +119,11 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            Root.getOptions().setStyle(this);
-            this.setResizable(false);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
+            setResizable(false);
             setTitle("Advanced Ambience Editor");
             SessionPartSelectionBox.setOnAction(event -> selectandloadsessionpart());
             SessionPartSelectionBox.getSelectionModel().select(sessionPart.number);

@@ -12,6 +12,8 @@ import kujiin.util.Util;
 
 import java.io.IOException;
 
+import static kujiin.xml.Options.PROGRAM_ICON;
+
 public class ChangeAllValues extends Stage {
     public Button AcceptButton;
     public Button CancelButton;
@@ -27,7 +29,10 @@ public class ChangeAllValues extends Stage {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            Root.getOptions().setStyle(this);
+            getIcons().clear();
+            getIcons().add(PROGRAM_ICON);
+            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             this.setResizable(false);
             setTitle(toptext);
             setAccepted(false);

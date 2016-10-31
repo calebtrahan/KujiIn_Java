@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static kujiin.util.enums.PlayerState.*;
+import static kujiin.xml.Options.PROGRAM_ICON;
 
 public class SessionCreator implements UI {
     private Button LoadPresetButton;
@@ -252,28 +253,6 @@ public class SessionCreator implements UI {
             setDisable(false, "");
         }
     }
-    public boolean checkreferencefiles() {
-        if (referenceType == null) {return false;}
-        int nonexisting = 0;
-        int empty = 0;
-        int invalid = 0;
-        for (SessionPart i : itemsinsession) {
-            if (! i.reference_exists()) {nonexisting++;}
-            else if (i.reference_empty()) {empty++;}
-            else if (i.reference_invalid(referenceType)) {invalid++;}
-        }
-        if (nonexisting > 0) {
-            new ErrorDialog(options, "Missing Reference Files", "Missing Reference Files For " + nonexisting + " Session Parts", "Cannot Enable Reference");
-            return false;
-        }
-        if (empty > 0 || invalid > 0) {
-            StringBuilder msg = new StringBuilder();
-            if (empty > 0) {msg.append(empty).append(" Session Parts With Empty Reference Files");}
-            if (empty > 0 && invalid > 0) {msg.append("\n");}
-            if (invalid > 0) {msg.append(invalid).append(" Session Parts With Invalid Reference Files");}
-            return new ConfirmationDialog(options, "Confirmation", "Reference Files Incomplete", msg.toString(), "Enable Reference", "Disable Reference").getResult();
-        } else {return true;}
-    }
 
 // Export
     public void exportsession() {}
@@ -343,9 +322,12 @@ public class SessionCreator implements UI {
         public Duration totalsessionduration;
         public int sessionpartcount;
         public List<SessionPart> sessionpartswithGoalsCompletedThisSession;
+        // Dialog Fields
+        public SelectReferenceType selectReferenceType;
 
         public Player() {
             try {
+                updateuitimeline.stop();
                 if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
                 progressTracker = Root.getProgressTracker();
 //                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
@@ -353,7 +335,10 @@ public class SessionCreator implements UI {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                options.setStyle(this);
+                getIcons().clear();
+                getIcons().add(PROGRAM_ICON);
+                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setTitle("Session Player");
                 reset(false);
                 boolean referenceoption = Root.getOptions().getSessionOptions().getReferenceoption();
@@ -415,7 +400,7 @@ public class SessionCreator implements UI {
                     displayreferencefile();
                     break;
                 case PAUSED:
-                    updateuitimeline.play();
+                    player_updateuitimeline.play();
                     currentsessionpart.resume();
                     break;
             }
@@ -423,14 +408,14 @@ public class SessionCreator implements UI {
         public void pause() {
             if (playerState == PlayerState.PLAYING) {
                 currentsessionpart.pause();
-                updateuitimeline.pause();
+                player_updateuitimeline.pause();
             }
         }
         public void stop() {
             if (playerState == PLAYING || playerState == PAUSED) {
                 if (new ConfirmationDialog(options, "Stop Session", "Really Stop Session?", "This Will Reset Session Player", "Stop Session", "Cancel").getResult()) {
                     currentsessionpart.stop();
-                    updateuitimeline.stop();
+                    player_updateuitimeline.stop();
                     reset(false);
                 }
             }
@@ -445,9 +430,7 @@ public class SessionCreator implements UI {
                     if (currentsessionpart.elapsedtime.greaterThan(Duration.ZERO)) {currentprogress = (float) currentsessionpart.elapsedtime.toMillis() / (float) currentsessionpart.getduration().toMillis();}
                     else {currentprogress = (float) 0;}
                 } catch (NullPointerException ignored) {currentprogress = (float) 0;}
-                if (totalsessiondurationelapsed.greaterThan(Duration.ZERO)) {
-                    totalprogress = (float) totalsessiondurationelapsed.toMillis()
-                            / (float) totalsessionduration.toMillis();}
+                if (totalsessiondurationelapsed.greaterThan(Duration.ZERO)) {totalprogress = (float) totalsessiondurationelapsed.toMillis() / (float) totalsessionduration.toMillis();}
                 else {totalprogress = (float) 0.0;}
                 CurrentSessionPartProgress.setProgress(currentprogress);
                 TotalProgress.setProgress(totalprogress);
@@ -474,11 +457,13 @@ public class SessionCreator implements UI {
                         displayReference.TotalPercentage.setText(totalprogress.intValue() + "%");
                         displayReference.CurrentName.setText(currentsessionpart.name);
                     }
-                } catch (NullPointerException ignored) {}
+                } catch (Exception ignored) {}
                 progressTracker.updateui_goals(this);
                 progressTracker.updateui_sessions();
                 currentsessionpart.tick();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                ignored.printStackTrace();
+            }
         }
         public void progresstonextsessionpart() {
             try {
@@ -490,6 +475,7 @@ public class SessionCreator implements UI {
                             sessionpartcount++;
                             currentsessionpart = itemsinsession.get(sessionpartcount);
                             currentsessionpart.start();
+                            displayreferencefile();
                         } catch (IndexOutOfBoundsException ignored) {
                             playerState = PlayerState.IDLE;
                             currentsessionpart.cleanupPlayersandAnimations();
@@ -568,7 +554,7 @@ public class SessionCreator implements UI {
         public boolean endsessionprematurely() {
             if (playerState == PlayerState.PLAYING || playerState == PlayerState.PAUSED || playerState == TRANSITIONING) {
                 currentsessionpart.pausewithoutanimation();
-                updateuitimeline.pause();
+                player_updateuitimeline.pause();
                 if (new ConfirmationDialog(options, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {return true;}
                 else {play(); return false;}
             } else {return true;}
@@ -588,29 +574,26 @@ public class SessionCreator implements UI {
                 closereferencefile();
                 togglevolumebinding();
             } else {
-                SelectReferenceType selectReferenceType = new SelectReferenceType(Root);
+                if (selectReferenceType != null && selectReferenceType.isShowing()) {return;}
+                else {selectReferenceType = new SelectReferenceType(Root, itemsinsession);}
                 switch (playerState) {
                     case IDLE:
-                        selectReferenceType.show();
-                        selectReferenceType.setOnHidden(event -> {
-                            Root.getOptions().getSessionOptions().setReferenceoption(selectReferenceType.getResult());
-                            if (selectReferenceType.getResult() && checkreferencefiles()) {
-                                Root.getOptions().getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
-                                Root.getOptions().getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
-                            } else {ReferenceCheckBox.setSelected(false);}
-                        });
+                        selectReferenceType.showAndWait();
+                        Root.getOptions().getSessionOptions().setReferenceoption(selectReferenceType.getResult());
+                        if (selectReferenceType.getResult()) {
+                            Root.getOptions().getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
+                            Root.getOptions().getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
+                        } else {ReferenceCheckBox.setSelected(false);}
                         break;
                     case PLAYING:
-                        selectReferenceType.show();
-                        selectReferenceType.setOnHidden(event -> {
-                            Root.getOptions().getSessionOptions().setReferenceoption(selectReferenceType.getResult());
-                            if (selectReferenceType.getResult()) {
-                                Root.getOptions().getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
-                                Root.getOptions().getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
-                                displayreferencefile();
-                                togglevolumebinding();
-                            }
-                        });
+                        selectReferenceType.showAndWait();
+                        Root.getOptions().getSessionOptions().setReferenceoption(selectReferenceType.getResult());
+                        if (selectReferenceType.getResult()) {
+                            Root.getOptions().getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
+                            Root.getOptions().getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
+                            displayreferencefile();
+                            togglevolumebinding();
+                        }
                         break;
                     case PAUSED:
                     case STOPPED:
@@ -647,6 +630,8 @@ public class SessionCreator implements UI {
             super.close();
             reset(false);
             if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
+            updategui();
+            updateuitimeline.play();
         }
     }
     public class Exporter extends Stage {
@@ -674,7 +659,10 @@ public class SessionCreator implements UI {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                options.setStyle(this);
+                getIcons().clear();
+                getIcons().add(PROGRAM_ICON);
+                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
                 setTitle("Exporting Session");
             } catch (IOException ignored) {}
