@@ -312,23 +312,18 @@ public class SessionCreator implements UI {
         public Label CurrentSessionPartTopLabel;
         public ProgressIndicator CurrentSessionPartProgress;
         public Label CurrentProgressDetails;
-
         public Slider EntrainmentVolume;
         public Label EntrainmentVolumePercentage;
         public Slider AmbienceVolume;
         public Label AmbienceVolumePercentage;
-
         public Label TotalSessionLabel;
         public ProgressIndicator TotalProgress;
         public Label TotalProgressDetails;
-
         public CheckBox ReferenceCheckBox;
         public ComboBox<String> ReferenceTypeComboBox;
-
         public Button PlayButton;
         public Button PauseButton;
         public Button StopButton;
-
         public Boolean displaynormaltime = true;
         private Timeline player_updateuitimeline;
         // Playback Fields
@@ -391,7 +386,7 @@ public class SessionCreator implements UI {
             } catch (IOException ignored) {}
         }
 
-        // Getters And Setters
+    // Getters And Setters
         public Double getCurrententrainmentvolume() {
             return currententrainmentvolume;
         }
@@ -403,6 +398,9 @@ public class SessionCreator implements UI {
         }
         public void setCurrentambiencevolume(Double currentambiencevolume) {
             this.currentambiencevolume = currentambiencevolume;
+        }
+        public Timeline getPlayer_updateuitimeline() {
+            return player_updateuitimeline;
         }
 
         // Playback
@@ -590,7 +588,7 @@ public class SessionCreator implements UI {
             }
         }
 
-        // Reference
+    // Reference
         public void togglereference() {
             boolean buttontoggled = ReferenceCheckBox.isSelected();
             Root.getOptions().getSessionOptions().setReferenceoption(buttontoggled);

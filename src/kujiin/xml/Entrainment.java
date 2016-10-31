@@ -52,23 +52,17 @@ public class Entrainment {
         else if (! soundFile.equals(rampfiles.get(index))) {rampfiles.set(index, soundFile);}
     }
     public SoundFile ramp_get(int index) {
-        System.out.println("Tried To Pull File " + index + " Out Of A Possible " + rampfiles.size());
         try {
             return rampfiles.get(index);
         } catch (NullPointerException | IndexOutOfBoundsException ignored) {
-            if (ignored instanceof IndexOutOfBoundsException) {
-                System.out.println("Index Out Of Bounds");
-                ramp_initialize();
-                return null;
-            } else {
-                return null;
-            }
+            if (ignored instanceof IndexOutOfBoundsException) {ramp_initialize(); return null;}
+            else {return null;}
         }
     }
 
     @Override
     public String toString() {
-        return super.toString();
+        return "Ramp File: " + rampfile.getFile().getAbsolutePath() + " & Freq: " + freq.getFile().getAbsolutePath();
     }
 
 }

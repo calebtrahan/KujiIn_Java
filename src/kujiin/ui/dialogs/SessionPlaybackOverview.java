@@ -474,7 +474,6 @@ public class SessionPlaybackOverview extends Stage {
     }
     public void playsession() {
         Root.getSessionCreator().setAmbienceenabled(AmbienceSwitch.isSelected());
-        System.out.println(ambiencePlaybackType);
         List<Integer> indexesmissingduration = new ArrayList<>();
         List<Integer> indexesmissinggoals = new ArrayList<>();
         for (SessionPart i : alladjustedsessionitems) {

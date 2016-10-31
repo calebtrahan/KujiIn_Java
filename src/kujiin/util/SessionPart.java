@@ -245,10 +245,7 @@ public class SessionPart {
                         creation_buildAmbience();}
         else {return creation_buildEntrainment();}
     }
-    protected boolean creation_buildEntrainment() {
-//        System.out.println(Boolean.toString(duration == null));
-        return ! duration.equals(Duration.ZERO) && entrainment.getFreq().isValid();
-    }
+    protected boolean creation_buildEntrainment() {return ! duration.equals(Duration.ZERO) && entrainment.getFreq().isValid();}
     protected boolean creation_buildAmbience() {
         return ambience.hasAnyAmbience();
     }
@@ -321,9 +318,7 @@ public class SessionPart {
             }
             volume_bindentrainment();
         }
-        System.out.println(root.getSessionCreator().isAmbienceenabled() + " & " + root.getSessionCreator().getAmbiencePlaybackType());
         if (root.getSessionCreator().isAmbienceenabled() && root.getSessionCreator().getAmbiencePlaybackType() != null) {
-            System.out.println("Made It In The Ambience Enabled Block");
             ambienceplayhistory = new ArrayList<>();
             currentambiencevolume = root.getSessionCreator().getPlayer().getCurrentambiencevolume();
             volume_unbindambience();
@@ -507,7 +502,7 @@ public class SessionPart {
         fade_entrainment_resume.setOnFinished(event -> {
             root.getSessionCreator().setPlayerState(PlayerState.PLAYING);
             timeline_progresstonextsessionpart.play();
-            if (root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED) {
+            if (root.getOptions().getSessionOptions().getRampenabled() && (timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.PAUSED)) {
                 timeline_start_ending_ramp.play();
             }
             if (timeline_fadeout_timer != null) {
@@ -541,9 +536,7 @@ public class SessionPart {
         }
         // PAUSE
         fade_entrainment_pause = new Transition() {
-            {
-                setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));
-            }
+            {setCycleDuration(Duration.seconds(DEFAULT_FADERESUMEANDPAUSEDURATION));}
 
             @Override
             protected void interpolate(double frac) {
@@ -551,8 +544,8 @@ public class SessionPart {
                     double fadeoutvolume = currententrainmentvolume - (frac * currententrainmentvolume);
                     String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
                     entrainmentplayer.setVolume(fadeoutvolume);
-                   root.getSessionCreator().getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
-                   root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
+                    root.getSessionCreator().getPlayer().EntrainmentVolume.setValue(fadeoutvolume);
+                    root.getSessionCreator().getPlayer().EntrainmentVolumePercentage.setText(percentage);
                     if (root.getSessionCreator().getPlayer().referencecurrentlyDisplayed()) {
                         root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
                         root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
@@ -563,12 +556,9 @@ public class SessionPart {
         fade_entrainment_pause.setOnFinished(event -> {
             entrainmentplayer.pause();
             timeline_progresstonextsessionpart.pause();
-            if (root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
-                timeline_start_ending_ramp.pause();
-            }
-            if (timeline_fadeout_timer != null) {
-                timeline_fadeout_timer.pause();
-            }
+            root.getSessionCreator().getPlayer().getPlayer_updateuitimeline().pause();
+            if (root.getOptions().getSessionOptions().getRampenabled() && (timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING)) {timeline_start_ending_ramp.pause();}
+            if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
             root.getSessionCreator().setPlayerState(PlayerState.PAUSED);
             toggleplayerbuttons();
         });
@@ -619,13 +609,10 @@ public class SessionPart {
             fade_entrainment_stop.setOnFinished(event -> {
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
-                if (root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
-                    timeline_start_ending_ramp.stop();
-                }
+                if (root.getOptions().getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ending_ramp.stop();}
+                root.getSessionCreator().getPlayer().getPlayer_updateuitimeline().stop();
                 timeline_progresstonextsessionpart.stop();
-                if (timeline_fadeout_timer != null) {
-                    timeline_fadeout_timer.stop();
-                }
+                if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
                 root.getSessionCreator().setPlayerState(PlayerState.STOPPED);
                 toggleplayerbuttons();
             });

@@ -391,9 +391,7 @@ public class MainController implements Initializable {
 //        }
     }
     public void menu_contactme() {
-//        PreviewFile previewFile = new PreviewFile(kujiin.xml.Options.TESTFILE, this);
-//        previewFile.showAndWait();
-        System.out.println(System.getProperty("os.name"));
+
     }
 
 // Startup Checks
