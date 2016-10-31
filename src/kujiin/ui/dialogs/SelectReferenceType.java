@@ -46,6 +46,7 @@ public class SelectReferenceType extends Stage {
             TextRadioButton.setOnAction(event ->  textButtonselected());
             AcceptButton.setOnAction(event -> accept());
             CancelButton.setOnAction(event -> close());
+            if (Root.getOptions().getSessionOptions().getReferencetype() == null) {Root.getOptions().getSessionOptions().setReferencetype(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);}
             switch (Root.getOptions().getSessionOptions().getReferencetype()) {
                 case html:
                     HTMLRadioButton.setSelected(true);
@@ -56,6 +57,7 @@ public class SelectReferenceType extends Stage {
                     setdescriptiontoselectedtype();
                     break;
             }
+            FullScreenCheckbox.setSelected(Root.getOptions().getSessionOptions().getReferencefullscreen());
         } catch (IOException ignored) {}
     }
 
@@ -79,7 +81,7 @@ public class SelectReferenceType extends Stage {
     }
     public void accept() {
         if (HTMLRadioButton.isSelected() || TextRadioButton.isSelected()) {result = true;  close();}
-        else {
+else {
             new InformationDialog(Root.getOptions(), "Cannot Accept", "No Reference Type Selected", null);
             result = false;
         }

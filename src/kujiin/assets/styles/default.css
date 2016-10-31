@@ -23,11 +23,11 @@ linear-gradient(to bottom, derive(-fx-base,+50%), derive(-fx-base,-40%), derive(
 }
 
 .progress-indicator {
-    -fx-color: transparent;
+    -fx-color: white;
 }
 
 .progress-indicator .percentage {
-    -fx-font-size: 0.916667em; /* 11pt - 1 less than the default font */
+    -fx-font-size: 0.916667em;
     -fx-fill: white;
 }
 

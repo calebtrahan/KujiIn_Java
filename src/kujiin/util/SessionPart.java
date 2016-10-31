@@ -1242,20 +1242,22 @@ public class SessionPart {
                 return null;
         }
     }
-    public boolean reference_filevalid(ReferenceType referenceType) {
-        if (referenceType == null) {return false;}
-        if (! reference_getFile().exists()) {return false;}
+    public boolean reference_exists() {
+        return reference_getFile().exists();
+    }
+    public boolean reference_empty() {
+        String filecontents = Util.file_getcontents(reference_getFile());
+        return filecontents == null || filecontents.isEmpty();
+    }
+    public boolean reference_invalid(ReferenceType referenceType) {
         String contents = Util.file_getcontents(reference_getFile());
-        if (contents == null) {return false;}
         switch (referenceType) {
             case html:
-                boolean validhtml = Util.String_validhtml(contents);
-                return contents.length() > 0 && validhtml;
+                return ! contents.isEmpty() && Util.String_validhtml(contents);
             case txt:
-                return contents.length() > 0;
-            default:
-                return false;
+                return ! contents.isEmpty();
         }
+        return false;
     }
 
 }

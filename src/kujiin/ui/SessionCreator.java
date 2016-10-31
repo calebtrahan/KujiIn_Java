@@ -3,8 +3,6 @@ package kujiin.ui;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -29,8 +27,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kujiin.util.enums.PlayerState.IDLE;
-import static kujiin.util.enums.PlayerState.TRANSITIONING;
+import static kujiin.util.enums.PlayerState.*;
 
 public class SessionCreator implements UI {
     private Button LoadPresetButton;
@@ -255,14 +252,27 @@ public class SessionCreator implements UI {
             setDisable(false, "");
         }
     }
-    public boolean checkreferencefiles(boolean enableprompt) {
-        int invalidsessionpartcount = 0;
-        for (SessionPart i : AllSessionParts) {
-            if (!i.reference_filevalid(referenceType)) invalidsessionpartcount++;
+    public boolean checkreferencefiles() {
+        if (referenceType == null) {return false;}
+        int nonexisting = 0;
+        int empty = 0;
+        int invalid = 0;
+        for (SessionPart i : itemsinsession) {
+            if (! i.reference_exists()) {nonexisting++;}
+            else if (i.reference_empty()) {empty++;}
+            else if (i.reference_invalid(referenceType)) {invalid++;}
         }
-        if (invalidsessionpartcount > 0 && enableprompt) {
-            return new ConfirmationDialog(options, "Confirmation", null, "There Are " + invalidsessionpartcount + " Session Parts With Empty/Invalid Reference Files", "Enable Reference", "Disable Reference").getResult();
-        } else {return invalidsessionpartcount == 0;}
+        if (nonexisting > 0) {
+            new ErrorDialog(options, "Missing Reference Files", "Missing Reference Files For " + nonexisting + " Session Parts", "Cannot Enable Reference");
+            return false;
+        }
+        if (empty > 0 || invalid > 0) {
+            StringBuilder msg = new StringBuilder();
+            if (empty > 0) {msg.append(empty).append(" Session Parts With Empty Reference Files");}
+            if (empty > 0 && invalid > 0) {msg.append("\n");}
+            if (invalid > 0) {msg.append(invalid).append(" Session Parts With Invalid Reference Files");}
+            return new ConfirmationDialog(options, "Confirmation", "Reference Files Incomplete", msg.toString(), "Enable Reference", "Disable Reference").getResult();
+        } else {return true;}
     }
 
 // Export
@@ -320,7 +330,6 @@ public class SessionCreator implements UI {
         public ProgressIndicator TotalProgress;
         public Label TotalProgressDetails;
         public CheckBox ReferenceCheckBox;
-        public ComboBox<String> ReferenceTypeComboBox;
         public Button PlayButton;
         public Button PauseButton;
         public Button StopButton;
@@ -355,25 +364,6 @@ public class SessionCreator implements UI {
                 setResizable(false);
                 CurrentProgressDetails.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
                 TotalProgressDetails.setOnMouseClicked(event -> displaynormaltime = ! displaynormaltime);
-                ObservableList<String> referencetypes = FXCollections.observableArrayList();
-                for (ReferenceType i : ReferenceType.values()) {referencetypes.add(i.toString());}
-                referencetypes.add("Help");
-                ReferenceTypeComboBox.setItems(referencetypes);
-                ReferenceTypeComboBox.setOnAction(event -> {
-                    int index = ReferenceTypeComboBox.getSelectionModel().getSelectedIndex();
-                    if (index == 0) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.html);}
-                    else if (index == 1) {Root.getOptions().getSessionOptions().setReferencetype(ReferenceType.txt);}
-                });
-                if (referenceType != null) {
-                    switch (referenceType) {
-                        case html:
-                            ReferenceTypeComboBox.getSelectionModel().select(0);
-                            break;
-                        case txt:
-                            ReferenceTypeComboBox.getSelectionModel().select(1);
-                            break;
-                    }
-                }
                 setOnCloseRequest(event -> {
                     if (playerState == PlayerState.PLAYING || playerState == PlayerState.STOPPED || playerState == PlayerState.PAUSED || playerState == PlayerState.IDLE) {
                         if (endsessionprematurely()) {close();} else {play(); event.consume();}
@@ -437,11 +427,13 @@ public class SessionCreator implements UI {
             }
         }
         public void stop() {
-            try {
-                currentsessionpart.stop();
-                updateuitimeline.stop();
-            } catch (NullPointerException ignored) {}
-            reset(false);
+            if (playerState == PLAYING || playerState == PAUSED) {
+                if (new ConfirmationDialog(options, "Stop Session", "Really Stop Session?", "This Will Reset Session Player", "Stop Session", "Cancel").getResult()) {
+                    currentsessionpart.stop();
+                    updateuitimeline.stop();
+                    reset(false);
+                }
+            }
         }
         public void updateui() {
             try {
@@ -596,37 +588,35 @@ public class SessionCreator implements UI {
                 closereferencefile();
                 togglevolumebinding();
             } else {
-                if (Root.getOptions().getSessionOptions().getReferencetype() == null || ReferenceTypeComboBox.getSelectionModel().getSelectedIndex() == -1) {
-                    Root.getOptions().getSessionOptions().setReferencetype(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);
-                    SelectReferenceType selectReferenceType = new SelectReferenceType(Root);
-                    selectReferenceType.show();
-                    selectReferenceType.setOnHidden(event -> {
-                        if (selectReferenceType.getResult()) {
-                            if (! checkreferencefiles(true)) {ReferenceCheckBox.setSelected(false);}
-                            else {
-                                switch (Root.getOptions().getSessionOptions().getReferencetype()) {
-                                    case html:
-                                        ReferenceTypeComboBox.getSelectionModel().select(0);
-                                        break;
-                                    case txt:
-                                        ReferenceTypeComboBox.getSelectionModel().select(1);
-                                        break;
-                                }
+                SelectReferenceType selectReferenceType = new SelectReferenceType(Root);
+                switch (playerState) {
+                    case IDLE:
+                        selectReferenceType.show();
+                        selectReferenceType.setOnHidden(event -> {
+                            Root.getOptions().getSessionOptions().setReferenceoption(selectReferenceType.getResult());
+                            if (selectReferenceType.getResult() && checkreferencefiles()) {
+                                Root.getOptions().getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
+                                Root.getOptions().getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
+                            } else {ReferenceCheckBox.setSelected(false);}
+                        });
+                        break;
+                    case PLAYING:
+                        selectReferenceType.show();
+                        selectReferenceType.setOnHidden(event -> {
+                            Root.getOptions().getSessionOptions().setReferenceoption(selectReferenceType.getResult());
+                            if (selectReferenceType.getResult()) {
+                                Root.getOptions().getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
+                                Root.getOptions().getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
+                                displayreferencefile();
+                                togglevolumebinding();
                             }
-                            if (playerState == PlayerState.PLAYING) {displayreferencefile(); togglevolumebinding();}
-                        } else {
-                            switch (Root.getOptions().getSessionOptions().getReferencetype()) {
-                                case html:
-                                    ReferenceTypeComboBox.getSelectionModel().select(0);
-                                    break;
-                                case txt:
-                                    ReferenceTypeComboBox.getSelectionModel().select(1);
-                                    break;
-                            }
-                        }
-                    });
-                } else {
-                    if (playerState == PlayerState.PLAYING) {displayreferencefile(); togglevolumebinding();}
+                        });
+                        break;
+                    case PAUSED:
+                    case STOPPED:
+                    default:
+                        ReferenceCheckBox.setSelected(false);
+                        break;
                 }
             }
         }
