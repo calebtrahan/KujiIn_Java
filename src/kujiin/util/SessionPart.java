@@ -319,8 +319,11 @@ public class SessionPart {
                 root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(currententrainmentvolume);
                 root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
             }
-            volume_bindentrainment();}
+            volume_bindentrainment();
+        }
+        System.out.println(root.getSessionCreator().isAmbienceenabled() + " & " + root.getSessionCreator().getAmbiencePlaybackType());
         if (root.getSessionCreator().isAmbienceenabled() && root.getSessionCreator().getAmbiencePlaybackType() != null) {
+            System.out.println("Made It In The Ambience Enabled Block");
             ambienceplayhistory = new ArrayList<>();
             currentambiencevolume = root.getSessionCreator().getPlayer().getCurrentambiencevolume();
             volume_unbindambience();

@@ -77,6 +77,7 @@ public class SessionCreator implements UI {
         AllSessionParts = Root.getAllSessionParts(false);
         updateuitimeline = new Timeline(new KeyFrame(Duration.seconds(10), ae -> updategui()));
         updateuitimeline.setCycleCount(Animation.INDEFINITE);
+        ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();
     }
 
     public void setupListeners(MainController Root) {
@@ -136,6 +137,9 @@ public class SessionCreator implements UI {
     }
     public void setAmbienceenabled(boolean ambienceenabled) {
         this.ambienceenabled = ambienceenabled;
+    }
+    public void setAmbiencePlaybackType(AmbiencePlaybackType ambiencePlaybackType) {
+        this.ambiencePlaybackType = ambiencePlaybackType;
     }
     public AmbiencePlaybackType getAmbiencePlaybackType() {
         return ambiencePlaybackType;

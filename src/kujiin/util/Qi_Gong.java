@@ -69,7 +69,7 @@ public class Qi_Gong extends SessionPart {
             if (parttotest instanceof  Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
             else {
                 // TODO The Indexing Is Fucked Up Here!
-                rampfile = entrainment.ramp_get(Options.CUTNAMES.indexOf(parttotest.name.toUpperCase()) - 1);
+                rampfile = entrainment.ramp_get(Options.ALLNAMES.indexOf(parttotest.name.toUpperCase()) - 1);
             }
             entrainment.setRampfile(rampfile);
             if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}

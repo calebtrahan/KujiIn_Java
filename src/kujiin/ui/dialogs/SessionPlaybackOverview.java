@@ -354,7 +354,6 @@ public class SessionPlaybackOverview extends Stage {
     // Ambience
     public void ambienceswitchtoggled() {
         checkambience();
-        Root.getSessionCreator().setAmbienceenabled(AmbienceSwitch.isSelected());
         AmbienceTypeComboBox.setDisable(!AmbienceSwitch.isSelected());
         populatetable();
     }
@@ -474,13 +473,15 @@ public class SessionPlaybackOverview extends Stage {
         return result;
     }
     public void playsession() {
+        Root.getSessionCreator().setAmbienceenabled(AmbienceSwitch.isSelected());
+        System.out.println(ambiencePlaybackType);
         List<Integer> indexesmissingduration = new ArrayList<>();
         List<Integer> indexesmissinggoals = new ArrayList<>();
         for (SessionPart i : alladjustedsessionitems) {
             if (i.getduration() == Duration.ZERO && !i.ramponly) {
                 indexesmissingduration.add(alladjustedsessionitems.indexOf(i));
             }
-            if (!i.goals_ui_hascurrentgoal()) {
+            if (! i.goals_ui_hascurrentgoal()) {
                 indexesmissinggoals.add(alladjustedsessionitems.indexOf(i));
             }
         }
@@ -493,15 +494,12 @@ public class SessionPlaybackOverview extends Stage {
         }
         // Check Ambience
         if (AmbienceSwitch.isSelected() && ambiencePlaybackType != null) {
+            Root.getSessionCreator().setAmbiencePlaybackType(ambiencePlaybackType);
             int count = 0;
             switch (ambiencePlaybackType) {
                 case REPEAT:
                 case SHUFFLE:
-                    for (SessionPart i : alladjustedsessionitems) {
-                        if (!i.getAmbience_hasAny()) {
-                            count++;
-                        }
-                    }
+                    for (SessionPart i : alladjustedsessionitems) {if (! i.getAmbience_hasAny()) {count++;}}
                     if (count > 0) {
                         new InformationDialog(Root.getOptions(), "Information", "Missing Ambience For " + count + " Session Parts", "Please Add Ambience Or Disable Ambience From Session");
                         return;
@@ -509,9 +507,7 @@ public class SessionPlaybackOverview extends Stage {
                     break;
                 case CUSTOM:
                     for (SessionPart i : alladjustedsessionitems) {
-                        if (!i.getAmbience().hasCustomAmbience()) {
-                            count++;
-                        }
+                        if (! i.getAmbience().hasCustomAmbience()) {count++;}
                     }
                     if (count > 0) {
                         new InformationDialog(Root.getOptions(), "Information", "Missing Ambience For " + count + " Session Parts", "Please Add Custom Ambience, Change Playback Type Or Disable Ambience From Session");
@@ -521,8 +517,8 @@ public class SessionPlaybackOverview extends Stage {
             }
         }
         // Check Goals
-        if (!indexesmissinggoals.isEmpty()) {
-            if (!new ConfirmationDialog(Root.getOptions(), "Confirmation", indexesmissinggoals.size() + " Session Parts Are Missing Goals", "Continue Playing Session Without Goals?",
+        if (! indexesmissinggoals.isEmpty()) {
+            if (! new ConfirmationDialog(Root.getOptions(), "Confirmation", indexesmissinggoals.size() + " Session Parts Are Missing Goals", "Continue Playing Session Without Goals?",
                     "Yes", "No").getResult()) {
                 return;
             }
