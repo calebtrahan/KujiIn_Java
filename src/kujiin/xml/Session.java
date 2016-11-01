@@ -11,8 +11,10 @@ import java.util.ArrayList;
 
 import static kujiin.util.Util.dateFormat;
 
+// TODO Fix Presession Writes A Null Value
+// TODO Implement Ambience Functionality For Session
+
 @XmlAccessorType(XmlAccessType.FIELD)
-//@XmlType(propOrder = "Name", "Presession_Duration"...)
 public class Session {
     private String Date_Practiced;
     private Integer Presession_Duration;

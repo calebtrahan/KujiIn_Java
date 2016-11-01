@@ -50,9 +50,7 @@ public class SessionCreator implements UI {
     private ProgressTracker progressTracker;
     private PlayerState playerState = IDLE;
     private DisplayReference displayReference;
-    private CreatorState creatorState = CreatorState.NOT_CREATED;
     private ExporterState exporterState;
-    private ReferenceType referenceType;
     private AmbiencePlaybackType ambiencePlaybackType;
     private List<SessionPart> itemsinsession;
     private boolean ambienceenabled = false;
@@ -127,9 +125,6 @@ public class SessionCreator implements UI {
     public boolean cleanup() {return true;}
 
 // Getters And Setters
-    public ReferenceType getReferenceType() {
-        return referenceType;
-    }
     public boolean isAmbienceenabled() {
         return ambienceenabled;
     }
@@ -341,9 +336,9 @@ public class SessionCreator implements UI {
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setTitle("Session Player");
                 reset(false);
-                boolean referenceoption = Root.getOptions().getSessionOptions().getReferenceoption();
-                if (referenceoption && referenceType != null) {ReferenceCheckBox.setSelected(true);}
-                else {ReferenceCheckBox.setSelected(false);}
+                if (Root.getOptions().getSessionOptions().getReferenceoption() && Root.getOptions().getSessionOptions().getReferencetype() != null) {
+                    ReferenceCheckBox.setSelected(true);
+                } else {ReferenceCheckBox.setSelected(false);}
                 togglereference();
                 ReferenceCheckBox.setSelected(Root.getOptions().getSessionOptions().getReferenceoption());
                 setResizable(false);
@@ -451,11 +446,9 @@ public class SessionCreator implements UI {
                 TotalProgressDetails.setText(String.format("%s -> %s", currenttotaltime, totaltotaltime));
                 try {
                     if (displayReference != null && displayReference.isShowing()) {
-                        displayReference.CurrentProgress.setProgress(currentprogress / 100);
-                        displayReference.CurrentPercentage.setText(currentprogress.intValue() + "%");
-                        displayReference.TotalProgress.setProgress(totalprogress / 100);
-                        displayReference.TotalPercentage.setText(totalprogress.intValue() + "%");
-                        displayReference.CurrentName.setText(currentsessionpart.name);
+                        displayReference.setCurrentProgress((double) currentprogress);
+                        displayReference.setTotalProgress((double) totalprogress);
+                        displayReference.setName(currentsessionpart.name);
                     }
                 } catch (Exception ignored) {}
                 progressTracker.updateui_goals(this);

@@ -13,6 +13,8 @@ import java.io.File;
 
 import static kujiin.ui.MainController.getallCutNames;
 
+// TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
+
 public class Cut extends SessionPart {
     private String FocusPoint;
     private String Concept;

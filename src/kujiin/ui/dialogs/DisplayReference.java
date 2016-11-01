@@ -156,6 +156,15 @@ public class DisplayReference extends Stage {
         Root.getSessionCreator().getPlayer().ReferenceCheckBox.setSelected(false);
         Root.getSessionCreator().getPlayer().togglereference();
     }
+    public void setTotalProgress(Double progress) {
+        TotalProgress.setProgress(progress);
+        TotalPercentage.setText(new Double(progress * 100).intValue() + "%");
+    }
+    public void setCurrentProgress(Double progress) {
+        CurrentProgress.setProgress(progress);
+        CurrentPercentage.setText(new Double(progress * 100).intValue() + "%");
+    }
+    public void setName(String name) {CurrentName.setText(name);}
 
     public void play() {Root.getSessionCreator().getPlayer().play();}
     public void pause() {Root.getSessionCreator().getPlayer().pause();}

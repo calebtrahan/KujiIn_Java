@@ -107,11 +107,6 @@ public class Sessions {
     public List<Session> getsessionpartsessions(SessionPart sessionPart) {
         return getSession().stream().filter(i -> i.getsessionpartduration(sessionPart) > 0).collect(Collectors.toList());
     }
-
-
-
-
-
     public Duration gettotalpracticedtime(SessionPart sessionpart, boolean includepreandpost) {
         try {
             Duration totalduration = Duration.ZERO;
@@ -127,6 +122,7 @@ public class Sessions {
         } catch (NullPointerException ignored) {return Duration.ZERO;}
     }
     public Duration getaveragepracticedurationforallsessions(SessionPart sessionpart, boolean includepreandpost) {
+        System.out.println("Trying To Get Average Practice Duration For " + sessionpart.name);
         try {
             return new Duration(gettotalpracticedtime(sessionpart, includepreandpost).toMillis() / getsessioncount(sessionpart, includepreandpost));}
         catch (NullPointerException | ArithmeticException ignored) {return Duration.ZERO;}
@@ -141,12 +137,11 @@ public class Sessions {
                 }
             }
             return sessioncount;
-        } catch (NullPointerException ignored) {return 0;}
+        } catch (NullPointerException ignored) {ignored.printStackTrace(); return 0;}
     }
     public int totalsessioncount() {
-        try {
-            return getSession().size();
-        } catch (NullPointerException ignored) {return 0;}
+        try {return getSession().size();}
+        catch (NullPointerException ignored) {return 0;}
     }
     public Session getspecificsession(int index) {
         return getSession().get(index);

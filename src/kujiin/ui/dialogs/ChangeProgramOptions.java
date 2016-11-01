@@ -36,6 +36,7 @@ public class ChangeProgramOptions extends Stage {
     public CheckBox AlertFileSwitch;
     public CheckBox PrePostRamp;
     public TextField ScrollIncrement;
+    public CheckBox TestingModeCheckbox;
     private kujiin.xml.Options Options;
     private ArrayList<ItemWithDescription> descriptionitems = new ArrayList<>();
     private MainController Root;
@@ -84,7 +85,7 @@ public class ChangeProgramOptions extends Stage {
         FadeOutValue.setDisable(! FadeSwitch.isSelected());
         EntrainmentVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getEntrainmentvolume() * 100).intValue()));
         AmbienceVolumePercentage.setText(String.valueOf(new Double(Options.getSessionOptions().getAmbiencevolume() * 100).intValue()));
-
+        TestingModeCheckbox.setSelected(Options.getDeveloperOptions().isTestingmode());
     }
     public void setuptooltips() {
         TooltipsCheckBox.setTooltip(new Tooltip("Display Messages Like These When Hovering Over Program Controls"));
@@ -267,6 +268,7 @@ public class ChangeProgramOptions extends Stage {
         Options.getSessionOptions().setFadeinduration(new Double(FadeInValue.getText()));
         Options.getSessionOptions().setRampenabled(RampSwitch.isSelected());
         Options.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
+        Options.getDeveloperOptions().setTestingmode(TestingModeCheckbox.isSelected());
         Options.marshall();
         super.close();
     }

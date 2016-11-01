@@ -39,6 +39,7 @@ public class Options {
     public static final File OPTIONSXMLFILE = new File(XMLDIRECTORY, "options.xml");
     public static final File DIRECTORYIMAGES = new File(ROOTDIRECTORY, "assets/img/");
     public static final File GOALSXMLFILE = new File(XMLDIRECTORY, "goals.xml");
+    public static final File SESSIONSXMLFILE_TESTING = new File(XMLDIRECTORY, "sessions_testing.xml");
     public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");
     public static final File ENTRAINMENTXMLFILE = new File(XMLDIRECTORY, "entrainment.xml");
     public static final File AMBIENCEXMLFILE = new File(XMLDIRECTORY, "ambience.xml");
@@ -85,6 +86,7 @@ public class Options {
     private UserInterfaceOptions UserInterfaceOptions;
     private SessionOptions SessionOptions;
     private ProgramOptions ProgramOptions;
+    private DeveloperOptions DeveloperOptions;
 
     public Options() {}
 
@@ -107,6 +109,12 @@ public class Options {
     public void setProgramOptions(ProgramOptions programOptions) {
         ProgramOptions = programOptions;
     }
+    public Options.DeveloperOptions getDeveloperOptions() {
+        return DeveloperOptions;
+    }
+    public void setDeveloperOptions(Options.DeveloperOptions developerOptions) {
+        DeveloperOptions = developerOptions;
+    }
 
 // XML Processing
     public void unmarshall() {
@@ -118,6 +126,7 @@ public class Options {
                 setUserInterfaceOptions(options.getUserInterfaceOptions());
                 setSessionOptions(options.getSessionOptions());
                 setProgramOptions(options.getProgramOptions());
+                setDeveloperOptions(options.getDeveloperOptions());
             } catch (JAXBException ignored) {
                 Platform.runLater(() -> new InformationDialog(this, "Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
@@ -140,6 +149,7 @@ public class Options {
         UserInterfaceOptions userInterfaceOptions = new UserInterfaceOptions();
         kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
         ProgramOptions programOptions = new ProgramOptions();
+        DeveloperOptions developerOptions = new DeveloperOptions();
         userInterfaceOptions.setTooltips(DEFAULT_TOOLTIPS_OPTION);
         userInterfaceOptions.setHelpdialogs(DEFAULT_HELP_DIALOGS_OPTION);
         userInterfaceOptions.setScrollincrement(DEFAULT_SCROLL_INCREMENT);
@@ -161,9 +171,11 @@ public class Options {
         sessionOptions.setReferencefullscreen(DEFAULT_REFERENCE_FULLSCREEN_OPTION);
         sessionOptions.setAmbiencePlaybackType(DEFAULT_AMBIENCE_PLAYBACK_TYPE);
         programOptions.setOS(System.getProperty("os.name"));
+        developerOptions.setTestingmode(false);
         setUserInterfaceOptions(userInterfaceOptions);
         setSessionOptions(sessionOptions);
         setProgramOptions(programOptions);
+        setDeveloperOptions(developerOptions);
         marshall();
     }
     public void addthemefile(String name, String file_location) {
@@ -354,6 +366,20 @@ public class Options {
             this.OS = OS;
         }
 
+    }
+    @XmlAccessorType(XmlAccessType.PROPERTY)
+    public static class DeveloperOptions {
+        private boolean testingmode;
+
+        public DeveloperOptions() {}
+
+        public boolean isTestingmode() {
+            return testingmode;
+        }
+
+        public void setTestingmode(boolean testingmode) {
+            this.testingmode = testingmode;
+        }
     }
 
 }

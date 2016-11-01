@@ -155,9 +155,7 @@ public class ProgressTracker implements UI {
         if (SelectedSessionPart instanceof Qi_Gong) {
             PrePostSwitch.setDisable(true);
             PrePostSwitch.setSelected(false);
-        } else {
-            PrePostSwitch.setDisable(disabled);
-        }
+        } else {PrePostSwitch.setDisable(disabled);}
     }
     public void displaysessionlist() {
         if (Sessions.getSession() == null || Sessions.getSession().size() == 0) {
@@ -576,7 +574,8 @@ public class ProgressTracker implements UI {
                         continue;
                     }
                 }
-                rowlist.add(new SessionRow(count, i.getDate_Practiced().format(Util.dateFormat), i.getPresession_Duration(), i.getRin_Duration(),
+                rowlist.add(new SessionRow(count,
+                        i.getDate_Practiced().format(Util.dateFormat), i.getPresession_Duration(), i.getRin_Duration(),
                         i.getKyo_Duration(), i.getToh_Duration(), i.getSha_Duration(), i.getKai_Duration(), i.getJin_Duration(),
                         i.getRetsu_Duration(), i.getZai_Duration(), i.getZen_Duration(), i.getEarth_Duration(), i.getAir_Duration(),
                         i.getFire_Duration(), i.getWater_Duration(), i.getVoid_Duration(), i.getPostsession_Duration(),

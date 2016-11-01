@@ -39,8 +39,6 @@ import java.util.stream.Collectors;
 
 // TODO Optional Additional Features
     // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
-    // TODO Display Short Cut Descriptions (Power/Responsibility... On The Player Widget While Playing)
-    // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
     // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
 
 // TODO Mind Workstation

@@ -57,7 +57,7 @@ public class EditReferenceFiles extends Stage {
             if (referenceType == null) {referenceType = kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION;}
             HTMLVariation.setSelected(referenceType == ReferenceType.html);
             TEXTVariation.setSelected(referenceType == ReferenceType.txt);
-            referenceType = Root.getSessionCreator().getReferenceType();
+            referenceType = Root.getOptions().getSessionOptions().getReferencetype();
             PreviewButton.setDisable(true);
             SaveButton.setDisable(true);
             String referencename = referenceType.name();

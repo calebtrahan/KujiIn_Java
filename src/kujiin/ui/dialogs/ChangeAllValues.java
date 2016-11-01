@@ -42,7 +42,7 @@ public class ChangeAllValues extends Stage {
                 try {setMinutes(Integer.parseInt(MinutesTextField.getText()));}
                 catch (NumberFormatException ignored) {setMinutes(0);}
             });
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
     }
 
     // Getters And Setters
