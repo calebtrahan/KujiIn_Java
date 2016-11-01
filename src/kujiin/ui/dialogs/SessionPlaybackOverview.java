@@ -562,7 +562,7 @@ public class SessionPlaybackOverview extends Stage {
         close();
     }
 
-    class SessionPlaybackOverview_ChangeDuration extends Stage {
+    public class SessionPlaybackOverview_ChangeDuration extends Stage {
         public TextField HoursTextField;
         public TextField MinutesTextField;
         public CheckBox RampOnlyCheckBox;
@@ -627,7 +627,7 @@ public class SessionPlaybackOverview extends Stage {
             }
         }
     }
-    class SessionPlaybackOverview_AddCustomAmbience extends Stage {
+    public class SessionPlaybackOverview_AddCustomAmbience extends Stage {
         public TableView<AmbienceSongWithNumber> AmbienceItemsTable;
         public TableColumn<AmbienceSongWithNumber, Integer> NumberColumn;
         public TableColumn<AmbienceSongWithNumber, String> NameColumn;
@@ -636,11 +636,13 @@ public class SessionPlaybackOverview extends Stage {
         public Button AcceptButton;
         public Button CancelButton;
         public Button RemoveButton;
-        public Button MoveUpButton;
-        public Button MoveDownButton;
         public Button PreviewButton;
-        public Button AddFilesButton;
-        public Button AddAmbienceButton;
+        public MenuButton AddMenuButton;
+        public MenuItem AddAmbience;
+        public MenuItem AddFiles;
+        public MenuButton MoveMenuButton;
+        public MenuItem MoveUp;
+        public MenuItem MoveDown;
         private AmbienceSongWithNumber selectedtableitem;
         private ObservableList<AmbienceSongWithNumber> TableItems = FXCollections.observableArrayList();
         private List<SoundFile> CustomAmbienceList = new ArrayList<>();
@@ -661,14 +663,16 @@ public class SessionPlaybackOverview extends Stage {
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
                 RemoveButton.setDisable(true);
-                MoveUpButton.setDisable(true);
-                MoveDownButton.setDisable(true);
                 setTitle("Set Custom Ambience");
                 NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
                 NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
                 DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
                 AmbienceItemsTable.getSelectionModel().selectedItemProperty().addListener(
                         (observable, oldValue, newValue) -> tableselectionchanged(newValue));
+                AddAmbience.setOnAction(event -> addambience());
+                AddFiles.setOnAction(event -> addfiles());
+                UpButton.setOnAction(event -> moveupintable());
+                DownButton.setOnAction(event -> movedownintable());
                 if (sessionPart.getAmbience().hasCustomAmbience()) {
                     int count = 1;
                     for (SoundFile i : sessionPart.getAmbience().getCustomAmbience()) {
@@ -684,17 +688,14 @@ public class SessionPlaybackOverview extends Stage {
 
         private void tableselectionchanged(AmbienceSongWithNumber newValue) {
             int index = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
-            if (index != -1) {
-                selectedtableitem = AmbienceItemsTable.getItems().get(index);
-            } else {
-                selectedtableitem = null;
-            }
+            if (index != -1) {selectedtableitem = AmbienceItemsTable.getItems().get(index);}
+            else {selectedtableitem = null;}
             RemoveButton.setDisable(index == -1);
-            MoveUpButton.setDisable(index == -1 || index == 0);
-            MoveDownButton.setDisable(index == -1 || index == AmbienceItemsTable.getItems().size() - 1);
+            MoveMenuButton.setDisable(index == -1);
+            MoveUp.setDisable(index == -1 || index == 0);
+            MoveDown.setDisable(index == -1 || index == AmbienceItemsTable.getItems().size() - 1);
             PreviewButton.setDisable(index == -1);
         }
-
         public boolean ambiencealreadyadded(File file) {
             if (CustomAmbienceList != null) {
                 for (SoundFile i : CustomAmbienceList) {
@@ -705,7 +706,6 @@ public class SessionPlaybackOverview extends Stage {
             }
             return false;
         }
-
         public void addfiles() {
             List<File> filesselected = new FileChooser().showOpenMultipleDialog(null);
             if (filesselected == null || filesselected.isEmpty()) {
@@ -736,7 +736,6 @@ public class SessionPlaybackOverview extends Stage {
                 }
             }
         }
-
         public void addambience() {
             SessionPlaybackOverview_SelectAmbience selectAmbience = new SessionPlaybackOverview_SelectAmbience(sessionPart);
             selectAmbience.showAndWait();
@@ -747,7 +746,6 @@ public class SessionPlaybackOverview extends Stage {
                 calculatetotal();
             }
         }
-
         public void orderambience() {
             int count = 1;
             for (AmbienceSongWithNumber i : TableItems) {
@@ -755,7 +753,6 @@ public class SessionPlaybackOverview extends Stage {
                 count++;
             }
         }
-
         public void removeambience() {
             if (selectedtableitem != null) {
                 if (new ConfirmationDialog(Root.getOptions(), "Remove Ambience", "Really Remove '" + selectedtableitem.getName() + "'?", "", "Remove", "Cancel").getResult()) {
@@ -768,7 +765,6 @@ public class SessionPlaybackOverview extends Stage {
                 }
             }
         }
-
         public Duration getcurrenttotal() {
             Duration duration = Duration.ZERO;
             for (SoundFile i : CustomAmbienceList) {
@@ -776,7 +772,6 @@ public class SessionPlaybackOverview extends Stage {
             }
             return duration;
         }
-
         public void calculatetotal() {
             if (getcurrenttotal().lessThan(sessionPart.getduration())) {
                 Duration timeleft = sessionPart.getduration().subtract(getcurrenttotal());
@@ -792,7 +787,6 @@ public class SessionPlaybackOverview extends Stage {
                 longenough = true;
             }
         }
-
         public void moveupintable() {
             int selectedindex = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
             if (selectedindex > 0) {
@@ -802,7 +796,6 @@ public class SessionPlaybackOverview extends Stage {
                 calculatetotal();
             }
         }
-
         public void movedownintable() {
             int selectedindex = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
             if (selectedindex != -1 && selectedindex != TableItems.size() - 1) {
@@ -812,22 +805,18 @@ public class SessionPlaybackOverview extends Stage {
                 calculatetotal();
             }
         }
-
         public void preview() {
             if (selectedtableitem != null) {
                 PreviewFile previewFile = new PreviewFile(selectedtableitem.getFile(), Root);
                 previewFile.showAndWait();
             }
         }
-
         public List<SoundFile> getCustomAmbienceList() {
             return CustomAmbienceList;
         }
-
         public boolean getResult() {
             return result;
         }
-
         public void accept() {
             if (getcurrenttotal().lessThan(sessionPart.getduration())) {
                 new InformationDialog(Root.getOptions(), "Ambience Too Short", "Need At Least " + sessionPart.getdurationasString(false, 50) + " To Set This As Custom Ambience", "");
@@ -838,7 +827,7 @@ public class SessionPlaybackOverview extends Stage {
         }
 
     }
-    class SessionPlaybackOverview_SelectAmbience extends Stage {
+    public class SessionPlaybackOverview_SelectAmbience extends Stage {
         public Label TopLabel;
         public TableView<AmbienceSong> AmbienceTable;
         public TableColumn<AmbienceSong, String> NameColumn;
@@ -863,7 +852,7 @@ public class SessionPlaybackOverview extends Stage {
                 String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
-                setTitle("Set Custom Ambience");
+                setTitle("Add Ambience");
                 PreviewButton.setDisable(true);
                 AddButton.setDisable(true);
                 NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);

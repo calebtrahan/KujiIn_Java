@@ -3,7 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="318.0" prefWidth="422.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="317.0" prefWidth="422.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox alignment="TOP_CENTER" layoutX="112.0" layoutY="136.0" prefHeight="318.0" prefWidth="416.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -17,25 +17,38 @@
                   <Insets left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
             </TableView>
-            <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="349.0">
+            <HBox alignment="CENTER_RIGHT" prefHeight="26.0" prefWidth="349.0">
                <children>
-                  <Button fx:id="AddFilesButton" mnemonicParsing="false" onAction="#addfiles" text="Add File(s)" />
-                  <Button fx:id="AddAmbienceButton" mnemonicParsing="false" onAction="#addambience" text="Add Ambience" />
+                  <MenuButton fx:id="AddMenuButton" mnemonicParsing="false" prefHeight="29.0" prefWidth="60.0" text="Add">
+                    <items>
+                      <MenuItem fx:id="AddAmbience" mnemonicParsing="false" text="Ambience" />
+                      <MenuItem fx:id="AddFiles" mnemonicParsing="false" text="Files" />
+                    </items>
+                  </MenuButton>
+                  <MenuButton fx:id="MoveMenuButton" mnemonicParsing="false" text="Move">
+                    <items>
+                      <MenuItem fx:id="MoveUp" mnemonicParsing="false" text="Up" />
+                      <MenuItem fx:id="MoveDown" mnemonicParsing="false" text="Down" />
+                    </items>
+                  </MenuButton>
                   <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removeambience" prefHeight="26.0" prefWidth="67.0" text="Remove" />
-                  <Button fx:id="MoveUpButton" mnemonicParsing="false" onAction="#moveupintable" text="Up" />
-                  <Button fx:id="MoveDownButton" mnemonicParsing="false" onAction="#movedownintable" text="Down" />
                   <Button fx:id="PreviewButton" mnemonicParsing="false" onAction="#preview" prefHeight="26.0" prefWidth="66.0" text="Preview" />
                </children>
                <VBox.margin>
                   <Insets top="3.0" />
                </VBox.margin>
                <padding>
-                  <Insets left="10.0" />
+                  <Insets left="10.0" right="10.0" />
                </padding>
             </HBox>
             <HBox alignment="CENTER_RIGHT" prefHeight="39.0" prefWidth="349.0">
                <children>
-                  <TextField fx:id="TotalDurationTextField" editable="false" prefHeight="29.0" prefWidth="276.0">
+                  <Label prefHeight="19.0" prefWidth="106.0" text="Current Duration:">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="TotalDurationTextField" editable="false" prefHeight="29.0" prefWidth="136.0">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin></TextField>

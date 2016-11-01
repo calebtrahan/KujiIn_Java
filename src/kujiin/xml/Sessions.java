@@ -53,6 +53,7 @@ public class Sessions {
     }
     public void marshall() {
         try {
+            deletenonvalidsessions();
             JAXBContext context = JAXBContext.newInstance(Sessions.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -75,26 +76,18 @@ public class Sessions {
         } else {sessionsList = new ArrayList<>();}
         sessionsList.add(session);
         setSession(sessionsList);
-        marshall();
     }
     public void remove(Session session) throws JAXBException {
         List<Session> sessionList = getSession();
         sessionList.remove(sessionList.indexOf(session));
         setSession(sessionList);
-        JAXBContext context = JAXBContext.newInstance(Sessions.class);
-        Marshaller createMarshaller = context.createMarshaller();
-        createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        createMarshaller.marshal(this, Options.SESSIONSXMLFILE);
     }
     public void deletenonvalidsessions() {
         try {
-            for (kujiin.xml.Session i : getSession()) {
-                if (! i.sessionnotEmpty()) {
-                    try {
-                        remove(i);}
-                    catch (JAXBException ignored) {}
-                }
-            }
+            getSession().stream().filter(kujiin.xml.Session::sessionempty).forEach(i -> {
+                try {remove(i);}
+                catch (JAXBException ignored) {}
+            });
         } catch (NullPointerException | ConcurrentModificationException ignored) {}
     }
     public void sort() {
@@ -130,6 +123,7 @@ public class Sessions {
     public int getsessioncount(SessionPart sessionpart, boolean includepreandpost) {
         try {
             int sessioncount = 0;
+            System.out.println(getSession().size());
             for (kujiin.xml.Session i : getSession()) {
                 if (i.getsessionpartduration(sessionpart) != 0) {sessioncount++; continue;}
                 if (includepreandpost) {

@@ -45,7 +45,6 @@ public class ProgressTracker implements UI {
     private TextField TotalTimePracticed;
     private TextField NumberOfSessionPracticed;
     private CheckBox PrePostSwitch;
-    private Button ListOfSessionsButton;
     private Label GoalTopLabel;
     private ProgressBar GoalProgressBar;
     private Label GoalPercentageLabel;
@@ -71,7 +70,6 @@ public class ProgressTracker implements UI {
         TotalTimePracticed = Root.TotalTimePracticed;
         NumberOfSessionPracticed = Root.NumberOfSessionsPracticed;
         PrePostSwitch = Root.PrePostSwitch;
-        ListOfSessionsButton = Root.ListOfSessionsButton;
         GoalTopLabel = Root.GoalTopLabel;
         GoalProgressBar = Root.goalsprogressbar;
         GoalPercentageLabel = Root.GoalProgressPercentageLabel;
@@ -450,7 +448,7 @@ public class ProgressTracker implements UI {
                 this.setResizable(false);
                 setTitle("Session List");
                 DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
-                DateColumn.setCellValueFactory(cellData -> cellData.getValue().datepracticed);
+                PreColumn.setCellValueFactory(cellData -> cellData.getValue().presession);
                 RinColumn.setCellValueFactory(cellData -> cellData.getValue().rin);
                 KyoColumn.setCellValueFactory(cellData -> cellData.getValue().kyo);
                 TohColumn.setCellValueFactory(cellData -> cellData.getValue().toh);

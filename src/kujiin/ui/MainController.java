@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 // TODO Bugs To Fix
-// Playback
-    // TODO Ambience Shuffle Algorithm Doesn't Add Last Actual Ambience File
+
 // GUI
     // TODO Session Playback Overview Set Dynamic Text Colors (It's All Fucked Up)
     // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified
@@ -39,7 +38,6 @@ import java.util.stream.Collectors;
 
 // TODO Optional Additional Features
     // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
-    // TODO Set Font Size, So The Program Looks Universal And Text Isn't Oversized Cross-Platform
 
 // TODO Mind Workstation
     // TODO Add Low (And Possibly Medium) Variations Of All Session Parts
@@ -375,18 +373,7 @@ public class MainController implements Initializable {
     public void menu_howtouseprogram() {
     }
     public void menu_aboutthisprogram() {
-//        for (SessionPart x : getAllSessionParts(false)) {
-//            if (x instanceof Cut || x instanceof Qi_Gong) {
-//                Ambience ambience = x.getAmbience();
-//                int count = 1;
-//                for (int i = 0; i < 100; i++) {
-//                    ambiencetestsoundfile = ambience.ambiencegenerator(AmbiencePlaybackType.SHUFFLE, ambienceplaybackhistory, ambiencetestsoundfile);
-//                    ambienceplaybackhistory.add(ambiencetestsoundfile);
-////                System.out.println(count + ": Sound File: " + ambiencetestsoundfile.getFile().getAbsolutePath());
-//                    count++;
-//                }
-//            }
-//        }
+
     }
     public void menu_contactme() {
 

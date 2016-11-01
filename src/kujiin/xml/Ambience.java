@@ -88,7 +88,7 @@ public class Ambience {
                     }
                 } else {
                     while (true) {
-                        soundfiletotest = get(random.nextInt(Ambience.size() - 1));
+                        soundfiletotest = get(random.nextInt(Ambience.size()));
                         if (! soundfiletotest.equals(currentsoundfile)) {
                             UsedFiles.add(soundfiletotest);
                             return soundfiletotest;

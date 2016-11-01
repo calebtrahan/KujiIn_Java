@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import static kujiin.util.Util.dateFormat;
 
-// TODO Fix Presession Writes A Null Value
 // TODO Implement Ambience Functionality For Session
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -405,13 +404,10 @@ public class Session {
         allsessionparttimes.add(getPostsession_Duration());
         return allsessionparttimes;
     }
-    public boolean sessionnotEmpty() {
-        int count = 0;
-        for (Integer i : getallsessionparttimes()) {
-            if (count > 0 && count < 15) {if (i > 0) {return true;}}
-            count++;
-        }
-        return false;
+    public boolean sessionempty() {
+        Duration minutes = Duration.ZERO;
+        for (Integer i : getallsessionparttimes()) {minutes.add(Duration.minutes(i));}
+        return minutes.greaterThan(Duration.ZERO);
     }
     public void updatetotalsessionduration() {
         Integer total = 0;
