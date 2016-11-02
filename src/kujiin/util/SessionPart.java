@@ -219,8 +219,11 @@ public class SessionPart {
     public void setGoalsController(Goals goals) {
         GoalsController = goals;
     }
+    public ArrayList<SoundFile> getAmbienceplayhistory() {
+        return ambienceplayhistory;
+    }
 
-// Duration
+    // Duration
     public void setRamponly(boolean ramponly) {
         this.ramponly = ramponly;
     }

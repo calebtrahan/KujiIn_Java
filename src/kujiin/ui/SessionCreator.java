@@ -485,6 +485,7 @@ public class SessionCreator implements UI {
         public void transition() {
             kujiin.xml.Session currentsession =  progressTracker.getSessions().getspecificsession(progressTracker.getSessions().totalsessioncount() - 1);
             currentsession.updateduration(currentsessionpart, currentsessionpart.getduration());
+            currentsession.updatesessionpartambience(currentsessionpart, currentsessionpart.getAmbienceplayhistory());
             progressTracker.getSessions().marshall();
             progressTracker.updateui_goals(this);
             currentsessionpart.stop();

@@ -19,8 +19,6 @@ public class Ambience {
     private List<SoundFile> Ambience;
     @XmlTransient
     private List<SoundFile> CustomAmbience;
-    @XmlTransient
-    private List<SoundFile> UsedFiles = new ArrayList<>();
 
     public Ambience() {
     }
@@ -75,14 +73,13 @@ public class Ambience {
                     else {return get(0);}
                 } else {return get(0);}
             case SHUFFLE:
-                if (Ambience.size() == 1) {UsedFiles.add(get(0)); return get(0);}
+                if (Ambience.size() == 1) {return get(0);}
                 Random random = new Random();
                 SoundFile soundfiletotest;
                 if (playbackhistory.size() < Ambience.size()) {
                     while (true) {
                         soundfiletotest = get(random.nextInt(Ambience.size()));
                         if (! playbackhistory.contains(soundfiletotest)) {
-                            UsedFiles.add(soundfiletotest);
                             return soundfiletotest;
                         }
                     }
@@ -90,7 +87,6 @@ public class Ambience {
                     while (true) {
                         soundfiletotest = get(random.nextInt(Ambience.size()));
                         if (! soundfiletotest.equals(currentsoundfile)) {
-                            UsedFiles.add(soundfiletotest);
                             return soundfiletotest;
                         }
                     }
