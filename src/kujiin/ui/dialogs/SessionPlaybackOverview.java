@@ -160,6 +160,7 @@ public class SessionPlaybackOverview extends Stage {
                 }
             });
             SessionItemsTable.setOnMouseClicked(event -> itemselected());
+            AmbienceTypeComboBox.setOnAction(event -> ambiencetypechanged());
             tableitems = FXCollections.observableArrayList();
             AmbienceTypeComboBox.setItems(ambiencetypes);
             AmbienceSwitch.setSelected(false);
@@ -186,7 +187,7 @@ public class SessionPlaybackOverview extends Stage {
         return alladjustedsessionitems;
     }
 
-    // Table
+// Table
     public void itemselected() {
         int index = SessionItemsTable.getSelectionModel().getSelectedIndex();
         if (index != -1) {
@@ -244,7 +245,7 @@ public class SessionPlaybackOverview extends Stage {
         }
     }
 
-    // Order/Sort Session Parts
+// Order/Sort Session Parts
     public void moveitemup() {
         int selectedindex = SessionItemsTable.getSelectionModel().getSelectedIndex();
         if (selectedindex == -1) {
@@ -300,7 +301,7 @@ public class SessionPlaybackOverview extends Stage {
         populatetable();
     }
 
-    // Session Parts Missing / Out Of Order
+// Session Parts Missing / Out Of Order
     public List<Cut> getwellformedcuts() {
         List<Cut> wellformedcuts = new ArrayList<>();
         for (int i = 0; i < getlastworkingcutindex(); i++) {
@@ -318,7 +319,7 @@ public class SessionPlaybackOverview extends Stage {
         return lastcutindex;
     }
 
-    //  Duration
+//  Duration
     public void adjustduration() {
         if (selectedsessionpart != null) {
             SessionPlaybackOverview_ChangeDuration changedurationdialog = new SessionPlaybackOverview_ChangeDuration(selectedsessionpart);
@@ -348,7 +349,7 @@ public class SessionPlaybackOverview extends Stage {
         CompletionTime.setText(sdf.format(cal.getTime()));
     }
 
-    // Goal
+// Goal
     public void setgoal() {
         if (selectedsessionpart != null) {
             Root.getProgressTracker().setnewgoal(selectedsessionpart);
@@ -356,16 +357,15 @@ public class SessionPlaybackOverview extends Stage {
         populatetable();
     }
 
-    // Ambience
+// Ambience
     public void ambienceswitchtoggled() {
         checkambience();
         AmbienceTypeComboBox.setDisable(!AmbienceSwitch.isSelected());
         populatetable();
     }
     public String getambiencetext(SessionPart sessionPart) {
-        if (! Root.getSessionCreator().isAmbienceenabled()) {
-            return "Disabled";
-        } else {
+        if (! AmbienceSwitch.isSelected()) {return "Disabled";}
+        else {
             switch (ambiencePlaybackType) {
                 case REPEAT:
                     if (!sessionPart.getAmbience().hasAnyAmbience()) {
@@ -473,7 +473,7 @@ public class SessionPlaybackOverview extends Stage {
         }
     }
 
-    // Dialog
+// Dialog
     public boolean getResult() {
         return result;
     }
@@ -594,20 +594,16 @@ public class SessionPlaybackOverview extends Stage {
         public ChangeDurationType getResult() {
             return result;
         }
-
         public Duration getDuration() {
             return duration;
         }
-
         public void setDuration(Duration duration) {
             this.duration = duration;
         }
-
         public void ramponlyselected() {
             HoursTextField.setDisable(RampOnlyCheckBox.isSelected());
             MinutesTextField.setDisable(RampOnlyCheckBox.isSelected());
         }
-
         public void OKButtonPressed() {
             try {
                 if (!RampOnlyCheckBox.isSelected()) {
@@ -662,13 +658,12 @@ public class SessionPlaybackOverview extends Stage {
                 String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
-                RemoveButton.setDisable(true);
                 setTitle("Set Custom Ambience");
                 NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
                 NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
                 DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
                 AmbienceItemsTable.getSelectionModel().selectedItemProperty().addListener(
-                        (observable, oldValue, newValue) -> tableselectionchanged(newValue));
+                        (observable, oldValue, newValue) -> tableselectionchanged());
                 AddAmbience.setOnAction(event -> addambience());
                 AddFiles.setOnAction(event -> addfiles());
                 UpButton.setOnAction(event -> moveupintable());
@@ -681,12 +676,11 @@ public class SessionPlaybackOverview extends Stage {
                     }
                     AmbienceItemsTable.setItems(TableItems);
                 }
-                calculatetotal();
-            } catch (IOException ignored) {
-            }
+                calculateduration();
+                syncbuttons();
+            } catch (IOException ignored) {}
         }
-
-        private void tableselectionchanged(AmbienceSongWithNumber newValue) {
+        private void tableselectionchanged() {
             int index = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
             if (index != -1) {selectedtableitem = AmbienceItemsTable.getItems().get(index);}
             else {selectedtableitem = null;}
@@ -730,11 +724,12 @@ public class SessionPlaybackOverview extends Stage {
                         TableItems.add(new AmbienceSongWithNumber(finalFilesselected.indexOf(i), x));
                         orderambience();
                         AmbienceItemsTable.setItems(TableItems);
-                        calculatetotal();
+                        calculateduration();
                         calculatedurationplayer.dispose();
                     });
                 }
             }
+            syncbuttons();
         }
         public void addambience() {
             SessionPlaybackOverview_SelectAmbience selectAmbience = new SessionPlaybackOverview_SelectAmbience(sessionPart);
@@ -743,8 +738,9 @@ public class SessionPlaybackOverview extends Stage {
                 TableItems.addAll(selectAmbience.getSoundfiles());
                 orderambience();
                 AmbienceItemsTable.setItems(TableItems);
-                calculatetotal();
+                calculateduration();
             }
+            syncbuttons();
         }
         public void orderambience() {
             int count = 1;
@@ -761,9 +757,10 @@ public class SessionPlaybackOverview extends Stage {
                     CustomAmbienceList.remove(index);
                     orderambience();
                     AmbienceItemsTable.setItems(TableItems);
-                    calculatetotal();
+                    calculateduration();
                 }
             }
+            syncbuttons();
         }
         public Duration getcurrenttotal() {
             Duration duration = Duration.ZERO;
@@ -772,19 +769,32 @@ public class SessionPlaybackOverview extends Stage {
             }
             return duration;
         }
-        public void calculatetotal() {
+        public void syncbuttons() {
+            boolean isemptyorhassingleitem = TableItems.isEmpty() || TableItems.size() == 1;
+            int selectedindex = AmbienceItemsTable.getSelectionModel().getSelectedIndex();
+            boolean noitemselected = selectedindex == -1;
+            MoveMenuButton.setDisable(isemptyorhassingleitem);
+            MoveUp.setDisable(isemptyorhassingleitem || noitemselected || AmbienceItemsTable.getSelectionModel().getSelectedIndex() == 0);
+            MoveDown.setDisable(isemptyorhassingleitem || noitemselected || AmbienceItemsTable.getSelectionModel().getSelectedIndex() == AmbienceItemsTable.getItems().size() - 1);
+            AddMenuButton.setDisable(longenough);
+            AddFiles.setDisable(longenough);
+            AddAmbience.setDisable(longenough);
+            RemoveButton.setDisable(noitemselected);
+            PreviewButton.setDisable(noitemselected);
+            AcceptButton.setDisable(! longenough);
+        }
+        public void calculateduration() {
             if (getcurrenttotal().lessThan(sessionPart.getduration())) {
                 Duration timeleft = sessionPart.getduration().subtract(getcurrenttotal());
                 TotalDurationTextField.setStyle("-fx-text-fill: red;");
-                String str = "Ambience Is Not Long Enough (" +
-                        Util.formatdurationtoStringSpelledOut(timeleft, TotalDurationTextField.getLayoutBounds().getWidth()) +
-                        " Left)";
-                TotalDurationTextField.setText(str);
+                TotalDurationTextField.setText(Util.formatdurationtoStringSpelledOut(timeleft, TotalDurationTextField.getLayoutBounds().getWidth()) + " Remaining");
                 longenough = false;
+                AddMenuButton.setDisable(false);
             } else {
                 TotalDurationTextField.setStyle("-fx-text-fill: white;");
                 TotalDurationTextField.setText("Ambience Is Long Enough");
                 longenough = true;
+                AddMenuButton.setDisable(true);
             }
         }
         public void moveupintable() {
@@ -793,7 +803,7 @@ public class SessionPlaybackOverview extends Stage {
                 Collections.swap(TableItems, selectedindex, selectedindex - 1);
                 Collections.swap(CustomAmbienceList, selectedindex, selectedindex - 1);
                 AmbienceItemsTable.setItems(TableItems);
-                calculatetotal();
+                calculateduration();
             }
         }
         public void movedownintable() {
@@ -802,7 +812,7 @@ public class SessionPlaybackOverview extends Stage {
                 Collections.swap(TableItems, selectedindex, selectedindex + 1);
                 Collections.swap(CustomAmbienceList, selectedindex, selectedindex + 1);
                 AmbienceItemsTable.setItems(TableItems);
-                calculatetotal();
+                calculateduration();
             }
         }
         public void preview() {
@@ -835,14 +845,12 @@ public class SessionPlaybackOverview extends Stage {
         public Button PreviewButton;
         public Button AddButton;
         public Button CancelButton;
-        private SessionPart sessionPart;
         private boolean result = false;
         private List<AmbienceSongWithNumber> soundfiles = new ArrayList<>();
         private ObservableList<AmbienceSong> ambienceSongs = FXCollections.observableArrayList();
 
         public SessionPlaybackOverview_SelectAmbience(SessionPart SessionPart) {
             try {
-                sessionPart = SessionPart;
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SelectAmbience.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -861,35 +869,30 @@ public class SessionPlaybackOverview extends Stage {
                 AmbienceTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
                 ambienceSongs.addAll(SessionPart.getAmbience().getAmbience().stream().map(AmbienceSong::new).collect(Collectors.toList()));
                 AmbienceTable.setItems(ambienceSongs);
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
 
         private void tableselectionchanged(AmbienceSong ambienceSong) {
             AddButton.setDisable(AmbienceTable.getSelectionModel().getSelectedItems().isEmpty());
             PreviewButton.setDisable(AmbienceTable.getSelectionModel().getSelectedItems().size() != 1);
         }
-
         public void preview() {
             if (!PreviewButton.isDisabled()) {
                 File file = ambienceSongs.get(AmbienceTable.getSelectionModel().getSelectedIndex()).getFile();
                 new PreviewFile(file, Root).showAndWait();
             }
         }
-
         public void addfiles() {
-            soundfiles.addAll(AmbienceTable.getSelectionModel().getSelectedItems().stream().map(i -> new AmbienceSongWithNumber(0, i)).collect(Collectors.toList()));
+            soundfiles.addAll(AmbienceTable.getSelectionModel().getSelectedItems().stream().map(i -> new AmbienceSongWithNumber(AmbienceTable.getSelectionModel().getSelectedItems().indexOf(i), i)).collect(Collectors.toList()));
             result = true;
             close();
         }
-
         public boolean getResult() {
             return result;
         }
-
         public List<AmbienceSongWithNumber> getSoundfiles() {
             return soundfiles;
         }
-    }
 
+    }
 }

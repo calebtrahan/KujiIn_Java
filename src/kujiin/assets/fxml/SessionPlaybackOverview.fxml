@@ -80,7 +80,7 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </CheckBox>
-                        <ComboBox fx:id="AmbienceTypeComboBox" onAction="#ambiencetypechanged" prefHeight="26.0" prefWidth="114.0">
+                        <ComboBox fx:id="AmbienceTypeComboBox" prefHeight="26.0" prefWidth="114.0">
                            <cursor>
                               <Cursor fx:constant="OPEN_HAND" />
                            </cursor></ComboBox>
