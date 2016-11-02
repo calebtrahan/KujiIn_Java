@@ -98,16 +98,16 @@ public class Sessions {
 
 // Session Information Getters
     public List<Session> getsessionpartsessions(SessionPart sessionPart) {
-        return getSession().stream().filter(i -> i.getsessionpartduration(sessionPart) > 0).collect(Collectors.toList());
+        return getSession().stream().filter(i -> i.getduration(sessionPart).greaterThan(Duration.ZERO)).collect(Collectors.toList());
     }
     public Duration gettotalpracticedtime(SessionPart sessionpart, boolean includepreandpost) {
         try {
             Duration totalduration = Duration.ZERO;
-            for (kujiin.xml.Session i : getSession()) {totalduration = totalduration.add(i.getsessionpartdurationasObject(sessionpart));}
+            for (kujiin.xml.Session i : getSession()) {totalduration = totalduration.add(i.getduration(sessionpart));}
             if (includepreandpost) {
                 for (SessionPart i : Root.getAllSessionParts(true)) {
                     if (i instanceof Qi_Gong) {
-                        for (kujiin.xml.Session x : getSession()) {totalduration = totalduration.add(x.getsessionpartdurationasObject(i));}
+                        for (kujiin.xml.Session x : getSession()) {totalduration = totalduration.add(x.getduration(i));}
                     }
                 }
             }
@@ -123,9 +123,9 @@ public class Sessions {
         try {
             int sessioncount = 0;
             for (kujiin.xml.Session i : getSession()) {
-                if (i.getsessionpartduration(sessionpart) != 0) {sessioncount++; continue;}
+                if (i.getduration(sessionpart).greaterThan(Duration.ZERO)) {sessioncount++; continue;}
                 if (includepreandpost) {
-                    if (i.getsessionpartduration(Root.getPresession()) != 0 || i.getsessionpartduration(Root.getPostsession()) != 0) {sessioncount++;}
+                    if (i.getduration(Root.getPresession()).greaterThan(Duration.ZERO) || i.getduration(Root.getPostsession()).greaterThan(Duration.ZERO)) {sessioncount++;}
                 }
             }
             return sessioncount;

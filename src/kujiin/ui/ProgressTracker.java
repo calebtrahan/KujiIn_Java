@@ -555,14 +555,14 @@ public class ProgressTracker implements UI {
                         if (getcheckbox(j).isSelected()) {
                             if (Filter_DurationThresholdCheckbox.isSelected()) {
                                 try {
-                                    if (i.getsessionpartduration(j) <= Integer.parseInt(Filter_ThresholdMinutesTextField.getText())) {
+                                    if (i.getduration(j).lessThanOrEqualTo(Duration.minutes(Double.parseDouble(Filter_ThresholdMinutesTextField.getText())))) {
                                         validsession = false;
                                     }
                                 } catch (NumberFormatException | NullPointerException ignored) {
-                                    validsession = i.getsessionpartduration(j) > 0;
+                                    validsession = i.getduration(j).greaterThan(Duration.ZERO);
                                 }
                             } else {
-                                if (i.getsessionpartduration(j) == 0) {
+                                if (i.getduration(j).equals(Duration.ZERO)) {
                                     validsession = false;
                                 }
                             }
@@ -573,11 +573,11 @@ public class ProgressTracker implements UI {
                     }
                 }
                 rowlist.add(new SessionRow(count,
-                        i.getDate_Practiced().format(Util.dateFormat), i.getPresession_Duration(), i.getRin_Duration(),
-                        i.getKyo_Duration(), i.getToh_Duration(), i.getSha_Duration(), i.getKai_Duration(), i.getJin_Duration(),
-                        i.getRetsu_Duration(), i.getZai_Duration(), i.getZen_Duration(), i.getEarth_Duration(), i.getAir_Duration(),
-                        i.getFire_Duration(), i.getWater_Duration(), i.getVoid_Duration(), i.getPostsession_Duration(),
-                        i.getTotal_Session_Duration()));
+                        i.getDate_Practiced().format(Util.dateFormat), i.getduration(0), i.getduration(1),
+                        i.getduration(2), i.getduration(3), i.getduration(4), i.getduration(5), i.getduration(6),
+                        i.getduration(7), i.getduration(8), i.getduration(9), i.getduration(10), i.getduration(11),
+                        i.getduration(12), i.getduration(13), i.getduration(14), i.getduration(15),
+                        i.gettotalsessionduration()));
                 filteredsessionlist.add(i);
                 count++;
             }

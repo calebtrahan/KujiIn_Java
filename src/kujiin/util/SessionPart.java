@@ -952,7 +952,7 @@ public class SessionPart {
     public void tick() {
         if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
             try {
-                root.getProgressTracker().getSessions().getspecificsession(root.getProgressTracker().getSessions().getSession().size() - 1).updatesessionpartduration(this, new Double(elapsedtime.toMinutes()).intValue());
+                root.getProgressTracker().getSessions().getspecificsession(root.getProgressTracker().getSessions().getSession().size() - 1).updateduration(this, elapsedtime);
                 goals_playbackupdate();
             } catch (NullPointerException ignored) {}
         }

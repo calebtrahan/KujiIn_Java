@@ -98,7 +98,7 @@ public class SessionDetails extends Stage {
             XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
             List<Integer> values = new ArrayList<>();
             for (SessionPart i : Root.getAllSessionParts(false)) {
-                int duration = session.getsessionpartduration(i);
+                int duration = (int) session.getduration(i).toMinutes();
                 values.add(duration);
                 String name;
                 if (i.number == 0) {name = "Pre";}
@@ -109,7 +109,7 @@ public class SessionDetails extends Stage {
             SessionBarChart.getData().add(series);
             SessionBarChart.setLegendVisible(false);
             SessionNumbersAxis.setUpperBound(Util.list_getmaxintegervalue(values));
-            SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(new Duration((session.getTotal_Session_Duration() * 60) * 1000), SessionDurationTextField.getLayoutBounds().getWidth()));
+            SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(session.gettotalsessionduration(), SessionDurationTextField.getLayoutBounds().getWidth()));
             SessionDurationTextField.setEditable(false);
             SessionBarChart.requestFocus();
             CloseButton.setOnAction(event -> close());
