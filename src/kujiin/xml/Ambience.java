@@ -23,7 +23,7 @@ public class Ambience {
     public Ambience() {
     }
 
-    // Getters And Setters
+// Getters And Setters
     public List<SoundFile> getAmbience() {return Ambience;}
     public void setAmbience(List<SoundFile> ambience) {
         this.Ambience = ambience;
@@ -36,7 +36,7 @@ public class Ambience {
         } catch (NullPointerException ignored) {return new ArrayList<>();}
     }
 
-    // Utility Methods
+// Utility Methods
     public void startup_addambiencefromdirectory(SessionPart selectedsessionpart) {
         try {
             File ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, selectedsessionpart.name);

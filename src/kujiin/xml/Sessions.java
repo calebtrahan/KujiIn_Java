@@ -12,10 +12,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -27,6 +24,7 @@ import java.util.stream.Collectors;
 public class Sessions {
     @XmlElement(name = "Session")
     private List<Session> Session;
+    @XmlTransient
     private MainController Root;
 
     public Sessions() {}
@@ -125,7 +123,7 @@ public class Sessions {
             for (kujiin.xml.Session i : getSession()) {
                 if (i.getduration(sessionpart).greaterThan(Duration.ZERO)) {sessioncount++; continue;}
                 if (includepreandpost) {
-                    if (i.getduration(Root.getPresession()).greaterThan(Duration.ZERO) || i.getduration(Root.getPostsession()).greaterThan(Duration.ZERO)) {sessioncount++;}
+                    if (i.getduration(Root.getSessionPart(0)).greaterThan(Duration.ZERO) || i.getduration(Root.getSessionPart(15)).greaterThan(Duration.ZERO)) {sessioncount++;}
                 }
             }
             return sessioncount;

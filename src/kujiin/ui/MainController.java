@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.dialogs.*;
 import kujiin.util.*;
+import kujiin.util.enums.FreqType;
 import kujiin.util.enums.ProgramState;
 import kujiin.util.enums.StartupCheckType;
 import kujiin.xml.Ambiences;
@@ -104,6 +105,7 @@ public class MainController implements Initializable {
     public Label GoalProgressPercentageLabel;
     private SessionCreator sessionCreator;
     private ProgressTracker progressTracker;
+    protected FreqType freqType;
     private Scene Scene;
     private Stage Stage;
     private StartupChecks startupChecks;
@@ -202,11 +204,11 @@ public class MainController implements Initializable {
         Postsession.setSummary("Gather Qi (Life Energy) Before The Session Starts");
         Postsession.setToolTip();
         Total = new Total(16, "Total", this, null, null);
-        for (SessionPart i : getAllSessionParts(false)) {
+        for (SessionPart i : getSessionParts(0, 16)) {
             i.setGoalsController(getProgressTracker().getGoals());
             i.goals_unmarshall();
         }
-        getProgressTracker().setSessionParts(getAllSessionParts(true));
+        getProgressTracker().setSessionParts(getSessionParts(0, 17));
     }
     public boolean cleanup() {
         Ambiences.marshall();
@@ -221,92 +223,18 @@ public class MainController implements Initializable {
     }
 
 // Getters And Setters
+    // Controller Classes
     public void setSessionCreator(SessionCreator sessionCreator) {
         this.sessionCreator = sessionCreator;
-    }
-    public void setProgressTracker(ProgressTracker progressTracker) {
-        this.progressTracker = progressTracker;
     }
     public SessionCreator getSessionCreator() {
         return sessionCreator;
     }
+    public void setProgressTracker(ProgressTracker progressTracker) {
+        this.progressTracker = progressTracker;
+    }
     public ProgressTracker getProgressTracker() {
         return progressTracker;
-    }
-    public ArrayList<SessionPart> getAllSessionParts(boolean includetotal) {
-        ArrayList<SessionPart> sessionparts = new ArrayList<>();
-        sessionparts.addAll(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen,
-                Earth, Air, Fire, Water, Void, Postsession));
-        if (includetotal) {sessionparts.add(Total);}
-        return sessionparts;
-    }
-    public ArrayList<Cut> getAllCuts() {
-        return getAllSessionParts(false).stream().filter(i -> i instanceof Cut).map(i -> (Cut) i).collect(Collectors.toCollection(ArrayList::new));
-    }
-    public static List<String> getallCutNames() {
-        return getAllSessionPartsNames(false).subList(1, 10);
-    }
-    public ArrayList<Element> getAllElements() {
-        return getAllSessionParts(false).stream().filter(i -> i instanceof Element).map(i -> (Element) i).collect(Collectors.toCollection(ArrayList::new));
-    }
-    public static ArrayList<String> getAllSessionPartsNames(boolean includetotal) {
-        ArrayList<String> sessionpartnames = new ArrayList<>();
-        sessionpartnames.addAll(Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI",
-                "JIN", "RETSU", "ZAI", "ZEN", "Earth", "Air", "Fire", "Water", "Void", "Postsession"));
-        if (includetotal) {sessionpartnames.add("Total");}
-        return sessionpartnames;
-    }
-    public Qi_Gong getPresession() {
-        return Presession;
-    }
-    public Cut getRin() {
-        return Rin;
-    }
-    public Cut getKyo() {
-        return Kyo;
-    }
-    public Cut getToh() {
-        return Toh;
-    }
-    public Cut getSha() {
-        return Sha;
-    }
-    public Cut getJin() {
-        return Jin;
-    }
-    public Cut getKai() {
-        return Kai;
-    }
-    public Cut getRetsu() {
-        return Retsu;
-    }
-    public Cut getZai() {
-        return Zai;
-    }
-    public Cut getZen() {
-        return Zen;
-    }
-    public Qi_Gong getPostsession() {
-        return Postsession;
-    }
-    public Element getEarth() {
-        return Earth;
-    }
-    public Element getAir() {
-        return Air;
-    }
-    public Element getFire() {
-        return Fire;
-    }
-    public Element getWater() {
-        return Water;
-    }
-    public Element getVoid() {
-        return Void;
-    }
-    public Total getTotal() {return Total;}
-    public ProgramState getProgramState() {
-        return programState;
     }
     public Entrainments getEntrainments() {
         return Entrainments;
@@ -338,13 +266,41 @@ public class MainController implements Initializable {
     public void setStage(javafx.stage.Stage stage) {
         Stage = stage;
     }
+    // Session Part Getters
+    public ArrayList<SessionPart> getAllSessionParts(boolean includetotal) {
+        ArrayList<SessionPart> allsessionparts = new ArrayList<>(Arrays.asList(Presession, Rin, Kyo, Toh, Sha, Kai, Jin, Retsu, Zai, Zen, Earth, Air, Fire, Water, Void, Postsession));
+        if (includetotal) {allsessionparts.add(Total);}
+        return allsessionparts;
+    }
+    public ArrayList<Cut> getAllCuts() {
+        return getAllSessionParts(false).stream().filter(i -> i instanceof Cut).map(i -> (Cut) i).collect(Collectors.toCollection(ArrayList::new));
+    }
+    public ArrayList<Element> getAllElements() {
+        return getAllSessionParts(false).stream().filter(i -> i instanceof Cut).map(i -> (Element) i).collect(Collectors.toCollection(ArrayList::new));
+    }
+    public SessionPart getSessionPart(int index) {
+        return getAllSessionParts(true).get(index);
+    }
+    public String getSessionPart_Name(int index) {
+        return getSessionPart(index).name;
+    }
+    public ArrayList<SessionPart> getSessionParts(int startindex, int index) {
+        return new ArrayList<>(getAllSessionParts(true).subList(startindex, index));
+    }
+    public ArrayList<String> getSessionPart_Names(int startindex, int index) {
+        return getSessionParts(startindex, index).stream().map(i -> i.name).collect(Collectors.toCollection(ArrayList::new));
+    }
+    // State Getters
+    public ProgramState getProgramState() {
+        return programState;
+    }
 
 // Menu
     public void menu_changesessionoptions() {
         new ChangeProgramOptions(this).showAndWait();
         Options.marshall();
-        getProgressTracker().updateui_sessions();
-        getProgressTracker().updateui_goals(null);
+        getProgressTracker().sessions_updateui();
+        getProgressTracker().goals_updateui(null);
     }
     public void menu_editprogramsambience() {
         if (programState == ProgramState.IDLE) {
@@ -381,7 +337,7 @@ public class MainController implements Initializable {
     public void startupchecks_start() {
         programState = ProgramState.STARTING_UP;
         sessionCreator.setDisable(true, "");
-        startupChecks = new StartupChecks(getAllSessionParts(false));
+        startupChecks = new StartupChecks(getSessionParts(0, 16));
         startupChecks.run();
     }
     public void startupchecks_finished() {

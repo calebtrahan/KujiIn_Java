@@ -346,7 +346,7 @@ public class SessionPlaybackOverview extends Stage {
 // Goal
     public void setgoal() {
         if (selectedsessionpart != null) {
-            Root.getProgressTracker().setnewgoal(selectedsessionpart);
+            Root.getProgressTracker().goals_setnew(selectedsessionpart);
         }
         populatetable();
     }

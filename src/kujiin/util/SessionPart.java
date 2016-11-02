@@ -13,7 +13,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.AnswerDialog;
-import kujiin.util.enums.FreqType;
 import kujiin.util.enums.PlayerState;
 import kujiin.util.enums.ReferenceType;
 import kujiin.util.enums.StartupCheckType;
@@ -24,7 +23,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static kujiin.ui.MainController.getallCutNames;
 import static kujiin.xml.Options.DEFAULT_FADERESUMEANDPAUSEDURATION;
 
 public class SessionPart {
@@ -52,7 +50,6 @@ public class SessionPart {
     protected Animation timeline_fadeout_timer;
     protected Animation timeline_progresstonextsessionpart;
     protected Animation timeline_start_ending_ramp;
-    protected FreqType freqType;
     protected StartupCheckType startupCheckType = StartupCheckType.ENTRAINMENT;
     public boolean ramponly;
     private Double currententrainmentvolume;
@@ -122,7 +119,7 @@ public class SessionPart {
         soundFile = entrainment.get(startupchecks_entrainment_count);
         File file;
         if (startupchecks_entrainment_count == 0) {file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");}
-        else {file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + getallCutNames().get(startupchecks_entrainment_count - 1).toLowerCase() + ".mp3");}
+        else {file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" + root.getSessionPart_Names(1, 10).get(startupchecks_entrainment_count - 1).toLowerCase() + ".mp3");}
         if (soundFile == null && file.exists()) {soundFile = new SoundFile(file);}
         return soundFile;
     }

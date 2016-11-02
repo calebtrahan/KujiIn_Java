@@ -70,7 +70,7 @@ public class SessionCreator implements UI {
         ExportButton = Root.ExportButton;
         StatusBar = Root.CreatorStatusBar;
         options = Root.getOptions();
-        AllSessionParts = Root.getAllSessionParts(false);
+        AllSessionParts = Root.getSessionParts(0, 16);
         updateuitimeline = new Timeline(new KeyFrame(Duration.seconds(10), ae -> updategui()));
         updateuitimeline.setCycleCount(Animation.INDEFINITE);
         ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();
@@ -182,10 +182,10 @@ public class SessionCreator implements UI {
             Integer min = changevaluesdialog.getMinutes();
             for (Cut i : Root.getAllCuts()) {i.changevalue(min);}
             if (changevaluesdialog.getincludepresession()) {
-                Root.getPresession().changevalue(min);
+                Root.getSessionPart(0).changevalue(min);
             }
             if (changevaluesdialog.getincludepostsession()) {
-                Root.getPostsession().changevalue(min);
+                Root.getSessionPart(15).changevalue(min);
             }
         }
     }
@@ -196,10 +196,10 @@ public class SessionCreator implements UI {
             Integer min = changevaluesdialog.getMinutes();
             for (Element i : Root.getAllElements()) {i.changevalue(min);}
             if (changevaluesdialog.getincludepresession()) {
-                Root.getPresession().changevalue(min);
+                Root.getSessionPart(0).changevalue(min);
             }
             if (changevaluesdialog.getincludepostsession()) {
-                Root.getPostsession().changevalue(min);
+                Root.getSessionPart(15).changevalue(min);
             }
         }
     }
@@ -451,8 +451,8 @@ public class SessionCreator implements UI {
                         displayReference.setName(currentsessionpart.name);
                     }
                 } catch (Exception ignored) {}
-                progressTracker.updateui_goals(this);
-                progressTracker.updateui_sessions();
+                progressTracker.goals_updateui(this);
+                progressTracker.sessions_updateui();
                 currentsessionpart.tick();
             } catch (Exception ignored) {
                 ignored.printStackTrace();
@@ -487,7 +487,7 @@ public class SessionCreator implements UI {
             currentsession.updateduration(currentsessionpart, currentsessionpart.getduration());
             currentsession.updatesessionpartambience(currentsessionpart, currentsessionpart.getAmbienceplayhistory());
             progressTracker.getSessions().marshall();
-            progressTracker.updateui_goals(this);
+            progressTracker.goals_updateui(this);
             currentsessionpart.stop();
             if (Root.getOptions().getSessionOptions().getAlertfunction()) {
                 Media alertmedia = new Media(Root.getOptions().getSessionOptions().getAlertfilelocation());
@@ -539,10 +539,10 @@ public class SessionCreator implements UI {
             playerState = PlayerState.STOPPED;
             itemsinsession.forEach(SessionPart::cleanupPlayersandAnimations);
             // TODO Prompt For Export
-            progressTracker.updateui_sessions();
-            progressTracker.updateui_goals(this);
+            progressTracker.sessions_updateui();
+            progressTracker.goals_updateui(this);
             reset(true);
-            progressTracker.displaysessiondetails(itemsinsession);
+            progressTracker.session_displaydetails(itemsinsession);
         }
         public boolean endsessionprematurely() {
             if (playerState == PlayerState.PLAYING || playerState == PlayerState.PAUSED || playerState == TRANSITIONING) {

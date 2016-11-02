@@ -17,7 +17,6 @@ import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.util.SessionPart;
 import kujiin.util.Util;
-import kujiin.xml.Options;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -79,7 +78,7 @@ public class SessionDetails extends Stage {
             CloseButton.setOnAction(event -> close());
         } catch (IOException ignored) {}
     }
-    public SessionDetails(Options options, kujiin.xml.Session session) {
+    public SessionDetails(MainController Root, kujiin.xml.Session session) {
         try {
             if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionDetails_Individual.fxml"));
@@ -97,7 +96,7 @@ public class SessionDetails extends Stage {
             DatePracticedTextField.setEditable(false);
             XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
             List<Integer> values = new ArrayList<>();
-            for (SessionPart i : Root.getAllSessionParts(false)) {
+            for (SessionPart i : Root.getSessionParts(0, 16)) {
                 int duration = (int) session.getduration(i).toMinutes();
                 values.add(duration);
                 String name;

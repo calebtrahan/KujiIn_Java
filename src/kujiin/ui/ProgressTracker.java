@@ -76,28 +76,26 @@ public class ProgressTracker implements UI {
         NewGoalButton = Root.newgoalButton;
         ViewCurrentGoalsButton = Root.viewcurrrentgoalsButton;
         NewGoalButton.setDisable(true);
-        GoalSessionPartComboBox.setItems(FXCollections.observableArrayList(MainController.getAllSessionPartsNames(true)));
+        GoalSessionPartComboBox.setItems(FXCollections.observableArrayList(Root.getSessionPart_Names(0, 17)));
     }
-
-    public SessionPart getSelectedSessionPart() {
-        return SelectedSessionPart;
-    }
-    public void setSessionParts(ArrayList<SessionPart> sessionParts) {
-        SessionParts = sessionParts;
-    }
-
     public void setupListeners(MainController Root) {
-        Root.GoalSessionPartComboBox.setOnAction(event -> sessionpartchanged());
-        Root.PrePostSwitch.setOnAction(event -> updateui_sessions());
-        Root.ListOfSessionsButton.setOnAction(event -> displaysessionlist());
-        Root.newgoalButton.setOnAction(event -> setnewgoal());
-        Root.viewcurrrentgoalsButton.setOnAction(event -> viewcurrentgoals());
+        Root.GoalSessionPartComboBox.setOnAction(event -> sessionpart_changed());
+        Root.PrePostSwitch.setOnAction(event -> sessions_updateui());
+        Root.ListOfSessionsButton.setOnAction(event -> sessions_displaylist());
+        Root.newgoalButton.setOnAction(event -> goals_setnew());
+        Root.viewcurrrentgoalsButton.setOnAction(event -> goals_viewcurrent());
     }
     public void setupTooltips() {}
     public void setDisable(boolean disable) {}
     public boolean cleanup() {return true;}
 
 // Getters And Setters
+    public SessionPart getSelectedSessionPart() {
+    return SelectedSessionPart;
+}
+    public void setSessionParts(ArrayList<SessionPart> sessionParts) {
+        SessionParts = sessionParts;
+    }
     public kujiin.xml.Sessions getSessions() {
         return Sessions;
     }
@@ -106,22 +104,22 @@ public class ProgressTracker implements UI {
     }
 
 // Sessions Part Selection
-    private void sessionpartchanged() {
+    private void sessionpart_changed() {
         int index = GoalSessionPartComboBox.getSelectionModel().getSelectedIndex();
         NewGoalButton.setDisable(index == -1);
         if (index != -1) {
             SelectedSessionPart = SessionParts.get(index);
             if (SelectedSessionPart instanceof Total) {PrePostSwitch.setSelected(true);}
         }
-        updateui_sessions();
-        updateui_goals(null);
+        sessions_updateui();
+        goals_updateui(null);
     }
     public void sessionpart_forceselect(int sessionpartindex) {
         GoalSessionPartComboBox.getSelectionModel().select(sessionpartindex);
     }
 
 // Sessions
-    public void updateui_sessions() {
+    public void sessions_updateui() {
         String averagesessiondurationtext;
         String totalminutespracticedtext;
         String numberofsessionspracticedtext;
@@ -155,20 +153,20 @@ public class ProgressTracker implements UI {
             PrePostSwitch.setSelected(false);
         } else {PrePostSwitch.setDisable(disabled);}
     }
-    public void displaysessionlist() {
+    public void sessions_displaylist() {
         if (Sessions.getSession() == null || Sessions.getSession().size() == 0) {
             new InformationDialog(Options, "No Sessions", "No Practiced Sessions", "Cannot View Sessions");
         } else {new AllSessionDetails().showAndWait();}
     }
-    public void displaysessiondetails(Session individualsession) {
-        new SessionDetails(Options, individualsession).showAndWait();
+    public void session_displaydetails(Session individualsession) {
+        new SessionDetails(Root, individualsession).showAndWait();
     }
-    public void displaysessiondetails(List<SessionPart> itemsinsession) {
+    public void session_displaydetails(List<SessionPart> itemsinsession) {
         new SessionDetails(Root, itemsinsession).show();
     }
 
 // Goals
-    public void updateui_goals(SessionCreator.Player playerUI) {
+    public void goals_updateui(SessionCreator.Player playerUI) {
         boolean disabled = SelectedSessionPart == null || SelectedSessionPart.goals_getCurrent() == null;
         Tooltip goalprogresstooltip;
         String toptext;
@@ -228,19 +226,19 @@ public class ProgressTracker implements UI {
             ViewCurrentGoalsButton.setTooltip(new Tooltip("Edit " + SelectedSessionPart.name + "'s Goals"));
         }
     }
-    private void setnewgoal() {
+    private void goals_setnew() {
         if (NewGoalButton.getText().equals(kujiin.xml.Options.NEWGOALTEXT)) {
             SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog(SelectedSessionPart);
             simpleGoalSetDialog.showAndWait();
             if (simpleGoalSetDialog.shouldSetgoal()) {
                 SelectedSessionPart.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalDuration()));
-                updateui_goals(null);
+                goals_updateui(null);
             }
         } else if (NewGoalButton.getText().equals(kujiin.xml.Options.GOALPACINGTEXT)) {
             new GoalPacingDialog().showAndWait();
         }
     }
-    public void setnewgoal(SessionPart sessionPart) {
+    public void goals_setnew(SessionPart sessionPart) {
         SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog(sessionPart);
         simpleGoalSetDialog.showAndWait();
         if (simpleGoalSetDialog.shouldSetgoal()) {
@@ -248,7 +246,7 @@ public class ProgressTracker implements UI {
             sessionPart.goals_marshall();
         }
     }
-    public void viewcurrentgoals() {
+    public void goals_viewcurrent() {
         if (SelectedSessionPart.getGoals() == null || SelectedSessionPart.getGoals().isEmpty()) {
             new InformationDialog(Options, "Information", "No Goals Exist For " + SelectedSessionPart.name, "Please Add A Goal For " + SelectedSessionPart.name);
         } else {
@@ -585,7 +583,7 @@ public class ProgressTracker implements UI {
         }
         public void viewsessiondetails(ActionEvent actionEvent) {
             if (sessionsTableView.getSelectionModel().getSelectedIndex() != -1) {
-                new SessionDetails(Options, filteredsessionlist.get(sessionsTableView.getSelectionModel().getSelectedIndex())).showAndWait();
+                new SessionDetails(Root, filteredsessionlist.get(sessionsTableView.getSelectionModel().getSelectedIndex())).showAndWait();
             }
         }
         public void filterbydateselected(ActionEvent actionEvent) {

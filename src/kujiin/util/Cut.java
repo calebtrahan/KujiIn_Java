@@ -11,8 +11,6 @@ import kujiin.xml.SoundFile;
 
 import java.io.File;
 
-import static kujiin.ui.MainController.getallCutNames;
-
 // TODO Put Add A Japanese Character Symbol Picture (Representing Each Cut) To Creator Cut Labels (With Tooltips Displaying Names)
 
 public class Cut extends SessionPart {
@@ -72,7 +70,7 @@ public class Cut extends SessionPart {
                 soundFile = entrainment.ramp_get(0);
                 if (number != 9) {
                     file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
-                            getallCutNames().get(getallCutNames().indexOf(name) + 1).toLowerCase() + ".mp3");
+                            root.getSessionPart_Names(1, 10).get(root.getSessionPart_Names(1, 10).indexOf(name) + 1).toLowerCase() + ".mp3");
                 } else {file = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");}
                 break;
             case 2:
