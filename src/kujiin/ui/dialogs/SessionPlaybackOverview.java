@@ -58,7 +58,6 @@ public class SessionPlaybackOverview extends Stage {
     private List<SessionPart> alladjustedsessionitems;
     private SessionPart selectedsessionpart;
     private ObservableList<SessionItem> tableitems = FXCollections.observableArrayList();
-    private final ObservableList<String> ambiencetypes = FXCollections.observableArrayList("Repeat", "Shuffle", "Custom");
     private boolean result;
     private MainController Root;
     private AmbiencePlaybackType ambiencePlaybackType;
@@ -82,87 +81,12 @@ public class SessionPlaybackOverview extends Stage {
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
             DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
-            DurationColumn.setCellFactory(new Callback<TableColumn<SessionItem, String>, TableCell<SessionItem, String>>() {
-                @Override
-                public TableCell<SessionItem, String> call(TableColumn<SessionItem, String> param) {
-                    return new TableCell<SessionItem, String>() {
-                        @Override
-                        protected void updateItem(String item, boolean empty) {
-                            super.updateItem(item, empty);
-                            if (!isEmpty()) {
-                                switch (item) {
-                                    case "No Duration Set":
-                                        setTextFill(Color.RED);
-                                        break;
-                                    case "Ramp Only":
-                                        setTextFill(Color.YELLOW);
-                                        break;
-                                    default:
-                                        setTextFill(Color.DEEPPINK);
-                                        break;
-                                }
-                                setText(item);
-                            } else {
-                                setText(null);
-                            }
-                        }
-                    };
-                }
-            });
             AmbienceColumn.setCellValueFactory(cellData -> cellData.getValue().ambiencesummary);
-            AmbienceColumn.setCellFactory(new Callback<TableColumn<SessionItem, String>, TableCell<SessionItem, String>>() {
-                @Override
-                public TableCell<SessionItem, String> call(TableColumn<SessionItem, String> param) {
-                    return new TableCell<SessionItem, String>() {
-                        @Override
-                        protected void updateItem(String item, boolean empty) {
-                            super.updateItem(item, empty);
-                            if (!isEmpty()) {
-                                switch (item) {
-                                    case "Ambience Not Set":
-                                        System.out.println("Text Should Be Red");
-                                        setTextFill(Color.YELLOW);
-                                        break;
-                                    case "Has No Ambience":
-                                        System.out.println("Color Should Be Blue");
-                                        setTextFill(Color.RED);
-                                        break;
-                                    case "Will Shuffle":
-                                    case "Will Repeat":
-                                        System.out.println("Color Should Be Black");
-                                        setTextFill(Color.BLACK);
-                                        break;
-                                }
-                                setText(item);
-                            } else {
-                                setText(null);
-                            }
-                        }
-                    };
-                }
-            });
             GoalColumn.setCellValueFactory(cellData -> cellData.getValue().goalsummary);
-            GoalColumn.setCellFactory(new Callback<TableColumn<SessionItem, String>, TableCell<SessionItem, String>>() {
-                @Override
-                public TableCell<SessionItem, String> call(TableColumn<SessionItem, String> param) {
-                    return new TableCell<SessionItem, String>() {
-                        @Override
-                        protected void updateItem(String item, boolean empty) {
-                            super.updateItem(item, empty);
-                            if (!isEmpty()) {
-                                if (item.equals("No Goal Set")) {
-                                    this.setTextFill(Color.YELLOW);
-                                }
-                                setText(item);
-                            }
-                        }
-                    };
-                }
-            });
             SessionItemsTable.setOnMouseClicked(event -> itemselected());
             AmbienceTypeComboBox.setOnAction(event -> ambiencetypechanged());
             tableitems = FXCollections.observableArrayList();
-            AmbienceTypeComboBox.setItems(ambiencetypes);
+            AmbienceTypeComboBox.setItems(FXCollections.observableArrayList("Repeat", "Shuffle", "Custom"));
             AmbienceSwitch.setSelected(false);
             if (Root.getOptions().getSessionOptions().getAmbiencePlaybackType() != null) {
                 switch (Root.getOptions().getSessionOptions().getAmbiencePlaybackType()) {
@@ -197,9 +121,79 @@ public class SessionPlaybackOverview extends Stage {
     }
     public void populatetable() {
         SessionItemsTable.getItems().removeAll(tableitems);
-        if (alladjustedsessionitems == null) {
-            alladjustedsessionitems = new ArrayList<>();
-        }
+        DurationColumn.setCellFactory(new Callback<TableColumn<SessionItem, String>, TableCell<SessionItem, String>>() {
+            @Override
+            public TableCell<SessionItem, String> call(TableColumn<SessionItem, String> param) {
+                return new TableCell<SessionItem, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (!isEmpty()) {
+                            switch (item) {
+                                case "No Duration Set":
+                                    setTextFill(Color.RED);
+                                    setStyle("-fx-text-fill: red");
+                                    break;
+                                case "Ramp Only":
+                                    setTextFill(Color.YELLOW);
+                                    break;
+                                default:
+                                    setTextFill(Color.DEEPPINK);
+                                    break;
+                            }
+                            setText(item);
+                        } else {
+                            setText(null);
+                        }
+                    }
+                };
+            }
+        });
+        AmbienceColumn.setCellFactory(column -> new TableCell<SessionItem, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null | empty) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    switch (item) {
+                        case "Ambience Not Set":
+                            System.out.println("Text Should Be Red");
+                            setTextFill(Color.YELLOW);
+                            break;
+                        case "Has No Ambience":
+                            System.out.println("Color Should Be Blue");
+                            setTextFill(Color.RED);
+                            break;
+                        case "Will Shuffle":
+                        case "Will Repeat":
+                            System.out.println("Color Should Be Black");
+                            setTextFill(Color.BLACK);
+                            break;
+                    }
+                }
+            }
+        });
+        GoalColumn.setCellFactory(new Callback<TableColumn<SessionItem, String>, TableCell<SessionItem, String>>() {
+            @Override
+            public TableCell<SessionItem, String> call(TableColumn<SessionItem, String> param) {
+                return new TableCell<SessionItem, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (!isEmpty()) {
+                            if (item.equals("No Goal Set")) {
+                                this.setTextFill(Color.YELLOW);
+                            }
+                            setText(item);
+                        }
+                    }
+                };
+            }
+        });
+        if (alladjustedsessionitems == null) {alladjustedsessionitems = new ArrayList<>();}
         int count = 1;
         List<SessionPart> newsessionitems = new ArrayList<>();
         for (SessionPart x : Root.getAllSessionParts(false)) {

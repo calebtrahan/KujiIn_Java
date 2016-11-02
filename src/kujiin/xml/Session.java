@@ -5,7 +5,6 @@ import kujiin.util.SessionPart;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -33,22 +32,22 @@ public class Session {
     private Integer Zen_Duration;
     private Integer Postsession_Duration;
     private Integer Total_Session_Duration;
-    private ArrayList<File> Presession_Ambience;
-    private ArrayList<File> Earth_Ambience;
-    private ArrayList<File> Air_Ambience;
-    private ArrayList<File> Fire_Ambience;
-    private ArrayList<File> Water_Ambience;
-    private ArrayList<File> Void_Ambience;
-    private ArrayList<File> Rin_Ambience;
-    private ArrayList<File> Kyo_Ambience;
-    private ArrayList<File> Toh_Ambience;
-    private ArrayList<File> Sha_Ambience;
-    private ArrayList<File> Kai_Ambience;
-    private ArrayList<File> Jin_Ambience;
-    private ArrayList<File> Retsu_Ambience;
-    private ArrayList<File> Zai_Ambience;
-    private ArrayList<File> Zen_Ambience;
-    private ArrayList<File> Postsession_Ambience;
+    private ArrayList<SoundFile> Presession_Ambience;
+    private ArrayList<SoundFile> Earth_Ambience;
+    private ArrayList<SoundFile> Air_Ambience;
+    private ArrayList<SoundFile> Fire_Ambience;
+    private ArrayList<SoundFile> Water_Ambience;
+    private ArrayList<SoundFile> Void_Ambience;
+    private ArrayList<SoundFile> Rin_Ambience;
+    private ArrayList<SoundFile> Kyo_Ambience;
+    private ArrayList<SoundFile> Toh_Ambience;
+    private ArrayList<SoundFile> Sha_Ambience;
+    private ArrayList<SoundFile> Kai_Ambience;
+    private ArrayList<SoundFile> Jin_Ambience;
+    private ArrayList<SoundFile> Retsu_Ambience;
+    private ArrayList<SoundFile> Zai_Ambience;
+    private ArrayList<SoundFile> Zen_Ambience;
+    private ArrayList<SoundFile> Postsession_Ambience;
 
     public Session(int[] durations) {
         Presession_Duration = durations[0];
@@ -175,119 +174,160 @@ public class Session {
         return Total_Session_Duration;
     }
     public void setTotal_Session_Duration(Integer total_Session_Duration) {Total_Session_Duration = total_Session_Duration;}
-    public ArrayList<File> getPresession_Ambience() {
+    public ArrayList<SoundFile> getPresession_Ambience() {
         return Presession_Ambience;
     }
-    public void setPresession_Ambience(ArrayList<File> presession_Ambience) {Presession_Ambience = presession_Ambience;}
-    public ArrayList<File> getEarth_Ambience() {
+    public void setPresession_Ambience(ArrayList<SoundFile> presession_Ambience) {
+        Presession_Ambience = presession_Ambience;
+    }
+    public ArrayList<SoundFile> getEarth_Ambience() {
         return Earth_Ambience;
     }
-    public void setEarth_Ambience(ArrayList<File> earth_Ambience) {
+    public void setEarth_Ambience(ArrayList<SoundFile> earth_Ambience) {
         Earth_Ambience = earth_Ambience;
     }
-    public ArrayList<File> getAir_Ambience() {
+    public ArrayList<SoundFile> getAir_Ambience() {
         return Air_Ambience;
     }
-    public void setAir_Ambience(ArrayList<File> air_Ambience) {
+    public void setAir_Ambience(ArrayList<SoundFile> air_Ambience) {
         Air_Ambience = air_Ambience;
     }
-    public ArrayList<File> getFire_Ambience() {
+    public ArrayList<SoundFile> getFire_Ambience() {
         return Fire_Ambience;
     }
-    public void setFire_Ambience(ArrayList<File> fire_Ambience) {
+    public void setFire_Ambience(ArrayList<SoundFile> fire_Ambience) {
         Fire_Ambience = fire_Ambience;
     }
-    public ArrayList<File> getWater_Ambience() {
+    public ArrayList<SoundFile> getWater_Ambience() {
         return Water_Ambience;
     }
-    public void setWater_Ambience(ArrayList<File> water_Ambience) {
+    public void setWater_Ambience(ArrayList<SoundFile> water_Ambience) {
         Water_Ambience = water_Ambience;
     }
-    public ArrayList<File> getVoid_Ambience() {
+    public ArrayList<SoundFile> getVoid_Ambience() {
         return Void_Ambience;
     }
-    public void setVoid_Ambience(ArrayList<File> void_Ambience) {
+    public void setVoid_Ambience(ArrayList<SoundFile> void_Ambience) {
         Void_Ambience = void_Ambience;
     }
-    public ArrayList<File> getRin_Ambience() {
+    public ArrayList<SoundFile> getRin_Ambience() {
         return Rin_Ambience;
     }
-    public void setRin_Ambience(ArrayList<File> rin_Ambience) {
+    public void setRin_Ambience(ArrayList<SoundFile> rin_Ambience) {
         Rin_Ambience = rin_Ambience;
     }
-    public ArrayList<File> getKyo_Ambience() {
+    public ArrayList<SoundFile> getKyo_Ambience() {
         return Kyo_Ambience;
     }
-    public void setKyo_Ambience(ArrayList<File> kyo_Ambience) {
+    public void setKyo_Ambience(ArrayList<SoundFile> kyo_Ambience) {
         Kyo_Ambience = kyo_Ambience;
     }
-    public ArrayList<File> getToh_Ambience() {
+    public ArrayList<SoundFile> getToh_Ambience() {
         return Toh_Ambience;
     }
-    public void setToh_Ambience(ArrayList<File> toh_Ambience) {
+    public void setToh_Ambience(ArrayList<SoundFile> toh_Ambience) {
         Toh_Ambience = toh_Ambience;
     }
-    public ArrayList<File> getSha_Ambience() {
+    public ArrayList<SoundFile> getSha_Ambience() {
         return Sha_Ambience;
     }
-    public void setSha_Ambience(ArrayList<File> sha_Ambience) {
+    public void setSha_Ambience(ArrayList<SoundFile> sha_Ambience) {
         Sha_Ambience = sha_Ambience;
     }
-    public ArrayList<File> getKai_Ambience() {
+    public ArrayList<SoundFile> getKai_Ambience() {
         return Kai_Ambience;
     }
-    public void setKai_Ambience(ArrayList<File> kai_Ambience) {
+    public void setKai_Ambience(ArrayList<SoundFile> kai_Ambience) {
         Kai_Ambience = kai_Ambience;
     }
-    public ArrayList<File> getJin_Ambience() {
+    public ArrayList<SoundFile> getJin_Ambience() {
         return Jin_Ambience;
     }
-    public void setJin_Ambience(ArrayList<File> jin_Ambience) {
+    public void setJin_Ambience(ArrayList<SoundFile> jin_Ambience) {
         Jin_Ambience = jin_Ambience;
     }
-    public ArrayList<File> getRetsu_Ambience() {
+    public ArrayList<SoundFile> getRetsu_Ambience() {
         return Retsu_Ambience;
     }
-    public void setRetsu_Ambience(ArrayList<File> retsu_Ambience) {
+    public void setRetsu_Ambience(ArrayList<SoundFile> retsu_Ambience) {
         Retsu_Ambience = retsu_Ambience;
     }
-    public ArrayList<File> getZai_Ambience() {
+    public ArrayList<SoundFile> getZai_Ambience() {
         return Zai_Ambience;
     }
-    public void setZai_Ambience(ArrayList<File> zai_Ambience) {
+    public void setZai_Ambience(ArrayList<SoundFile> zai_Ambience) {
         Zai_Ambience = zai_Ambience;
     }
-    public ArrayList<File> getZen_Ambience() {return Zen_Ambience;}
-    public void setZen_Ambience(ArrayList<File> zen_Ambience) {
+    public ArrayList<SoundFile> getZen_Ambience() {
+        return Zen_Ambience;
+    }
+    public void setZen_Ambience(ArrayList<SoundFile> zen_Ambience) {
         Zen_Ambience = zen_Ambience;
     }
-    public ArrayList<File> getPostsession_Ambience() {
+    public ArrayList<SoundFile> getPostsession_Ambience() {
         return Postsession_Ambience;
     }
-    public void setPostsession_Ambience(ArrayList<File> postsession_Ambience) {
+    public void setPostsession_Ambience(ArrayList<SoundFile> postsession_Ambience) {
         Postsession_Ambience = postsession_Ambience;
     }
     public LocalDate getDate_Practiced() {return LocalDate.parse(Date_Practiced, dateFormat);}
     public void setDate_Practiced(LocalDate date_Practiced) {Date_Practiced = date_Practiced.format(dateFormat);}
 
 // Other Methods
+    public void updatesessionpartambience(SessionPart sessionPart,ArrayList<SoundFile> ambiencelist) {
+
+    }
     public void updatesessionpartduration(SessionPart sessionPart, int duration) {
-        if (sessionPart.number == 0) {setPresession_Duration(duration);}
-        if (sessionPart.number == 1) {setRin_Duration(duration);}
-        if (sessionPart.number == 2) {setKyo_Duration(duration);}
-        if (sessionPart.number == 3) {setToh_Duration(duration);}
-        if (sessionPart.number == 4) {setSha_Duration(duration);}
-        if (sessionPart.number == 5) {setKai_Duration(duration);}
-        if (sessionPart.number == 6) {setJin_Duration(duration);}
-        if (sessionPart.number == 7) {setRetsu_Duration(duration);}
-        if (sessionPart.number == 8) {setZai_Duration(duration);}
-        if (sessionPart.number == 9) {setZen_Duration(duration);}
-        if (sessionPart.number == 10) {setEarth_Duration(duration);}
-        if (sessionPart.number == 11) {setAir_Duration(duration);}
-        if (sessionPart.number == 12) {setFire_Duration(duration);}
-        if (sessionPart.number == 13) {setWater_Duration(duration);}
-        if (sessionPart.number == 14) {setVoid_Duration(duration);}
-        if (sessionPart.number == 15) {setPostsession_Duration(duration);}
+        switch (sessionPart.number) {
+            case 0:
+                setPresession_Duration(duration);
+                break;
+            case 1:
+                setRin_Duration(duration);
+                break;
+            case 2:
+                setKyo_Duration(duration);
+                break;
+            case 3:
+                setToh_Duration(duration);
+                break;
+            case 4:
+                setSha_Duration(duration);
+                break;
+            case 5:
+                setKai_Duration(duration);
+                break;
+            case 6:
+                setJin_Duration(duration);
+                break;
+            case 7:
+                setRetsu_Duration(duration);
+                break;
+            case 8:
+                setZai_Duration(duration);
+                break;
+            case 9:
+                setZen_Duration(duration);
+                break;
+            case 10:
+                setEarth_Duration(duration);
+                break;
+            case 11:
+                setAir_Duration(duration);
+                break;
+            case 12:
+                setFire_Duration(duration);
+                break;
+            case 13:
+                setWater_Duration(duration);
+                break;
+            case 14:
+                setVoid_Duration(duration);
+                break;
+            case 15:
+                setPostsession_Duration(duration);
+                break;
+        }
         updatetotalsessionduration();
     }
     public int getsessionpartduration(SessionPart sessionpart) {
@@ -331,7 +371,7 @@ public class Session {
     public Duration getsessionpartdurationasObject(SessionPart sessionPart) {
         return Duration.minutes(getsessionpartduration(sessionPart));
     }
-    public void setsessionpartambience(SessionPart sessionpart, ArrayList<File> ambiencelist) {
+    public void setsessionpartambience(SessionPart sessionpart, ArrayList<SoundFile> ambiencelist) {
         switch (sessionpart.number) {
             case 0:
                 setPresession_Ambience(ambiencelist);

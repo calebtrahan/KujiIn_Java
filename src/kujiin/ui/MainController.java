@@ -102,8 +102,6 @@ public class MainController implements Initializable {
     public Button ChangeAllElementsButton;
     public Button ResetCreatorButton;
     public Label GoalProgressPercentageLabel;
-    private SoundFile ambiencetestsoundfile;
-    private List<SoundFile> ambienceplaybackhistory = new ArrayList<>();
     private SessionCreator sessionCreator;
     private ProgressTracker progressTracker;
     private Scene Scene;
@@ -389,6 +387,7 @@ public class MainController implements Initializable {
     public void startupchecks_finished() {
         sessionCreator.setDisable(false, "");
         programState = ProgramState.IDLE;
+        startupChecks = null;
         Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Startup Checks Completed", 3000);
     }
     class StartupChecks extends Task {

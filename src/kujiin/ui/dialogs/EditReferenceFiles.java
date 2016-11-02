@@ -181,8 +181,7 @@ public class EditReferenceFiles extends Stage {
             if (! Util.String_validhtml(MainTextArea.getText())) {
                 if (! new ConfirmationDialog(Root.getOptions(), "Confirmation", null, "Html Code In Text Area Is Not Valid HTML", "Preview Anyways", "Cancel").getResult()) {return;}
             }
-            // TODO Fix Reference Display Preview
-//                new DisplayReference(MainTextArea.getText());
+            new DisplayReference(Root, MainTextArea.getText());
         }
     }
 

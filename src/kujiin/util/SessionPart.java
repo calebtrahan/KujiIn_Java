@@ -258,8 +258,6 @@ public class SessionPart {
 
 // Playback
     public void start() {
-        // TODO On Last Session Part:
-            // Do NOT Play Ramp (If Enabled For Session)
         elapsedtime = Duration.ZERO;
         setupfadeanimations();
         volume_unbindentrainment();

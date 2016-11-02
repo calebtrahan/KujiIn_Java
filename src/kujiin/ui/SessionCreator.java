@@ -525,7 +525,6 @@ public class SessionCreator implements UI {
             AmbienceVolume.setDisable(true);
             AmbienceVolume.setValue(0.0);
             AmbienceVolumePercentage.setText("0%");
-            // TODO Reset Goal UI Here
             if (endofsession) {PlayButton.setText("Replay");}
             else {PlayButton.setText("Start");}
             PauseButton.setDisable(true);

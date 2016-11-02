@@ -115,7 +115,6 @@ public class Sessions {
         } catch (NullPointerException ignored) {return Duration.ZERO;}
     }
     public Duration getaveragepracticedurationforallsessions(SessionPart sessionpart, boolean includepreandpost) {
-        System.out.println("Trying To Get Average Practice Duration For " + sessionpart.name);
         try {
             return new Duration(gettotalpracticedtime(sessionpart, includepreandpost).toMillis() / getsessioncount(sessionpart, includepreandpost));}
         catch (NullPointerException | ArithmeticException ignored) {return Duration.ZERO;}
@@ -123,7 +122,6 @@ public class Sessions {
     public int getsessioncount(SessionPart sessionpart, boolean includepreandpost) {
         try {
             int sessioncount = 0;
-            System.out.println(getSession().size());
             for (kujiin.xml.Session i : getSession()) {
                 if (i.getsessionpartduration(sessionpart) != 0) {sessioncount++; continue;}
                 if (includepreandpost) {
