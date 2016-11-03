@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 // TODO Bugs To Fix
 
 // GUI
-    // TODO Session Playback Overview Set Dynamic Text Colors (It's All Fucked Up)
     // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified
     // TODO Closing Reference Display With 'ESC' Is Crashing The Whole App
 
