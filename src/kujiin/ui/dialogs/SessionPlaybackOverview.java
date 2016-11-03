@@ -7,10 +7,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.util.Cut;
@@ -87,8 +85,9 @@ public class SessionPlaybackOverview extends Stage {
             tableitems = FXCollections.observableArrayList();
             AmbienceTypeComboBox.setItems(FXCollections.observableArrayList("Repeat", "Shuffle", "Custom"));
             AmbienceSwitch.setSelected(false);
-            if (Root.getOptions().getSessionOptions().getAmbiencePlaybackType() != null) {
-                switch (Root.getOptions().getSessionOptions().getAmbiencePlaybackType()) {
+            ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();
+            if (ambiencePlaybackType != null) {
+                switch (ambiencePlaybackType) {
                     case REPEAT:
                         AmbienceTypeComboBox.getSelectionModel().select(0);
                         break;
@@ -106,6 +105,7 @@ public class SessionPlaybackOverview extends Stage {
         }
     }
 
+// Getters And Setters
     public List<SessionPart> getAlladjustedsessionitems() {
         return alladjustedsessionitems;
     }
@@ -120,35 +120,7 @@ public class SessionPlaybackOverview extends Stage {
     }
     public void populatetable() {
         SessionItemsTable.getItems().removeAll(tableitems);
-        DurationColumn.setCellFactory(new Callback<TableColumn<SessionItem, String>, TableCell<SessionItem, String>>() {
-            @Override
-            public TableCell<SessionItem, String> call(TableColumn<SessionItem, String> param) {
-                return new TableCell<SessionItem, String>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (!isEmpty()) {
-                            switch (item) {
-                                case "No Duration Set":
-                                    setTextFill(Color.RED);
-                                    setStyle("-fx-text-fill: red");
-                                    break;
-                                case "Ramp Only":
-                                    setTextFill(Color.YELLOW);
-                                    break;
-                                default:
-                                    setTextFill(Color.DEEPPINK);
-                                    break;
-                            }
-                            setText(item);
-                        } else {
-                            setText(null);
-                        }
-                    }
-                };
-            }
-        });
-        AmbienceColumn.setCellFactory(column -> new TableCell<SessionItem, String>() {
+        DurationColumn.setCellFactory((column -> new TableCell<SessionItem, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -158,38 +130,69 @@ public class SessionPlaybackOverview extends Stage {
                 } else {
                     setText(item);
                     switch (item) {
+                        case "No Duration Set":
+                            setStyle("-fx-text-fill: red");
+                            setText(item);
+                            break;
+                        case "Ramp Only":
+                            setStyle("-fx-text-fill: yellow");
+                            setText(item);
+                            break;
+                        default:
+                            setStyle("-fx-text-fill: white");
+                            setText(item);
+                            break;
+                    }
+                }
+            }
+        }));
+        AmbienceColumn.setCellFactory(column -> new TableCell<SessionItem, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null | empty) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    switch (item) {
                         case "Ambience Not Set":
-                            System.out.println("Text Should Be Red");
-                            setTextFill(Color.YELLOW);
+                            setStyle("-fx-text-fill: yellow");
+                            setText(item);
                             break;
                         case "Has No Ambience":
-                            System.out.println("Color Should Be Blue");
-                            setTextFill(Color.RED);
+                            setStyle("-fx-text-fill: red");
+                            setText(item);
                             break;
                         case "Will Shuffle":
                         case "Will Repeat":
-                            System.out.println("Color Should Be Black");
-                            setTextFill(Color.BLACK);
+                        case "Disabled":
+                            setStyle("-fx-text-fill: white");
+                            setText(item);
                             break;
                     }
                 }
             }
         });
-        GoalColumn.setCellFactory(new Callback<TableColumn<SessionItem, String>, TableCell<SessionItem, String>>() {
+        GoalColumn.setCellFactory(column -> new TableCell<SessionItem, String>() {
             @Override
-            public TableCell<SessionItem, String> call(TableColumn<SessionItem, String> param) {
-                return new TableCell<SessionItem, String>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (!isEmpty()) {
-                            if (item.equals("No Goal Set")) {
-                                this.setTextFill(Color.YELLOW);
-                            }
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null | empty) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    switch (item) {
+                        case "No Goal Set":
+                            setStyle("-fx-text-fill: yellow");
                             setText(item);
-                        }
+                            break;
+                        default:
+                            setStyle("-fx-text-fill: white");
+                            setText(item);
+                            break;
                     }
-                };
+                }
             }
         });
         if (alladjustedsessionitems == null) {alladjustedsessionitems = new ArrayList<>();}
