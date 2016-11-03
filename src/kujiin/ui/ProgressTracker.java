@@ -34,6 +34,7 @@ import kujiin.xml.Sessions;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,9 @@ public class ProgressTracker implements UI {
         NewGoalButton = Root.newgoalButton;
         ViewCurrentGoalsButton = Root.viewcurrrentgoalsButton;
         NewGoalButton.setDisable(true);
-        GoalSessionPartComboBox.setItems(FXCollections.observableArrayList(Root.getSessionPart_Names(0, 17)));
+        GoalSessionPartComboBox.setItems(FXCollections.observableArrayList(Arrays.asList(
+                "Presession", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Earth", "Air", "Fire", "Water", "Void", "Postsession"
+        )));
     }
     public void setupListeners(MainController Root) {
         Root.GoalSessionPartComboBox.setOnAction(event -> sessionpart_changed());

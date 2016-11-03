@@ -276,7 +276,7 @@ public class MainController implements Initializable {
         return getAllSessionParts(false).stream().filter(i -> i instanceof Cut).map(i -> (Cut) i).collect(Collectors.toCollection(ArrayList::new));
     }
     public ArrayList<Element> getAllElements() {
-        return getAllSessionParts(false).stream().filter(i -> i instanceof Cut).map(i -> (Element) i).collect(Collectors.toCollection(ArrayList::new));
+        return getAllSessionParts(false).stream().filter(i -> i instanceof Element).map(i -> (Element) i).collect(Collectors.toCollection(ArrayList::new));
     }
     public SessionPart getSessionPart(int index) {
         return getAllSessionParts(true).get(index);

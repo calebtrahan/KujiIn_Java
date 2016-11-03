@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 import static kujiin.xml.Options.PROGRAM_ICON;
 
 public class SessionPlaybackOverview extends Stage {
-    // TODO If has No Ambience -> Change Set Ambience Button To "Add Ambience"
     public TableView<SessionItem> SessionItemsTable;
     public TableColumn<SessionItem, Integer> NumberColumn;
     public TableColumn<SessionItem, String> NameColumn;
@@ -227,7 +226,7 @@ public class SessionPlaybackOverview extends Stage {
                         SetAmbienceButton.setText("Edit Ambience");
                     }
                 } else {
-                    if (!selectedsessionpart.getAmbience_hasAny()) {
+                    if (! selectedsessionpart.getAmbience_hasAny()) {
                         SetAmbienceButton.setDisable(false);
                         SetAmbienceButton.setText("Add Ambience");
                     } else {
@@ -353,8 +352,8 @@ public class SessionPlaybackOverview extends Stage {
 
 // Ambience
     public void ambienceswitchtoggled() {
-        checkambience();
-        AmbienceTypeComboBox.setDisable(!AmbienceSwitch.isSelected());
+        AmbienceTypeComboBox.setDisable(! AmbienceSwitch.isSelected());
+        if (ambiencePlaybackType == null) {ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();}
         populatetable();
     }
     public String getambiencetext(SessionPart sessionPart) {
@@ -418,54 +417,53 @@ public class SessionPlaybackOverview extends Stage {
                 break;
         }
     }
-    public void checkambience() {
-        if (isShowing() && AmbienceSwitch.isSelected()) {
-            ArrayList<SessionPart> sessionpartswithnoambience = new ArrayList<>();
-            ArrayList<SessionPart> sessionpartswithreducedambience = new ArrayList<>();
-            Root.getAllSessionParts(false).stream().filter(i -> i.getduration().greaterThan(Duration.ZERO)).forEach(i -> {
-                Root.CreatorStatusBar.setText(String.format("Checking Ambience. Currently Checking %s...", i.name));
-                if (!i.getAmbience().hasAnyAmbience()) {
-                    sessionpartswithnoambience.add(i);
-                } else if (!i.getAmbience().hasEnoughAmbience(i.getduration())) {
-                    sessionpartswithreducedambience.add(i);
-                }
-            });
-            Root.CreatorStatusBar.setText("");
-            if (!sessionpartswithnoambience.isEmpty()) {
-                StringBuilder a = new StringBuilder();
-                for (int i = 0; i < sessionpartswithnoambience.size(); i++) {
-                    a.append(sessionpartswithnoambience.get(i).name);
-                    if (i != sessionpartswithnoambience.size() - 1) {
-                        a.append(", ");
-                    }
-                }
-                if (new ConfirmationDialog(Root.getOptions(), "Missing Ambience", null, "Missing Ambience For " + a.toString() + ". Ambience Cannot Be Enabled For Session Without At Least One Working Ambience File" +
-                        " Per Session Part", "Add Ambience", "Disable Ambience").getResult()) {
-                    if (sessionpartswithnoambience.size() == 1) {
-                        new AmbienceEditor_Simple(Root, sessionpartswithnoambience.get(0)).showAndWait();
-                    } else {
-                        new AmbienceEditor_Simple(Root).showAndWait();
-                    }
-                } else {
-                    AmbienceSwitch.setSelected(false);
-                }
-            } else {
-//                    if (! sessionpartswithreducedambience.isEmpty()) {
-//                        StringBuilder a = new StringBuilder();
-//                        int count = 0;
-//                        for (SessionPart aSessionpartswithreducedambience : sessionpartswithreducedambience) {
-//                            a.append("\n");
-//                            String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(aSessionpartswithreducedambience.getAmbience().gettotalDuration(), null);
-//                            String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(aSessionpartswithreducedambience.getduration(), null);
-//                            a.append(count + 1).append(". ").append(aSessionpartswithreducedambience.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
-//                            count++;
-//                        }
-//                    if (ambiencePlaybackType == null) {AmbienceSwitch.setSelected(false);}
-                AmbienceSwitch.setSelected(true);
-                ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();
-            }
-        }
-    }
+//    public void checkambience() {
+//        if (isShowing() && AmbienceSwitch.isSelected()) {
+//            ArrayList<SessionPart> sessionpartswithnoambience = new ArrayList<>();
+//            ArrayList<SessionPart> sessionpartswithreducedambience = new ArrayList<>();
+//            Root.getAllSessionParts(false).stream().filter(i -> i.getduration().greaterThan(Duration.ZERO)).forEach(i -> {
+//                Root.CreatorStatusBar.setText(String.format("Checking Ambience. Currently Checking %s...", i.name));
+//                if (!i.getAmbience().hasAnyAmbience()) {
+//                    sessionpartswithnoambience.add(i);
+//                } else if (!i.getAmbience().hasEnoughAmbience(i.getduration())) {
+//                    sessionpartswithreducedambience.add(i);
+//                }
+//            });
+//
+////            if (!sessionpartswithnoambience.isEmpty()) {
+////                StringBuilder a = new StringBuilder();
+////                for (int i = 0; i < sessionpartswithnoambience.size(); i++) {
+////                    a.append(sessionpartswithnoambience.get(i).name);
+////                    if (i != sessionpartswithnoambience.size() - 1) {
+////                        a.append(", ");
+////                    }
+////                }
+////                if (new ConfirmationDialog(Root.getOptions(), "Missing Ambience", null, "Missing Ambience For " + a.toString() + ". Ambience Cannot Be Enabled For Session Without At Least One Working Ambience File" +
+////                        " Per Session Part", "Add Ambience", "Disable Ambience").getResult()) {
+////                    if (sessionpartswithnoambience.size() == 1) {
+////                        new AmbienceEditor_Simple(Root, sessionpartswithnoambience.get(0)).showAndWait();
+////                    } else {
+////                        new AmbienceEditor_Simple(Root).showAndWait();
+////                    }
+////                } else {
+////                    AmbienceSwitch.setSelected(false);
+////                }
+////            } else {
+//////                    if (! sessionpartswithreducedambience.isEmpty()) {
+//////                        StringBuilder a = new StringBuilder();
+//////                        int count = 0;
+//////                        for (SessionPart aSessionpartswithreducedambience : sessionpartswithreducedambience) {
+//////                            a.append("\n");
+//////                            String formattedcurrentduration = Util.formatdurationtoStringSpelledOut(aSessionpartswithreducedambience.getAmbience().gettotalDuration(), null);
+//////                            String formattedexpectedduration = Util.formatdurationtoStringSpelledOut(aSessionpartswithreducedambience.getduration(), null);
+//////                            a.append(count + 1).append(". ").append(aSessionpartswithreducedambience.name).append(" >  Current: ").append(formattedcurrentduration).append(" | Needed: ").append(formattedexpectedduration);
+//////                            count++;
+//////                        }
+//////                    if (ambiencePlaybackType == null) {AmbienceSwitch.setSelected(false);}
+////
+////            }
+//        }
+//    }
 
 // Dialog
     public boolean getResult() {
@@ -508,7 +506,7 @@ public class SessionPlaybackOverview extends Stage {
                         if (! i.getAmbience().hasCustomAmbience()) {count++;}
                     }
                     if (count > 0) {
-                        new InformationDialog(Root.getOptions(), "Information", "Missing Ambience For " + count + " Session Parts", "Please Add Custom Ambience, Change Playback Type Or Disable Ambience From Session");
+                        new InformationDialog(Root.getOptions(), "Cannot Start Playback",  count + " Session Parts Missing Custom Ambience", "Please Add Custom Ambience, Change Ambience Playback\nType Or Disable Ambience From Session");
                         return;
                     }
                     break;
@@ -778,6 +776,7 @@ public class SessionPlaybackOverview extends Stage {
             AcceptButton.setDisable(! longenough);
         }
         public void calculateduration() {
+            System.out.println(TotalDurationTextField.getLayoutBounds().getWidth());
             if (getcurrenttotal().lessThan(sessionPart.getduration())) {
                 Duration timeleft = sessionPart.getduration().subtract(getcurrenttotal());
                 TotalDurationTextField.setStyle("-fx-text-fill: red;");
