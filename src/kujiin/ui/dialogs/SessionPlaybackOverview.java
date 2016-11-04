@@ -20,6 +20,7 @@ import kujiin.util.enums.ChangeDurationType;
 import kujiin.util.table.AmbienceSong;
 import kujiin.util.table.AmbienceSongWithNumber;
 import kujiin.util.table.SessionItem;
+import kujiin.xml.Preferences;
 import kujiin.xml.SoundFile;
 
 import java.io.File;
@@ -31,7 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class SessionPlaybackOverview extends Stage {
     public TableView<SessionItem> SessionItemsTable;
@@ -69,7 +70,7 @@ public class SessionPlaybackOverview extends Stage {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             setOnCloseRequest(event -> {
@@ -85,7 +86,7 @@ public class SessionPlaybackOverview extends Stage {
             tableitems = FXCollections.observableArrayList();
             AmbienceTypeComboBox.setItems(FXCollections.observableArrayList("Repeat", "Shuffle", "Custom"));
             AmbienceSwitch.setSelected(false);
-            ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();
+            ambiencePlaybackType = Root.getPreferences().getSessionOptions().getAmbiencePlaybackType();
             if (ambiencePlaybackType != null) {
                 switch (ambiencePlaybackType) {
                     case REPEAT:
@@ -248,7 +249,7 @@ public class SessionPlaybackOverview extends Stage {
             return;
         }
         if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
-            new InformationDialog(Root.getOptions(), "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
+            new InformationDialog(Root.getPreferences(), "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
             return;
         }
         if (selectedindex == 0) {
@@ -258,12 +259,12 @@ public class SessionPlaybackOverview extends Stage {
         SessionPart oneitemup = alladjustedsessionitems.get(selectedindex - 1);
         if (selecteditem instanceof Cut && oneitemup instanceof Cut) {
             if (selecteditem.number > oneitemup.number) {
-                new InformationDialog(Root.getOptions(), "Cannot Move", selecteditem.name + " Cannot Be Moved Before " + oneitemup.name + ". Cuts Would Be Out Of Order", "Cannot Move");
+                new InformationDialog(Root.getPreferences(), "Cannot Move", selecteditem.name + " Cannot Be Moved Before " + oneitemup.name + ". Cuts Would Be Out Of Order", "Cannot Move");
                 return;
             }
         }
         if (oneitemup instanceof Qi_Gong) {
-            new InformationDialog(Root.getOptions(), "Cannot Move", "Cannot Replace Presession", "Cannot Move");
+            new InformationDialog(Root.getPreferences(), "Cannot Move", "Cannot Replace Presession", "Cannot Move");
             return;
         }
         Collections.swap(alladjustedsessionitems, selectedindex, selectedindex - 1);
@@ -275,7 +276,7 @@ public class SessionPlaybackOverview extends Stage {
             return;
         }
         if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
-            new InformationDialog(Root.getOptions(), "Information", "Cannot Move", tableitems.get(selectedindex).name + " Cannot Be Moved");
+            new InformationDialog(Root.getPreferences(), "Information", "Cannot Move", tableitems.get(selectedindex).name + " Cannot Be Moved");
             return;
         }
         if (selectedindex == tableitems.size() - 1) {
@@ -285,12 +286,12 @@ public class SessionPlaybackOverview extends Stage {
         SessionPart oneitemdown = alladjustedsessionitems.get(selectedindex + 1);
         if (selecteditem instanceof Cut && oneitemdown instanceof Cut) {
             if (selecteditem.number < oneitemdown.number) {
-                new InformationDialog(Root.getOptions(), "Cannot Move", selecteditem.name + " Cannot Be Moved After " + oneitemdown.name + ". Cuts Would Be Out Of Order", "Cannot Move");
+                new InformationDialog(Root.getPreferences(), "Cannot Move", selecteditem.name + " Cannot Be Moved After " + oneitemdown.name + ". Cuts Would Be Out Of Order", "Cannot Move");
                 return;
             }
         }
         if (oneitemdown instanceof Qi_Gong) {
-            new InformationDialog(Root.getOptions(), "Cannot Move", "Cannot Replace Postsession", "Cannot Move");
+            new InformationDialog(Root.getPreferences(), "Cannot Move", "Cannot Replace Postsession", "Cannot Move");
             return;
         }
         Collections.swap(alladjustedsessionitems, selectedindex, selectedindex + 1);
@@ -356,7 +357,7 @@ public class SessionPlaybackOverview extends Stage {
 // Ambience
     public void ambienceswitchtoggled() {
         AmbienceTypeComboBox.setDisable(! AmbienceSwitch.isSelected());
-        if (ambiencePlaybackType == null) {ambiencePlaybackType = Root.getOptions().getSessionOptions().getAmbiencePlaybackType();}
+        if (ambiencePlaybackType == null) {ambiencePlaybackType = Root.getPreferences().getSessionOptions().getAmbiencePlaybackType();}
         populatetable();
     }
     public String getambiencetext(SessionPart sessionPart) {
@@ -413,7 +414,9 @@ public class SessionPlaybackOverview extends Stage {
                 }
                 break;
             case "Add Ambience":
-                new AmbienceEditor_Simple(Root, selectedsessionpart).showAndWait();
+                if (Root.getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Simple")) {
+                    new AmbienceEditor_Simple(Root, selectedsessionpart).showAndWait();
+                } else {new AmbienceEditor_Advanced(Root, selectedsessionpart).showAndWait();}
                 populatetable();
                 break;
             default:
@@ -441,7 +444,7 @@ public class SessionPlaybackOverview extends Stage {
 ////                        a.append(", ");
 ////                    }
 ////                }
-////                if (new ConfirmationDialog(Root.getOptions(), "Missing Ambience", null, "Missing Ambience For " + a.toString() + ". Ambience Cannot Be Enabled For Session Without At Least One Working Ambience File" +
+////                if (new ConfirmationDialog(Root.getPreferences(), "Missing Ambience", null, "Missing Ambience For " + a.toString() + ". Ambience Cannot Be Enabled For Session Without At Least One Working Ambience File" +
 ////                        " Per Session Part", "Add Ambience", "Disable Ambience").getResult()) {
 ////                    if (sessionpartswithnoambience.size() == 1) {
 ////                        new AmbienceEditor_Simple(Root, sessionpartswithnoambience.get(0)).showAndWait();
@@ -486,7 +489,7 @@ public class SessionPlaybackOverview extends Stage {
         }
         // Add Ramp Option For Missing Durations
         if (!indexesmissingduration.isEmpty()) {
-            if (new ConfirmationDialog(Root.getOptions(), "Confirmation", indexesmissingduration.size() + " Session Parts Are Missing Durations", "Set Ramp Only For The Parts Missing Durations",
+            if (new ConfirmationDialog(Root.getPreferences(), "Confirmation", indexesmissingduration.size() + " Session Parts Are Missing Durations", "Set Ramp Only For The Parts Missing Durations",
                     "Set Ramp Only", "Cancel Playback").getResult()) {
                 for (int x : indexesmissingduration) {alladjustedsessionitems.get(x).setRamponly(true);}
             } else {return;}
@@ -500,7 +503,7 @@ public class SessionPlaybackOverview extends Stage {
                 case SHUFFLE:
                     for (SessionPart i : alladjustedsessionitems) {if (! i.getAmbience_hasAny()) {count++;}}
                     if (count > 0) {
-                        new InformationDialog(Root.getOptions(), "Information", "Missing Ambience For " + count + " Session Parts", "Please Add Ambience Or Disable Ambience From Session");
+                        new InformationDialog(Root.getPreferences(), "Information", "Missing Ambience For " + count + " Session Parts", "Please Add Ambience Or Disable Ambience From Session");
                         return;
                     }
                     break;
@@ -509,7 +512,7 @@ public class SessionPlaybackOverview extends Stage {
                         if (! i.getAmbience().hasCustomAmbience()) {count++;}
                     }
                     if (count > 0) {
-                        new InformationDialog(Root.getOptions(), "Cannot Start Playback",  count + " Session Parts Missing Custom Ambience", "Please Add Custom Ambience, Change Ambience Playback\nType Or Disable Ambience From Session");
+                        new InformationDialog(Root.getPreferences(), "Cannot Start Playback",  count + " Session Parts Missing Custom Ambience", "Please Add Custom Ambience, Change Ambience Playback\nType Or Disable Ambience From Session");
                         return;
                     }
                     break;
@@ -517,7 +520,7 @@ public class SessionPlaybackOverview extends Stage {
         }
         // Check Goals
         if (! indexesmissinggoals.isEmpty()) {
-            if (! new ConfirmationDialog(Root.getOptions(), "Confirmation", indexesmissinggoals.size() + " Session Parts Are Missing Goals", "Continue Playing Session Without Goals?",
+            if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", indexesmissinggoals.size() + " Session Parts Are Missing Goals", "Continue Playing Session Without Goals?",
                     "Yes", "No").getResult()) {
                 return;
             }
@@ -525,13 +528,13 @@ public class SessionPlaybackOverview extends Stage {
         // Check Alert File Needed/Not Needed
         boolean longsession = false;
         for (SessionPart i : alladjustedsessionitems) {
-            if (i.getduration().greaterThanOrEqualTo(Duration.minutes(kujiin.xml.Options.DEFAULT_LONG_SESSIONPART_DURATION))) {
+            if (i.getduration().greaterThanOrEqualTo(Duration.minutes(Preferences.DEFAULT_LONG_SESSIONPART_DURATION))) {
                 longsession = true;
                 break;
             }
         }
-        if (longsession && !Root.getOptions().getSessionOptions().getAlertfunction()) {
-            switch (new AnswerDialog(Root.getOptions(), "Add Alert File", null, "I've Detected A Long Session. Add Alert File In Between Session Parts?",
+        if (longsession && !Root.getPreferences().getSessionOptions().getAlertfunction()) {
+            switch (new AnswerDialog(Root.getPreferences(), "Add Alert File", null, "I've Detected A Long Session. Add Alert File In Between Session Parts?",
                     "Add Alert File", "Continue Without Alert File", "Cancel Playback").getResult()) {
                 case YES:
                     new SelectAlertFile(Root).showAndWait();
@@ -539,11 +542,11 @@ public class SessionPlaybackOverview extends Stage {
                 case CANCEL:
                     return;
             }
-        } else if (Root.getOptions().getSessionOptions().getAlertfunction()) {
-            switch (new AnswerDialog(Root.getOptions(), "Disable Alert File", null, "I've Detected A Relatively Short Session With Alert File Enabled",
+        } else if (Root.getPreferences().getSessionOptions().getAlertfunction()) {
+            switch (new AnswerDialog(Root.getPreferences(), "Disable Alert File", null, "I've Detected A Relatively Short Session With Alert File Enabled",
                     "Disable Alert File", "Leave Alert File Enabled", "Cancel Playback").getResult()) {
                 case YES:
-                    Root.getOptions().getSessionOptions().setAlertfunction(false);
+                    Root.getPreferences().getSessionOptions().setAlertfunction(false);
                     break;
                 case CANCEL:
                     return;
@@ -574,7 +577,7 @@ public class SessionPlaybackOverview extends Stage {
                 setScene(defaultscene);
                 getIcons().clear();
                 getIcons().add(PROGRAM_ICON);
-                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
                 setTitle("Change " + sessionPart.name + " Duration");
@@ -607,7 +610,7 @@ public class SessionPlaybackOverview extends Stage {
                         setDuration(duration);
                         result = ChangeDurationType.DURATION;
                     } else {
-                        new InformationDialog(Root.getOptions(), "Information", "Cannot Change Value To 0", null);
+                        new InformationDialog(Root.getPreferences(), "Information", "Cannot Change Value To 0", null);
                         return;
                     }
                 } else {
@@ -650,7 +653,7 @@ public class SessionPlaybackOverview extends Stage {
                 setScene(defaultscene);
                 getIcons().clear();
                 getIcons().add(PROGRAM_ICON);
-                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
                 setTitle("Set Custom Ambience");
@@ -701,7 +704,7 @@ public class SessionPlaybackOverview extends Stage {
                 return;
             }
             if (Util.list_hasduplicates(filesselected)) {
-                if (!new ConfirmationDialog(Root.getOptions(), "Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard").getResult()) {
+                if (!new ConfirmationDialog(Root.getPreferences(), "Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard").getResult()) {
                     filesselected = Util.list_removeduplicates(filesselected);
                 }
             }
@@ -746,7 +749,7 @@ public class SessionPlaybackOverview extends Stage {
         }
         public void removeambience() {
             if (selectedtableitem != null) {
-                if (new ConfirmationDialog(Root.getOptions(), "Remove Ambience", "Really Remove '" + selectedtableitem.getName() + "'?", "", "Remove", "Cancel").getResult()) {
+                if (new ConfirmationDialog(Root.getPreferences(), "Remove Ambience", "Really Remove '" + selectedtableitem.getName() + "'?", "", "Remove", "Cancel").getResult()) {
                     int index = TableItems.indexOf(selectedtableitem);
                     TableItems.remove(index);
                     CustomAmbienceList.remove(index);
@@ -825,7 +828,7 @@ public class SessionPlaybackOverview extends Stage {
         }
         public void accept() {
             if (getcurrenttotal().lessThan(sessionPart.getduration())) {
-                new InformationDialog(Root.getOptions(), "Ambience Too Short", "Need At Least " + sessionPart.getdurationasString(false, 50) + " To Set This As Custom Ambience", "");
+                new InformationDialog(Root.getPreferences(), "Ambience Too Short", "Need At Least " + sessionPart.getdurationasString(false, 50) + " To Set This As Custom Ambience", "");
             } else {
                 result = true;
                 close();
@@ -853,7 +856,7 @@ public class SessionPlaybackOverview extends Stage {
                 setScene(defaultscene);
                 getIcons().clear();
                 getIcons().add(PROGRAM_ICON);
-                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
                 setTitle("Add Ambience");

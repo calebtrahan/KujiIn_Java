@@ -14,6 +14,7 @@ import kujiin.ui.MainController;
 import kujiin.util.SessionPart;
 import kujiin.util.Util;
 import kujiin.util.table.AmbienceSong;
+import kujiin.xml.Preferences;
 import kujiin.xml.SoundFile;
 import org.apache.commons.io.FileUtils;
 
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class AmbienceEditor_Advanced extends Stage implements Initializable {
     public Button RightArrow;
@@ -69,7 +70,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         Actual_Table.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> actualselectionchanged(newValue));
         ObservableList<String> allnames = FXCollections.observableArrayList();
-        allnames.addAll(kujiin.xml.Options.ALLNAMES);
+        allnames.addAll(Preferences.ALLNAMES);
         SessionPartSelectionBox.setItems(allnames);
         Actual_TotalDuration.setEditable(false);
         Temp_TotalDuration.setEditable(false);
@@ -94,12 +95,12 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (new AnswerDialog(Root.getOptions(), "Save Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save And Close", "Close", "Cancel").getResult()) {
+                    switch (new AnswerDialog(Root.getPreferences(), "Save Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save And Close", "Close", "Cancel").getResult()) {
                         case YES:
                             save();
                             break;
@@ -109,7 +110,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             });
             setTitle("Advanced Ambience Editor");
             SessionPartSelectionBox.setOnAction(event -> selectandloadsessionpart());
-            tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
+            tempdirectory = new File(Preferences.DIRECTORYTEMP, "AmbienceEditor");
         } catch (IOException e) {new org.controlsfx.dialog.ExceptionDialog(e).showAndWait();}
     }
     public AmbienceEditor_Advanced(MainController Root, SessionPart sessionPart) {
@@ -121,14 +122,14 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             setTitle("Advanced Ambience Editor");
             SessionPartSelectionBox.setOnAction(event -> selectandloadsessionpart());
             SessionPartSelectionBox.getSelectionModel().select(sessionPart.number);
-            tempdirectory = new File(kujiin.xml.Options.DIRECTORYTEMP, "AmbienceEditor");
-        } catch (IOException e) {new ExceptionDialog(Root.getOptions(), e).showAndWait();}
+            tempdirectory = new File(Preferences.DIRECTORYTEMP, "AmbienceEditor");
+        } catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e).showAndWait();}
     }
 
 // Transfer Methods
@@ -145,9 +146,9 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             }
         } else {
             if (selected_temp_ambiencesong == null) {
-                new InformationDialog(Root.getOptions(), "Information", "Cannot Transfer", "Nothing Selected");}
+                new InformationDialog(Root.getPreferences(), "Information", "Cannot Transfer", "Nothing Selected");}
             else {
-                new InformationDialog(Root.getOptions(), "Information", "Cannot Transfer", "No SessionPart Selected");}
+                new InformationDialog(Root.getPreferences(), "Information", "Cannot Transfer", "No SessionPart Selected");}
         }
     }
     public void leftarrowpressed() {
@@ -223,7 +224,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         }
         if (validfilecount > 0) {
             if (Util.list_hasduplicates(files)) {
-                if (! new ConfirmationDialog(Root.getOptions(), "Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard").getResult()) {
+                if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard").getResult()) {
                     files = Util.list_removeduplicates(files);
                 }
             }
@@ -232,7 +233,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             SoundFile soundFile = new SoundFile(i);
             addandcalculateduration(soundFile, table, soundfilelist, songlist);
         }
-        if (notvalidfilecount > 0) {new InformationDialog(Root.getOptions(), "Information", notvalidfilecount + " Files Were Not Valid And Weren't Added", "");}
+        if (notvalidfilecount > 0) {new InformationDialog(Root.getPreferences(), "Information", notvalidfilecount + " Files Were Not Valid And Weren't Added", "");}
     }
     public void addandcalculateduration(SoundFile soundFile, TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
         MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
@@ -251,7 +252,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         int index = table.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             SoundFile soundFile = soundfilelist.get(index);
-            switch (new AnswerDialog(Root.getOptions(), "Removing File", null, "Removing Ambience From Table. Also Delete File " + soundFile.getName() + " From Disk? (This Cannot Be Undone)",
+            switch (new AnswerDialog(Root.getPreferences(), "Removing File", null, "Removing Ambience From Table. Also Delete File " + soundFile.getName() + " From Disk? (This Cannot Be Undone)",
                     "Remove And Delete File", "Remove But Keep File", "Cancel").getResult()) {
                 case YES: soundFile.getFile().delete(); break;
                 case CANCEL: return;
@@ -262,7 +263,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             calculateactualtotalduration();
             calculatetemptotalduration();
         }
-        else {new InformationDialog(Root.getOptions(), "Information", "Nothing Selected", "Select A Table Item To Remove");}
+        else {new InformationDialog(Root.getPreferences(), "Information", "Nothing Selected", "Select A Table Item To Remove");}
     }
     private void preview(AmbienceSong selectedsong) {
         if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
@@ -284,11 +285,11 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
-                new InformationDialog(Root.getOptions(), "Information", selectedsessionpart + " Has No Ambience", "Please Add Ambience To " + selectedsessionpart);
+                new InformationDialog(Root.getPreferences(), "Information", selectedsessionpart + " Has No Ambience", "Please Add Ambience To " + selectedsessionpart);
                 return false;
             }
         } else {
-            new InformationDialog(Root.getOptions(), "Information", "No SessionPart Loaded", "Load A SessionPart's Ambience First");
+            new InformationDialog(Root.getPreferences(), "Information", "No SessionPart Loaded", "Load A SessionPart's Ambience First");
             return false;
         }
     }
@@ -311,13 +312,13 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             actual_soundfilelist.stream().filter(i -> !selectedsessionpart.getAmbience().ambienceexistsinActual(i)).forEach(i -> selectedsessionpart.getAmbience().add(i));
             Root.getAmbiences().setsessionpartAmbience(selectedsessionpart, selectedsessionpart.getAmbience());
             Root.getAmbiences().marshall();
-            new InformationDialog(Root.getOptions(), "Saved", "Ambience Saved To " + selectedsessionpart, "");
+            new InformationDialog(Root.getPreferences(), "Saved", "Ambience Saved To " + selectedsessionpart, "");
         } else {
-            new InformationDialog(Root.getOptions(), "Cannot Save", "No SessionPart Selected", "Cannot Save");}
+            new InformationDialog(Root.getPreferences(), "Cannot Save", "No SessionPart Selected", "Cannot Save");}
     }
     public void switchtosimple() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getOptions(), "Switch To Simple Mode", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save Changes", "Switch Without Saving", "Cancel").getResult()) {
+            switch (new AnswerDialog(Root.getPreferences(), "Switch To Simple Mode", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save Changes", "Switch Without Saving", "Cancel").getResult()) {
                 case YES: save(); break;
                 case CANCEL: return;
             }

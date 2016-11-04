@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import kujiin.xml.Options;
+import kujiin.xml.Preferences;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -522,7 +522,7 @@ public class Util {
     public static boolean audio_trimfile(File filetotrim, Integer lengthinseconds) {
         try {
             // ffmpeg -i input.mp3 -ss 00:02:54.583 -t 300 -acodec copy output.mp3
-            File tempfile = new File(Options.DIRECTORYTEMP, "Export/temptrim.mp3");
+            File tempfile = new File(Preferences.DIRECTORYTEMP, "Export/temptrim.mp3");
             FileUtils.moveFile(filetotrim, tempfile);
             ArrayList<String> cmdarraylist = new ArrayList<>();
             cmdarraylist.add("ffmpeg");

@@ -12,7 +12,7 @@ import kujiin.util.Util;
 
 import java.io.IOException;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class ChangeAllValues extends Stage {
     public Button AcceptButton;
@@ -31,7 +31,7 @@ public class ChangeAllValues extends Stage {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             this.setResizable(false);
             setTitle(toptext);

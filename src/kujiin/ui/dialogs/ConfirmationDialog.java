@@ -4,14 +4,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
-import kujiin.xml.Options;
+import kujiin.xml.Preferences;
 
 import java.util.Optional;
 
 public class ConfirmationDialog {
     private boolean result;
 
-    public ConfirmationDialog(Options options, String titletext, String headertext, String contenttext, String yesbuttontext, String nobuttontext) {
+    public ConfirmationDialog(Preferences preferences, String titletext, String headertext, String contenttext, String yesbuttontext, String nobuttontext) {
         String yestext;
         String notext;
         if (yesbuttontext != null) {
@@ -32,17 +32,17 @@ public class ConfirmationDialog {
             a.setHeaderText(headertext);
         }
         DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(options. getUserInterfaceOptions().getThemefile());
+        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
         Optional<ButtonType> answer = a.showAndWait();
         result = answer.isPresent() && answer.get() == yes;
     }
-    public ConfirmationDialog(Options options, String title, String header, String content) {
+    public ConfirmationDialog(Preferences preferences, String title, String header, String content) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setTitle(title);
         if (header != null) {a.setHeaderText(header);}
         if (content != null) {a.setContentText(content);}
         DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(options. getUserInterfaceOptions().getThemefile());
+        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
         Optional<ButtonType> answer = a.showAndWait();
         result = answer.isPresent() && answer.get() == ButtonType.OK;
     }

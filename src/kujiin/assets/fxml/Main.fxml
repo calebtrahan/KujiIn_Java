@@ -11,21 +11,21 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem mnemonicParsing="false" onAction="#menu_changesessionoptions" text="Preferences" />
-                  <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
+                  <MenuItem fx:id="Menu_Preferences" mnemonicParsing="false" text="Preferences" />
+                  <MenuItem fx:id="Menu_Close" mnemonicParsing="false" onAction="#close" text="Close" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Tools">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#menu_editprogramsambience" text="Edit Program's Ambience" />
-              <MenuItem mnemonicParsing="false" onAction="#menu_editreferencefiles" text="Edit Reference Files" />
+              <MenuItem fx:id="Menu_EditAmbience" mnemonicParsing="false" text="Edit Program's Ambience" />
+              <MenuItem fx:id="Menu_EditReference" mnemonicParsing="false" text="Edit Reference Files" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#menu_howtouseprogram" text="How To Use This Program" />
-              <MenuItem mnemonicParsing="false" onAction="#menu_aboutthisprogram" text="About" />
-              <MenuItem mnemonicParsing="false" onAction="#menu_contactme" text="Contact Me" />
+              <MenuItem fx:id="Menu_Help" mnemonicParsing="false" text="How To Use This Program" />
+              <MenuItem fx:id="Menu_About" mnemonicParsing="false" text="About" />
+              <MenuItem fx:id="Menu_Contact" mnemonicParsing="false" text="Contact Me" />
             </items>
           </Menu>
         </menus>

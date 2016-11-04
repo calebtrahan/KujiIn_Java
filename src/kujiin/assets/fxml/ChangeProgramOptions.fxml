@@ -4,9 +4,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="351.0" prefWidth="430.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.text.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="356.0" prefWidth="430.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox layoutX="54.0" layoutY="57.0" prefHeight="589.0" prefWidth="430.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox layoutX="54.0" layoutY="57.0" prefHeight="466.0" prefWidth="430.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <TabPane prefHeight="216.0" prefWidth="430.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
@@ -16,42 +17,45 @@
                            <children>
                               <VBox layoutX="77.0" layoutY="-31.0" prefHeight="183.0" prefWidth="430.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <CheckBox fx:id="TooltipsCheckBox" mnemonicParsing="false" text="Show Tooltips">
+                                    <Label text="Accessibility &amp; Help">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
                                        <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
+                                          <Insets bottom="5.0" left="10.0" top="5.0" />
                                        </VBox.margin>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
-                                    </CheckBox>
-                                    <CheckBox fx:id="HelpDialogsCheckBox" mnemonicParsing="false" text="Show Help Dialogs">
+                                    </Label>
+                                    <HBox>
                                        <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
+                                          <Insets left="10.0" />
                                        </VBox.margin>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
-                                    </CheckBox>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="0.0" prefWidth="430.0">
                                        <children>
-                                          <Label text="Session Creator Scroll Incremement:">
+                                          <CheckBox fx:id="TooltipsCheckBox" mnemonicParsing="false" text="Display Tooltips">
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </CheckBox>
+                                          <CheckBox fx:id="HelpDialogsCheckBox" mnemonicParsing="false" text="Display Help Dialogs">
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
                                              <HBox.margin>
                                                 <Insets left="10.0" />
                                              </HBox.margin>
-                                          </Label>
-                                          <TextField fx:id="ScrollIncrement" alignment="CENTER" prefHeight="26.0" prefWidth="33.0">
-                                             <HBox.margin>
-                                                <Insets left="10.0" />
-                                             </HBox.margin>
-                                          </TextField>
+                                          </CheckBox>
                                        </children>
-                                       <VBox.margin>
-                                          <Insets top="10.0" />
-                                       </VBox.margin>
                                     </HBox>
+                                    <Label text="Appearance">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets left="10.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
                                     <HBox alignment="CENTER_LEFT">
                                        <children>
-                                          <Label text="Appearance">
+                                          <Label text="Theme">
                                              <HBox.margin>
                                                 <Insets />
                                              </HBox.margin>
@@ -61,7 +65,7 @@
                                                 <Insets left="10.0" />
                                              </HBox.margin>
                                           </ChoiceBox>
-                                          <Button fx:id="AddNewThemeButton" mnemonicParsing="false" text="Add New Theme">
+                                          <Button fx:id="AddNewThemeButton" mnemonicParsing="false" text="Add New">
                                              <HBox.margin>
                                                 <Insets left="5.0" />
                                              </HBox.margin>
@@ -71,7 +75,7 @@
                                           <Insets left="10.0" />
                                        </padding>
                                        <VBox.margin>
-                                          <Insets top="10.0" />
+                                          <Insets />
                                        </VBox.margin>
                                     </HBox>
                                  </children>
@@ -80,100 +84,273 @@
                         </AnchorPane>
                     </content>
                   </Tab>
-                <Tab text="Session &amp; Playback">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <Tab text="Creation">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <VBox prefHeight="181.0" prefWidth="430.0" AnchorPane.bottomAnchor="-40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <VBox prefHeight="183.0" prefWidth="430.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="537.0">
+                                    <Label text="Creation User Interface">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" left="10.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="0.0" prefWidth="430.0">
                                        <children>
-                                          <CheckBox fx:id="AlertFileSwitch" mnemonicParsing="false" prefHeight="18.0" prefWidth="218.0" text="Alert File Between Session Parts" />
+                                          <Label text="Scroll Incremement:" />
+                                          <TextField fx:id="ScrollIncrement" alignment="CENTER" prefHeight="26.0" prefWidth="33.0">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </TextField>
                                        </children>
                                        <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
+                                          <Insets left="10.0" />
                                        </VBox.margin>
                                     </HBox>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="537.0">
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+                  <Tab text="Export">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    </content>
+                  </Tab>
+                  <Tab text="Session">
+                     <content>
+                        <ScrollPane>
+                          <content>
+                            <AnchorPane prefHeight="239.0" prefWidth="411.0">
+                                 <children>
+                                    <VBox prefHeight="184.0" prefWidth="343.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <CheckBox fx:id="ReferenceSwitch" mnemonicParsing="false" text="Display Reference">
+                                          <Label text="Alert File">
+                                             <font>
+                                                <Font name="System Bold" size="13.0" />
+                                             </font>
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" left="10.0" top="10.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <CheckBox fx:id="AlertFileSwitch" mnemonicParsing="false" prefHeight="18.0" prefWidth="218.0" text="Alert File Between Session Parts">
+                                             <VBox.margin>
+                                                <Insets left="10.0" />
+                                             </VBox.margin>
+                                          </CheckBox>
+                                          <Label text="Reference Defaults">
+                                             <font>
+                                                <Font name="System Bold" size="13.0" />
+                                             </font>
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" left="10.0" top="5.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <HBox alignment="CENTER_LEFT">
+                                             <VBox.margin>
+                                                <Insets left="10.0" />
+                                             </VBox.margin>
+                                             <children>
+                                                <CheckBox fx:id="ReferenceSwitch" mnemonicParsing="false" text="Enabled">
+                                                   <cursor>
+                                                      <Cursor fx:constant="HAND" />
+                                                   </cursor>
+                                                </CheckBox>
+                                                <Label prefHeight="19.0" prefWidth="34.0" text="Type:">
+                                                   <HBox.margin>
+                                                      <Insets left="10.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="System Italic" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ChoiceBox fx:id="ReferenceTypeChoiceBox" prefHeight="29.0" prefWidth="93.0" />
+                                                <CheckBox fx:id="ReferenceFullScreenCheckBox" mnemonicParsing="false" text="Full Screen">
+                                                   <HBox.margin>
+                                                      <Insets left="10.0" />
+                                                   </HBox.margin>
+                                                </CheckBox>
+                                             </children>
+                                          </HBox>
+                                          <Label text="Ramp Defaults">
+                                             <font>
+                                                <Font name="System Bold" size="13.0" />
+                                             </font>
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" left="10.0" top="5.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <HBox alignment="CENTER_LEFT">
+                                             <children>
+                                                <CheckBox fx:id="RampSwitch" mnemonicParsing="false" prefHeight="25.0" text="Ramp Between Session Parts">
+                                                   <cursor>
+                                                      <Cursor fx:constant="HAND" />
+                                                   </cursor>
+                                                </CheckBox>
+                                                <CheckBox fx:id="PrePostRamp" mnemonicParsing="false" text="Pre/Post Ramp">
+                                                   <HBox.margin>
+                                                      <Insets left="10.0" />
+                                                   </HBox.margin>
+                                                </CheckBox>
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets />
+                                             </VBox.margin>
+                                             <padding>
+                                                <Insets left="10.0" />
+                                             </padding>
+                                          </HBox>
+                                          <Label text="Ambience Defaults">
+                                             <font>
+                                                <Font name="System Bold" size="13.0" />
+                                             </font>
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" left="10.0" top="5.0" />
+                                             </VBox.margin>
+                                          </Label>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="28.0" prefWidth="411.0">
+                                             <children>
+                                                <CheckBox fx:id="AmbienceSwitch" mnemonicParsing="false" text="Enabled" />
+                                                <Label text="Type:">
+                                                   <HBox.margin>
+                                                      <Insets left="10.0" right="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="System Italic" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ChoiceBox fx:id="AmbienceTypeChoiceBox" prefHeight="29.0" prefWidth="139.0" />
+                                             </children>
+                                             <padding>
+                                                <Insets left="10.0" />
+                                             </padding>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </ScrollPane>
+                     </content>
+                  </Tab>
+                <Tab text="Playback">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="124.0" prefWidth="430.0">
+                           <children>
+                              <VBox prefHeight="183.0" prefWidth="430.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <Label text="Fade Animations">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" left="10.0" top="10.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="39.0" prefWidth="430.0">
+                                       <children>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="29.0" prefWidth="185.0">
+                                             <children>
+                                                <CheckBox fx:id="FadeAnimation_PlaySwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Play" />
+                                                <TextField fx:id="FadeAnimation_PlayValue" alignment="CENTER_RIGHT" prefWidth="45.0">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                </TextField>
+                                                <Label text="sec(s)">
+                                                   <HBox.margin>
+                                                      <Insets left="3.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
+                                             <padding>
+                                                <Insets left="10.0" />
+                                             </padding>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="200.0">
+                                             <children>
+                                                <CheckBox fx:id="FadeAnimation_StopSwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Stop" />
+                                                <TextField fx:id="FadeAnimation_StopValue" alignment="CENTER_RIGHT" prefWidth="45.0">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                </TextField>
+                                                <Label text="sec(s)">
+                                                   <HBox.margin>
+                                                      <Insets left="2.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
                                              <HBox.margin>
                                                 <Insets />
                                              </HBox.margin>
-                                             <cursor>
-                                                <Cursor fx:constant="HAND" />
-                                             </cursor>
-                                          </CheckBox>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox alignment="CENTER_LEFT">
-                                       <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
-                                       </VBox.margin>
-                                       <children>
-                                          <CheckBox fx:id="RampSwitch" mnemonicParsing="false" prefHeight="25.0" text="Ramp Between Session Parts">
-                                             <cursor>
-                                                <Cursor fx:constant="HAND" />
-                                             </cursor>
-                                          </CheckBox>
-                                          <CheckBox fx:id="PrePostRamp" mnemonicParsing="false" text="Pre/Post Ramp">
-                                             <HBox.margin>
+                                             <padding>
                                                 <Insets left="10.0" />
-                                             </HBox.margin>
-                                          </CheckBox>
+                                             </padding>
+                                          </HBox>
                                        </children>
                                     </HBox>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="404.0">
+                                    <HBox prefHeight="37.0" prefWidth="430.0">
                                        <children>
-                                          <CheckBox fx:id="FadeSwitch" mnemonicParsing="false" text="Fade In/Out">
-                                             <HBox.margin>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="29.0" prefWidth="185.0">
+                                             <children>
+                                                <CheckBox fx:id="FadeAnimation_ResumeSwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Resume" />
+                                                <TextField fx:id="FadeAnimation_ResumeValue" alignment="CENTER_RIGHT" prefWidth="45.0">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                </TextField>
+                                                <Label prefHeight="19.0" prefWidth="46.0" text="sec(s)">
+                                                   <HBox.margin>
+                                                      <Insets left="3.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
+                                             <padding>
                                                 <Insets left="10.0" />
-                                             </HBox.margin>
-                                          </CheckBox>
-                                          <Label text="In:">
-                                             <HBox.margin>
-                                                <Insets left="72.0" right="12.0" />
-                                             </HBox.margin>
-                                          </Label>
-                                          <TextField fx:id="FadeOutValue" alignment="CENTER" prefWidth="45.0">
+                                             </padding>
+                                          </HBox>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="200.0">
+                                             <children>
+                                                <CheckBox fx:id="FadeAnimation_PauseSwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Pause" />
+                                                <TextField fx:id="FadeAnimation_PauseValue" alignment="CENTER_RIGHT" prefWidth="45.0">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                </TextField>
+                                                <Label text="sec(s)">
+                                                   <HBox.margin>
+                                                      <Insets left="2.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
                                              <HBox.margin>
                                                 <Insets />
                                              </HBox.margin>
-                                          </TextField>
-                                          <Label text="s">
-                                             <HBox.margin>
-                                                <Insets left="5.0" />
-                                             </HBox.margin>
-                                          </Label>
-                                          <Label text="Out:">
-                                             <HBox.margin>
-                                                <Insets left="53.0" />
-                                             </HBox.margin>
-                                          </Label>
-                                          <TextField fx:id="FadeInValue" alignment="CENTER" prefHeight="26.0" prefWidth="45.0">
-                                             <HBox.margin>
-                                                <Insets left="12.0" right="10.0" />
-                                             </HBox.margin>
-                                          </TextField>
-                                          <Label text="s" />
+                                             <padding>
+                                                <Insets left="10.0" />
+                                             </padding>
+                                          </HBox>
                                        </children>
-                                       <VBox.margin>
-                                          <Insets top="10.0" />
-                                       </VBox.margin>
                                     </HBox>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="42.0" prefWidth="386.0">
+                                    <Label text="Volume Defaults">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" left="10.0" top="10.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="20.0" prefWidth="430.0">
                                        <children>
-                                          <Label text="Volume Defaults:">
+                                          <Label text="Entrainment">
                                              <HBox.margin>
-                                                <Insets left="10.0" />
-                                             </HBox.margin>
-                                          </Label>
-                                          <Label text="Entrainment:">
-                                             <HBox.margin>
-                                                <Insets left="10.0" />
+                                                <Insets />
                                              </HBox.margin>
                                           </Label>
                                           <TextField fx:id="EntrainmentVolumePercentage" alignment="CENTER" prefWidth="45.0">
@@ -181,20 +358,35 @@
                                                 <Insets left="10.0" right="2.0" />
                                              </HBox.margin>
                                           </TextField>
-                                          <Label text="\%" />
-                                          <Label text="Ambience:">
+                                          <Label text="\%">
+                                             <HBox.margin>
+                                                <Insets left="2.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <Label text="Ambience">
                                              <HBox.margin>
                                                 <Insets left="15.0" />
                                              </HBox.margin>
                                           </Label>
                                           <TextField fx:id="AmbienceVolumePercentage" alignment="CENTER" prefHeight="26.0" prefWidth="45.0">
                                              <HBox.margin>
-                                                <Insets left="10.0" right="2.0" />
+                                                <Insets left="10.0" />
                                              </HBox.margin>
+                                             <padding>
+                                                <Insets left="10.0" />
+                                             </padding>
                                           </TextField>
-                                          <Label text="\%" />
+                                          <Label text="\%">
+                                             <HBox.margin>
+                                                <Insets left="2.0" />
+                                             </HBox.margin>
+                                          </Label>
                                        </children>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
                                     </HBox>
+                                    <HBox prefHeight="67.0" prefWidth="430.0" />
                                  </children>
                               </VBox>
                            </children>
@@ -207,19 +399,60 @@
                            <children>
                               <VBox prefHeight="167.0" prefWidth="558.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Button fx:id="DeleteAllSessionsProgressButton" mnemonicParsing="false" text="Delete All Session Progress">
+                                    <Label text="Default Ambience Editor">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
                                        <VBox.margin>
                                           <Insets left="10.0" top="10.0" />
                                        </VBox.margin>
-                                    </Button>
-                                    <Button fx:id="DeleteAllGoalsButton" mnemonicParsing="false" text="Delete All Goals">
+                                    </Label>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="430.0">
+                                       <children>
+                                          <Label text="Ambience Editor">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <ChoiceBox fx:id="AmbienceEditorDefaultChoiceBox" prefHeight="29.0" prefWidth="121.0">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </ChoiceBox>
+                                       </children>
+                                    </HBox>
+                                    <Label text="Session And Goal Progress">
                                        <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
+                                          <Insets bottom="5.0" left="10.0" top="5.0" />
                                        </VBox.margin>
-                                    </Button>
-                                    <CheckBox fx:id="TestingModeCheckbox" mnemonicParsing="false" text="Testing Mode">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <HBox>
                                        <VBox.margin>
-                                          <Insets left="10.0" top="10.0" />
+                                          <Insets left="10.0" />
+                                       </VBox.margin>
+                                       <children>
+                                          <Button fx:id="DeleteAllSessionsProgressButton" mnemonicParsing="false" text="Delete All Session Progress" />
+                                          <Button fx:id="DeleteAllGoalsButton" mnemonicParsing="false" text="Delete All Goals">
+                                             <HBox.margin>
+                                                <Insets left="10.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                       </children>
+                                    </HBox>
+                                    <Label text="Developer Options">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" left="10.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <CheckBox fx:id="DebugModeCheckbox" mnemonicParsing="false" text="Debug Mode">
+                                       <VBox.margin>
+                                          <Insets left="10.0" />
                                        </VBox.margin>
                                     </CheckBox>
                                  </children>
@@ -239,7 +472,7 @@
                   </Label>
                </children>
             </HBox>
-            <TextArea fx:id="DescriptionTextField" prefHeight="76.0" prefWidth="430.0" wrapText="true">
+            <TextArea fx:id="DescriptionTextField" editable="false" prefHeight="76.0" prefWidth="430.0" wrapText="true">
                <VBox.margin>
                   <Insets left="5.0" right="5.0" />
                </VBox.margin>

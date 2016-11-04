@@ -9,12 +9,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import kujiin.util.Util;
-import kujiin.xml.Options;
+import kujiin.xml.Preferences;
 
 import java.io.IOException;
 import java.time.LocalDate;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class ExceptionDialog extends Stage {
     public TextArea StackTraceTextField;
@@ -23,7 +23,7 @@ public class ExceptionDialog extends Stage {
     public CheckBox NotifyMeCheckbox;
     public Label TopText;
 
-    public ExceptionDialog(Options options, Exception exception) {
+    public ExceptionDialog(Preferences preferences, Exception exception) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("assets/fxml/ExceptionDialog.fxml"));
             fxmlLoader.setController(this);
@@ -31,7 +31,7 @@ public class ExceptionDialog extends Stage {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = options.getUserInterfaceOptions().getThemefile();
+            String themefile = preferences.getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             System.out.println(String.format("Time %s Encountered: %s", exception.getClass().getName(), LocalDate.now()));
             exception.printStackTrace();

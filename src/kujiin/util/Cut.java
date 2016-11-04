@@ -6,7 +6,7 @@ import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.util.enums.StartupCheckType;
-import kujiin.xml.Options;
+import kujiin.xml.Preferences;
 import kujiin.xml.SoundFile;
 
 import java.io.File;
@@ -21,7 +21,7 @@ public class Cut extends SessionPart {
 
     public Cut(int number, String name, MainController Root, ToggleButton aSwitch, TextField value) {
         super(number, name, Root, aSwitch, value);
-        if (root.getOptions().getUserInterfaceOptions().getTooltips()) {
+        if (root.getPreferences().getUserInterfaceOptions().getTooltips()) {
             Value.setTooltip(new Tooltip("Minutes You Want To Practice " + name));
         }
     }
@@ -64,20 +64,20 @@ public class Cut extends SessionPart {
         switch (startupchecks_entrainment_count) {
             case 0:
                 soundFile = entrainment.getFreq();
-                file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
+                file = new File(Preferences.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
                 break;
             case 1:
                 soundFile = entrainment.ramp_get(0);
                 if (number != 9) {
-                    file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
+                    file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
                             root.getSessionPart_Names(1, 10).get(root.getSessionPart_Names(1, 10).indexOf(name) + 1).toLowerCase() + ".mp3");
-                } else {file = new File(Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");}
+                } else {file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");}
                 break;
             case 2:
                 if (number == 9) {startupCheckType = StartupCheckType.AMBIENCE; throw new IndexOutOfBoundsException();}
                 else {
                     soundFile = entrainment.ramp_get(1);
-                    file = new File(kujiin.xml.Options.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");
+                    file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");
                     break;
                 }
             default:
@@ -90,7 +90,7 @@ public class Cut extends SessionPart {
 // Creation
     @Override
     public boolean creation_buildEntrainment() {
-        if (root.getOptions().getSessionOptions().getRampenabled()) {
+        if (root.getPreferences().getSessionOptions().getRampenabled()) {
             try {
                 int index = allsessionpartstoplay.indexOf(this);
                 SessionPart partafter = allsessionpartstoplay.get(index + 1);

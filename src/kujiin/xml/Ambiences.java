@@ -39,10 +39,10 @@ public class Ambiences {
     public Ambiences() {}
     public Ambiences(MainController Root) {
         this.Root = Root;
-        if (! Root.getOptions().getProgramOptions().getOS().equals(System.getProperty("os.name"))) {
-            if (! Options.AMBIENCEXMLFILE.delete()) {
-                new ErrorDialog(Root.getOptions(), "Error", "Cannot Write To Ambience's XML File",
-                        "Check Permissions For " + Options.AMBIENCEXMLFILE.getAbsolutePath());
+        if (! Root.getPreferences().getAdvancedOptions().getOS().equals(System.getProperty("os.name"))) {
+            if (! Preferences.AMBIENCEXMLFILE.delete()) {
+                new ErrorDialog(Root.getPreferences(), "Error", "Cannot Write To Ambience's XML File",
+                        "Check Permissions For " + Preferences.AMBIENCEXMLFILE.getAbsolutePath());
                 return;
             }
         }
@@ -51,11 +51,11 @@ public class Ambiences {
 
 // XML Processing
     public void unmarshall() {
-        if (Options.AMBIENCEXMLFILE.exists()) {
+        if (Preferences.AMBIENCEXMLFILE.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Ambiences.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
-                Ambiences ambiences = (Ambiences) createMarshaller.unmarshal(Options.AMBIENCEXMLFILE);
+                Ambiences ambiences = (Ambiences) createMarshaller.unmarshal(Preferences.AMBIENCEXMLFILE);
                 Presession = ambiences.Presession;
                 Rin = ambiences.Rin;
                 Kyo = ambiences.Kyo;
@@ -80,9 +80,9 @@ public class Ambiences {
             JAXBContext context = JAXBContext.newInstance(Ambiences.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, Options.AMBIENCEXMLFILE);
+            createMarshaller.marshal(this, Preferences.AMBIENCEXMLFILE);
         } catch (JAXBException ignored) {
-            new InformationDialog(Root.getOptions(), "Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Options.AMBIENCEXMLFILE.getAbsolutePath());}
+            new InformationDialog(Root.getPreferences(), "Information", "Couldn't Write Ambience XML File", "Check Write File Permissions Of " + Preferences.AMBIENCEXMLFILE.getAbsolutePath());}
     }
 
 // Other Methods

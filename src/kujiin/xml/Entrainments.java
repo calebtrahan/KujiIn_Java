@@ -39,10 +39,10 @@ public class Entrainments {
     public Entrainments() {}
     public Entrainments(MainController Root) {
         this.Root = Root;
-        if (! Root.getOptions().getProgramOptions().getOS().equals(System.getProperty("os.name"))) {
-            if (! Options.ENTRAINMENTXMLFILE.delete()) {
-                new ErrorDialog(Root.getOptions(), "Error", "Cannot Write To Entrainment's XML File",
-                        "Check Permissions For " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+        if (! Root.getPreferences().getAdvancedOptions().getOS().equals(System.getProperty("os.name"))) {
+            if (! Preferences.ENTRAINMENTXMLFILE.delete()) {
+                new ErrorDialog(Root.getPreferences(), "Error", "Cannot Write To Entrainment's XML File",
+                        "Check Permissions For " + Preferences.ENTRAINMENTXMLFILE.getAbsolutePath());
                 return;
             }
         }
@@ -51,11 +51,11 @@ public class Entrainments {
 
 // XML Processing
     public void unmarshall() {
-        if (Options.ENTRAINMENTXMLFILE.exists()) {
+        if (Preferences.ENTRAINMENTXMLFILE.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Entrainments.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
-                Entrainments entrainments = (Entrainments) createMarshaller.unmarshal(Options.ENTRAINMENTXMLFILE);
+                Entrainments entrainments = (Entrainments) createMarshaller.unmarshal(Preferences.ENTRAINMENTXMLFILE);
                 Presession = entrainments.Presession;
                 Rin = entrainments.Rin;
                 Kyo = entrainments.Kyo;
@@ -97,10 +97,10 @@ public class Entrainments {
             JAXBContext context = JAXBContext.newInstance(Entrainments.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, Options.ENTRAINMENTXMLFILE);
+            createMarshaller.marshal(this, Preferences.ENTRAINMENTXMLFILE);
         } catch (JAXBException e) {
             e.printStackTrace();
-            new InformationDialog(Root.getOptions(), "Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Options.ENTRAINMENTXMLFILE.getAbsolutePath());
+            new InformationDialog(Root.getPreferences(), "Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Preferences.ENTRAINMENTXMLFILE.getAbsolutePath());
         }
     }
 

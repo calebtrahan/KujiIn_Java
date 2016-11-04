@@ -12,7 +12,7 @@ import kujiin.util.enums.ProgramState;
 import kujiin.xml.Ambiences;
 import kujiin.xml.Entrainments;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 
 public class Main extends Application {
@@ -34,19 +34,20 @@ public class Main extends Application {
         Root.setStage(primaryStage);
         primaryStage.getIcons().clear();
         primaryStage.getIcons().add(PROGRAM_ICON);
-        String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+        String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
         if (themefile != null) {primaryStage.getScene().getStylesheets().add(themefile);}
         primaryStage.setOnShowing(event -> {
             Root.setEntrainments(new Entrainments(Root));
             Root.setAmbiences(new Ambiences(Root));
             Root.setProgressTracker(new ProgressTracker(Root));
             Root.setupSessionParts();
+            Root.setupMenuActions();
             Root.setSessionCreator(new SessionCreator(Root));
             Root.startupchecks_start();
         });
         primaryStage.setOnCloseRequest(event -> {
             if (Root.getProgramState() == ProgramState.IDLE &&
-                    new ConfirmationDialog(Root.getOptions(), "Confirmation", null, "Really Exit?", "Exit", "Cancel").getResult()) {
+                    new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Really Exit?", "Exit", "Cancel").getResult()) {
                 Root.close();
             }
             else {event.consume();}

@@ -2,11 +2,11 @@ package kujiin.ui.dialogs;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.DialogPane;
-import kujiin.xml.Options;
+import kujiin.xml.Preferences;
 
 public class InformationDialog {
 
-    public InformationDialog(Options options, String titletext, String headertext, String contexttext) {
+    public InformationDialog(Preferences preferences, String titletext, String headertext, String contexttext) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setTitle(titletext);
         if (headertext != null) {
@@ -14,7 +14,7 @@ public class InformationDialog {
         }
         a.setContentText(contexttext);
         DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(options. getUserInterfaceOptions().getThemefile());
+        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
         a.showAndWait();
     }
 }

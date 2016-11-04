@@ -38,14 +38,14 @@ public class Sessions {
 
 // XML Processing
     public void unmarshall() {
-        if (Options.SESSIONSXMLFILE.exists()) {
+        if (Preferences.SESSIONSXMLFILE.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Sessions.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
-                Sessions noises1 = (Sessions) createMarshaller.unmarshal(Options.SESSIONSXMLFILE);
+                Sessions noises1 = (Sessions) createMarshaller.unmarshal(Preferences.SESSIONSXMLFILE);
                 setSession(noises1.getSession());
             } catch (JAXBException e) {
-                new InformationDialog(Root.getOptions(), "Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());
+                new InformationDialog(Root.getPreferences(), "Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Preferences.SESSIONSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -55,19 +55,19 @@ public class Sessions {
             JAXBContext context = JAXBContext.newInstance(Sessions.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, Options.SESSIONSXMLFILE);
+            createMarshaller.marshal(this, Preferences.SESSIONSXMLFILE);
         } catch (JAXBException e) {
-            new InformationDialog(Root.getOptions(), "Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Options.SESSIONSXMLFILE.getAbsolutePath());}
+            new InformationDialog(Root.getPreferences(), "Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Preferences.SESSIONSXMLFILE.getAbsolutePath());}
     }
     public void createnew() {
         try {
             int[] array = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             add(new Session(array));
         } catch (JAXBException ignored) {
-            new ErrorDialog(Root.getOptions(), "Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
+            new ErrorDialog(Root.getPreferences(), "Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
     }
     public void add(Session session) throws JAXBException {
-        if (Options.SESSIONSXMLFILE.exists()) {unmarshall();}
+        if (Preferences.SESSIONSXMLFILE.exists()) {unmarshall();}
         List<Session> sessionsList = getSession();
         if (sessionsList != null && sessionsList.size() > 0) {
             sort();

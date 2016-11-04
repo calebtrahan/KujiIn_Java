@@ -10,12 +10,13 @@ import javafx.stage.Stage;
 import kujiin.ui.MainController;
 import kujiin.util.SessionPart;
 import kujiin.util.enums.ReferenceType;
+import kujiin.xml.Preferences;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class SelectReferenceType extends Stage {
     public RadioButton HTMLRadioButton;
@@ -40,7 +41,7 @@ public class SelectReferenceType extends Stage {
             setTitle("Select Reference Type");
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             this.setResizable(false);
             setOnCloseRequest(event -> {});
@@ -54,8 +55,8 @@ public class SelectReferenceType extends Stage {
             TextRadioButton.setOnAction(event ->  textButtonselected());
             AcceptButton.setOnAction(event -> accept());
             CancelButton.setOnAction(event -> close());
-            if (Root.getOptions().getSessionOptions().getReferencetype() == null) {Root.getOptions().getSessionOptions().setReferencetype(kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION);}
-            switch (Root.getOptions().getSessionOptions().getReferencetype()) {
+            if (Root.getPreferences().getSessionOptions().getReferencetype() == null) {Root.getPreferences().getSessionOptions().setReferencetype(Preferences.DEFAULT_REFERENCE_TYPE_OPTION);}
+            switch (Root.getPreferences().getSessionOptions().getReferencetype()) {
                 case html:
                     HTMLRadioButton.setSelected(true);
                     setdescriptiontoselectedtype();
@@ -65,7 +66,7 @@ public class SelectReferenceType extends Stage {
                     setdescriptiontoselectedtype();
                     break;
             }
-            FullScreenCheckbox.setSelected(Root.getOptions().getSessionOptions().getReferencefullscreen());
+            FullScreenCheckbox.setSelected(Root.getPreferences().getSessionOptions().getReferencefullscreen());
         } catch (IOException ignored) {}
     }
 
@@ -97,7 +98,7 @@ public class SelectReferenceType extends Stage {
             else if (i.reference_invalid(getReferenceType())) {invalid++;}
         }
         if (nonexisting > 0) {
-            new ErrorDialog(Root.getOptions(), "Missing Reference Files", "Missing Reference Files For " + nonexisting + " Session Parts", "Cannot Enable Reference");
+            new ErrorDialog(Root.getPreferences(), "Missing Reference Files", "Missing Reference Files For " + nonexisting + " Session Parts", "Cannot Enable Reference");
             return false;
         }
         if (empty > 0 || invalid > 0) {
@@ -105,7 +106,7 @@ public class SelectReferenceType extends Stage {
             if (empty > 0) {msg.append(empty).append(" Session Parts With Empty Reference Files");}
             if (empty > 0 && invalid > 0) {msg.append("\n");}
             if (invalid > 0) {msg.append(invalid).append(" Session Parts With Invalid .html Reference");}
-            return new ConfirmationDialog(Root.getOptions(), "Enable Reference Confirmation", "Reference Files Incomplete", msg.toString(), "Continue Anyway", "Cancel").getResult();
+            return new ConfirmationDialog(Root.getPreferences(), "Enable Reference Confirmation", "Reference Files Incomplete", msg.toString(), "Continue Anyway", "Cancel").getResult();
         } else {return true;}
     }
     public void accept() {
@@ -113,7 +114,7 @@ public class SelectReferenceType extends Stage {
             if (checkreferencefiles()) {result = true;  close();}
         }
         else {
-            new InformationDialog(Root.getOptions(), "Cannot Accept", "No Reference Type Selected", null);
+            new InformationDialog(Root.getPreferences(), "Cannot Accept", "No Reference Type Selected", null);
             result = false;
         }
     }

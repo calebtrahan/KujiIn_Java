@@ -27,7 +27,7 @@ import kujiin.util.table.GoalProgressBinding;
 import kujiin.util.table.SessionRow;
 import kujiin.util.table.TotalProgressRow;
 import kujiin.xml.Goals;
-import kujiin.xml.Options;
+import kujiin.xml.Preferences;
 import kujiin.xml.Session;
 import kujiin.xml.Sessions;
 
@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class ProgressTracker implements UI {
     private ComboBox<String> GoalSessionPartComboBox;
@@ -55,11 +55,11 @@ public class ProgressTracker implements UI {
     private Goals Goals;
     private SessionPart SelectedSessionPart;
     private ArrayList<SessionPart> SessionParts;
-    private Options Options;
+    private Preferences Preferences;
     private MainController Root;
 
     public ProgressTracker(MainController Root) {
-        Options = Root.getOptions();
+        Preferences = Root.getPreferences();
         Sessions = new Sessions(Root);
         this.Root = Root;
         Sessions.unmarshall();
@@ -158,7 +158,7 @@ public class ProgressTracker implements UI {
     }
     public void sessions_displaylist() {
         if (Sessions.getSession() == null || Sessions.getSession().size() == 0) {
-            new InformationDialog(Options, "No Sessions", "No Practiced Sessions", "Cannot View Sessions");
+            new InformationDialog(Preferences, "No Sessions", "No Practiced Sessions", "Cannot View Sessions");
         } else {new AllSessionDetails().showAndWait();}
     }
     public void session_displaydetails(Session individualsession) {
@@ -187,7 +187,7 @@ public class ProgressTracker implements UI {
             goalprogresstooltip = new Tooltip("");
             percentage = "";
             progress = 0.0;
-            newgoalbuttontext = kujiin.xml.Options.NEWGOALTEXT;
+            newgoalbuttontext = kujiin.xml.Preferences.NEWGOALTEXT;
             newgoalbuttontooltip = new Tooltip("Set A New Goal");
         } else if (SelectedSessionPart.goals_getCurrent() == null || SelectedSessionPart.sessions_getPracticedDuration(null).lessThanOrEqualTo(Duration.ZERO)) {
             // No Current Goal Set
@@ -195,7 +195,7 @@ public class ProgressTracker implements UI {
             percentage = SelectedSessionPart.goals_ui_getcurrentgoalpercentage(2);
             progress = SelectedSessionPart.goals_ui_getcurrentgoalprogress();
             goalprogresstooltip = new Tooltip("No Current Goal Set For " + SelectedSessionPart.name);
-            newgoalbuttontext = kujiin.xml.Options.NEWGOALTEXT;
+            newgoalbuttontext = kujiin.xml.Preferences.NEWGOALTEXT;
             newgoalbuttontooltip = new Tooltip("Set A New Goal");
         } else {
             toptext = "Current Goal Progress";
@@ -205,7 +205,7 @@ public class ProgressTracker implements UI {
                     Util.formatdurationtoStringSpelledOut(SelectedSessionPart.sessions_getPracticedDuration(null), null),
                     Util.formatdurationtoStringSpelledOut(SelectedSessionPart.goals_getCurrent().getDuration(), null))
             );
-            newgoalbuttontext = kujiin.xml.Options.GOALPACINGTEXT;
+            newgoalbuttontext = kujiin.xml.Preferences.GOALPACINGTEXT;
             newgoalbuttontooltip = new Tooltip("Calculate Goal Pacing For This Goal");
         }
         GoalPercentageLabel.setText(percentage);
@@ -224,20 +224,20 @@ public class ProgressTracker implements UI {
 //            playerUI.GoalPercentageLabel.setText(percentage);
 //            // String.format("%s hrs -> %s hrs (%d", practiceddecimalhours, goaldecimalhours, progress.intValue()) + "%)");
 //        }
-        if (SelectedSessionPart != null && Options.getUserInterfaceOptions().getTooltips()) {
+        if (SelectedSessionPart != null && Preferences.getUserInterfaceOptions().getTooltips()) {
             NewGoalButton.setTooltip(new Tooltip("Set A New Goal"));
             ViewCurrentGoalsButton.setTooltip(new Tooltip("Edit " + SelectedSessionPart.name + "'s Goals"));
         }
     }
     private void goals_setnew() {
-        if (NewGoalButton.getText().equals(kujiin.xml.Options.NEWGOALTEXT)) {
+        if (NewGoalButton.getText().equals(kujiin.xml.Preferences.NEWGOALTEXT)) {
             SimpleGoalSetDialog simpleGoalSetDialog = new SimpleGoalSetDialog(SelectedSessionPart);
             simpleGoalSetDialog.showAndWait();
             if (simpleGoalSetDialog.shouldSetgoal()) {
                 SelectedSessionPart.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalDuration()));
                 goals_updateui(null);
             }
-        } else if (NewGoalButton.getText().equals(kujiin.xml.Options.GOALPACINGTEXT)) {
+        } else if (NewGoalButton.getText().equals(kujiin.xml.Preferences.GOALPACINGTEXT)) {
             new GoalPacingDialog().showAndWait();
         }
     }
@@ -251,7 +251,7 @@ public class ProgressTracker implements UI {
     }
     public void goals_viewcurrent() {
         if (SelectedSessionPart.getGoals() == null || SelectedSessionPart.getGoals().isEmpty()) {
-            new InformationDialog(Options, "Information", "No Goals Exist For " + SelectedSessionPart.name, "Please Add A Goal For " + SelectedSessionPart.name);
+            new InformationDialog(Preferences, "Information", "No Goals Exist For " + SelectedSessionPart.name, "Please Add A Goal For " + SelectedSessionPart.name);
         } else {
             new AllSessionPartGoalProgress().showAndWait();
         }
@@ -280,7 +280,7 @@ public class ProgressTracker implements UI {
                 setScene(defaultscene);
                 getIcons().clear();
                 getIcons().add(PROGRAM_ICON);
-                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
                 setTitle("Goal Progress");
@@ -303,13 +303,13 @@ public class ProgressTracker implements UI {
                 this.setOnCloseRequest(event -> {
                     ArrayList<SessionPart> sessionpartsmissingcurrentgoals = SessionParts.stream().filter(i -> i.goals_getCurrent() == null).collect(Collectors.toCollection(ArrayList::new));
                     if (sessionpartsmissingcurrentgoals.size() > 0) {
-                        if (! new ConfirmationDialog(Options, "Confirmation", null, "Missing Current Goals For " + sessionpartsmissingcurrentgoals.size() + " Session Parts. Close Without Setting Goals", "Close", "Cancel").getResult()) {
+                        if (! new ConfirmationDialog(Preferences, "Confirmation", null, "Missing Current Goals For " + sessionpartsmissingcurrentgoals.size() + " Session Parts. Close Without Setting Goals", "Close", "Cancel").getResult()) {
                             event.consume();
                         }
                     }
                 });
             } catch (IOException e) {
-                new ExceptionDialog(Options, e).showAndWait();
+                new ExceptionDialog(Preferences, e).showAndWait();
             }
         }
 
@@ -444,7 +444,7 @@ public class ProgressTracker implements UI {
                 setScene(defaultscene);
                 getIcons().clear();
                 getIcons().add(PROGRAM_ICON);
-                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
                 setTitle("Session List");
@@ -474,7 +474,7 @@ public class ProgressTracker implements UI {
                 populatetotalsbargraphandtable();
                 populatetable(null);
             } catch (IOException e) {
-                new ExceptionDialog(Options, e).showAndWait();
+                new ExceptionDialog(Preferences, e).showAndWait();
             }
         }
 
@@ -621,7 +621,7 @@ public class ProgressTracker implements UI {
                 setScene(defaultscene);
                 getIcons().clear();
                 getIcons().add(PROGRAM_ICON);
-                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
                 setTitle("Goal Pacing");
@@ -636,7 +636,7 @@ public class ProgressTracker implements UI {
                 PracticeDays.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
                 TopLabel.setText("Goal Pacing For " + SelectedSessionPart.name + " Current Goal");
                 calculate();
-            } catch (IOException e) {new ExceptionDialog(Options, e).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(Preferences, e).showAndWait();}
         }
 
         // Other Methods
@@ -665,7 +665,7 @@ public class ProgressTracker implements UI {
                 setScene(defaultscene);
                 getIcons().clear();
                 getIcons().add(PROGRAM_ICON);
-                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
                 setTitle("Set A New Goal");
@@ -678,7 +678,7 @@ public class ProgressTracker implements UI {
                 Util.custom_textfield_integer(MinutesSpinner, 0, 59, 5);
                 HoursSpinner.textProperty().addListener((observable, oldValue, newValue) -> checkvalue());
                 MinutesSpinner.textProperty().addListener((observable, oldValue, newValue) -> checkvalue());
-            } catch (IOException e) {new ExceptionDialog(Options, e).showAndWait();}
+            } catch (IOException e) {new ExceptionDialog(Preferences, e).showAndWait();}
         }
 
         private Duration getPotentialGoalDuration() {

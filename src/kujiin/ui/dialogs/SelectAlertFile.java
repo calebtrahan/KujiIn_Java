@@ -9,12 +9,13 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.util.Util;
+import kujiin.xml.Preferences;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class SelectAlertFile extends Stage {
     public Button HelpButton;
@@ -37,12 +38,12 @@ public class SelectAlertFile extends Stage {
             Root.setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setTitle("Alert File Editor");
-            AlertFileToggleButton.setSelected(Root.getOptions().getSessionOptions().getAlertfunction());
-            String alertfilelocation = Root.getOptions().getSessionOptions().getAlertfilelocation();
-            if (alertfilelocation != null) {alertfile = new File(Root.getOptions().getSessionOptions().getAlertfilelocation());}
+            AlertFileToggleButton.setSelected(Root.getPreferences().getSessionOptions().getAlertfunction());
+            String alertfilelocation = Root.getPreferences().getSessionOptions().getAlertfilelocation();
+            if (alertfilelocation != null) {alertfile = new File(Root.getPreferences().getSessionOptions().getAlertfilelocation());}
             alertfiletoggled();
             HelpButton.setOnAction(event -> help());
             PreviewButton.setOnAction(event -> preview());
@@ -56,13 +57,13 @@ public class SelectAlertFile extends Stage {
 // Button Actions
     public void accept() {
         if (AlertFileToggleButton.isSelected() && alertfile == null) {
-            new InformationDialog(Root.getOptions(), "No Alert File Selected", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
+            new InformationDialog(Root.getPreferences(), "No Alert File Selected", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
             return;
         }
-        Root.getOptions().getSessionOptions().setAlertfunction(AlertFileToggleButton.isSelected());
-        if (alertfile != null) {Root.getOptions().getSessionOptions().setAlertfilelocation(alertfile.toURI().toString());}
-        else {Root.getOptions().getSessionOptions().setAlertfilelocation(null);}
-        Root.getOptions().marshall();
+        Root.getPreferences().getSessionOptions().setAlertfunction(AlertFileToggleButton.isSelected());
+        if (alertfile != null) {Root.getPreferences().getSessionOptions().setAlertfilelocation(alertfile.toURI().toString());}
+        else {Root.getPreferences().getSessionOptions().setAlertfilelocation(null);}
+        Root.getPreferences().marshall();
         close();
     }
     public void cancel() {
@@ -88,20 +89,20 @@ public class SelectAlertFile extends Stage {
         if (alertfile != null && alertfile.exists()) {
             Double duration = Util.audio_getduration(alertfile);
             Duration alertfileduration = new Duration(duration * 1000);
-            if (duration >= kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH && duration < kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                switch (new AnswerDialog(Root.getOptions(), "Alert File Longer Than Suggested Duration", null,
+            if (duration >= Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH && duration < Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
+                switch (new AnswerDialog(Root.getPreferences(), "Alert File Longer Than Suggested Duration", null,
                         String.format("Alert File Is %s Which Is Longer Than Suggested Duration: %s And May Break Immersion",
                                 Util.formatdurationtoStringDecimalWithColons(alertfileduration),
-                                Util.formatdurationtoStringDecimalWithColons(new Duration(kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000))),
+                                Util.formatdurationtoStringDecimalWithColons(new Duration(Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000))),
                         "Use As Alert File", "Don't Use As Alert File", "Cancel"
                 ).getResult()) {
                     case YES:
-                        if (new ConfirmationDialog(Root.getOptions(), "Really Use " + alertfile.getName() + " As Your Alert File?", null, "Really Use This As Your Alert File? This May Break Immersion", null, null).getResult()) {break;}
+                        if (new ConfirmationDialog(Root.getPreferences(), "Really Use " + alertfile.getName() + " As Your Alert File?", null, "Really Use This As Your Alert File? This May Break Immersion", null, null).getResult()) {break;}
                         else {return;}
                     case CANCEL: return;
                 }
-            } else if (duration >= kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                new InformationDialog(Root.getOptions(), "Cannot Add Alert File", null,
+            } else if (duration >= Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
+                new InformationDialog(Root.getPreferences(), "Cannot Add Alert File", null,
                         String.format("Alert File Is %s Which Is Too Long And Will Break Immersion", Util.formatdurationtoStringDecimalWithColons(alertfileduration)));
                 return;
             }
@@ -110,36 +111,36 @@ public class SelectAlertFile extends Stage {
             alertfileTextField.setText(text);
         } else {
             if (alertfile != null) {alertfile = null; alertfiletoggled();}
-            alertfileTextField.setText(kujiin.xml.Options.NO_ALERT_FILE_SELECTED_TEXT);
+            alertfileTextField.setText(Preferences.NO_ALERT_FILE_SELECTED_TEXT);
         }
     }
     public void help() {
-        new InformationDialog(Root.getOptions(), "What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to player_transition to the next\npart of the session");
+        new InformationDialog(Root.getPreferences(), "What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to player_transition to the next\npart of the session");
     }
 
 // Utility Methods
     public boolean fileisgood(File testfile) {
         // Test If Valid Extension
         if (! Util.audio_isValid(testfile)) {
-            new InformationDialog(Root.getOptions(), "Information", "Invalid Audio Format", "Supported Audio Formats: " + Collections.singletonList(Util.SUPPORTEDAUDIOFORMATS).toString());
+            new InformationDialog(Root.getPreferences(), "Information", "Invalid Audio Format", "Supported Audio Formats: " + Collections.singletonList(Util.SUPPORTEDAUDIOFORMATS).toString());
             return false;
         }
         Double duration = Util.audio_getduration(testfile);
         if (duration == 0.0) {
-            new InformationDialog(Root.getOptions(), "Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
-        else if (duration >= (kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
+            new InformationDialog(Root.getPreferences(), "Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
+        else if (duration >= (Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
             String confirmationtext = String.format("%s Is %s Which Is Longer Than The Suggested Maximum Duration %s. This May Break Session Immersion", testfile.getName(),
-                    Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(kujiin.xml.Options.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), null));
-            return new ConfirmationDialog(Root.getOptions(), "Alert File Too Long", null, confirmationtext, "Use As Alert File", "Cancel").getResult();
-        } else if (duration >= kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-            String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(kujiin.xml.Options.ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), null));
-            new InformationDialog(Root.getOptions(), "Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
+                    Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), null));
+            return new ConfirmationDialog(Root.getPreferences(), "Alert File Too Long", null, confirmationtext, "Use As Alert File", "Cancel").getResult();
+        } else if (duration >= Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
+            String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), null));
+            new InformationDialog(Root.getPreferences(), "Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
             return false;
         } else {return true;}
     }
     //        public void alertfiletoggle() {
 //            if (AlertSwitch.isSelected()) {
-//                if (Options.getSessionOptions().getAlertfilelocation() == null) {
+//                if (Preferences.getSessionOptions().getAlertfilelocation() == null) {
 //                    AlertFile = getnewalertfile();
 //                    checkalertfile();
 //                }
@@ -173,15 +174,15 @@ public class SelectAlertFile extends Stage {
 //            boolean good;
 //            if (AlertFile != null && Util.audio_isValid(AlertFile)) {
 //                good = true;
-//                Options.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());
+//                Preferences.getSessionOptions().setAlertfilelocation(AlertFile.toURI().toString());
 //                String audioduration = Util.format_secondsforplayerdisplay((int) Util.audio_getduration(AlertFile));
 //                AlertFileTextField.setText(String.format("%s (%s)", AlertFile.getName(), audioduration));
 //            } else {
 //                good = false;
 //                AlertFileTextField.setText("Alert Feature Disabled");
-//                Options.getSessionOptions().setAlertfilelocation(null);
+//                Preferences.getSessionOptions().setAlertfilelocation(null);
 //            }
-//            Options.getSessionOptions().setAlertfunction(good);
+//            Preferences.getSessionOptions().setAlertfunction(good);
 //            AlertFileEditButton.gui_setDisable(! good);
 //            AlertFileTextField.gui_setDisable(! good);
 //            AlertSwitch.setSelected(good);

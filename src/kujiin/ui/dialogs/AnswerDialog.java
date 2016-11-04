@@ -4,14 +4,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import kujiin.util.Util;
-import kujiin.xml.Options;
+import kujiin.xml.Preferences;
 
 import java.util.Optional;
 
 public class AnswerDialog {
     private Util.AnswerType result;
 
-    public AnswerDialog(Options options, String title, String header, String content, String yesbuttontext, String nobuttontext, String cancelbuttontext) {
+    public AnswerDialog(Preferences preferences, String title, String header, String content, String yesbuttontext, String nobuttontext, String cancelbuttontext) {
         ButtonType yes;
         ButtonType no;
         ButtonType cancel;
@@ -33,7 +33,7 @@ public class AnswerDialog {
         a.setTitle(title);
         if (header != null) {a.setHeaderText(header);}
         DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(options. getUserInterfaceOptions().getThemefile());
+        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
         Optional<ButtonType> answer = a.showAndWait();
         if (answer.isPresent()) {
             if (answer.get() == yes) {

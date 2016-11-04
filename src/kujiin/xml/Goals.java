@@ -94,11 +94,11 @@ public class Goals {
 
 // XML Processing
     public void unmarshall() {
-        if (Options.GOALSXMLFILE.exists()) {
+        if (Preferences.GOALSXMLFILE.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(Goals.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
-                Goals currentGoals = (Goals) createMarshaller.unmarshal(Options.GOALSXMLFILE);
+                Goals currentGoals = (Goals) createMarshaller.unmarshal(Preferences.GOALSXMLFILE);
                 PresessionGoals = currentGoals.PresessionGoals;
                 RinGoals = currentGoals.RinGoals;
                 KyoGoals = currentGoals.KyoGoals;
@@ -117,7 +117,7 @@ public class Goals {
                 PostsessionGoals = currentGoals.PostsessionGoals;
                 TotalGoals = currentGoals.TotalGoals;
             } catch (JAXBException e) {
-                new InformationDialog(Root.getOptions(), "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+                new InformationDialog(Root.getPreferences(), "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Preferences.GOALSXMLFILE.getAbsolutePath());
             }
         }
     }
@@ -126,9 +126,9 @@ public class Goals {
             JAXBContext context = JAXBContext.newInstance(Goals.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, Options.GOALSXMLFILE);
+            createMarshaller.marshal(this, Preferences.GOALSXMLFILE);
         } catch (JAXBException e) {
-            new InformationDialog(Root.getOptions(), "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Options.GOALSXMLFILE.getAbsolutePath());
+            new InformationDialog(Root.getPreferences(), "Information", "Couldn't Save Current Goals XML File", "Check Write File Permissions Of " + Preferences.GOALSXMLFILE.getAbsolutePath());
         }
     }
 

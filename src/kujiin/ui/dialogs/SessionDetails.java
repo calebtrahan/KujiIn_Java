@@ -17,13 +17,14 @@ import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.util.SessionPart;
 import kujiin.util.Util;
+import kujiin.xml.Preferences;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class SessionDetails extends Stage {
     private MainController Root;
@@ -48,7 +49,7 @@ public class SessionDetails extends Stage {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             SessionNumbersAxis.setLabel("Minutes");
@@ -87,7 +88,7 @@ public class SessionDetails extends Stage {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             SessionNumbersAxis.setLabel("Minutes");
@@ -102,7 +103,7 @@ public class SessionDetails extends Stage {
                 String name;
                 if (i.number == 0) {name = "Pre";}
                 else if (i.number == 15) {name = "Post";}
-                else {name = kujiin.xml.Options.ALLNAMES.get(i.number);}
+                else {name = Preferences.ALLNAMES.get(i.number);}
                 series.getData().add(new XYChart.Data<>(name, duration));
             }
             SessionBarChart.getData().add(series);

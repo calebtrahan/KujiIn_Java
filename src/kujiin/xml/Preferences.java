@@ -20,9 +20,9 @@ import java.util.Arrays;
 import static javafx.application.Application.STYLESHEET_CASPIAN;
 import static javafx.application.Application.STYLESHEET_MODENA;
 
-@XmlRootElement(name = "Options")
+@XmlRootElement(name = "Preferences")
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class Options {
+public class Preferences {
     // Directory Constants
     public static final File PROJECTROOT = new File(System.getProperty("user.dir"));
     public static final File ROOTDIRECTORY = new File(PROJECTROOT, "src/kujiin/");
@@ -51,44 +51,52 @@ public class Options {
     public static final ArrayList<String> ELEMENTNAMES = new ArrayList<>(Arrays.asList("Earth", "Air", "Fire", "Water", "Void"));
     public static final ArrayList<String> ALLNAMES = new ArrayList<>(Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Earth", "Air", "Fire", "Water", "Void", "Postsession"));
 /// Default Option Values
-    // Program Options
-    public static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
-    public static final Boolean DEFAULT_HELP_DIALOGS_OPTION = true;
-    public static final Integer DEFAULT_SCROLL_INCREMENT = 1;
-    // Session Options
-    public static final Double FADE_VALUE_MAX_DURATION = 30.0;
+    // Program Preferences
+    private static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
+    private static final Boolean DEFAULT_HELP_DIALOGS_OPTION = true;
+    private static final Integer DEFAULT_SCROLL_INCREMENT = 1;
+    // Session Preferences
+    public static final Double FADE_VALUE_MAX_DURATION = 15.0;
     public static final Double VOLUME_SLIDER_ADJUSTMENT_INCREMENT = 5.0;
-    public static final Double DEFAULT_ENTRAINMENTVOLUME = 0.6;
-    public static final Double DEFAULT_AMBIENCEVOLUME = 1.0;
-    public static final Boolean DEFAULT_FADE_ENABLED = true;
-    public static final Double DEFAULT_FADEINDURATION = 10.0;
-    public static final Double DEFAULT_FADEOUTDURATION = 10.0;
-    public static final Double DEFAULT_FADERESUMEANDPAUSEDURATION = 2.0;
-    public static final Boolean DEFAULT_ALERTFUNCTION_OPTION = false;
-    public static final String DEFAULT_ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
-    public static final File DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "default.css");
+    private static final Double DEFAULT_ENTRAINMENTVOLUME = 0.6;
+    private static final Double DEFAULT_AMBIENCEVOLUME = 1.0;
+    private static final Boolean DEFAULT_FADE_PLAY_ENABLED = true;
+    private static final Double DEFAULT_FADE_PLAY_DURATION = 10.0;
+    private static final Boolean DEFAULT_FADE_STOP_ENABLED = true;
+    private static final Double DEFAULT_FADE_STOP_DURATION = 10.0;
+    private static final Boolean DEFAULT_FADE_RESUME_ENABLED = true;
+    private static final Double DEFAULT_FADE_RESUME_DURATION = 2.0;
+    private static final Boolean DEFAULT_FADE_PAUSE_ENABLED = true;
+    private static final Double DEFAULT_FADE_PAUSE_DURATION = 2.0;
+    private static final Boolean DEFAULT_ALERTFUNCTION_OPTION = false;
+    private static final String DEFAULT_ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
+    private static final File DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "default.css");
     public static final File REFERENCE_THEMEFILE = new File(DIRECTORYSTYLES, "referencefile.css");
-    public static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
-    public static final Boolean DEFAULT_PREPOST_RAMP_ENABLED_OPTION = true;
-    public static final AmbiencePlaybackType DEFAULT_AMBIENCE_PLAYBACK_TYPE = AmbiencePlaybackType.SHUFFLE;
+    private static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
+    private static final Boolean DEFAULT_PREPOST_RAMP_ENABLED_OPTION = true;
+    private static final AmbiencePlaybackType DEFAULT_AMBIENCE_PLAYBACK_TYPE = AmbiencePlaybackType.SHUFFLE;
     public static final ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = ReferenceType.html;
-    public static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
-    public static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
+    private static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
+    private static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
+    private static final Boolean DEFAULT_AMBIENCE_OPTION = false;
+    public static final String[] AMBIENCE_EDITOR_TYPES = {"Simple", "Advanced"};
     public static final Integer DEFAULT_LONG_SESSIONPART_DURATION = 10;
-    public static final Double DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION = 3.0;
+    public static final Double DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION = 5.0;
     public static final String NEWGOALTEXT = "New Goal";
     public static final String GOALPACINGTEXT = "Goal Pacing";
-    public static final Image PROGRAM_ICON = new Image(new File(Options.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString());
+    public static final Image PROGRAM_ICON = new Image(new File(Preferences.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString());
     public final static String NO_ALERT_FILE_SELECTED_TEXT = "No Alert File Selected";
     public final static int SUGGESTED_ALERT_FILE_MAX_LENGTH = 10;
     public final static int ABSOLUTE_ALERT_FILE_MAX_LENGTH = 30;
     // Files
     private UserInterfaceOptions UserInterfaceOptions;
+    private CreationOptions CreationOptions;
+    private ExportOptions ExportOptions;
     private SessionOptions SessionOptions;
-    private ProgramOptions ProgramOptions;
-    private DeveloperOptions DeveloperOptions;
+    private PlaybackOptions PlaybackOptions;
+    private AdvancedOptions AdvancedOptions;
 
-    public Options() {}
+    public Preferences() {}
 
 // Getters And Setters
     public UserInterfaceOptions getUserInterfaceOptions() {
@@ -103,32 +111,46 @@ public class Options {
     public void setSessionOptions(SessionOptions sessionOptions) {
         SessionOptions = sessionOptions;
     }
-    public ProgramOptions getProgramOptions() {
-        return ProgramOptions;
+    public AdvancedOptions getAdvancedOptions() {
+        return AdvancedOptions;
     }
-    public void setProgramOptions(ProgramOptions programOptions) {
-        ProgramOptions = programOptions;
+    public void setAdvancedOptions(AdvancedOptions advancedOptions) {
+        AdvancedOptions = advancedOptions;
     }
-    public Options.DeveloperOptions getDeveloperOptions() {
-        return DeveloperOptions;
+    public Preferences.CreationOptions getCreationOptions() {
+        return CreationOptions;
     }
-    public void setDeveloperOptions(Options.DeveloperOptions developerOptions) {
-        DeveloperOptions = developerOptions;
+    public void setCreationOptions(Preferences.CreationOptions creationOptions) {
+        CreationOptions = creationOptions;
+    }
+    public Preferences.ExportOptions getExportOptions() {
+        return ExportOptions;
+    }
+    public void setExportOptions(Preferences.ExportOptions exportOptions) {
+        ExportOptions = exportOptions;
+    }
+    public Preferences.PlaybackOptions getPlaybackOptions() {
+        return PlaybackOptions;
+    }
+    public void setPlaybackOptions(Preferences.PlaybackOptions playbackOptions) {
+        PlaybackOptions = playbackOptions;
     }
 
-// XML Processing
+    // XML Processing
     public void unmarshall() {
         if (OPTIONSXMLFILE.exists()) {
             try {
-                JAXBContext context = JAXBContext.newInstance(kujiin.xml.Options.class);
+                JAXBContext context = JAXBContext.newInstance(Preferences.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
-                kujiin.xml.Options options = (kujiin.xml.Options) unmarshaller.unmarshal(OPTIONSXMLFILE);
-                setUserInterfaceOptions(options.getUserInterfaceOptions());
-                setSessionOptions(options.getSessionOptions());
-                setProgramOptions(options.getProgramOptions());
-                setDeveloperOptions(options.getDeveloperOptions());
+                Preferences preferences = (Preferences) unmarshaller.unmarshal(OPTIONSXMLFILE);
+                setUserInterfaceOptions(preferences.getUserInterfaceOptions());
+                setCreationOptions(preferences.getCreationOptions());
+                setExportOptions(preferences.getExportOptions());
+                setSessionOptions(preferences.getSessionOptions());
+                setPlaybackOptions(preferences.getPlaybackOptions());
+                setAdvancedOptions(preferences.getAdvancedOptions());
             } catch (JAXBException ignored) {
-                Platform.runLater(() -> new InformationDialog(this, "Information", "Couldn't Open Options", "Check Read File Permissions Of \n" +
+                Platform.runLater(() -> new InformationDialog(this, "Information", "Couldn't Open Preferences", "Check Read File Permissions Of \n" +
                         OPTIONSXMLFILE.getName()));
             }
         } else {
@@ -137,45 +159,55 @@ public class Options {
     }
     public void marshall() {
         try {
-            JAXBContext context = JAXBContext.newInstance(Options.class);
+            JAXBContext context = JAXBContext.newInstance(Preferences.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, OPTIONSXMLFILE);
         } catch (JAXBException e) {
-            new InformationDialog(this, "Information", "Couldn't Save Options", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
+            new InformationDialog(this, "Information", "Couldn't Save Preferences", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
         }
     }
     public void resettodefaults() {
         UserInterfaceOptions userInterfaceOptions = new UserInterfaceOptions();
-        kujiin.xml.Options.SessionOptions sessionOptions = new SessionOptions();
-        ProgramOptions programOptions = new ProgramOptions();
-        DeveloperOptions developerOptions = new DeveloperOptions();
+        kujiin.xml.Preferences.CreationOptions creationOptions = new CreationOptions();
+        kujiin.xml.Preferences.ExportOptions exportOptions = new ExportOptions();
+        SessionOptions sessionOptions = new SessionOptions();
+        kujiin.xml.Preferences.PlaybackOptions playbackOptions = new PlaybackOptions();
+        AdvancedOptions advancedOptions = new AdvancedOptions();
         userInterfaceOptions.setTooltips(DEFAULT_TOOLTIPS_OPTION);
         userInterfaceOptions.setHelpdialogs(DEFAULT_HELP_DIALOGS_OPTION);
-        userInterfaceOptions.setScrollincrement(DEFAULT_SCROLL_INCREMENT);
         userInterfaceOptions.setThemefile(DEFAULT_THEMEFILE.toURI().toString());
         userInterfaceOptions.setThemefiles(new ArrayList<>(Arrays.asList(DEFAULT_THEMEFILE.toURI().toString(), STYLESHEET_MODENA, STYLESHEET_CASPIAN)));
         userInterfaceOptions.setThemefilenames(new ArrayList<>(Arrays.asList("Default (Dark)", "Default (Light)", "Default (Legacy)")));
-        sessionOptions.setFadeoutduration(DEFAULT_FADEOUTDURATION);
-        sessionOptions.setRamponlyfadeduration(DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION);
-        sessionOptions.setAmbiencevolume(DEFAULT_AMBIENCEVOLUME);
+        creationOptions.setScrollincrement(DEFAULT_SCROLL_INCREMENT);
         sessionOptions.setAlertfunction(DEFAULT_ALERTFUNCTION_OPTION);
         sessionOptions.setAlertfilelocation(DEFAULT_ALERTFILELOCATION);
-        sessionOptions.setFadeenabled(DEFAULT_FADE_ENABLED);
-        sessionOptions.setFadeinduration(DEFAULT_FADEINDURATION);
-        sessionOptions.setEntrainmentvolume(DEFAULT_ENTRAINMENTVOLUME);
         sessionOptions.setRampenabled(DEFAULT_RAMP_ENABLED_OPTION);
         sessionOptions.setPrepostrampenabled(DEFAULT_PREPOST_RAMP_ENABLED_OPTION);
         sessionOptions.setReferenceoption(DEFAULT_REFERENCE_DISPLAY);
         sessionOptions.setReferencetype(DEFAULT_REFERENCE_TYPE_OPTION);
         sessionOptions.setReferencefullscreen(DEFAULT_REFERENCE_FULLSCREEN_OPTION);
+        sessionOptions.setAmbienceoption(DEFAULT_AMBIENCE_OPTION);
         sessionOptions.setAmbiencePlaybackType(DEFAULT_AMBIENCE_PLAYBACK_TYPE);
-        programOptions.setOS(System.getProperty("os.name"));
-        developerOptions.setTestingmode(false);
+        playbackOptions.setAnimation_fade_play_enabled(DEFAULT_FADE_PLAY_ENABLED);
+        playbackOptions.setAnimation_fade_play_value(DEFAULT_FADE_PLAY_DURATION);
+        playbackOptions.setAnimation_fade_stop_enabled(DEFAULT_FADE_STOP_ENABLED);
+        playbackOptions.setAnimation_fade_stop_value(DEFAULT_FADE_STOP_DURATION);
+        playbackOptions.setAnimation_fade_resume_enabled(DEFAULT_FADE_RESUME_ENABLED);
+        playbackOptions.setAnimation_fade_resume_value(DEFAULT_FADE_RESUME_DURATION);
+        playbackOptions.setAnimation_fade_pause_enabled(DEFAULT_FADE_PAUSE_ENABLED);
+        playbackOptions.setAnimation_fade_pause_value(DEFAULT_FADE_PAUSE_DURATION);
+        playbackOptions.setEntrainmentvolume(DEFAULT_ENTRAINMENTVOLUME);
+        playbackOptions.setAmbiencevolume(DEFAULT_AMBIENCEVOLUME);
+        advancedOptions.setDefaultambienceeditor(AMBIENCE_EDITOR_TYPES[0]);
+        advancedOptions.setOS(System.getProperty("os.name"));
+        advancedOptions.setDebugmode(false);
         setUserInterfaceOptions(userInterfaceOptions);
+        setCreationOptions(creationOptions);
+        setExportOptions(exportOptions);
         setSessionOptions(sessionOptions);
-        setProgramOptions(programOptions);
-        setDeveloperOptions(developerOptions);
+        setPlaybackOptions(playbackOptions);
+        setAdvancedOptions(advancedOptions);
         marshall();
     }
     public void addthemefile(String name, String file_location) {
@@ -200,7 +232,6 @@ public class Options {
     public static class UserInterfaceOptions {
         private Boolean tooltips; // Show Tooltips (Checkbox)
         private Boolean helpdialogs; // Show Help Dialogs (Checkbox)
-        private Integer scrollincrement; // Creator Scroll Increment
         private String themefile;
         private ArrayList<String> themefiles;
         private ArrayList<String> themefilenames;
@@ -208,12 +239,6 @@ public class Options {
         public UserInterfaceOptions() {}
 
     // Getters And Setters
-        public Integer getScrollincrement() {
-            return scrollincrement;
-        }
-        public void setScrollincrement(Integer scrollincrement) {
-            this.scrollincrement = scrollincrement;
-        }
         public Boolean getTooltips() {
                 return tooltips;
             }
@@ -247,61 +272,40 @@ public class Options {
 
     }
     @XmlAccessorType(XmlAccessType.PROPERTY)
+    public static class CreationOptions {
+        private Integer scrollincrement;
+
+        public CreationOptions() {}
+
+    // Getters And Setters
+        public Integer getScrollincrement() {
+            return scrollincrement;
+        }
+        public void setScrollincrement(Integer scrollincrement) {
+            this.scrollincrement = scrollincrement;
+        }
+
+    }
+    @XmlAccessorType(XmlAccessType.PROPERTY)
+    public static class ExportOptions {
+
+        public ExportOptions() {}
+    }
+    @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class SessionOptions {
-        private Double entrainmentvolume;
-        private Double ambiencevolume;
-        private Boolean fadeenabled;
-        private Double fadeinduration;
-        private Double fadeoutduration;
-        private Double ramponlyfadeduration;
+        private Boolean alertfunction;
         private String alertfilelocation;
         private Boolean rampenabled;
         private Boolean prepostrampenabled;
-        private Boolean alertfunction;
         private Boolean referenceoption;
-        private AmbiencePlaybackType ambiencePlaybackType;
         private ReferenceType referencetype;
         private Boolean referencefullscreen;
+        private Boolean ambienceoption;
+        private AmbiencePlaybackType ambiencePlaybackType;
 
         public SessionOptions() {}
 
     // Getters And Setters
-        public Double getEntrainmentvolume() {
-            return entrainmentvolume;
-        }
-        public void setEntrainmentvolume(Double entrainmentvolume) {
-            this.entrainmentvolume = entrainmentvolume;
-        }
-        public Double getAmbiencevolume() {
-            return ambiencevolume;
-        }
-        public void setAmbiencevolume(Double ambiencevolume) {
-            this.ambiencevolume = ambiencevolume;
-        }
-        public Boolean getFadeenabled() {
-            return fadeenabled;
-        }
-        public void setFadeenabled(Boolean fadeenabled) {
-            this.fadeenabled = fadeenabled;
-        }
-        public Double getFadeinduration() {
-            return fadeinduration;
-        }
-        public void setFadeinduration(Double fadeinduration) {
-            this.fadeinduration = fadeinduration;
-        }
-        public Double getFadeoutduration() {
-            return fadeoutduration;
-        }
-        public void setFadeoutduration(Double fadeoutduration) {
-            this.fadeoutduration = fadeoutduration;
-        }
-        public Double getRamponlyfadeduration() {
-            return ramponlyfadeduration;
-        }
-        public void setRamponlyfadeduration(Double ramponlyfadeduration) {
-            this.ramponlyfadeduration = ramponlyfadeduration;
-        }
         public String getAlertfilelocation() {
             return alertfilelocation;
         }
@@ -344,6 +348,12 @@ public class Options {
         public void setReferencefullscreen(Boolean referencefullscreen) {
             this.referencefullscreen = referencefullscreen;
         }
+        public Boolean getAmbienceoption() {
+            return ambienceoption;
+        }
+        public void setAmbienceoption(Boolean ambienceoption) {
+            this.ambienceoption = ambienceoption;
+        }
         public AmbiencePlaybackType getAmbiencePlaybackType() {
             return ambiencePlaybackType;
         }
@@ -353,32 +363,109 @@ public class Options {
 
     }
     @XmlAccessorType(XmlAccessType.PROPERTY)
-    public static class ProgramOptions {
-        private String OS;
+    public static class PlaybackOptions {
+        private Boolean animation_fade_play_enabled;
+        private Double animation_fade_play_value;
+        private Boolean animation_fade_stop_enabled;
+        private Double animation_fade_stop_value;
+        private Boolean animation_fade_resume_enabled;
+        private Double animation_fade_resume_value;
+        private Boolean animation_fade_pause_enabled;
+        private Double animation_fade_pause_value;
+        private Double entrainmentvolume;
+        private Double ambiencevolume;
 
-        public ProgramOptions() {}
+        public PlaybackOptions() {}
 
     // Getters And Setters
+        public Boolean getAnimation_fade_play_enabled() {
+            return animation_fade_play_enabled;
+        }
+        public void setAnimation_fade_play_enabled(Boolean animation_fade_play_enabled) {
+            this.animation_fade_play_enabled = animation_fade_play_enabled;
+        }
+        public Double getAnimation_fade_play_value() {
+            return animation_fade_play_value;
+        }
+        public void setAnimation_fade_play_value(Double animation_fade_play_value) {
+            this.animation_fade_play_value = animation_fade_play_value;
+        }
+        public Boolean getAnimation_fade_stop_enabled() {
+            return animation_fade_stop_enabled;
+        }
+        public void setAnimation_fade_stop_enabled(Boolean animation_fade_stop_enabled) {
+            this.animation_fade_stop_enabled = animation_fade_stop_enabled;
+        }
+        public Double getAnimation_fade_stop_value() {
+            return animation_fade_stop_value;
+        }
+        public void setAnimation_fade_stop_value(Double animation_fade_stop_value) {
+            this.animation_fade_stop_value = animation_fade_stop_value;
+        }
+        public Boolean getAnimation_fade_resume_enabled() {
+            return animation_fade_resume_enabled;
+        }
+        public void setAnimation_fade_resume_enabled(Boolean animation_fade_resume_enabled) {
+            this.animation_fade_resume_enabled = animation_fade_resume_enabled;
+        }
+        public Double getAnimation_fade_resume_value() {
+            return animation_fade_resume_value;
+        }
+        public void setAnimation_fade_resume_value(Double animation_fade_resume_value) {
+            this.animation_fade_resume_value = animation_fade_resume_value;
+        }
+        public Boolean getAnimation_fade_pause_enabled() {
+            return animation_fade_pause_enabled;
+        }
+        public void setAnimation_fade_pause_enabled(Boolean animation_fade_pause_enabled) {
+            this.animation_fade_pause_enabled = animation_fade_pause_enabled;
+        }
+        public Double getAnimation_fade_pause_value() {
+            return animation_fade_pause_value;
+        }
+        public void setAnimation_fade_pause_value(Double animation_fade_pause_value) {
+            this.animation_fade_pause_value = animation_fade_pause_value;
+        }
+        public Double getEntrainmentvolume() {
+            return entrainmentvolume;
+        }
+        public void setEntrainmentvolume(Double entrainmentvolume) {
+            this.entrainmentvolume = entrainmentvolume;
+        }
+        public Double getAmbiencevolume() {
+            return ambiencevolume;
+        }
+        public void setAmbiencevolume(Double ambiencevolume) {
+            this.ambiencevolume = ambiencevolume;
+        }
+
+    }
+    @XmlAccessorType(XmlAccessType.PROPERTY)
+    public static class AdvancedOptions {
+        private String defaultambienceeditor;
+        private boolean debugmode;
+        private String OS;
+
+        public AdvancedOptions() {}
+
+    // Getters And Setters
+        public String getDefaultambienceeditor() {
+            return defaultambienceeditor;
+        }
+        public void setDefaultambienceeditor(String defaultambienceeditor) {
+            this.defaultambienceeditor = defaultambienceeditor;
+        }
+        public boolean isDebugmode() {
+            return debugmode;
+        }
+        public void setDebugmode(boolean debugmode) {
+            this.debugmode = debugmode;
+        }
         public String getOS() {
             return OS;
         }
         public void setOS(String OS) {
             this.OS = OS;
-        }
-
-    }
-    @XmlAccessorType(XmlAccessType.PROPERTY)
-    public static class DeveloperOptions {
-        private boolean testingmode;
-
-        public DeveloperOptions() {}
-
-        public boolean isTestingmode() {
-            return testingmode;
-        }
-
-        public void setTestingmode(boolean testingmode) {
-            this.testingmode = testingmode;
         }
     }
 

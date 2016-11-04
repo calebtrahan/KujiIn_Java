@@ -15,7 +15,7 @@ import kujiin.util.enums.ProgramState;
 import kujiin.util.enums.StartupCheckType;
 import kujiin.xml.Ambiences;
 import kujiin.xml.Entrainments;
-import kujiin.xml.Options;
+import kujiin.xml.Preferences;
 import kujiin.xml.SoundFile;
 
 import java.net.URL;
@@ -102,6 +102,13 @@ public class MainController implements Initializable {
     public Button ChangeAllElementsButton;
     public Button ResetCreatorButton;
     public Label GoalProgressPercentageLabel;
+    public MenuItem Menu_Preferences;
+    public MenuItem Menu_Close;
+    public MenuItem Menu_EditAmbience;
+    public MenuItem Menu_EditReference;
+    public MenuItem Menu_Help;
+    public MenuItem Menu_About;
+    public MenuItem Menu_Contact;
     private SessionCreator sessionCreator;
     private ProgressTracker progressTracker;
     protected FreqType freqType;
@@ -110,7 +117,7 @@ public class MainController implements Initializable {
     private StartupChecks startupChecks;
     private ProgramState programState = ProgramState.IDLE;
 
-// My Fields
+    // My Fields
     private Qi_Gong Presession;
     private Cut Rin;
     private Cut Kyo;
@@ -128,14 +135,14 @@ public class MainController implements Initializable {
     private Element Water;
     private Element Void;
     private Total Total;
-    private Options Options;
+    private Preferences Preferences;
     private Entrainments Entrainments;
     private Ambiences Ambiences;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setOptions(new Options());
-        getOptions().unmarshall();
+        setPreferences(new Preferences());
+        getPreferences().unmarshall();
     }
     public void setupSessionParts() {
         Presession =  new Qi_Gong(0, "Presession", this, PreSwitch, PreTime);
@@ -209,10 +216,32 @@ public class MainController implements Initializable {
         }
         getProgressTracker().setSessionParts(getSessionParts(0, 17));
     }
+    public void setupMenuActions() {
+        Menu_Preferences.setOnAction(event -> {
+            new ChangeProgramOptions(MainController.this).showAndWait();
+            getAllSessionParts(false).forEach(SessionPart::syncguielements);
+            Preferences.marshall();
+            getProgressTracker().sessions_updateui();
+            getProgressTracker().goals_updateui(null);
+        });
+        Menu_Close.setOnAction(event -> close());
+        Menu_EditAmbience.setOnAction(event -> {
+            if (programState == ProgramState.IDLE) {
+                if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Simple")) {new AmbienceEditor_Simple(this).showAndWait();}
+                else if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Advanced")) {new AmbienceEditor_Advanced(this).showAndWait();}
+            } else {
+                new InformationDialog(getPreferences(), "Information", "Cannot Edit Ambience While Performing Startup Checks", "");
+            }
+        });
+        Menu_EditReference.setOnAction(event -> new EditReferenceFiles(this).showAndWait());
+        Menu_Help.setOnAction(event -> {});
+        Menu_About.setOnAction(event -> {});
+        Menu_Contact.setOnAction(event -> {});
+    }
     public boolean cleanup() {
         Ambiences.marshall();
         Entrainments.marshall();
-        Options.marshall();
+        Preferences.marshall();
         return sessionCreator.cleanup() && progressTracker.cleanup();
     }
     public void close() {
@@ -247,11 +276,11 @@ public class MainController implements Initializable {
     public Ambiences getAmbiences() {
         return Ambiences;
     }
-    public Options getOptions() {
-        return Options;
+    public Preferences getPreferences() {
+        return Preferences;
     }
-    public void setOptions(Options options) {
-        Options = options;
+    public void setPreferences(Preferences preferences) {
+        Preferences = preferences;
     }
     public javafx.scene.Scene getScene() {
         return Scene;
@@ -292,44 +321,6 @@ public class MainController implements Initializable {
     // State Getters
     public ProgramState getProgramState() {
         return programState;
-    }
-
-// Menu
-    public void menu_changesessionoptions() {
-        new ChangeProgramOptions(this).showAndWait();
-        Options.marshall();
-        getProgressTracker().sessions_updateui();
-        getProgressTracker().goals_updateui(null);
-    }
-    public void menu_editprogramsambience() {
-        if (programState == ProgramState.IDLE) {
-            new AmbienceEditor_Simple(this).showAndWait();
-        } else {
-            new InformationDialog(getOptions(), "Information", "Cannot Edit Ambience While Performing Startup Checks", "");
-        }
-    }
-    public void menu_opensimpleambienceeditor() {
-        new AmbienceEditor_Simple(this).showAndWait();
-    }
-    public void menu_opensimpleambienceeditor(SessionPart sessionPart) {
-        new AmbienceEditor_Simple(this, sessionPart).showAndWait();
-    }
-    public void menu_openadvancedambienceeditor() {
-    }
-    public void menu_openadvancedambienceeditor(SessionPart sessionPart) {
-        AmbienceEditor_Advanced sae = new AmbienceEditor_Advanced(this, sessionPart);
-        sae.showAndWait();
-    }
-    public void menu_editreferencefiles() {
-        new EditReferenceFiles(this).showAndWait();
-    }
-    public void menu_howtouseprogram() {
-    }
-    public void menu_aboutthisprogram() {
-
-    }
-    public void menu_contactme() {
-
     }
 
 // Startup Checks

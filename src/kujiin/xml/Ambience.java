@@ -39,7 +39,7 @@ public class Ambience {
 // Utility Methods
     public void startup_addambiencefromdirectory(SessionPart selectedsessionpart) {
         try {
-            File ambiencedirectory = new File(Options.DIRECTORYAMBIENCE, selectedsessionpart.name);
+            File ambiencedirectory = new File(Preferences.DIRECTORYAMBIENCE, selectedsessionpart.name);
             for (File i : ambiencedirectory.listFiles()) {
                 if (Util.audio_isValid(i) && ! selectedsessionpart.getAmbience().getAmbienceFiles().contains(i)) {add(new SoundFile(i));}
             }

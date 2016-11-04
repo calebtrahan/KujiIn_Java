@@ -12,12 +12,13 @@ import kujiin.ui.MainController;
 import kujiin.util.SessionPart;
 import kujiin.util.Util;
 import kujiin.util.enums.ReferenceType;
+import kujiin.xml.Preferences;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class EditReferenceFiles extends Stage {
     public ChoiceBox<String> SessionPartNamesChoiceBox;
@@ -43,27 +44,27 @@ public class EditReferenceFiles extends Stage {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setTitle("Reference Files Editor");
             ObservableList<String> sessionpartnames = FXCollections.observableArrayList();
-            sessionpartnames.addAll(kujiin.xml.Options.ALLNAMES);
+            sessionpartnames.addAll(Preferences.ALLNAMES);
             userselectedindexes = new ArrayList<>();
             SessionPartNamesChoiceBox.setItems(sessionpartnames);
             MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
             SessionPartNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {if (oldValue != null) userselectedindexes.add(oldValue.intValue());});
             HTMLVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             TEXTVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
-            if (referenceType == null) {referenceType = kujiin.xml.Options.DEFAULT_REFERENCE_TYPE_OPTION;}
+            if (referenceType == null) {referenceType = Preferences.DEFAULT_REFERENCE_TYPE_OPTION;}
             HTMLVariation.setSelected(referenceType == ReferenceType.html);
             TEXTVariation.setSelected(referenceType == ReferenceType.txt);
-            referenceType = Root.getOptions().getSessionOptions().getReferencetype();
+            referenceType = Root.getPreferences().getSessionOptions().getReferencetype();
             PreviewButton.setDisable(true);
             SaveButton.setDisable(true);
             String referencename = referenceType.name();
             this.setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (new AnswerDialog(Root.getOptions(), "Confirmation", null, SessionPartNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes",
+                    switch (new AnswerDialog(Root.getPreferences(), "Confirmation", null, SessionPartNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes",
                             "Save And Close", "Close Without Saving", "Cancel").getResult()) {
                         case YES:
                             saveselectedfile();
@@ -81,7 +82,7 @@ public class EditReferenceFiles extends Stage {
             PreviewButton.setOnAction(event -> preview());
             SaveButton.setOnAction(event -> saveselectedfile());
             CloseButton.setOnAction(event -> close());
-        } catch (IOException e) {new ExceptionDialog(Root.getOptions(), e).showAndWait();}
+        } catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e).showAndWait();}
     }
 
     // Text Area Methods
@@ -94,7 +95,7 @@ public class EditReferenceFiles extends Stage {
         HTMLVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
         TEXTVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
         if (userselectedindexes.size() > 0 && selectedfile != null && unsavedchanges()) {
-            Util.AnswerType answerType = new AnswerDialog(Root.getOptions(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+            Util.AnswerType answerType = new AnswerDialog(Root.getPreferences(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
                     "Save And Close", "Close Without Saving", "Cancel").getResult();
             switch (answerType) {
                 case YES:
@@ -134,7 +135,7 @@ public class EditReferenceFiles extends Stage {
     // Button Methods
     public void htmlselected() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getOptions(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+            switch (new AnswerDialog(Root.getPreferences(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
                     "Save And Close", "Close Without Saving", "Cancel").getResult()) {
                 case YES:
                     saveselectedfile();
@@ -156,7 +157,7 @@ public class EditReferenceFiles extends Stage {
     }
     public void textselected() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getOptions(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+            switch (new AnswerDialog(Root.getPreferences(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
                     "Save And Close", "Close Without Saving", "Cancel").getResult()) {
                 case YES:
                     saveselectedfile();
@@ -179,7 +180,7 @@ public class EditReferenceFiles extends Stage {
     public void preview() {
         if (MainTextArea.getText().length() > 0 && HTMLVariation.isSelected() && referenceType == ReferenceType.html) {
             if (! Util.String_validhtml(MainTextArea.getText())) {
-                if (! new ConfirmationDialog(Root.getOptions(), "Confirmation", null, "Html Code In Text Area Is Not Valid HTML", "Preview Anyways", "Cancel").getResult()) {return;}
+                if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Html Code In Text Area Is Not Valid HTML", "Preview Anyways", "Cancel").getResult()) {return;}
             }
             new DisplayReference(Root, MainTextArea.getText());
         }
@@ -189,9 +190,9 @@ public class EditReferenceFiles extends Stage {
     public void saveselectedfile() {
         if (Util.file_writecontents(selectedfile, MainTextArea.getText())) {
             String text = selectedsessionpart + "'s Reference File (" + referenceType.toString() + " Variation) Has Been Saved";
-            new InformationDialog(Root.getOptions(), "Changes Saved", text, "");
+            new InformationDialog(Root.getPreferences(), "Changes Saved", text, "");
         } else {
-            new ErrorDialog(Root.getOptions(), "Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
+            new ErrorDialog(Root.getPreferences(), "Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
     }
     public void loadselectedfile() {
         int index = SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex();
@@ -206,9 +207,9 @@ public class EditReferenceFiles extends Stage {
             SaveButton.setDisable(true);
         } else {
             if (SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1) {
-                new InformationDialog(Root.getOptions(), "Information", "No SessionPart Selected", "Select A SessionPart To Load");}
+                new InformationDialog(Root.getPreferences(), "Information", "No SessionPart Selected", "Select A SessionPart To Load");}
             else {
-                new InformationDialog(Root.getOptions(), "Information", "No Variation Selected", "Select A Variation To Load");}
+                new InformationDialog(Root.getPreferences(), "Information", "No Variation Selected", "Select A Variation To Load");}
             PreviewButton.setDisable(true);
         }
     }
@@ -216,12 +217,12 @@ public class EditReferenceFiles extends Stage {
         if (referenceType == null || selectedsessionpart == null) {selectedfile = null; return;}
         switch (referenceType) {
             case html:
-                selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "html"), selectedsessionpart.getNameForReference() + ".html");
-                if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root.getOptions(), e);}}
+                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "html"), selectedsessionpart.getNameForReference() + ".html");
+                if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e);}}
                 break;
             case txt:
-                selectedfile = new File(new File(kujiin.xml.Options.DIRECTORYREFERENCE, "txt"), selectedsessionpart.getNameForReference() + ".txt");
-                if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root.getOptions(), e);}}
+                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "txt"), selectedsessionpart.getNameForReference() + ".txt");
+                if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e);}}
                 break;
         }
     }

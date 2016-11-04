@@ -15,7 +15,7 @@ import kujiin.util.Util;
 import java.io.File;
 import java.io.IOException;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class PreviewFile extends Stage {
     public Label CurrentTime;
@@ -41,7 +41,7 @@ public class PreviewFile extends Stage {
                 setScene(defaultscene);
                 getIcons().clear();
                 getIcons().add(PROGRAM_ICON);
-                String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
                 File filetopreview1 = filetopreview;
@@ -63,7 +63,7 @@ public class PreviewFile extends Stage {
                 PauseButton.setOnAction(event -> pause());
                 StopButton.setOnAction(event -> stop());
             } catch (IOException ignored) {}
-        } else {new InformationDialog(Root.getOptions(), "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+        } else {new InformationDialog(Root.getPreferences(), "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
     }
 
     public void play() {

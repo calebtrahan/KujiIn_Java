@@ -13,14 +13,14 @@ import kujiin.ui.MainController;
 import kujiin.util.SessionPart;
 import kujiin.util.enums.PlayerState;
 import kujiin.util.enums.ReferenceType;
-import kujiin.xml.Options;
+import kujiin.xml.Preferences;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import static kujiin.xml.Options.PROGRAM_ICON;
+import static kujiin.xml.Preferences.PROGRAM_ICON;
 
 public class DisplayReference extends Stage {
     public ScrollPane ContentPane;
@@ -44,15 +44,15 @@ public class DisplayReference extends Stage {
     public DisplayReference(MainController Root, SessionPart sessionPart, boolean showsuggestions) {
         try {
             this.Root = Root;
-            referenceType = Root.getOptions().getSessionOptions().getReferencetype();
-            fullscreenoption = Root.getOptions().getSessionOptions().getReferencefullscreen();
+            referenceType = Root.getPreferences().getSessionOptions().getReferencetype();
+            fullscreenoption = Root.getPreferences().getSessionOptions().getReferencefullscreen();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ReferenceDisplay.fxml"));
             fxmlLoader.setController(this);
             scene = new Scene(fxmlLoader.load());
             setScene(scene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
 //                this.setResizable(false);
             setTitle(sessionPart.name + "'s Reference");
@@ -75,7 +75,7 @@ public class DisplayReference extends Stage {
                         if (Root.getSessionCreator().getPlayerState() == PlayerState.PLAYING) {
                             boolean fullscreen = this.isFullScreen();
                             fullscreenoption = !fullscreen;
-                            Root.getOptions().getSessionOptions().setReferencefullscreen(fullscreenoption);
+                            Root.getPreferences().getSessionOptions().setReferencefullscreen(fullscreenoption);
                             setsizing();
                             if (!fullscreen) {setFullScreenExitHint("");}
                             break;
@@ -93,7 +93,7 @@ public class DisplayReference extends Stage {
             setScene(scene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             this.setResizable(false);
             setTitle("Reference File Preview");
@@ -101,7 +101,7 @@ public class DisplayReference extends Stage {
             setsizing();
             WebView browser = new WebView();
             WebEngine webEngine = browser.getEngine();
-            webEngine.setUserStyleSheetLocation(new File(kujiin.xml.Options.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
+            webEngine.setUserStyleSheetLocation(new File(Preferences.DIRECTORYSTYLES, "referencefile.css").toURI().toString());
             webEngine.loadContent(htmlcontent);
             ContentPane.setContent(browser);
         } catch (IOException ignored) {}
@@ -137,14 +137,14 @@ public class DisplayReference extends Stage {
                     ContentPane.setContent(ta);
                     getIcons().clear();
                     getIcons().add(PROGRAM_ICON);
-                    String themefile = Root.getOptions().getUserInterfaceOptions().getThemefile();
+                    String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                     if (themefile != null) {getScene().getStylesheets().add(themefile);}
                     break;
                 case html:
                     WebView browser = new WebView();
                     WebEngine webEngine = browser.getEngine();
                     webEngine.load(referencefile.toURI().toString());
-                    webEngine.setUserStyleSheetLocation(Options.REFERENCE_THEMEFILE.toURI().toString());
+                    webEngine.setUserStyleSheetLocation(Preferences.REFERENCE_THEMEFILE.toURI().toString());
                     ContentPane.setContent(browser);
                     break;
                 default:

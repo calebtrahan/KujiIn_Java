@@ -87,10 +87,10 @@ public class Preset {
         if (! presetfile.getName().endsWith(".xml")) {
             if (! presetfile.getName().contains(".")) {
                 // No File Extension
-                if (new ConfirmationDialog(Root.getOptions(), "Confirmation", null, "No File Extension", "Save As .xml", "Save As Is").getResult()) {
+                if (new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "No File Extension", "Save As .xml", "Save As Is").getResult()) {
                     presetfile = new File(presetfile.getAbsolutePath().concat(".xml"));
                 } else {
-                    if (! new ConfirmationDialog(Root.getOptions(), "Confirmation", null, "Save Preset As Invalid XML File? You May Not Be Able To Load This Preset",
+                    if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Save Preset As Invalid XML File? You May Not Be Able To Load This Preset",
                             "Save Anyway", "Cancel").getResult()) {
                         presetfile = null;
                         return false;
@@ -99,11 +99,11 @@ public class Preset {
             } else {
                 // Invalid File Extension
                 String extension = presetfile.getName().substring(presetfile.getName().lastIndexOf("."));
-                if (new ConfirmationDialog(Root.getOptions(), "Confirmation", null, "Invalid Extension " + extension + " Rename As .xml?", "Rename", "Keep Extension").getResult()) {
+                if (new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Invalid Extension " + extension + " Rename As .xml?", "Rename", "Keep Extension").getResult()) {
                     String filewithoutextension = presetfile.getAbsolutePath().substring(0, presetfile.getName().lastIndexOf("."));
                     presetfile = new File(filewithoutextension.concat(".xml"));
                 } else {
-                    if (! new ConfirmationDialog(Root.getOptions(), "Confirmation", null, "Really Save Preset With ." + extension + " Extension? You May Not Be Able To Load This Preset",
+                    if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Really Save Preset With ." + extension + " Extension? You May Not Be Able To Load This Preset",
                             "Save Anyway", "Cancel").getResult()) {
                         presetfile = null;
                         return false;

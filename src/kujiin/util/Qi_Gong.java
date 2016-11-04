@@ -6,7 +6,7 @@ import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.util.enums.ReferenceType;
-import kujiin.xml.Options;
+import kujiin.xml.Preferences;
 import kujiin.xml.SoundFile;
 
 import java.io.File;
@@ -16,7 +16,7 @@ public class Qi_Gong extends SessionPart {
 
     public Qi_Gong (int number, String name, MainController Root,  ToggleButton aSwitch, TextField value) {
         super(number, name, Root, aSwitch, value);
-        if (Root.getOptions().getUserInterfaceOptions().getTooltips()) {
+        if (Root.getPreferences().getUserInterfaceOptions().getTooltips()) {
             if (number == 0) {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Preceding The Session"));}
             else {Value.setTooltip(new Tooltip("Minutes You Want To Collect Qi/Prana Following The Session"));}
         } else {Value.setTooltip(null);}
@@ -51,7 +51,7 @@ public class Qi_Gong extends SessionPart {
 // Creation
     @Override
     public boolean creation_buildEntrainment() {
-        if (root.getOptions().getSessionOptions().getRampenabled()) {
+        if (root.getPreferences().getSessionOptions().getRampenabled()) {
             int index = allsessionpartstoplay.indexOf(this);
             SessionPart parttotest;
             switch (number) {
@@ -66,7 +66,7 @@ public class Qi_Gong extends SessionPart {
             }
             SoundFile rampfile;
             if (parttotest instanceof  Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
-            else {rampfile = entrainment.ramp_get(Options.ALLNAMES.indexOf(parttotest.name.toUpperCase()) - 1);}
+            else {rampfile = entrainment.ramp_get(Preferences.ALLNAMES.indexOf(parttotest.name.toUpperCase()) - 1);}
             entrainment.setRampfile(rampfile);
             if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
             return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
@@ -75,15 +75,15 @@ public class Qi_Gong extends SessionPart {
 
     @Override
     public File reference_getFile(ReferenceType referenceType) {
-        if (referenceType == null) {referenceType = root.getOptions().getSessionOptions().getReferencetype();}
+        if (referenceType == null) {referenceType = root.getPreferences().getSessionOptions().getReferencetype();}
         switch (referenceType) {
             case html: {
                 String name = "Qi-Gong.html";
-                return new File(Options.DIRECTORYREFERENCE, "html/" + name);
+                return new File(Preferences.DIRECTORYREFERENCE, "html/" + name);
             }
             case txt: {
                 String name = "Qi-Gong.txt";
-                return new File(Options.DIRECTORYREFERENCE, "txt/" + name);
+                return new File(Preferences.DIRECTORYREFERENCE, "txt/" + name);
             }
             default:
                 return null;
