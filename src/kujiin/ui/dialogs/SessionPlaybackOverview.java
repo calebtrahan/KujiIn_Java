@@ -34,8 +34,6 @@ import java.util.stream.Collectors;
 
 import static kujiin.xml.Preferences.PROGRAM_ICON;
 
-// TODO Session Duration Text Field Has Text Scrolling Out Of The Box, Fix Text Length
-
 public class SessionPlaybackOverview extends Stage {
     public TableView<SessionItem> SessionItemsTable;
     public TableColumn<SessionItem, Integer> NumberColumn;

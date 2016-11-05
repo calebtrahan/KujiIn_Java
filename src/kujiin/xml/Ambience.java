@@ -43,9 +43,7 @@ public class Ambience {
             for (File i : ambiencedirectory.listFiles()) {
                 if (Util.audio_isValid(i) && ! selectedsessionpart.getAmbience().getAmbienceFiles().contains(i)) {add(new SoundFile(i));}
             }
-        } catch (NullPointerException ignored) {
-            // TODO Change This To Reflect No Ambience Files In Directory
-        }
+        } catch (NullPointerException ignored) {}
     }
     public void startup_checkfordeletedfiles() {
         if (Ambience != null) {

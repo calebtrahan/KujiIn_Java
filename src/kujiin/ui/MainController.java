@@ -24,22 +24,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-// TODO Bugs To Fix
+// Bugs To Fix
 
 // GUI
     // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified
-    // TODO Closing Reference Display With 'ESC' Is Crashing The Whole App
 
-// TODO Test
+// Features To Test
 
-// TODO Additional Features To Definitely Add
+// Additional Features To Definitely Add
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
     // TODO Exporter
 
-// TODO Optional Additional Features
+// Optional Additional Features
     // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
 
-// TODO Mind Workstation
+// Mind Workstation
     // TODO Add Low (And Possibly Medium) Variations Of All Session Parts
     // TODO Add Ramps To Connect Low (And Possibly Medium) Variations Of Session Parts With Each Other
 

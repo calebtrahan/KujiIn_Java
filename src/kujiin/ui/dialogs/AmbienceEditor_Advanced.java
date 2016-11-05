@@ -133,7 +133,6 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
     }
 
 // Transfer Methods
-    // TODO Add Check Duplicates Before Moving Over (Or Ask Allow Duplicates?)
     public void rightarrowpressed() {
         // Transfer To Current Cut (use Task)
         if (selected_temp_ambiencesong != null && selectedsessionpart != null) {

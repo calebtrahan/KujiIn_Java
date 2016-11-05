@@ -1,5 +1,6 @@
 package kujiin.ui.dialogs;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -68,9 +69,11 @@ public class DisplayReference extends Stage {
             addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                 switch (event.getCode()) {
                     case ESCAPE:
-//                                hide();
-//                                untoggleplayerreference();
-//                                break;
+                        Platform.runLater(() -> {
+                            hide();
+                            untoggleplayerreference();
+                        });
+                        break;
                     case F11:
                         if (Root.getSessionCreator().getPlayerState() == PlayerState.PLAYING) {
                             boolean fullscreen = this.isFullScreen();
