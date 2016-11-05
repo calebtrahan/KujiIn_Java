@@ -3,6 +3,8 @@ package kujiin;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
 import kujiin.ui.ProgressTracker;
@@ -11,6 +13,9 @@ import kujiin.ui.dialogs.ConfirmationDialog;
 import kujiin.util.enums.ProgramState;
 import kujiin.xml.Ambiences;
 import kujiin.xml.Entrainments;
+import kujiin.xml.Preferences;
+
+import java.io.File;
 
 import static kujiin.xml.Preferences.PROGRAM_ICON;
 
@@ -60,6 +65,14 @@ public class Main extends Application {
             super.stop();
             System.exit(0);
         }
+    }
+
+    public void test() {
+        File file = new File(Preferences.SOUNDDIRECTORY, "Test.mp3");
+        Media media = new Media(file.toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.play();
+        mediaPlayer.setOnHalted(() -> System.out.println("Error"));
     }
 
 }

@@ -5,9 +5,14 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
@@ -307,9 +312,9 @@ public class SessionCreator implements UI {
         public Button PlayButton;
         public Button PauseButton;
         public Button StopButton;
+    // Playback Fields
         public Boolean displaynormaltime = true;
         private Timeline player_updateuitimeline;
-        // Playback Fields
         private Double currententrainmentvolume;
         private Double currentambiencevolume;
         public SessionPart currentsessionpart;
@@ -317,7 +322,7 @@ public class SessionCreator implements UI {
         public Duration totalsessionduration;
         public int sessionpartcount;
         public List<SessionPart> sessionpartswithGoalsCompletedThisSession;
-        // Dialog Fields
+    // Dialog Fields
         public SelectReferenceType selectReferenceType;
 
         public Player() {
@@ -356,6 +361,21 @@ public class SessionCreator implements UI {
             } catch (IOException ignored) {}
         }
 
+        public void setupKeyBoardShortcuts() {
+            addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+                KeyCodeCombination forwardambience = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
+                KeyCodeCombination backambience = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
+                @Override
+                public void handle(KeyEvent event) {
+                    if (playerState == PLAYING) {
+                        if (forwardambience.match(event)) {currentsessionpart.playnextambience();}
+                        else if (backambience.match(event)) {currentsessionpart.playpreviousambience();}
+                        else if (event.getCode() == KeyCode.ESCAPE) {close();}
+                    }
+                }
+            });
+        }
+
     // Getters And Setters
         public Double getCurrententrainmentvolume() {
             return currententrainmentvolume;
@@ -373,11 +393,12 @@ public class SessionCreator implements UI {
             return player_updateuitimeline;
         }
 
-        // Playback
+    // Playback
         public void play() {
             switch (playerState) {
                 case IDLE:
                 case STOPPED:
+                    setupKeyBoardShortcuts();
                     sessionpartswithGoalsCompletedThisSession = new ArrayList<>();
                     totalsessiondurationelapsed = Duration.ZERO;
                     totalsessionduration = Duration.ZERO;

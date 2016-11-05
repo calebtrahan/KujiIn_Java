@@ -273,10 +273,7 @@ public class SessionPart {
         entrainmentplayer.play();
         timeline_progresstonextsessionpart = new Timeline(new KeyFrame(getduration(), ae -> root.getSessionCreator().getPlayer().progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
-        currententrainmentvolume = root.
-                getSessionCreator().
-                getPlayer().
-                getCurrententrainmentvolume();
+        currententrainmentvolume = root.getSessionCreator().getPlayer().getCurrententrainmentvolume();
         boolean isLastSessionPart = allsessionpartstoplay.indexOf(this) == allsessionpartstoplay.size() - 1;
         if (! ramponly && ! isLastSessionPart && root.getPreferences().getSessionOptions().getRampenabled()) {
             timeline_start_ending_ramp = new Timeline(new KeyFrame(duration.subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
@@ -645,7 +642,7 @@ public class SessionPart {
             }
         }
     }
-    private void playnextentrainment() {
+    public void playnextentrainment() {
         try {
             volume_unbindentrainment();
             entrainmentplayer.dispose();
@@ -661,7 +658,7 @@ public class SessionPart {
             cleanupPlayersandAnimations();
         }
     }
-    private void playnextambience() {
+    public void playnextambience() {
         try {
             volume_unbindambience();
             ambienceplayer.dispose();
@@ -675,6 +672,18 @@ public class SessionPart {
             ambienceplayer.play();
             ambienceplayer.setOnPlaying(this::volume_bindambience);
         } catch (IndexOutOfBoundsException ignored) {ambienceplayer.dispose();}
+    }
+    public void playpreviousambience() {
+        if (ambienceplayhistory.size() > 1) {
+            volume_unbindambience();
+            SoundFile soundFile = ambienceplayhistory.get(ambienceplayhistory.size() - 1);
+            ambienceplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
+            ambienceplayer.setOnEndOfMedia(this::playnextambience);
+            ambienceplayer.setOnError(this::ambienceerror);
+            ambienceplayer.setVolume(currentambiencevolume);
+            ambienceplayer.play();
+            ambienceplayer.setOnPlaying(this::volume_bindambience);
+        }
     }
     public void cleanupPlayersandAnimations() {
         try {

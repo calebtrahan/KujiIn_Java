@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 
 import static kujiin.xml.Preferences.PROGRAM_ICON;
 
+// TODO Session Duration Text Field Has Text Scrolling Out Of The Box, Fix Text Length
+
 public class SessionPlaybackOverview extends Stage {
     public TableView<SessionItem> SessionItemsTable;
     public TableColumn<SessionItem, Integer> NumberColumn;
@@ -339,7 +341,10 @@ public class SessionPlaybackOverview extends Stage {
         for (SessionPart i : alladjustedsessionitems) {
             duration = duration.add(i.getduration());
         }
-        TotalSessionTime.setText(Util.formatdurationtoStringSpelledOut(duration, TotalSessionTime.getLayoutBounds().getWidth()));
+        double width = TotalSessionTime.getLayoutBounds().getWidth();
+        if (width > 0.0) {
+            TotalSessionTime.setText(Util.formatdurationtoStringSpelledOut(duration, width));
+        } else {TotalSessionTime.setText(Util.formatdurationtoStringSpelledOut(duration, 100.0));}
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MILLISECOND, new Double(duration.toMillis()).intValue());
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
