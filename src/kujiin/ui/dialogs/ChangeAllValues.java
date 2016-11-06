@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
 import kujiin.util.Util;
@@ -27,6 +28,8 @@ public class ChangeAllValues extends Stage {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ChangeAllValuesDialog.fxml"));
             fxmlLoader.setController(this);
+            initModality(Modality.WINDOW_MODAL);
+            initOwner(Root.getStage());
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             getIcons().clear();

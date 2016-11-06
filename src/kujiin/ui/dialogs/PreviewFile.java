@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
@@ -30,23 +31,23 @@ public class PreviewFile extends Stage {
     private MediaPlayer PreviewPlayer;
     private MainController Root;
 
-    public PreviewFile(File filetopreview, MainController Root) {
+    public PreviewFile(File filetopreview, MainController Root, Stage parent) {
         this.Root = Root;
         if (Util.audio_isValid(filetopreview)) {
             try {
-                if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/PreviewAudioDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
                 getIcons().clear();
                 getIcons().add(PROGRAM_ICON);
+                initModality(Modality.WINDOW_MODAL);
+                initOwner(parent);
                 String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
-                File filetopreview1 = filetopreview;
-                setTitle("Preview: " + filetopreview1.getName().substring(0, filetopreview1.getName().lastIndexOf(".")));
-                Mediatopreview = new Media(filetopreview1.toURI().toString());
+                setTitle("Preview: " + filetopreview.getName().substring(0, filetopreview.getName().lastIndexOf(".")));
+                Mediatopreview = new Media(filetopreview.toURI().toString());
                 PreviewPlayer = new MediaPlayer(Mediatopreview);
                 PlayButton.setDisable(true);
                 PauseButton.setDisable(true);

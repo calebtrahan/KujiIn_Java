@@ -819,7 +819,7 @@ public class SessionPlaybackOverview extends Stage {
         }
         public void preview() {
             if (selectedtableitem != null) {
-                PreviewFile previewFile = new PreviewFile(selectedtableitem.getFile(), Root);
+                PreviewFile previewFile = new PreviewFile(selectedtableitem.getFile(), Root, this);
                 previewFile.showAndWait();
             }
         }
@@ -881,7 +881,7 @@ public class SessionPlaybackOverview extends Stage {
         public void preview() {
             if (!PreviewButton.isDisabled()) {
                 File file = ambienceSongs.get(AmbienceTable.getSelectionModel().getSelectedIndex()).getFile();
-                new PreviewFile(file, Root).showAndWait();
+                new PreviewFile(file, Root, this).showAndWait();
             }
         }
         public void addfiles() {

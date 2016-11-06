@@ -267,7 +267,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
     private void preview(AmbienceSong selectedsong) {
         if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
             if (previewdialog == null || !previewdialog.isShowing()) {
-                previewdialog = new PreviewFile(selectedsong.getFile(), Root);
+                previewdialog = new PreviewFile(selectedsong.getFile(), Root, this);
                 previewdialog.showAndWait();
             }
         }

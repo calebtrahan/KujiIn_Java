@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
@@ -49,6 +50,8 @@ public class SessionDetails extends Stage {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
+            initModality(Modality.WINDOW_MODAL);
+            initOwner(Root.getStage());
             String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
@@ -79,7 +82,7 @@ public class SessionDetails extends Stage {
             CloseButton.setOnAction(event -> close());
         } catch (IOException ignored) {}
     }
-    public SessionDetails(MainController Root, kujiin.xml.Session session) {
+    public SessionDetails(MainController Root, kujiin.xml.Session session, Stage parent) {
         try {
             if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionDetails_Individual.fxml"));
@@ -88,6 +91,8 @@ public class SessionDetails extends Stage {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
+            initModality(Modality.WINDOW_MODAL);
+            initOwner(parent);
             String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);

@@ -76,7 +76,7 @@ public class SelectAlertFile extends Stage {
     }
     public void preview() {
         if (alertfile != null && alertfile.exists()) {
-            PreviewFile previewFile = new PreviewFile(alertfile, Root);
+            PreviewFile previewFile = new PreviewFile(alertfile, Root, this);
             previewFile.showAndWait();
         }
     }

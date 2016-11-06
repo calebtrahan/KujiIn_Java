@@ -589,7 +589,7 @@ public class SessionCreator implements UI {
                 togglevolumebinding();
             } else {
                 if (selectReferenceType != null && selectReferenceType.isShowing()) {return;}
-                else {selectReferenceType = new SelectReferenceType(Root, itemsinsession);}
+                else {selectReferenceType = new SelectReferenceType(Root, itemsinsession, playerState != PLAYING);}
                 switch (playerState) {
                     case IDLE:
                         selectReferenceType.showAndWait();

@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
 import kujiin.util.SessionPart;
@@ -30,7 +31,7 @@ public class SelectReferenceType extends Stage {
     private MainController Root;
     private List<SessionPart> itemsinsession;
 
-    public SelectReferenceType(MainController Root, List<SessionPart> itemsinsession) {
+    public SelectReferenceType(MainController Root, List<SessionPart> itemsinsession, boolean modal) {
         this.itemsinsession = itemsinsession;
         try {
             this.Root = Root;
@@ -41,6 +42,10 @@ public class SelectReferenceType extends Stage {
             setTitle("Select Reference Type");
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
+            if (modal) {
+                initModality(Modality.WINDOW_MODAL);
+                initOwner(Root.getStage());
+            }
             String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             this.setResizable(false);

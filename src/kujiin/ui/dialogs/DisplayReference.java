@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
@@ -96,6 +97,8 @@ public class DisplayReference extends Stage {
             setScene(scene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
+            initModality(Modality.WINDOW_MODAL);
+            initOwner(Root.getStage());
             String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             this.setResizable(false);

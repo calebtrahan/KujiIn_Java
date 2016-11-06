@@ -162,7 +162,7 @@ public class ProgressTracker implements UI {
         } else {new AllSessionDetails().showAndWait();}
     }
     public void session_displaydetails(Session individualsession) {
-        new SessionDetails(Root, individualsession).showAndWait();
+        new SessionDetails(Root, individualsession, Root.getStage()).showAndWait();
     }
     public void session_displaydetails(List<SessionPart> itemsinsession) {
         new SessionDetails(Root, itemsinsession).show();
@@ -586,7 +586,7 @@ public class ProgressTracker implements UI {
         }
         public void viewsessiondetails(ActionEvent actionEvent) {
             if (sessionsTableView.getSelectionModel().getSelectedIndex() != -1) {
-                new SessionDetails(Root, filteredsessionlist.get(sessionsTableView.getSelectionModel().getSelectedIndex())).showAndWait();
+                new SessionDetails(Root, filteredsessionlist.get(sessionsTableView.getSelectionModel().getSelectedIndex()), Root.getStage()).showAndWait();
             }
         }
         public void filterbydateselected(ActionEvent actionEvent) {

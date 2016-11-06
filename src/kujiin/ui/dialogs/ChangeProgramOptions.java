@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
 import kujiin.util.Util;
@@ -74,6 +75,8 @@ public class ChangeProgramOptions extends Stage {
             setScene(defaultscene);
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
+            initModality(Modality.WINDOW_MODAL);
+            initOwner(Root.getStage());
             String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
@@ -264,7 +267,7 @@ public class ChangeProgramOptions extends Stage {
     public void referencetoggled() {
         Preferences.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
         if (ReferenceSwitch.isSelected()) {
-            SelectReferenceType selectReferenceType = new SelectReferenceType(Root, Root.getAllSessionParts(false));
+            SelectReferenceType selectReferenceType = new SelectReferenceType(Root, Root.getAllSessionParts(false), true);
             selectReferenceType.showAndWait();
             if (selectReferenceType.getResult()) {
                 Preferences.getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
