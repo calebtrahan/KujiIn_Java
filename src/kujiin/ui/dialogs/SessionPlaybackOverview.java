@@ -222,7 +222,7 @@ public class SessionPlaybackOverview extends Stage {
             SetAmbienceButton.setDisable(!AmbienceSwitch.isSelected() && ambiencePlaybackType == null);
             if (Root.getSessionCreator().isAmbienceenabled()) {
                 if (ambiencePlaybackType == AmbiencePlaybackType.CUSTOM) {
-                    if (!selectedsessionpart.getAmbience().hasCustomAmbience()) {
+                    if (! selectedsessionpart.getAmbience().hasCustomAmbience()) {
                         SetAmbienceButton.setDisable(false);
                         SetAmbienceButton.setText("Set Ambience");
                     } else {
@@ -231,6 +231,7 @@ public class SessionPlaybackOverview extends Stage {
                     }
                 } else {
                     if (! selectedsessionpart.getAmbience_hasAny()) {
+                        System.out.println("Should Be Setting Ambience Button To Add Ambience");
                         SetAmbienceButton.setDisable(false);
                         SetAmbienceButton.setText("Add Ambience");
                     } else {
