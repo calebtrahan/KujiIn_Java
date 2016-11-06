@@ -216,8 +216,8 @@ public class ChangeProgramOptions extends Stage {
         if (FadeAnimation_StopSwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_stop_value(Double.parseDouble(FadeAnimation_StopValue.getText()));}
         if (FadeAnimation_ResumeSwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_resume_value(Double.parseDouble(FadeAnimation_ResumeValue.getText()));}
         if (FadeAnimation_PauseSwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_pause_value(Double.parseDouble(FadeAnimation_PauseValue.getText()));}
-        Preferences.getPlaybackOptions().setEntrainmentvolume(Double.parseDouble(EntrainmentVolumePercentage.getText()));
-        Preferences.getPlaybackOptions().setAmbiencevolume(Double.parseDouble(AmbienceVolumePercentage.getText()));
+        Preferences.getPlaybackOptions().setEntrainmentvolume(Double.parseDouble(EntrainmentVolumePercentage.getText()) / 100);
+        Preferences.getPlaybackOptions().setAmbiencevolume(Double.parseDouble(AmbienceVolumePercentage.getText()) / 100);
         Preferences.marshall();
         super.close();
     }
