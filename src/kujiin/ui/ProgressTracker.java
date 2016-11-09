@@ -332,7 +332,7 @@ public class ProgressTracker implements UI {
                     currentgoaltime = "No Goal Set";
                     percentcompleted = "No Goal Set";
                 }
-                allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtext, currentgoaltime, percentcompleted, i.goals_get(false, true).size()));
+                allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtext, currentgoaltime, percentcompleted, i.goals_getAllCompleted().size()));
             }
             GoalsTable.setItems(allgoalsdetails);
         }
@@ -352,7 +352,7 @@ public class ProgressTracker implements UI {
                 } else {
                     SetCurrentGoalButton.setText(goalpacingtext);
                 }
-                ViewCompletedGoalsButton.setDisable(SelectedSessionPart.goals_get(false, true).size() == 0);
+                ViewCompletedGoalsButton.setDisable(SelectedSessionPart.goals_getAllCompleted().isEmpty());
             }
         }
         public void setcurrentgoal(ActionEvent actionEvent) {

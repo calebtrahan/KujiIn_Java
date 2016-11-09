@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -17,14 +16,14 @@
                   <TableColumn fx:id="NumberGoalsCompletedColumn" prefWidth="134.0" text="# Goals Completed" />
               </columns>
                <VBox.margin>
-                  <Insets left="5.0" right="5.0" />
+                  <Insets left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
             </TableView>
             <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="600.0">
                <children>
-                  <Button fx:id="SetCurrentGoalButton" mnemonicParsing="false" text="Set Current Goal" onAction="#setcurrentgoal"/>
-                  <Button fx:id="ViewCompletedGoalsButton" mnemonicParsing="false" text="View Completed Goals" onAction="#viewcompletedgoals"/>
-                  <Button fx:id="CloseButton" mnemonicParsing="false" text="Close" onAction="#close">
+                  <Button fx:id="SetCurrentGoalButton" mnemonicParsing="false" onAction="#setcurrentgoal" text="Set Goal" />
+                  <Button fx:id="ViewCompletedGoalsButton" mnemonicParsing="false" onAction="#viewcompletedgoals" text="View Completed Goals" />
+                  <Button fx:id="CloseButton" mnemonicParsing="false" onAction="#close" text="Close">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>

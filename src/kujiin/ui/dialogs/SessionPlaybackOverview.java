@@ -201,7 +201,10 @@ public class SessionPlaybackOverview extends Stage {
         List<SessionPart> newsessionitems = new ArrayList<>();
         for (SessionPart x : Root.getAllSessionParts(false)) {
             if ((alladjustedsessionitems.contains(x)) || (!getwellformedcuts().isEmpty() && x instanceof Cut && (!alladjustedsessionitems.contains(x) && getwellformedcuts().contains(x)))) {
-                tableitems.add(new SessionItem(count, x.name, x.getdurationasString(true, 150.0), getambiencetext(x), x.goals_getCurrentAsString(true, 150.0)));
+                String currentgoaltext = "";
+                if (x.goals_getCurrent() == null) {currentgoaltext = "No Goal Set";}
+                else {currentgoaltext = x.goals_getCurrent().getFormattedString(Root.getProgressTracker().getSessions().gettotalpracticedtime(x, false), true, 150.0);}
+                tableitems.add(new SessionItem(count, x.name, x.getdurationasString(true, 150.0), getambiencetext(x), currentgoaltext));
                 newsessionitems.add(x);
                 count++;
             }

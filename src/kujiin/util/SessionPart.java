@@ -22,6 +22,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SessionPart {
 // GUI Fields
@@ -1089,48 +1090,20 @@ public class SessionPart {
     public void goals_marshall() {root.getProgressTracker().getGoals().setSessionPartGoalList(number, Goals);}
     // List Methods
     public kujiin.xml.Goals.Goal goals_getCurrent() {
-        if (Goals == null || Goals.isEmpty() || goals_get(true, false).isEmpty()) {return null;}
-        return goals_get(true, false).get(0);
+        if (Goals == null || Goals.isEmpty() || goals_getAll().isEmpty()) {return null;}
+        return goals_getAllCurrent().get(0);
     }
-    public String goals_getCurrentAsString(boolean includepercentage, double maxchars) {
-        kujiin.xml.Goals.Goal currentgoal = goals_getCurrent();
-        if (currentgoal == null || currentgoal.getDuration().lessThanOrEqualTo(Duration.ZERO)) {return "No Goal Set";}
-        else {
-            Duration goal = currentgoal.getDuration();
-            if (includepercentage) {
-                StringBuilder text = new StringBuilder();
-                Duration practiced = sessions_getPracticedDuration(false);
-                try {
-                    int percentage = new Double((practiced.toHours() / goal.toHours()) * 100).intValue();
-                    String percentagetext =  " (" + percentage + "%)";
-                    text.append(Util.formatdurationtoStringSpelledOut(goal, maxchars - percentagetext.length()));
-                    text.append(percentagetext);
-                } catch (ArithmeticException ignored) {text.append(Util.formatdurationtoStringSpelledOut(goal, maxchars));}
-                return text.toString();
-            } else {return Util.formatdurationtoStringSpelledOut(goal, maxchars);}
-        }
+    public List<kujiin.xml.Goals.Goal> goals_getAll() {
+        goals_sort();
+        return Goals;
     }
-    public List<kujiin.xml.Goals.Goal> goals_get(boolean includecurrent, boolean includecompleted) {
-        List<kujiin.xml.Goals.Goal> goals = new ArrayList<>();
-        for (kujiin.xml.Goals.Goal i : Goals) {
-            if (includecurrent && includecompleted) {goals.add(i);}
-            else if (includecompleted) {if (! i.getCompleted()) goals.add(i);}
-            else {
-                if (i.getCompleted())
-                goals.add(i);
-            }
-        }
-        return goals;
+    public List<kujiin.xml.Goals.Goal> goals_getAllCurrent() {
+        goals_sort();
+        return Goals.stream().filter(i -> !i.getCompleted()).collect(Collectors.toList());
     }
-    public List<kujiin.xml.Goals.Goal> goals_get(boolean includecurrent, boolean includecompleted, LocalDate practicedorcompletedondate) {
-        List<kujiin.xml.Goals.Goal> goals = new ArrayList<>();
-        for (kujiin.xml.Goals.Goal i : Goals) {
-            boolean completedonselecteddate = i.getDate_Completed().isEqual(practicedorcompletedondate);
-            if (includecurrent && includecompleted && completedonselecteddate) {goals.add(i);}
-            else if (includecompleted && completedonselecteddate) {if (! i.getCompleted()) goals.add(i);}
-            else {if (i.getCompleted() && completedonselecteddate) goals.add(i);}
-        }
-        return goals;
+    public List<kujiin.xml.Goals.Goal> goals_getAllCompleted() {
+        goals_sort();
+        return Goals.stream().filter(kujiin.xml.Goals.Goal::getCompleted).collect(Collectors.toList());
     }
     public void goals_add(kujiin.xml.Goals.Goal newgoal) {
         if (Goals == null) {Goals = new ArrayList<>();}

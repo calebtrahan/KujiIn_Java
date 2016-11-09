@@ -111,7 +111,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             setTitle("Advanced Ambience Editor");
             SessionPartSelectionBox.setOnAction(event -> selectandloadsessionpart());
             tempdirectory = new File(Preferences.DIRECTORYTEMP, "AmbienceEditor");
-        } catch (IOException e) {new org.controlsfx.dialog.ExceptionDialog(e).showAndWait();}
+        } catch (IOException e) {}
     }
     public AmbienceEditor_Advanced(MainController Root, SessionPart sessionPart) {
         try {

@@ -3,6 +3,7 @@ package kujiin.xml;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.InformationDialog;
+import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -150,7 +151,9 @@ public class Goals {
         private Double Duration; // Stored As Minutes
         private Boolean Completed;
 
-        public Goal() {}
+        public Goal() {
+        }
+
         public Goal(Duration goalduration) {
             setDuration(goalduration);
             setDate_Set(LocalDate.now());
@@ -177,8 +180,12 @@ public class Goals {
         public void setDuration(Duration duration) {
             Duration = duration.toMinutes();
         }
-        public Integer getID() {return ID;}
-        public void setID(Integer ID) {this.ID = ID;}
+        public Integer getID() {
+            return ID;
+        }
+        public void setID(Integer ID) {
+            this.ID = ID;
+        }
         public LocalDate getDate_Completed() {
             return LocalDate.parse(Date_Completed, dateFormat);
         }
@@ -194,13 +201,18 @@ public class Goals {
 
     // Other Methods
         public boolean isCompleted(Duration currentduration) {
-            try {return currentduration.greaterThanOrEqualTo(getDuration());}
-            catch (NullPointerException | ArithmeticException ignored) {return false;}
+            try {
+                return currentduration.greaterThanOrEqualTo(getDuration());
+            } catch (NullPointerException | ArithmeticException ignored) {
+                return false;
+            }
         }
         public String getpercentagecompleted(Duration currentduration) {
             Double percent = currentduration.toMillis() / getDuration().toMillis();
             percent *= 100.0;
-            if (percent >= 100.0) {percent = 100.0;}
+            if (percent >= 100.0) {
+                percent = 100.0;
+            }
             return String.format("%.2f", percent) + "%";
         }
 
@@ -208,8 +220,23 @@ public class Goals {
         public String toString() {
             return String.format("Set Date: %s Goal Hours: %s Is Completed: %s Date Completed: %s", getDate_Set(), getDuration(), getCompleted(), getDate_Completed());
         }
+        public String getFormattedString(Duration timepracticed, boolean includepercentage, double maxchars) {
+            if (getDuration().greaterThan(javafx.util.Duration.ZERO)) {
+                StringBuilder text = new StringBuilder();
+                if (includepercentage) {
+                    Double percentage = null;
+                    String percentagetext;
+                    try {
+                        percentage = (timepracticed.toMillis() / getDuration().toMillis()) * 100;
+                        percentagetext = " (" + percentage.intValue() + "%)";
+                    } catch (ArithmeticException e) {percentagetext = "(0%)";}
+                    text.append(text.append(Util.formatdurationtoStringSpelledOut(getDuration(), maxchars - percentagetext.length())));
+                    text.append(percentagetext);
+                } else {text.append(Util.formatdurationtoStringSpelledOut(getDuration(), maxchars));}
+                return text.toString();
+            } else {return "Goal Not Set";}
+        }
     }
-
 }
 
 

@@ -1,7 +1,6 @@
 package kujiin.xml;
 
 import javafx.util.Duration;
-import kujiin.lib.BeanComparator;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.ErrorDialog;
 import kujiin.ui.dialogs.InformationDialog;
@@ -89,9 +88,7 @@ public class Sessions {
         } catch (NullPointerException | ConcurrentModificationException ignored) {}
     }
     public void sort() {
-        List<Session> sessions = getSession();
-        Collections.sort(sessions, new BeanComparator(Session.class, "getDate_Practiced"));
-        setSession(sessions);
+        Collections.sort(Session, (o1, o2) -> o1.getDate_Practiced().compareTo(o2.getDate_Practiced()));
     }
 
 // Session Information Getters

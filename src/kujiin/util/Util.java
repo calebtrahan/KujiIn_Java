@@ -8,9 +8,7 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import kujiin.xml.Preferences;
-import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -372,11 +370,12 @@ public class Util {
             }
             String newname = file.getName().substring(firstindex, file.getName().length());
             File newfile = new File(file.getParentFile(), newname);
-            try {
-                FileUtils.moveFile(file, newfile);
-                if (newfile.exists()) {return newfile;}
-                else {return null;}
-            } catch (FileExistsException ignored) {return newfile;}
+//            try {
+//                FileUtils.moveFile(file, newfile);
+//                if (newfile.exists()) {return newfile;}
+//                else {return null;}
+//            } catch (FileExistsException ignored) {return newfile;}
+            return null;
         } catch (Exception ignored) {return null;}
     }
 
@@ -564,7 +563,7 @@ public class Util {
     }
     public static boolean String_validhtml(String text) {
         SAXBuilder builder = new SAXBuilder();
-        try {builder.build(IOUtils.toInputStream(text, "UTF-8")); return true;}
+        try {builder.build(text); return true;}
         catch (IOException | JDOMException | NullPointerException e) {return false;}
     }
     public static boolean String_validhtml(File file) {
