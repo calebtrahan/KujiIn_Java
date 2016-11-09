@@ -1,7 +1,6 @@
 package kujiin.xml;
 
 import javafx.util.Duration;
-import kujiin.lib.BeanComparator;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.InformationDialog;
 
@@ -134,13 +133,11 @@ public class Goals {
 
 // Utility
     public static List<Goal> sortgoalsbyDuration(List<Goal> listtosort) {
-        BeanComparator bc = new BeanComparator(kujiin.xml.Goals.Goal.class, "getDuration");
-        Collections.sort(listtosort, bc);
+        Collections.sort(listtosort, (o1, o2) -> o1.Duration.compareTo(o2.Duration));
         return listtosort;
     }
     public static List<Goal> sortgoalsbyDate(List<Goal> listtosort) {
-        BeanComparator bc = new BeanComparator(kujiin.xml.Goals.Goal.class, "getDate_Set");
-        Collections.sort(listtosort, bc);
+        Collections.sort(listtosort, (o1, o2) -> o1.Date_Set.compareTo(o2.Date_Set));
         return listtosort;
     }
 

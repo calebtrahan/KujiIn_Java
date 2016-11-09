@@ -86,6 +86,7 @@ public class DisplayReference extends Stage {
                         }
                 }
             });
+            if (Root.getPreferences().getUserInterfaceOptions().getTooltips()) {setToolTips();}
         } catch (IOException ignored) {}
     }
     public DisplayReference(MainController Root, String htmlcontent) {
@@ -113,6 +114,34 @@ public class DisplayReference extends Stage {
         } catch (IOException ignored) {}
     }
 
+// Settters
+    public void setTotalProgress(Double progress) {
+    TotalProgress.setProgress(progress);
+    TotalPercentage.setText(new Double(progress * 100).intValue() + "%");
+}
+    public void setCurrentProgress(Double progress) {
+        CurrentProgress.setProgress(progress);
+        CurrentPercentage.setText(new Double(progress * 100).intValue() + "%");
+    }
+    public void setName(String name) {CurrentName.setText(name);}
+
+// Button Actions
+    public void play() {Root.getSessionCreator().getPlayer().play();}
+    public void pause() {Root.getSessionCreator().getPlayer().pause();}
+    public void stop() {Root.getSessionCreator().getPlayer().stop();}
+
+// Utility Methods
+    public void setToolTips() {
+        EntrainmentVolumeSlider.setTooltip(new Tooltip("Entrainment Volume"));
+        EntrainmentVolumePercentage.setTooltip(new Tooltip("Entrainment Volume Percentage"));
+        AmbienceVolumeSlider.setTooltip(new Tooltip("Ambience Volume"));
+        AmbienceVolumePercentage.setTooltip(new Tooltip("Ambience Volume Percentage"));
+        CurrentProgress.setTooltip(new Tooltip("Current Session Part Progress"));
+        CurrentName.setTooltip(new Tooltip("Current Session Part Name"));
+        CurrentPercentage.setTooltip(new Tooltip("Current Session Part Percentage"));
+        TotalProgress.setTooltip(new Tooltip("Current Total Session Progress"));
+        TotalPercentage.setTooltip(new Tooltip("Current Total Session Progress Percentage"));
+    }
     public void setsizing() {
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         double height = primaryScreenBounds.getHeight();
@@ -162,18 +191,5 @@ public class DisplayReference extends Stage {
         Root.getSessionCreator().getPlayer().ReferenceCheckBox.setSelected(false);
         Root.getSessionCreator().getPlayer().togglereference();
     }
-    public void setTotalProgress(Double progress) {
-        TotalProgress.setProgress(progress);
-        TotalPercentage.setText(new Double(progress * 100).intValue() + "%");
-    }
-    public void setCurrentProgress(Double progress) {
-        CurrentProgress.setProgress(progress);
-        CurrentPercentage.setText(new Double(progress * 100).intValue() + "%");
-    }
-    public void setName(String name) {CurrentName.setText(name);}
-
-    public void play() {Root.getSessionCreator().getPlayer().play();}
-    public void pause() {Root.getSessionCreator().getPlayer().pause();}
-    public void stop() {Root.getSessionCreator().getPlayer().stop();}
 
 }

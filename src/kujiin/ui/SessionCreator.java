@@ -297,6 +297,7 @@ public class SessionCreator implements UI {
         }
     }
 
+// Subclasses
     public class Player extends Stage {
         public Label CurrentSessionPartTopLabel;
         public ProgressIndicator CurrentSessionPartProgress;
@@ -314,6 +315,8 @@ public class SessionCreator implements UI {
         public Button StopButton;
     // Playback Fields
         public Boolean displaynormaltime = true;
+        public Label EntrainmentVolumeTopLabel;
+        public Label AmbienceVolumeTopLabel;
         private Timeline player_updateuitimeline;
         private Double currententrainmentvolume;
         private Double currentambiencevolume;
@@ -330,7 +333,6 @@ public class SessionCreator implements UI {
                 updateuitimeline.stop();
                 if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
                 progressTracker = Root.getProgressTracker();
-//                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayerDialog.fxml"));
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../assets/fxml/SessionPlayer.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
@@ -358,6 +360,7 @@ public class SessionCreator implements UI {
                         event.consume();
                     }
                 });
+                if (Root.getPreferences().getUserInterfaceOptions().getTooltips()) {setupTooltips();}
             } catch (IOException ignored) {}
         }
 
@@ -374,6 +377,20 @@ public class SessionCreator implements UI {
                     }
                 }
             });
+        }
+        public void setupTooltips() {
+            CurrentSessionPartTopLabel.setTooltip(new Tooltip("Current Session Part Playing"));
+            CurrentProgressDetails.setTooltip(new Tooltip("Current Session Part Progress"));
+            CurrentProgressDetails.setTooltip(new Tooltip("Detailed Current Session Part Progress"));
+            EntrainmentVolume.setTooltip(new Tooltip("Current Entrainment Volume"));
+            EntrainmentVolumeTopLabel.setTooltip(new Tooltip("Entrainment Volume"));
+            EntrainmentVolumePercentage.setTooltip(new Tooltip("Current Entrainment Volume Percentage"));
+            AmbienceVolume.setTooltip(new Tooltip("Current Ambience Volume"));
+            AmbienceVolumeTopLabel.setTooltip(new Tooltip("Ambience Volume"));
+            AmbienceVolumePercentage.setTooltip(new Tooltip("Current Ambience Volume Percentage"));
+            TotalProgress.setTooltip(new Tooltip("Total Session Progress"));
+            TotalProgressDetails.setTooltip(new Tooltip("Detailed Total Session Progress"));
+            ReferenceCheckBox.setTooltip(new Tooltip("Display Reference During Session Playback"));
         }
 
     // Getters And Setters

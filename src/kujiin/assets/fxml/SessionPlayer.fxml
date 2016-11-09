@@ -8,7 +8,7 @@
    <children>
       <VBox alignment="CENTER" layoutX="78.0" layoutY="151.0" prefHeight="199.0" prefWidth="417.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label alignment="TOP_CENTER" prefHeight="16.0" prefWidth="114.0" text="Session Player">
+            <Label alignment="TOP_CENTER" prefHeight="20.0" prefWidth="361.0" text="Session Player">
                <font>
                   <Font name="System Bold" size="17.0" />
                </font>
@@ -38,14 +38,14 @@
                            <children>
                               <VBox alignment="CENTER" prefHeight="170.0" prefWidth="46.0">
                                  <children>
-                                    <Label text="ENT" />
+                                    <Label fx:id="EntrainmentVolumeTopLabel" text="ENT" />
                                     <Slider fx:id="EntrainmentVolume" max="1.0" orientation="VERTICAL" />
                                     <Label fx:id="EntrainmentVolumePercentage" text="100%" />
                                  </children>
                               </VBox>
                               <VBox alignment="CENTER" prefHeight="170.0" prefWidth="40.0">
                                  <children>
-                                    <Label text="AMB" />
+                                    <Label fx:id="AmbienceVolumeTopLabel" text="AMB" />
                                     <Slider fx:id="AmbienceVolume" max="1.0" orientation="VERTICAL" />
                                     <Label fx:id="AmbienceVolumePercentage" text="100%" />
                                  </children>
