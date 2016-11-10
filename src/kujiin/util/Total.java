@@ -29,7 +29,7 @@ public class Total extends SessionPart {
     }
     @Override
     public int sessions_getPracticedSessionCount(Boolean includepreandpostoverride) {
-        return root.getProgressTracker().getSessions().totalsessioncount();
+        return root.getProgressTracker().getSessions().getSession().size();
     }
     @Override
     public Duration sessions_getAverageSessionLength(Boolean includepreandpostoverride) {

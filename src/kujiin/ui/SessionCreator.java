@@ -23,7 +23,9 @@ import kujiin.util.enums.*;
 import kujiin.util.interfaces.UI;
 import kujiin.xml.Preferences;
 import kujiin.xml.Preset;
+import kujiin.xml.Session;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -327,6 +329,8 @@ public class SessionCreator implements UI {
         public List<SessionPart> sessionpartswithGoalsCompletedThisSession;
     // Dialog Fields
         public SelectReferenceType selectReferenceType;
+    // Tracking Fields
+        public Session currentsession;
 
         public Player() {
             try {
@@ -415,6 +419,7 @@ public class SessionCreator implements UI {
             switch (playerState) {
                 case IDLE:
                 case STOPPED:
+                    currentsession = new Session();
                     setupKeyBoardShortcuts();
                     sessionpartswithGoalsCompletedThisSession = new ArrayList<>();
                     totalsessiondurationelapsed = Duration.ZERO;
@@ -426,7 +431,6 @@ public class SessionCreator implements UI {
                     player_updateuitimeline.play();
                     sessionpartcount = 0;
                     currentsessionpart = itemsinsession.get(sessionpartcount);
-                    Root.getProgressTracker().getSessions().createnew();
                     currententrainmentvolume = Root.getPreferences().getPlaybackOptions().getEntrainmentvolume();
                     currentambiencevolume = Root.getPreferences().getPlaybackOptions().getAmbiencevolume();
                     currentsessionpart.start();
@@ -491,7 +495,7 @@ public class SessionCreator implements UI {
                 } catch (Exception ignored) {}
                 progressTracker.goals_updateui(this);
                 progressTracker.sessions_updateui();
-                currentsessionpart.tick();
+                if (playerState == PLAYING) {currentsession.updateduration(currentsessionpart, currentsessionpart.elapsedtime);}
             } catch (Exception ignored) {
                 ignored.printStackTrace();
             }
@@ -521,10 +525,9 @@ public class SessionCreator implements UI {
             } catch (Exception ignored) {}
         }
         public void transition() {
-            kujiin.xml.Session currentsession =  progressTracker.getSessions().getspecificsession(progressTracker.getSessions().totalsessioncount() - 1);
             currentsession.updateduration(currentsessionpart, currentsessionpart.getduration());
             currentsession.updatesessionpartambience(currentsessionpart, currentsessionpart.getAmbienceplayhistory());
-            progressTracker.getSessions().marshall();
+            progressTracker.sessions_updateui();
             progressTracker.goals_updateui(this);
             currentsessionpart.stop();
             if (Root.getPreferences().getSessionOptions().getAlertfunction()) {
@@ -576,9 +579,12 @@ public class SessionCreator implements UI {
             PlayButton.setText("Replay");
             playerState = PlayerState.STOPPED;
             itemsinsession.forEach(SessionPart::cleanupPlayersandAnimations);
+            try {progressTracker.getSessions().add(currentsession);}
+            catch (JAXBException ignored) {new ErrorDialog(Root.getPreferences(), "Error", "Cannot Save Session", "Check File Permisssions");}
             // TODO Prompt For Export
             progressTracker.sessions_updateui();
             progressTracker.goals_updateui(this);
+            currentsession = null;
             reset(true);
             progressTracker.session_displaydetails(itemsinsession);
         }
@@ -586,7 +592,14 @@ public class SessionCreator implements UI {
             if (playerState == PlayerState.PLAYING || playerState == PlayerState.PAUSED || playerState == TRANSITIONING) {
                 currentsessionpart.pausewithoutanimation();
                 player_updateuitimeline.pause();
-                if (new ConfirmationDialog(preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {return true;}
+                if (new ConfirmationDialog(preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
+                    try {progressTracker.getSessions().add(currentsession);}
+                    catch (JAXBException ignored) {new ErrorDialog(Root.getPreferences(), "Error", "Cannot Save Session", "Check File Permisssions");}
+                    progressTracker.sessions_updateui();
+                    progressTracker.goals_updateui(this);
+                    reset(true);
+                    return true;
+                }
                 else {play(); return false;}
             } else {return true;}
         }

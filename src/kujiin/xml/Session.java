@@ -47,29 +47,48 @@ public class Session {
     private ArrayList<SoundFile> Zen_Ambience;
     private ArrayList<SoundFile> Postsession_Ambience;
 
-    public Session(int[] durations) {
-        Presession_Duration = durations[0];
-        Rin_Duration = durations[1];
-        Kyo_Duration = durations[2];
-        Toh_Duration = durations[3];
-        Sha_Duration = durations[4];
-        Kai_Duration = durations[5];
-        Jin_Duration = durations[6];
-        Retsu_Duration = durations[7];
-        Zai_Duration = durations[8];
-        Zen_Duration = durations[9];
-        Earth_Duration = durations[10];
-        Air_Duration = durations[11];
-        Fire_Duration = durations[12];
-        Water_Duration = durations[13];
-        Void_Duration = durations[14];
-        Postsession_Duration = durations[15];
-        int totalduration = 0;
-        for (int i : durations) {totalduration += i;}
-        Total_Session_Duration = totalduration;
+//    public Session(int[] durations) {
+//        Presession_Duration = durations[0];
+//        Rin_Duration = durations[1];
+//        Kyo_Duration = durations[2];
+//        Toh_Duration = durations[3];
+//        Sha_Duration = durations[4];
+//        Kai_Duration = durations[5];
+//        Jin_Duration = durations[6];
+//        Retsu_Duration = durations[7];
+//        Zai_Duration = durations[8];
+//        Zen_Duration = durations[9];
+//        Earth_Duration = durations[10];
+//        Air_Duration = durations[11];
+//        Fire_Duration = durations[12];
+//        Water_Duration = durations[13];
+//        Void_Duration = durations[14];
+//        Postsession_Duration = durations[15];
+//        int totalduration = 0;
+//        for (int i : durations) {totalduration += i;}
+//        Total_Session_Duration = totalduration;
+//        setDate_Practiced(LocalDate.now());
+//    }
+    public Session() {
+        Presession_Duration = 0;
+        Rin_Duration = 0;
+        Kyo_Duration = 0;
+        Toh_Duration = 0;
+        Sha_Duration = 0;
+        Kai_Duration = 0;
+        Jin_Duration = 0;
+        Retsu_Duration = 0;
+        Zai_Duration = 0;
+        Zen_Duration = 0;
+        Earth_Duration = 0;
+        Air_Duration = 0;
+        Fire_Duration = 0;
+        Water_Duration = 0;
+        Void_Duration = 0;
+        Postsession_Duration = 0;
+        Total_Session_Duration = 0;
         setDate_Practiced(LocalDate.now());
     }
-    public Session() {setDate_Practiced(LocalDate.now());}
 
 // Getters And Setters
     public LocalDate getDate_Practiced() {return LocalDate.parse(Date_Practiced, dateFormat);}

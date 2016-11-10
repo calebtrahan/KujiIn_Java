@@ -2,7 +2,6 @@ package kujiin.xml;
 
 import javafx.util.Duration;
 import kujiin.ui.MainController;
-import kujiin.ui.dialogs.ErrorDialog;
 import kujiin.ui.dialogs.InformationDialog;
 import kujiin.util.Qi_Gong;
 import kujiin.util.SessionPart;
@@ -14,7 +13,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +48,6 @@ public class Sessions {
     }
     public void marshall() {
         try {
-            deletenonvalidsessions();
             JAXBContext context = JAXBContext.newInstance(Sessions.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -58,13 +55,8 @@ public class Sessions {
         } catch (JAXBException e) {
             new InformationDialog(Root.getPreferences(), "Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Preferences.SESSIONSXMLFILE.getAbsolutePath());}
     }
-    public void createnew() {
-        try {
-            int[] array = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            add(new Session(array));
-        } catch (JAXBException ignored) {
-            new ErrorDialog(Root.getPreferences(), "Error", "Cannot Create Session. This Session's Progress Won't Be Updated Into The Total Tracker", "Check File Permissions");}
-    }
+
+// Session Methods
     public void add(Session session) throws JAXBException {
         if (Preferences.SESSIONSXMLFILE.exists()) {unmarshall();}
         List<Session> sessionsList = getSession();
@@ -74,18 +66,14 @@ public class Sessions {
         sessionsList.add(session);
         setSession(sessionsList);
     }
+    public Session get(int index) {
+        try {return Session.get(index);}
+        catch (IndexOutOfBoundsException ignored) {return null;}
+    }
     public void remove(Session session) throws JAXBException {
         List<Session> sessionList = getSession();
         sessionList.remove(sessionList.indexOf(session));
         setSession(sessionList);
-    }
-    public void deletenonvalidsessions() {
-        try {
-            getSession().stream().filter(kujiin.xml.Session::sessionempty).forEach(i -> {
-                try {remove(i);}
-                catch (JAXBException ignored) {}
-            });
-        } catch (NullPointerException | ConcurrentModificationException ignored) {}
     }
     public void sort() {
         Collections.sort(Session, (o1, o2) -> o1.getDate_Practiced().compareTo(o2.getDate_Practiced()));
@@ -125,13 +113,6 @@ public class Sessions {
             }
             return sessioncount;
         } catch (NullPointerException ignored) {ignored.printStackTrace(); return 0;}
-    }
-    public int totalsessioncount() {
-        try {return getSession().size();}
-        catch (NullPointerException ignored) {return 0;}
-    }
-    public Session getspecificsession(int index) {
-        return getSession().get(index);
     }
 
 }

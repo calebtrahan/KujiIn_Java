@@ -964,14 +964,6 @@ public class SessionPart {
     }
     public void volume_rebindambience() {volume_unbindambience(); volume_bindambience();}
     public void volume_rebindentrainment() {volume_unbindentrainment(); volume_bindentrainment();}
-    public void tick() {
-        if (entrainmentplayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            try {
-                root.getProgressTracker().getSessions().getspecificsession(root.getProgressTracker().getSessions().getSession().size() - 1).updateduration(this, elapsedtime);
-                goals_playbackupdate();
-            } catch (NullPointerException ignored) {}
-        }
-    }
     // Error Handling
     protected void entrainmenterror() {
         System.out.println("Entrainment Error");
