@@ -146,9 +146,8 @@ public class Goals {
     public static class Goal {
         private Integer ID;
         private String Date_Set;
-        private String Date_Due;
         private String Date_Completed;
-        private Double Duration; // Stored As Minutes
+        private Double Duration;
         private Boolean Completed;
 
         public Goal() {
@@ -168,12 +167,6 @@ public class Goals {
         public void setDate_Set(LocalDate date_Set) {
             Date_Set = date_Set.format(dateFormat);
         }
-        public void setDate_Due(LocalDate date_Due) {
-            Date_Due = date_Due.format(dateFormat);
-        }
-        public LocalDate getDate_Due() {
-            return LocalDate.parse(Date_Due, dateFormat);
-        }
         public Duration getDuration() {
             return javafx.util.Duration.minutes(Duration);
         }
@@ -190,7 +183,7 @@ public class Goals {
             return LocalDate.parse(Date_Completed, dateFormat);
         }
         public void setDate_Completed(LocalDate date_Completed) {
-            Date_Completed = date_Completed.format(dateFormat);
+            if (date_Completed != null) {Date_Completed = date_Completed.format(dateFormat);}
         }
         public Boolean getCompleted() {
             return Completed;

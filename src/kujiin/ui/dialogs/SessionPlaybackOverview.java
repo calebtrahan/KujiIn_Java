@@ -101,26 +101,13 @@ public class SessionPlaybackOverview extends Stage {
                 }
             }
             AmbienceTypeComboBox.setDisable(true);
+            setupTableColors();
             populatetable();
         } catch (IOException ignored) {
         }
     }
 
-// Getters And Setters
-    public List<SessionPart> getAlladjustedsessionitems() {
-        return alladjustedsessionitems;
-    }
-
-// Table
-    public void itemselected() {
-        int index = SessionItemsTable.getSelectionModel().getSelectedIndex();
-        if (index != -1) {
-            selectedsessionpart = alladjustedsessionitems.get(index);
-        }
-        syncbuttons();
-    }
-    public void populatetable() {
-        SessionItemsTable.getItems().removeAll(tableitems);
+    public void setupTableColors() {
         DurationColumn.setCellFactory((column -> new TableCell<SessionItem, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -157,9 +144,6 @@ public class SessionPlaybackOverview extends Stage {
                 } else {
                     switch (item) {
                         case "Ambience Not Set":
-                            setStyle("-fx-text-fill: yellow");
-                            setText(item);
-                            break;
                         case "Has No Ambience":
                             setStyle("-fx-text-fill: red");
                             setText(item);
@@ -196,6 +180,23 @@ public class SessionPlaybackOverview extends Stage {
                 }
             }
         });
+    }
+
+// Getters And Setters
+    public List<SessionPart> getAlladjustedsessionitems() {
+        return alladjustedsessionitems;
+    }
+
+// Table
+    public void itemselected() {
+        int index = SessionItemsTable.getSelectionModel().getSelectedIndex();
+        if (index != -1) {
+            selectedsessionpart = alladjustedsessionitems.get(index);
+        } else {selectedsessionpart = null;}
+        syncbuttons();
+    }
+    public void populatetable() {
+        SessionItemsTable.getItems().removeAll(tableitems);
         if (alladjustedsessionitems == null) {alladjustedsessionitems = new ArrayList<>();}
         int count = 1;
         List<SessionPart> newsessionitems = new ArrayList<>();
@@ -209,6 +210,9 @@ public class SessionPlaybackOverview extends Stage {
                 count++;
             }
         }
+        SetGoalButton.setDisable(true);
+        SetAmbienceButton.setDisable(true);
+        AdjustDurationButton.setDisable(true);
         alladjustedsessionitems = newsessionitems;
         SessionItemsTable.setItems(tableitems);
         syncbuttons();
@@ -216,33 +220,34 @@ public class SessionPlaybackOverview extends Stage {
     }
     public void syncbuttons() {
         int index = SessionItemsTable.getSelectionModel().getSelectedIndex();
-        boolean itemselected = index != -1;
         UpButton.setDisable(index < 1);
-        DownButton.setDisable(!itemselected && index != SessionItemsTable.getItems().size() - 1);
+        DownButton.setDisable(index == -1 || index == SessionItemsTable.getItems().size() - 1);
         AdjustDurationButton.setDisable(selectedsessionpart == null);
         if (selectedsessionpart != null) {
             SetGoalButton.setDisable(selectedsessionpart.goals_ui_hascurrentgoal());
             SetAmbienceButton.setDisable(!AmbienceSwitch.isSelected() && ambiencePlaybackType == null);
-            if (Root.getSessionCreator().isAmbienceenabled()) {
-                if (ambiencePlaybackType == AmbiencePlaybackType.CUSTOM) {
-                    if (! selectedsessionpart.getAmbience().hasCustomAmbience()) {
-                        SetAmbienceButton.setDisable(false);
-                        SetAmbienceButton.setText("Set Ambience");
-                    } else {
-                        SetAmbienceButton.setDisable(false);
-                        SetAmbienceButton.setText("Edit Ambience");
-                    }
-                } else {
-                    if (! selectedsessionpart.getAmbience_hasAny()) {
-                        System.out.println("Should Be Setting Ambience Button To Add Ambience");
-                        SetAmbienceButton.setDisable(false);
-                        SetAmbienceButton.setText("Add Ambience");
-                    } else {
+            if (AmbienceSwitch.isSelected()) {
+                switch (ambiencePlaybackType) {
+                    case CUSTOM:
+                        SetAmbienceButton.setDisable(index == -1);
+                        if (! selectedsessionpart.getAmbience().hasCustomAmbience()) {SetAmbienceButton.setText("Set Custom Ambience");}
+                        else {SetAmbienceButton.setText("Edit Custom Ambience");}
+                        break;
+                    case SHUFFLE:
+                    case REPEAT:
+                        if (! selectedsessionpart.getAmbience_hasAny() && index != -1) {
+                            SetAmbienceButton.setDisable(false);
+                            SetAmbienceButton.setText("Add Ambience");
+                        } else {SetAmbienceButton.setDisable(true);}
+                        break;
+                    default:
                         SetAmbienceButton.setDisable(true);
-                        SetAmbienceButton.setText("");
-                    }
+                        break;
                 }
-            }
+            } else {SetAmbienceButton.setDisable(true);}
+            if (selectedsessionpart.goals_getAllCurrent().isEmpty()) {SetGoalButton.setText("Set Current Goal");}
+            else {SetGoalButton.setText("Add Goal");}
+            SetGoalButton.setDisable(index == -1);
         }
     }
 
@@ -412,7 +417,8 @@ public class SessionPlaybackOverview extends Stage {
     public void setoraddambience() {
         switch (SetAmbienceButton.getText()) {
             case "Set Ambience":
-            case "Edit Ambience":
+            case "Set Custom Ambience":
+            case "Edit Custom Ambience":
                 SessionPlaybackOverview_AddCustomAmbience addCustomAmbience = new SessionPlaybackOverview_AddCustomAmbience(selectedsessionpart);
                 addCustomAmbience.showAndWait();
                 if (addCustomAmbience.getResult()) {
@@ -663,7 +669,7 @@ public class SessionPlaybackOverview extends Stage {
                 String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 this.setResizable(false);
-                setTitle("Set Custom Ambience");
+                setTitle("Set Custom Ambience For " + selectedsessionpart.name);
                 NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
                 NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
                 DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
@@ -870,6 +876,7 @@ public class SessionPlaybackOverview extends Stage {
                 PreviewButton.setDisable(true);
                 AddButton.setDisable(true);
                 NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+                NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
                 DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().length);
                 AmbienceTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> tableselectionchanged(newValue));
                 AmbienceTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

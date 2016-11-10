@@ -29,11 +29,11 @@
             </MenuBar>
             <TableView fx:id="SessionItemsTable" prefHeight="318.0" prefWidth="327.0">
               <columns>
-                <TableColumn fx:id="NumberColumn" prefWidth="30.0" text="#" />
-                <TableColumn fx:id="NameColumn" prefWidth="150.0" text="Name" />
-                  <TableColumn fx:id="DurationColumn" prefWidth="150.0" text="Practice Time" />
-                  <TableColumn fx:id="AmbienceColumn" prefWidth="150.0" text="Ambience" />
-                  <TableColumn fx:id="GoalColumn" prefWidth="150.0" text="Current Goal" />
+                <TableColumn fx:id="NumberColumn" editable="false" prefWidth="30.0" sortable="false" text="#" />
+                <TableColumn fx:id="NameColumn" editable="false" prefWidth="150.0" sortable="false" text="Name" />
+                  <TableColumn fx:id="DurationColumn" editable="false" prefWidth="150.0" sortable="false" text="Practice Time" />
+                  <TableColumn fx:id="AmbienceColumn" editable="false" prefWidth="150.0" sortable="false" text="Ambience" />
+                  <TableColumn fx:id="GoalColumn" editable="false" prefWidth="150.0" sortable="false" text="Current Goal" />
               </columns>
                <VBox.margin>
                   <Insets left="5.0" right="5.0" />
@@ -56,7 +56,7 @@
                         <Insets left="5.0" />
                      </padding>
                   </HBox>
-                  <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="348.0">
+                  <HBox alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="667.0">
                      <children>
                         <Button fx:id="AdjustDurationButton" disable="true" mnemonicParsing="false" onAction="#adjustduration" prefHeight="26.0" prefWidth="108.0" text="Adjust Duration" />
                         <Button fx:id="SetAmbienceButton" disable="true" mnemonicParsing="false" onAction="#setoraddambience" text="Set Ambience" />

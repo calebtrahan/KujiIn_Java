@@ -21,6 +21,7 @@ import kujiin.xml.*;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -1090,20 +1091,23 @@ public class SessionPart {
     public void goals_marshall() {root.getProgressTracker().getGoals().setSessionPartGoalList(number, Goals);}
     // List Methods
     public kujiin.xml.Goals.Goal goals_getCurrent() {
-        if (Goals == null || Goals.isEmpty() || goals_getAll().isEmpty()) {return null;}
+        if (goals_getAll().isEmpty()) {return null;}
         return goals_getAllCurrent().get(0);
     }
     public List<kujiin.xml.Goals.Goal> goals_getAll() {
         goals_sort();
-        return Goals;
+        if (Goals == null) {return Collections.emptyList();}
+        else {return Goals;}
     }
     public List<kujiin.xml.Goals.Goal> goals_getAllCurrent() {
         goals_sort();
-        return Goals.stream().filter(i -> !i.getCompleted()).collect(Collectors.toList());
+        if (Goals == null) {return Collections.emptyList();}
+        else {return Goals.stream().filter(i -> !i.getCompleted()).collect(Collectors.toList());}
     }
     public List<kujiin.xml.Goals.Goal> goals_getAllCompleted() {
         goals_sort();
-        return Goals.stream().filter(kujiin.xml.Goals.Goal::getCompleted).collect(Collectors.toList());
+        if (Goals == null) {return Collections.emptyList();}
+        else {return Goals.stream().filter(kujiin.xml.Goals.Goal::getCompleted).collect(Collectors.toList());}
     }
     public void goals_add(kujiin.xml.Goals.Goal newgoal) {
         if (Goals == null) {Goals = new ArrayList<>();}

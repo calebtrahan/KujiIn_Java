@@ -250,11 +250,12 @@ public class ProgressTracker implements UI {
         }
     }
     public void goals_viewcurrent() {
-        if (SelectedSessionPart.getGoals() == null || SelectedSessionPart.getGoals().isEmpty()) {
-            new InformationDialog(Preferences, "Information", "No Goals Exist For " + SelectedSessionPart.name, "Please Add A Goal For " + SelectedSessionPart.name);
-        } else {
-            new AllSessionPartGoalProgress().showAndWait();
-        }
+        new AllSessionPartGoalProgress().showAndWait();
+//        if (SelectedSessionPart.getGoals() == null || SelectedSessionPart.getGoals().isEmpty()) {
+//            new InformationDialog(Preferences, "Information", "No Goals Exist For " + SelectedSessionPart.name, "Please Add A Goal For " + SelectedSessionPart.name);
+//        } else {
+//            new AllSessionPartGoalProgress().showAndWait();
+//        }
     }
 
 // Subclasses / Dialogs
@@ -289,7 +290,7 @@ public class ProgressTracker implements UI {
                 CurrentGoalColumn.setCellValueFactory(cellData -> cellData.getValue().currentgoaltime);
                 PercentCompletedColumn.setCellValueFactory(cellData -> cellData.getValue().percentcompleted);
                 NumberGoalsCompletedColumn.setCellValueFactory(cellData -> cellData.getValue().numbergoalscompleted);
-                NameColumn.setStyle("-fx-alignment: CENTER;");
+                NameColumn.setStyle("-fx-alignment: CENTER-LEFT;");
                 PracticedTimeColumn.setStyle("-fx-alignment: CENTER;");
                 CurrentGoalColumn.setStyle("-fx-alignment: CENTER;");
                 PercentCompletedColumn.setStyle("-fx-alignment: CENTER;");
@@ -319,7 +320,7 @@ public class ProgressTracker implements UI {
                 Duration practicedtime = i.sessions_getPracticedDuration(false);
                 String practicedtext;
                 if (practicedtime.lessThanOrEqualTo(Duration.ZERO)) {
-                    practicedtext = "No Practiced Time";
+                    practicedtext = "None";
                 } else {
                     practicedtext = Util.formatdurationtoStringSpelledOut(i.sessions_getPracticedDuration(false), null);
                 }
@@ -329,8 +330,8 @@ public class ProgressTracker implements UI {
                     currentgoaltime = i.goals_ui_getcurrentgoalDuration(null);
                     percentcompleted = i.goals_ui_getcurrentgoalpercentage(0);
                 } else {
-                    currentgoaltime = "No Goal Set";
-                    percentcompleted = "No Goal Set";
+                    currentgoaltime = "None";
+                    percentcompleted = "-";
                 }
                 allgoalsdetails.add(new GoalProgressBinding(i.name, practicedtext, currentgoaltime, percentcompleted, i.goals_getAllCompleted().size()));
             }
@@ -668,10 +669,11 @@ public class ProgressTracker implements UI {
                 String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
                 if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
-                setTitle("Set A New Goal");
-                TopLabel.setText("Set A New Goal For " + sessionPart.name);
+                String text = "Set Current Goal";
+                if (! sessionPart.goals_getAllCurrent().isEmpty()) {text = "Set A New Goal";}
+                setTitle(text);
+                TopLabel.setText(text + " For " + sessionPart.name);
                 practicedduration = sessionPart.sessions_getPracticedDuration(false);
-                System.out.println(sessionPart.name + "'s Practiced Duration: " + practicedduration.toMinutes() + " Minutes");
                 HoursSpinner.setText(String.valueOf((int) practicedduration.toMinutes() / 60));
                 MinutesSpinner.setText(String.valueOf((int) practicedduration.toMinutes() % 60));
                 Util.custom_textfield_integer(HoursSpinner, 0, Integer.MAX_VALUE, 1);

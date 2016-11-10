@@ -404,7 +404,7 @@
                               <Font size="12.0" />
                            </font>
                         </Button>
-                        <Button fx:id="viewcurrrentgoalsButton" mnemonicParsing="false" text="Goal Editor">
+                        <Button fx:id="viewcurrrentgoalsButton" mnemonicParsing="false" text="Open Goal Editor">
                            <font>
                               <Font size="12.0" />
                            </font>
