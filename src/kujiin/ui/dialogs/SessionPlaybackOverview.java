@@ -449,7 +449,7 @@ public class SessionPlaybackOverview extends Stage {
 //                }
 //            });
 //
-////            if (!sessionpartswithnoambience.isEmpty()) {
+////            if (!sessionpartswithnoambience.isValid()) {
 ////                StringBuilder a = new StringBuilder();
 ////                for (int i = 0; i < sessionpartswithnoambience.size(); i++) {
 ////                    a.append(sessionpartswithnoambience.get(i).name);
@@ -468,7 +468,7 @@ public class SessionPlaybackOverview extends Stage {
 ////                    AmbienceSwitch.setSelected(false);
 ////                }
 ////            } else {
-//////                    if (! sessionpartswithreducedambience.isEmpty()) {
+//////                    if (! sessionpartswithreducedambience.isValid()) {
 //////                        StringBuilder a = new StringBuilder();
 //////                        int count = 0;
 //////                        for (SessionPart aSessionpartswithreducedambience : sessionpartswithreducedambience) {

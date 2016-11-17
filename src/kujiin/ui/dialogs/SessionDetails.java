@@ -40,7 +40,7 @@ public class SessionDetails extends Stage {
     public TextField MostProgressTextField;
     public TextField AverageDurationTextField;
 
-    public SessionDetails(MainController Root, List<SessionPart> itemsinsession) {
+    public SessionDetails(MainController Root, List<SessionPart> itemsinsession, Stage parent) {
         try {
             this.Root = Root;
             if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
@@ -51,7 +51,7 @@ public class SessionDetails extends Stage {
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
             initModality(Modality.WINDOW_MODAL);
-            initOwner(Root.getStage());
+            initOwner(parent);
             String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);

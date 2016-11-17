@@ -14,7 +14,6 @@ import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @XmlRootElement(name = "Sessions")
 @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -48,6 +47,7 @@ public class Sessions {
     }
     public void marshall() {
         try {
+            System.out.println("Should Be Marshalling " + Session.size() + " Sessions");
             JAXBContext context = JAXBContext.newInstance(Sessions.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -57,32 +57,28 @@ public class Sessions {
     }
 
 // Session Methods
-    public void add(Session session) throws JAXBException {
-        if (Preferences.SESSIONSXMLFILE.exists()) {unmarshall();}
-        List<Session> sessionsList = getSession();
-        if (sessionsList != null && sessionsList.size() > 0) {
+    public void add(Session session) {
+        if (Session == null) {Session = new ArrayList<>();}
+        if (session.isValid()) {
+            Session.add(session);
             sort();
-        } else {sessionsList = new ArrayList<>();}
-        sessionsList.add(session);
-        setSession(sessionsList);
+            marshall();
+        }
     }
     public Session get(int index) {
         try {return Session.get(index);}
         catch (IndexOutOfBoundsException ignored) {return null;}
     }
-    public void remove(Session session) throws JAXBException {
-        List<Session> sessionList = getSession();
-        sessionList.remove(sessionList.indexOf(session));
-        setSession(sessionList);
+    public void remove(Session session) {
+        if (Session != null) {
+            Session.remove(session);
+            sort();
+            marshall();
+        }
     }
-    public void sort() {
-        Collections.sort(Session, (o1, o2) -> o1.getDate_Practiced().compareTo(o2.getDate_Practiced()));
-    }
+    public void sort() {Collections.sort(Session, (o1, o2) -> o1.getDate_Practiced().compareTo(o2.getDate_Practiced()));}
 
 // Session Information Getters
-    public List<Session> getsessionpartsessions(SessionPart sessionPart) {
-        return getSession().stream().filter(i -> i.getduration(sessionPart).greaterThan(Duration.ZERO)).collect(Collectors.toList());
-    }
     public Duration gettotalpracticedtime(SessionPart sessionpart, boolean includepreandpost) {
         try {
             Duration totalduration = Duration.ZERO;
@@ -112,7 +108,7 @@ public class Sessions {
                 }
             }
             return sessioncount;
-        } catch (NullPointerException ignored) {ignored.printStackTrace(); return 0;}
+        } catch (NullPointerException ignored) {return 0;}
     }
 
 }

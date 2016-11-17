@@ -164,9 +164,6 @@ public class ProgressTracker implements UI {
     public void session_displaydetails(Session individualsession) {
         new SessionDetails(Root, individualsession, Root.getStage()).showAndWait();
     }
-    public void session_displaydetails(List<SessionPart> itemsinsession) {
-        new SessionDetails(Root, itemsinsession).show();
-    }
 
 // Goals
     public void goals_updateui(SessionCreator.Player playerUI) {
@@ -251,7 +248,7 @@ public class ProgressTracker implements UI {
     }
     public void goals_viewcurrent() {
         new AllSessionPartGoalProgress().showAndWait();
-//        if (SelectedSessionPart.getGoals() == null || SelectedSessionPart.getGoals().isEmpty()) {
+//        if (SelectedSessionPart.getGoals() == null || SelectedSessionPart.getGoals().isValid()) {
 //            new InformationDialog(Preferences, "Information", "No Goals Exist For " + SelectedSessionPart.name, "Please Add A Goal For " + SelectedSessionPart.name);
 //        } else {
 //            new AllSessionPartGoalProgress().showAndWait();

@@ -33,27 +33,27 @@ public class SessionRow {
                       Duration Void, Duration total) {
         this.id = new SimpleIntegerProperty(id);
         this.datepracticed = new SimpleStringProperty(datepracticed);
-        this.presession = new SimpleStringProperty(convertduration(presession));
-        this.rin = new SimpleStringProperty(convertduration(rin));
-        this.kyo = new SimpleStringProperty(convertduration(kyo));
-        this.toh = new SimpleStringProperty(convertduration(toh));
-        this.sha = new SimpleStringProperty(convertduration(sha));
-        this.kai = new SimpleStringProperty(convertduration(kai));
-        this.jin = new SimpleStringProperty(convertduration(jin));
-        this.retsu = new SimpleStringProperty(convertduration(retsu));
-        this.zai = new SimpleStringProperty(convertduration(zai));
-        this.zen = new SimpleStringProperty(convertduration(zen));
-        this.earth = new SimpleStringProperty(convertduration(earth));
-        this.air = new SimpleStringProperty(convertduration(air));
-        this.fire = new SimpleStringProperty(convertduration(fire));
-        this.water = new SimpleStringProperty(convertduration(water));
-        this.Void = new SimpleStringProperty(convertduration(Void));
-        this.postsession = new SimpleStringProperty(convertduration(postsession));
+        this.presession = new SimpleStringProperty(formatduration(presession));
+        this.rin = new SimpleStringProperty(formatduration(rin));
+        this.kyo = new SimpleStringProperty(formatduration(kyo));
+        this.toh = new SimpleStringProperty(formatduration(toh));
+        this.sha = new SimpleStringProperty(formatduration(sha));
+        this.kai = new SimpleStringProperty(formatduration(kai));
+        this.jin = new SimpleStringProperty(formatduration(jin));
+        this.retsu = new SimpleStringProperty(formatduration(retsu));
+        this.zai = new SimpleStringProperty(formatduration(zai));
+        this.zen = new SimpleStringProperty(formatduration(zen));
+        this.earth = new SimpleStringProperty(formatduration(earth));
+        this.air = new SimpleStringProperty(formatduration(air));
+        this.fire = new SimpleStringProperty(formatduration(fire));
+        this.water = new SimpleStringProperty(formatduration(water));
+        this.Void = new SimpleStringProperty(formatduration(Void));
+        this.postsession = new SimpleStringProperty(formatduration(postsession));
         this.total = new SimpleStringProperty(Util.formatdurationtoStringDecimalWithColons(total));
     }
 
-    public String convertduration(Duration duration) {
-        return String.valueOf((int) duration.toMinutes());
+    public String formatduration(Duration duration) {
+        return String.format("%.1f", duration.toMinutes());
     }
     public String toString() {
         return String.format("%s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s > %s",

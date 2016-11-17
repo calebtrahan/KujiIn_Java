@@ -13,23 +13,23 @@ import static kujiin.util.Util.dateFormat;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Session {
     private String Date_Practiced;
-    private Integer Presession_Duration;
-    private Integer Earth_Duration;
-    private Integer Air_Duration;
-    private Integer Fire_Duration;
-    private Integer Water_Duration;
-    private Integer Void_Duration;
-    private Integer Rin_Duration;
-    private Integer Kyo_Duration;
-    private Integer Toh_Duration;
-    private Integer Sha_Duration;
-    private Integer Kai_Duration;
-    private Integer Jin_Duration;
-    private Integer Retsu_Duration;
-    private Integer Zai_Duration;
-    private Integer Zen_Duration;
-    private Integer Postsession_Duration;
-    private Integer Total_Session_Duration;
+    private Double Presession_Duration;
+    private Double Earth_Duration;
+    private Double Air_Duration;
+    private Double Fire_Duration;
+    private Double Water_Duration;
+    private Double Void_Duration;
+    private Double Rin_Duration;
+    private Double Kyo_Duration;
+    private Double Toh_Duration;
+    private Double Sha_Duration;
+    private Double Kai_Duration;
+    private Double Jin_Duration;
+    private Double Retsu_Duration;
+    private Double Zai_Duration;
+    private Double Zen_Duration;
+    private Double Postsession_Duration;
+    private Double Total_Session_Duration;
     private ArrayList<SoundFile> Presession_Ambience;
     private ArrayList<SoundFile> Earth_Ambience;
     private ArrayList<SoundFile> Air_Ambience;
@@ -47,46 +47,46 @@ public class Session {
     private ArrayList<SoundFile> Zen_Ambience;
     private ArrayList<SoundFile> Postsession_Ambience;
 
-//    public Session(int[] durations) {
-//        Presession_Duration = durations[0];
-//        Rin_Duration = durations[1];
-//        Kyo_Duration = durations[2];
-//        Toh_Duration = durations[3];
-//        Sha_Duration = durations[4];
-//        Kai_Duration = durations[5];
-//        Jin_Duration = durations[6];
-//        Retsu_Duration = durations[7];
-//        Zai_Duration = durations[8];
-//        Zen_Duration = durations[9];
-//        Earth_Duration = durations[10];
-//        Air_Duration = durations[11];
-//        Fire_Duration = durations[12];
-//        Water_Duration = durations[13];
-//        Void_Duration = durations[14];
-//        Postsession_Duration = durations[15];
-//        int totalduration = 0;
-//        for (int i : durations) {totalduration += i;}
-//        Total_Session_Duration = totalduration;
-//        setDate_Practiced(LocalDate.now());
-//    }
     public Session() {
-        Presession_Duration = 0;
-        Rin_Duration = 0;
-        Kyo_Duration = 0;
-        Toh_Duration = 0;
-        Sha_Duration = 0;
-        Kai_Duration = 0;
-        Jin_Duration = 0;
-        Retsu_Duration = 0;
-        Zai_Duration = 0;
-        Zen_Duration = 0;
-        Earth_Duration = 0;
-        Air_Duration = 0;
-        Fire_Duration = 0;
-        Water_Duration = 0;
-        Void_Duration = 0;
-        Postsession_Duration = 0;
-        Total_Session_Duration = 0;
+        Presession_Duration = 0.0;
+        Rin_Duration = 0.0;
+        Kyo_Duration = 0.0;
+        Toh_Duration = 0.0;
+        Sha_Duration = 0.0;
+        Kai_Duration = 0.0;
+        Jin_Duration = 0.0;
+        Retsu_Duration = 0.0;
+        Zai_Duration = 0.0;
+        Zen_Duration = 0.0;
+        Earth_Duration = 0.0;
+        Air_Duration = 0.0;
+        Fire_Duration = 0.0;
+        Water_Duration = 0.0;
+        Void_Duration = 0.0;
+        Postsession_Duration = 0.0;
+        Total_Session_Duration = 0.0;
+        setDate_Practiced(LocalDate.now());
+    }
+    public Session(double[] durations) {
+        Presession_Duration = durations[0];
+        Rin_Duration = durations[1];
+        Kyo_Duration = durations[2];
+        Toh_Duration = durations[3];
+        Sha_Duration = durations[4];
+        Kai_Duration = durations[5];
+        Jin_Duration = durations[6];
+        Retsu_Duration = durations[7];
+        Zai_Duration = durations[8];
+        Zen_Duration = durations[9];
+        Earth_Duration = durations[10];
+        Air_Duration = durations[11];
+        Fire_Duration = durations[12];
+        Water_Duration = durations[13];
+        Void_Duration = durations[14];
+        Postsession_Duration = durations[15];
+        double totalduration = 0;
+        for (double i : durations) {totalduration += i;}
+        Total_Session_Duration = totalduration;
         setDate_Practiced(LocalDate.now());
     }
 
@@ -94,7 +94,7 @@ public class Session {
     public LocalDate getDate_Practiced() {return LocalDate.parse(Date_Practiced, dateFormat);}
     public void setDate_Practiced(LocalDate date_Practiced) {Date_Practiced = date_Practiced.format(dateFormat);}
     public void updateduration(SessionPart sessionPart, Duration duration) {
-        int minutes = (int) duration.toMinutes();
+        double minutes = duration.toMinutes();
         switch (sessionPart.number) {
             case 0:
                 Presession_Duration = minutes;
@@ -145,7 +145,9 @@ public class Session {
                 Postsession_Duration = minutes;
                 break;
         }
-        Total_Session_Duration = (int) gettotalsessionduration().toMinutes();
+        Duration total = Duration.ZERO;
+        for (int i=0; i<16; i++) {total = total.add(getduration(i));}
+        Total_Session_Duration = total.toMinutes();
     }
     public Duration getduration(SessionPart sessionpart) {
         switch (sessionpart.number) {
@@ -224,9 +226,7 @@ public class Session {
         }
     }
     public Duration gettotalsessionduration() {
-        Duration duration = Duration.ZERO;
-        for (int i = 0; i < 16; i++) {duration = duration.add(getduration(i));}
-        return duration;
+        return Duration.minutes(Total_Session_Duration);
     }
     public void updatesessionpartambience(SessionPart sessionPart, ArrayList<SoundFile> ambiencelist) {
         switch (sessionPart.number) {
@@ -320,8 +320,8 @@ public class Session {
     }
 
 // Utility Methods
-    public boolean sessionempty() {
-        return gettotalsessionduration().greaterThan(Duration.ZERO);
+    public boolean isValid() {
+        return Duration.minutes(Total_Session_Duration).greaterThan(Duration.ZERO);
     }
 
 }
