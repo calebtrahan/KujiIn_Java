@@ -1079,8 +1079,7 @@ public class SessionPart {
 
 // Goals
     // XML
-    public void goals_unmarshall() {Goals = root.getProgressTracker().getGoals().getSessionPartGoalList(number);}
-    public void goals_marshall() {root.getProgressTracker().getGoals().setSessionPartGoalList(number, Goals);}
+    public void goals_unmarshall() {Goals = root.getProgressTracker().getGoals().get(this);}
     // List Methods
     public kujiin.xml.Goals.Goal goals_getCurrent() {
         if (goals_getAll().isEmpty()) {return null;}
@@ -1115,7 +1114,7 @@ public class SessionPart {
         List<kujiin.xml.Goals.Goal> goallist = Goals;
         if (goallist != null && ! goallist.isEmpty()) {
             try {
-                goallist = kujiin.xml.Goals.sortgoalsbyDuration(goallist);
+                Collections.sort(goallist, (o1, o2) -> o1.getDuration().compareTo(o2.getDuration()));
                 int count = 1;
                 for (kujiin.xml.Goals.Goal i : goallist) {
                     i.setID(count);

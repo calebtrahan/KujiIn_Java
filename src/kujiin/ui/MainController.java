@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 // Bugs To Fix
+    // TODO Find NullPointer During Session Playback On Thread During Transition
 
 // GUI
     // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified

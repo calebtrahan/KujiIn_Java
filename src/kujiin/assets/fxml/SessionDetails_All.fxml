@@ -298,6 +298,11 @@
                                                 <Insets left="5.0" />
                                              </HBox.margin>
                                           </Button>
+                                          <HBox alignment="CENTER_RIGHT" prefHeight="26.0" prefWidth="810.0">
+                                             <children>
+                                                <Label text="(All Durations In Minutes)" />
+                                             </children>
+                                          </HBox>
                                        </children>
                                     </HBox>
                                     <HBox alignment="CENTER_RIGHT" prefHeight="26.0" prefWidth="488.0">

@@ -3,6 +3,7 @@ package kujiin.xml;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.InformationDialog;
+import kujiin.util.SessionPart;
 import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
@@ -14,7 +15,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 import static kujiin.util.Util.dateFormat;
@@ -48,8 +48,8 @@ public class Goals {
     }
 
 // List Getters
-    public List<Goal> getSessionPartGoalList(int sessionpartindex) {
-        switch (sessionpartindex) {
+    public List<Goal> get(SessionPart sessionpart) {
+        switch (sessionpart.number) {
             case 0: return PresessionGoals;
             case 1: return RinGoals;
             case 2: return KyoGoals;
@@ -70,8 +70,8 @@ public class Goals {
             default: return null;
         }
     }
-    public void setSessionPartGoalList(int sessionpartindex, List<Goal> goallist) {
-        switch (sessionpartindex) {
+    public void set(SessionPart sessionpart, List<Goal> goallist) {
+        switch (sessionpart.number) {
             case 0: PresessionGoals = goallist; return;
             case 1: RinGoals = goallist; return;
             case 2: KyoGoals = goallist; return;
@@ -133,14 +133,6 @@ public class Goals {
     }
 
 // Utility
-    public static List<Goal> sortgoalsbyDuration(List<Goal> listtosort) {
-        Collections.sort(listtosort, (o1, o2) -> o1.Duration.compareTo(o2.Duration));
-        return listtosort;
-    }
-    public static List<Goal> sortgoalsbyDate(List<Goal> listtosort) {
-        Collections.sort(listtosort, (o1, o2) -> o1.Date_Set.compareTo(o2.Date_Set));
-        return listtosort;
-    }
 
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Goal {

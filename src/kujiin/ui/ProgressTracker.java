@@ -14,7 +14,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import kujiin.ui.dialogs.ConfirmationDialog;
 import kujiin.ui.dialogs.ExceptionDialog;
 import kujiin.ui.dialogs.InformationDialog;
 import kujiin.ui.dialogs.SessionDetails;
@@ -36,7 +35,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static kujiin.xml.Preferences.PROGRAM_ICON;
 
@@ -243,7 +241,7 @@ public class ProgressTracker implements UI {
         simpleGoalSetDialog.showAndWait();
         if (simpleGoalSetDialog.shouldSetgoal()) {
             sessionPart.goals_add(new Goals.Goal(simpleGoalSetDialog.getNewGoalDuration()));
-            sessionPart.goals_marshall();
+            Goals.set(sessionPart, sessionPart.getGoals());
         }
     }
     public void goals_viewcurrent() {
@@ -295,20 +293,8 @@ public class ProgressTracker implements UI {
                 GoalsTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> newrowselected());
                 populatetable();
                 newrowselected();
-                if (SelectedSessionPart != null) {
-                    GoalsTable.getSelectionModel().select(SelectedSessionPart.number);
-                }
-                this.setOnCloseRequest(event -> {
-                    ArrayList<SessionPart> sessionpartsmissingcurrentgoals = SessionParts.stream().filter(i -> i.goals_getCurrent() == null).collect(Collectors.toCollection(ArrayList::new));
-                    if (sessionpartsmissingcurrentgoals.size() > 0) {
-                        if (! new ConfirmationDialog(Preferences, "Confirmation", null, "Missing Current Goals For " + sessionpartsmissingcurrentgoals.size() + " Session Parts. Close Without Setting Goals", "Close", "Cancel").getResult()) {
-                            event.consume();
-                        }
-                    }
-                });
-            } catch (IOException e) {
-                new ExceptionDialog(Preferences, e).showAndWait();
-            }
+                if (SelectedSessionPart != null) {GoalsTable.getSelectionModel().select(SelectedSessionPart.number);}
+            } catch (IOException e) {new ExceptionDialog(Preferences, e).showAndWait();}
         }
 
         public void populatetable() {
@@ -316,10 +302,10 @@ public class ProgressTracker implements UI {
             for (SessionPart i : SessionParts) {
                 Duration practicedtime = i.sessions_getPracticedDuration(false);
                 String practicedtext;
-                if (practicedtime.lessThanOrEqualTo(Duration.ZERO)) {
-                    practicedtext = "None";
+                if (practicedtime.lessThanOrEqualTo(Duration.ZERO)) {practicedtext = "None";
                 } else {
                     practicedtext = Util.formatdurationtoStringSpelledOut(i.sessions_getPracticedDuration(false), null);
+                    System.out.println(i.name + ": " + practicedtext);
                 }
                 String currentgoaltime;
                 String percentcompleted;

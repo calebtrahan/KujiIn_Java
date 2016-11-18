@@ -65,8 +65,8 @@
         </freq>
         <rampfile>
             <duration>30040.816326</duration>
-            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/rintokyo.mp3</file>
-            <name>rintokyo</name>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/rintoqi.mp3</file>
+            <name>rintoqi</name>
         </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
@@ -518,8 +518,8 @@
         </freq>
         <rampfile>
             <duration>30040.816326</duration>
-            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/qitozen.mp3</file>
-            <name>qitozen</name>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/entrainment/ramp/qitorin.mp3</file>
+            <name>qitorin</name>
         </rampfile>
         <rampfiles>
             <duration>30040.816326</duration>
