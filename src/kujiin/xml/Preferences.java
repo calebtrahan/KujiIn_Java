@@ -2,7 +2,7 @@ package kujiin.xml;
 
 import javafx.application.Platform;
 import javafx.scene.image.Image;
-import kujiin.ui.dialogs.InformationDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.enums.AmbiencePlaybackType;
 import kujiin.util.enums.ReferenceType;
 
@@ -143,19 +143,15 @@ public class Preferences {
                 JAXBContext context = JAXBContext.newInstance(Preferences.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
                 Preferences preferences = (Preferences) unmarshaller.unmarshal(OPTIONSXMLFILE);
+                if (! preferences.getAdvancedOptions().getOS().equals(System.getProperty("os.name"))) {preferences.getUserInterfaceOptions().recalculatethemefile();}
                 setUserInterfaceOptions(preferences.getUserInterfaceOptions());
                 setCreationOptions(preferences.getCreationOptions());
                 setExportOptions(preferences.getExportOptions());
                 setSessionOptions(preferences.getSessionOptions());
                 setPlaybackOptions(preferences.getPlaybackOptions());
                 setAdvancedOptions(preferences.getAdvancedOptions());
-            } catch (JAXBException ignored) {
-                Platform.runLater(() -> new InformationDialog(this, "Information", "Couldn't Open Preferences", "Check Read File Permissions Of \n" +
-                        OPTIONSXMLFILE.getName()));
-            }
-        } else {
-            resettodefaults();
-        }
+            } catch (JAXBException ignored) {Platform.runLater(() -> new InformationDialog(this, "Information", "Couldn't Open Preferences", "Check Read File Permissions Of \n" + OPTIONSXMLFILE.getName()));}
+        } else {resettodefaults();}
     }
     public void marshall() {
         try {
@@ -239,6 +235,9 @@ public class Preferences {
         public UserInterfaceOptions() {}
 
     // Getters And Setters
+        public void recalculatethemefile() {
+            themefile = DEFAULT_THEMEFILE.toURI().toString();
+        }
         public Boolean getTooltips() {
                 return tooltips;
             }

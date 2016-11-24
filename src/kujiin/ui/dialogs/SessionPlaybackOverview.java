@@ -11,6 +11,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.alerts.AnswerDialog;
+import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Cut;
 import kujiin.util.Qi_Gong;
 import kujiin.util.SessionPart;
@@ -34,7 +38,7 @@ import java.util.stream.Collectors;
 
 import static kujiin.xml.Preferences.PROGRAM_ICON;
 
-public class SessionPlaybackOverview extends Stage {
+public class SessionPlaybackOverview extends ModalDialog {
     public TableView<SessionItem> SessionItemsTable;
     public TableColumn<SessionItem, Integer> NumberColumn;
     public TableColumn<SessionItem, String> NameColumn;
@@ -60,7 +64,8 @@ public class SessionPlaybackOverview extends Stage {
     private MainController Root;
     private AmbiencePlaybackType ambiencePlaybackType;
 
-    public SessionPlaybackOverview(MainController Root, List<SessionPart> itemsinsession) {
+    public SessionPlaybackOverview(MainController Root, Stage parent, boolean minimizeparent, List<SessionPart> itemsinsession) {
+        super(Root, parent, minimizeparent);
         try {
             this.Root = Root;
             alladjustedsessionitems = itemsinsession;
@@ -68,12 +73,9 @@ public class SessionPlaybackOverview extends Stage {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             setOnCloseRequest(event -> {
+
             });
             setTitle("Session Playback Overview");
             NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
@@ -335,7 +337,7 @@ public class SessionPlaybackOverview extends Stage {
                     selectedsessionpart.changevalue((int) changedurationdialog.getDuration().toMinutes());
                     break;
                 case RAMP:
-                    selectedsessionpart.setRamponly(true);
+                    selectedsessionpart.setRamponly();
                     break;
                 case CANCEL:
                     break;
@@ -428,8 +430,8 @@ public class SessionPlaybackOverview extends Stage {
                 break;
             case "Add Ambience":
                 if (Root.getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Simple")) {
-                    new AmbienceEditor_Simple(Root, selectedsessionpart).showAndWait();
-                } else {new AmbienceEditor_Advanced(Root, selectedsessionpart).showAndWait();}
+                    new AmbienceEditor_Simple(Root, this, false, selectedsessionpart).showAndWait();
+                } else {new AmbienceEditor_Advanced(Root, this, false, selectedsessionpart).showAndWait();}
                 populatetable();
                 break;
             default:
@@ -504,7 +506,7 @@ public class SessionPlaybackOverview extends Stage {
         if (!indexesmissingduration.isEmpty()) {
             if (new ConfirmationDialog(Root.getPreferences(), "Confirmation", indexesmissingduration.size() + " Session Parts Are Missing Durations", "Set Ramp Only For The Parts Missing Durations",
                     "Set Ramp Only", "Cancel Playback").getResult()) {
-                for (int x : indexesmissingduration) {alladjustedsessionitems.get(x).setRamponly(true);}
+                for (int x : indexesmissingduration) {alladjustedsessionitems.get(x).setRamponly();}
             } else {return;}
         }
         // Check Ambience
@@ -547,16 +549,16 @@ public class SessionPlaybackOverview extends Stage {
             }
         }
         if (longsession && !Root.getPreferences().getSessionOptions().getAlertfunction()) {
-            switch (new AnswerDialog(Root.getPreferences(), "Add Alert File", null, "I've Detected A Long Session. Add Alert File In Between Session Parts?",
+            switch (new AnswerDialog(Root.getPreferences(), this, "Add Alert File", null, "I've Detected A Long Session. Add Alert File In Between Session Parts?",
                     "Add Alert File", "Continue Without Alert File", "Cancel Playback").getResult()) {
                 case YES:
-                    new SelectAlertFile(Root).showAndWait();
+                    new SelectAlertFile(Root, this, false).showAndWait();
                     break;
                 case CANCEL:
                     return;
             }
         } else if (Root.getPreferences().getSessionOptions().getAlertfunction()) {
-            switch (new AnswerDialog(Root.getPreferences(), "Disable Alert File", null, "I've Detected A Relatively Short Session With Alert File Enabled",
+            switch (new AnswerDialog(Root.getPreferences(), this,  "Disable Alert File", null, "I've Detected A Relatively Short Session With Alert File Enabled",
                     "Disable Alert File", "Leave Alert File Enabled", "Cancel Playback").getResult()) {
                 case YES:
                     Root.getPreferences().getSessionOptions().setAlertfunction(false);
@@ -829,7 +831,7 @@ public class SessionPlaybackOverview extends Stage {
         }
         public void preview() {
             if (selectedtableitem != null) {
-                PreviewFile previewFile = new PreviewFile(selectedtableitem.getFile(), Root, this);
+                PreviewFile previewFile = new PreviewFile(selectedtableitem.getFile(), Root, this, false);
                 previewFile.showAndWait();
             }
         }
@@ -890,9 +892,9 @@ public class SessionPlaybackOverview extends Stage {
             PreviewButton.setDisable(AmbienceTable.getSelectionModel().getSelectedItems().size() != 1);
         }
         public void preview() {
-            if (!PreviewButton.isDisabled()) {
+            if (! PreviewButton.isDisabled()) {
                 File file = ambienceSongs.get(AmbienceTable.getSelectionModel().getSelectedIndex()).getFile();
-                new PreviewFile(file, Root, this).showAndWait();
+                new PreviewFile(file, Root, this, false).showAndWait();
             }
         }
         public void addfiles() {

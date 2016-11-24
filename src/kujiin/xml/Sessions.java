@@ -2,7 +2,7 @@ package kujiin.xml;
 
 import javafx.util.Duration;
 import kujiin.ui.MainController;
-import kujiin.ui.dialogs.InformationDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.Qi_Gong;
 import kujiin.util.SessionPart;
 

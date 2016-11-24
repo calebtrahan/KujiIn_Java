@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 import kujiin.ui.MainController;
 import kujiin.ui.ProgressTracker;
 import kujiin.ui.SessionCreator;
-import kujiin.ui.dialogs.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.util.enums.ProgramState;
 import kujiin.xml.Ambiences;
 import kujiin.xml.Entrainments;

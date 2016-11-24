@@ -14,9 +14,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import kujiin.ui.dialogs.ExceptionDialog;
-import kujiin.ui.dialogs.InformationDialog;
 import kujiin.ui.dialogs.SessionDetails;
+import kujiin.ui.dialogs.alerts.ExceptionDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.Qi_Gong;
 import kujiin.util.SessionPart;
 import kujiin.util.Total;
@@ -159,8 +159,8 @@ public class ProgressTracker implements UI {
             new InformationDialog(Preferences, "No Sessions", "No Practiced Sessions", "Cannot View Sessions");
         } else {new AllSessionDetails().showAndWait();}
     }
-    public void session_displaydetails(Session individualsession) {
-        new SessionDetails(Root, individualsession, Root.getStage()).showAndWait();
+    public void session_displaydetails(Session individualsession, Stage stage) {
+        new SessionDetails(Root, stage, false, individualsession).showAndWait();
     }
 
 // Goals
@@ -568,9 +568,9 @@ public class ProgressTracker implements UI {
             }
             sessionsTableView.setItems(rowlist);
         }
-        public void viewsessiondetails(ActionEvent actionEvent) {
+        public void viewsessiondetails() {
             if (sessionsTableView.getSelectionModel().getSelectedIndex() != -1) {
-                new SessionDetails(Root, filteredsessionlist.get(sessionsTableView.getSelectionModel().getSelectedIndex()), Root.getStage()).showAndWait();
+                new SessionDetails(Root, this, false, filteredsessionlist.get(sessionsTableView.getSelectionModel().getSelectedIndex())).showAndWait();
             }
         }
         public void filterbydateselected(ActionEvent actionEvent) {

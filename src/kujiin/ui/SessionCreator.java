@@ -5,6 +5,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,6 +19,10 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.dialogs.*;
+import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.ErrorDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.*;
 import kujiin.util.enums.*;
 import kujiin.util.interfaces.UI;
@@ -182,7 +187,7 @@ public class SessionCreator implements UI {
         }
     }
     public void changeallcutvalues() {
-        ChangeAllValues changevaluesdialog = new ChangeAllValues(Root, "Change All Cut Values To: ");
+        ChangeAllValues changevaluesdialog = new ChangeAllValues(Root, Root.getStage(), false, "Change All Cut Values To: ");
         changevaluesdialog.showAndWait();
         if (changevaluesdialog.getAccepted()) {
             Integer min = changevaluesdialog.getMinutes();
@@ -196,7 +201,7 @@ public class SessionCreator implements UI {
         }
     }
     public void changeallelementvalues() {
-        ChangeAllValues changevaluesdialog = new ChangeAllValues(Root, "Change All Element Values To: ");
+        ChangeAllValues changevaluesdialog = new ChangeAllValues(Root, Root.getStage(), false, "Change All Element Values To: ");
         changevaluesdialog.showAndWait();
         if (changevaluesdialog.getAccepted()) {
             Integer min = changevaluesdialog.getMinutes();
@@ -213,7 +218,7 @@ public class SessionCreator implements UI {
         itemsinsession = new ArrayList<>();
         for (SessionPart i : Root.getAllSessionParts(false)) {
             if (i.getduration().greaterThan(Duration.ZERO) || i.ramponly) {itemsinsession.add(i);}
-            else if (i instanceof Qi_Gong && Root.getPreferences().getSessionOptions().getPrepostrampenabled()) {i.setRamponly(true); itemsinsession.add(i);}
+            else if (i instanceof Qi_Gong && Root.getPreferences().getSessionOptions().getPrepostrampenabled()) {i.setRamponly(); itemsinsession.add(i);}
         }
     }
     public boolean creationprechecks() {
@@ -224,7 +229,7 @@ public class SessionCreator implements UI {
             }
             populateitemsinsession();
             setDisable(true, "Creator Disabled While Confirming Session");
-            SessionPlaybackOverview sessionPlaybackOverview = new SessionPlaybackOverview(Root, itemsinsession);
+            SessionPlaybackOverview sessionPlaybackOverview = new SessionPlaybackOverview(Root, Root.getStage(), false, itemsinsession);
             sessionPlaybackOverview.showAndWait();
             setDisable(false, "");
             if (sessionPlaybackOverview.getResult()) {
@@ -299,7 +304,7 @@ public class SessionCreator implements UI {
     }
 
 // Subclasses
-    public class Player extends Stage {
+    public class Player extends ModalDialog {
         public Label CurrentSessionPartTopLabel;
         public ProgressIndicator CurrentSessionPartProgress;
         public Label CurrentProgressDetails;
@@ -332,6 +337,7 @@ public class SessionCreator implements UI {
         public Session currentsession;
 
         public Player() {
+            super(Root, Root.getStage(), true);
             try {
                 updateuitimeline.stop();
                 if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
@@ -340,10 +346,6 @@ public class SessionCreator implements UI {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                getIcons().clear();
-                getIcons().add(PROGRAM_ICON);
-                String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setTitle("Session Player");
                 reset(false);
                 if (Root.getPreferences().getSessionOptions().getReferenceoption() && Root.getPreferences().getSessionOptions().getReferencetype() != null) {
@@ -449,10 +451,10 @@ public class SessionCreator implements UI {
         }
         public void stop() {
             if (playerState == PLAYING || playerState == PAUSED) {
-                if (new ConfirmationDialog(preferences, "Stop Session", "Really Stop Session?", "This Will Reset Session Player", "Stop Session", "Cancel").getResult()) {
+                if (new ConfirmationDialog(preferences, "Stop Session", "Really Stop Session?", "Session Will Be Stopped And Cannot Be Resumed",
+                        "Stop Session", "Cancel").getResult()) {
                     currentsessionpart.stop();
                     player_updateuitimeline.stop();
-                    reset(false);
                 }
             }
         }
@@ -577,6 +579,12 @@ public class SessionCreator implements UI {
             CurrentSessionPartTopLabel.setText(currentsessionpart.name + " Completed");
             TotalSessionLabel.setText("Session Completed");
             player_updateuitimeline.stop();
+            player_updateuitimeline.setOnFinished(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    reset(false);
+                }
+            });
             PlayButton.setText("Replay");
             playerState = PlayerState.STOPPED;
             itemsinsession.forEach(SessionPart::cleanupPlayersandAnimations);
@@ -585,7 +593,7 @@ public class SessionCreator implements UI {
             progressTracker.sessions_updateui();
             progressTracker.goals_updateui(this);
             currentsession = null;
-            new SessionDetails(Root, itemsinsession, this).show();
+            new SessionDetails(Root, this, false, itemsinsession).show();
             reset(true);
         }
         public boolean endsessionprematurely() {
@@ -618,7 +626,7 @@ public class SessionCreator implements UI {
                 togglevolumebinding();
             } else {
                 if (selectReferenceType != null && selectReferenceType.isShowing()) {return;}
-                else {selectReferenceType = new SelectReferenceType(Root, itemsinsession, playerState != PLAYING);}
+                else {selectReferenceType = new SelectReferenceType(Root, this, false, itemsinsession);}
                 switch (playerState) {
                     case IDLE:
                         selectReferenceType.showAndWait();
@@ -651,7 +659,7 @@ public class SessionCreator implements UI {
             boolean referenceenabledwithvalidtype = Root.getPreferences().getSessionOptions().getReferenceoption() &&
                     (Root.getPreferences().getSessionOptions().getReferencetype() == ReferenceType.html || Root.getPreferences().getSessionOptions().getReferencetype() == ReferenceType.txt);
             if (notalreadyshowing && referenceenabledwithvalidtype) {
-                displayReference = new DisplayReference(Root, currentsessionpart, itemsinsession.indexOf(currentsessionpart) == 0);
+                displayReference = new DisplayReference(Root, this, false, currentsessionpart, itemsinsession.indexOf(currentsessionpart) == 0);
                 displayReference.show();
                 displayReference.setOnHidden(event -> {
                     currentsessionpart.volume_rebindentrainment();

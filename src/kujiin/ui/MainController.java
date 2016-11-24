@@ -8,7 +8,11 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import kujiin.ui.dialogs.*;
+import kujiin.ui.dialogs.AmbienceEditor_Advanced;
+import kujiin.ui.dialogs.AmbienceEditor_Simple;
+import kujiin.ui.dialogs.ChangeProgramOptions;
+import kujiin.ui.dialogs.EditReferenceFiles;
+import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.*;
 import kujiin.util.enums.FreqType;
 import kujiin.util.enums.ProgramState;
@@ -26,9 +30,9 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 // Bugs To Fix
     // TODO Find NullPointer During Session Playback On Thread During Transition
-
-// GUI
-    // TODO Find Out Why Displaying Some Dialogs Makes Root Uniconified
+    // TODO Startup Checks
+        // Percentage Isn't Calculating Correctly
+    // TODO Find A Way To Reset Session After Stop Animation Ends
 
 // Features To Test
 
@@ -218,7 +222,7 @@ public class MainController implements Initializable {
     }
     public void setupMenuActions() {
         Menu_Preferences.setOnAction(event -> {
-            new ChangeProgramOptions(MainController.this).showAndWait();
+            new ChangeProgramOptions(MainController.this, getStage(), false).showAndWait();
             getAllSessionParts(false).forEach(SessionPart::syncguielements);
             Preferences.marshall();
             getProgressTracker().sessions_updateui();
@@ -227,13 +231,13 @@ public class MainController implements Initializable {
         Menu_Close.setOnAction(event -> close());
         Menu_EditAmbience.setOnAction(event -> {
             if (programState == ProgramState.IDLE) {
-                if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Simple")) {new AmbienceEditor_Simple(this).showAndWait();}
-                else if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Advanced")) {new AmbienceEditor_Advanced(this).showAndWait();}
+                if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Simple")) {new AmbienceEditor_Simple(this, getStage(), false).showAndWait();}
+                else if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Advanced")) {new AmbienceEditor_Advanced(this, getStage(), false).showAndWait();}
             } else {
                 new InformationDialog(getPreferences(), "Information", "Cannot Edit Ambience While Performing Startup Checks", "");
             }
         });
-        Menu_EditReference.setOnAction(event -> new EditReferenceFiles(this).showAndWait());
+        Menu_EditReference.setOnAction(event -> new EditReferenceFiles(this, getStage(), false).showAndWait());
         Menu_Help.setOnAction(event -> {});
         Menu_About.setOnAction(event -> {});
         Menu_Contact.setOnAction(event -> {});

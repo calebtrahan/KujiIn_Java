@@ -12,10 +12,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.SessionPart;
 import kujiin.util.Util;
 import kujiin.xml.Preferences;
@@ -25,9 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kujiin.xml.Preferences.PROGRAM_ICON;
-
-public class SessionDetails extends Stage {
+public class SessionDetails extends ModalDialog {
     private MainController Root;
     public BarChart<String, Number> SessionBarChart;
     public CategoryAxis SessionCategoryAxis;
@@ -40,20 +38,14 @@ public class SessionDetails extends Stage {
     public TextField MostProgressTextField;
     public TextField AverageDurationTextField;
 
-    public SessionDetails(MainController Root, List<SessionPart> itemsinsession, Stage parent) {
+    public SessionDetails(MainController Root, Stage parent, boolean minimizeparent, List<SessionPart> itemsinsession) {
+        super(Root, parent, minimizeparent);
         try {
             this.Root = Root;
-            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionCompleteDialog.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            initModality(Modality.WINDOW_MODAL);
-            initOwner(parent);
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             SessionNumbersAxis.setLabel("Minutes");
             setTitle("Session Details");
@@ -82,19 +74,13 @@ public class SessionDetails extends Stage {
             CloseButton.setOnAction(event -> close());
         } catch (IOException ignored) {}
     }
-    public SessionDetails(MainController Root, kujiin.xml.Session session, Stage parent) {
+    public SessionDetails(MainController Root, Stage parent, boolean minimizeparent, kujiin.xml.Session session) {
+        super(Root, parent, minimizeparent);
         try {
-            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionDetails_Individual.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            initModality(Modality.WINDOW_MODAL);
-            initOwner(parent);
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             SessionNumbersAxis.setLabel("Minutes");
             setTitle("Session Details");

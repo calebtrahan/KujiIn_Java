@@ -1,8 +1,8 @@
 package kujiin.xml;
 
 import kujiin.ui.MainController;
-import kujiin.ui.dialogs.ErrorDialog;
-import kujiin.ui.dialogs.InformationDialog;
+import kujiin.ui.dialogs.alerts.ErrorDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.SessionPart;
 
 import javax.xml.bind.JAXBContext;

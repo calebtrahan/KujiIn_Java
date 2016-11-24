@@ -1,7 +1,7 @@
 package kujiin.xml;
 
 import kujiin.ui.MainController;
-import kujiin.ui.dialogs.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;

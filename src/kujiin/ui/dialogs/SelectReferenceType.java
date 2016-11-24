@@ -6,9 +6,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.ErrorDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.SessionPart;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.Preferences;
@@ -17,9 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static kujiin.xml.Preferences.PROGRAM_ICON;
-
-public class SelectReferenceType extends Stage {
+public class SelectReferenceType extends ModalDialog {
     public RadioButton HTMLRadioButton;
     public RadioButton TextRadioButton;
     public TextArea Description;
@@ -31,24 +32,17 @@ public class SelectReferenceType extends Stage {
     private MainController Root;
     private List<SessionPart> itemsinsession;
 
-    public SelectReferenceType(MainController Root, List<SessionPart> itemsinsession, boolean modal) {
-        this.itemsinsession = itemsinsession;
+    public SelectReferenceType(MainController Root, Stage stage, boolean minimizeparent, List<SessionPart> itemsinsession) {
+        super(Root, stage, minimizeparent);
         try {
+            this.itemsinsession = itemsinsession;
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SelectReferenceType.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setTitle("Select Reference Type");
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            if (modal) {
-                initModality(Modality.WINDOW_MODAL);
-                initOwner(Root.getStage());
-            }
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
-            this.setResizable(false);
+            setResizable(false);
             setOnCloseRequest(event -> {});
             descriptions.add("Display HTML Variation Of Reference Files During Session Playback. This Is Stylized Code That Allows You To Color/Format Your Reference In A Way Plain Text Cannot");
             descriptions.add("Display Text Variation Of Reference Files During Session Playback. This Is Just Plain Text So It Won't Be Formatted Or Styled");

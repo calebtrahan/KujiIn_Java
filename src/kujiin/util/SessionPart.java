@@ -12,7 +12,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
-import kujiin.ui.dialogs.AnswerDialog;
+import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.util.enums.PlayerState;
 import kujiin.util.enums.ReferenceType;
 import kujiin.util.enums.StartupCheckType;
@@ -51,7 +51,7 @@ public class SessionPart {
     protected Animation timeline_progresstonextsessionpart;
     protected Animation timeline_start_ending_ramp;
     protected StartupCheckType startupCheckType = StartupCheckType.ENTRAINMENT;
-    public boolean ramponly;
+    public boolean ramponly = false;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
     private ArrayList<SoundFile> ambienceplayhistory;
@@ -227,8 +227,8 @@ public class SessionPart {
     }
 
     // Duration
-    public void setRamponly(boolean ramponly) {
-        this.ramponly = ramponly;
+    public void setRamponly() {
+        this.ramponly = true;
     }
     public void setDuration(Duration duration) {this.duration = duration;}
     public Duration getduration() {return duration;}
@@ -968,7 +968,7 @@ public class SessionPart {
     protected void entrainmenterror() {
         System.out.println("Entrainment Error");
         // Pause Ambience If Exists
-        switch (new AnswerDialog(root.getPreferences(), "Entrainment Playback Error", null, "An Error Occured While Playing " + name +
+        switch (new AnswerDialog(root.getPreferences(), root.getSessionCreator().getPlayer(), "Entrainment Playback Error", null, "An Error Occured While Playing " + name +
                         "'s Entrainment. Problem File Is: '" + entrainmentplayer.getMedia().getSource() + "'",
                 "Retry Playback", "Mute Entrainment", "Stop Session Playback").getResult()) {
             case YES:
@@ -984,7 +984,7 @@ public class SessionPart {
     protected void ambienceerror() {
         System.out.println("Ambience Error!");
         // Pause Entrainment
-        switch (new AnswerDialog(root.getPreferences(), "Ambience Playback Error", null, "An Error Occured While Playing " + name +
+        switch (new AnswerDialog(root.getPreferences(), root.getSessionCreator().getPlayer(), "Ambience Playback Error", null, "An Error Occured While Playing " + name +
                         "'s Ambience. Problem File Is: '" + ambienceplayer.getMedia().getSource() + "'",
                 "Retry Playback", "Mute Ambience", "Stop Session Playback").getResult()) {
             case YES:

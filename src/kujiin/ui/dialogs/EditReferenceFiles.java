@@ -10,6 +10,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.alerts.*;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.SessionPart;
 import kujiin.util.Util;
 import kujiin.util.enums.ReferenceType;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
 
 import static kujiin.xml.Preferences.PROGRAM_ICON;
 
-public class EditReferenceFiles extends Stage {
+public class EditReferenceFiles extends ModalDialog {
     public ChoiceBox<String> SessionPartNamesChoiceBox;
     public TextArea MainTextArea;
     public Button CloseButton;
@@ -36,7 +38,8 @@ public class EditReferenceFiles extends Stage {
     private ReferenceType referenceType;
     private MainController Root;
 
-    public EditReferenceFiles(MainController Root) {
+    public EditReferenceFiles(MainController Root, Stage stage, boolean minimizeparent) {
+        super(Root, stage, minimizeparent);
         try {
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/EditReferenceFiles.fxml"));
@@ -67,7 +70,7 @@ public class EditReferenceFiles extends Stage {
             String referencename = referenceType.name();
             this.setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (new AnswerDialog(Root.getPreferences(), "Confirmation", null, SessionPartNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes",
+                    switch (new AnswerDialog(Root.getPreferences(), this, "Confirmation", null, SessionPartNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes",
                             "Save And Close", "Close Without Saving", "Cancel").getResult()) {
                         case YES:
                             saveselectedfile();
@@ -98,7 +101,7 @@ public class EditReferenceFiles extends Stage {
         HTMLVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
         TEXTVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
         if (userselectedindexes.size() > 0 && selectedfile != null && unsavedchanges()) {
-            Util.AnswerType answerType = new AnswerDialog(Root.getPreferences(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+            Util.AnswerType answerType = new AnswerDialog(Root.getPreferences(), Root.getStage(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
                     "Save And Close", "Close Without Saving", "Cancel").getResult();
             switch (answerType) {
                 case YES:
@@ -138,7 +141,7 @@ public class EditReferenceFiles extends Stage {
     // Button Methods
     public void htmlselected() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getPreferences(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+            switch (new AnswerDialog(Root.getPreferences(), Root.getStage(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
                     "Save And Close", "Close Without Saving", "Cancel").getResult()) {
                 case YES:
                     saveselectedfile();
@@ -160,7 +163,7 @@ public class EditReferenceFiles extends Stage {
     }
     public void textselected() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getPreferences(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+            switch (new AnswerDialog(Root.getPreferences(), Root.getStage(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
                     "Save And Close", "Close Without Saving", "Cancel").getResult()) {
                 case YES:
                     saveselectedfile();
@@ -185,7 +188,7 @@ public class EditReferenceFiles extends Stage {
             if (! Util.String_validhtml(MainTextArea.getText())) {
                 if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Html Code In Text Area Is Not Valid HTML", "Preview Anyways", "Cancel").getResult()) {return;}
             }
-            new DisplayReference(Root, MainTextArea.getText());
+            new DisplayReference(Root, this, false, MainTextArea.getText());
         }
     }
 

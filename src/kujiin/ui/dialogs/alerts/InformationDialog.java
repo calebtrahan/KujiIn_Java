@@ -1,4 +1,4 @@
-package kujiin.ui.dialogs;
+package kujiin.ui.dialogs.alerts;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.DialogPane;

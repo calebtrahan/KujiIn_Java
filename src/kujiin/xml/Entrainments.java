@@ -1,8 +1,8 @@
 package kujiin.xml;
 
 import kujiin.ui.MainController;
-import kujiin.ui.dialogs.ErrorDialog;
-import kujiin.ui.dialogs.InformationDialog;
+import kujiin.ui.dialogs.alerts.ErrorDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.SessionPart;
 
 import javax.xml.bind.JAXBContext;
@@ -45,6 +45,7 @@ public class Entrainments {
                         "Check Permissions For " + Preferences.ENTRAINMENTXMLFILE.getAbsolutePath());
                 return;
             }
+            Root.getPreferences().getAdvancedOptions().setOS(System.getProperty("os.name"));
         }
         unmarshall();
     }

@@ -8,9 +8,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.alerts.AnswerDialog;
+import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.ErrorDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.SessionPart;
 import kujiin.util.Util;
 import kujiin.util.table.AmbienceSong;
@@ -24,9 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static kujiin.xml.Preferences.PROGRAM_ICON;
-
-public class AmbienceEditor_Simple extends Stage implements Initializable {
+public class AmbienceEditor_Simple extends ModalDialog implements Initializable {
     public TableView<AmbienceSong> AmbienceTable;
     public TableColumn<AmbienceSong, String> NameColumn;
     public TableColumn<AmbienceSong, String> DurationColumn;
@@ -61,36 +65,32 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         RemoveButton.setOnAction(event -> remove());
         PreviewButton.setOnAction(event -> preview());
     }
-    public AmbienceEditor_Simple(MainController Root) {
+    public AmbienceEditor_Simple(MainController Root, Stage stage, boolean minimizeparent) {
+        super(Root, stage, minimizeparent);
         try {
-            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
+//            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Simple.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
+            initOwner(stage);
+            initModality(Modality.APPLICATION_MODAL);
             setTitle("Simple Ambience Editor");
             setOnCloseRequest(event -> closedialog());
             SessionPartChoiceBox.setOnAction(event -> selectandloadsessionpart());
             NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
         } catch (IOException ignored) {}
     }
-    public AmbienceEditor_Simple(MainController Root, SessionPart sessionPart) {
+    public AmbienceEditor_Simple(MainController Root, Stage stage, boolean minimizeparent, SessionPart sessionPart) {
+        super(Root, stage, minimizeparent);
         try {
-            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
+//            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Simple.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
-            this.setResizable(false);
+            setResizable(false);
             setTitle("Simple Ambience Editor");
             setOnCloseRequest(event -> closedialog());
             setOnShowing(event -> {
@@ -174,7 +174,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
     public void preview() {
         if (selectedambiencesong != null && selectedambiencesong.getFile() != null && selectedambiencesong.getFile().exists()) {
             if (previewdialog == null || !previewdialog.isShowing()) {
-                previewdialog = new PreviewFile(selectedambiencesong.getFile(), Root, this);
+                previewdialog = new PreviewFile(selectedambiencesong.getFile(), Root, this, false);
                 previewdialog.showAndWait();
             }
         }
@@ -225,8 +225,8 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         }
         this.close();
         if (selectedsessionpart != null) {
-            new AmbienceEditor_Advanced(Root, selectedsessionpart).show();
-        } else {new AmbienceEditor_Advanced(Root).show();}
+            new AmbienceEditor_Advanced(Root, Root.getStage(), true, selectedsessionpart).show();
+        } else {new AmbienceEditor_Advanced(Root, Root.getStage(), true).show();}
     }
     public void save() {
         int index = SessionPartChoiceBox.getSelectionModel().getSelectedIndex();
@@ -242,7 +242,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
     }
     public void closedialog() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getPreferences(), "Unsaved Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save", "Discard", "Cancel").getResult()) {
+            switch (new AnswerDialog(Root.getPreferences(), this, "Unsaved Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save", "Discard", "Cancel").getResult()) {
                 case YES: save();
                 case NO: close(); break;
             }

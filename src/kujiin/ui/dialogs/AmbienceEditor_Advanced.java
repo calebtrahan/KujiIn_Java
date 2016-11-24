@@ -11,6 +11,11 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.alerts.AnswerDialog;
+import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.ExceptionDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.SessionPart;
 import kujiin.util.Util;
 import kujiin.util.table.AmbienceSong;
@@ -25,9 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static kujiin.xml.Preferences.PROGRAM_ICON;
-
-public class AmbienceEditor_Advanced extends Stage implements Initializable {
+public class AmbienceEditor_Advanced extends ModalDialog implements Initializable {
     public Button RightArrow;
     public Button LeftArrow;
     public ChoiceBox<String> SessionPartSelectionBox;
@@ -86,21 +89,18 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         CloseButton.setOnAction(event -> close());
         SwitchToSimpleEditor.setOnAction(event -> switchtosimple());
     }
-    public AmbienceEditor_Advanced(MainController Root) {
+    public AmbienceEditor_Advanced(MainController Root, Stage stage, boolean minimizeparent) {
+        super(Root, stage, minimizeparent);
         try {
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Advanced.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (new AnswerDialog(Root.getPreferences(), "Save Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save And Close", "Close", "Cancel").getResult()) {
+                    switch (new AnswerDialog(Root.getPreferences(), this, "Save Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save And Close", "Close", "Cancel").getResult()) {
                         case YES:
                             save();
                             break;
@@ -113,17 +113,14 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             tempdirectory = new File(Preferences.DIRECTORYTEMP, "AmbienceEditor");
         } catch (IOException e) {}
     }
-    public AmbienceEditor_Advanced(MainController Root, SessionPart sessionPart) {
+    public AmbienceEditor_Advanced(MainController Root, Stage stage, boolean minimizeparent, SessionPart sessionPart) {
+        super(Root, stage, minimizeparent);
         try {
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Advanced.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             setTitle("Advanced Ambience Editor");
             SessionPartSelectionBox.setOnAction(event -> selectandloadsessionpart());
@@ -251,7 +248,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         int index = table.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             SoundFile soundFile = soundfilelist.get(index);
-            switch (new AnswerDialog(Root.getPreferences(), "Removing File", null, "Removing Ambience From Table. Also Delete File " + soundFile.getName() + " From Disk? (This Cannot Be Undone)",
+            switch (new AnswerDialog(Root.getPreferences(), this, "Removing File", null, "Removing Ambience From Table. Also Delete File " + soundFile.getName() + " From Disk? (This Cannot Be Undone)",
                     "Remove And Delete File", "Remove But Keep File", "Cancel").getResult()) {
                 case YES: soundFile.getFile().delete(); break;
                 case CANCEL: return;
@@ -267,7 +264,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
     private void preview(AmbienceSong selectedsong) {
         if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
             if (previewdialog == null || !previewdialog.isShowing()) {
-                previewdialog = new PreviewFile(selectedsong.getFile(), Root, this);
+                previewdialog = new PreviewFile(selectedsong.getFile(), Root, this, false);
                 previewdialog.showAndWait();
             }
         }
@@ -317,7 +314,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
     }
     public void switchtosimple() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getPreferences(), "Switch To Simple Mode", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save Changes", "Switch Without Saving", "Cancel").getResult()) {
+            switch (new AnswerDialog(Root.getPreferences(), this, "Switch To Simple Mode", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save Changes", "Switch Without Saving", "Cancel").getResult()) {
                 case YES: save(); break;
                 case CANCEL: return;
             }
@@ -325,8 +322,8 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         this.close();
         deletetempambiencefromdirectory();
         if (selected_temp_ambiencesong != null && selectedsessionpart != null) {
-            new AmbienceEditor_Simple(Root, selectedsessionpart).show();
-        } else {new AmbienceEditor_Simple(Root).show();}
+            new AmbienceEditor_Simple(Root, Root.getStage(), false, selectedsessionpart).show();
+        } else {new AmbienceEditor_Simple(Root, Root.getStage(), false).show();}
     }
 
 }

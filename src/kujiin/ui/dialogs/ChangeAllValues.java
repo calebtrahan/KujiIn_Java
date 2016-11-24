@@ -9,13 +9,12 @@ import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Util;
 
 import java.io.IOException;
 
-import static kujiin.xml.Preferences.PROGRAM_ICON;
-
-public class ChangeAllValues extends Stage {
+public class ChangeAllValues extends ModalDialog {
     public Button AcceptButton;
     public Button CancelButton;
     public TextField MinutesTextField;
@@ -24,7 +23,8 @@ public class ChangeAllValues extends Stage {
     private Boolean accepted;
     private int minutes;
 
-    public ChangeAllValues(MainController Root, String toptext) {
+    public ChangeAllValues(MainController Root, Stage stage, boolean minimizeparent, String toptext) {
+        super(Root, stage, minimizeparent);
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ChangeAllValuesDialog.fxml"));
             fxmlLoader.setController(this);
@@ -32,11 +32,7 @@ public class ChangeAllValues extends Stage {
             initOwner(Root.getStage());
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
-            this.setResizable(false);
+            setResizable(false);
             setTitle(toptext);
             setAccepted(false);
             MinutesTextField.setText("0");

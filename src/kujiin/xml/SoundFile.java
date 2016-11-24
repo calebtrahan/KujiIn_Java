@@ -43,9 +43,7 @@ public class SoundFile {
 
 // Utility Methods
     public boolean isValid() {
-        boolean isvalid = name != null && file != null && duration != null && duration > 0.0;
-        if (! isvalid) {System.out.println("Invalid File: " + toString());}
-        return isvalid;
+        return name != null && file != null && duration != null && duration > 0.0;
     }
 
 // Method Overrides

@@ -8,6 +8,10 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.alerts.AnswerDialog;
+import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Util;
 import kujiin.xml.Preferences;
 
@@ -15,9 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
-import static kujiin.xml.Preferences.PROGRAM_ICON;
-
-public class SelectAlertFile extends Stage {
+public class SelectAlertFile extends ModalDialog {
     public Button HelpButton;
     public Button AcceptButton;
     public Button CancelButton;
@@ -28,18 +30,14 @@ public class SelectAlertFile extends Stage {
     private File alertfile;
     private MainController Root;
 
-    public SelectAlertFile(MainController Root) {
+    public SelectAlertFile(MainController Root, Stage stage, boolean minimizeparent) {
+        super(Root, stage, minimizeparent);
         try {
             if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ChangeAlertDialog.fxml"));
             fxmlLoader.setController(this);
-            Scene defaultscene = new Scene(fxmlLoader.load());
-            Root.setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
+            setScene(new Scene(fxmlLoader.load()));
             setTitle("Alert File Editor");
             AlertFileToggleButton.setSelected(Root.getPreferences().getSessionOptions().getAlertfunction());
             String alertfilelocation = Root.getPreferences().getSessionOptions().getAlertfilelocation();
@@ -76,7 +74,7 @@ public class SelectAlertFile extends Stage {
     }
     public void preview() {
         if (alertfile != null && alertfile.exists()) {
-            PreviewFile previewFile = new PreviewFile(alertfile, Root, this);
+            PreviewFile previewFile = new PreviewFile(alertfile, Root, this, false);
             previewFile.showAndWait();
         }
     }
@@ -90,7 +88,7 @@ public class SelectAlertFile extends Stage {
             Double duration = Util.audio_getduration(alertfile);
             Duration alertfileduration = new Duration(duration * 1000);
             if (duration >= Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH && duration < Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                switch (new AnswerDialog(Root.getPreferences(), "Alert File Longer Than Suggested Duration", null,
+                switch (new AnswerDialog(Root.getPreferences(), this, "Alert File Longer Than Suggested Duration", null,
                         String.format("Alert File Is %s Which Is Longer Than Suggested Duration: %s And May Break Immersion",
                                 Util.formatdurationtoStringDecimalWithColons(alertfileduration),
                                 Util.formatdurationtoStringDecimalWithColons(new Duration(Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000))),

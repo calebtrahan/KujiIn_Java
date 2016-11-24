@@ -8,10 +8,10 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.boilerplate.NonModalDialog;
 import kujiin.util.SessionPart;
 import kujiin.util.enums.PlayerState;
 import kujiin.util.enums.ReferenceType;
@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import static kujiin.xml.Preferences.PROGRAM_ICON;
 
-public class DisplayReference extends Stage {
+public class DisplayReference extends NonModalDialog {
     public ScrollPane ContentPane;
     public Slider EntrainmentVolumeSlider;
     public Label EntrainmentVolumePercentage;
@@ -43,7 +43,8 @@ public class DisplayReference extends Stage {
     private ReferenceType referenceType;
     private MainController Root;
 
-    public DisplayReference(MainController Root, SessionPart sessionPart, boolean showsuggestions) {
+    public DisplayReference(MainController Root, Stage stage, boolean minimizeparent, SessionPart sessionPart, boolean showsuggestions) {
+        super(Root, stage, minimizeparent);
         try {
             this.Root = Root;
             referenceType = Root.getPreferences().getSessionOptions().getReferencetype();
@@ -52,10 +53,6 @@ public class DisplayReference extends Stage {
             fxmlLoader.setController(this);
             scene = new Scene(fxmlLoader.load());
             setScene(scene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
 //                this.setResizable(false);
             setTitle(sessionPart.name + "'s Reference");
             setsizing();
@@ -70,10 +67,7 @@ public class DisplayReference extends Stage {
             addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                 switch (event.getCode()) {
                     case ESCAPE:
-                        Platform.runLater(() -> {
-                            hide();
-                            untoggleplayerreference();
-                        });
+                        Platform.runLater(() -> {hide(); untoggleplayerreference();});
                         break;
                     case F11:
                         if (Root.getSessionCreator().getPlayerState() == PlayerState.PLAYING) {
@@ -89,20 +83,15 @@ public class DisplayReference extends Stage {
             if (Root.getPreferences().getUserInterfaceOptions().getTooltips()) {setToolTips();}
         } catch (IOException ignored) {}
     }
-    public DisplayReference(MainController Root, String htmlcontent) {
+    public DisplayReference(MainController Root, Stage stage, boolean minimizeparent, String htmlcontent) {
+        super(Root, stage, minimizeparent);
         try {
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ReferencePreview.fxml"));
             fxmlLoader.setController(this);
             scene = new Scene(fxmlLoader.load());
             setScene(scene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            initModality(Modality.WINDOW_MODAL);
-            initOwner(Root.getStage());
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
-            this.setResizable(false);
+            setResizable(false);
             setTitle("Reference File Preview");
             fullscreenoption = false;
             setsizing();

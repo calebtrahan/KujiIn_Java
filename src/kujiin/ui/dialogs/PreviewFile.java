@@ -7,18 +7,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.alerts.InformationDialog;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Util;
 
 import java.io.File;
 import java.io.IOException;
 
-import static kujiin.xml.Preferences.PROGRAM_ICON;
-
-public class PreviewFile extends Stage {
+public class PreviewFile extends ModalDialog {
     public Label CurrentTime;
     public Slider ProgressSlider;
     public Label TotalTime;
@@ -31,7 +30,8 @@ public class PreviewFile extends Stage {
     private MediaPlayer PreviewPlayer;
     private MainController Root;
 
-    public PreviewFile(File filetopreview, MainController Root, Stage parent) {
+    public PreviewFile(File filetopreview, MainController Root, Stage parent, boolean minimizeparent) {
+        super(Root, parent, minimizeparent);
         this.Root = Root;
         if (Util.audio_isValid(filetopreview)) {
             try {
@@ -39,12 +39,6 @@ public class PreviewFile extends Stage {
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
-                getIcons().clear();
-                getIcons().add(PROGRAM_ICON);
-                initModality(Modality.WINDOW_MODAL);
-                initOwner(parent);
-                String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-                if (themefile != null) {getScene().getStylesheets().add(themefile);}
                 setResizable(false);
                 setTitle("Preview: " + filetopreview.getName().substring(0, filetopreview.getName().lastIndexOf(".")));
                 Mediatopreview = new Media(filetopreview.toURI().toString());

@@ -5,9 +5,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
+import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.ErrorDialog;
+import kujiin.ui.dialogs.alerts.ExceptionDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
+import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Util;
 import kujiin.util.enums.AmbiencePlaybackType;
 import kujiin.util.enums.ReferenceType;
@@ -19,9 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static kujiin.xml.Preferences.AMBIENCE_EDITOR_TYPES;
-import static kujiin.xml.Preferences.PROGRAM_ICON;
 
-public class ChangeProgramOptions extends Stage {
+public class ChangeProgramOptions extends ModalDialog {
 // User Interface Tab
     public CheckBox TooltipsCheckBox;
     public CheckBox HelpDialogsCheckBox;
@@ -65,7 +68,8 @@ public class ChangeProgramOptions extends Stage {
     private ArrayList<ItemWithDescription> descriptionitems = new ArrayList<>();
     private MainController Root;
 
-    public ChangeProgramOptions(MainController Root) {
+    public ChangeProgramOptions(MainController Root, Stage stage, boolean minimizeparent) {
+        super(Root, stage, minimizeparent);
         try {
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ChangeProgramOptions.fxml"));
@@ -73,12 +77,6 @@ public class ChangeProgramOptions extends Stage {
             Preferences = Root.getPreferences();
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            initModality(Modality.WINDOW_MODAL);
-            initOwner(Root.getStage());
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setResizable(false);
             setTitle("Preferences");
             setuplisteners();
@@ -249,7 +247,7 @@ public class ChangeProgramOptions extends Stage {
     // Alert File
     public void alertfiletoggled() {
         if (AlertFileSwitch.isSelected()) {
-            SelectAlertFile selectAlertFile = new SelectAlertFile(Root);
+            SelectAlertFile selectAlertFile = new SelectAlertFile(Root, this, false);
             selectAlertFile.showAndWait();
             AlertFileSwitch.setSelected(Preferences.getSessionOptions().getAlertfunction() && Preferences.hasValidAlertFile());
         }
@@ -267,7 +265,7 @@ public class ChangeProgramOptions extends Stage {
     public void referencetoggled() {
         Preferences.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
         if (ReferenceSwitch.isSelected()) {
-            SelectReferenceType selectReferenceType = new SelectReferenceType(Root, Root.getAllSessionParts(false), true);
+            SelectReferenceType selectReferenceType = new SelectReferenceType(Root, this, false, Root.getAllSessionParts(false));
             selectReferenceType.showAndWait();
             if (selectReferenceType.getResult()) {
                 Preferences.getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
