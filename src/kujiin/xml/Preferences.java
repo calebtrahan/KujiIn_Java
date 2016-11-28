@@ -143,7 +143,10 @@ public class Preferences {
                 JAXBContext context = JAXBContext.newInstance(Preferences.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
                 Preferences preferences = (Preferences) unmarshaller.unmarshal(OPTIONSXMLFILE);
-                if (! preferences.getAdvancedOptions().getOS().equals(System.getProperty("os.name"))) {preferences.getUserInterfaceOptions().recalculatethemefile();}
+                if (! preferences.getAdvancedOptions().getOS().equals(System.getProperty("os.name"))) {
+
+                    preferences.getUserInterfaceOptions().recalculatethemefile();
+                }
                 setUserInterfaceOptions(preferences.getUserInterfaceOptions());
                 setCreationOptions(preferences.getCreationOptions());
                 setExportOptions(preferences.getExportOptions());
