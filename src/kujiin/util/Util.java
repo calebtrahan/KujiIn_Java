@@ -586,11 +586,6 @@ public class Util {
        }
         return false;
     }
-    public static int list_getmaxintegervalue(List<Integer> list) {
-        List<Integer> listcopy = list;
-        Collections.sort(listcopy);
-        return listcopy.get(listcopy.size() - 1);
-    }
 
 // Log Methods
     public static boolean sendstacktracetodeveloper(String stacktrace) {

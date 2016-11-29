@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 // Additional Features To Definitely Add
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
     // TODO Exporter
+    // TODO Add Logging (And Write To Log File) For Troubleshooting
 
 // Optional Additional Features
     // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
@@ -356,9 +357,6 @@ public class MainController implements Initializable {
         }
 
     // Getters And Setters
-        public ArrayList<SessionPart> getPartswithnoambience() {
-            return partswithnoambience;
-        }
         public ArrayList<SessionPart> getPartswithmissingentrainment() {
             return partswithmissingentrainment;
         }

@@ -22,6 +22,7 @@ import kujiin.xml.Preferences;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,7 +100,8 @@ public class SessionDetails extends ModalDialog {
             }
             SessionBarChart.getData().add(series);
             SessionBarChart.setLegendVisible(false);
-            SessionNumbersAxis.setUpperBound(Util.list_getmaxintegervalue(values));
+            Collections.sort(values);
+            SessionNumbersAxis.setUpperBound(values.get(values.size() - 1));
             SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(session.gettotalsessionduration(), SessionDurationTextField.getLayoutBounds().getWidth()));
             SessionDurationTextField.setEditable(false);
             SessionBarChart.requestFocus();
