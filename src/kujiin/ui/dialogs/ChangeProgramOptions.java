@@ -1,6 +1,7 @@
 package kujiin.ui.dialogs;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -222,12 +223,17 @@ public class ChangeProgramOptions extends ModalDialog {
 
 // User Interface Tab
     public void populateappearancecheckbox() {
-    ProgramThemeChoiceBox.setItems(FXCollections.observableArrayList(Preferences. getUserInterfaceOptions().getThemefilenames()));
-    try {
-        int index = Preferences.getUserInterfaceOptions().getThemefiles().indexOf(Preferences.getUserInterfaceOptions().getThemefile());
-        ProgramThemeChoiceBox.getSelectionModel().select(index);
-    } catch (Exception ignored) {}
-}
+        ObservableList<String> appearanceitems = FXCollections.observableArrayList();
+        appearanceitems.add("System");
+        appearanceitems.addAll(Preferences. getUserInterfaceOptions().getThemefilenames());
+        ProgramThemeChoiceBox.setItems(appearanceitems);
+        if (Preferences.getUserInterfaceOptions().getThemefile() != null) {
+            try {
+                int index = Preferences.getUserInterfaceOptions().getThemefiles().indexOf(Preferences.getUserInterfaceOptions().getThemefile());
+                ProgramThemeChoiceBox.getSelectionModel().select(index);
+            } catch (Exception ignored) {}
+        } else {ProgramThemeChoiceBox.getSelectionModel().select(0);}
+    }
     public void addnewtheme() {
         File newfile = new FileChooser().showOpenDialog(this);
         if (newfile == null) {return;}
@@ -237,9 +243,11 @@ public class ChangeProgramOptions extends ModalDialog {
     public void selectnewtheme() {
         int index = ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex();
         if (index != -1) {
-            Preferences. getUserInterfaceOptions().setThemefile(Preferences.getUserInterfaceOptions().getThemefiles().get(index));
             getScene().getStylesheets().clear();
-            getScene().getStylesheets().add(Preferences. getUserInterfaceOptions().getThemefile());
+            if (index != 0) {
+                Preferences. getUserInterfaceOptions().setThemefile(Preferences.getUserInterfaceOptions().getThemefiles().get(index - 1));
+                getScene().getStylesheets().add(Preferences. getUserInterfaceOptions().getThemefile());
+            } else {Preferences.getUserInterfaceOptions().setThemefile(null);}
         }
     }
 

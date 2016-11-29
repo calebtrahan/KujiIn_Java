@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.enums.AmbiencePlaybackType;
 import kujiin.util.enums.ReferenceType;
+import org.apache.commons.io.FileUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -14,11 +15,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import static javafx.application.Application.STYLESHEET_CASPIAN;
-import static javafx.application.Application.STYLESHEET_MODENA;
 
 @XmlRootElement(name = "Preferences")
 @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -102,9 +101,7 @@ public class Preferences {
     public UserInterfaceOptions getUserInterfaceOptions() {
     return UserInterfaceOptions;
 }
-    public void setUserInterfaceOptions(UserInterfaceOptions userInterfaceOptions) {
-        UserInterfaceOptions = userInterfaceOptions;
-    }
+    public void setUserInterfaceOptions(UserInterfaceOptions userInterfaceOptions) {UserInterfaceOptions = userInterfaceOptions;}
     public SessionOptions getSessionOptions() {
         return SessionOptions;
     }
@@ -114,27 +111,13 @@ public class Preferences {
     public AdvancedOptions getAdvancedOptions() {
         return AdvancedOptions;
     }
-    public void setAdvancedOptions(AdvancedOptions advancedOptions) {
-        AdvancedOptions = advancedOptions;
-    }
-    public Preferences.CreationOptions getCreationOptions() {
-        return CreationOptions;
-    }
-    public void setCreationOptions(Preferences.CreationOptions creationOptions) {
-        CreationOptions = creationOptions;
-    }
-    public Preferences.ExportOptions getExportOptions() {
-        return ExportOptions;
-    }
-    public void setExportOptions(Preferences.ExportOptions exportOptions) {
-        ExportOptions = exportOptions;
-    }
-    public Preferences.PlaybackOptions getPlaybackOptions() {
-        return PlaybackOptions;
-    }
-    public void setPlaybackOptions(Preferences.PlaybackOptions playbackOptions) {
-        PlaybackOptions = playbackOptions;
-    }
+    public void setAdvancedOptions(AdvancedOptions advancedOptions) {AdvancedOptions = advancedOptions;}
+    public Preferences.CreationOptions getCreationOptions() {return CreationOptions;}
+    public void setCreationOptions(Preferences.CreationOptions creationOptions) {CreationOptions = creationOptions;}
+    public Preferences.ExportOptions getExportOptions() {return ExportOptions;}
+    public void setExportOptions(Preferences.ExportOptions exportOptions) {ExportOptions = exportOptions;}
+    public Preferences.PlaybackOptions getPlaybackOptions() {return PlaybackOptions;}
+    public void setPlaybackOptions(Preferences.PlaybackOptions playbackOptions) {PlaybackOptions = playbackOptions;}
 
     // XML Processing
     public void unmarshall() {
@@ -144,8 +127,19 @@ public class Preferences {
                 Unmarshaller unmarshaller = context.createUnmarshaller();
                 Preferences preferences = (Preferences) unmarshaller.unmarshal(OPTIONSXMLFILE);
                 if (! preferences.getAdvancedOptions().getOS().equals(System.getProperty("os.name"))) {
-
-                    preferences.getUserInterfaceOptions().recalculatethemefile();
+                // Correct Theme File Directory Names
+                    ArrayList<String> newfiles = new ArrayList<>();
+                    int currentthemeindex = -1;
+                    for (String i : preferences.getUserInterfaceOptions().getThemefiles()) {
+                        if (i.equals(preferences.getUserInterfaceOptions().getThemefile())) {currentthemeindex = preferences.getUserInterfaceOptions().getThemefiles().indexOf(i);}
+                        if (! i.equals("CASPIAN") && ! i.equals("MODENA")) {
+                            File newfile = new File(DIRECTORYSTYLES, i.substring(i.lastIndexOf("/")));
+                            newfiles.add(newfile.toURI().toString());
+                        }
+                    }
+                    if (currentthemeindex != -1) {preferences.getUserInterfaceOptions().setThemefile(newfiles.get(currentthemeindex));}
+                    else {preferences.getUserInterfaceOptions().setThemefile(DEFAULT_THEMEFILE.toURI().toString());}
+                    preferences.getAdvancedOptions().setOS(System.getProperty("os.name"));
                 }
                 setUserInterfaceOptions(preferences.getUserInterfaceOptions());
                 setCreationOptions(preferences.getCreationOptions());
@@ -176,8 +170,8 @@ public class Preferences {
         userInterfaceOptions.setTooltips(DEFAULT_TOOLTIPS_OPTION);
         userInterfaceOptions.setHelpdialogs(DEFAULT_HELP_DIALOGS_OPTION);
         userInterfaceOptions.setThemefile(DEFAULT_THEMEFILE.toURI().toString());
-        userInterfaceOptions.setThemefiles(new ArrayList<>(Arrays.asList(DEFAULT_THEMEFILE.toURI().toString(), STYLESHEET_MODENA, STYLESHEET_CASPIAN)));
-        userInterfaceOptions.setThemefilenames(new ArrayList<>(Arrays.asList("Default (Dark)", "Default (Light)", "Default (Legacy)")));
+        userInterfaceOptions.setThemefiles(new ArrayList<>(Arrays.asList(DEFAULT_THEMEFILE.toURI().toString())));
+        userInterfaceOptions.setThemefilenames(new ArrayList<>(Arrays.asList("Default")));
         creationOptions.setScrollincrement(DEFAULT_SCROLL_INCREMENT);
         sessionOptions.setAlertfunction(DEFAULT_ALERTFUNCTION_OPTION);
         sessionOptions.setAlertfilelocation(DEFAULT_ALERTFILELOCATION);
@@ -212,10 +206,16 @@ public class Preferences {
     public void addthemefile(String name, String file_location) {
         ArrayList<String> files = getUserInterfaceOptions().getThemefiles();
         ArrayList<String> names =  getUserInterfaceOptions().getThemefilenames();
-        files.add(file_location);
-        names.add(name);
-        getUserInterfaceOptions().setThemefiles(files);
-        getUserInterfaceOptions().setThemefilenames(names);
+        if (! files.contains(file_location)) {
+            try {
+                File newstylefile = new File(DIRECTORYSTYLES, file_location.substring(file_location.lastIndexOf("/")));
+                FileUtils.moveFile(new File(file_location), newstylefile);
+                files.add(newstylefile.toURI().toString());
+                names.add(name);
+                getUserInterfaceOptions().setThemefiles(files);
+                getUserInterfaceOptions().setThemefilenames(names);
+            } catch (IOException e) {e.printStackTrace();}
+        } else {}
     }
     public boolean hasValidAlertFile() {
         String location = getSessionOptions().getAlertfilelocation();
@@ -238,9 +238,6 @@ public class Preferences {
         public UserInterfaceOptions() {}
 
     // Getters And Setters
-        public void recalculatethemefile() {
-            themefile = DEFAULT_THEMEFILE.toURI().toString();
-        }
         public Boolean getTooltips() {
                 return tooltips;
             }
