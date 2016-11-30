@@ -36,7 +36,7 @@
                                        <HBox.margin>
                                           <Insets right="5.0" />
                                        </HBox.margin></Label>
-                                          <TextField fx:id="SessionDurationTextField" alignment="CENTER" />
+                                          <TextField fx:id="SessionDurationTextField" alignment="CENTER" editable="false" />
                                  </children>
                                  <VBox.margin>
                                     <Insets />
@@ -49,7 +49,7 @@
                                           <Insets right="5.0" />
                                        </HBox.margin>
                                     </Label>
-                                    <TextField fx:id="AverageDurationTextField" alignment="CENTER">
+                                    <TextField fx:id="AverageDurationTextField" alignment="CENTER" editable="false">
                                        <HBox.margin>
                                           <Insets left="6.0" />
                                        </HBox.margin>
@@ -63,7 +63,7 @@
                                           <Insets right="5.0" />
                                        </HBox.margin>
                                     </Label>
-                                    <TextField fx:id="MostProgressTextField" alignment="CENTER" />
+                                    <TextField fx:id="MostProgressTextField" alignment="CENTER" editable="false" />
                                  </children>
                               </HBox>
                            </children>

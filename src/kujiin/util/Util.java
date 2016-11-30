@@ -256,7 +256,7 @@ public class Util {
         int hours = 0;
         if (seconds >= 3600) {hours = seconds / 3600; seconds -= hours * 3600;}
         if (seconds >= 60) {minutes = seconds / 60; seconds -= minutes * 60;}
-            // Long
+    // Long
         if (hours == 0 && minutes == 0 && seconds == 0) {
             if ("0 minutes".length() <= maxcharlength) {return "0 Minutes";}
             else if ("0 Mins".length() <= maxcharlength) {return "0 Mins";}
@@ -271,7 +271,7 @@ public class Util {
         }
         if (maxcharlength == null || longtext.toString().length() <= maxcharlength) {return longtext.toString();}
         else {
-            // Short
+    // Short
             StringBuilder shorttext = new StringBuilder();
             if (hours > 0) {shorttext.append(hours).append("Hr"); if (hours > 1) {shorttext.append("s");} if (minutes > 0) {shorttext.append(" ");}}
             if (minutes > 0) {
@@ -281,6 +281,7 @@ public class Util {
             }
             if (shorttext.toString().length() <= maxcharlength) {return shorttext.toString();}
             else {
+    // Really Short
                 StringBuilder reallyshorttext = new StringBuilder();
                 if (hours > 0) {
                     reallyshorttext.append(hours);

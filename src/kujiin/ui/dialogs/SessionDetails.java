@@ -60,17 +60,17 @@ public class SessionDetails extends ModalDialog {
                 if (i.getduration().greaterThan(highestduration)) {highestduration = i.getduration();}
                 completedgoalsitems.addAll(i.getGoalscompletedthissession().stream().map(x -> String.format("%s: %s Hours Completed (%s Current)", i.name, x.getDuration(), i.getduration().toHours())).collect(Collectors.toList()));
             }
-            if (completedgoalsitems.size() > 0) {
-                GoalsCompletedTopLabel.setText(completedgoalsitems.size() + " Goals Completed This Session");
-                GoalsCompletedListView.setItems(completedgoalsitems);
-            }
-            else {GoalsCompletedTopLabel.setText("No Goals Completed This Session");}
+            GoalsCompletedTopLabel.setText("Goals Completed This Session");
+            if (completedgoalsitems.size() > 0) {GoalsCompletedListView.setItems(completedgoalsitems);}
             SessionBarChart.getData().add(series);
             SessionBarChart.setLegendVisible(false);
-            SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(totalsessionduration, SessionDurationTextField.getLayoutBounds().getWidth()));
-            SessionDurationTextField.setEditable(false);
-            AverageDurationTextField.setText(Util.formatdurationtoStringSpelledOut(Duration.millis(highestduration.toMillis() / itemsinsession.size()), AverageDurationTextField.getLayoutBounds().getWidth()));
-            MostProgressTextField.setText(Util.formatdurationtoStringSpelledOut(highestduration, MostProgressTextField.getLayoutBounds().getWidth()));
+            Duration finalTotalsessionduration = totalsessionduration;
+            Duration finalHighestduration = highestduration;
+            setOnShowing(event -> {
+                SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(finalTotalsessionduration, SessionDurationTextField.getLayoutBounds().getWidth()));
+                AverageDurationTextField.setText(Util.formatdurationtoStringSpelledOut(Duration.millis(finalHighestduration.toMillis() / itemsinsession.size()), AverageDurationTextField.getLayoutBounds().getWidth()));
+                MostProgressTextField.setText(Util.formatdurationtoStringSpelledOut(finalHighestduration, MostProgressTextField.getLayoutBounds().getWidth()));
+            });
             SessionBarChart.requestFocus();
             CloseButton.setOnAction(event -> close());
         } catch (IOException ignored) {}

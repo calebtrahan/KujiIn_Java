@@ -456,7 +456,7 @@ public class ProgressTracker implements UI {
                 sessionsTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> ViewDetailsButton.setDisable(sessionsTableView.getSelectionModel().getSelectedIndex() == -1));
                 Util.custom_textfield_integer(Filter_ThresholdMinutesTextField, 0, Integer.MAX_VALUE, 1);
                 populatetotalsbargraphandtable();
-                populatetable(null);
+                populatetable();
             } catch (IOException e) {
                 new ExceptionDialog(Preferences, e).showAndWait();
             }
@@ -515,7 +515,7 @@ public class ProgressTracker implements UI {
             TotalProgressTableView.setItems(totalprogressrows);
             SessionTotalsBarGraph.getData().add(series);
         }
-        public void populatetable(ActionEvent actionEvent) {
+        public void populatetable() {
             filteredsessionlist = new ArrayList<>();
             ObservableList<SessionRow> rowlist = FXCollections.observableArrayList();
             int count = 1;
