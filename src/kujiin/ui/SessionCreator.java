@@ -337,7 +337,8 @@ public class SessionCreator implements UI {
         public Session currentsession;
 
         public Player() {
-            super(Root, Root.getStage(), true);
+            super(Root, null, false);
+            Root.getStage().setIconified(true);
             try {
                 updateuitimeline.stop();
                 if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
