@@ -498,9 +498,7 @@ public class SessionCreator implements UI {
                 progressTracker.goals_updateui(this);
                 progressTracker.sessions_updateui();
                 if (playerState == PLAYING) {currentsession.updateduration(currentsessionpart, currentsessionpart.elapsedtime);}
-            } catch (Exception ignored) {
-                ignored.printStackTrace();
-            }
+            } catch (Exception ignored) {ignored.printStackTrace();}
         }
         public void progresstonextsessionpart() {
             try {
