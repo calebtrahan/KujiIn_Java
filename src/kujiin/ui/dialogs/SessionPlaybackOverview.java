@@ -541,14 +541,14 @@ public class SessionPlaybackOverview extends ModalDialog {
             }
         }
         // Check Alert File Needed/Not Needed
-        boolean longsession = false;
+        int longsessionparts = 0;
         for (SessionPart i : alladjustedsessionitems) {
             if (i.getduration().greaterThanOrEqualTo(Duration.minutes(Preferences.DEFAULT_LONG_SESSIONPART_DURATION))) {
-                longsession = true;
+                longsessionparts++;
                 break;
             }
         }
-        if (longsession && !Root.getPreferences().getSessionOptions().getAlertfunction()) {
+        if (longsessionparts > 1 && !Root.getPreferences().getSessionOptions().getAlertfunction()) {
             switch (new AnswerDialog(Root.getPreferences(), this, "Add Alert File", null, "I've Detected A Long Session. Add Alert File In Between Session Parts?",
                     "Add Alert File", "Continue Without Alert File", "Cancel Playback").getResult()) {
                 case YES:
