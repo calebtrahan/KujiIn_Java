@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.boilerplate.IconImageView;
 import kujiin.ui.creation.AddOrEditAmbience;
@@ -277,7 +278,10 @@ public class MainController implements Initializable {
 // Top Menu Methods
     public void editpreferences() {
         if (programState == ProgramState.IDLE) {
-            new ChangeProgramOptions(this, getStage(), false).showAndWait();
+            ChangeProgramOptions changeProgramOptions = new ChangeProgramOptions(this);
+            changeProgramOptions.initModality(Modality.APPLICATION_MODAL);
+            changeProgramOptions.initOwner(getStage());
+            changeProgramOptions.showAndWait();
             preferences.marshall();
         }
     }
@@ -289,7 +293,10 @@ public class MainController implements Initializable {
         else if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Advanced")) {new AmbienceEditor_Advanced(availableAmbiences, preferences).showAndWait();}
     }
     public void editreferencefiles() {
-        new EditReferenceFiles(this, getStage(), false).showAndWait();
+       EditReferenceFiles editReferenceFiles = new EditReferenceFiles(this);
+       editReferenceFiles.initOwner(getStage());
+       editReferenceFiles.initModality(Modality.APPLICATION_MODAL);
+       editReferenceFiles.showAndWait();
     }
     public void aboutthisprogram() {
     }

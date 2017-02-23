@@ -6,13 +6,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.ExceptionDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Util;
 import kujiin.util.enums.AmbiencePlaybackType;
 import kujiin.util.enums.ReferenceType;
@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 import static kujiin.xml.Preferences.AMBIENCE_EDITOR_TYPES;
 
-public class ChangeProgramOptions extends ModalDialog {
+public class ChangeProgramOptions extends Stage {
 // User Interface Tab
     public CheckBox TooltipsCheckBox;
     public CheckBox HelpDialogsCheckBox;
@@ -69,8 +69,7 @@ public class ChangeProgramOptions extends ModalDialog {
     private ArrayList<ItemWithDescription> descriptionitems = new ArrayList<>();
     private MainController Root;
 
-    public ChangeProgramOptions(MainController Root, Stage stage, boolean minimizeparent) {
-        super(Root, stage, minimizeparent);
+    public ChangeProgramOptions(MainController Root) {
         try {
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ChangeProgramOptions.fxml"));
@@ -255,7 +254,9 @@ public class ChangeProgramOptions extends ModalDialog {
     // Alert File
     public void alertfiletoggled() {
         if (AlertFileSwitch.isSelected()) {
-            SelectAlertFile selectAlertFile = new SelectAlertFile(Root, this, false);
+            SelectAlertFile selectAlertFile = new SelectAlertFile(Root);
+            selectAlertFile.initModality(Modality.APPLICATION_MODAL);
+            selectAlertFile.initOwner(this);
             selectAlertFile.showAndWait();
             AlertFileSwitch.setSelected(Preferences.getSessionOptions().getAlertfunction() && Preferences.hasValidAlertFile());
         }

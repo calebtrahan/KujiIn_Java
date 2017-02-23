@@ -9,12 +9,11 @@ import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
-import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Util;
 
 import java.io.IOException;
 
-public class ChangeAllValues extends ModalDialog {
+public class ChangeAllValues extends Stage {
     public Button AcceptButton;
     public Button CancelButton;
     public TextField MinutesTextField;
@@ -23,8 +22,7 @@ public class ChangeAllValues extends ModalDialog {
     private Boolean accepted;
     private int minutes;
 
-    public ChangeAllValues(MainController Root, Stage stage, boolean minimizeparent, String toptext) {
-        super(Root, stage, minimizeparent);
+    public ChangeAllValues(MainController Root, String toptext) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ChangeAllValuesDialog.fxml"));
             fxmlLoader.setController(this);

@@ -11,7 +11,6 @@ import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.Preferences;
 import kujiin.xml.Session;
@@ -20,7 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectReferenceType extends ModalDialog {
+public class SelectReferenceType extends Stage {
     public RadioButton HTMLRadioButton;
     public RadioButton TextRadioButton;
     public TextArea Description;
@@ -32,8 +31,7 @@ public class SelectReferenceType extends ModalDialog {
     private MainController Root;
     private List<Session.PlaybackItem> itemsinsession;
 
-    public SelectReferenceType(MainController Root, Stage stage, boolean minimizeparent, List<Session.PlaybackItem> itemsinsession) {
-        super(Root, stage, minimizeparent);
+    public SelectReferenceType(MainController Root, List<Session.PlaybackItem> itemsinsession) {
         try {
             this.itemsinsession = itemsinsession;
             this.Root = Root;

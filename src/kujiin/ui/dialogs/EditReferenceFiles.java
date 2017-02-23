@@ -11,7 +11,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.*;
-import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Util;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.Preferences;
@@ -23,7 +22,7 @@ import java.util.ArrayList;
 
 import static kujiin.xml.Preferences.PROGRAM_ICON;
 
-public class EditReferenceFiles extends ModalDialog {
+public class EditReferenceFiles extends Stage {
     public ChoiceBox<String> SessionPartNamesChoiceBox;
     public TextArea MainTextArea;
     public Button CloseButton;
@@ -38,8 +37,7 @@ public class EditReferenceFiles extends ModalDialog {
     private ReferenceType referenceType;
     private MainController Root;
 
-    public EditReferenceFiles(MainController Root, Stage stage, boolean minimizeparent) {
-        super(Root, stage, minimizeparent);
+    public EditReferenceFiles(MainController Root) {
         try {
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/EditReferenceFiles.fxml"));

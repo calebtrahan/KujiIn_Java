@@ -9,9 +9,6 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import kujiin.xml.Preferences;
 import org.apache.commons.io.FileUtils;
-import org.jdom2.Document;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -315,14 +312,14 @@ public class Util {
 // File Methods
     public static void file_printtostdout(File textfile) {
         try (BufferedReader br = new BufferedReader(new FileReader(textfile))) {
-            String line = null;
+            String line;
             while ((line = br.readLine()) != null) {
                 System.out.println(line);
             }
         } catch (IOException ignored) {}
     }
     public static boolean file_erase(File textfile) {
-        PrintWriter writer = null;
+        PrintWriter writer;
         try {
             writer = new PrintWriter(textfile);
             writer.close();
@@ -406,7 +403,7 @@ public class Util {
                     InputStreamReader(proc.getInputStream()));
             BufferedReader stdError = new BufferedReader(new
                     InputStreamReader(proc.getErrorStream()));
-            String s = null;
+            String s;
             StringBuilder a = new StringBuilder();
             while ((s = stdInput.readLine()) != null) {
                 a.append(s);
@@ -425,7 +422,7 @@ public class Util {
                     InputStreamReader(proc.getInputStream()));
             BufferedReader stdError = new BufferedReader(new
                     InputStreamReader(proc.getErrorStream()));
-            String s = null;
+            String s;
             StringBuilder a = new StringBuilder();
             while ((s = stdInput.readLine()) != null) {
                 a.append(s);
@@ -578,14 +575,16 @@ public class Util {
         return newname.toString();
     }
     public static boolean String_validhtml(String text) {
-        SAXBuilder builder = new SAXBuilder();
-        try {builder.build(text); return true;}
-        catch (IOException | JDOMException | NullPointerException e) {return false;}
+//        SAXBuilder builder = new SAXBuilder();
+//        try {builder.build(text); return true;}
+//        catch (IOException | JDOMException | NullPointerException e) {return false;}
+        return true;
     }
     public static boolean String_validhtml(File file) {
-        SAXBuilder builder = new SAXBuilder();
-        try {Document document = builder.build(file); return true;}
-        catch (IOException | JDOMException e) {return false;}
+//        SAXBuilder builder = new SAXBuilder();
+//        try {Document document = builder.build(file); return true;}
+//        catch (IOException | JDOMException e) {return false;}
+        return false;
     }
 
 // List Methods

@@ -11,7 +11,6 @@ import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Util;
 import kujiin.xml.Preferences;
 
@@ -19,7 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
-public class SelectAlertFile extends ModalDialog {
+public class SelectAlertFile extends Stage {
     public Button HelpButton;
     public Button AcceptButton;
     public Button CancelButton;
@@ -30,8 +29,7 @@ public class SelectAlertFile extends ModalDialog {
     private File alertfile;
     private MainController Root;
 
-    public SelectAlertFile(MainController Root, Stage stage, boolean minimizeparent) {
-        super(Root, stage, minimizeparent);
+    public SelectAlertFile(MainController Root) {
         try {
             if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             this.Root = Root;
