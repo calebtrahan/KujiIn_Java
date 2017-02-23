@@ -14,8 +14,8 @@ import kujiin.ui.dialogs.alerts.*;
 import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Util;
 import kujiin.util.enums.ReferenceType;
-import kujiin.util.sessionitems.SessionItem;
 import kujiin.xml.Preferences;
+import kujiin.xml.Session;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class EditReferenceFiles extends ModalDialog {
     public RadioButton HTMLVariation;
     public RadioButton TEXTVariation;
     private File selectedfile;
-    private SessionItem selectedsessionpart;
+    private Session.PlaybackItem selectedplaybackitem;
     private ArrayList<Integer> userselectedindexes;
     private ReferenceType referenceType;
     private MainController Root;
@@ -57,7 +57,7 @@ public class EditReferenceFiles extends ModalDialog {
             sessionpartnames.addAll(Preferences.ALLNAMES);
             userselectedindexes = new ArrayList<>();
             SessionPartNamesChoiceBox.setItems(sessionpartnames);
-            MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> {textchanged();});
+            MainTextArea.textProperty().addListener((observable, oldValue, newValue) -> textchanged());
             SessionPartNamesChoiceBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {if (oldValue != null) userselectedindexes.add(oldValue.intValue());});
             HTMLVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
             TEXTVariation.setDisable(SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex() == -1);
@@ -117,10 +117,10 @@ public class EditReferenceFiles extends ModalDialog {
         loadselectedfile();
     }
     private void textchanged() {
-        if (referenceType != null && selectedsessionpart != null && selectedfile != null) {
+        if (referenceType != null && selectedplaybackitem != null && selectedfile != null) {
             boolean hasvalidtext = MainTextArea.getText() != null && MainTextArea.getText().length() > 0;
             PreviewButton.setDisable(! hasvalidtext || referenceType == ReferenceType.txt);
-            SaveButton.setDisable(MainTextArea.getText() == null || Util.file_getcontents(selectedfile).equals(MainTextArea.getText().toCharArray()));
+            SaveButton.setDisable(MainTextArea.getText() == null || Util.file_getcontents(selectedfile).equals(MainTextArea.getText()));
             switch (referenceType) {
                 case html:
                     if (MainTextArea.getText() != null && Util.String_validhtml(MainTextArea.getText())) {StatusBar.setTextFill(Color.BLACK); StatusBar.setText("");}
@@ -195,7 +195,7 @@ public class EditReferenceFiles extends ModalDialog {
     // Utility Methods
     public void saveselectedfile() {
         if (Util.file_writecontents(selectedfile, MainTextArea.getText())) {
-            String text = selectedsessionpart + "'s Reference File (" + referenceType.toString() + " Variation) Has Been Saved";
+            String text = selectedplaybackitem + "'s Reference File (" + referenceType.toString() + " Variation) Has Been Saved";
             new InformationDialog(Root.getPreferences(), "Changes Saved", text, "");
         } else {
             new ErrorDialog(Root.getPreferences(), "Error", "Couldn't Save To:\n" + selectedfile.getAbsolutePath(), "Check If You Have Write Access To File");}
@@ -203,7 +203,7 @@ public class EditReferenceFiles extends ModalDialog {
     public void loadselectedfile() {
         int index = SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex();
         if (index != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
-//            selectedsessionpart = Root.getAllSessionParts(false).get(index);
+//            selectedplaybackitem = Root.getAllSessionParts(false).get(index);
             selectnewfile();
             String contents = Util.file_getcontents(selectedfile);
             MainTextArea.setText(contents);
@@ -220,15 +220,15 @@ public class EditReferenceFiles extends ModalDialog {
         }
     }
     public void selectnewfile() {
-        if (referenceType == null || selectedsessionpart == null) {selectedfile = null; return;}
+        if (referenceType == null || selectedplaybackitem == null) {selectedfile = null; return;}
         switch (referenceType) {
             case html:
-//                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "html"), selectedsessionpart.getNameForReference() + ".html");
-                if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e);}}
+//                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "html"), selectedplaybackitem.getNameForReference() + ".html");
+                if (! selectedfile.exists()) {try {if (! selectedfile.createNewFile()) throw new IOException();} catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e);}}
                 break;
             case txt:
-//                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "txt"), selectedsessionpart.getNameForReference() + ".txt");
-                if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e);}}
+//                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "txt"), selectedplaybackitem.getNameForReference() + ".txt");
+                if (! selectedfile.exists()) {try {if (! selectedfile.createNewFile()) throw new IOException();} catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e);}}
                 break;
         }
     }

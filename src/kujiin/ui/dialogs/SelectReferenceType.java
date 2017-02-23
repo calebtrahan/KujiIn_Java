@@ -13,8 +13,8 @@ import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.enums.ReferenceType;
-import kujiin.util.sessionitems.SessionItem;
 import kujiin.xml.Preferences;
+import kujiin.xml.Session;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,9 +30,9 @@ public class SelectReferenceType extends ModalDialog {
     private ArrayList<String> descriptions = new ArrayList<>();
     private boolean result = false;
     private MainController Root;
-    private List<SessionItem> itemsinsession;
+    private List<Session.PlaybackItem> itemsinsession;
 
-    public SelectReferenceType(MainController Root, Stage stage, boolean minimizeparent, List<SessionItem> itemsinsession) {
+    public SelectReferenceType(MainController Root, Stage stage, boolean minimizeparent, List<Session.PlaybackItem> itemsinsession) {
         super(Root, stage, minimizeparent);
         try {
             this.itemsinsession = itemsinsession;

@@ -4,11 +4,13 @@ import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import kujiin.util.Util;
 import kujiin.util.enums.FreqType;
+import kujiin.util.enums.ReferenceType;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -178,6 +180,20 @@ public class Session {
         public boolean isValid() {return javafx.util.Duration.seconds(Duration).greaterThan(javafx.util.Duration.ZERO);}
         public Tooltip getTooltip() {return new Tooltip(toString());}
 
+    // Reference
+        public File getReferenceFile(ReferenceType referenceType) {
+            switch (referenceType) {
+                case html: {
+                    return new File(Preferences.DIRECTORYREFERENCE, "html/" + Name + ".html");
+                }
+                case txt: {
+                    return new File(Preferences.DIRECTORYREFERENCE, "txt/" + Name + ".txt");
+                }
+                default:
+                    return null;
+            }
+        }
+
     // Creation Methods
 //        public boolean creation_buildEntrainment() {
 //            if (root.getPreferences().getSessionOptions().getRampenabled()) {
@@ -259,12 +275,94 @@ public class Session {
                     "Mantra Meaning: " + mantrameaning + "\n" +
                     "Side Effects: " + sideeffects + "\n";
         }
+//        // Entrainment
+//        @Override
+//        public int startup_entrainmentpartcount() {
+//            if (number == 9) {return 2;}
+//            else {return 3;}
+//        }
+//        @Override
+//        public SoundFile startup_getnextentrainment() throws IndexOutOfBoundsException {
+//            SoundFile soundFile;
+//            File file;
+//            switch (startupchecks_entrainment_count) {
+//                case 0:
+//                    soundFile = entrainment.getFreq();
+//                    file = new File(Preferences.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
+//                    break;
+//                case 1:
+//                    soundFile = entrainment.ramp_get(0);
+//                    if (number != 9) {
+//                        file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
+//                                root.getSessionPart_Names(1, 10).get(root.getSessionPart_Names(1, 10).indexOf(name) + 1).toLowerCase() + ".mp3");
+//                    } else {file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");}
+//                    break;
+//                case 2:
+//                    if (number == 9) {startupCheckType = StartupCheckType.AMBIENCE; throw new IndexOutOfBoundsException();}
+//                    else {
+//                        soundFile = entrainment.ramp_get(1);
+//                        file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");
+//                        break;
+//                    }
+//                default:
+//                    throw new IndexOutOfBoundsException();
+//            }
+//            if (soundFile == null && file.exists()) {soundFile = new SoundFile(file);}
+//            return soundFile;
+//        }
+//
+//        // Creation
+//        @Override
+//        public boolean creation_buildEntrainment() {
+//            if (root.getPreferences().getSessionOptions().getRampenabled()) {
+//                try {
+//                    int index = allsessionpartstoplay.indexOf(this);
+//                    SessionPart partafter = allsessionpartstoplay.get(index + 1);
+//                    if ((partafter instanceof Qi_Gong || partafter instanceof kujiin.util.Element) && ! name.equals("ZEN")) {entrainment.setRampfile(entrainment.ramp_get(1));}
+//                    else {entrainment.setRampfile(entrainment.ramp_get(0));}
+//                    if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
+//                    return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+//                } catch (IndexOutOfBoundsException ignored) {return false;}
+//            }
+//            return super.creation_buildEntrainment();
+//        }
     }
     public class Element extends PlaybackItem {
 
         public Element(String name) {
             super(name);
         }
+
+//        // Gettters And Setters
+//        @Override
+//        public Tooltip getTooltip() {
+//            return super.getTooltip();
+//        }
+//        @Override
+//        public String getNameForFiles() {return "qi";}
+//
+//        // Entrainment
+//        @Override
+//        public int startup_entrainmentpartcount() {
+//            return 10;
+//        }
+//
+//        // Creation
+//        @Override
+//        public boolean creation_buildEntrainment() {
+//            if (root.getPreferences().getSessionOptions().getRampenabled()) {
+//                try {
+//                    int index = allsessionpartstoplay.indexOf(this);
+//                    SessionPart parttotest = allsessionpartstoplay.get(index + 1);
+//                    SoundFile rampfile;
+//                    if (parttotest instanceof Qi_Gong || parttotest instanceof kujiin.util.Element) {rampfile = entrainment.getFreq();}
+//                    else {rampfile = entrainment.ramp_get(Preferences.CUTNAMES.indexOf(parttotest.name.toUpperCase()));}
+//                    entrainment.setRampfile(rampfile);
+//                    if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
+//                    return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+//                } catch (IndexOutOfBoundsException ignored) {return super.creation_buildEntrainment();}
+//            } else {return super.creation_buildEntrainment();}
+//        }
     }
     public class QiGong extends PlaybackItem {
         protected final String summary = "Gather Qi (Life Energy) Before The Session Starts";
@@ -278,6 +376,46 @@ public class Session {
         public String toString() {
             return super.Name + "\n" + summary;
         }
+
+        @Override
+        public File getReferenceFile(ReferenceType referenceType) {
+            switch (referenceType) {
+                case html: {
+                    String name = "Qi-Gong.html";
+                    return new File(Preferences.DIRECTORYREFERENCE, "html/" + name);
+                }
+                case txt: {
+                    String name = "Qi-Gong.txt";
+                    return new File(Preferences.DIRECTORYREFERENCE, "txt/" + name);
+                }
+                default:
+                    return null;
+            }
+        }
+
+//        @Override
+//        public boolean creation_buildEntrainment() {
+//            if (root.getPreferences().getSessionOptions().getRampenabled()) {
+//                int index = allsessionpartstoplay.indexOf(this);
+//                SessionPart parttotest;
+//                switch (number) {
+//                    case 0:
+//                        parttotest = allsessionpartstoplay.get(index + 1);
+//                        break;
+//                    case 15:
+//                        parttotest = allsessionpartstoplay.get(index - 1);
+//                        break;
+//                    default:
+//                        parttotest = null;
+//                }
+//                SoundFile rampfile;
+//                if (parttotest instanceof Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
+//                else {rampfile = entrainment.ramp_get(Preferences.ALLNAMES.indexOf(parttotest.name.toUpperCase()) - 1);}
+//                entrainment.setRampfile(rampfile);
+//                if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
+//                return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+//            } else {return super.creation_buildEntrainment();}
+//        }
     }
     public class Rin extends Cut {
 
