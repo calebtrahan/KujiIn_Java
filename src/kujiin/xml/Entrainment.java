@@ -65,4 +65,5 @@ public class Entrainment {
         return "Ramp File: " + rampfile.getFile().getAbsolutePath() + " & Freq: " + freq.getFile().getAbsolutePath();
     }
 
+    public boolean isValid() {return true;}
 }

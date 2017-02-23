@@ -14,7 +14,7 @@ public class InformationDialog {
         }
         a.setContentText(contexttext);
         DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
+        dialogPane.getStylesheets().add(preferences.getUserInterfaceOptions().getThemefile());
         a.showAndWait();
     }
 }

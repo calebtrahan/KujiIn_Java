@@ -1,327 +1,426 @@
 package kujiin.xml;
 
+import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
-import kujiin.util.SessionPart;
+import kujiin.util.Util;
+import kujiin.util.enums.FreqType;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 import static kujiin.util.Util.dateFormat;
 
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class Session {
     private String Date_Practiced;
-    private Double Presession_Duration;
-    private Double Earth_Duration;
-    private Double Air_Duration;
-    private Double Fire_Duration;
-    private Double Water_Duration;
-    private Double Void_Duration;
-    private Double Rin_Duration;
-    private Double Kyo_Duration;
-    private Double Toh_Duration;
-    private Double Sha_Duration;
-    private Double Kai_Duration;
-    private Double Jin_Duration;
-    private Double Retsu_Duration;
-    private Double Zai_Duration;
-    private Double Zen_Duration;
-    private Double Postsession_Duration;
-    private Double Total_Session_Duration;
-    private ArrayList<SoundFile> Presession_Ambience;
-    private ArrayList<SoundFile> Earth_Ambience;
-    private ArrayList<SoundFile> Air_Ambience;
-    private ArrayList<SoundFile> Fire_Ambience;
-    private ArrayList<SoundFile> Water_Ambience;
-    private ArrayList<SoundFile> Void_Ambience;
-    private ArrayList<SoundFile> Rin_Ambience;
-    private ArrayList<SoundFile> Kyo_Ambience;
-    private ArrayList<SoundFile> Toh_Ambience;
-    private ArrayList<SoundFile> Sha_Ambience;
-    private ArrayList<SoundFile> Kai_Ambience;
-    private ArrayList<SoundFile> Jin_Ambience;
-    private ArrayList<SoundFile> Retsu_Ambience;
-    private ArrayList<SoundFile> Zai_Ambience;
-    private ArrayList<SoundFile> Zen_Ambience;
-    private ArrayList<SoundFile> Postsession_Ambience;
+    private ArrayList<PlaybackItem> playbackItems;
+    private Double SessionDuration; // In Millis
+    private FreqType freqType;
 
     public Session() {
-        Presession_Duration = 0.0;
-        Rin_Duration = 0.0;
-        Kyo_Duration = 0.0;
-        Toh_Duration = 0.0;
-        Sha_Duration = 0.0;
-        Kai_Duration = 0.0;
-        Jin_Duration = 0.0;
-        Retsu_Duration = 0.0;
-        Zai_Duration = 0.0;
-        Zen_Duration = 0.0;
-        Earth_Duration = 0.0;
-        Air_Duration = 0.0;
-        Fire_Duration = 0.0;
-        Water_Duration = 0.0;
-        Void_Duration = 0.0;
-        Postsession_Duration = 0.0;
-        Total_Session_Duration = 0.0;
-        setDate_Practiced(LocalDate.now());
-    }
-    public Session(double[] durations) {
-        Presession_Duration = durations[0];
-        Rin_Duration = durations[1];
-        Kyo_Duration = durations[2];
-        Toh_Duration = durations[3];
-        Sha_Duration = durations[4];
-        Kai_Duration = durations[5];
-        Jin_Duration = durations[6];
-        Retsu_Duration = durations[7];
-        Zai_Duration = durations[8];
-        Zen_Duration = durations[9];
-        Earth_Duration = durations[10];
-        Air_Duration = durations[11];
-        Fire_Duration = durations[12];
-        Water_Duration = durations[13];
-        Void_Duration = durations[14];
-        Postsession_Duration = durations[15];
-        double totalduration = 0;
-        for (double i : durations) {totalduration += i;}
-        Total_Session_Duration = totalduration;
+        SessionDuration = 0.0;
         setDate_Practiced(LocalDate.now());
     }
 
 // Getters And Setters
-    public LocalDate getDate_Practiced() {return LocalDate.parse(Date_Practiced, dateFormat);}
     public void setDate_Practiced(LocalDate date_Practiced) {Date_Practiced = date_Practiced.format(dateFormat);}
-    public void updateduration(SessionPart sessionPart, Duration duration) {
-        double minutes = duration.toMinutes();
-        switch (sessionPart.number) {
-            case 0:
-                Presession_Duration = minutes;
-                break;
-            case 1:
-                Rin_Duration = minutes;
-                break;
-            case 2:
-                Kyo_Duration = minutes;
-                break;
-            case 3:
-                Toh_Duration = minutes;
-                break;
-            case 4:
-                Sha_Duration = minutes;
-                break;
-            case 5:
-                Kai_Duration = minutes;
-                break;
-            case 6:
-                Jin_Duration = minutes;
-                break;
-            case 7:
-                Retsu_Duration = minutes;
-                break;
-            case 8:
-                Zai_Duration = minutes;
-                break;
-            case 9:
-                Zen_Duration = minutes;
-                break;
-            case 10:
-                Earth_Duration = minutes;
-                break;
-            case 11:
-                Air_Duration = minutes;
-                break;
-            case 12:
-                Fire_Duration = minutes;
-                break;
-            case 13:
-                Water_Duration = minutes;
-                break;
-            case 14:
-                Void_Duration = minutes;
-                break;
-            case 15:
-                Postsession_Duration = minutes;
-                break;
+    public LocalDate getDate_Practiced() {return LocalDate.parse(Date_Practiced, dateFormat);}
+    public Duration getSessionDuration() {
+        Duration totalduration = Duration.ZERO;
+        for (PlaybackItem i : playbackItems) {
+            totalduration = totalduration.add(new Duration(i.getDuration()));
         }
-        Duration total = Duration.ZERO;
-        for (int i=0; i<16; i++) {total = total.add(getduration(i));}
-        Total_Session_Duration = total.toMinutes();
+        return totalduration;
     }
-    public Duration getduration(SessionPart sessionpart) {
-        switch (sessionpart.number) {
-            case 0:
-                return Duration.minutes(Presession_Duration);
-            case 1:
-                return Duration.minutes(Rin_Duration);
-            case 2:
-                return Duration.minutes(Kyo_Duration);
-            case 3:
-                return Duration.minutes(Toh_Duration);
-            case 4:
-                return Duration.minutes(Sha_Duration);
-            case 5:
-                return Duration.minutes(Kai_Duration);
-            case 6:
-                return Duration.minutes(Jin_Duration);
-            case 7:
-                return Duration.minutes(Retsu_Duration);
-            case 8:
-                return Duration.minutes(Zai_Duration);
-            case 9:
-                return Duration.minutes(Zen_Duration);
-            case 10:
-                return Duration.minutes(Earth_Duration);
-            case 11:
-                return Duration.minutes(Air_Duration);
-            case 12:
-                return Duration.minutes(Fire_Duration);
-            case 13:
-                return Duration.minutes(Water_Duration);
-            case 14:
-                return Duration.minutes(Void_Duration);
-            case 15:
-                return Duration.minutes(Postsession_Duration);
-            default:
-                return Duration.ZERO;
-        }
+    public void setPlaybackItems(ArrayList<PlaybackItem> playbackItems) {
+        this.playbackItems = playbackItems;
     }
-    public Duration getduration(int index) {
+    public ArrayList<PlaybackItem> getPlaybackItems() {
+        if (playbackItems == null) {return new ArrayList<>();}
+        else {return playbackItems;}
+    }
+    public void addplaybackitem(int index) {
+        if (playbackItems == null) {playbackItems = new ArrayList<>();}
         switch (index) {
             case 0:
-                return Duration.minutes(Presession_Duration);
+                playbackItems.add(new QiGong());
+                break;
             case 1:
-                return Duration.minutes(Rin_Duration);
+                playbackItems.add(new Rin());
+                break;
             case 2:
-                return Duration.minutes(Kyo_Duration);
+                playbackItems.add(new Kyo());
+                break;
             case 3:
-                return Duration.minutes(Toh_Duration);
+                playbackItems.add(new Toh());
+                break;
             case 4:
-                return Duration.minutes(Sha_Duration);
+                playbackItems.add(new Sha());
+                break;
             case 5:
-                return Duration.minutes(Kai_Duration);
+                playbackItems.add(new Kai());
+                break;
             case 6:
-                return Duration.minutes(Jin_Duration);
+                playbackItems.add(new Jin());
+                break;
             case 7:
-                return Duration.minutes(Retsu_Duration);
+                playbackItems.add(new Retsu());
+                break;
             case 8:
-                return Duration.minutes(Zai_Duration);
+                playbackItems.add(new Zai());
+                break;
             case 9:
-                return Duration.minutes(Zen_Duration);
+                playbackItems.add(new Zen());
+                break;
             case 10:
-                return Duration.minutes(Earth_Duration);
+                playbackItems.add(new Earth());
+                break;
             case 11:
-                return Duration.minutes(Air_Duration);
+                playbackItems.add(new Air());
+                break;
             case 12:
-                return Duration.minutes(Fire_Duration);
+                playbackItems.add(new Fire());
+                break;
             case 13:
-                return Duration.minutes(Water_Duration);
+                playbackItems.add(new Water());
+                break;
             case 14:
-                return Duration.minutes(Void_Duration);
-            case 15:
-                return Duration.minutes(Postsession_Duration);
+                playbackItems.add(new Void());
+                break;
             default:
-                return Duration.ZERO;
-        }
-    }
-    public Duration gettotalsessionduration() {
-        return Duration.minutes(Total_Session_Duration);
-    }
-    public void updatesessionpartambience(SessionPart sessionPart, ArrayList<SoundFile> ambiencelist) {
-        switch (sessionPart.number) {
-            case 0:
-                Presession_Ambience = ambiencelist;
-                break;
-            case 1:
-                Rin_Ambience = ambiencelist;
-                break;
-            case 2:
-                Kyo_Ambience = ambiencelist;
-                break;
-            case 3:
-                Toh_Ambience = ambiencelist;
-                break;
-            case 4:
-                Sha_Ambience = ambiencelist;
-                break;
-            case 5:
-                Kai_Ambience = ambiencelist;
-                break;
-            case 6:
-                Jin_Ambience = ambiencelist;
-                break;
-            case 7:
-                Retsu_Ambience = ambiencelist;
-                break;
-            case 8:
-                Zai_Ambience = ambiencelist;
-                break;
-            case 9:
-                Zen_Ambience = ambiencelist;
-                break;
-            case 10:
-                Earth_Ambience = ambiencelist;
-                break;
-            case 11:
-                Air_Ambience = ambiencelist;
-                break;
-            case 12:
-                Fire_Ambience = ambiencelist;
-                break;
-            case 13:
-                Water_Ambience = ambiencelist;
-                break;
-            case 14:
-                Void_Ambience = ambiencelist;
-                break;
-            case 15:
-                Postsession_Ambience = ambiencelist;
                 break;
         }
     }
-    public ArrayList<SoundFile> getsessionpartambience(SessionPart sessionPart) {
-        switch (sessionPart.number) {
-            case 0:
-                return Presession_Ambience;
-            case 1:
-                return Rin_Ambience;
-            case 2:
-                return Kyo_Ambience;
-            case 3:
-                return Toh_Ambience;
-            case 4:
-                return Sha_Ambience;
-            case 5:
-                return Kai_Ambience;
-            case 6:
-                return Jin_Ambience;
-            case 7:
-                return Retsu_Ambience;
-            case 8:
-                return Zai_Ambience;
-            case 9:
-                return Zen_Ambience;
-            case 10:
-                return Earth_Ambience;
-            case 11:
-                return Air_Ambience;
-            case 12:
-                return Fire_Ambience;
-            case 13:
-                return Water_Ambience;
-            case 14:
-                return Void_Ambience;
-            case 15:
-                return Postsession_Ambience;
-            default:
-                return null;
-        }
+    public void removeplaybackitem(int index) {
+        playbackItems.remove(index);
     }
 
 // Utility Methods
     public boolean isValid() {
-        return Duration.minutes(Total_Session_Duration).greaterThan(Duration.ZERO);
+        return Duration.minutes(SessionDuration).greaterThan(Duration.ZERO);
+    }
+
+// Subclasses
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public class PlaybackItem {
+        protected int availableambienceindex;
+        protected int playbackindex;
+        protected String Name;
+        private double Duration; // As Millis
+        private boolean RampOnly;
+        private Ambience ambience;
+        private Entrainment entrainment;
+        @XmlTransient
+        private ArrayList<Goals.Goal> GoalsCompletedThisSession;
+
+        public PlaybackItem() {}
+        public PlaybackItem(String name) {
+            this.Name = name;
+            Duration = 0.0;
+            ambience = new Ambience();
+        }
+
+    // Getters And Setters
+        public int getAvailableambienceindex() {
+            return availableambienceindex;
+        }
+        public void setPlaybackindex(int playbackindex) {
+                this.playbackindex = playbackindex;
+            }
+        public int getPlaybackindex() {
+            return playbackindex;
+        }
+        public boolean isRampOnly() {
+            return RampOnly;
+        }
+        public void setRampOnly(boolean rampOnly) {
+            this.RampOnly = rampOnly;
+        }
+        public String getName() {
+            return Name;
+        }
+        public void setDuration(double duration) {
+            Duration = duration;
+        }
+        public double getDuration() {
+                return Duration;
+            }
+        public String getdurationasString(double maxchars) {
+            if (Duration == 0.0 && ! RampOnly) {return "No Duration Set";}
+            else {
+                if (Duration == 0.0 && RampOnly) {return "Ramp Only";}
+                else {return Util.formatdurationtoStringSpelledOut(new Duration(getDuration()), maxchars);}
+            }
+        }
+        public String getAmbienceasString(double maxchars) {
+            if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {return "No Ambience Set";}
+            else {return "Ambience Set " + "(" + ambience.getAmbience().size() + " Files)";}
+        }
+        public void updateduration(Duration duration) {this.Duration = duration.toMillis();}
+        public ArrayList<Goals.Goal> getGoalsCompletedThisSession() {
+            return GoalsCompletedThisSession;
+        }
+        public Ambience getAmbience() {
+            return ambience;
+        }
+
+    // Utility Methods
+        public void addCompletedGoal(Goals.Goal Goal) {
+            if (GoalsCompletedThisSession == null) {
+                GoalsCompletedThisSession = new ArrayList<>();}
+            GoalsCompletedThisSession.add(Goal);
+        }
+        public boolean isValid() {return javafx.util.Duration.seconds(Duration).greaterThan(javafx.util.Duration.ZERO);}
+        public Tooltip getTooltip() {return new Tooltip(toString());}
+
+    // Creation Methods
+//        public boolean creation_buildEntrainment() {
+//            if (root.getPreferences().getSessionOptions().getRampenabled()) {
+//                try {
+//                    int index = allsessionpartstoplay.indexOf(this);
+//                    SessionItem partafter = allsessionpartstoplay.get(index + 1);
+//                    if ((partafter instanceof Qi_Gong || partafter instanceof Element) && ! name.equals("ZEN")) {entrainment.setRampfile(entrainment.ramp_get(1));}
+//                    else {entrainment.setRampfile(entrainment.ramp_get(0));}
+//                    if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
+//                    return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+//                } catch (IndexOutOfBoundsException ignored) {return false;}
+//            }
+//            return super.creation_buildEntrainment();
+//        }
+
+    // Startup Methods
+//        public int startup_entrainmentpartcount() {
+//            if (index == 9) {return 2;}
+//            else {return 3;}
+//        }
+//        public SoundFile startup_getnextentrainment() throws IndexOutOfBoundsException {
+//            SoundFile soundFile;
+//            File file;
+//            switch (startupchecks_entrainment_count) {
+//                case 0:
+//                    soundFile = entrainment.getFreq();
+//                    file = new File(Preferences.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
+//                    break;
+//                case 1:
+//                    soundFile = entrainment.ramp_get(0);
+//                    if (index != 9) {
+//                        file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
+//                                root.getSessionPart_Names(1, 10).get(root.getSessionPart_Names(1, 10).indexOf(name) + 1).toLowerCase() + ".mp3");
+//                    } else {file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");}
+//                    break;
+//                case 2:
+//                    if (index == 9) {startupCheckType = StartupCheckType.AMBIENCE; throw new IndexOutOfBoundsException();}
+//                    else {
+//                        soundFile = entrainment.ramp_get(1);
+//                        file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");
+//                        break;
+//                    }
+//                default:
+//                    throw new IndexOutOfBoundsException();
+//            }
+//            if (soundFile == null && file.exists()) {soundFile = new SoundFile(file);}
+//            return soundFile;
+//        }
+
+    // String Methods
+        @Override
+        public String toString() {
+            return Name;
+        }
+        public String getNameforFiles() {return Name.toLowerCase();}
+
+    }
+    public class Cut extends PlaybackItem {
+        @XmlTransient
+        protected int cutindex;
+        @XmlTransient
+        protected String focuspoint;
+        @XmlTransient
+        protected String concept;
+        @XmlTransient
+        protected String mantrameaning;
+        @XmlTransient
+        protected String sideeffects;
+
+        public Cut(String name) {
+            super(name);
+        }
+
+        @Override
+        public String toString() {
+            return super.Name + "\n" +
+                    "Focus Point: " + focuspoint + "\n" +
+                    "Concept: " + concept + "\n" +
+                    "Mantra Meaning: " + mantrameaning + "\n" +
+                    "Side Effects: " + sideeffects + "\n";
+        }
+    }
+    public class Element extends PlaybackItem {
+
+        public Element(String name) {
+            super(name);
+        }
+    }
+    public class QiGong extends PlaybackItem {
+        protected final String summary = "Gather Qi (Life Energy) Before The Session Starts";
+
+        public QiGong() {
+            super("Qi-Gong");
+            super.availableambienceindex = 0;
+        }
+
+        @Override
+        public String toString() {
+            return super.Name + "\n" + summary;
+        }
+    }
+    public class Rin extends Cut {
+
+        public Rin() {
+            super("Rin");
+            super.availableambienceindex = 1;
+            cutindex = 1;
+            super.focuspoint = "Root Chakra";
+            super.concept = "A Celebration Of The Spirit Coming Into The Body";
+            super.mantrameaning = "All/Everything/Vast As It Is Defined Now";
+            super.sideeffects = "Increases The Bioelectric Output Of The Body";
+        }
+    }
+    public class Kyo extends Cut {
+
+        public Kyo() {
+            super("Kyo");
+            super.availableambienceindex = 2;
+            cutindex = 2;
+            super.focuspoint = "Navel Chakra";
+            super.concept = "In Order To Become Powerful, Responsiblity Must Be Taken For All Actions";
+            super.mantrameaning = "Use Your Tools/Manage Yourself Correctly";
+            super.sideeffects = "Increases The Healthy Flow Of Energy Leading To The Mastery Of The Control And Direction Of Energy";
+        }
+    }
+    public class Toh extends Cut {
+
+        public Toh() {
+            super("Toh");
+            super.availableambienceindex = 3;
+            cutindex = 3;
+            super.focuspoint = "Dan-tian";
+            super.concept = "Conscious Dissolement Of All Personal Fights In Order To Achieve Harmony";
+            super.mantrameaning = "Conquering Limiting Beliefs/Doubts Will Allow You To Get The Treasures Of Life";
+            super.sideeffects = "Enhances Your Positive Relationship With The Universe, Resulting In Improved Harmony And Balance";
+        }
+    }
+    public class Sha extends Cut {
+
+        public Sha() {
+            super("Sha");
+            super.availableambienceindex = 4;
+            cutindex = 4;
+            super.focuspoint = "Solar Plexus Charkra";
+            super.concept = "By Letting Go Of The Limits Of My Mind You Can Vibrate With The Power Of The Universe And Exist Fully Powerful";
+            super.mantrameaning = "Grounded, I Understand The Power That I Express";
+            super.sideeffects = "Increases The Healing Ability Of The Body As A Result Of Higher Energy Levels Passing Through The Body";
+        }
+    }
+    public class Kai extends Cut {
+
+        public Kai() {
+            super("Kai");
+            super.availableambienceindex = 5;
+            cutindex = 5;
+            super.focuspoint = "Heart Chakra";
+            super.concept = "Everything (Created Or Not) In The Universe Is One";
+            super.mantrameaning = "I Acknowledge The All Pervading Conscious State of Things As They Are, And I Live It [I Am Conscious Of EVERYTHING]";
+            super.sideeffects = "Develops Foreknowledge, Premonition, Intuition And Feeling By Acknowlegding That Everything Is One";
+        }
+    }
+    public class Jin extends Cut {
+
+        public Jin() {
+            super("Jin");
+            super.availableambienceindex = 6;
+            cutindex = 6;
+            super.focuspoint = "Throat Chakra";
+            super.concept = "An Observation Of The Universe And What Binds Every Part Of Us To Every Part Of Everything Else";
+            super.mantrameaning = "Conscious Experience Of The Fire That Everything Is Really Made Of";
+            super.sideeffects = "By Understanding The ";
+        }
+    }
+    public class Retsu extends Cut {
+
+        public Retsu() {
+            super("Retsu");
+            super.availableambienceindex = 7;
+            cutindex = 7;
+            super.focuspoint = "Jade Gate Chakra";
+            super.concept = "Transmute The Limits Of Perception By Remembering Our Wholeness As Spirit";
+            super.mantrameaning = "Everything Flows/Is Elevated To The Divine";
+            super.sideeffects = "Enhances Your Perception And Mastery Of Space-Time Dimensions";
+        }
+    }
+    public class Zai extends Cut {
+
+        public Zai() {
+            super("Zai");
+            super.availableambienceindex = 8;
+            cutindex = 8;
+            super.focuspoint = "Third Eye Chakra";
+            super.concept = "Works With Our Mind, Heart And Body In Order To Define Ourselves As A Spirit That Is Having A Human Experience, Rather Than A Human Being Sometimes Having A Spiritual Experience";
+            super.mantrameaning = "Everything Is Manifested In The Correct Way According To The Experience That I Live";
+            super.sideeffects = "Increases My Power Of Manifestation By Fostering A Relationship With The Elements Of Creation";
+        }
+    }
+    public class Zen extends Cut {
+
+        public Zen() {
+            super("Zen");
+            super.availableambienceindex = 9;
+            cutindex = 9;
+            super.focuspoint = "Crown Chakra";
+            super.concept = "The Human Completely Relents Itself To The Spirit With Only The Consciousness Aspect Of The Human Remaining Active";
+            super.mantrameaning = "I am the void and the light";
+            super.sideeffects = "Completely Relenting Into Spirit Results In Englightenment, Completeness, Suggestive Invisibility";
+        }
+    }
+    public class Earth extends Element {
+
+        public Earth() {
+            super("Earth");
+            super.availableambienceindex = 10;
+        }
+    }
+    public class Air extends Element {
+
+        public Air() {
+            super("Air");
+            super.availableambienceindex = 11;
+        }
+    }
+    public class Fire extends Element {
+
+        public Fire() {
+            super("Fire");
+            super.availableambienceindex = 12;
+        }
+    }
+    public class Water extends Element {
+
+        public Water() {
+            super("Water");
+            super.availableambienceindex = 13;
+        }
+    }
+    public class Void extends Element {
+
+        public Void() {
+            super("Void");
+            super.availableambienceindex = 14;
+        }
     }
 
 }

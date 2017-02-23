@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox prefHeight="376.0" prefWidth="399.0" stylesheets="@../../../styles/default.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.ui.creation.CreateOrEditSession">
+   <children>
+      <VBox prefHeight="398.0" prefWidth="416.0" VBox.vgrow="ALWAYS">
+         <children>
+            <HBox alignment="CENTER">
+               <children>
+                  <Label text="Playback Items">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </HBox>
+            <TableView fx:id="PlaybackItemsTable" prefHeight="332.0" prefWidth="395.0" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="NumberColumn" prefWidth="40.0" text="#" />
+                  <TableColumn fx:id="NameColumn" prefWidth="115.0" text="Name" />
+                  <TableColumn fx:id="DurationColumn" prefWidth="115.0" text="Duration" />
+                  <TableColumn fx:id="AmbienceColumn" prefWidth="118.0" text="Ambience" />
+               </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+            <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="416.0">
+               <children>
+                  <MenuButton mnemonicParsing="false" text="Add Item">
+                    <items>
+                      <MenuItem fx:id="AddQiGongMenuItem" mnemonicParsing="false" onAction="#add_QiGong" text="Qi-Gong" />
+                        <Menu mnemonicParsing="false" text="Kuji-In">
+                          <items>
+                            <MenuItem fx:id="AddRinMenuItem" mnemonicParsing="false" onAction="#addRin" text="Rin" />
+                              <MenuItem fx:id="AddKyoMenuItem" mnemonicParsing="false" onAction="#addkyo" text="Kyo" />
+                              <MenuItem fx:id="AddTohMenuItem" mnemonicParsing="false" onAction="#addToh" text="Toh" />
+                              <MenuItem fx:id="AddShaMenuItem" mnemonicParsing="false" onAction="#addSha" text="Sha" />
+                              <MenuItem fx:id="AddKaiMenuItem" mnemonicParsing="false" onAction="#addKai" text="Kai" />
+                              <MenuItem fx:id="addJinMenuItem" mnemonicParsing="false" onAction="#addJin" text="Jin" />
+                              <MenuItem fx:id="AddRetsuMenuItem" mnemonicParsing="false" onAction="#addRetsu" text="Retsu" />
+                              <MenuItem fx:id="AddZaiMenuItem" mnemonicParsing="false" onAction="#addZai" text="Zai" />
+                              <MenuItem fx:id="AddZenMenuItem" mnemonicParsing="false" onAction="#addZen" text="Zen" />
+                          </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Element">
+                           <items>
+                              <MenuItem fx:id="AddEarthMenuItem" mnemonicParsing="false" onAction="#addEarth" text="Earth" />
+                              <MenuItem fx:id="AddAirMenuItem" mnemonicParsing="false" onAction="#addAir" text="Air" />
+                              <MenuItem fx:id="AddFireMenuItem" mnemonicParsing="false" onAction="#addFire" text="Fire" />
+                              <MenuItem fx:id="AddWaterMenuItem" mnemonicParsing="false" onAction="#addWater" text="Water" />
+                              <MenuItem fx:id="AddVoidMenuItem" mnemonicParsing="false" onAction="#addVoid" text="Void" />
+                           </items>
+                        </Menu>
+                    </items>
+                  </MenuButton>
+                  <Button fx:id="EditDurationButton" disable="true" mnemonicParsing="false" onAction="#editduration" text="Edit Duration" />
+                  <Button fx:id="AddEditAmbienceButton" disable="true" mnemonicParsing="false" onAction="#addoreditambience" text="Edit Ambience" />
+                  <Button fx:id="RemoveButton" disable="true" mnemonicParsing="false" onAction="#removeitem" text="Remove" />
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+      <HBox alignment="CENTER_RIGHT" maxHeight="36.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label fx:id="StatusBar" />
+               </children>
+            </HBox>
+            <Button fx:id="CreateButton" defaultButton="true" mnemonicParsing="false" onAction="#create" text="Create" />
+            <Button fx:id="CancelButton" cancelButton="true" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</VBox>

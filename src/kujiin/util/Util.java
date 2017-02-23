@@ -269,6 +269,11 @@ public class Util {
             longtext.append(" Minute");
             if (minutes > 1) {longtext.append("s");}
         }
+        if (seconds > 0) {
+            longtext.append(minutes);
+            longtext.append(" Second");
+            if (seconds > 1) {longtext.append("s");}
+        }
         if (maxcharlength == null || longtext.toString().length() <= maxcharlength) {return longtext.toString();}
         else {
     // Short
@@ -278,6 +283,11 @@ public class Util {
                 shorttext.append(minutes);
                 shorttext.append(" Min");
                 if (minutes > 1) {shorttext.append("s");}
+            }
+            if (seconds > 0) {
+                shorttext.append(minutes);
+                shorttext.append(" Second");
+                if (seconds > 1) {shorttext.append("s");}
             }
             if (shorttext.toString().length() <= maxcharlength) {return shorttext.toString();}
             else {
@@ -291,6 +301,11 @@ public class Util {
                 if (minutes > 0) {
                     reallyshorttext.append(minutes);
                     reallyshorttext.append(" M");
+                }
+                if (seconds > 0) {
+                    reallyshorttext.append(minutes);
+                    reallyshorttext.append(" Second");
+                    if (seconds > 1) {reallyshorttext.append("s");}
                 }
                 return reallyshorttext.toString();
             }

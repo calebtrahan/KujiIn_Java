@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.enums.AmbiencePlaybackType;
+import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.ReferenceType;
 import org.apache.commons.io.FileUtils;
 
@@ -37,11 +38,32 @@ public class Preferences {
     // XML File Location Constants
     public static final File OPTIONSXMLFILE = new File(XMLDIRECTORY, "options.xml");
     public static final File DIRECTORYIMAGES = new File(ROOTDIRECTORY, "assets/img/");
+    public static final File DIRECTORYICONS = new File(DIRECTORYIMAGES, "icons/");
+    // Icons
+    public static final Image ICON_ADDTOFAVORITE = new Image(new File(DIRECTORYICONS, "AddToFavorite.png").toURI().toString());
+    public static final Image ICON_ADD = new Image(new File(DIRECTORYICONS, "Add.png").toURI().toString());
+    public static final Image ICON_REMOVE = new Image(new File(DIRECTORYICONS, "Remove.png").toURI().toString());
+    public static final Image ICON_EXPORTTOAUDIO = new Image(new File(DIRECTORYICONS, "ExportSession.png").toURI().toString());
+    public static final Image ICON_EXPORTTODOCUMENT = new Image(new File(DIRECTORYICONS, "ExportToFile.png").toURI().toString());
+    public static final Image ICON_FAVORITES = new Image(new File(DIRECTORYICONS, "Favorites.png").toURI().toString());
+    public static final Image ICON_FULLSCREEN = new Image(new File(DIRECTORYICONS, "Fullscreen.png").toURI().toString());
+    public static final Image ICON_MOVEDOWN = new Image(new File(DIRECTORYICONS, "MoveDown.png").toURI().toString());
+    public static final Image ICON_MOVEUP = new Image(new File(DIRECTORYICONS, "MoveUp.png").toURI().toString());
+    public static final Image ICON_PAUSE = new Image(new File(DIRECTORYICONS, "Pause.png").toURI().toString());
+    public static final Image ICON_PLAY = new Image(new File(DIRECTORYICONS, "Play.png").toURI().toString());
+    public static final Image ICON_RECENTSESSIONS = new Image(new File(DIRECTORYICONS, "RecentlyPlayed.png").toURI().toString());
+    public static final Image ICON_SETTINGS = new Image(new File(DIRECTORYICONS, "Settings.png").toURI().toString());
+    public static final Image ICON_STOP = new Image(new File(DIRECTORYICONS, "Stop.png").toURI().toString());
+    public static final Image ICON_OPENFILE = new Image(new File(DIRECTORYICONS, "OpenFile.png").toURI().toString());
+    public static final Image ICON_EDITDURATION = new Image(new File(DIRECTORYICONS, "EditDuration.png").toURI().toString());
+    public static final Image ICON_AMBIENCE = new Image(new File(DIRECTORYICONS, "Ambience.png").toURI().toString());
     public static final File GOALSXMLFILE = new File(XMLDIRECTORY, "goals.xml");
     public static final File SESSIONSXMLFILE_TESTING = new File(XMLDIRECTORY, "sessions_testing.xml");
     public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");
     public static final File ENTRAINMENTXMLFILE = new File(XMLDIRECTORY, "entrainment.xml");
     public static final File AMBIENCEXMLFILE = new File(XMLDIRECTORY, "ambience.xml");
+    public static final File AVAILABLEAMBIENCEXMLFILE = new File(XMLDIRECTORY, "availableambience.xml");
+    public static final File FAVORITESESSIONSXMLFILE = new File(XMLDIRECTORY, "favoritesessions.xml");
     public final static File TESTFILE = new File(SOUNDDIRECTORY, "Test.mp3");
 
     // Name Constants
@@ -172,6 +194,7 @@ public class Preferences {
         userInterfaceOptions.setThemefile(DEFAULT_THEMEFILE.toURI().toString());
         userInterfaceOptions.setThemefiles(new ArrayList<>(Arrays.asList(DEFAULT_THEMEFILE.toURI().toString())));
         userInterfaceOptions.setThemefilenames(new ArrayList<>(Arrays.asList("Default")));
+        userInterfaceOptions.setIconDisplayType(IconDisplayType.ICONS_AND_TEXT);
         creationOptions.setScrollincrement(DEFAULT_SCROLL_INCREMENT);
         sessionOptions.setAlertfunction(DEFAULT_ALERTFUNCTION_OPTION);
         sessionOptions.setAlertfilelocation(DEFAULT_ALERTFILELOCATION);
@@ -234,6 +257,7 @@ public class Preferences {
         private String themefile;
         private ArrayList<String> themefiles;
         private ArrayList<String> themefilenames;
+        private IconDisplayType iconDisplayType;
 
         public UserInterfaceOptions() {}
 
@@ -267,6 +291,12 @@ public class Preferences {
         }
         public void setThemefilenames(ArrayList<String> themefilenames) {
             this.themefilenames = themefilenames;
+        }
+        public IconDisplayType getIconDisplayType() {
+            return iconDisplayType;
+        }
+        public void setIconDisplayType(IconDisplayType iconDisplayType) {
+            this.iconDisplayType = iconDisplayType;
         }
 
     }

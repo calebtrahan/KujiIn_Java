@@ -12,8 +12,8 @@ import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.ui.dialogs.boilerplate.ModalDialog;
-import kujiin.util.SessionPart;
 import kujiin.util.enums.ReferenceType;
+import kujiin.util.sessionitems.SessionItem;
 import kujiin.xml.Preferences;
 
 import java.io.IOException;
@@ -30,9 +30,9 @@ public class SelectReferenceType extends ModalDialog {
     private ArrayList<String> descriptions = new ArrayList<>();
     private boolean result = false;
     private MainController Root;
-    private List<SessionPart> itemsinsession;
+    private List<SessionItem> itemsinsession;
 
-    public SelectReferenceType(MainController Root, Stage stage, boolean minimizeparent, List<SessionPart> itemsinsession) {
+    public SelectReferenceType(MainController Root, Stage stage, boolean minimizeparent, List<SessionItem> itemsinsession) {
         super(Root, stage, minimizeparent);
         try {
             this.itemsinsession = itemsinsession;
@@ -91,11 +91,11 @@ public class SelectReferenceType extends ModalDialog {
         int nonexisting = 0;
         int empty = 0;
         int invalid = 0;
-        for (SessionPart i : itemsinsession) {
-            if (! i.reference_exists(getReferenceType())) {nonexisting++;}
-            else if (i.reference_empty(getReferenceType())) {empty++;}
-            else if (i.reference_invalid(getReferenceType())) {invalid++;}
-        }
+//        for (SessionItem i : itemsinsession) {
+//            if (! i.reference_exists(getReferenceType())) {nonexisting++;}
+//            else if (i.reference_empty(getReferenceType())) {empty++;}
+//            else if (i.reference_invalid(getReferenceType())) {invalid++;}
+//        }
         if (nonexisting > 0) {
             new ErrorDialog(Root.getPreferences(), "Missing Reference Files", "Missing Reference Files For " + nonexisting + " Session Parts", "Cannot Enable Reference");
             return false;

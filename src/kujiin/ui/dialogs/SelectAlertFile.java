@@ -74,7 +74,7 @@ public class SelectAlertFile extends ModalDialog {
     }
     public void preview() {
         if (alertfile != null && alertfile.exists()) {
-            PreviewFile previewFile = new PreviewFile(alertfile, Root, this, false);
+            PreviewFile previewFile = new PreviewFile(alertfile);
             previewFile.showAndWait();
         }
     }
@@ -186,7 +186,6 @@ public class SelectAlertFile extends ModalDialog {
 //            AlertSwitch.setSelected(good);
 //            return good;
 //        }
-
 
     @Override
     public void close() {

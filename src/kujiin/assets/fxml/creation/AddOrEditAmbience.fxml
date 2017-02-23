@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0" prefWidth="367.0" stylesheets="@../../../../../../../../../../../mnt/Gaming/Programming/Java/Kuji-In/src/kujiin/assets/styles/default.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.ui.creation.AddOrEditAmbience">
+   <children>
+      <TableView fx:id="AddOrEditAmbienceTable" prefHeight="200.0" prefWidth="313.0">
+        <columns>
+          <TableColumn fx:id="NumberColumn" prefWidth="45.0" sortable="false" text="#" />
+          <TableColumn fx:id="NameColumn" prefWidth="154.0" sortable="false" text="Name" />
+            <TableColumn fx:id="DurationColumn" prefWidth="156.0" sortable="false" text="Duration" />
+        </columns>
+      </TableView>
+      <HBox alignment="CENTER_LEFT" prefHeight="31.0" prefWidth="357.0">
+         <children>
+            <MenuButton fx:id="AddMenu" mnemonicParsing="false" text="Add">
+              <items>
+                  <Menu mnemonicParsing="false" text="Quick Add">
+                    <items>
+                      <MenuItem fx:id="QuickAddRepeatAmbience" mnemonicParsing="false" onAction="#quickaddrepeatambience" text="Repeat Available Ambience" />
+                        <MenuItem fx:id="QuickAddShuffleAmbience" mnemonicParsing="false" onAction="#quickaddshuffleambience" text="Shuffle Available Ambience" />
+                    </items>
+                  </Menu>
+                <MenuItem fx:id="AddFromAmbienceDirectory" mnemonicParsing="false" onAction="#addfromavailableambience" text="From Ambience Directory" />
+                <MenuItem fx:id="AddOpenFiles" mnemonicParsing="false" onAction="#addfromfiles" text="From File(s)" />
+              </items>
+            </MenuButton>
+            <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removefromtable" text="Remove" />
+            <Button fx:id="PreviewButton" mnemonicParsing="false" onAction="#preview" text="Preview" />
+            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+               <children>
+                  <Button fx:id="UpButton" mnemonicParsing="false" onAction="#moveup" text="Up" />
+                  <Button fx:id="DownButton" mnemonicParsing="false" onAction="#movedown" text="Down" />
+               </children>
+            </HBox>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER_RIGHT" prefHeight="31.0" prefWidth="357.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label fx:id="StatusBar" text="Need To Add 00:43:00 Of Ambience" />
+               </children>
+            </HBox>
+            <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#accept" text="Accept" />
+            <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</VBox>

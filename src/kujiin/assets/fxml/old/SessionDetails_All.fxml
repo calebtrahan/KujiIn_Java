@@ -7,7 +7,7 @@
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="928.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="928.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox prefHeight="530.0" prefWidth="928.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -38,7 +38,7 @@
                                                             <TableView fx:id="TotalProgressTableView" prefHeight="488.0" prefWidth="243.0">
                                                               <columns>
                                                                 <TableColumn fx:id="NameColumn" prefWidth="75.0" text="Name" />
-                                                                <TableColumn fx:id="CurrentPracticeTimeColumn" prefWidth="161.0" text="Current Practice Time" />
+                                                                <TableColumn fx:id="CurrentPracticeTimeColumn" prefWidth="161.0" text="Total Practiced Time" />
                                                               </columns>
                                                                <HBox.margin>
                                                                   <Insets right="5.0" />
@@ -66,9 +66,9 @@
                                   </Tab>
                                   <Tab text="Balance">
                                     <content>
-                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                      <AnchorPane>
                                              <children>
-                                                <PieChart fx:id="SessionBalancePieChart" layoutY="1.0" prefHeight="555.0" prefWidth="895.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <PieChart fx:id="SessionBalancePieChart" layoutY="1.0" prefHeight="472.0" prefWidth="928.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                              </children>
                                           </AnchorPane>
                                     </content>

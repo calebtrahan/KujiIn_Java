@@ -8,20 +8,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.ui.dialogs.boilerplate.ModalDialog;
-import kujiin.util.SessionPart;
 import kujiin.util.Util;
 import kujiin.util.table.AmbienceSong;
-import kujiin.xml.Preferences;
-import kujiin.xml.SoundFile;
+import kujiin.xml.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class AmbienceEditor_Simple extends ModalDialog implements Initializable {
+public class AmbienceEditor_Simple extends Stage implements Initializable {
     public TableView<AmbienceSong> AmbienceTable;
     public TableColumn<AmbienceSong, String> NameColumn;
     public TableColumn<AmbienceSong, String> DurationColumn;
@@ -42,12 +37,14 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
     public Button PreviewButton;
     public TextField TotalDuration;
     public Button AdvancedButton;
-    private ObservableList<AmbienceSong> AmbienceList;
-    private ArrayList<SoundFile> SoundList;
+    private ObservableList<AmbienceSong> AmbienceList = FXCollections.observableArrayList();
+    private ArrayList<SoundFile> SoundList = new ArrayList<>();
     private AmbienceSong selectedambiencesong;
-    private SessionPart selectedsessionpart;
+    private Session.PlaybackItem selectedplaybackitem;
     private PreviewFile previewdialog;
-    private MainController Root;
+    private AvailableAmbiences availableAmbiences;
+    private PlaybackItemAmbience selectedplaybackitemambience;
+    private Preferences preferences;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -65,27 +62,26 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
         RemoveButton.setOnAction(event -> remove());
         PreviewButton.setOnAction(event -> preview());
     }
-    public AmbienceEditor_Simple(MainController Root, Stage stage, boolean minimizeparent) {
-        super(Root, stage, minimizeparent);
+    public AmbienceEditor_Simple(AvailableAmbiences availableAmbiences, Preferences preferences) {
         try {
+            this.availableAmbiences = availableAmbiences;
+            this.preferences = preferences;
 //            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
-            this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Simple.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            initOwner(stage);
-            initModality(Modality.APPLICATION_MODAL);
             setTitle("Simple Ambience Editor");
             setOnCloseRequest(event -> closedialog());
             SessionPartChoiceBox.setOnAction(event -> selectandloadsessionpart());
             NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
         } catch (IOException ignored) {}
     }
-    public AmbienceEditor_Simple(MainController Root, Stage stage, boolean minimizeparent, SessionPart sessionPart) {
-        super(Root, stage, minimizeparent);
+    public AmbienceEditor_Simple(AvailableAmbiences availableAmbiences, Preferences preferences, Session.PlaybackItem playbackItem) {
         try {
 //            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
+            this.availableAmbiences = availableAmbiences;
+            this.preferences = preferences;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Simple.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -94,10 +90,11 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
             setTitle("Simple Ambience Editor");
             setOnCloseRequest(event -> closedialog());
             setOnShowing(event -> {
-                SessionPartChoiceBox.getSelectionModel().select(sessionPart.number);
+                SessionPartChoiceBox.getSelectionModel().select(playbackItem.getAvailableambienceindex());
                 selectandloadsessionpart();
             });
             SessionPartChoiceBox.setOnAction(event -> selectandloadsessionpart());
+            selectedplaybackitemambience = availableAmbiences.getsessionpartAmbience(playbackItem.getAvailableambienceindex());
         } catch (IOException ignored) {}
     }
 
@@ -106,15 +103,9 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
     public void selectandloadsessionpart() {
         int index = SessionPartChoiceBox.getSelectionModel().getSelectedIndex();
         if (index != -1) {
-            if (AmbienceList == null) {AmbienceList = FXCollections.observableArrayList();}
-            else {AmbienceList.clear();}
-            if (SoundList == null) {SoundList = new ArrayList<>();}
-            else {SoundList.clear();}
+            AmbienceList.clear();
+            SoundList.clear();
             AmbienceTable.getItems().clear();
-            selectedsessionpart = Root.getAllSessionParts(false).get(index);
-            if (populateactualambiencetable()) {
-                AmbienceTable.setItems(AmbienceList);
-            }
             calculatetotalduration();
         }
     }
@@ -129,7 +120,7 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
         }
         if (validfilecount > 0) {
             if (Util.list_hasduplicates(files)) {
-                if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard").getResult()) {
+                if (! new ConfirmationDialog(preferences, "Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard").getResult()) {
                     files = Util.list_removeduplicates(files);
                 }
             }
@@ -138,7 +129,7 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
             SoundFile soundFile = new SoundFile(i);
             addandcalculateduration(soundFile);
         }
-        if (notvalidfilecount > 0) {new InformationDialog(Root.getPreferences(), "Information", notvalidfilecount + " Files Were Not Valid And Weren't Added", "");}
+        if (notvalidfilecount > 0) {new InformationDialog(preferences, "Information", notvalidfilecount + " Files Were Not Valid And Weren't Added", "");}
     }
     public void addandcalculateduration(SoundFile soundFile) {
         MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
@@ -149,7 +140,7 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
             AmbienceSong tempsong = new AmbienceSong(soundFile);
             AmbienceList.add(tempsong);
             AmbienceTable.getItems().add(tempsong);
-            selectedsessionpart.getAmbience().add(soundFile);
+            selectedplaybackitemambience.add(soundFile);
             calculatetotalduration();
         });
     }
@@ -157,10 +148,10 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
         int index = AmbienceTable.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             SoundFile soundFile = SoundList.get(index);
-            selectedsessionpart.getAmbience().remove(soundFile);
-            if (new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Also Delete File " + soundFile.getName() + " From Hard Drive? This Cannot Be Undone", "Delete File", "Keep File").getResult()) {
+            selectedplaybackitemambience.remove(index);
+            if (new ConfirmationDialog(preferences, "Confirmation", null, "Also Delete File " + soundFile.getName() + " From Hard Drive? This Cannot Be Undone", "Delete File", "Keep File").getResult()) {
                 if (! soundFile.getFile().delete()) {
-                    new ErrorDialog(Root.getPreferences(), "Couldn't Delete", null, "Couldn't Delete " + soundFile.getFile().getAbsolutePath() + " Check File Permissions");
+                    new ErrorDialog(preferences, "Couldn't Delete", null, "Couldn't Delete " + soundFile.getFile().getAbsolutePath() + " Check File Permissions");
                 }
             }
             AmbienceTable.getItems().remove(index);
@@ -169,34 +160,27 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
             calculatetotalduration();
         }
         else {
-            new InformationDialog(Root.getPreferences(), "Information", "Nothing Selected", "Select A Table Item To Remove");}
+            new InformationDialog(preferences, "Information", "Nothing Selected", "Select A Table Item To Remove");}
     }
     public void preview() {
         if (selectedambiencesong != null && selectedambiencesong.getFile() != null && selectedambiencesong.getFile().exists()) {
             if (previewdialog == null || !previewdialog.isShowing()) {
-                previewdialog = new PreviewFile(selectedambiencesong.getFile(), Root, this, false);
+                previewdialog = new PreviewFile(selectedambiencesong.getFile());
                 previewdialog.showAndWait();
             }
         }
     }
-    public boolean populateactualambiencetable() {
+    public void populateactualambiencetable() {
         AmbienceList.clear();
-        if (selectedsessionpart != null) {
-            try {
-                if (selectedsessionpart.getAmbience() == null) {return false;}
-                for (SoundFile i : selectedsessionpart.getAmbience().getAmbience()) {
+        if (selectedplaybackitem != null) {
+            PlaybackItemAmbience playbackItemAmbience = availableAmbiences.getsessionpartAmbience(selectedplaybackitem.getAvailableambienceindex());
+            if (playbackItemAmbience.hasAny()) {
+                for (SoundFile i : playbackItemAmbience.getAmbience()) {
                     SoundList.add(i);
                     AmbienceList.add(new AmbienceSong(i));
                 }
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                new InformationDialog(Root.getPreferences(), "Information", selectedsessionpart + " Has No Ambience", "Please Add Ambience To " + selectedsessionpart);
-                return false;
+                AmbienceTable.setItems(AmbienceList);
             }
-        } else {
-            new InformationDialog(Root.getPreferences(), "Information", "No SessionPart Loaded", "Load A SessionPart's Ambience First");
-            return false;
         }
     }
     public void calculatetotalduration() {
@@ -209,7 +193,7 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
     public boolean unsavedchanges() {
         if (SessionPartChoiceBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
         try {
-            List<SoundFile> ambiencelist = selectedsessionpart.getAmbience().getAmbience();
+            List<SoundFile> ambiencelist = selectedplaybackitemambience.getAmbience();
             if (SoundList.size() != ambiencelist.size()) {return true;}
             for (SoundFile x : SoundList) {
                 if (! ambiencelist.contains(x)) {return true;}
@@ -221,37 +205,25 @@ public class AmbienceEditor_Simple extends ModalDialog implements Initializable 
 // Dialog Methods
     public void advancedmode() {
         if (unsavedchanges()) {
-            if (new ConfirmationDialog(Root.getPreferences(), "Unsaved Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save Changes", "Discard").getResult()) {save();}
+            if (new ConfirmationDialog(preferences, "Unsaved Changes", null, "You Have Unsaved Changes To " + selectedplaybackitem.getName(), "Save Changes", "Discard").getResult()) {save();}
         }
         this.close();
-        if (selectedsessionpart != null) {
-            new AmbienceEditor_Advanced(Root, Root.getStage(), true, selectedsessionpart).show();
-        } else {new AmbienceEditor_Advanced(Root, Root.getStage(), true).show();}
+        if (selectedplaybackitem != null) {
+            new AmbienceEditor_Advanced(availableAmbiences, preferences, selectedplaybackitem).show();
+        } else {new AmbienceEditor_Advanced(availableAmbiences, preferences).show();}
     }
     public void save() {
-        int index = SessionPartChoiceBox.getSelectionModel().getSelectedIndex();
-        if (index != -1) {
-            SoundList.stream().filter(i -> !selectedsessionpart.getAmbience().ambienceexistsinActual(i)).forEach(i -> {
-                selectedsessionpart.getAmbience().add(i);
-            });
-            Root.getAmbiences().setsessionpartAmbience(selectedsessionpart, selectedsessionpart.getAmbience());
-            Root.getAmbiences().marshall();
-            new InformationDialog(Root.getPreferences(), "Saved", "Ambience Saved To " + selectedsessionpart, "");
-        } else {
-            new InformationDialog(Root.getPreferences(), "Cannot Save", "No SessionPart Selected", "Cannot Save");}
+        availableAmbiences.setsessionpartAmbience(selectedplaybackitem.getAvailableambienceindex(), selectedplaybackitemambience);
+        availableAmbiences.marshall();
+        new InformationDialog(preferences, "Saved", selectedplaybackitem.getName() + "Ambience Saved", null);
     }
     public void closedialog() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getPreferences(), this, "Unsaved Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save", "Discard", "Cancel").getResult()) {
+            switch (new AnswerDialog(preferences, this, "Unsaved Changes", null, "You Have Unsaved Changes To " + selectedplaybackitem.getName(), "Save", "Discard", "Cancel").getResult()) {
                 case YES: save();
                 case NO: close(); break;
             }
         } else {close();}
-    }
-    @Override
-    public void close() {
-        super.close();
-        if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
     }
 
 }

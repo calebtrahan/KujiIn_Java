@@ -3,7 +3,6 @@ package kujiin.xml;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.util.SessionPart;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -106,8 +105,8 @@ public class Entrainments {
     }
 
 // Other Methods
-    public Entrainment getsessionpartEntrainment(SessionPart sessionPart) {
-        switch (sessionPart.number) {
+    public Entrainment getsessionpartEntrainment(Session.PlaybackItem sessionItem) {
+        switch (sessionItem.getAvailableambienceindex()) {
             case 0: return Presession;
             case 1: return Rin;
             case 2: return Kyo;
@@ -127,8 +126,8 @@ public class Entrainments {
         }
         return null;
     }
-    public void setsessionpartEntrainment(SessionPart sessionPart, Entrainment entrainment) {
-        switch (sessionPart.number) {
+    public void setsessionpartEntrainment(Session.PlaybackItem sessionItem, Entrainment entrainment) {
+        switch (sessionItem.getAvailableambienceindex()) {
             case 0: Presession = entrainment; break;
             case 1: Rin = entrainment; break;
             case 2: Kyo = entrainment; break;

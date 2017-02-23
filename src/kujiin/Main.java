@@ -7,13 +7,10 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import kujiin.ui.MainController;
-import kujiin.ui.ProgressTracker;
-import kujiin.ui.SessionCreator;
-import kujiin.ui.dialogs.alerts.ConfirmationDialog;
-import kujiin.util.enums.ProgramState;
-import kujiin.xml.Ambiences;
-import kujiin.xml.Entrainments;
+import kujiin.xml.AvailableAmbiences;
+import kujiin.xml.FavoriteSessions;
 import kujiin.xml.Preferences;
+import kujiin.xml.Sessions;
 
 import java.io.File;
 
@@ -41,30 +38,23 @@ public class Main extends Application {
         primaryStage.getIcons().add(PROGRAM_ICON);
         String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
         if (themefile != null) {primaryStage.getScene().getStylesheets().add(themefile);}
-        primaryStage.setOnShowing(event -> {
-            Root.setEntrainments(new Entrainments(Root));
-            Root.setAmbiences(new Ambiences(Root));
-            Root.setProgressTracker(new ProgressTracker(Root));
-            Root.setupSessionParts();
-            Root.setupMenuActions();
-            Root.setSessionCreator(new SessionCreator(Root));
-            Root.startupchecks_start();
-        });
+        Root.setAvailableAmbiences(new AvailableAmbiences(Root));
+        Root.setFavoriteSessions(new FavoriteSessions());
+        Root.setSessions(new Sessions(Root));
         primaryStage.setOnCloseRequest(event -> {
-            if (Root.getProgramState() == ProgramState.IDLE &&
-                    new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Really Exit?", "Exit", "Cancel").getResult()) {
-                Root.close();
-            }
-            else {event.consume();}
+//        if (Root.getProgramState() == ProgramState.IDLE &&
+//                new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Really Exit?", "Exit", "Cancel").getResult()) {
+//            Root.close();
+//        } else {event.consume();}
         });
         primaryStage.show();
     }
     @Override
     public void stop() throws Exception {
-        if (Root.cleanup()) {
-            super.stop();
-            System.exit(0);
-        }
+//        if (Root.cleanup()) {
+//            super.stop();
+//            System.exit(0);
+//        }
     }
 
     public void test() {

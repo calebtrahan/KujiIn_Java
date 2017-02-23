@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane prefHeight="213.0" prefWidth="593.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.ui.dialogs.CreateNewSessionOld">
+   <children>
+      <HBox alignment="CENTER_RIGHT" layoutX="454.0" layoutY="180.0" prefHeight="23.0" prefWidth="132.0">
+         <children>
+            <Button fx:id="OKButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="51.0" text="OK">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Button>
+            <Button fx:id="CancelButton" mnemonicParsing="false" prefHeight="17.0" prefWidth="62.0" text="Cancel">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
+      <VBox alignment="TOP_CENTER" layoutY="101.0" prefHeight="79.0" prefWidth="593.0">
+         <children>
+            <Label alignment="CENTER" prefHeight="16.0" prefWidth="592.0" text="CUTS" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+            </Label>
+            <HBox alignment="BOTTOM_CENTER" prefHeight="26.0" prefWidth="593.0">
+               <children>
+                  <ToggleButton fx:id="RinSwitch" minWidth="64.0" mnemonicParsing="false" text="RIN">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="KyoSwitch" minWidth="64.0" mnemonicParsing="false" text="KYO">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="TohSwitch" minWidth="64.0" mnemonicParsing="false" text="TOH">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="ShaSwitch" minWidth="64.0" mnemonicParsing="false" text="SHA">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="KaiSwitch" minWidth="64.0" mnemonicParsing="false" text="KAI">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="JinSwitch" minWidth="64.0" mnemonicParsing="false" text="JIN">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="RetsuSwitch" minWidth="64.0" mnemonicParsing="false" text="RETSU">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="ZaiSwitch" minWidth="64.0" mnemonicParsing="false" text="ZAI">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="ZenSwitch" minWidth="64.0" mnemonicParsing="false" text="ZEN">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="31.0" prefWidth="593.0">
+               <children>
+                  <TextField fx:id="RinTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="KyoTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="TohTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="ShaTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="KaiTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="JinTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="RetsuTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="ZaiTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="ZenTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox alignment="TOP_CENTER" layoutX="140.0" layoutY="7.0" prefHeight="87.0" prefWidth="322.0">
+         <children>
+            <Label alignment="CENTER" prefHeight="16.0" prefWidth="348.0" text="ELEMENTS">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="6.0" />
+               </VBox.margin>
+            </Label>
+            <HBox alignment="CENTER" prefHeight="31.0" prefWidth="331.0">
+               <children>
+                  <ToggleButton fx:id="EarthSwitch" mnemonicParsing="false" prefWidth="64.0" text="EARTH">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="AirSwitch" mnemonicParsing="false" prefWidth="64.0" text="AIR">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="FireSwitch" mnemonicParsing="false" prefWidth="64.0" text="FIRE">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="WaterSwitch" mnemonicParsing="false" prefWidth="64.0" text="WATER">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="VoidSwitch" mnemonicParsing="false" prefWidth="64.0" text="VOID">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="18.0" prefWidth="331.0">
+               <children>
+                  <TextField fx:id="EarthTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="AirTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="FireTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="WaterTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="VoidTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+               </children>
+               <VBox.margin>
+                  <Insets top="-1.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox alignment="TOP_CENTER" layoutX="6.0" layoutY="7.0" prefHeight="87.0" prefWidth="132.0">
+         <children>
+            <Label text="QI-GONG">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="3.0" top="6.0" />
+               </VBox.margin>
+            </Label>
+            <HBox alignment="CENTER" prefHeight="18.0" prefWidth="128.0">
+               <children>
+                  <ToggleButton fx:id="PreSwitch" mnemonicParsing="false" prefWidth="64.0" text="PRE">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+                  <ToggleButton fx:id="PostSwitch" mnemonicParsing="false" prefWidth="64.0" text="POST">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ToggleButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="32.0" prefWidth="137.0">
+               <children>
+                  <TextField fx:id="PreTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+                  <TextField fx:id="PostTime" alignment="CENTER" prefHeight="25.0" prefWidth="64.0" text="0" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox layoutX="465.0" layoutY="38.0" prefHeight="56.0" prefWidth="121.0">
+         <children>
+            <VBox alignment="CENTER" prefHeight="49.0" prefWidth="121.0">
+               <children>
+                  <Label text="Session Length">
+                     <VBox.margin>
+                        <Insets bottom="4.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="TotalSessionTime" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="121.0" text="-">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </TextField>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+      <HBox layoutX="6.0" layoutY="180.0" prefHeight="26.0" prefWidth="353.0">
+         <children>
+            <Button fx:id="ChangeAllCutsButton" mnemonicParsing="false" text="Change All Cuts">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Button>
+            <Button fx:id="ChangeAllElementsButton" mnemonicParsing="false" text="Change All Elements">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Button>
+            <Button fx:id="ResetCreatorButton" mnemonicParsing="false" prefHeight="23.0" prefWidth="54.0" text="Reset">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

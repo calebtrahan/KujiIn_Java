@@ -10,17 +10,13 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ExceptionDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.ui.dialogs.boilerplate.ModalDialog;
-import kujiin.util.SessionPart;
 import kujiin.util.Util;
 import kujiin.util.table.AmbienceSong;
-import kujiin.xml.Preferences;
-import kujiin.xml.SoundFile;
+import kujiin.xml.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -30,7 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class AmbienceEditor_Advanced extends ModalDialog implements Initializable {
+public class AmbienceEditor_Advanced extends Stage implements Initializable {
+    private AvailableAmbiences availableAmbiences;
+    private Preferences preferences;
     public Button RightArrow;
     public Button LeftArrow;
     public ChoiceBox<String> SessionPartSelectionBox;
@@ -57,11 +55,9 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
     private ArrayList<SoundFile> temp_soundfilelist;
     private AmbienceSong selected_temp_ambiencesong;
     private AmbienceSong selected_actual_ambiencesong;
-    private SessionPart selectedsessionpart;
+    private PlaybackItemAmbience selectedplaybackitemambience;
     private File tempdirectory;
     private PreviewFile previewdialog;
-    private MainController Root;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Temp_NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
@@ -89,10 +85,10 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
         CloseButton.setOnAction(event -> close());
         SwitchToSimpleEditor.setOnAction(event -> switchtosimple());
     }
-    public AmbienceEditor_Advanced(MainController Root, Stage stage, boolean minimizeparent) {
-        super(Root, stage, minimizeparent);
+    public AmbienceEditor_Advanced(AvailableAmbiences availableAmbiences, Preferences preferences) {
         try {
-            this.Root = Root;
+            this.availableAmbiences = availableAmbiences;
+            this.preferences = preferences;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Advanced.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -100,7 +96,7 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
             setResizable(false);
             setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (new AnswerDialog(Root.getPreferences(), this, "Save Changes", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save And Close", "Close", "Cancel").getResult()) {
+                    switch (new AnswerDialog(preferences, this, "Save Changes", null, "You Have Unsaved Changes To " + selectedplaybackitemambience, "Save And Close", "Close", "Cancel").getResult()) {
                         case YES:
                             save();
                             break;
@@ -113,10 +109,10 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
             tempdirectory = new File(Preferences.DIRECTORYTEMP, "AmbienceEditor");
         } catch (IOException e) {}
     }
-    public AmbienceEditor_Advanced(MainController Root, Stage stage, boolean minimizeparent, SessionPart sessionPart) {
-        super(Root, stage, minimizeparent);
+    public AmbienceEditor_Advanced(AvailableAmbiences availableAmbiences, Preferences preferences, Session.PlaybackItem playbackitem) {
         try {
-            this.Root = Root;
+            this.availableAmbiences = availableAmbiences;
+            this.preferences = preferences;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AmbienceEditor_Advanced.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -124,15 +120,15 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
             setResizable(false);
             setTitle("Advanced Ambience Editor");
             SessionPartSelectionBox.setOnAction(event -> selectandloadsessionpart());
-            SessionPartSelectionBox.getSelectionModel().select(sessionPart.number);
+            SessionPartSelectionBox.getSelectionModel().select(playbackitem.getAvailableambienceindex());
             tempdirectory = new File(Preferences.DIRECTORYTEMP, "AmbienceEditor");
-        } catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e).showAndWait();}
+        } catch (IOException e) {new ExceptionDialog(preferences, e).showAndWait();}
     }
 
 // Transfer Methods
     public void rightarrowpressed() {
         // Transfer To Current Cut (use Task)
-        if (selected_temp_ambiencesong != null && selectedsessionpart != null) {
+        if (selected_temp_ambiencesong != null && selectedplaybackitemambience != null) {
             if (! Actual_Table.getItems().contains(selected_temp_ambiencesong)) {
                 int tempindex = Temp_Table.getItems().indexOf(selected_actual_ambiencesong);
                 actual_ambiencesonglist.add(temp_ambiencesonglist.get(tempindex));
@@ -142,13 +138,13 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
             }
         } else {
             if (selected_temp_ambiencesong == null) {
-                new InformationDialog(Root.getPreferences(), "Information", "Cannot Transfer", "Nothing Selected");}
+                new InformationDialog(preferences, "Information", "Cannot Transfer", "Nothing Selected");}
             else {
-                new InformationDialog(Root.getPreferences(), "Information", "Cannot Transfer", "No SessionPart Selected");}
+                new InformationDialog(preferences, "Information", "Cannot Transfer", "No SessionPart Selected");}
         }
     }
     public void leftarrowpressed() {
-        if (selected_actual_ambiencesong != null && selectedsessionpart != null) {
+        if (selected_actual_ambiencesong != null && selectedplaybackitemambience != null) {
             if (! Temp_Table.getItems().contains(selected_actual_ambiencesong)) {
                 int actualindex = Actual_Table.getItems().indexOf(selected_actual_ambiencesong);
                 temp_ambiencesonglist.add(actual_ambiencesonglist.get(actualindex));
@@ -204,7 +200,7 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
             if (actual_soundfilelist == null) {actual_soundfilelist = new ArrayList<>();}
             else {actual_soundfilelist.clear();}
             Actual_Table.getItems().clear();
-            selectedsessionpart = Root.getAllSessionParts(false).get(index);
+            selectedplaybackitemambience = availableAmbiences.getsessionpartAmbience(index);
             if (populateactualambiencetable()) {Actual_Table.setItems(actual_ambiencesonglist);}
             calculateactualtotalduration();
         }
@@ -220,7 +216,7 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
         }
         if (validfilecount > 0) {
             if (Util.list_hasduplicates(files)) {
-                if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard").getResult()) {
+                if (! new ConfirmationDialog(preferences, "Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard").getResult()) {
                     files = Util.list_removeduplicates(files);
                 }
             }
@@ -229,7 +225,7 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
             SoundFile soundFile = new SoundFile(i);
             addandcalculateduration(soundFile, table, soundfilelist, songlist);
         }
-        if (notvalidfilecount > 0) {new InformationDialog(Root.getPreferences(), "Information", notvalidfilecount + " Files Were Not Valid And Weren't Added", "");}
+        if (notvalidfilecount > 0) {new InformationDialog(preferences, "Information", notvalidfilecount + " Files Were Not Valid And Weren't Added", "");}
     }
     public void addandcalculateduration(SoundFile soundFile, TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
         MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
@@ -248,7 +244,7 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
         int index = table.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             SoundFile soundFile = soundfilelist.get(index);
-            switch (new AnswerDialog(Root.getPreferences(), this, "Removing File", null, "Removing Ambience From Table. Also Delete File " + soundFile.getName() + " From Disk? (This Cannot Be Undone)",
+            switch (new AnswerDialog(preferences, this, "Removing File", null, "Removing Ambience From Table. Also Delete File " + soundFile.getName() + " From Disk? (This Cannot Be Undone)",
                     "Remove And Delete File", "Remove But Keep File", "Cancel").getResult()) {
                 case YES: soundFile.getFile().delete(); break;
                 case CANCEL: return;
@@ -259,33 +255,33 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
             calculateactualtotalduration();
             calculatetemptotalduration();
         }
-        else {new InformationDialog(Root.getPreferences(), "Information", "Nothing Selected", "Select A Table Item To Remove");}
+        else {new InformationDialog(preferences, "Information", "Nothing Selected", "Select A Table Item To Remove");}
     }
     private void preview(AmbienceSong selectedsong) {
         if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
             if (previewdialog == null || !previewdialog.isShowing()) {
-                previewdialog = new PreviewFile(selectedsong.getFile(), Root, this, false);
+                previewdialog = new PreviewFile(selectedsong.getFile());
                 previewdialog.showAndWait();
             }
         }
     }
     private boolean populateactualambiencetable() {
         actual_ambiencesonglist.clear();
-        if (selectedsessionpart != null) {
+        if (selectedplaybackitemambience != null) {
             try {
-                if (selectedsessionpart.getAmbience() == null) {return false;}
-                for (SoundFile i : selectedsessionpart.getAmbience().getAmbience()) {
+                if (selectedplaybackitemambience.getAmbience() == null) {return false;}
+                for (SoundFile i : selectedplaybackitemambience.getAmbience()) {
                     actual_soundfilelist.add(i);
                     actual_ambiencesonglist.add(new AmbienceSong(i));
                 }
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
-                new InformationDialog(Root.getPreferences(), "Information", selectedsessionpart + " Has No Ambience", "Please Add Ambience To " + selectedsessionpart);
+                new InformationDialog(preferences, "Information", selectedplaybackitemambience + " Has No Ambience", "Please Add Ambience To " + selectedplaybackitemambience);
                 return false;
             }
         } else {
-            new InformationDialog(Root.getPreferences(), "Information", "No SessionPart Loaded", "Load A SessionPart's Ambience First");
+            new InformationDialog(preferences, "Information", "No SessionPart Loaded", "Load A SessionPart's Ambience First");
             return false;
         }
     }
@@ -294,7 +290,7 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
     public boolean unsavedchanges() {
         if (SessionPartSelectionBox.getSelectionModel().getSelectedIndex() == -1) {return false;}
         try {
-            List<SoundFile> ambiencelist = selectedsessionpart.getAmbience().getAmbience();
+            List<SoundFile> ambiencelist = selectedplaybackitemambience.getAmbience();
             if (actual_soundfilelist.size() != ambiencelist.size()) {return true;}
             for (SoundFile x : actual_soundfilelist) {
                 if (! ambiencelist.contains(x)) {return true;}
@@ -305,25 +301,23 @@ public class AmbienceEditor_Advanced extends ModalDialog implements Initializabl
     public void save() {
         int index = SessionPartSelectionBox.getSelectionModel().getSelectedIndex();
         if (index != -1) {
-            actual_soundfilelist.stream().filter(i -> !selectedsessionpart.getAmbience().ambienceexistsinActual(i)).forEach(i -> selectedsessionpart.getAmbience().add(i));
-            Root.getAmbiences().setsessionpartAmbience(selectedsessionpart, selectedsessionpart.getAmbience());
-            Root.getAmbiences().marshall();
-            new InformationDialog(Root.getPreferences(), "Saved", "Ambience Saved To " + selectedsessionpart, "");
+            actual_soundfilelist.stream().filter(i -> ! selectedplaybackitemambience.getAmbience().contains(i)).forEach(i -> selectedplaybackitemambience.getAmbience().add(i));
+            availableAmbiences.setsessionpartAmbience(index, selectedplaybackitemambience);
+            availableAmbiences.marshall();
+            new InformationDialog(preferences, "Saved", "Ambience Saved To " + selectedplaybackitemambience, "");
         } else {
-            new InformationDialog(Root.getPreferences(), "Cannot Save", "No SessionPart Selected", "Cannot Save");}
+            new InformationDialog(preferences, "Cannot Save", "No SessionPart Selected", "Cannot Save");}
     }
     public void switchtosimple() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getPreferences(), this, "Switch To Simple Mode", null, "You Have Unsaved Changes To " + selectedsessionpart, "Save Changes", "Switch Without Saving", "Cancel").getResult()) {
+            switch (new AnswerDialog(preferences, this, "Switch To Simple Mode", null, "You Have Unsaved Changes To " + selectedplaybackitemambience, "Save Changes", "Switch Without Saving", "Cancel").getResult()) {
                 case YES: save(); break;
                 case CANCEL: return;
             }
         }
         this.close();
         deletetempambiencefromdirectory();
-        if (selected_temp_ambiencesong != null && selectedsessionpart != null) {
-            new AmbienceEditor_Simple(Root, Root.getStage(), false, selectedsessionpart).show();
-        } else {new AmbienceEditor_Simple(Root, Root.getStage(), false).show();}
+        new AmbienceEditor_Simple(availableAmbiences, preferences).show();
     }
 
 }

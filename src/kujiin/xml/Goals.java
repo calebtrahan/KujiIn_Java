@@ -3,7 +3,6 @@ package kujiin.xml;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.util.SessionPart;
 import kujiin.util.Util;
 
 import javax.xml.bind.JAXBContext;
@@ -15,6 +14,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static kujiin.util.Util.dateFormat;
@@ -22,7 +23,7 @@ import static kujiin.util.Util.dateFormat;
 @XmlRootElement(name = "Goals")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Goals {
-    private List<Goal> PresessionGoals;
+    private List<Goal> QiGongGoals;
     private List<Goal> RinGoals;
     private List<Goal> KyoGoals;
     private List<Goal> TohGoals;
@@ -37,7 +38,6 @@ public class Goals {
     private List<Goal> FireGoals;
     private List<Goal> WaterGoals;
     private List<Goal> VoidGoals;
-    private List<Goal> PostsessionGoals;
     private List<Goal> TotalGoals;
     @XmlTransient
     private MainController Root;
@@ -48,47 +48,54 @@ public class Goals {
     }
 
 // List Getters
-    public List<Goal> get(SessionPart sessionpart) {
-        switch (sessionpart.number) {
-            case 0: return PresessionGoals;
-            case 1: return RinGoals;
-            case 2: return KyoGoals;
-            case 3: return TohGoals;
-            case 4: return ShaGoals;
-            case 5: return KaiGoals;
-            case 6: return JinGoals;
-            case 7: return RetsuGoals;
-            case 8: return ZaiGoals;
-            case 9: return ZenGoals;
-            case 10: return EarthGoals;
-            case 11: return AirGoals;
-            case 12: return FireGoals;
-            case 13: return WaterGoals;
-            case 14: return VoidGoals;
-            case 15: return PostsessionGoals;
-            case 16: return TotalGoals;
-            default: return null;
+    public List<List<Goal>> getAll() {
+        return new ArrayList<>(Arrays.asList(QiGongGoals, RinGoals, KyoGoals, TohGoals, ShaGoals, KaiGoals, JinGoals, RetsuGoals, ZaiGoals, ZenGoals,
+                EarthGoals, AirGoals, FireGoals, WaterGoals, VoidGoals, TotalGoals));
+    }
+    public List<Goal> get(Session.PlaybackItem sessionpart) {
+        if (sessionpart == null) {return TotalGoals;}
+        else {
+            switch (sessionpart.getName()) {
+                case "Qi-Gong": return QiGongGoals;
+                case "Rin": return RinGoals;
+                case "Kyo": return KyoGoals;
+                case "Toh": return TohGoals;
+                case "Sha": return ShaGoals;
+                case "Kai": return KaiGoals;
+                case "Jin": return JinGoals;
+                case "Retsu": return RetsuGoals;
+                case "Zai": return ZaiGoals;
+                case "Zen": return ZenGoals;
+                case "Earth": return EarthGoals;
+                case "Air": return AirGoals;
+                case "Fire": return FireGoals;
+                case "Water": return WaterGoals;
+                case "Void": return VoidGoals;
+                default: return null;
+            }
         }
     }
-    public void set(SessionPart sessionpart, List<Goal> goallist) {
-        switch (sessionpart.number) {
-            case 0: PresessionGoals = goallist; return;
-            case 1: RinGoals = goallist; return;
-            case 2: KyoGoals = goallist; return;
-            case 3: TohGoals = goallist; return;
-            case 4: ShaGoals = goallist; return;
-            case 5: KaiGoals = goallist; return;
-            case 6: JinGoals = goallist; return;
-            case 7: RetsuGoals = goallist; return;
-            case 8: ZaiGoals = goallist; return;
-            case 9: ZenGoals = goallist; return;
-            case 10: EarthGoals = goallist; return;
-            case 11: AirGoals = goallist; return;
-            case 12: FireGoals = goallist; return;
-            case 13: WaterGoals = goallist; return;
-            case 14: VoidGoals = goallist; return;
-            case 15: PostsessionGoals = goallist; return;
-            case 16: TotalGoals = goallist;
+    public void set(Session.PlaybackItem sessionpart, List<Goal> goallist) {
+        if (sessionpart == null) {TotalGoals = goallist;}
+        else {
+            switch (sessionpart.getName()) {
+                case "Qi-Gong": QiGongGoals = goallist; return;
+                case "Rin": RinGoals = goallist; return;
+                case "Kyo": KyoGoals = goallist; return;
+                case "Toh": TohGoals = goallist; return;
+                case "Sha": ShaGoals = goallist; return;
+                case "Kai": KaiGoals = goallist; return;
+                case "Jin": JinGoals = goallist; return;
+                case "Retsu": RetsuGoals = goallist; return;
+                case "Zai": ZaiGoals = goallist; return;
+                case "Zen": ZenGoals = goallist; return;
+                case "Earth": EarthGoals = goallist; return;
+                case "Air": AirGoals = goallist; return;
+                case "Fire": FireGoals = goallist; return;
+                case "Water": WaterGoals = goallist; return;
+                case "Void": VoidGoals = goallist; return;
+                default:
+            }
         }
     }
 
@@ -99,7 +106,7 @@ public class Goals {
                 JAXBContext context = JAXBContext.newInstance(Goals.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
                 Goals currentGoals = (Goals) createMarshaller.unmarshal(Preferences.GOALSXMLFILE);
-                PresessionGoals = currentGoals.PresessionGoals;
+                QiGongGoals = currentGoals.QiGongGoals;
                 RinGoals = currentGoals.RinGoals;
                 KyoGoals = currentGoals.KyoGoals;
                 TohGoals = currentGoals.TohGoals;
@@ -114,7 +121,6 @@ public class Goals {
                 FireGoals = currentGoals.FireGoals;
                 WaterGoals = currentGoals.WaterGoals;
                 VoidGoals = currentGoals.VoidGoals;
-                PostsessionGoals = currentGoals.PostsessionGoals;
                 TotalGoals = currentGoals.TotalGoals;
             } catch (JAXBException e) {
                 new InformationDialog(Root.getPreferences(), "Information", "Couldn't Open Current Goals XML File", "Check Read File Permissions Of " + Preferences.GOALSXMLFILE.getAbsolutePath());
@@ -133,32 +139,21 @@ public class Goals {
     }
 
 // Utility
-
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Goal {
         private Integer ID;
-        private String Date_Set;
-        private String Date_Completed;
         private Double Duration;
         private Boolean Completed;
+        private String Date_Completed;
 
         public Goal() {
         }
-
         public Goal(Duration goalduration) {
             setDuration(goalduration);
-            setDate_Set(LocalDate.now());
             setCompleted(false);
-            setDate_Completed(null);
         }
 
     // Getters And Setters
-        public LocalDate getDate_Set() {
-            return LocalDate.parse(Date_Set, dateFormat);
-        }
-        public void setDate_Set(LocalDate date_Set) {
-            Date_Set = date_Set.format(dateFormat);
-        }
         public Duration getDuration() {
             return javafx.util.Duration.minutes(Duration);
         }
@@ -203,7 +198,7 @@ public class Goals {
 
         @Override
         public String toString() {
-            return String.format("Set Date: %s Goal Hours: %s Is Completed: %s Date Completed: %s", getDate_Set(), getDuration(), getCompleted(), getDate_Completed());
+            return String.format("Goal Hours: %s Is Completed: %s Date Completed: %s", getDuration(), getCompleted(), getDate_Completed());
         }
         public String getFormattedString(Duration timepracticed, boolean includepercentage, double maxchars) {
             if (getDuration().greaterThan(javafx.util.Duration.ZERO)) {

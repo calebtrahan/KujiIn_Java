@@ -12,9 +12,9 @@ import javafx.stage.Stage;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.*;
 import kujiin.ui.dialogs.boilerplate.ModalDialog;
-import kujiin.util.SessionPart;
 import kujiin.util.Util;
 import kujiin.util.enums.ReferenceType;
+import kujiin.util.sessionitems.SessionItem;
 import kujiin.xml.Preferences;
 
 import java.io.File;
@@ -33,7 +33,7 @@ public class EditReferenceFiles extends ModalDialog {
     public RadioButton HTMLVariation;
     public RadioButton TEXTVariation;
     private File selectedfile;
-    private SessionPart selectedsessionpart;
+    private SessionItem selectedsessionpart;
     private ArrayList<Integer> userselectedindexes;
     private ReferenceType referenceType;
     private MainController Root;
@@ -188,7 +188,7 @@ public class EditReferenceFiles extends ModalDialog {
             if (! Util.String_validhtml(MainTextArea.getText())) {
                 if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Html Code In Text Area Is Not Valid HTML", "Preview Anyways", "Cancel").getResult()) {return;}
             }
-            new DisplayReference(Root, this, false, MainTextArea.getText());
+            new DisplayReference();
         }
     }
 
@@ -203,7 +203,7 @@ public class EditReferenceFiles extends ModalDialog {
     public void loadselectedfile() {
         int index = SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex();
         if (index != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
-            selectedsessionpart = Root.getAllSessionParts(false).get(index);
+//            selectedsessionpart = Root.getAllSessionParts(false).get(index);
             selectnewfile();
             String contents = Util.file_getcontents(selectedfile);
             MainTextArea.setText(contents);
@@ -223,11 +223,11 @@ public class EditReferenceFiles extends ModalDialog {
         if (referenceType == null || selectedsessionpart == null) {selectedfile = null; return;}
         switch (referenceType) {
             case html:
-                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "html"), selectedsessionpart.getNameForReference() + ".html");
+//                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "html"), selectedsessionpart.getNameForReference() + ".html");
                 if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e);}}
                 break;
             case txt:
-                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "txt"), selectedsessionpart.getNameForReference() + ".txt");
+//                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "txt"), selectedsessionpart.getNameForReference() + ".txt");
                 if (! selectedfile.exists()) {try {selectedfile.createNewFile();} catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e);}}
                 break;
         }

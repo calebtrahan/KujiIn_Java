@@ -15,18 +15,13 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
-import kujiin.ui.dialogs.boilerplate.ModalDialog;
-import kujiin.util.SessionPart;
 import kujiin.util.Util;
-import kujiin.xml.Preferences;
+import kujiin.xml.Session;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
-public class SessionDetails extends ModalDialog {
+public class SessionDetails extends Stage {
     private MainController Root;
     public BarChart<String, Number> SessionBarChart;
     public CategoryAxis SessionCategoryAxis;
@@ -39,8 +34,7 @@ public class SessionDetails extends ModalDialog {
     public TextField MostProgressTextField;
     public TextField AverageDurationTextField;
 
-    public SessionDetails(MainController Root, Stage parent, boolean minimizeparent, List<SessionPart> itemsinsession) {
-        super(Root, parent, minimizeparent);
+    public SessionDetails(Session session) {
         try {
             this.Root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionCompleteDialog.fxml"));
@@ -54,11 +48,11 @@ public class SessionDetails extends ModalDialog {
             Duration totalsessionduration = new Duration(0);
             Duration highestduration = Duration.ZERO;
             ObservableList<String> completedgoalsitems = FXCollections.observableArrayList();
-            for (SessionPart i : itemsinsession) {
-                series.getData().add(new XYChart.Data<>(i.getNameForChart(), i.getduration().toMinutes()));
-                totalsessionduration = totalsessionduration.add(i.getduration());
-                if (i.getduration().greaterThan(highestduration)) {highestduration = i.getduration();}
-                completedgoalsitems.addAll(i.getGoalscompletedthissession().stream().map(x -> String.format("%s: %s Hours Completed (%s Current)", i.name, x.getDuration(), i.getduration().toHours())).collect(Collectors.toList()));
+            for (Session.PlaybackItem i : session.getPlaybackItems()) {
+                series.getData().add(new XYChart.Data<>(i.getName(), new Duration(i.getDuration()).toMinutes()));
+                totalsessionduration = totalsessionduration.add(new Duration(i.getDuration()));
+                if (new Duration(i.getDuration()).greaterThan(highestduration)) {highestduration = new Duration(i.getDuration());}
+                completedgoalsitems.addAll(i.getGoalsCompletedThisSession().stream().map(x -> String.format("%s: %s Hours Completed (%s Current)", i.getName(), x.getDuration(), new Duration(i.getDuration()).toHours())).collect(Collectors.toList()));
             }
             GoalsCompletedTopLabel.setText("Goals Completed This Session");
             if (completedgoalsitems.size() > 0) {GoalsCompletedListView.setItems(completedgoalsitems);}
@@ -68,46 +62,45 @@ public class SessionDetails extends ModalDialog {
             Duration finalHighestduration = highestduration;
             setOnShowing(event -> {
                 SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(finalTotalsessionduration, SessionDurationTextField.getLayoutBounds().getWidth()));
-                AverageDurationTextField.setText(Util.formatdurationtoStringSpelledOut(Duration.millis(finalHighestduration.toMillis() / itemsinsession.size()), AverageDurationTextField.getLayoutBounds().getWidth()));
+                AverageDurationTextField.setText(Util.formatdurationtoStringSpelledOut(Duration.millis(finalHighestduration.toMillis() / session.getPlaybackItems().size()), AverageDurationTextField.getLayoutBounds().getWidth()));
                 MostProgressTextField.setText(Util.formatdurationtoStringSpelledOut(finalHighestduration, MostProgressTextField.getLayoutBounds().getWidth()));
             });
             SessionBarChart.requestFocus();
             CloseButton.setOnAction(event -> close());
         } catch (IOException ignored) {}
     }
-    public SessionDetails(MainController Root, Stage parent, boolean minimizeparent, kujiin.xml.Session session) {
-        super(Root, parent, minimizeparent);
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionDetails_Individual.fxml"));
-            fxmlLoader.setController(this);
-            Scene defaultscene = new Scene(fxmlLoader.load());
-            setScene(defaultscene);
-            setResizable(false);
-            SessionNumbersAxis.setLabel("Minutes");
-            setTitle("Session Details");
-            DatePracticedTextField.setText(session.getDate_Practiced().format(Util.dateFormat));
-            DatePracticedTextField.setEditable(false);
-            XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
-            List<Integer> values = new ArrayList<>();
-            for (SessionPart i : Root.getSessionParts(0, 16)) {
-                int duration = (int) session.getduration(i).toMinutes();
-                values.add(duration);
-                String name;
-                if (i.number == 0) {name = "Pre";}
-                else if (i.number == 15) {name = "Post";}
-                else {name = Preferences.ALLNAMES.get(i.number);}
-                series.getData().add(new XYChart.Data<>(name, duration));
-            }
-            SessionBarChart.getData().add(series);
-            SessionBarChart.setLegendVisible(false);
-            Collections.sort(values);
-            SessionNumbersAxis.setUpperBound(values.get(values.size() - 1));
-            SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(session.gettotalsessionduration(), SessionDurationTextField.getLayoutBounds().getWidth()));
-            SessionDurationTextField.setEditable(false);
-            SessionBarChart.requestFocus();
-            CloseButton.setOnAction(event -> close());
-        } catch (IOException | NullPointerException ignored) {}
-    }
+//    public SessionDetails(kujiin.xml.Session session) {
+//        try {
+//            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/SessionDetails_Individual.fxml"));
+//            fxmlLoader.setController(this);
+//            Scene defaultscene = new Scene(fxmlLoader.load());
+//            setScene(defaultscene);
+//            setResizable(false);
+//            SessionNumbersAxis.setLabel("Minutes");
+//            setTitle("Session Details");
+//            DatePracticedTextField.setText(session.getDate_Practiced().format(Util.dateFormat));
+//            DatePracticedTextField.setEditable(false);
+//            XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
+//            List<Integer> values = new ArrayList<>();
+//            for (SessionItem i : Root.getSessionParts(0, 16)) {
+//                int duration = (int) session.getduration(i).toMinutes();
+//                values.add(duration);
+//                String name;
+//                if (i.index == 0) {name = "Pre";}
+//                else if (i.index == 15) {name = "Post";}
+//                else {name = Preferences.ALLNAMES.get(i.index);}
+//                series.getData().add(new XYChart.Data<>(name, duration));
+//            }
+//            SessionBarChart.getData().add(series);
+//            SessionBarChart.setLegendVisible(false);
+//            Collections.sort(values);
+//            SessionNumbersAxis.setUpperBound(values.get(values.size() - 1));
+//            SessionDurationTextField.setText(Util.formatdurationtoStringSpelledOut(session.gettotalsessionduration(), SessionDurationTextField.getLayoutBounds().getWidth()));
+//            SessionDurationTextField.setEditable(false);
+//            SessionBarChart.requestFocus();
+//            CloseButton.setOnAction(event -> close());
+//        } catch (IOException | NullPointerException ignored) {}
+//    }
 
     @Override
     public void close() {

@@ -9,15 +9,12 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import kujiin.ui.MainController;
-import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.ui.dialogs.boilerplate.ModalDialog;
 import kujiin.util.Util;
 
 import java.io.File;
 import java.io.IOException;
 
-public class PreviewFile extends ModalDialog {
+public class PreviewFile extends Stage {
     public Label CurrentTime;
     public Slider ProgressSlider;
     public Label TotalTime;
@@ -28,14 +25,11 @@ public class PreviewFile extends ModalDialog {
     public Label VolumePercentage;
     private Media Mediatopreview;
     private MediaPlayer PreviewPlayer;
-    private MainController Root;
 
-    public PreviewFile(File filetopreview, MainController Root, Stage parent, boolean minimizeparent) {
-        super(Root, parent, minimizeparent);
-        this.Root = Root;
+    public PreviewFile(File filetopreview) {
         if (Util.audio_isValid(filetopreview)) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/PreviewAudioDialog.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/old/PreviewAudioDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);
@@ -58,7 +52,9 @@ public class PreviewFile extends ModalDialog {
                 PauseButton.setOnAction(event -> pause());
                 StopButton.setOnAction(event -> stop());
             } catch (IOException ignored) {}
-        } else {new InformationDialog(Root.getPreferences(), "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");}
+        } else {
+        //  new InformationDialog(Root.getPreferences(), "Information", filetopreview.getName() + " Is Not A Valid Audio File", "Cannot Preview");
+        }
     }
 
     public void play() {
@@ -134,9 +130,4 @@ public class PreviewFile extends ModalDialog {
         syncbuttons();
     }
 
-    @Override
-    public void close() {
-        super.close();
-        if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
-    }
 }

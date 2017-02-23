@@ -271,29 +271,29 @@ public class ChangeProgramOptions extends ModalDialog {
     }
     // Reference
     public void referencetoggled() {
-        Preferences.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
-        if (ReferenceSwitch.isSelected()) {
-            SelectReferenceType selectReferenceType = new SelectReferenceType(Root, this, false, Root.getAllSessionParts(false));
-            selectReferenceType.showAndWait();
-            if (selectReferenceType.getResult()) {
-                Preferences.getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
-                switch (Preferences.getSessionOptions().getReferencetype()) {
-                    case html:
-                        ReferenceTypeChoiceBox.getSelectionModel().select(0);
-                        break;
-                    case txt:
-                        ReferenceTypeChoiceBox.getSelectionModel().select(1);
-                        break;
-                }
-                Preferences.getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
-                ReferenceFullScreenCheckBox.setSelected(selectReferenceType.getFullScreen());
-            } else {
-                Preferences.getSessionOptions().setReferenceoption(false);
-                ReferenceSwitch.setSelected(false);
-                ReferenceFullScreenCheckBox.setDisable(true);
-                ReferenceTypeChoiceBox.setDisable(true);
-            }
-        }
+//        Preferences.getSessionOptions().setReferenceoption(ReferenceSwitch.isSelected());
+//        if (ReferenceSwitch.isSelected()) {
+//            SelectReferenceType selectReferenceType = new SelectReferenceType(Root, this, false, Root.getAllSessionParts(false));
+//            selectReferenceType.showAndWait();
+//            if (selectReferenceType.getResult()) {
+//                Preferences.getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
+//                switch (Preferences.getSessionOptions().getReferencetype()) {
+//                    case html:
+//                        ReferenceTypeChoiceBox.getSelectionModel().select(0);
+//                        break;
+//                    case txt:
+//                        ReferenceTypeChoiceBox.getSelectionModel().select(1);
+//                        break;
+//                }
+//                Preferences.getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
+//                ReferenceFullScreenCheckBox.setSelected(selectReferenceType.getFullScreen());
+//            } else {
+//                Preferences.getSessionOptions().setReferenceoption(false);
+//                ReferenceSwitch.setSelected(false);
+//                ReferenceFullScreenCheckBox.setDisable(true);
+//                ReferenceTypeChoiceBox.setDisable(true);
+//            }
+//        }
     }
     public void referencetypetoggled() {
         switch (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex()) {

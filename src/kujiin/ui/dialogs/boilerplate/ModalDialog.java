@@ -18,7 +18,5 @@ public class ModalDialog extends Stage {
             String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
             if (themefile != null) {getScene().getStylesheets().add(themefile);}
         });
-
     }
-
 }

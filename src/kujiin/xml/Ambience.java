@@ -1,8 +1,6 @@
 package kujiin.xml;
 
 import javafx.util.Duration;
-import kujiin.util.SessionPart;
-import kujiin.util.Util;
 import kujiin.util.enums.AmbiencePlaybackType;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -12,56 +10,102 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Ambience {
     private List<SoundFile> Ambience;
+    private boolean Enabled;
+    private ArrayList<SoundFile> PlaybackHistory;
     @XmlTransient
-    private List<SoundFile> CustomAmbience;
+    private SoundFile CurrentAmbienceSoundfile;
+    @XmlTransient
+    private int currentplaycount = 0;
+    @XmlTransient
+    private int currentplaybackhistorycount = 0;
 
-    public Ambience() {
-    }
+    public Ambience() {}
+    public Ambience(AvailableAmbiences availableAmbiences) {}
 
 // Getters And Setters
-    public List<SoundFile> getAmbience() {return Ambience;}
-    public void setAmbience(List<SoundFile> ambience) {
-        this.Ambience = ambience;
+    public boolean isEnabled() {
+        return Enabled;
+    }
+    public void setEnabled(boolean enabled) {
+        this.Enabled = enabled;
+    }
+    public SoundFile getCurrentAmbienceSoundfile() {
+        return CurrentAmbienceSoundfile;
+    }
+    public void setCurrentAmbienceSoundfile(SoundFile currentAmbienceSoundfile) {
+        this.CurrentAmbienceSoundfile = currentAmbienceSoundfile;
     }
     public List<File> getAmbienceFiles() {
         List<File> files = new ArrayList<>();
         try {
-            files.addAll(Ambience.stream().map(SoundFile::getFile).collect(Collectors.toList()));
+//            files.addAll(AvailableAmbiences.stream().map(SoundFile::getFile).collect(Collectors.toList()));
             return files;
         } catch (NullPointerException ignored) {return new ArrayList<>();}
     }
 
 // Utility Methods
-    public void startup_addambiencefromdirectory(SessionPart selectedsessionpart) {
-        try {
-            File ambiencedirectory = new File(Preferences.DIRECTORYAMBIENCE, selectedsessionpart.name);
-            for (File i : ambiencedirectory.listFiles()) {
-                if (Util.audio_isValid(i) && ! selectedsessionpart.getAmbience().getAmbienceFiles().contains(i)) {add(new SoundFile(i));}
-            }
-        } catch (NullPointerException ignored) {}
-    }
-    public void startup_checkfordeletedfiles() {
-        if (Ambience != null) {
-            Ambience.stream().filter(i -> !i.getFile().exists()).forEach(this::remove);
-        }
-    }
+//    public void startup_addambiencefromdirectory(SessionItem selectedsessionpart) {
+//        try {
+//            File ambiencedirectory = new File(Preferences.DIRECTORYAMBIENCE, selectedsessionpart.name);
+//            for (File i : ambiencedirectory.listFiles()) {
+//                if (Util.audio_isValid(i) && ! selectedsessionpart.getAmbience().getAmbienceFiles().contains(i)) {add(new SoundFile(i));}
+//            }
+//        } catch (NullPointerException ignored) {}
+//    }
+//    public void startup_checkfordeletedfiles() {
+////        if (AvailableAmbiences != null) {
+////            AvailableAmbiences.stream().filter(i -> !i.getFile().exists()).forEach(this::remove);
+////        }
+//    }
 
-// Actual Ambience
+// Actual AvailableAmbiences
     public void add(SoundFile soundFile) {
         if (Ambience == null) Ambience = new ArrayList<>();
         Ambience.add(soundFile);
     }
     public void setoraddsoundfile(SoundFile soundFile) {
         int index = getAmbienceFiles().indexOf(soundFile.getFile());
-        if (index != -1) {Ambience.set(index, soundFile);}
-        else {add(soundFile);}
+        if (index != -1) {
+//            AvailableAmbiences.set(index, soundFile);}
+        } else {add(soundFile);}
     }
     public SoundFile get(int index) throws IndexOutOfBoundsException {return Ambience.get(index);}
+    public SoundFile getnextambienceforplayback() {
+        try {
+            SoundFile nextambiencefile = Ambience.get(currentplaycount);
+            currentplaycount++;
+            PlaybackHistory.add(nextambiencefile);
+            currentplaybackhistorycount++;
+            return nextambiencefile;
+        } catch (IndexOutOfBoundsException ignored) {
+            currentplaycount = 0;
+            PlaybackHistory.add(Ambience.get(0));
+            currentplaybackhistorycount++;
+            return Ambience.get(0);
+        }
+    }
+    public SoundFile getnextambiencehistory() {
+        try {
+            currentplaybackhistorycount++;
+            return PlaybackHistory.get(currentplaybackhistorycount);
+        } catch (IndexOutOfBoundsException ignored) {
+            currentplaybackhistorycount--;
+            return null;
+        }
+    }
+    public SoundFile getpreviousambiencehistory() {
+        try {
+            currentplaybackhistorycount--;
+            return PlaybackHistory.get(currentplaybackhistorycount);
+        } catch (IndexOutOfBoundsException ignored) {
+            currentplaybackhistorycount++;
+            return null;
+        }
+    }
     public SoundFile ambiencegenerator(AmbiencePlaybackType ambiencePlaybackType, List<SoundFile> playbackhistory, SoundFile currentsoundfile) {
         switch (ambiencePlaybackType) {
             case REPEAT:
@@ -91,9 +135,9 @@ public class Ambience {
                 }
             case CUSTOM:
                 if (currentsoundfile != null) {
-                    int index = CustomAmbience.indexOf(currentsoundfile);
-                    return CustomAmbience.get(index + 1);
-                } else {return CustomAmbience.get(0);}
+                    int index = Ambience.indexOf(currentsoundfile);
+                    return Ambience.get(index + 1);
+                } else {return Ambience.get(0);}
             default:
                 return null;
         }
@@ -106,14 +150,15 @@ public class Ambience {
         for (SoundFile i : Ambience) {if (i.getFile().equals(file)) return i;}
         return null;
     }
-    public void remove(SoundFile soundFile) {
-        Ambience.remove(soundFile);
+    public void remove(int index) {
+        Ambience.remove(index);
     }
 
 // Custom Ambience
-    public boolean hasCustomAmbience() {return CustomAmbience != null && ! CustomAmbience.isEmpty();}
-    public void setCustomAmbience(List<SoundFile> customAmbience) {CustomAmbience = customAmbience;}
-    public List<SoundFile> getCustomAmbience() {return CustomAmbience;}
+    public boolean hasCustomAmbience() {return Ambience != null && ! Ambience.isEmpty();}
+    public void setAmbience(List<SoundFile> ambience) {
+        Ambience = ambience;}
+    public List<SoundFile> getAmbience() {return Ambience;}
 
 // Validation Methods
     public Duration gettotalDuration() {
@@ -125,26 +170,9 @@ public class Ambience {
         }
         return duration;
     }
-    public boolean hasAnyAmbience() {
-        return Ambience != null && Ambience.size() > 0;
-    }
-    public boolean hasEnoughAmbience(Duration duration) {
-        return gettotalDuration().greaterThanOrEqualTo(duration);
-    }
-    public boolean ambienceexistsinActual(SoundFile soundFile) {
-        try {
-            if (Ambience.contains(soundFile)) {
-                return true;
-            }
-            for (SoundFile i : Ambience) {
-                if (i.getFile().equals(soundFile.getFile())) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (NullPointerException ignored) {
-            return false;
-        }
+    public void addambiencetoplaybackhistory(SoundFile soundFile) {
+        if (PlaybackHistory == null) {PlaybackHistory = new ArrayList<>();}
+        PlaybackHistory.add(soundFile);
     }
 
 }

@@ -3,8 +3,6 @@ package kujiin.xml;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.util.Qi_Gong;
-import kujiin.util.SessionPart;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -12,7 +10,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @XmlRootElement(name = "Sessions")
@@ -76,35 +74,37 @@ public class Sessions {
             marshall();
         }
     }
-    public void sort() {Collections.sort(Session, (o1, o2) -> o1.getDate_Practiced().compareTo(o2.getDate_Practiced()));}
+    public void sort() {Session.sort(Comparator.comparing(kujiin.xml.Session::getDate_Practiced));}
 
 // Session Information Getters
-    public Duration gettotalpracticedtime(SessionPart sessionpart, boolean includepreandpost) {
+    public Duration gettotalpracticedtime(kujiin.xml.Session.PlaybackItem playbackItem, boolean includeqigong) {
         try {
             Duration totalduration = Duration.ZERO;
-            for (kujiin.xml.Session i : getSession()) {totalduration = totalduration.add(i.getduration(sessionpart));}
-            if (includepreandpost) {
-                for (SessionPart i : Root.getAllSessionParts(true)) {
-                    if (i instanceof Qi_Gong) {
-                        for (kujiin.xml.Session x : getSession()) {totalduration = totalduration.add(x.getduration(i));}
+            for (kujiin.xml.Session i : getSession()) {
+                for (kujiin.xml.Session.PlaybackItem x : i.getPlaybackItems()) {
+                    if (x.getAvailableambienceindex() == playbackItem.getAvailableambienceindex()) {
+                        totalduration = totalduration.add(new Duration(x.getDuration()));
+                    }
+                    if (includeqigong && ! (playbackItem instanceof kujiin.xml.Session.QiGong) && x instanceof kujiin.xml.Session.QiGong) {
+                        totalduration = totalduration.add(new Duration(x.getDuration()));
                     }
                 }
             }
             return totalduration;
         } catch (NullPointerException ignored) {return Duration.ZERO;}
     }
-    public Duration getaveragepracticedurationforallsessions(SessionPart sessionpart, boolean includepreandpost) {
+    public Duration getaveragepracticedurationforallsessions(kujiin.xml.Session.PlaybackItem playbackitem, boolean includepreandpost) {
         try {
-            return new Duration(gettotalpracticedtime(sessionpart, includepreandpost).toMillis() / getsessioncount(sessionpart, includepreandpost));}
+            return new Duration(gettotalpracticedtime(playbackitem, includepreandpost).toMillis() / getsessioncount(playbackitem, includepreandpost));}
         catch (NullPointerException | ArithmeticException ignored) {return Duration.ZERO;}
     }
-    public int getsessioncount(SessionPart sessionpart, boolean includepreandpost) {
+    public int getsessioncount(kujiin.xml.Session.PlaybackItem playbackitem, boolean includeqigong) {
         try {
             int sessioncount = 0;
             for (kujiin.xml.Session i : getSession()) {
-                if (i.getduration(sessionpart).greaterThan(Duration.ZERO)) {sessioncount++; continue;}
-                if (includepreandpost) {
-                    if (i.getduration(Root.getSessionPart(0)).greaterThan(Duration.ZERO) || i.getduration(Root.getSessionPart(15)).greaterThan(Duration.ZERO)) {sessioncount++;}
+                for (kujiin.xml.Session.PlaybackItem x : i.getPlaybackItems()) {
+                    if (x.getAvailableambienceindex() == playbackitem.getAvailableambienceindex() && x.getDuration() > 0.0) {sessioncount++; continue;}
+                    if (includeqigong && ! (playbackitem instanceof kujiin.xml.Session.QiGong) && x.getDuration() > 0.0) {sessioncount++;}
                 }
             }
             return sessioncount;

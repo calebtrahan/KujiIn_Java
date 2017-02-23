@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import org.controlsfx.control.StatusBar?>
+<VBox prefHeight="330.0" prefWidth="636.0" stylesheets="@../styles/default.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.ui.MainController">
+   <children>
+      <MenuBar>
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem fx:id="MenuItemPreferences" mnemonicParsing="false" text="Preferences" />
+              <MenuItem fx:id="MenuItemExit" mnemonicParsing="false" text="Exit" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem fx:id="MenuItemEditAmbience" mnemonicParsing="false" text="Ambience" />
+                  <MenuItem fx:id="MenuItemEditReferenceFiles" mnemonicParsing="false" text="Reference Files" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+                  <MenuItem fx:id="MenuItemHelp" mnemonicParsing="false" text="Help" />
+                  <MenuItem fx:id="MenuItemContactMe" mnemonicParsing="false" text="Contact Me" />
+              <MenuItem fx:id="MenuItemAbout" mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <TabPane minWidth="692.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <tabs>
+          <Tab fx:id="PlayTab" text="Play/Export">
+            <content>
+              <AnchorPane>
+                     <children>
+                        <SplitPane dividerPositions="0.29797979797979796" prefWidth="747.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <items>
+                            <AnchorPane fx:id="LoadedSessionContainer" maxHeight="248.0" maxWidth="240.0" minHeight="248.0" minWidth="240.0">
+                                 <children>
+                                    <VBox alignment="TOP_CENTER" maxWidth="240.0" minWidth="240.0" prefHeight="248.0" prefWidth="240.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <ToolBar>
+                                            <items>
+                                                <Label prefHeight="25.0" prefWidth="213.0" text="Open/Create Session">
+                                                   <font>
+                                                      <Font name="System Bold" size="16.0" />
+                                                   </font>
+                                                </Label>
+                                              <Button fx:id="CreateNewSessionButton" mnemonicParsing="false" onAction="#createnewsessionbuttonpressed" text="Create New" />
+                                                <Button fx:id="RecentPracticedButton" mnemonicParsing="false" onAction="#openrecentlypracticedsessionbuttonpressed" text="Open Recently Practiced" />
+                                                <Button fx:id="FavoritesButton" mnemonicParsing="false" onAction="#openfavoritesessionbuttonpressed" text="Open Favorite" />
+                                                <Button fx:id="OpenFileButton" mnemonicParsing="false" onAction="#opensessionfromfilebuttonpressed" text="Open File" />
+                                            </items>
+                                             <VBox.margin>
+                                                <Insets />
+                                             </VBox.margin>
+                                          </ToolBar>
+                                          <Label fx:id="LoadedSessionTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="238.0" text="Loaded Session Details" textAlignment="CENTER">
+                                             <font>
+                                                <Font name="System Italic" size="17.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </Label>
+                                          <GridPane prefHeight="161.0" prefWidth="240.0">
+                                            <columnConstraints>
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <children>
+                                                <Label text="Favorite" />
+                                                <Label text="Session Name" GridPane.rowIndex="1" />
+                                                <CheckBox fx:id="LoadedSessionFavoriteCheckBox" mnemonicParsing="false" onAction="#loadedsessionfavoritecheckboxtoggled" GridPane.columnIndex="1" />
+                                                <TextField fx:id="LoadedSessionName" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Label text="Session Parts" GridPane.rowIndex="3" />
+                                                <TextField fx:id="LoadedSessionNumberOfSessionParts" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <Label text="Longest Session Part" GridPane.rowIndex="4" />
+                                                <TextField fx:id="LoadedSessionLongestSessionPart" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                <Label text="Total Duration" GridPane.rowIndex="5" />
+                                                <TextField fx:id="LoadedSessionDuration" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                <Label text="Preset Ambience" GridPane.rowIndex="2" />
+                                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                   <children>
+                                                      <TextField fx:id="LoadedSessionHasPresetAmbience" editable="false" prefHeight="25.0" prefWidth="57.0" />
+                                                      <Button fx:id="LoadedSessionPresetAmbienceDetailsButton" mnemonicParsing="false" onAction="#presetambiencedetailsbuttonpressed" prefHeight="25.0" prefWidth="52.0" text="Edit" HBox.hgrow="ALWAYS">
+                                                         <HBox.margin>
+                                                            <Insets left="5.0" />
+                                                         </HBox.margin>
+                                                      </Button>
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets />
+                                             </VBox.margin>
+                                             <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" />
+                                             </padding>
+                                          </GridPane>
+                                          <HBox alignment="CENTER_RIGHT" prefHeight="33.0" prefWidth="239.0">
+                                             <children>
+                                                <Button fx:id="LoadedSessionExportButton" mnemonicParsing="false" onAction="#exportsessionbuttonpressed" text="Export" />
+                                                <Button fx:id="LoadedSessionSaveAsPresetButton" mnemonicParsing="false" onAction="#savepresetbuttonpressed" text="Save Preset" />
+                                                <Button fx:id="LoadedSessionDisplayDetailsButton" mnemonicParsing="false" onAction="#loadedsessiondetailsbuttonpressed" text="Details">
+                                                   <HBox.margin>
+                                                      <Insets />
+                                                   </HBox.margin>
+                                                </Button>
+                                             </children>
+                                             <padding>
+                                                <Insets right="5.0" />
+                                             </padding>
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </AnchorPane>
+                            <AnchorPane fx:id="PlayerContainer" minHeight="0.0" minWidth="0.0">
+                                 <children>
+                                    <VBox alignment="TOP_CENTER" layoutX="-14.0" layoutY="14.0" prefHeight="248.0" prefWidth="444.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <VBox alignment="TOP_CENTER">
+                                             <children>
+                                                <HBox alignment="CENTER">
+                                                   <children>
+                                                      <Label text="Session Player">
+                                                         <font>
+                                                            <Font name="System Bold" size="15.0" />
+                                                         </font>
+                                                      </Label>
+                                                   </children>
+                                                   <VBox.margin>
+                                                      <Insets bottom="10.0" />
+                                                   </VBox.margin>
+                                                </HBox>
+                                                <HBox>
+                                                   <VBox.margin>
+                                                      <Insets bottom="5.0" />
+                                                   </VBox.margin>
+                                                   <children>
+                                                      <Label fx:id="PlayerCurrentTopLabel" alignment="CENTER" prefHeight="17.0" prefWidth="205.0" text="Postsession (100%) (1/9)">
+                                                         <HBox.margin>
+                                                            <Insets right="2.0" />
+                                                         </HBox.margin>
+                                                      </Label>
+                                                      <Label fx:id="PlayerSessionTopLabel" alignment="CENTER" prefHeight="16.0" prefWidth="205.0" text="Session (100%)">
+                                                         <HBox.margin>
+                                                            <Insets left="2.0" />
+                                                         </HBox.margin>
+                                                      </Label>
+                                                   </children>
+                                                </HBox>
+                                                <HBox minHeight="20.0">
+                                                   <VBox.margin>
+                                                      <Insets bottom="10.0" />
+                                                   </VBox.margin>
+                                                   <children>
+                                                      <StackPane prefWidth="205.0">
+                                                         <children>
+                                                            <ProgressBar fx:id="PlayerCurrentProgress" prefHeight="20.0" prefWidth="675.0" progress="0.0" />
+                                                            <Label fx:id="PlayerCurrentProgressTime" alignment="CENTER" prefHeight="16.0" prefWidth="685.0" text="00:00:00 &gt; 99:99:99" />
+                                                         </children>
+                                                         <HBox.margin>
+                                                            <Insets right="2.0" />
+                                                         </HBox.margin>
+                                                      </StackPane>
+                                                      <StackPane prefWidth="205.0">
+                                                         <children>
+                                                            <ProgressBar fx:id="PlayerSessionProgress" prefHeight="20.0" prefWidth="674.0" progress="0.0" />
+                                                            <Label fx:id="PlayerSessionProgressTime" alignment="CENTER" prefHeight="16.0" prefWidth="813.0" text="00:00:00 &gt; 99:99:99" />
+                                                         </children>
+                                                         <HBox.margin>
+                                                            <Insets left="2.0" />
+                                                         </HBox.margin>
+                                                      </StackPane>
+                                                   </children>
+                                                </HBox>
+                                                <HBox alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="682.0">
+                                                   <children>
+                                                      <HBox alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="434.0">
+                                                         <children>
+                                                            <Label text="Entrainment" />
+                                                            <Slider fx:id="PlayerEntrainmentVolume" prefHeight="16.0" prefWidth="85.0">
+                                                               <HBox.margin>
+                                                                  <Insets left="4.0" right="4.0" />
+                                                               </HBox.margin>
+                                                            </Slider>
+                                                            <Label fx:id="PlayerEntrainmentVolumePercentage" text="100%" />
+                                                            <Label text="Ambience">
+                                                               <HBox.margin>
+                                                                  <Insets left="15.0" />
+                                                               </HBox.margin>
+                                                            </Label>
+                                                            <Slider fx:id="PlayerAmbienceVolume" prefHeight="16.0" prefWidth="85.0">
+                                                               <HBox.margin>
+                                                                  <Insets left="4.0" right="4.0" />
+                                                               </HBox.margin>
+                                                            </Slider>
+                                                            <Label fx:id="PlayerAmbienceVolumePercentage" text="100%" />
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                   <VBox.margin>
+                                                      <Insets />
+                                                   </VBox.margin>
+                                                   <padding>
+                                                      <Insets right="10.0" />
+                                                   </padding>
+                                                </HBox>
+                                                <HBox alignment="CENTER_RIGHT" prefHeight="31.0" prefWidth="670.0">
+                                                   <children>
+                                                      <HBox alignment="CENTER_LEFT" prefHeight="31.0" prefWidth="257.0">
+                                                         <children>
+                                                            <CheckBox fx:id="PlayerDisplayReferenceCheckBox" mnemonicParsing="false" onAction="#togglereferencedisplay" prefHeight="17.0" prefWidth="128.0" text="Display Reference" />
+                                                            <Label text="Type:">
+                                                               <HBox.margin>
+                                                                  <Insets left="5.0" />
+                                                               </HBox.margin>
+                                                            </Label>
+                                                            <ChoiceBox fx:id="PlayerDisplayReferenceTypeChoiceBox" prefWidth="80.0">
+                                                               <HBox.margin>
+                                                                  <Insets left="10.0" />
+                                                               </HBox.margin>
+                                                            </ChoiceBox>
+                                                         </children>
+                                                      </HBox>
+                                                      <HBox alignment="CENTER_RIGHT" prefHeight="31.0" prefWidth="162.0">
+                                                         <children>
+                                                            <Button fx:id="PlayerPlayButton" mnemonicParsing="false" onAction="#playbuttonpressed" text="Play" />
+                                                            <Button fx:id="PlayerPauseButton" mnemonicParsing="false" onAction="#pausebuttonpressed" text="Pause" />
+                                                            <Button fx:id="PlayerStopButton" mnemonicParsing="false" onAction="#stopbuttonpressed" text="Stop" />
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets />
+                                             </VBox.margin>
+                                             <padding>
+                                                <Insets left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </VBox>
+                                          <VBox alignment="TOP_CENTER" prefHeight="105.0" prefWidth="434.0">
+                                             <children>
+                                                <SplitPane dividerPositions="0.1597222222222222" VBox.vgrow="ALWAYS">
+                                                   <items>
+                                                      <VBox alignment="CENTER" maxWidth="215.0" minWidth="215.0" prefWidth="215.0">
+                                                         <children>
+                                                            <Label text="Progress Summary ">
+                                                               <font>
+                                                                  <Font name="System Bold" size="15.0" />
+                                                               </font>
+                                                            </Label>
+                                                            <GridPane>
+                                                              <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <children>
+                                                                  <Label text="Time Practiced">
+                                                                     <GridPane.margin>
+                                                                        <Insets left="5.0" />
+                                                                     </GridPane.margin>
+                                                                  </Label>
+                                                                  <Label text="Average Practiced" GridPane.rowIndex="1">
+                                                                     <GridPane.margin>
+                                                                        <Insets left="5.0" />
+                                                                     </GridPane.margin>
+                                                                  </Label>
+                                                                  <TextField fx:id="PlayerProgressSummaryTimePracticed" editable="false" GridPane.columnIndex="1">
+                                                                     <GridPane.margin>
+                                                                        <Insets right="5.0" />
+                                                                     </GridPane.margin>
+                                                                  </TextField>
+                                                                  <TextField fx:id="PlayerProgressSummaryAveragePracticed" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                                     <GridPane.margin>
+                                                                        <Insets right="5.0" />
+                                                                     </GridPane.margin>
+                                                                  </TextField>
+                                                               </children>
+                                                            </GridPane>
+                                                         </children>
+                                                      </VBox>
+                                                      <VBox alignment="CENTER" maxWidth="215.0" minWidth="215.0" prefWidth="215.0">
+                                                         <children>
+                                                            <Label text="Goals Summary">
+                                                               <font>
+                                                                  <Font name="System Bold" size="15.0" />
+                                                               </font>
+                                                               <VBox.margin>
+                                                                  <Insets />
+                                                               </VBox.margin>
+                                                            </Label>
+                                                            <GridPane>
+                                                              <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <children>
+                                                                  <Label text="Current Goal">
+                                                                     <GridPane.margin>
+                                                                        <Insets left="5.0" />
+                                                                     </GridPane.margin>
+                                                                  </Label>
+                                                                  <Label text="Progress To Goal" GridPane.rowIndex="1">
+                                                                     <GridPane.margin>
+                                                                        <Insets left="5.0" />
+                                                                     </GridPane.margin>
+                                                                  </Label>
+                                                                  <TextField fx:id="PlayerGoalSummaryCurrentGoal" editable="false" GridPane.columnIndex="1">
+                                                                     <GridPane.margin>
+                                                                        <Insets right="5.0" />
+                                                                     </GridPane.margin>
+                                                                  </TextField>
+                                                                  <StackPane GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                                     <children>
+                                                                        <ProgressBar fx:id="PlayerGoalSummaryCurrentGoalProgress" prefHeight="25.0" prefWidth="200.0" progress="0.0" />
+                                                                        <Label fx:id="PlayerGoalSummaryCurrentGoalPercentage" alignment="CENTER" prefHeight="17.0" prefWidth="103.0" text="100%" />
+                                                                     </children>
+                                                                     <GridPane.margin>
+                                                                        <Insets right="5.0" />
+                                                                     </GridPane.margin>
+                                                                  </StackPane>
+                                                               </children>
+                                                            </GridPane>
+                                                         </children>
+                                                      </VBox>
+                                                   </items>
+                                                </SplitPane>
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                             <padding>
+                                                <Insets bottom="10.0" />
+                                             </padding>
+                                          </VBox>
+                                       </children>
+                                       <padding>
+                                          <Insets left="5.0" right="5.0" />
+                                       </padding>
+                                    </VBox>
+                                 </children>
+                              </AnchorPane>
+                          </items>
+                        </SplitPane>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab fx:id="ProgressTab" text="Progress">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0">
+                     <children>
+                        <VBox prefHeight="250.0" prefWidth="692.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <TableView fx:id="ProgressTable" prefHeight="213.0" prefWidth="672.0" VBox.vgrow="ALWAYS">
+                                <columns>
+                                  <TableColumn fx:id="ProgressTableNumberColumn" prefWidth="60.0" text="#" />
+                                  <TableColumn fx:id="ProgressTableNameColumn" prefWidth="147.0" resizable="false" text="Name" />
+                                    <TableColumn fx:id="ProgressTableNumberOfSessionsColumn" prefWidth="119.0" resizable="false" text="# Of Sessions" />
+                                    <TableColumn fx:id="ProgressTableTimePracticedColumn" prefWidth="207.0" resizable="false" text="Time Practiced" />
+                                    <TableColumn fx:id="ProgressTableAverageTimeColumn" prefWidth="138.0" resizable="false" text="Average Time" />
+                                </columns>
+                              </TableView>
+                              <HBox alignment="CENTER_RIGHT" prefHeight="31.0" prefWidth="672.0">
+                                 <children>
+                                    <Button fx:id="ProgressBalanceButton" mnemonicParsing="false" onAction="#balancebuttonpressed" text="Balance Pie Chart" />
+                                    <Button fx:id="ProgressSessionListButton" mnemonicParsing="false" onAction="#sessionlistbuttonpressed" text="Session List" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="2.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                           <padding>
+                              <Insets left="10.0" right="10.0" />
+                           </padding>
+                        </VBox>
+                     </children></AnchorPane>
+            </content>
+          </Tab>
+            <Tab fx:id="GoalsTab" text="Goals">
+              <content>
+                <AnchorPane>
+                     <children>
+                        <VBox layoutX="-6.0" layoutY="-24.0" prefHeight="250.0" prefWidth="692.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" prefHeight="35.0" prefWidth="692.0">
+                                 <children>
+                                    <Label text="Select A Session Part">
+                                       <HBox.margin>
+                                          <Insets right="10.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <ChoiceBox fx:id="GoalsSelectedSessionPart" prefWidth="150.0">
+                                       <HBox.margin>
+                                          <Insets right="10.0" />
+                                       </HBox.margin></ChoiceBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="35.0" prefWidth="330.0">
+                                       <children>
+                                          <Label text="Current Practiced Time">
+                                             <HBox.margin>
+                                                <Insets right="10.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <TextField fx:id="GoalsCurrentPracticedTime" editable="false" prefHeight="25.0" prefWidth="150.0" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                                 <padding>
+                                    <Insets left="10.0" />
+                                 </padding>
+                              </HBox>
+                              <SplitPane dividerPositions="0.29797979797979796" prefHeight="204.0" prefWidth="672.0">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="332.0" prefHeight="160.0" prefWidth="350.0">
+                                       <children>
+                                          <VBox alignment="TOP_CENTER" layoutX="108.0" layoutY="93.0" prefHeight="202.0" prefWidth="332.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <Label text="Current Goals">
+                                                   <font>
+                                                      <Font size="15.0" />
+                                                   </font>
+                                                </Label>
+                                                <TableView prefHeight="149.0" prefWidth="322.0">
+                                                  <columns>
+                                                    <TableColumn fx:id="GoalsCurrentTableNumberColumn" prefWidth="43.0" resizable="false" text="#" />
+                                                    <TableColumn fx:id="GoalsCurrentTableDateSetColumn" prefWidth="96.0" resizable="false" text="Date Set" />
+                                                      <TableColumn fx:id="GoalsCurrentTableGoalColumn" prefWidth="89.0" resizable="false" text="Goal" />
+                                                      <TableColumn fx:id="GoalsCurrentTablePercentCompletedColumn" prefWidth="93.0" resizable="false" text="\% Complete" />
+                                                  </columns>
+                                                </TableView>
+                                                <HBox alignment="CENTER_RIGHT" prefHeight="26.0" prefWidth="322.0">
+                                                   <children>
+                                                      <Button fx:id="GoalsSetNewGoalButton" mnemonicParsing="false" onAction="#setnewgoalbuttonpressed" text="Set New Goal" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </padding>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="332.0" prefHeight="160.0" prefWidth="350.0">
+                                       <children>
+                                          <VBox alignment="TOP_CENTER" prefHeight="202.0" prefWidth="332.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <Label text="Completed Goals">
+                                                   <font>
+                                                      <Font size="15.0" />
+                                                   </font>
+                                                </Label>
+                                                <TableView prefHeight="200.0" prefWidth="200.0">
+                                                  <columns>
+                                                    <TableColumn fx:id="GoalsCompletedTableNumberColumn" prefWidth="41.0" resizable="false" text="#" />
+                                                    <TableColumn fx:id="GoalsCompletedTableDateSetColumn" prefWidth="79.0" resizable="false" text="Date Set" />
+                                                      <TableColumn fx:id="GoalsCompletedTableGoalColumn" prefWidth="95.0" resizable="false" text="Goal" />
+                                                      <TableColumn fx:id="GoalsCompletedTableDateCompletedColumn" prefWidth="105.0" resizable="false" text="Date Completed" />
+                                                  </columns>
+                                                </TableView>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </padding>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
+                           </children>
+                           <padding>
+                              <Insets left="10.0" right="10.0" />
+                           </padding>
+                        </VBox>
+                     </children></AnchorPane>
+              </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <StatusBar maxHeight="20.0" text="">
+         <padding>
+            <Insets left="5.0" right="5.0" />
+         </padding>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </StatusBar>
+      <!--<StatusBar text="" />-->
+   </children>
+</VBox>
