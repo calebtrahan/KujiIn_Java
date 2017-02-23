@@ -1,4 +1,4 @@
-package kujiin.util;
+package kujiin.ui.boilerplate;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
