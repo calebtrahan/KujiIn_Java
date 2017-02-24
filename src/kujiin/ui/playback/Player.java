@@ -30,7 +30,6 @@ import kujiin.xml.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 
 import static kujiin.util.enums.PlayerState.*;
 
@@ -72,8 +71,6 @@ public class Player extends Stage {
     private Animation updateuitimeline;
     private final Duration updateuifrequency = Duration.millis(100);
 // Playback
-    private ArrayList<Session.PlaybackItem> allPlaybackItems;
-    private int sessionitemindex;
     private MediaPlayer entrainmentplayer;
     private MediaPlayer ambienceplayer;
     private SoundFile currentambiencesoundfile;
@@ -151,8 +148,7 @@ public class Player extends Stage {
                 updateuitimeline = new Timeline(new KeyFrame(updateuifrequency, ae -> updateplayerui()));
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 updateuitimeline.play();
-                sessionitemindex = 0;
-                selectedPlaybackItem = allPlaybackItems.get(0);
+                selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
                 currententrainmentvolume = Preferences.getPlaybackOptions().getEntrainmentvolume();
                 currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume();
                 start();
@@ -320,7 +316,7 @@ public class Player extends Stage {
         entrainmentplayer.play();
         timeline_progresstonextsessionpart = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getDuration()), ae -> progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
-        boolean isLastSessionPart = allPlaybackItems.indexOf(selectedPlaybackItem) == allPlaybackItems.size() - 1;
+        boolean isLastSessionPart = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) == SessionInProgress.getPlaybackItems().size() - 1;
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
             timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getDuration()).subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
                 volume_unbindentrainment();
@@ -530,8 +526,7 @@ public class Player extends Stage {
                 case TRANSITIONING:
                     try {
                         cleanupPlayersandAnimations();
-                        sessionitemindex++;
-                        selectedPlaybackItem = allPlaybackItems.get(sessionitemindex);
+                        selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(SelectedPlaybackItem) + 1);
                         start();
                         displayreferencefile();
                     } catch (IndexOutOfBoundsException ignored) {
