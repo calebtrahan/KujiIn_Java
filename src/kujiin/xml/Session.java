@@ -23,13 +23,17 @@ public class Session {
     private ArrayList<PlaybackItem> playbackItems;
     private Double SessionDuration; // In Millis
     private FreqType freqType;
+    @XmlTransient
+    private Duration elapsedtime;
 
     public Session() {
         SessionDuration = 0.0;
+        elapsedtime = Duration.ZERO;
         setDate_Practiced(LocalDate.now());
     }
 
 // Getters And Setters
+
     public void setDate_Practiced(LocalDate date_Practiced) {Date_Practiced = date_Practiced.format(dateFormat);}
     public LocalDate getDate_Practiced() {return LocalDate.parse(Date_Practiced, dateFormat);}
     public Duration getSessionDuration() {
@@ -46,6 +50,10 @@ public class Session {
         if (playbackItems == null) {return new ArrayList<>();}
         else {return playbackItems;}
     }
+    public void setElapsedtime(Duration elapsedtime) {
+        this.elapsedtime = elapsedtime;
+    }
+    public double getElapsedTime() {return elapsedtime.toMillis();}
     public void addplaybackitem(int index) {
         if (playbackItems == null) {playbackItems = new ArrayList<>();}
         switch (index) {
@@ -103,6 +111,9 @@ public class Session {
     }
 
 // Utility Methods
+    public void addelapsedtime(Duration duration) {
+        elapsedtime = elapsedtime.add(duration);
+    }
     public boolean isValid() {
         return Duration.minutes(SessionDuration).greaterThan(Duration.ZERO);
     }
@@ -110,7 +121,7 @@ public class Session {
 // Subclasses
     @XmlAccessorType(XmlAccessType.FIELD)
     public class PlaybackItem {
-        protected int availableambienceindex;
+        protected int entrainmentandavailableambienceindex;
         protected int playbackindex;
         protected String Name;
         private double Duration; // As Millis
@@ -118,18 +129,21 @@ public class Session {
         private Ambience ambience;
         private Entrainment entrainment;
         @XmlTransient
+        private Duration elapsedtime;
+        @XmlTransient
         private ArrayList<Goals.Goal> GoalsCompletedThisSession;
 
         public PlaybackItem() {}
         public PlaybackItem(String name) {
             this.Name = name;
             Duration = 0.0;
+            elapsedtime = javafx.util.Duration.ZERO;
             ambience = new Ambience();
         }
 
     // Getters And Setters
-        public int getAvailableambienceindex() {
-            return availableambienceindex;
+        public int getEntrainmentandavailableambienceindex() {
+            return entrainmentandavailableambienceindex;
         }
         public void setPlaybackindex(int playbackindex) {
                 this.playbackindex = playbackindex;
@@ -152,6 +166,10 @@ public class Session {
         public double getDuration() {
                 return Duration;
             }
+        public void setElapsedtime(javafx.util.Duration elapsedtime) {
+            this.elapsedtime = elapsedtime;
+        }
+        public double getElapsedTime() {return elapsedtime.toMillis();}
         public String getdurationasString(double maxchars) {
             if (Duration == 0.0 && ! RampOnly) {return "No Duration Set";}
             else {
@@ -172,6 +190,7 @@ public class Session {
         }
 
     // Utility Methods
+        public void addelapsedtime(Duration duration) {elapsedtime = elapsedtime.add(duration);}
         public void addCompletedGoal(Goals.Goal Goal) {
             if (GoalsCompletedThisSession == null) {
                 GoalsCompletedThisSession = new ArrayList<>();}
@@ -369,7 +388,7 @@ public class Session {
 
         public QiGong() {
             super("Qi-Gong");
-            super.availableambienceindex = 0;
+            super.entrainmentandavailableambienceindex = 0;
         }
 
         @Override
@@ -421,7 +440,7 @@ public class Session {
 
         public Rin() {
             super("Rin");
-            super.availableambienceindex = 1;
+            super.entrainmentandavailableambienceindex = 1;
             cutindex = 1;
             super.focuspoint = "Root Chakra";
             super.concept = "A Celebration Of The Spirit Coming Into The Body";
@@ -433,7 +452,7 @@ public class Session {
 
         public Kyo() {
             super("Kyo");
-            super.availableambienceindex = 2;
+            super.entrainmentandavailableambienceindex = 2;
             cutindex = 2;
             super.focuspoint = "Navel Chakra";
             super.concept = "In Order To Become Powerful, Responsiblity Must Be Taken For All Actions";
@@ -445,7 +464,7 @@ public class Session {
 
         public Toh() {
             super("Toh");
-            super.availableambienceindex = 3;
+            super.entrainmentandavailableambienceindex = 3;
             cutindex = 3;
             super.focuspoint = "Dan-tian";
             super.concept = "Conscious Dissolement Of All Personal Fights In Order To Achieve Harmony";
@@ -457,7 +476,7 @@ public class Session {
 
         public Sha() {
             super("Sha");
-            super.availableambienceindex = 4;
+            super.entrainmentandavailableambienceindex = 4;
             cutindex = 4;
             super.focuspoint = "Solar Plexus Charkra";
             super.concept = "By Letting Go Of The Limits Of My Mind You Can Vibrate With The Power Of The Universe And Exist Fully Powerful";
@@ -469,7 +488,7 @@ public class Session {
 
         public Kai() {
             super("Kai");
-            super.availableambienceindex = 5;
+            super.entrainmentandavailableambienceindex = 5;
             cutindex = 5;
             super.focuspoint = "Heart Chakra";
             super.concept = "Everything (Created Or Not) In The Universe Is One";
@@ -481,7 +500,7 @@ public class Session {
 
         public Jin() {
             super("Jin");
-            super.availableambienceindex = 6;
+            super.entrainmentandavailableambienceindex = 6;
             cutindex = 6;
             super.focuspoint = "Throat Chakra";
             super.concept = "An Observation Of The Universe And What Binds Every Part Of Us To Every Part Of Everything Else";
@@ -493,7 +512,7 @@ public class Session {
 
         public Retsu() {
             super("Retsu");
-            super.availableambienceindex = 7;
+            super.entrainmentandavailableambienceindex = 7;
             cutindex = 7;
             super.focuspoint = "Jade Gate Chakra";
             super.concept = "Transmute The Limits Of Perception By Remembering Our Wholeness As Spirit";
@@ -505,7 +524,7 @@ public class Session {
 
         public Zai() {
             super("Zai");
-            super.availableambienceindex = 8;
+            super.entrainmentandavailableambienceindex = 8;
             cutindex = 8;
             super.focuspoint = "Third Eye Chakra";
             super.concept = "Works With Our Mind, Heart And Body In Order To Define Ourselves As A Spirit That Is Having A Human Experience, Rather Than A Human Being Sometimes Having A Spiritual Experience";
@@ -517,7 +536,7 @@ public class Session {
 
         public Zen() {
             super("Zen");
-            super.availableambienceindex = 9;
+            super.entrainmentandavailableambienceindex = 9;
             cutindex = 9;
             super.focuspoint = "Crown Chakra";
             super.concept = "The Human Completely Relents Itself To The Spirit With Only The Consciousness Aspect Of The Human Remaining Active";
@@ -529,35 +548,35 @@ public class Session {
 
         public Earth() {
             super("Earth");
-            super.availableambienceindex = 10;
+            super.entrainmentandavailableambienceindex = 10;
         }
     }
     public class Air extends Element {
 
         public Air() {
             super("Air");
-            super.availableambienceindex = 11;
+            super.entrainmentandavailableambienceindex = 11;
         }
     }
     public class Fire extends Element {
 
         public Fire() {
             super("Fire");
-            super.availableambienceindex = 12;
+            super.entrainmentandavailableambienceindex = 12;
         }
     }
     public class Water extends Element {
 
         public Water() {
             super("Water");
-            super.availableambienceindex = 13;
+            super.entrainmentandavailableambienceindex = 13;
         }
     }
     public class Void extends Element {
 
         public Void() {
             super("Void");
-            super.availableambienceindex = 14;
+            super.entrainmentandavailableambienceindex = 14;
         }
     }
 

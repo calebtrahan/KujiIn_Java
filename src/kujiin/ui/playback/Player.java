@@ -4,6 +4,8 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -19,6 +21,7 @@ import javafx.util.Duration;
 import kujiin.ui.dialogs.SessionDetails;
 import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.table.PlaylistTableItem;
 import kujiin.util.Util;
 import kujiin.util.enums.PlayerState;
 import kujiin.util.enums.ReferenceType;
@@ -28,7 +31,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.List;
 
 import static kujiin.util.enums.PlayerState.*;
 
@@ -40,10 +42,10 @@ public class Player extends Stage {
     public MenuItem AboutMenuItem;
     public CheckBox ReferenceToggleCheckBox;
     public ChoiceBox ReferenceTypeChoiceBox;
-    public TableView PlaylistTableView;
-    public TableColumn NameColumn;
-    public TableColumn DurationColumn;
-    public TableColumn PercentColumn;
+    public TableView<PlaylistTableItem> PlaylistTableView;
+    public TableColumn<PlaylistTableItem, String> NameColumn;
+    public TableColumn<PlaylistTableItem, String> DurationColumn;
+    public TableColumn<PlaylistTableItem, String> PercentColumn;
     public Label SessionCurrentTime;
     public ProgressBar SessionProgress;
     public Label SessionProgressPercentage;
@@ -77,26 +79,19 @@ public class Player extends Stage {
     private SoundFile currentambiencesoundfile;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
-    private Duration sessionelapsedtime;
-    private Duration sessionitemelapsedtime;
-    private Duration sessionduration;
 // Class Objects
     private Session SessionTemplate;
     private Session SessionInProgress;
     private Session.PlaybackItem selectedPlaybackItem;
-    private Sessions Sessions;
     private Goals Goals;
-    private Entrainments Entrainments;
-    private Entrainment SessionPartEntrainment;
-    private Ambiences Ambiences;
-    private Ambience SessionPartAmbience;
+    private Entrainments entrainments;
+    private Sessions sessions;
     private PlayerState playerState;
     private Preferences Preferences;
     private ReferenceType referenceType;
+    private Session.PlaybackItem SelectedPlaybackItem;
 // Toggles
     public Boolean displaynormaltime = true;
-// Session And Goal Tracking
-    public List<Session.PlaybackItem> sessionItemsWithGoalsCompletedThisPlayback;
 // Event Handlers
     EventHandler<KeyEvent> AmbienceSwitchWithKeyboard = new EventHandler<KeyEvent>() {
         KeyCodeCombination forwardambience = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
@@ -115,14 +110,17 @@ public class Player extends Stage {
         }
     };
 
-    public Player(Session sessionInProgress) {
+    public Player(Session sessionInProgress, Sessions sessions, Entrainments entrainments) {
         try {
             SessionTemplate = sessionInProgress;
+            this.entrainments = entrainments;
+            this.sessions = sessions;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/playback/Player.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setTitle("Simple Ambience Editor");
+            PlaylistTableView.setSelectionModel(null);
             setOnCloseRequest(event -> closedialog());
         } catch (IOException ignored) {}
     }
@@ -150,11 +148,6 @@ public class Player extends Stage {
             case STOPPED:
                 SessionInProgress = SessionTemplate;
 //                setupKeyBoardShortcuts();
-                sessionItemsWithGoalsCompletedThisPlayback = new ArrayList<>();
-                sessionelapsedtime = Duration.ZERO;
-                sessionitemelapsedtime = Duration.ZERO;
-                for (Session.PlaybackItem i : allPlaybackItems) {sessionduration = sessionduration.add(new Duration(i.getDuration()));}
-//                    TotalTotalTimeLabel.setText(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
                 updateuitimeline = new Timeline(new KeyFrame(updateuifrequency, ae -> updateplayerui()));
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 updateuitimeline.play();
@@ -192,48 +185,34 @@ public class Player extends Stage {
 // Playback
     // UI Update
     private void updateplayerui() {
-        try {
-            sessionelapsedtime = sessionelapsedtime.add(updateuifrequency);
-            sessionitemelapsedtime = sessionitemelapsedtime.add(updateuifrequency);
-            Float currentprogress;
-            Float totalprogress;
+        if (playerState == PLAYING) {
             try {
-                if (sessionitemelapsedtime.greaterThan(Duration.ZERO)) {currentprogress = (float) sessionitemelapsedtime.toMillis() / (float) selectedPlaybackItem.getDuration();}
-                else {currentprogress = (float) 0;}
-            } catch (NullPointerException ignored) {currentprogress = (float) 0;}
-            if (sessionelapsedtime.greaterThan(Duration.ZERO)) {totalprogress = (float) sessionelapsedtime.toMillis() / (float) sessionduration.toMillis();}
-            else {totalprogress = (float) 0.0;}
-            SessionProgress.setProgress(totalprogress * 100);
-            BigDecimal bd = new BigDecimal(totalprogress);
-            bd = bd.setScale(2, RoundingMode.HALF_UP);
-            SessionProgressPercentage.setText(bd.doubleValue() + "%");
-//            CurrentTopLabel.setText(selectedPlaybackItem.getName() + "(" + new Float(currentprogress * 100).intValue() + "%) [" + (allPlaybackItems.indexOf(selectedPlaybackItem) + 1)  + "/" + allPlaybackItems.size() + "]");
-//            SessionTopLabel.setText("SessionInProgress (" + new Float(totalprogress * 100).intValue() + "%)");
-            String currentparttime;
-            String totalparttime;
-            try {currentparttime = Util.formatdurationtoStringDecimalWithColons(sessionitemelapsedtime);}
-            catch (NullPointerException ignored) {currentparttime = Util.formatdurationtoStringDecimalWithColons(Duration.ZERO);}
-            if (displaynormaltime) {totalparttime = Util.formatdurationtoStringDecimalWithColons(new Duration(selectedPlaybackItem.getDuration()));}
-            else {totalparttime = Util.formatdurationtoStringDecimalWithColons(new Duration(selectedPlaybackItem.getDuration()).subtract(sessionitemelapsedtime));}
-//            CurrentProgressTime.setText(String.format("%s -> %s", currentparttime, totalparttime));
-            String currenttotaltime;
-            String totaltotaltime;
-            currenttotaltime = Util.formatdurationtoStringDecimalWithColons(sessionelapsedtime);
-            if (displaynormaltime) {totaltotaltime = Util.formatdurationtoStringDecimalWithColons(sessionduration);}
-            else {totaltotaltime = Util.formatdurationtoStringDecimalWithColons(sessionduration.subtract(sessionelapsedtime));}
-            SessionCurrentTime.setText(currenttotaltime);
-//            try {
-//                if (displayReference != null && displayReference.isShowing()) {
-//                    displayReference.setCurrentProgress((double) currentprogress);
-//                    displayReference.setTotalProgress((double) totalprogress);
-//                    displayReference.setName(selectedPlaybackItem.getName());
-//                }
-//            } catch (Exception ignored) {}
-            updatesessionui();
-            updategoalui();
-            if (playerState == PLAYING) {
-                selectedPlaybackItem.updateduration(sessionitemelapsedtime);}
-        } catch (Exception ignored) {ignored.printStackTrace();}
+                SelectedPlaybackItem.addelapsedtime(updateuifrequency);
+                SessionInProgress.addelapsedtime(updateuifrequency);
+            // Update Playlist
+                PlaylistTableView.getItems().clear();
+                ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
+                for (Session.PlaybackItem i : SessionInProgress.getPlaybackItems()) {
+                    float totalprogress = (float) i.getElapsedTime() / (float) i.getDuration();
+                    int percentage = new Double(totalprogress * 100).intValue();
+                    playlistitems.add(new PlaylistTableItem(i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getElapsedTime())), percentage + "%"));
+                }
+                PlaylistTableView.setItems(playlistitems);
+            // Update Total Progress
+                SessionCurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(SessionInProgress.getElapsedTime())));
+                Float totalprogress;
+                if (SessionInProgress.getElapsedTime() > 0.0) {totalprogress = (float) SessionInProgress.getElapsedTime() / (float) SessionInProgress.getSessionDuration().toMillis();}
+                else {totalprogress = (float) 0.0;}
+                SessionProgress.setProgress(totalprogress * 100);
+                BigDecimal bd = new BigDecimal(totalprogress);
+                bd = bd.setScale(2, RoundingMode.HALF_UP);
+                SessionProgressPercentage.setText(bd.doubleValue() + "%");
+                if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionDuration()));}
+                else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionDuration().subtract(new Duration(SessionInProgress.getElapsedTime()))));}
+                updatesessionui();
+                updategoalui();
+            } catch (Exception ignored) {ignored.printStackTrace();}
+        }
     }
     private void updatesessionui() {}
     private void updategoalui() {}
@@ -328,11 +307,13 @@ public class Player extends Stage {
     }
     // Playback Methods
     private void start() {
-        sessionelapsedtime = Duration.ZERO;
+        SessionInProgress.setElapsedtime(Duration.ZERO);
+        SelectedPlaybackItem.setElapsedtime(Duration.ZERO);
         setupfadeanimations();
         volume_unbindentrainment();
-        if (! selectedPlaybackItem.isRampOnly() || selectedPlaybackItem.getPlaybackindex() == SessionInProgress.getPlaybackItems().size() - 1) {entrainmentplayer = new MediaPlayer(new Media(SessionPartEntrainment.getFreq().getFile().toURI().toString()));}
-        else {entrainmentplayer = new MediaPlayer(new Media(SessionPartEntrainment.getRampfile().getFile().toURI().toString()));}
+        Entrainment entrainment = entrainments.getsessionpartEntrainment(SelectedPlaybackItem);
+        if (! selectedPlaybackItem.isRampOnly() || selectedPlaybackItem.getPlaybackindex() == SessionInProgress.getPlaybackItems().size() - 1) {entrainmentplayer = new MediaPlayer(new Media(entrainment.getFreq().getFile().toURI().toString()));}
+        else {entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampfile().getFile().toURI().toString()));}
         entrainmentplayer.setVolume(0.0);
         if (! selectedPlaybackItem.isRampOnly()) {entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);}
         entrainmentplayer.setOnError(this::entrainmenterror);
@@ -341,11 +322,11 @@ public class Player extends Stage {
         timeline_progresstonextsessionpart.play();
         boolean isLastSessionPart = allPlaybackItems.indexOf(selectedPlaybackItem) == allPlaybackItems.size() - 1;
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
-            timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getDuration()).subtract(Duration.millis(SessionPartEntrainment.getRampfile().getDuration())), ae -> {
+            timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getDuration()).subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
-                entrainmentplayer = new MediaPlayer(new Media(SessionPartEntrainment.getRampfile().getFile().toURI().toString()));
+                entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampfile().getFile().toURI().toString()));
                 entrainmentplayer.setOnError(this::entrainmenterror);
                 entrainmentplayer.setVolume(currententrainmentvolume);
                 entrainmentplayer.play();
@@ -405,7 +386,6 @@ public class Player extends Stage {
         }
         toggleplayerbuttons();
         getScene().addEventHandler(KeyEvent.KEY_PRESSED, AmbienceSwitchWithKeyboard);
-        sessionItemsWithGoalsCompletedThisPlayback = new ArrayList<>();
     }
     private void resume() {
         volume_unbindentrainment();
@@ -470,7 +450,7 @@ public class Player extends Stage {
             volume_unbindentrainment();
             entrainmentplayer.dispose();
             entrainmentplayer = null;
-            entrainmentplayer = new MediaPlayer(new Media(SessionPartEntrainment.getFreq().getFile().toURI().toString()));
+            entrainmentplayer = new MediaPlayer(new Media(entrainments.getsessionpartEntrainment(SelectedPlaybackItem).getFreq().getFile().toURI().toString()));
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
             entrainmentplayer.setVolume(currententrainmentvolume);
@@ -486,7 +466,7 @@ public class Player extends Stage {
             volume_unbindambience();
             ambienceplayer.dispose();
             ambienceplayer = null;
-            currentambiencesoundfile = SessionPartAmbience.getnextambienceforplayback();
+            currentambiencesoundfile = SelectedPlaybackItem.getAmbience().getnextambienceforplayback();
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
@@ -549,8 +529,6 @@ public class Player extends Stage {
             switch (playerState) {
                 case TRANSITIONING:
                     try {
-                        if (! selectedPlaybackItem.getGoalsCompletedThisSession().isEmpty()) {
-                            sessionItemsWithGoalsCompletedThisPlayback.add(selectedPlaybackItem);}
                         cleanupPlayersandAnimations();
                         sessionitemindex++;
                         selectedPlaybackItem = allPlaybackItems.get(sessionitemindex);
@@ -619,7 +597,7 @@ public class Player extends Stage {
         updateuitimeline.setOnFinished(event -> reset(false));
         PlayButton.setText("Replay");
         playerState = STOPPED;
-        Sessions.add(SessionInProgress);
+        sessions.add(SessionInProgress);
         // TODO Prompt For Export
         updatesessionui();
         updategoalui();
@@ -632,7 +610,7 @@ public class Player extends Stage {
             pausewithoutanimation();
             updateuitimeline.pause();
             if (new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
-                Sessions.add(SessionInProgress);
+                sessions.add(SessionInProgress);
                 updatesessionui();
                 updategoalui();
                 reset(true);

@@ -106,7 +106,7 @@ public class Entrainments {
 
 // Other Methods
     public Entrainment getsessionpartEntrainment(Session.PlaybackItem sessionItem) {
-        switch (sessionItem.getAvailableambienceindex()) {
+        switch (sessionItem.getEntrainmentandavailableambienceindex()) {
             case 0: return Presession;
             case 1: return Rin;
             case 2: return Kyo;
@@ -127,7 +127,7 @@ public class Entrainments {
         return null;
     }
     public void setsessionpartEntrainment(Session.PlaybackItem sessionItem, Entrainment entrainment) {
-        switch (sessionItem.getAvailableambienceindex()) {
+        switch (sessionItem.getEntrainmentandavailableambienceindex()) {
             case 0: Presession = entrainment; break;
             case 1: Rin = entrainment; break;
             case 2: Kyo = entrainment; break;

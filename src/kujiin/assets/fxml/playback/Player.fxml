@@ -115,8 +115,8 @@
                               </Label>
                               <StackPane prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                                  <children>
-                                    <ProgressBar fx:id="SessionProgress" maxWidth="1.7976931348623157E308" progress="1.0" />
-                                    <Label fx:id="SessionProgressPercentage" text="100%">
+                                    <ProgressBar fx:id="SessionProgress" maxWidth="1.7976931348623157E308" progress="0.0" />
+                                    <Label fx:id="SessionProgressPercentage">
                                        <StackPane.margin>
                                           <Insets bottom="1.0" />
                                        </StackPane.margin>

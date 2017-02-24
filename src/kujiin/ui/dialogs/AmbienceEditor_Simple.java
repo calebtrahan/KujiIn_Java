@@ -90,11 +90,11 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
             setTitle("Simple Ambience Editor");
             setOnCloseRequest(event -> closedialog());
             setOnShowing(event -> {
-                SessionPartChoiceBox.getSelectionModel().select(playbackItem.getAvailableambienceindex());
+                SessionPartChoiceBox.getSelectionModel().select(playbackItem.getEntrainmentandavailableambienceindex());
                 selectandloadsessionpart();
             });
             SessionPartChoiceBox.setOnAction(event -> selectandloadsessionpart());
-            selectedplaybackitemambience = availableAmbiences.getsessionpartAmbience(playbackItem.getAvailableambienceindex());
+            selectedplaybackitemambience = availableAmbiences.getsessionpartAmbience(playbackItem.getEntrainmentandavailableambienceindex());
         } catch (IOException ignored) {}
     }
 
@@ -173,7 +173,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
     public void populateactualambiencetable() {
         AmbienceList.clear();
         if (selectedplaybackitem != null) {
-            PlaybackItemAmbience playbackItemAmbience = availableAmbiences.getsessionpartAmbience(selectedplaybackitem.getAvailableambienceindex());
+            PlaybackItemAmbience playbackItemAmbience = availableAmbiences.getsessionpartAmbience(selectedplaybackitem.getEntrainmentandavailableambienceindex());
             if (playbackItemAmbience.hasAny()) {
                 for (SoundFile i : playbackItemAmbience.getAmbience()) {
                     SoundList.add(i);
@@ -213,7 +213,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         } else {new AmbienceEditor_Advanced(availableAmbiences, preferences).show();}
     }
     public void save() {
-        availableAmbiences.setsessionpartAmbience(selectedplaybackitem.getAvailableambienceindex(), selectedplaybackitemambience);
+        availableAmbiences.setsessionpartAmbience(selectedplaybackitem.getEntrainmentandavailableambienceindex(), selectedplaybackitemambience);
         availableAmbiences.marshall();
         new InformationDialog(preferences, "Saved", selectedplaybackitem.getName() + "Ambience Saved", null);
     }

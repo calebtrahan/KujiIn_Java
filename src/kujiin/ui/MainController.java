@@ -445,7 +445,7 @@ public class MainController implements Initializable {
     }
     public void playcreatedsession() {
         if (createdsession != null) {
-            new Player(createdsession).showAndWait();
+            new Player(createdsession, sessions, Entrainments).showAndWait();
         }
     }
     public void exportcreatedsession() {

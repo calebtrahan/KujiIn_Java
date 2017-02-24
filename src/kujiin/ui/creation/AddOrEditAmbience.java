@@ -59,7 +59,7 @@ public class AddOrEditAmbience extends Stage {
             this.preferences = preferences;
             this.playbackItem = playbackItem;
             this.availableAmbiences = availableAmbiences;
-            playbackItemAmbience = availableAmbiences.getsessionpartAmbience(playbackItem.getAvailableambienceindex());
+            playbackItemAmbience = availableAmbiences.getsessionpartAmbience(playbackItem.getEntrainmentandavailableambienceindex());
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/AddOrEditAmbience.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());

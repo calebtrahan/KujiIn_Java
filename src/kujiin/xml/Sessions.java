@@ -82,7 +82,7 @@ public class Sessions {
             Duration totalduration = Duration.ZERO;
             for (kujiin.xml.Session i : getSession()) {
                 for (kujiin.xml.Session.PlaybackItem x : i.getPlaybackItems()) {
-                    if (x.getAvailableambienceindex() == playbackItem.getAvailableambienceindex()) {
+                    if (x.getEntrainmentandavailableambienceindex() == playbackItem.getEntrainmentandavailableambienceindex()) {
                         totalduration = totalduration.add(new Duration(x.getDuration()));
                     }
                     if (includeqigong && ! (playbackItem instanceof kujiin.xml.Session.QiGong) && x instanceof kujiin.xml.Session.QiGong) {
@@ -103,7 +103,7 @@ public class Sessions {
             int sessioncount = 0;
             for (kujiin.xml.Session i : getSession()) {
                 for (kujiin.xml.Session.PlaybackItem x : i.getPlaybackItems()) {
-                    if (x.getAvailableambienceindex() == playbackitem.getAvailableambienceindex() && x.getDuration() > 0.0) {sessioncount++; continue;}
+                    if (x.getEntrainmentandavailableambienceindex() == playbackitem.getEntrainmentandavailableambienceindex() && x.getDuration() > 0.0) {sessioncount++; continue;}
                     if (includeqigong && ! (playbackitem instanceof kujiin.xml.Session.QiGong) && x.getDuration() > 0.0) {sessioncount++;}
                 }
             }
