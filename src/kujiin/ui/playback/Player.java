@@ -25,13 +25,16 @@ import kujiin.util.enums.ReferenceType;
 import kujiin.xml.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
 import static kujiin.util.enums.PlayerState.*;
 
 public class Player extends Stage {
-    // UI Elements`
+    // UI Elements
+    public MenuBar TopMenuBar;
     public MenuItem ToggleFullScreenMenuItem;
     public MenuItem EnablePlaylistSelectionMenuItem;
     public MenuItem AboutMenuItem;
@@ -42,7 +45,8 @@ public class Player extends Stage {
     public TableColumn DurationColumn;
     public TableColumn PercentColumn;
     public Label SessionCurrentTime;
-    public Slider SessionProgress;
+    public ProgressBar SessionProgress;
+    public Label SessionProgressPercentage;
     public Label SessionTotalTime;
     public Slider EntrainmentVolume;
     public Label EntrainmentVolumePercentage;
@@ -199,7 +203,10 @@ public class Player extends Stage {
             } catch (NullPointerException ignored) {currentprogress = (float) 0;}
             if (sessionelapsedtime.greaterThan(Duration.ZERO)) {totalprogress = (float) sessionelapsedtime.toMillis() / (float) sessionduration.toMillis();}
             else {totalprogress = (float) 0.0;}
-            SessionProgress.setValue(totalprogress);
+            SessionProgress.setProgress(totalprogress * 100);
+            BigDecimal bd = new BigDecimal(totalprogress);
+            bd = bd.setScale(2, RoundingMode.HALF_UP);
+            SessionProgressPercentage.setText(bd.doubleValue() + "%");
 //            CurrentTopLabel.setText(selectedPlaybackItem.getName() + "(" + new Float(currentprogress * 100).intValue() + "%) [" + (allPlaybackItems.indexOf(selectedPlaybackItem) + 1)  + "/" + allPlaybackItems.size() + "]");
 //            SessionTopLabel.setText("SessionInProgress (" + new Float(totalprogress * 100).intValue() + "%)");
             String currentparttime;
@@ -595,7 +602,8 @@ public class Player extends Stage {
     public void reset(boolean endofsession) {
         if (endofsession) {PlayButton.setText("Replay");}
         else {PlayButton.setText("Start");}
-        SessionProgress.setValue(0.0);
+        SessionProgress.setProgress(0.0);
+        SessionProgressPercentage.setText("0.0%");
         SessionProgress.setDisable(true);
         EntrainmentVolume.setDisable(true);
         EntrainmentVolume.setValue(0.0);
