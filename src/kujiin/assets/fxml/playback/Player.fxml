@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<VBox prefHeight="414.0" prefWidth="640.0" stylesheets="@../../styles/default.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.ui.playback.Player">
+<VBox prefHeight="414.0" prefWidth="640.0" stylesheets="@../../styles/default.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <MenuBar fx:id="TopMenuBar">
         <menus>
@@ -84,11 +84,11 @@
                                           </Label>
                                        </children>
                                     </HBox>
-                                    <TableView fx:id="PlaylistTableView" maxWidth="250.0" minWidth="180.0" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="PlaylistTableView" maxWidth="260.0" minWidth="180.0" VBox.vgrow="ALWAYS">
                                       <columns>
                                         <TableColumn fx:id="NameColumn" maxWidth="95.0" minWidth="85.0" prefWidth="89.0" sortable="false" text="Name" />
-                                        <TableColumn fx:id="DurationColumn" maxWidth="114.0" minWidth="95.0" prefWidth="110.0" sortable="false" text="Duration" />
-                                          <TableColumn fx:id="PercentColumn" maxWidth="60.0" minWidth="51.0" prefWidth="51.0" sortable="false" text="\%" />
+                                        <TableColumn fx:id="DurationColumn" maxWidth="100.0" minWidth="95.0" prefWidth="110.0" sortable="false" text="Duration" />
+                                          <TableColumn fx:id="PercentColumn" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" sortable="false" text="\%" />
                                       </columns>
                                     </TableView>
                                  </children>
@@ -136,9 +136,9 @@
                            <children>
                               <HBox minWidth="210.0" prefHeight="25.0">
                                  <children>
-                                    <Button fx:id="PlayButton" mnemonicParsing="false" text="Play" />
-                                    <Button fx:id="PauseButton" mnemonicParsing="false" text="Pause" />
-                                    <Button fx:id="StopButton" mnemonicParsing="false" text="Stop" />
+                                    <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#playbuttonpressed" text="Play" />
+                                    <Button fx:id="PauseButton" mnemonicParsing="false" onAction="#pausebuttonpressed" text="Pause" />
+                                    <Button fx:id="StopButton" mnemonicParsing="false" onAction="#stopbuttonpressed" text="Stop" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" minWidth="350.0" HBox.hgrow="ALWAYS">

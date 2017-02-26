@@ -4,9 +4,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class PlaylistTableItem {
-    StringProperty itemname;
-    StringProperty duration;
-    StringProperty percentcompleted;
+    public StringProperty itemname;
+    public StringProperty duration;
+    public StringProperty percentcompleted;
 
     public PlaylistTableItem(String itemname, String duration, String percentcompleted) {
         this.itemname = new SimpleStringProperty(itemname);

@@ -107,39 +107,34 @@ public class Player extends Stage {
         }
     };
 
-    public Player(Session sessionInProgress, Sessions sessions, Entrainments entrainments) {
+    public Player(Preferences preferences, Sessions sessions, Entrainments entrainments, Session sessiontoplay) {
         try {
-            SessionTemplate = sessionInProgress;
+            Preferences = preferences;
+            SessionTemplate = sessiontoplay;
+            SessionInProgress = SessionTemplate;
             this.entrainments = entrainments;
+            System.out.println("Entrainments Is Null: " + Boolean.toString(entrainments == null));
             this.sessions = sessions;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/playback/Player.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            setTitle("Simple Ambience Editor");
+            setTitle("Session Player");
+            updateplaylist();
+            NameColumn.setCellValueFactory(cellData -> cellData.getValue().itemname);
+            DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().duration);
+            PercentColumn.setCellValueFactory(cellDate -> cellDate.getValue().percentcompleted);
             PlaylistTableView.setSelectionModel(null);
+            playerState = IDLE;
+            setupTooltips();
             setOnCloseRequest(event -> closedialog());
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {ignored.printStackTrace();}
     }
     public void setupTooltips() {
-        if (Preferences.getUserInterfaceOptions().getTooltips()) {
-//            CurrentTopLabel.setTooltip(new Tooltip("Current SessionInProgress Part Playing"));
-//            CurrentProgressDetails.setTooltip(new Tooltip("Current SessionInProgress Part Progress"));
-//            CurrentProgressDetails.setTooltip(new Tooltip("Detailed Current SessionInProgress Part Progress"));
-//            EntrainmentVolume.setTooltip(new Tooltip("Current Entrainment Volume"));
-//            EntrainmentVolumeTopLabel.setTooltip(new Tooltip("Entrainment Volume"));
-//            EntrainmentVolumePercentage.setTooltip(new Tooltip("Current Entrainment Volume Percentage"));
-//            AmbienceVolume.setTooltip(new Tooltip("Current Ambience Volume"));
-//            AmbienceVolumeTopLabel.setTooltip(new Tooltip("Ambience Volume"));
-//            AmbienceVolumePercentage.setTooltip(new Tooltip("Current Ambience Volume Percentage"));
-//            TotalProgress.setTooltip(new Tooltip("Total SessionInProgress Progress"));
-//            TotalProgressDetails.setTooltip(new Tooltip("Detailed Total SessionInProgress Progress"));
-//            ReferenceToggleCheckBox.setTooltip(new Tooltip("Display Reference During SessionInProgress Playback"));
-        }
     }
 
 // UI Methods
-    private void playbuttonpressed() {
+    public void playbuttonpressed() {
         switch (playerState) {
             case IDLE:
             case STOPPED:
@@ -160,13 +155,13 @@ public class Player extends Stage {
                 break;
         }
     }
-    private void pausebuttonpressed() {
+    public void pausebuttonpressed() {
         if (playerState == PLAYING) {
             pause();
             updateuitimeline.pause();
         }
     }
-    private void stopbuttonpressed() {
+    public void stopbuttonpressed() {
         if (playerState == PLAYING || playerState == PAUSED) {
             if (new ConfirmationDialog(Preferences, "Stop Session", "Really Stop Session?", "Session Will Be Stopped And Cannot Be Resumed",
                     "Stop Session", "Cancel").getResult()) {
@@ -177,6 +172,16 @@ public class Player extends Stage {
     }
     private void ReferenceToggleCheckboxtoggled() {}
     private void referencetypechanged() {}
+    private void updateplaylist() {
+        PlaylistTableView.getItems().clear();
+        ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
+        for (Session.PlaybackItem i : SessionInProgress.getPlaybackItems()) {
+            float totalprogress = (float) i.getElapsedTime() / (float) i.getDuration();
+            int percentage = new Double(totalprogress * 100).intValue();
+            playlistitems.add(new PlaylistTableItem(i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getDuration())), percentage + "%"));
+        }
+        PlaylistTableView.setItems(playlistitems);
+    }
 
 // Playback
     // UI Update
@@ -185,15 +190,7 @@ public class Player extends Stage {
             try {
                 SelectedPlaybackItem.addelapsedtime(updateuifrequency);
                 SessionInProgress.addelapsedtime(updateuifrequency);
-            // Update Playlist
-                PlaylistTableView.getItems().clear();
-                ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
-                for (Session.PlaybackItem i : SessionInProgress.getPlaybackItems()) {
-                    float totalprogress = (float) i.getElapsedTime() / (float) i.getDuration();
-                    int percentage = new Double(totalprogress * 100).intValue();
-                    playlistitems.add(new PlaylistTableItem(i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getElapsedTime())), percentage + "%"));
-                }
-                PlaylistTableView.setItems(playlistitems);
+                updateplaylist();
             // Update Total Progress
                 SessionCurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(SessionInProgress.getElapsedTime())));
                 Float totalprogress;
@@ -303,6 +300,7 @@ public class Player extends Stage {
     }
     // Playback Methods
     private void start() {
+        SelectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
         SessionInProgress.setElapsedtime(Duration.ZERO);
         SelectedPlaybackItem.setElapsedtime(Duration.ZERO);
         setupfadeanimations();
@@ -353,10 +351,6 @@ public class Player extends Stage {
             String percentage = new Double(currententrainmentvolume * 100).intValue() + "%";
             EntrainmentVolumePercentage.setText(percentage);
             playerState = kujiin.util.enums.PlayerState.PLAYING;
-//            if (referencecurrentlyDisplayed()) {
-//                displayReference.EntrainmentVolumeSlider.setValue(currententrainmentvolume);
-//                displayReference.EntrainmentVolumePercentage.setText(percentage);
-//            }
             volume_bindentrainment();
         }
         if (selectedPlaybackItem.getAmbience().isEnabled()) {
@@ -526,7 +520,9 @@ public class Player extends Stage {
                 case TRANSITIONING:
                     try {
                         cleanupPlayersandAnimations();
-                        selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(SelectedPlaybackItem) + 1);
+                        int index = SessionInProgress.getPlaybackItems().indexOf(SelectedPlaybackItem) + 1;
+                        selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(index);
+                        PlaylistTableView.getSelectionModel().select(index);
                         start();
                         displayreferencefile();
                     } catch (IndexOutOfBoundsException ignored) {

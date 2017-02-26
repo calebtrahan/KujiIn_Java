@@ -445,7 +445,12 @@ public class MainController implements Initializable {
     }
     public void playcreatedsession() {
         if (createdsession != null) {
-            new Player(createdsession, sessions, Entrainments).showAndWait();
+            getStage().setIconified(true);
+            Player player = new Player(preferences, sessions, Entrainments, createdsession);
+            player.initModality(Modality.APPLICATION_MODAL);
+            player.initOwner(getStage());
+            player.showAndWait();
+            getStage().setIconified(false);
         }
     }
     public void exportcreatedsession() {
