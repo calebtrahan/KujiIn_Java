@@ -16,6 +16,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.dialogs.SessionDetails;
@@ -27,6 +29,9 @@ import kujiin.util.enums.PlayerState;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.*;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -40,7 +45,8 @@ public class Player extends Stage {
     public MenuItem EnablePlaylistSelectionMenuItem;
     public MenuItem AboutMenuItem;
     public CheckBox ReferenceToggleCheckBox;
-    public ChoiceBox ReferenceTypeChoiceBox;
+    public ChoiceBox<String> ReferenceTypeChoiceBox;
+    public ScrollPane ReferenceContentPane;
     public TableView<PlaylistTableItem> PlaylistTableView;
     public TableColumn<PlaylistTableItem, String> NameColumn;
     public TableColumn<PlaylistTableItem, String> DurationColumn;
@@ -128,6 +134,7 @@ public class Player extends Stage {
             playerState = IDLE;
             setupTooltips();
             setOnCloseRequest(event -> closedialog());
+            ReferenceTypeChoiceBox.setOnAction(event -> referencetypechanged());
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
     public void setupTooltips() {
@@ -170,8 +177,63 @@ public class Player extends Stage {
             }
         }
     }
-    private void ReferenceToggleCheckboxtoggled() {}
-    private void referencetypechanged() {}
+    public void ReferenceToggleCheckboxtoggled() {
+        if (ReferenceToggleCheckBox.isSelected()) {
+            if (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() == -1) {
+                switch (Preferences.getSessionOptions().getReferencetype()) {
+                    case html:
+                        ReferenceTypeChoiceBox.getSelectionModel().select(0);
+                        break;
+                    case txt:
+                        ReferenceTypeChoiceBox.getSelectionModel().select(1);
+                        break;
+                    default:
+                        ReferenceTypeChoiceBox.getSelectionModel().select(0);
+                        break;
+                }
+            }
+            referencetypechanged();
+        } else {loadreference();}
+    }
+    public void referencetypechanged() {
+        int index = ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex();
+        switch (index) {
+            case 0: referenceType = ReferenceType.html; break;
+            case 1: referenceType = ReferenceType.txt; break;
+        }
+        loadreference();
+    }
+    private void loadreference() {
+        try {
+            File referencefile = SelectedPlaybackItem.getReferenceFile(referenceType);
+            if (referencefile != null) {
+                switch (referenceType) {
+                    case txt:
+                        StringBuilder sb = new StringBuilder();
+                        try (FileInputStream fis = new FileInputStream(referencefile); BufferedInputStream bis = new BufferedInputStream(fis)) {
+                            while (bis.available() > 0) {
+                                sb.append((char) bis.read());
+                            }
+                        } catch (Exception ignored) {
+                        }
+                        TextArea ta = new TextArea();
+                        ta.setText(sb.toString());
+                        ta.setWrapText(true);
+                        ReferenceContentPane.setContent(ta);
+                        break;
+                    case html:
+                        WebView browser = new WebView();
+                        WebEngine webEngine = browser.getEngine();
+                        webEngine.load(referencefile.toURI().toString());
+                        webEngine.setUserStyleSheetLocation(kujiin.xml.Preferences.REFERENCE_THEMEFILE.toURI().toString());
+                        ReferenceContentPane.setContent(browser);
+                        break;
+                    default:
+                        break;
+                }
+            } else {ReferenceContentPane.setContent(new TextArea("Reference File Is Empty Or Missing"));}
+        } catch (NullPointerException ignored) {ReferenceContentPane.setContent(new TextArea("No Session Playing"));}
+    }
     private void updateplaylist() {
         PlaylistTableView.getItems().clear();
         ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
