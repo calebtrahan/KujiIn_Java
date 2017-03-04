@@ -127,7 +127,7 @@ public class Session {
         private double Duration; // As Millis
         private boolean RampOnly;
         private Ambience ambience;
-        private Entrainment entrainment;
+        private PlaybackItemEntrainment playbackItemEntrainment;
         @XmlTransient
         private Duration elapsedtime;
         @XmlTransient
@@ -219,10 +219,10 @@ public class Session {
 //                try {
 //                    int index = allsessionpartstoplay.indexOf(this);
 //                    SessionItem partafter = allsessionpartstoplay.get(index + 1);
-//                    if ((partafter instanceof Qi_Gong || partafter instanceof Element) && ! name.equals("ZEN")) {entrainment.setRampfile(entrainment.ramp_get(1));}
-//                    else {entrainment.setRampfile(entrainment.ramp_get(0));}
-//                    if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
-//                    return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+//                    if ((partafter instanceof Qi_Gong || partafter instanceof Element) && ! name.equals("ZEN")) {playbackItemEntrainment.setRampfile(playbackItemEntrainment.ramp_get(1));}
+//                    else {playbackItemEntrainment.setRampfile(playbackItemEntrainment.ramp_get(0));}
+//                    if (ramponly) {setDuration(Duration.millis(playbackItemEntrainment.getRampfile().getDuration()));}
+//                    return super.creation_buildEntrainment() && playbackItemEntrainment.getRampfile().isValid();
 //                } catch (IndexOutOfBoundsException ignored) {return false;}
 //            }
 //            return super.creation_buildEntrainment();
@@ -238,11 +238,11 @@ public class Session {
 //            File file;
 //            switch (startupchecks_entrainment_count) {
 //                case 0:
-//                    soundFile = entrainment.getFreq();
+//                    soundFile = playbackItemEntrainment.getFreq();
 //                    file = new File(Preferences.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
 //                    break;
 //                case 1:
-//                    soundFile = entrainment.ramp_get(0);
+//                    soundFile = playbackItemEntrainment.ramp_get(0);
 //                    if (index != 9) {
 //                        file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
 //                                root.getSessionPart_Names(1, 10).get(root.getSessionPart_Names(1, 10).indexOf(name) + 1).toLowerCase() + ".mp3");
@@ -251,7 +251,7 @@ public class Session {
 //                case 2:
 //                    if (index == 9) {startupCheckType = StartupCheckType.AMBIENCE; throw new IndexOutOfBoundsException();}
 //                    else {
-//                        soundFile = entrainment.ramp_get(1);
+//                        soundFile = playbackItemEntrainment.ramp_get(1);
 //                        file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");
 //                        break;
 //                    }
@@ -294,7 +294,7 @@ public class Session {
                     "Mantra Meaning: " + mantrameaning + "\n" +
                     "Side Effects: " + sideeffects + "\n";
         }
-//        // Entrainment
+//        // PlaybackItemEntrainment
 //        @Override
 //        public int startup_entrainmentpartcount() {
 //            if (number == 9) {return 2;}
@@ -306,11 +306,11 @@ public class Session {
 //            File file;
 //            switch (startupchecks_entrainment_count) {
 //                case 0:
-//                    soundFile = entrainment.getFreq();
+//                    soundFile = playbackItemEntrainment.getFreq();
 //                    file = new File(Preferences.DIRECTORYENTRAINMENT, getNameForFiles().toUpperCase() + ".mp3");
 //                    break;
 //                case 1:
-//                    soundFile = entrainment.ramp_get(0);
+//                    soundFile = playbackItemEntrainment.ramp_get(0);
 //                    if (number != 9) {
 //                        file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "to" +
 //                                root.getSessionPart_Names(1, 10).get(root.getSessionPart_Names(1, 10).indexOf(name) + 1).toLowerCase() + ".mp3");
@@ -319,7 +319,7 @@ public class Session {
 //                case 2:
 //                    if (number == 9) {startupCheckType = StartupCheckType.AMBIENCE; throw new IndexOutOfBoundsException();}
 //                    else {
-//                        soundFile = entrainment.ramp_get(1);
+//                        soundFile = playbackItemEntrainment.ramp_get(1);
 //                        file = new File(Preferences.DIRECTORYENTRAINMENT, "ramp/" + getNameForFiles() + "toqi.mp3");
 //                        break;
 //                    }
@@ -337,10 +337,10 @@ public class Session {
 //                try {
 //                    int index = allsessionpartstoplay.indexOf(this);
 //                    SessionPart partafter = allsessionpartstoplay.get(index + 1);
-//                    if ((partafter instanceof Qi_Gong || partafter instanceof kujiin.util.Element) && ! name.equals("ZEN")) {entrainment.setRampfile(entrainment.ramp_get(1));}
-//                    else {entrainment.setRampfile(entrainment.ramp_get(0));}
-//                    if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
-//                    return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+//                    if ((partafter instanceof Qi_Gong || partafter instanceof kujiin.util.Element) && ! name.equals("ZEN")) {playbackItemEntrainment.setRampfile(playbackItemEntrainment.ramp_get(1));}
+//                    else {playbackItemEntrainment.setRampfile(playbackItemEntrainment.ramp_get(0));}
+//                    if (ramponly) {setDuration(Duration.millis(playbackItemEntrainment.getRampfile().getDuration()));}
+//                    return super.creation_buildEntrainment() && playbackItemEntrainment.getRampfile().isValid();
 //                } catch (IndexOutOfBoundsException ignored) {return false;}
 //            }
 //            return super.creation_buildEntrainment();
@@ -360,7 +360,7 @@ public class Session {
 //        @Override
 //        public String getNameForFiles() {return "qi";}
 //
-//        // Entrainment
+//        // PlaybackItemEntrainment
 //        @Override
 //        public int startup_entrainmentpartcount() {
 //            return 10;
@@ -374,11 +374,11 @@ public class Session {
 //                    int index = allsessionpartstoplay.indexOf(this);
 //                    SessionPart parttotest = allsessionpartstoplay.get(index + 1);
 //                    SoundFile rampfile;
-//                    if (parttotest instanceof Qi_Gong || parttotest instanceof kujiin.util.Element) {rampfile = entrainment.getFreq();}
-//                    else {rampfile = entrainment.ramp_get(Preferences.CUTNAMES.indexOf(parttotest.name.toUpperCase()));}
-//                    entrainment.setRampfile(rampfile);
-//                    if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
-//                    return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+//                    if (parttotest instanceof Qi_Gong || parttotest instanceof kujiin.util.Element) {rampfile = playbackItemEntrainment.getFreq();}
+//                    else {rampfile = playbackItemEntrainment.ramp_get(Preferences.CUTNAMES.indexOf(parttotest.name.toUpperCase()));}
+//                    playbackItemEntrainment.setRampfile(rampfile);
+//                    if (ramponly) {setDuration(Duration.millis(playbackItemEntrainment.getRampfile().getDuration()));}
+//                    return super.creation_buildEntrainment() && playbackItemEntrainment.getRampfile().isValid();
 //                } catch (IndexOutOfBoundsException ignored) {return super.creation_buildEntrainment();}
 //            } else {return super.creation_buildEntrainment();}
 //        }
@@ -428,11 +428,11 @@ public class Session {
 //                        parttotest = null;
 //                }
 //                SoundFile rampfile;
-//                if (parttotest instanceof Qi_Gong || parttotest instanceof Element) {rampfile = entrainment.getFreq();}
-//                else {rampfile = entrainment.ramp_get(Preferences.ALLNAMES.indexOf(parttotest.name.toUpperCase()) - 1);}
-//                entrainment.setRampfile(rampfile);
-//                if (ramponly) {setDuration(Duration.millis(entrainment.getRampfile().getDuration()));}
-//                return super.creation_buildEntrainment() && entrainment.getRampfile().isValid();
+//                if (parttotest instanceof Qi_Gong || parttotest instanceof Element) {rampfile = playbackItemEntrainment.getFreq();}
+//                else {rampfile = playbackItemEntrainment.ramp_get(Preferences.ALLNAMES.indexOf(parttotest.name.toUpperCase()) - 1);}
+//                playbackItemEntrainment.setRampfile(rampfile);
+//                if (ramponly) {setDuration(Duration.millis(playbackItemEntrainment.getRampfile().getDuration()));}
+//                return super.creation_buildEntrainment() && playbackItemEntrainment.getRampfile().isValid();
 //            } else {return super.creation_buildEntrainment();}
 //        }
     }

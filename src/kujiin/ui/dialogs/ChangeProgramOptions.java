@@ -165,7 +165,7 @@ public class ChangeProgramOptions extends Stage {
 //        RampSwitch.setTooltip(new Tooltip("Enable A Ramp In Between Session Parts To Smooth Mental Transition"));
 //        FadeInValue.setTooltip(new Tooltip("Seconds To Fade In Audio Into Session Part"));
 //        FadeOutValue.setTooltip(new Tooltip("Seconds To Fade Out Audio Out Of Session Part"));
-//        EntrainmentVolumePercentage.setTooltip(new Tooltip("Default Volume Percentage For Entrainment (Changeable In Session)"));
+//        EntrainmentVolumePercentage.setTooltip(new Tooltip("Default Volume Percentage For PlaybackItemEntrainment (Changeable In Session)"));
 //        AmbienceVolumePercentage.setTooltip(new Tooltip("Default Volume Percentage For Ambience (Changeable In Session)"));
 //        DeleteAllGoalsButton.setTooltip(new Tooltip("Delete ALL Goals Past, Present And Completed (This CANNOT Be Undone)"));
 //        DeleteAllSessionsProgressButton.setTooltip((new Tooltip("Delete ALL Sessions Past, Present And Completed (This CANNOT Be Undone)")));
@@ -392,7 +392,7 @@ public class ChangeProgramOptions extends Stage {
         descriptionitems.add(new ItemWithDescription("Resume Fade Animation", "Seconds To Fade In From Silent Into Playback When Resuming"));
         descriptionitems.add(new ItemWithDescription("Pause Fade Animation", "Enable/Disable Fade Out Audio When When Pausing"));
         descriptionitems.add(new ItemWithDescription("Pause Fade Animation", "Seconds To Fade Out To Silent From Playback Playback When Pausing"));
-        descriptionitems.add(new ItemWithDescription("Entrainment Volume", "Default Volume Percentage For Entrainment\n(Can Be Adjusted In Session)"));
+        descriptionitems.add(new ItemWithDescription("PlaybackItemEntrainment Volume", "Default Volume Percentage For PlaybackItemEntrainment\n(Can Be Adjusted In Session)"));
         descriptionitems.add(new ItemWithDescription("Ambience Volume", "Default Volume Percentage For Ambience\n(Can Be Adjusted In Session)"));
         descriptionitems.add(new ItemWithDescription("Ambience Editor Default", "The Default Ambience Editor To Open When Adding/Editing Ambiences"));
         descriptionitems.add(new ItemWithDescription("Delete Session Button", "This Button Will Permanently Delete All Session Progress And Reset All Cut/Elements Progress"));

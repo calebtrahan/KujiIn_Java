@@ -37,7 +37,7 @@
                                  <children>
                                     <HBox alignment="CENTER" maxHeight="25.0" minHeight="25.0">
                                        <children>
-                                          <CheckBox fx:id="ReferenceToggleCheckBox" mnemonicParsing="false" text="Display Reference" textAlignment="CENTER" />
+                                          <CheckBox fx:id="ReferenceToggleCheckBox" mnemonicParsing="false" onAction="#ReferenceToggleCheckboxtoggled" text="Display Reference" textAlignment="CENTER" />
                                           <Label text="Type:">
                                              <HBox.margin>
                                                 <Insets left="20.0" />

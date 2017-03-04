@@ -63,7 +63,7 @@ public class MainController implements Initializable {
 // Controller Classes
     private Preferences preferences;
     private AvailableAmbiences availableAmbiences;
-    private Entrainments Entrainments;
+    private AvailableEntrainments AvailableEntrainments;
     private Sessions sessions;
     private FavoriteSessions favoriteSessions;
     private Goals goals;
@@ -186,6 +186,15 @@ public class MainController implements Initializable {
     public void setAvailableAmbiences(AvailableAmbiences availableAmbiences) {
         this.availableAmbiences = availableAmbiences;
     }
+    public AvailableAmbiences getAvailableAmbiences() {
+        return availableAmbiences;
+    }
+    public kujiin.xml.AvailableEntrainments getAvailableEntrainments() {
+        return AvailableEntrainments;
+    }
+    public void setAvailableEntrainments(kujiin.xml.AvailableEntrainments availableEntrainments) {
+        AvailableEntrainments = availableEntrainments;
+    }
     public void setSessions(Sessions sessions) {
         this.sessions = sessions;
     }
@@ -197,7 +206,7 @@ public class MainController implements Initializable {
 // Window Methods
     private boolean cleanup() {
     availableAmbiences.marshall();
-    Entrainments.marshall();
+    AvailableEntrainments.marshall();
     preferences.marshall();
     return true;
 }
@@ -446,7 +455,7 @@ public class MainController implements Initializable {
     public void playcreatedsession() {
         if (createdsession != null) {
             getStage().setIconified(true);
-            Player player = new Player(preferences, sessions, Entrainments, createdsession);
+            Player player = new Player(preferences, sessions, AvailableEntrainments, createdsession);
             player.initModality(Modality.APPLICATION_MODAL);
             player.initOwner(getStage());
             player.showAndWait();
@@ -533,101 +542,7 @@ public class MainController implements Initializable {
 ////        Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Startup Checks Completed", 3000);
 //    }
 //    class StartupChecks extends Task {
-//        private SessionItem selectedsessionpart;
-//        private List<SessionItem> sessionItemList;
-//        private int sessionpartcount = 0;
-//        private MediaPlayer startupcheckplayer;
-//        private ArrayList<SessionItem> partswithnoambience = new ArrayList<>();
-//        private ArrayList<SessionItem> partswithmissingentrainment = new ArrayList<>();
-//        private boolean firstcall = true;
-//        private final double[] workcount = {0, 0};
-//        private boolean progresstonextsessionpart = true;
-//
-//        public StartupChecks(List<SessionItem> allsessionparts) {
-//            sessionItemList = allsessionparts;
-//        }
-//
-//    // Getters And Setters
-//        public ArrayList<SessionItem> getPartswithmissingentrainment() {
-//            return partswithmissingentrainment;
-//        }
-//
-//    // Method Overrides
-//        @Override
-//        protected Object call() throws Exception {
-//            if (firstcall) {CreatorStatusBar.textProperty().bind(messageProperty()); calculatetotalworktodo(); firstcall = false;}
-//            if (progresstonextsessionpart) {
-//                try {
-//                    if (selectedsessionpart == null) {selectedsessionpart = sessionItemList.get(sessionpartcount);}
-//                } catch (IndexOutOfBoundsException e) {
-//                    // End Of Startup Checks
-//                    CreatorStatusBar.textProperty().unbind();
-//                    Entrainments.marshall();
-//                    availableAmbiences.marshall();
-//                    startupchecks_finished();
-//                    return null;
-//                }
-//            }
-//            SoundFile soundFile;
-//            try {soundFile = selectedsessionpart.startup_getNext();}
-//            catch (IndexOutOfBoundsException ignored) {
-//                Entrainments.setsessionpartEntrainment(selectedsessionpart, selectedsessionpart.getEntrainment());
-//                if (! selectedsessionpart.getAmbience_hasAny() && ! partswithnoambience.contains(selectedsessionpart)) {partswithnoambience.add(selectedsessionpart);}
-//                else { availableAmbiences.setsessionpartAmbience(selectedsessionpart, selectedsessionpart.getAmbience());}
-//                sessionpartcount++;
-//                selectedsessionpart = null;
-//                try {call();} catch (Exception ign) {ignored.printStackTrace();}
-//                return null;
-//            }
-//            if (! soundFile.isValid()) {
-//                startupcheckplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
-//                startupcheckplayer.setOnReady(() -> {
-//                    if (startupcheckplayer.getTotalDuration().greaterThan(Duration.ZERO)) {
-//                        soundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
-//                        startupcheckplayer.dispose();
-//                        startupcheckplayer = null;
-//                        if (selectedsessionpart.getStartupCheckType() == StartupCheckType.ENTRAINMENT) {
-//                            selectedsessionpart.startup_setEntrainmentSoundFile(soundFile);
-//                            selectedsessionpart.startup_incremententrainmentcount();
-//                        } else if (selectedsessionpart.getStartupCheckType() == StartupCheckType.AMBIENCE) {
-//                            selectedsessionpart.startup_setAmbienceSoundFile(soundFile);
-//                            selectedsessionpart.startup_incrementambiencecount();
-//                        }
-//                        workcount[0]++;
-//                        updateProgress(workcount[0], workcount[1]);
-//                        updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
-//                        progresstonextsessionpart = true;
-//                        try {call();} catch (Exception ignored) {ignored.printStackTrace();}
-//                    } else {
-//                        progresstonextsessionpart = false;
-//                        startupcheckplayer.dispose();
-//                        startupcheckplayer = null;
-//                        try {call();} catch (Exception ignored) {ignored.printStackTrace();}
-//                    }
-//                });
-//            } else {
-//                if (selectedsessionpart.getStartupCheckType() == StartupCheckType.ENTRAINMENT) {
-//                    selectedsessionpart.startup_incremententrainmentcount();
-//                } else if (selectedsessionpart.getStartupCheckType() == StartupCheckType.AMBIENCE) {
-//                    selectedsessionpart.startup_incrementambiencecount();
-//                }
-//                progresstonextsessionpart = true;
-//                workcount[0]++;
-//                updateProgress(workcount[0], workcount[1]);
-//                updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
-//                try {call();} catch (Exception ignored) {ignored.printStackTrace();}}
-//            return null;
-//        }
-//        protected void calculatetotalworktodo() {
-//            for (SessionItem i : sessionItemList) {
-//                workcount[1] += i.startup_entrainmentpartcount();
-//                if (i.getAmbience().hasAnyAmbience()) {
-//                    workcount[1] += i.getAmbience().getAvailableAmbience().size();
-//                }
-//            }
-//        }
-//
-//    }
+
 
 /////////////////////// STARTUP CHECKS END ////////////////////////////////
 

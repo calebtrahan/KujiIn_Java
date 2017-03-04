@@ -2,17 +2,22 @@ package kujiin.xml;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Entrainment {
+public class PlaybackItemEntrainment {
     private SoundFile freq;
     private SoundFile rampfile;
     private List<SoundFile> rampfiles;
+    @XmlTransient
+    private BlockingQueue<SoundFile> EntrainmentFilesToCheck;
 
-    public Entrainment() {
+    public PlaybackItemEntrainment() {
     }
 
     public void set(SoundFile soundFile) {
@@ -27,6 +32,7 @@ public class Entrainment {
     }
 
 // Getters And Setters
+    public List<SoundFile> getAllEntrainmentFiles() {return Arrays.asList(freq);}
     public SoundFile getFreq() {
         return freq;
     }

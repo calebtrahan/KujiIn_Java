@@ -15,8 +15,8 @@ public class Exporter {
         //                @Override
         //                protected Boolean call() throws Exception {
         //                    updateTitle("Building " + name);
-        //                    System.out.println("Concatenating Entrainment For " + name);
-        //                    updateMessage("Concatenating Entrainment Files");
+        //                    System.out.println("Concatenating PlaybackItemEntrainment For " + name);
+        //                    updateMessage("Concatenating PlaybackItemEntrainment Files");
         //                    Util.audio_concatenatefiles(entrainmentlist, tempentrainmenttextfile, finalentrainmentfile);
         //                    if (isCancelled()) return false;
         //                    if (ambienceenabled) {
@@ -35,7 +35,7 @@ public class Exporter {
         ////                            if (isCancelled()) return false;
         //                        updateProgress(0.75, 1.0);
         //                        System.out.println("Mixing Final Audio For " + name);
-        //                        updateMessage("Combining Entrainment And Ambience Files");
+        //                        updateMessage("Combining PlaybackItemEntrainment And Ambience Files");
         //                        mixentrainmentandambience();
         //                        if (isCancelled()) return false;
         //                        updateProgress(1.0, 1.0);
@@ -63,7 +63,7 @@ public class Exporter {
     }
     public Boolean sessionreadyforFinalExport() {
 //        boolean cutisgood;
-//        File entrainmentfile = new File(Preferences.DIRECTORYTEMP, "Entrainment/" + name + ".mp3");
+//        File entrainmentfile = new File(Preferences.DIRECTORYTEMP, "PlaybackItemEntrainment/" + name + ".mp3");
 //        cutisgood = entrainmentfile.exists();
 //        if (ambienceenabled) {
 //            File ambiencefile = new File(Preferences.DIRECTORYTEMP, "Ambience/" + name + ".mp3");

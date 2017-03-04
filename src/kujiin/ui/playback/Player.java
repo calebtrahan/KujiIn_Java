@@ -87,7 +87,7 @@ public class Player extends Stage {
     private Session SessionInProgress;
     private Session.PlaybackItem selectedPlaybackItem;
     private Goals Goals;
-    private Entrainments entrainments;
+    private AvailableEntrainments availableEntrainments;
     private Sessions sessions;
     private PlayerState playerState;
     private Preferences Preferences;
@@ -113,13 +113,13 @@ public class Player extends Stage {
         }
     };
 
-    public Player(Preferences preferences, Sessions sessions, Entrainments entrainments, Session sessiontoplay) {
+    public Player(Preferences preferences, Sessions sessions, AvailableEntrainments availableEntrainments, Session sessiontoplay) {
         try {
             Preferences = preferences;
             SessionTemplate = sessiontoplay;
             SessionInProgress = SessionTemplate;
-            this.entrainments = entrainments;
-            System.out.println("Entrainments Is Null: " + Boolean.toString(entrainments == null));
+            this.availableEntrainments = availableEntrainments;
+            System.out.println("AvailableEntrainments Is Null: " + Boolean.toString(availableEntrainments == null));
             this.sessions = sessions;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/playback/Player.fxml"));
             fxmlLoader.setController(this);
@@ -214,8 +214,7 @@ public class Player extends Stage {
                             while (bis.available() > 0) {
                                 sb.append((char) bis.read());
                             }
-                        } catch (Exception ignored) {
-                        }
+                        } catch (Exception ignored) {}
                         TextArea ta = new TextArea();
                         ta.setText(sb.toString());
                         ta.setWrapText(true);
@@ -367,9 +366,9 @@ public class Player extends Stage {
         SelectedPlaybackItem.setElapsedtime(Duration.ZERO);
         setupfadeanimations();
         volume_unbindentrainment();
-        Entrainment entrainment = entrainments.getsessionpartEntrainment(SelectedPlaybackItem);
-        if (! selectedPlaybackItem.isRampOnly() || selectedPlaybackItem.getPlaybackindex() == SessionInProgress.getPlaybackItems().size() - 1) {entrainmentplayer = new MediaPlayer(new Media(entrainment.getFreq().getFile().toURI().toString()));}
-        else {entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampfile().getFile().toURI().toString()));}
+        PlaybackItemEntrainment playbackItemEntrainment = availableEntrainments.getsessionpartEntrainment(SelectedPlaybackItem);
+        if (! selectedPlaybackItem.isRampOnly() || selectedPlaybackItem.getPlaybackindex() == SessionInProgress.getPlaybackItems().size() - 1) {entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getFreq().getFile().toURI().toString()));}
+        else {entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getRampfile().getFile().toURI().toString()));}
         entrainmentplayer.setVolume(0.0);
         if (! selectedPlaybackItem.isRampOnly()) {entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);}
         entrainmentplayer.setOnError(this::entrainmenterror);
@@ -378,11 +377,11 @@ public class Player extends Stage {
         timeline_progresstonextsessionpart.play();
         boolean isLastSessionPart = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) == SessionInProgress.getPlaybackItems().size() - 1;
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
-            timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getDuration()).subtract(Duration.millis(entrainment.getRampfile().getDuration())), ae -> {
+            timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getDuration()).subtract(Duration.millis(playbackItemEntrainment.getRampfile().getDuration())), ae -> {
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
-                entrainmentplayer = new MediaPlayer(new Media(entrainment.getRampfile().getFile().toURI().toString()));
+                entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getRampfile().getFile().toURI().toString()));
                 entrainmentplayer.setOnError(this::entrainmenterror);
                 entrainmentplayer.setVolume(currententrainmentvolume);
                 entrainmentplayer.play();
@@ -502,7 +501,7 @@ public class Player extends Stage {
             volume_unbindentrainment();
             entrainmentplayer.dispose();
             entrainmentplayer = null;
-            entrainmentplayer = new MediaPlayer(new Media(entrainments.getsessionpartEntrainment(SelectedPlaybackItem).getFreq().getFile().toURI().toString()));
+            entrainmentplayer = new MediaPlayer(new Media(availableEntrainments.getsessionpartEntrainment(SelectedPlaybackItem).getFreq().getFile().toURI().toString()));
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
             entrainmentplayer.setVolume(currententrainmentvolume);
@@ -912,7 +911,7 @@ public class Player extends Stage {
             if (timeline_start_ending_ramp != null) {timeline_fadeout_timer.stop(); timeline_start_ending_ramp = null;}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop(); timeline_fadeout_timer = null;}
             toggleplayerbuttons();
-//            System.out.println(name + "'s Entrainment Player Status: " + entrainmentplayer.getStatus());
+//            System.out.println(name + "'s PlaybackItemEntrainment Player Status: " + entrainmentplayer.getStatus());
 //            System.out.println(name + "'s Ambience Player Status: " + ambienceplayer.getStatus());
         } catch (Exception ignored) {}
     }
@@ -1076,11 +1075,11 @@ public class Player extends Stage {
     private void volume_rebindentrainment() {volume_unbindentrainment(); volume_bindentrainment();}
     // Error Handling
     private void entrainmenterror() {
-        System.out.println("Entrainment Error");
+        System.out.println("PlaybackItemEntrainment Error");
         // Pause Ambience If Exists
-        switch (new AnswerDialog(Preferences, this, "Entrainment Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
-                "'s Entrainment. Problem File Is: '" + entrainmentplayer.getMedia().getSource() + "'",
-                "Retry Playback", "Mute Entrainment", "Stop SessionInProgress Playback").getResult()) {
+        switch (new AnswerDialog(Preferences, this, "PlaybackItemEntrainment Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
+                "'s PlaybackItemEntrainment. Problem File Is: '" + entrainmentplayer.getMedia().getSource() + "'",
+                "Retry Playback", "Mute PlaybackItemEntrainment", "Stop SessionInProgress Playback").getResult()) {
             case YES:
                 entrainmentplayer.stop();
                 entrainmentplayer.play();
@@ -1093,7 +1092,7 @@ public class Player extends Stage {
     }
     private void ambienceerror() {
         System.out.println("Ambience Error!");
-        // Pause Entrainment
+        // Pause PlaybackItemEntrainment
         switch (new AnswerDialog(Preferences, this, "Ambience Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
                 "'s Ambience. Problem File Is: '" + ambienceplayer.getMedia().getSource() + "'",
                 "Retry Playback", "Mute Ambience", "Stop SessionInProgress Playback").getResult()) {

@@ -31,7 +31,7 @@ public class FavoriteSessions {
     public void unmarshall() {
         if (Preferences.FAVORITESESSIONSXMLFILE.exists()) {
             try {
-                JAXBContext context = JAXBContext.newInstance(Entrainments.class);
+                JAXBContext context = JAXBContext.newInstance(AvailableEntrainments.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
                 FavoriteSessions favoriteSessions = (FavoriteSessions) createMarshaller.unmarshal(Preferences.FAVORITESESSIONSXMLFILE);
                 FavoriteSessions = favoriteSessions.FavoriteSessions;
@@ -46,7 +46,7 @@ public class FavoriteSessions {
             createMarshaller.marshal(this, Preferences.FAVORITESESSIONSXMLFILE);
         } catch (JAXBException e) {
             e.printStackTrace();
-            new InformationDialog(root.getPreferences(), "Information", "Couldn't Write Entrainment XML File", "Check Write File Permissions Of " + Preferences.ENTRAINMENTXMLFILE.getAbsolutePath());
+            new InformationDialog(root.getPreferences(), "Information", "Couldn't Write PlaybackItemEntrainment XML File", "Check Write File Permissions Of " + Preferences.ENTRAINMENTXMLFILE.getAbsolutePath());
         }
     }
 

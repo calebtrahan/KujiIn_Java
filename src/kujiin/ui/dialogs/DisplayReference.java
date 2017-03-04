@@ -102,8 +102,8 @@ public class DisplayReference {
 //
 //// Utility Methods
 //    public void setToolTips() {
-//        EntrainmentVolumeSlider.setTooltip(new Tooltip("Entrainment Volume"));
-//        EntrainmentVolumePercentage.setTooltip(new Tooltip("Entrainment Volume Percentage"));
+//        EntrainmentVolumeSlider.setTooltip(new Tooltip("PlaybackItemEntrainment Volume"));
+//        EntrainmentVolumePercentage.setTooltip(new Tooltip("PlaybackItemEntrainment Volume Percentage"));
 //        AmbienceVolumeSlider.setTooltip(new Tooltip("Ambience Volume"));
 //        AmbienceVolumePercentage.setTooltip(new Tooltip("Ambience Volume Percentage"));
 //        CurrentProgress.setTooltip(new Tooltip("Current Session Part Progress"));
