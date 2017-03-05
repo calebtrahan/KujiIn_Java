@@ -1,11 +1,16 @@
 package kujiin.xml;
 
 import javafx.util.Duration;
+import kujiin.ui.MainController;
 
 import java.util.List;
 
 public class PlaybackItemAmbience {
     private List<SoundFile> Ambience;
+
+    public PlaybackItemAmbience() {}
+    public PlaybackItemAmbience(MainController Root) {}
+
 
     // Getters And Setters
     public List<SoundFile> getAmbience() {

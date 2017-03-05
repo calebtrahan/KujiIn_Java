@@ -34,7 +34,7 @@ public class Preferences {
     public static final File DIRECTORYTEMP = new File(SOUNDDIRECTORY, "temp/");
     public static final File DIRECTORYENTRAINMENT = new File(SOUNDDIRECTORY, "entrainment/");
     public static final File DIRECTORYAMBIENCE = new File(SOUNDDIRECTORY, "ambience/");
-    public static final File DIRECTORYRAMP = new File(DIRECTORYENTRAINMENT, "ramp/");
+    public static final File DIRECTORYRAMP = new File(SOUNDDIRECTORY, "ramp/");
     // XML File Location Constants
     public static final File OPTIONSXMLFILE = new File(XMLDIRECTORY, "options.xml");
     public static final File DIRECTORYIMAGES = new File(ROOTDIRECTORY, "assets/img/");
@@ -62,6 +62,7 @@ public class Preferences {
     public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");
     public static final File ENTRAINMENTXMLFILE = new File(XMLDIRECTORY, "entrainment.xml");
     public static final File AMBIENCEXMLFILE = new File(XMLDIRECTORY, "ambience.xml");
+    public static final File RAMPFILESXMLFILE = new File(XMLDIRECTORY, "rampfiles.xml");
     public static final File AVAILABLEAMBIENCEXMLFILE = new File(XMLDIRECTORY, "availableambience.xml");
     public static final File FAVORITESESSIONSXMLFILE = new File(XMLDIRECTORY, "favoritesessions.xml");
     public final static File TESTFILE = new File(SOUNDDIRECTORY, "Test.mp3");

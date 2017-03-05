@@ -9,7 +9,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
@@ -29,18 +28,15 @@ public class AvailableAmbiences {
     private PlaybackItemAmbience Fire;
     private PlaybackItemAmbience Water;
     private PlaybackItemAmbience Void;
-    @XmlTransient
-    private MainController root;
 
     public AvailableAmbiences() {}
     public AvailableAmbiences(MainController Root) {
-        root = Root;
         unmarshall();
     }
 
-    // XML Processing
+// XML Processing
     public void unmarshall() {
-        if (Preferences.AMBIENCEXMLFILE.exists()) {
+        if (Preferences.AVAILABLEAMBIENCEXMLFILE.exists()) {
             try {
                 JAXBContext context = JAXBContext.newInstance(AvailableAmbiences.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
@@ -61,6 +57,22 @@ public class AvailableAmbiences {
                 Water = ambiences.Water;
                 Void = ambiences.Void;
             } catch (JAXBException ignored) {}
+        } else {
+            QiGong = new PlaybackItemAmbience();
+            Rin = new PlaybackItemAmbience();
+            Kyo = new PlaybackItemAmbience();
+            Toh = new PlaybackItemAmbience();
+            Sha = new PlaybackItemAmbience();
+            Kai = new PlaybackItemAmbience();
+            Jin = new PlaybackItemAmbience();
+            Retsu = new PlaybackItemAmbience();
+            Zai = new PlaybackItemAmbience();
+            Zen = new PlaybackItemAmbience();
+            Earth = new PlaybackItemAmbience();
+            Air = new PlaybackItemAmbience();
+            Fire = new PlaybackItemAmbience();
+            Water = new PlaybackItemAmbience();
+            Void = new PlaybackItemAmbience();
         }
     }
     public void marshall() {
@@ -72,7 +84,7 @@ public class AvailableAmbiences {
         } catch (JAXBException ignored) {ignored.printStackTrace();}
     }
 
-    // Other Methods
+// Other Methods
     public PlaybackItemAmbience getsessionpartAmbience(int index) {
         switch (index) {
             case 0:

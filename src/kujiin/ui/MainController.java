@@ -23,7 +23,6 @@ import kujiin.ui.playback.Player;
 import kujiin.ui.table.CreatedSessionTableItem;
 import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.ProgramState;
-import kujiin.util.enums.StartupCheckType;
 import kujiin.xml.*;
 import kujiin.xml.Preferences;
 
@@ -64,11 +63,10 @@ public class MainController implements Initializable {
     private Preferences preferences;
     private AvailableAmbiences availableAmbiences;
     private AvailableEntrainments AvailableEntrainments;
+    private RampFiles RampFiles;
     private Sessions sessions;
     private FavoriteSessions favoriteSessions;
     private Goals goals;
-//    private StartupChecks startupChecks;
-    protected StartupCheckType startupCheckType = StartupCheckType.ENTRAINMENT;
     private ProgramState programState = ProgramState.IDLE;
 // GUI Fields
     // Top Menu
@@ -201,16 +199,24 @@ public class MainController implements Initializable {
     public void setFavoriteSessions(FavoriteSessions favoriteSessions) {
         this.favoriteSessions = favoriteSessions;
     }
+    public ProgramState getProgramState() {
+        return programState;
+    }
+    public void setRampFiles(kujiin.xml.RampFiles rampFiles) {
+        RampFiles = rampFiles;
+    }
+    public kujiin.xml.RampFiles getRampFiles() {
+        return RampFiles;
+    }
 
-
-// Window Methods
+    // Window Methods
     private boolean cleanup() {
     availableAmbiences.marshall();
     AvailableEntrainments.marshall();
     preferences.marshall();
     return true;
 }
-    private void close() {
+    public void close() {
         if (cleanup()) {System.exit(0);}
     }
 
@@ -455,7 +461,7 @@ public class MainController implements Initializable {
     public void playcreatedsession() {
         if (createdsession != null) {
             getStage().setIconified(true);
-            Player player = new Player(preferences, sessions, AvailableEntrainments, createdsession);
+            Player player = new Player(this, sessions, createdsession);
             player.initModality(Modality.APPLICATION_MODAL);
             player.initOwner(getStage());
             player.showAndWait();

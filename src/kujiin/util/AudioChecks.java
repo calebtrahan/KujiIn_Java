@@ -27,10 +27,11 @@ public class AudioChecks extends Task {
 
     public AudioChecks(MainController Root) {
         root = Root;
+        Session testSession = new Session();
         for (int i = 0; i < 15; i++) {
-            Session testSession = new Session();
             testSession.addplaybackitem(i);
             playbackitemstocheck.add(testSession.getPlaybackItems().get(i));
+            try {selectedplaybackitem = playbackitemstocheck.take();} catch (InterruptedException e) {e.printStackTrace();}
             populatefilestocheckforSelectedPlaybackItem();
             populateRampFilesToCheck();
         }
@@ -52,7 +53,7 @@ public class AudioChecks extends Task {
             if (selectedplaybackitem == null) {selectedplaybackitem = playbackitemstocheck.take(); populatefilestocheckforSelectedPlaybackItem();}
             if (! PlaybackItemEntrainmentFiles.isEmpty()) {
                 audioCheckingType = AudioCheckingType.Entrainment; soundFile = PlaybackItemEntrainmentFiles.take();}
-            else if (! PlaybackItemAmbienceFiles.isEmpty()) {
+            else if (PlaybackItemAmbienceFiles != null && ! PlaybackItemAmbienceFiles.isEmpty()) {
                 audioCheckingType = AudioCheckingType.Ambience; soundFile = PlaybackItemAmbienceFiles.take();}
             else {savechangestoXML(); selectedplaybackitem = null; return call();}
         } else {
@@ -60,7 +61,7 @@ public class AudioChecks extends Task {
                 audioCheckingType = AudioCheckingType.Ramp;
                 soundFile = SessionRampFiles.take();
             } else {
-                root.getAvailableEntrainments().setRampFiles(rampfiles);
+                root.getRampFiles().setRampFiles(rampfiles.getRampFiles());
                 // End Of Audio Checks
                 return null;
             }
@@ -108,13 +109,15 @@ public class AudioChecks extends Task {
         PlaybackItemEntrainmentFiles = null;
         PlaybackItemEntrainmentFiles = new ArrayBlockingQueue<>(playbackItemEntrainment.getAllEntrainmentFiles().size());
         PlaybackItemEntrainmentFiles.addAll(playbackItemEntrainment.getAllEntrainmentFiles());
-        PlaybackItemAmbienceFiles = new ArrayBlockingQueue<>(playbackItemAmbience.getAmbience().size());
-        PlaybackItemAmbienceFiles.addAll(playbackItemAmbience.getAmbience());
+        try {
+            PlaybackItemAmbienceFiles = new ArrayBlockingQueue<>(playbackItemAmbience.getAmbience().size());
+            PlaybackItemAmbienceFiles.addAll(playbackItemAmbience.getAmbience());
+        } catch (Exception ignored) {}
 
     }
     private void populateRampFilesToCheck() {
-        rampfiles = root.getAvailableEntrainments().getRampFiles();
-        SessionRampFiles = new ArrayBlockingQueue<>(root.getAvailableEntrainments().getRampFiles().getRampFiles().size());
+        rampfiles = root.getRampFiles();
+        SessionRampFiles = new ArrayBlockingQueue<>(root.getRampFiles().getRampFiles().size());
     }
 
 }

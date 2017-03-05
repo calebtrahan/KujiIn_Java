@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.io.File;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
@@ -31,7 +32,6 @@ public class AvailableEntrainments {
     private PlaybackItemEntrainment Fire;
     private PlaybackItemEntrainment Water;
     private PlaybackItemEntrainment Void;
-    private RampFiles rampFiles;
     @XmlTransient
     private MainController Root;
 
@@ -71,7 +71,6 @@ public class AvailableEntrainments {
                 Fire = availableEntrainments.Fire;
                 Water = availableEntrainments.Water;
                 Void = availableEntrainments.Void;
-                rampFiles = availableEntrainments.rampFiles;
             } catch (JAXBException ignored) {}
         } else {
             QiGong = new PlaybackItemEntrainment();
@@ -89,7 +88,7 @@ public class AvailableEntrainments {
             Fire = new PlaybackItemEntrainment();
             Water = new PlaybackItemEntrainment();
             Void = new PlaybackItemEntrainment();
-            rampFiles = new RampFiles();
+            populatedefaults();
         }
     }
     public void marshall() {
@@ -144,11 +143,16 @@ public class AvailableEntrainments {
             case 14: Void = playbackItemEntrainment; break;
         }
     }
-    public RampFiles getRampFiles() {
-        return rampFiles;
+    private void populatedefaults() {
+        QiGong.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "QI.mp3")));
+        Rin.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "RIN.mp3")));
+        Kyo.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "KYO.mp3")));
+        Toh.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "TOH.mp3")));
+        Sha.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "SHA.mp3")));
+        Kai.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "KAI.mp3")));
+        Jin.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "JIN.mp3")));
+        Retsu.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "RETSU.mp3")));
+        Zai.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "ZAI.mp3")));
+        Zen.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "ZEN.mp3")));
     }
-    public void setRampFiles(RampFiles rampFiles) {
-        this.rampFiles = rampFiles;
-    }
-
 }

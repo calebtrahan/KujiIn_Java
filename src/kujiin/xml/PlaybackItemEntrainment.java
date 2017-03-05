@@ -3,11 +3,9 @@ package kujiin.xml;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.stream.Collectors;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PlaybackItemEntrainment {
@@ -20,17 +18,6 @@ public class PlaybackItemEntrainment {
     public PlaybackItemEntrainment() {
     }
 
-    public void set(SoundFile soundFile) {
-        if (! soundFile.getFile().getAbsolutePath().contains("ramp")) {setFreq(soundFile);}
-        else {ramp_addorset(soundFile);}
-    }
-    public SoundFile get(int index) {
-        switch (index) {
-            case 0: return freq;
-            default: return ramp_get(index - 1);
-        }
-    }
-
 // Getters And Setters
     public List<SoundFile> getAllEntrainmentFiles() {return Arrays.asList(freq);}
     public SoundFile getFreq() {
@@ -39,32 +26,23 @@ public class PlaybackItemEntrainment {
     public void setFreq(SoundFile freq) {
         this.freq = freq;
     }
-    public SoundFile getRampfile() {
-        return rampfile;
-    }
-    public void setRampfile(SoundFile rampfile) {
-        this.rampfile = rampfile;
-    }
-    public List<SoundFile> getRampfiles() {
-        return rampfiles;
-    }
 
-// Ramp Methods
-    public void ramp_initialize() {if (rampfiles == null) {rampfiles = new ArrayList<>();}}
-    public void ramp_addorset(SoundFile soundFile) {
-        ramp_initialize();
-        int index = rampfiles.stream().map(SoundFile::getFile).collect(Collectors.toCollection(ArrayList::new)).indexOf(soundFile.getFile());
-        if (index == -1) {rampfiles.add(soundFile);}
-        else if (! soundFile.equals(rampfiles.get(index))) {rampfiles.set(index, soundFile);}
-    }
-    public SoundFile ramp_get(int index) {
-        try {
-            return rampfiles.get(index);
-        } catch (NullPointerException | IndexOutOfBoundsException ignored) {
-            if (ignored instanceof IndexOutOfBoundsException) {ramp_initialize(); return null;}
-            else {return null;}
-        }
-    }
+//// Ramp Methods
+//    public void ramp_initialize() {if (rampfiles == null) {rampfiles = new ArrayList<>();}}
+//    public void ramp_addorset(SoundFile soundFile) {
+//        ramp_initialize();
+//        int index = rampfiles.stream().map(SoundFile::getFile).collect(Collectors.toCollection(ArrayList::new)).indexOf(soundFile.getFile());
+//        if (index == -1) {rampfiles.add(soundFile);}
+//        else if (! soundFile.equals(rampfiles.get(index))) {rampfiles.set(index, soundFile);}
+//    }
+//    public SoundFile ramp_get(int index) {
+//        try {
+//            return rampfiles.get(index);
+//        } catch (NullPointerException | IndexOutOfBoundsException ignored) {
+//            if (ignored instanceof IndexOutOfBoundsException) {ramp_initialize(); return null;}
+//            else {return null;}
+//        }
+//    }
 
     @Override
     public String toString() {

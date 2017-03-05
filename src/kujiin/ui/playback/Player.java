@@ -20,6 +20,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import kujiin.ui.MainController;
 import kujiin.ui.dialogs.SessionDetails;
 import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
@@ -88,6 +89,7 @@ public class Player extends Stage {
     private Session.PlaybackItem selectedPlaybackItem;
     private Goals Goals;
     private AvailableEntrainments availableEntrainments;
+    private RampFiles rampfiles;
     private Sessions sessions;
     private PlayerState playerState;
     private Preferences Preferences;
@@ -113,12 +115,13 @@ public class Player extends Stage {
         }
     };
 
-    public Player(Preferences preferences, Sessions sessions, AvailableEntrainments availableEntrainments, Session sessiontoplay) {
+    public Player(MainController Root, Sessions sessions, Session sessiontoplay) {
         try {
-            Preferences = preferences;
+            Preferences = Root.getPreferences();
             SessionTemplate = sessiontoplay;
             SessionInProgress = SessionTemplate;
-            this.availableEntrainments = availableEntrainments;
+            availableEntrainments = Root.getAvailableEntrainments();
+            rampfiles = Root.getRampFiles();
             System.out.println("AvailableEntrainments Is Null: " + Boolean.toString(availableEntrainments == null));
             this.sessions = sessions;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/playback/Player.fxml"));
@@ -368,7 +371,7 @@ public class Player extends Stage {
         volume_unbindentrainment();
         PlaybackItemEntrainment playbackItemEntrainment = availableEntrainments.getsessionpartEntrainment(SelectedPlaybackItem);
         if (! selectedPlaybackItem.isRampOnly() || selectedPlaybackItem.getPlaybackindex() == SessionInProgress.getPlaybackItems().size() - 1) {entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getFreq().getFile().toURI().toString()));}
-        else {entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getRampfile().getFile().toURI().toString()));}
+        else {entrainmentplayer = new MediaPlayer(new Media(rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1)).getFile().toURI().toString()));}
         entrainmentplayer.setVolume(0.0);
         if (! selectedPlaybackItem.isRampOnly()) {entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);}
         entrainmentplayer.setOnError(this::entrainmenterror);
@@ -377,11 +380,12 @@ public class Player extends Stage {
         timeline_progresstonextsessionpart.play();
         boolean isLastSessionPart = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) == SessionInProgress.getPlaybackItems().size() - 1;
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
-            timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getDuration()).subtract(Duration.millis(playbackItemEntrainment.getRampfile().getDuration())), ae -> {
+            SoundFile rampfile = rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1));
+            timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getDuration()).subtract(Duration.millis(rampfile.getDuration())), ae -> {
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
-                entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getRampfile().getFile().toURI().toString()));
+                entrainmentplayer = new MediaPlayer(new Media(rampfile.getFile().toURI().toString()));
                 entrainmentplayer.setOnError(this::entrainmenterror);
                 entrainmentplayer.setVolume(currententrainmentvolume);
                 entrainmentplayer.play();
