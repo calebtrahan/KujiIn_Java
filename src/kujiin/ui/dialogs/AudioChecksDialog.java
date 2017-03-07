@@ -18,17 +18,17 @@ public class AudioChecksDialog extends Stage {
     public ProgressBar Progress;
     public Label ProgressPercentage;
     public Label StatusBar;
-    private final AudioChecks audioChecks;
+    private AudioChecks audioChecks;
 
     public AudioChecksDialog(MainController Root) {
-        audioChecks = new AudioChecks(Root);
         try {
+            audioChecks = new AudioChecks(Root);
             root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AudioChecksDialog.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            setTitle("Simple Ambience Editor");
+            setTitle("Starting Up");
             setOnShowing(event -> {
                 audioChecks.setOnRunning(event1 -> {
                     StatusBar.textProperty().bind(audioChecks.messageProperty());

@@ -106,7 +106,7 @@ public class Preferences {
     public static final Double DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION = 5.0;
     public static final String NEWGOALTEXT = "New Goal";
     public static final String GOALPACINGTEXT = "Goal Pacing";
-    public static final Image PROGRAM_ICON = new Image(new File(Preferences.DIRECTORYIMAGES, "icons/mainwinicon.jpg").toURI().toString());
+    public static final Image PROGRAM_ICON = new Image(new File(Preferences.DIRECTORYICONS, "mainwinicon.jpg").toURI().toString());
     public final static String NO_ALERT_FILE_SELECTED_TEXT = "No Alert File Selected";
     public final static int SUGGESTED_ALERT_FILE_MAX_LENGTH = 10;
     public final static int ABSOLUTE_ALERT_FILE_MAX_LENGTH = 30;

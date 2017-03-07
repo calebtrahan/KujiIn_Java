@@ -55,7 +55,6 @@ public class Session {
     }
     public double getElapsedTime() {return elapsedtime.toMillis();}
     public void addplaybackitem(int index) {
-        System.out.println("Should Be Adding" + index);
         if (playbackItems == null) {playbackItems = new ArrayList<>();}
         switch (index) {
             case 0:

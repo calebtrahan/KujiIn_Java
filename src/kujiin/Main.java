@@ -49,7 +49,7 @@ public class Main extends Application {
                 root.close();
             } else {event.consume();}
         });
-        primaryStage.showAndWait();
+        primaryStage.show();
     }
 
     public void test() {

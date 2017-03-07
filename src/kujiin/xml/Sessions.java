@@ -45,7 +45,6 @@ public class Sessions {
     }
     public void marshall() {
         try {
-            System.out.println("Should Be Marshalling " + Session.size() + " Sessions");
             JAXBContext context = JAXBContext.newInstance(Sessions.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
