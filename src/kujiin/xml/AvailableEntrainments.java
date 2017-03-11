@@ -154,10 +154,10 @@ public class AvailableEntrainments {
         Retsu.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "RETSU.mp3")));
         Zai.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "ZAI.mp3")));
         Zen.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "ZEN.mp3")));
-        Earth.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "EARTH.mp3")));
-        Air.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "AIR.mp3")));
-        Fire.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "FIRE.mp3")));
-        Water.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "WATER.mp3")));
-        Void.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "VOID.mp3")));
+        Earth.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "QI.mp3")));
+        Air.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "QI.mp3")));
+        Fire.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "QI.mp3")));
+        Water.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "QI.mp3")));
+        Void.setFreq(new SoundFile(new File(Preferences.DIRECTORYENTRAINMENT, "QI.mp3")));
     }
 }

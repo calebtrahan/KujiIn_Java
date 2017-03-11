@@ -64,7 +64,7 @@ public class RampFiles {
         return null;
     }
     private void populatedefaults() {
-        String[] names = {"rin", "kyo", "toh", "sha", "kai", "jin", "retsu", "zai", "zen", "earth", "air", "fire", "water", "void"};
+        String[] names = {"rin", "kyo", "toh", "sha", "kai", "jin", "retsu", "zai", "zen"};
         ArrayList<SoundFile> filenames = new ArrayList<>();
         for (int i = 0; i < names.length; i++) {
             for (int x = 0; x < 2; x++) {

@@ -24,22 +24,25 @@ public class AudioChecks extends Task {
     private BlockingQueue<Session.PlaybackItem> playbackitemstocheck = new ArrayBlockingQueue<>(15);
     private BlockingQueue<SoundFile> PlaybackItemEntrainmentFiles;
     private BlockingQueue<SoundFile> PlaybackItemAmbienceFiles;
+    private BlockingQueue<SoundFile> TempSessionRampFiles;
     private BlockingQueue<SoundFile> SessionRampFiles;
     private int totaltasks = 0;
     private int currenttaskcount = 0;
     private final Session testsession;
 
     public AudioChecks(MainController Root) {
-        System.out.println("Called Audio Checks Constructor");
         root = Root;
         testsession = new Session();
         for (int i = 0; i < 15; i++) {
             testsession.addplaybackitem(i);
             playbackitemstocheck.add(testsession.getPlaybackItems().get(i));
-            try {selectedplaybackitem = playbackitemstocheck.take();} catch (InterruptedException e) {e.printStackTrace();}
         }
+        try {selectedplaybackitem = playbackitemstocheck.take();} catch (InterruptedException e) {e.printStackTrace();}
         populatefilestocheckforSelectedPlaybackItem();
-        populateRampFilesToCheck();
+        rampfiles = root.getRampFiles();
+        TempSessionRampFiles = new ArrayBlockingQueue<>(root.getRampFiles().getRampFiles().size());
+        SessionRampFiles = new ArrayBlockingQueue<>(root.getRampFiles().getRampFiles().size());
+        TempSessionRampFiles.addAll(root.getRampFiles().getRampFiles());
         calculateworktodo();
     }
 
@@ -51,37 +54,32 @@ public class AudioChecks extends Task {
 // Method Overrides
     @Override
     protected Object call() throws Exception {
-        System.out.println("Called call() Method");
     // Get Sound File
         try {
             SoundFile soundFile;
             AudioCheckingType audioCheckingType;
             if (! playbackitemstocheck.isEmpty()) {
                 if (selectedplaybackitem == null) {selectedplaybackitem = playbackitemstocheck.take(); populatefilestocheckforSelectedPlaybackItem();}
-                if (! PlaybackItemEntrainmentFiles.isEmpty()) {
-                    audioCheckingType = AudioCheckingType.Entrainment; soundFile = PlaybackItemEntrainmentFiles.take();}
-                else if (PlaybackItemAmbienceFiles != null && ! PlaybackItemAmbienceFiles.isEmpty()) {
-                    audioCheckingType = AudioCheckingType.Ambience; soundFile = PlaybackItemAmbienceFiles.take();}
+                if (! PlaybackItemEntrainmentFiles.isEmpty()) {audioCheckingType = AudioCheckingType.Entrainment; soundFile = PlaybackItemEntrainmentFiles.take();}
+                else if (PlaybackItemAmbienceFiles != null && ! PlaybackItemAmbienceFiles.isEmpty()) {audioCheckingType = AudioCheckingType.Ambience; soundFile = PlaybackItemAmbienceFiles.take();}
                 else {savechangestoXML(); selectedplaybackitem = null; return call();}
+            } else if (! TempSessionRampFiles.isEmpty()) {
+                audioCheckingType = AudioCheckingType.Ramp;
+                soundFile = TempSessionRampFiles.take();
             } else {
-                if (! SessionRampFiles.isEmpty()) {
-                    audioCheckingType = AudioCheckingType.Ramp;
-                    soundFile = SessionRampFiles.take();
-                } else {
-                    root.getRampFiles().setRampFiles(rampfiles.getRampFiles());
-                    // End Of Audio Checks
-                    return null;
-                }
+                List<SoundFile> rampfiles = new ArrayList<>();
+                SessionRampFiles.drainTo(rampfiles);
+                root.getRampFiles().setRampFiles(rampfiles);
+                // End Of Audio Checks
+                return null;
             }
         // Check If File Exists
-            System.out.println("Grabbed " + soundFile.getFile().getAbsolutePath() + " As Sound File To Check");
             if (! soundFile.getFile().exists()) {
                 if (audioCheckingType == AudioCheckingType.Ambience) {playbackItemAmbience.remove(playbackItemAmbience.getAmbience().indexOf(soundFile));}
                 return call();
             }
         // Check And Calculate Duration If Needed
             if (! soundFile.isValid()) {
-                System.out.println("Sound File Is Not Valid");
                 startupcheckplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
                 startupcheckplayer.setOnReady(() -> {
                     try {
@@ -91,7 +89,7 @@ public class AudioChecks extends Task {
                             startupcheckplayer.dispose();
                             startupcheckplayer = null;
                             updateProgress(currenttaskcount, totaltasks);
-                            updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
+                            updateMessage("Please Wait (" + new Double(getProgress() * 100).intValue() + "% ) [" + currenttaskcount + "/" + totaltasks + "]");
                             try {call();} catch (Exception ignored) {ignored.printStackTrace();}
                         } else {
                             switch (audioCheckingType) {
@@ -114,14 +112,13 @@ public class AudioChecks extends Task {
             } else {
                 currenttaskcount++;
                 updateProgress(currenttaskcount, totaltasks);
-                updateMessage("Performing Startup Checks. Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
+                updateMessage("Please Wait (" + new Double(getProgress() * 100).intValue() + "% [" + currenttaskcount + "/" + totaltasks + "]");
                 try {call();} catch (Exception ignored) {ignored.printStackTrace();}
             }
         } catch (Exception ignored) {
             System.out.println("Exception Encountered!");
             ignored.printStackTrace();
         }
-
         return null;
     }
 
@@ -143,25 +140,15 @@ public class AudioChecks extends Task {
             PlaybackItemAmbienceFiles.addAll(playbackItemAmbience.getAmbience());
         } catch (Exception ignored) {}
     }
-    private void populateRampFilesToCheck() {
-        rampfiles = root.getRampFiles();
-        SessionRampFiles = new ArrayBlockingQueue<>(root.getRampFiles().getRampFiles().size());
-    }
     private void calculateworktodo() {
-        List<SoundFile> totalworktodo = new ArrayList<>();
         for (Session.PlaybackItem i : testsession.getPlaybackItems()) {
-            totalworktodo.addAll(root.getAvailableEntrainments().getsessionpartEntrainment(i).getAllEntrainmentFiles());
             totaltasks += root.getAvailableEntrainments().getsessionpartEntrainment(i).getAllEntrainmentFiles().size();
-            try {
-                totaltasks += root.getAvailableAmbiences().getsessionpartAmbience(i.getEntrainmentandavailableambienceindex()).getAmbience().size();
-                totalworktodo.addAll(root.getAvailableAmbiences().getsessionpartAmbience(i.getEntrainmentandavailableambienceindex()).getAmbience());
-            } catch (NullPointerException ignored) {}
+            try {totaltasks += root.getAvailableAmbiences().getsessionpartAmbience(i.getEntrainmentandavailableambienceindex()).getAmbience().size();}
+            catch (NullPointerException ignored) {}
         }
         totaltasks += root.getRampFiles().getRampFiles().size();
-        totalworktodo.addAll(root.getRampFiles().getRampFiles());
-        int count = 1;
-        for (SoundFile i : totalworktodo) {System.out.println(count + ": " + i.getFile().getAbsolutePath()); count++;}
     }
+
 }
 
 enum AudioCheckingType {
