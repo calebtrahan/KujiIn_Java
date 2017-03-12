@@ -7,6 +7,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
@@ -21,13 +22,15 @@ import kujiin.xml.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static kujiin.util.Util.SUPPORTEDAUDIOFORMATS;
 
-public class AddOrEditAmbience extends Stage {
+public class AddOrEditAmbience extends Stage implements Initializable {
     public TableView<AddOrEditAmbienceTableItem> AddOrEditAmbienceTable;
     public TableColumn<AddOrEditAmbienceTableItem, Integer> NumberColumn;
     public TableColumn<AddOrEditAmbienceTableItem, String> NameColumn;
@@ -54,21 +57,34 @@ public class AddOrEditAmbience extends Stage {
     private PlaybackItemAmbience playbackItemAmbience;
     private Preferences preferences;
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        QuickAddRepeatAmbience.setOnAction(event -> quickaddrepeatambience());
+        QuickAddShuffleAmbience.setOnAction(event -> quickaddshuffleambience());
+        AddFromAmbienceDirectory.setOnAction(event -> addfromavailableambience());
+        AddOpenFiles.setOnAction(event -> addfromfiles());
+        RemoveButton.setOnAction(event -> removefromtable());
+        PreviewButton.setOnAction(event -> preview());
+        UpButton.setOnAction(event -> moveup());
+        DownButton.setOnAction(event -> movedown());
+        AcceptButton.setOnAction(event -> accept());
+        CancelButton.setOnAction(event -> cancel());
+    }
     public AddOrEditAmbience(Preferences preferences, Session.PlaybackItem playbackItem, AvailableAmbiences availableAmbiences) {
         try {
+            ambience = playbackItem.getAmbience();
             this.preferences = preferences;
             this.playbackItem = playbackItem;
             this.availableAmbiences = availableAmbiences;
             playbackItemAmbience = availableAmbiences.getsessionpartAmbience(playbackItem.getEntrainmentandavailableambienceindex());
+            playbackitemduration = new Duration(playbackItem.getDuration());
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/AddOrEditAmbience.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setResizable(false);
-            ambience = playbackItem.getAmbience();
-            if (ambience.getAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
+            if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
             else {setTitle("Edit Ambience"); populatetable();}
-            playbackitemduration = new Duration(playbackItem.getDuration());
         } catch (IOException e) {e.printStackTrace();}
     }
 
@@ -124,7 +140,11 @@ public class AddOrEditAmbience extends Stage {
         Duration duration = Duration.ZERO;
         int indexcount = 0;
         while (duration.lessThan(playbackitemduration)) {
-            try {ambience.add(playbackItemAmbience.getAmbience().get(indexcount));}
+            try {
+                SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
+                ambience.add(filetoadd);
+                duration = duration.add(Duration.millis(filetoadd.getDuration()));
+            }
             catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
         }
         populatetable();
@@ -134,7 +154,9 @@ public class AddOrEditAmbience extends Stage {
         Duration duration = Duration.ZERO;
         int indexcount = 0;
         while (duration.lessThan(playbackitemduration)) {
-            try {listtoshuffle.add(playbackItemAmbience.getAmbience().get(indexcount));}
+            try {
+
+                listtoshuffle.add(playbackItemAmbience.getAmbience().get(indexcount));}
             catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
         }
         Collections.shuffle(listtoshuffle);
@@ -238,7 +260,9 @@ public class AddOrEditAmbience extends Stage {
         DownButton.setDisable(nothingselected || selectedindex == AddOrEditAmbienceTable.getItems().size() - 1);
     }
 
-// Table Class
+
+
+    // Table Class
     class AddOrEditAmbienceTableItem {
         IntegerProperty number;
         StringProperty name;

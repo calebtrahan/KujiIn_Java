@@ -122,7 +122,6 @@ public class Player extends Stage {
             SessionInProgress = SessionTemplate;
             availableEntrainments = Root.getAvailableEntrainments();
             rampfiles = Root.getRampFiles();
-            System.out.println("AvailableEntrainments Is Null: " + Boolean.toString(availableEntrainments == null));
             this.sessions = sessions;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/playback/Player.fxml"));
             fxmlLoader.setController(this);
@@ -260,7 +259,7 @@ public class Player extends Stage {
                 Float totalprogress;
                 if (SessionInProgress.getElapsedTime() > 0.0) {totalprogress = (float) SessionInProgress.getElapsedTime() / (float) SessionInProgress.getSessionDuration().toMillis();}
                 else {totalprogress = (float) 0.0;}
-                SessionProgress.setProgress(totalprogress * 100);
+                SessionProgress.setProgress(totalprogress);
                 BigDecimal bd = new BigDecimal(totalprogress);
                 bd = bd.setScale(2, RoundingMode.HALF_UP);
                 SessionProgressPercentage.setText(bd.doubleValue() + "%");

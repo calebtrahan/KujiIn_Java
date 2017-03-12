@@ -211,11 +211,12 @@ public class MainController implements Initializable {
 
     // Window Methods
     private boolean cleanup() {
-    availableAmbiences.marshall();
-    AvailableEntrainments.marshall();
-    preferences.marshall();
-    return true;
-}
+        availableAmbiences.marshall();
+        AvailableEntrainments.marshall();
+        RampFiles.marshall();
+        preferences.marshall();
+        return true;
+    }
     public void close() {
         if (cleanup()) {System.exit(0);}
     }
@@ -304,7 +305,11 @@ public class MainController implements Initializable {
         new SetOrAdjustDuration(null).showAndWait();
     }
     public void editavailableambience() {
-        if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Simple")) {new AmbienceEditor_Simple(availableAmbiences, preferences).showAndWait();}
+        if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Simple")) {
+            AmbienceEditor_Simple ambienceEditor_simple = new AmbienceEditor_Simple(availableAmbiences, getPreferences());
+            ambienceEditor_simple.initModality(Modality.APPLICATION_MODAL);
+            ambienceEditor_simple.showAndWait();
+        }
         else if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Advanced")) {new AmbienceEditor_Advanced(availableAmbiences, preferences).showAndWait();}
     }
     public void editreferencefiles() {
@@ -320,6 +325,13 @@ public class MainController implements Initializable {
 // Play/Export Tab
     // Create/Open Toolbar Methods
     public void createblanksession() {
+        if (createdsession != null && sessions.getSession().isEmpty() && getAvailableAmbiences().completelyempty()) {
+            if (new ConfirmationDialog(getPreferences(), "Add Available Ambience", "There Is No Available Ambience For Any Playback Items", "Open Ambience Editor To Add Ambience?").getResult()) {
+                AmbienceEditor_Simple ambienceEditor_simple = new AmbienceEditor_Simple(availableAmbiences, getPreferences());
+                ambienceEditor_simple.initModality(Modality.APPLICATION_MODAL);
+                ambienceEditor_simple.showAndWait();
+            }
+        }
         if (createdsession != null && ! new ConfirmationDialog(preferences, "Load New Session",
                 "Really Load New Session?", "This will clear any unsaved changes you made to this session").getResult()) {
             return;
@@ -463,7 +475,6 @@ public class MainController implements Initializable {
             getStage().setIconified(true);
             Player player = new Player(this, sessions, createdsession);
             player.initModality(Modality.APPLICATION_MODAL);
-            player.initOwner(getStage());
             player.showAndWait();
             getStage().setIconified(false);
         }

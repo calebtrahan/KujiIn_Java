@@ -58,21 +58,21 @@ public class AvailableAmbiences {
                 Void = ambiences.Void;
             } catch (JAXBException ignored) {}
         } else {
-            QiGong = new PlaybackItemAmbience();
-            Rin = new PlaybackItemAmbience();
-            Kyo = new PlaybackItemAmbience();
-            Toh = new PlaybackItemAmbience();
-            Sha = new PlaybackItemAmbience();
-            Kai = new PlaybackItemAmbience();
-            Jin = new PlaybackItemAmbience();
-            Retsu = new PlaybackItemAmbience();
-            Zai = new PlaybackItemAmbience();
-            Zen = new PlaybackItemAmbience();
-            Earth = new PlaybackItemAmbience();
-            Air = new PlaybackItemAmbience();
-            Fire = new PlaybackItemAmbience();
-            Water = new PlaybackItemAmbience();
-            Void = new PlaybackItemAmbience();
+            QiGong = new PlaybackItemAmbience("Qi-Gong");
+            Rin = new PlaybackItemAmbience("Rin");
+            Kyo = new PlaybackItemAmbience("Kyo");
+            Toh = new PlaybackItemAmbience("Toh");
+            Sha = new PlaybackItemAmbience("Sha");
+            Kai = new PlaybackItemAmbience("Kai");
+            Jin = new PlaybackItemAmbience("Jin");
+            Retsu = new PlaybackItemAmbience("Retsu");
+            Zai = new PlaybackItemAmbience("Zai");
+            Zen = new PlaybackItemAmbience("Zen");
+            Earth = new PlaybackItemAmbience("Earth");
+            Air = new PlaybackItemAmbience("Air");
+            Fire = new PlaybackItemAmbience("Fire");
+            Water = new PlaybackItemAmbience("Water");
+            Void = new PlaybackItemAmbience("Void");
         }
     }
     public void marshall() {
@@ -88,35 +88,35 @@ public class AvailableAmbiences {
     public PlaybackItemAmbience getsessionpartAmbience(int index) {
         switch (index) {
             case 0:
-                if (QiGong != null) {return QiGong;} else {return new PlaybackItemAmbience();}
+                if (QiGong != null) {return QiGong;} else {return new PlaybackItemAmbience("Qi-Gong");}
             case 1:
-                if (Rin != null) {return Rin;} else {return new PlaybackItemAmbience();}
+                if (Rin != null) {return Rin;} else {return new PlaybackItemAmbience("Rin");}
             case 2:
-                if (Kyo != null) {return Kyo;} else {return new PlaybackItemAmbience();}
+                if (Kyo != null) {return Kyo;} else {return new PlaybackItemAmbience("Kyo");}
             case 3:
-                if (Toh != null) {return Toh;} else {return new PlaybackItemAmbience();}
+                if (Toh != null) {return Toh;} else {return new PlaybackItemAmbience("Toh");}
             case 4:
-                if (Sha != null) {return Sha;} else {return new PlaybackItemAmbience();}
+                if (Sha != null) {return Sha;} else {return new PlaybackItemAmbience("Sha");}
             case 5:
-                if (Kai != null) {return Kai;} else {return new PlaybackItemAmbience();}
+                if (Kai != null) {return Kai;} else {return new PlaybackItemAmbience("Kai");}
             case 6:
-                if (Jin != null) {return Jin;} else {return new PlaybackItemAmbience();}
+                if (Jin != null) {return Jin;} else {return new PlaybackItemAmbience("Jin");}
             case 7:
-                if (Retsu != null) {return Retsu;} else {return new PlaybackItemAmbience();}
+                if (Retsu != null) {return Retsu;} else {return new PlaybackItemAmbience("Retsu");}
             case 8:
-                if (Zai != null) {return Zai;} else {return new PlaybackItemAmbience();}
+                if (Zai != null) {return Zai;} else {return new PlaybackItemAmbience("Zai");}
             case 9:
-                if (Zen != null) {return Zen;} else {return new PlaybackItemAmbience();}
+                if (Zen != null) {return Zen;} else {return new PlaybackItemAmbience("Zen");}
             case 10:
-                if (Earth != null) {return Earth;} else {return new PlaybackItemAmbience();}
+                if (Earth != null) {return Earth;} else {return new PlaybackItemAmbience("Earth");}
             case 11:
-                if (Air != null) {return Air;} else {return new PlaybackItemAmbience();}
+                if (Air != null) {return Air;} else {return new PlaybackItemAmbience("Air");}
             case 12:
-                if (Fire != null) {return Fire;} else {return new PlaybackItemAmbience();}
+                if (Fire != null) {return Fire;} else {return new PlaybackItemAmbience("Fire");}
             case 13:
-                if (Water != null) {return Water;} else {return new PlaybackItemAmbience();}
+                if (Water != null) {return Water;} else {return new PlaybackItemAmbience("Water");}
             case 14:
-                if (Void != null) {return Void;} else {return new PlaybackItemAmbience();}
+                if (Void != null) {return Void;} else {return new PlaybackItemAmbience("Void");}
             default:
                 return null;
         }
@@ -169,6 +169,13 @@ public class AvailableAmbiences {
                 Void = ambience;
                 break;
         }
+    }
+    public boolean completelyempty() {
+        boolean completelyempty = true;
+        for (int i = 0; i < 16; i++) {
+            if (getsessionpartAmbience(i).hasAny()) {completelyempty = false;}
+        }
+        return completelyempty;
     }
 
 }

@@ -13,12 +13,14 @@ public class AmbienceSong {
     public StringProperty length;
     private File file;
     private double duration;
+    private SoundFile soundFile;
 
     public AmbienceSong(SoundFile soundFile) {
         this.name = new SimpleStringProperty(soundFile.getName());
         this.file = soundFile.getFile();
         duration = soundFile.getDuration();
-        this.length = new SimpleStringProperty(Util.formatdurationtoStringSpelledOut(new Duration(duration), null));
+        this.length = new SimpleStringProperty(Util.formatdurationtoStringDecimalWithColons(new Duration(duration)));
+        this.soundFile = soundFile;
     }
 
     public String getName() {
@@ -28,4 +30,7 @@ public class AmbienceSong {
         return file;
     }
     public double getDuration() {return duration;}
+    public SoundFile getSoundFile() {
+        return soundFile;
+    }
 }

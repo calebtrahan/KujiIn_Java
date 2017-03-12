@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0" prefWidth="367.0" stylesheets="@../../../../../../../../../../../mnt/Gaming/Programming/Java/Kuji-In/src/kujiin/assets/styles/default.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.ui.creation.AddOrEditAmbience">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0" prefWidth="367.0" stylesheets="@../../styles/default.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TableView fx:id="AddOrEditAmbienceTable" prefHeight="200.0" prefWidth="313.0">
         <columns>
@@ -18,20 +18,20 @@
               <items>
                   <Menu mnemonicParsing="false" text="Quick Add">
                     <items>
-                      <MenuItem fx:id="QuickAddRepeatAmbience" mnemonicParsing="false" onAction="#quickaddrepeatambience" text="Repeat Available Ambience" />
-                        <MenuItem fx:id="QuickAddShuffleAmbience" mnemonicParsing="false" onAction="#quickaddshuffleambience" text="Shuffle Available Ambience" />
+                      <MenuItem fx:id="QuickAddRepeatAmbience" mnemonicParsing="false" text="Repeat Available Ambience" />
+                        <MenuItem fx:id="QuickAddShuffleAmbience" mnemonicParsing="false" text="Shuffle Available Ambience" />
                     </items>
                   </Menu>
-                <MenuItem fx:id="AddFromAmbienceDirectory" mnemonicParsing="false" onAction="#addfromavailableambience" text="From Ambience Directory" />
-                <MenuItem fx:id="AddOpenFiles" mnemonicParsing="false" onAction="#addfromfiles" text="From File(s)" />
+                <MenuItem fx:id="AddFromAmbienceDirectory" mnemonicParsing="false" text="From Ambience Directory" />
+                <MenuItem fx:id="AddOpenFiles" mnemonicParsing="false" text="From File(s)" />
               </items>
             </MenuButton>
-            <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removefromtable" text="Remove" />
-            <Button fx:id="PreviewButton" mnemonicParsing="false" onAction="#preview" text="Preview" />
+            <Button fx:id="RemoveButton" mnemonicParsing="false" text="Remove" />
+            <Button fx:id="PreviewButton" mnemonicParsing="false" text="Preview" />
             <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                <children>
-                  <Button fx:id="UpButton" mnemonicParsing="false" onAction="#moveup" text="Up" />
-                  <Button fx:id="DownButton" mnemonicParsing="false" onAction="#movedown" text="Down" />
+                  <Button fx:id="UpButton" mnemonicParsing="false" text="Up" />
+                  <Button fx:id="DownButton" mnemonicParsing="false" text="Down" />
                </children>
             </HBox>
          </children>
@@ -43,8 +43,8 @@
                   <Label fx:id="StatusBar" text="Need To Add 00:43:00 Of Ambience" />
                </children>
             </HBox>
-            <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#accept" text="Accept" />
-            <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+            <Button fx:id="AcceptButton" mnemonicParsing="false" text="Accept" />
+            <Button fx:id="CancelButton" mnemonicParsing="false" text="Cancel" />
          </children>
       </HBox>
    </children>

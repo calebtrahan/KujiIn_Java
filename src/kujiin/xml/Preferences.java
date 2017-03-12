@@ -68,10 +68,7 @@ public class Preferences {
     public final static File TESTFILE = new File(SOUNDDIRECTORY, "Test.mp3");
 
     // Name Constants
-    public static final ArrayList<String> QIGONGNAMES = new ArrayList<>(Arrays.asList("Presession", "Postsession"));
-    public static final ArrayList<String> CUTNAMES = new ArrayList<>(Arrays.asList("RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN"));
-    public static final ArrayList<String> ELEMENTNAMES = new ArrayList<>(Arrays.asList("Earth", "Air", "Fire", "Water", "Void"));
-    public static final ArrayList<String> ALLNAMES = new ArrayList<>(Arrays.asList("Presession", "RIN", "KYO", "TOH", "SHA", "KAI", "JIN", "RETSU", "ZAI", "ZEN", "Earth", "Air", "Fire", "Water", "Void", "Postsession"));
+    public static final ArrayList<String> ALLNAMES = new ArrayList<>(Arrays.asList("Qi-Gong", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Earth", "Air", "Fire", "Water", "Void"));
 /// Default Option Values
     // Program Preferences
     private static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
