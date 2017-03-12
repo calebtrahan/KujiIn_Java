@@ -12,8 +12,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.Duration;
+import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.PreviewFile;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 
 import static kujiin.util.Util.SUPPORTEDAUDIOFORMATS;
 
-public class AddOrEditAmbience extends Stage implements Initializable {
+public class AddOrEditAmbience extends StyledStage implements Initializable {
     public TableView<AddOrEditAmbienceTableItem> AddOrEditAmbienceTable;
     public TableColumn<AddOrEditAmbienceTableItem, Integer> NumberColumn;
     public TableColumn<AddOrEditAmbienceTableItem, String> NameColumn;
@@ -69,6 +69,9 @@ public class AddOrEditAmbience extends Stage implements Initializable {
         DownButton.setOnAction(event -> movedown());
         AcceptButton.setOnAction(event -> accept());
         CancelButton.setOnAction(event -> cancel());
+        NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
+        NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+        DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
     }
     public AddOrEditAmbience(Preferences preferences, Session.PlaybackItem playbackItem, AvailableAmbiences availableAmbiences) {
         try {
@@ -150,13 +153,15 @@ public class AddOrEditAmbience extends Stage implements Initializable {
         populatetable();
     }
     public void quickaddshuffleambience() {
-        List<SoundFile> listtoshuffle = playbackItemAmbience.getAmbience();
+        List<SoundFile> listtoshuffle = new ArrayList<>();
         Duration duration = Duration.ZERO;
         int indexcount = 0;
         while (duration.lessThan(playbackitemduration)) {
             try {
-
-                listtoshuffle.add(playbackItemAmbience.getAmbience().get(indexcount));}
+                SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
+                listtoshuffle.add(filetoadd);
+                duration = duration.add(Duration.millis(filetoadd.getDuration()));
+            }
             catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
         }
         Collections.shuffle(listtoshuffle);
@@ -234,7 +239,7 @@ public class AddOrEditAmbience extends Stage implements Initializable {
         ObservableList<AddOrEditAmbienceTableItem> items = FXCollections.observableArrayList();
         int count = 1;
         for (SoundFile i : ambience.getAmbience()) {
-            items.add(new AddOrEditAmbienceTableItem(count, i.getName(), Util.formatdurationtoStringSpelledOut(new Duration(i.getDuration()), DurationColumn.getWidth())));
+            items.add(new AddOrEditAmbienceTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getDuration()))));
         }
         AddOrEditAmbienceTable.setItems(items);
         updatestatusbar();
@@ -243,12 +248,12 @@ public class AddOrEditAmbience extends Stage implements Initializable {
     private void updatestatusbar() {
         AcceptButton.setDisable(! ambience.gettotalDuration().greaterThan(playbackitemduration));
         if (ambience.gettotalDuration().greaterThan(playbackitemduration)) {
-            StatusBar.setText("Ambience Is Long Enough For Session Duration");
+            StatusBar.setText("Ambience Is Long Enough");
         } else {
             Duration leftoverduration;
             if (ambience.gettotalDuration().greaterThan(Duration.ZERO)) {leftoverduration = playbackitemduration.subtract(ambience.gettotalDuration());}
             else {leftoverduration = playbackitemduration;}
-            StatusBar.setText("Still Need " + Util.formatdurationtoStringDecimalWithColons(leftoverduration) + " Of Ambience");
+            StatusBar.setText("Still Need " + Util.formatdurationtoStringDecimalWithColons(leftoverduration));
         }
     }
     private void syncbuttons() {
@@ -259,8 +264,6 @@ public class AddOrEditAmbience extends Stage implements Initializable {
         UpButton.setDisable(nothingselected || selectedindex == 0);
         DownButton.setDisable(nothingselected || selectedindex == AddOrEditAmbienceTable.getItems().size() - 1);
     }
-
-
 
     // Table Class
     class AddOrEditAmbienceTableItem {

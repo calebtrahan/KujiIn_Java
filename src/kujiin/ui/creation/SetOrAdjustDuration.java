@@ -6,14 +6,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.stage.Stage;
 import javafx.util.Duration;
+import kujiin.ui.boilerplate.StyledStage;
 import kujiin.xml.Session;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-public class SetOrAdjustDuration extends Stage {
+public class SetOrAdjustDuration extends StyledStage {
     public CheckBox RampOnlyCheckbox;
     public Spinner<Integer> HoursSpinner;
     public Spinner<Integer> MinutesSpinner;

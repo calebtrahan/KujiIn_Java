@@ -4,7 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox fx:controller="kujiin.ui.creation.SelectAvailableAmbience" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="298.0" prefWidth="318.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="298.0" prefWidth="318.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TableView fx:id="AvailableAmbienceTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
         <columns>
@@ -22,8 +22,8 @@
                   <Label fx:id="StatusBar" text="Label" />
                </children>
             </HBox>
-            <Button fx:id="AddButton" mnemonicParsing="false" text="Add" onAction="#accept"/>
-            <Button fx:id="CancelButton" mnemonicParsing="false" text="Cancel" onAction="#cancel" />
+            <Button fx:id="AddButton" mnemonicParsing="false" text="Add" />
+            <Button fx:id="CancelButton" mnemonicParsing="false" text="Cancel" />
          </children>
          <VBox.margin>
             <Insets />

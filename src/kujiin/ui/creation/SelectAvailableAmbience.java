@@ -7,12 +7,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.stage.Stage;
+import javafx.scene.control.*;
 import javafx.util.Duration;
+import kujiin.ui.boilerplate.StyledStage;
 import kujiin.util.Util;
 import kujiin.xml.PlaybackItemAmbience;
 import kujiin.xml.SoundFile;
@@ -23,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class SelectAvailableAmbience extends Stage implements Initializable {
+public class SelectAvailableAmbience extends StyledStage implements Initializable {
     public TableView<AvailableAmbienceTableItem> AvailableAmbienceTable;
     public TableColumn<AvailableAmbienceTableItem, String> NameColumn;
     public TableColumn<AvailableAmbienceTableItem, String> DurationColumn;
@@ -36,8 +33,11 @@ public class SelectAvailableAmbience extends Stage implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        AvailableAmbienceTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
+        AddButton.setOnAction(event -> accept());
+        CancelButton.setOnAction(event -> cancel());
     }
     public SelectAvailableAmbience(PlaybackItemAmbience availableAmbience) {
         try {
