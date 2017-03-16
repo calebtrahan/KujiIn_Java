@@ -9,18 +9,21 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import kujiin.ui.boilerplate.IconImageView;
 import kujiin.ui.creation.AddOrEditAmbience;
-import kujiin.ui.creation.SetOrAdjustDuration;
+import kujiin.ui.creation.AdjustDuration;
 import kujiin.ui.dialogs.AmbienceEditor_Advanced;
 import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.ChangeProgramOptions;
 import kujiin.ui.dialogs.EditReferenceFiles;
+import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.ui.export.Exporter;
 import kujiin.ui.playback.Player;
 import kujiin.ui.table.CreatedSessionTableItem;
+import kujiin.util.Util;
 import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.ProgramState;
 import kujiin.xml.*;
@@ -302,7 +305,7 @@ public class MainController implements Initializable {
         }
     }
     public void closeprogram() {
-        new SetOrAdjustDuration(null).showAndWait();
+        new AdjustDuration(null).showAndWait();
     }
     public void editavailableambience() {
         if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Simple")) {
@@ -368,21 +371,41 @@ public class MainController implements Initializable {
     private void add(int availableambienceindex) {
         createdsession.addplaybackitem(availableambienceindex);
         Session.PlaybackItem playbackItem = createdsession.getPlaybackItems().get(createdsession.getPlaybackItems().size() - 1);
-        SetOrAdjustDuration setOrAdjustDuration = new SetOrAdjustDuration(playbackItem);
-        setOrAdjustDuration.showAndWait();
-        if (setOrAdjustDuration.isAccepted()) {
-            createdsession.getPlaybackItems().get(createdsession.getPlaybackItems().size() - 1).setDuration(setOrAdjustDuration.getNewduration().toMillis());
+        AdjustDuration adjustDuration = new AdjustDuration(playbackItem);
+        adjustDuration.showAndWait();
+        if (adjustDuration.isAccepted()) {
+            createdsession.getPlaybackItems().get(createdsession.getPlaybackItems().size() - 1).setDuration(adjustDuration.getNewduration().toMillis());
+            if (availableAmbiences.getsessionpartAmbience(playbackItem.getCreationindex()).hasAny()) {
+                Util.AnswerType answerType = new AnswerDialog(preferences, getStage(), "Add Ambience", "Quick Add Ambience?", "Quick Add Shuffle or Repeat Ambience?", "Shuffle", "Repeat", "No").getResult();
+                if (answerType == Util.AnswerType.YES || answerType == Util.AnswerType.NO) {
+                    PlaybackItemAmbience playbackItemAmbience = availableAmbiences.getsessionpartAmbience(playbackItem.getCreationindex());
+                    List<SoundFile> ambience = playbackItemAmbience.getAmbience();
+                    int indexcount = 0;
+                    Duration duration = Duration.ZERO;
+                    while (duration.lessThan(Duration.millis(playbackItem.getDuration()))) {
+                        try {
+                            SoundFile filetoadd = ambience.get(indexcount);
+                            ambience.add(filetoadd);
+                            duration = duration.add(Duration.millis(filetoadd.getDuration()));
+                        }
+                        catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
+                    }
+                    if (answerType == Util.AnswerType.YES) {Collections.shuffle(ambience);}
+                    playbackItem.getAmbience().setAmbience(ambience);
+                    playbackItem.getAmbience().setEnabled(! ambience.isEmpty());
+                }
+            }
         }
         populatetable();
     }
     private void add(int[] availableambienceindexes) {
         for (int i : availableambienceindexes) {createdsession.addplaybackitem(i);}
-        SetOrAdjustDuration setOrAdjustDuration = new SetOrAdjustDuration(availableambienceindexes.length);
-        setOrAdjustDuration.showAndWait();
-        if (setOrAdjustDuration.isAccepted()) {
+        AdjustDuration adjustDuration = new AdjustDuration(availableambienceindexes.length);
+        adjustDuration.showAndWait();
+        if (adjustDuration.isAccepted()) {
             int playbackitemssize = createdsession.getPlaybackItems().size();
             for (int i = playbackitemssize - 1; i >= playbackitemssize - availableambienceindexes.length; i--) {
-                createdsession.getPlaybackItems().get(i).setDuration(setOrAdjustDuration.getNewduration().toMillis());
+                createdsession.getPlaybackItems().get(i).setDuration(adjustDuration.getNewduration().toMillis());
             }
         }
         populatetable();
@@ -415,18 +438,18 @@ public class MainController implements Initializable {
     public void editduration() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1 && createdtableselecteditem != null) {
-            SetOrAdjustDuration setOrAdjustDuration = new SetOrAdjustDuration(createdtableselecteditem);
-            setOrAdjustDuration.initOwner(getStage());
-            setOrAdjustDuration.showAndWait();
-            if (setOrAdjustDuration.isAccepted()) {
+            AdjustDuration adjustDuration = new AdjustDuration(createdtableselecteditem);
+            adjustDuration.initOwner(getStage());
+            adjustDuration.showAndWait();
+            if (adjustDuration.isAccepted()) {
                 Session.PlaybackItem playbackItem = createdtableselecteditem;
-                playbackItem.setDuration(setOrAdjustDuration.getNewduration().toMillis());
+                playbackItem.setDuration(adjustDuration.getNewduration().toMillis());
                 createdtableplaybackitems.set(selectedindex, playbackItem);
                 populatetable();
             }
         } else {new InformationDialog(preferences, "Cannot Edit Duration", "Select A Single Table Item To Edit Duration", null);}
     }
-    public void addeditambience() {
+    public void addoreditambience() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1 && createdtableselecteditem != null) {
             AddOrEditAmbience addOrEditAmbience = new AddOrEditAmbience(preferences, createdtableselecteditem, availableAmbiences);

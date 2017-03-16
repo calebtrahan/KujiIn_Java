@@ -120,7 +120,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             setResizable(false);
             setTitle("Advanced Ambience Editor");
             SessionPartSelectionBox.setOnAction(event -> selectandloadsessionpart());
-            SessionPartSelectionBox.getSelectionModel().select(playbackitem.getEntrainmentandavailableambienceindex());
+            SessionPartSelectionBox.getSelectionModel().select(playbackitem.getCreationindex());
             tempdirectory = new File(Preferences.DIRECTORYTEMP, "AmbienceEditor");
         } catch (IOException e) {new ExceptionDialog(preferences, e).showAndWait();}
     }

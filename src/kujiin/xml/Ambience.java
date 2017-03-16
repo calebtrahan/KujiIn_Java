@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -62,7 +63,7 @@ public class Ambience {
 ////        }
 //    }
 
-// Actual AvailableAmbiences
+// Ambience List Methods
     public void add(SoundFile soundFile) {
         if (Ambience == null) Ambience = new ArrayList<>();
         Ambience.add(soundFile);
@@ -150,6 +151,34 @@ public class Ambience {
         for (SoundFile i : Ambience) {if (i.getFile().equals(file)) return i;}
         return null;
     }
+    public void addavailableambience_repeat(Duration duration, PlaybackItemAmbience playbackItemAmbience) {
+        Duration currentduration = Duration.ZERO;
+        int indexcount = 0;
+        while (currentduration.lessThan(duration)) {
+            try {
+                SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
+                add(filetoadd);
+                duration = duration.add(Duration.millis(filetoadd.getDuration()));
+            }
+            catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
+        }
+    }
+    public void addavailableambience_shuffle(Duration duration, PlaybackItemAmbience playbackItemAmbience) {
+        List<SoundFile> ambiencelist = new ArrayList<>();
+        Duration currentduration = Duration.ZERO;
+        int indexcount = 0;
+        while (currentduration.lessThan(duration)) {
+            try {
+                SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
+                ambiencelist.add(filetoadd);
+                duration = duration.add(Duration.millis(filetoadd.getDuration()));
+            }
+            catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
+        }
+        Collections.shuffle(ambiencelist);
+        setAmbience(ambiencelist);
+    }
+    public void clearambience() {Ambience.clear();}
     public void remove(int index) {
         Ambience.remove(index);
     }

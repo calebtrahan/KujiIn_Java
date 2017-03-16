@@ -79,7 +79,7 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
             this.preferences = preferences;
             this.playbackItem = playbackItem;
             this.availableAmbiences = availableAmbiences;
-            playbackItemAmbience = availableAmbiences.getsessionpartAmbience(playbackItem.getEntrainmentandavailableambienceindex());
+            playbackItemAmbience = availableAmbiences.getsessionpartAmbience(playbackItem.getCreationindex());
             playbackitemduration = new Duration(playbackItem.getDuration());
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/AddOrEditAmbience.fxml"));
             fxmlLoader.setController(this);
@@ -140,32 +140,11 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
         }
     }
     public void quickaddrepeatambience() {
-        Duration duration = Duration.ZERO;
-        int indexcount = 0;
-        while (duration.lessThan(playbackitemduration)) {
-            try {
-                SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
-                ambience.add(filetoadd);
-                duration = duration.add(Duration.millis(filetoadd.getDuration()));
-            }
-            catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
-        }
+        ambience.addavailableambience_repeat(playbackitemduration, playbackItemAmbience);
         populatetable();
     }
     public void quickaddshuffleambience() {
-        List<SoundFile> listtoshuffle = new ArrayList<>();
-        Duration duration = Duration.ZERO;
-        int indexcount = 0;
-        while (duration.lessThan(playbackitemduration)) {
-            try {
-                SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
-                listtoshuffle.add(filetoadd);
-                duration = duration.add(Duration.millis(filetoadd.getDuration()));
-            }
-            catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
-        }
-        Collections.shuffle(listtoshuffle);
-        ambience.setAmbience(listtoshuffle);
+        ambience.addavailableambience_shuffle(playbackitemduration, playbackItemAmbience);
         populatetable();
     }
     public void removefromtable() {
@@ -226,6 +205,7 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
         }
     }
     public void accept() {
+        ambience.setEnabled(! ambience.getAmbience().isEmpty());
         accepted = ! ambience.getAmbience().isEmpty();
         close();
     }

@@ -107,11 +107,11 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
             NameColumn.setStyle( "-fx-alignment: CENTER-LEFT;");
             DurationColumn.setStyle("-fx-alignment: CENTER");
             setOnShown(event -> {
-                SessionPartChoiceBox.getSelectionModel().select(playbackItem.getEntrainmentandavailableambienceindex());
+                SessionPartChoiceBox.getSelectionModel().select(playbackItem.getCreationindex());
                 selectandloadsessionpart();
             });
             SessionPartChoiceBox.setOnAction(event -> selectandloadsessionpart());
-            selectedplaybackitemambience = availableAmbiences.getsessionpartAmbience(playbackItem.getEntrainmentandavailableambienceindex());
+            selectedplaybackitemambience = availableAmbiences.getsessionpartAmbience(playbackItem.getCreationindex());
         } catch (IOException ignored) {}
     }
 

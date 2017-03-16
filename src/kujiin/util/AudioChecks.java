@@ -132,11 +132,11 @@ public class AudioChecks extends Task {
 // Utility Methods
     private void saveplaybackitemchangestoXML() {
         root.getAvailableEntrainments().setsessionpartEntrainment(selectedplaybackitem, playbackItemEntrainment);
-        root.getAvailableAmbiences().setsessionpartAmbience(selectedplaybackitem.getEntrainmentandavailableambienceindex(), playbackItemAmbience);
+        root.getAvailableAmbiences().setsessionpartAmbience(selectedplaybackitem.getCreationindex(), playbackItemAmbience);
     }
     private void populatefilestocheckforSelectedPlaybackItem() {
         playbackItemEntrainment = root.getAvailableEntrainments().getsessionpartEntrainment(selectedplaybackitem);
-        playbackItemAmbience = root.getAvailableAmbiences().getsessionpartAmbience(selectedplaybackitem.getEntrainmentandavailableambienceindex());
+        playbackItemAmbience = root.getAvailableAmbiences().getsessionpartAmbience(selectedplaybackitem.getCreationindex());
         PlaybackItemAmbienceFiles = null;
         PlaybackItemEntrainmentFiles = null;
         PlaybackItemEntrainmentFiles = new ArrayBlockingQueue<>(playbackItemEntrainment.getAllEntrainmentFiles().size());
@@ -149,7 +149,7 @@ public class AudioChecks extends Task {
     private void calculateworktodo() {
         for (Session.PlaybackItem i : testsession.getPlaybackItems()) {
             totaltasks += root.getAvailableEntrainments().getsessionpartEntrainment(i).getAllEntrainmentFiles().size();
-            try {totaltasks += root.getAvailableAmbiences().getsessionpartAmbience(i.getEntrainmentandavailableambienceindex()).getAmbience().size();}
+            try {totaltasks += root.getAvailableAmbiences().getsessionpartAmbience(i.getCreationindex()).getAmbience().size();}
             catch (NullPointerException ignored) {}
         }
         totaltasks += root.getRampFiles().getRampFiles().size();

@@ -105,7 +105,7 @@ public class AvailableEntrainments {
 
 // Other Methods
     public PlaybackItemEntrainment getsessionpartEntrainment(Session.PlaybackItem sessionItem) {
-        switch (sessionItem.getEntrainmentandavailableambienceindex()) {
+        switch (sessionItem.getCreationindex()) {
             case 0: return QiGong;
             case 1: return Rin;
             case 2: return Kyo;
@@ -125,7 +125,7 @@ public class AvailableEntrainments {
         return null;
     }
     public void setsessionpartEntrainment(Session.PlaybackItem sessionItem, PlaybackItemEntrainment playbackItemEntrainment) {
-        switch (sessionItem.getEntrainmentandavailableambienceindex()) {
+        switch (sessionItem.getCreationindex()) {
             case 0: QiGong = playbackItemEntrainment; break;
             case 1: Rin = playbackItemEntrainment; break;
             case 2: Kyo = playbackItemEntrainment; break;

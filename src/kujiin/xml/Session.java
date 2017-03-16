@@ -121,7 +121,7 @@ public class Session {
 // Subclasses
     @XmlAccessorType(XmlAccessType.FIELD)
     public class PlaybackItem {
-        protected int entrainmentandavailableambienceindex;
+        protected int creationindex;
         protected int playbackindex;
         protected String Name;
         private double Duration; // As Millis
@@ -142,8 +142,8 @@ public class Session {
         }
 
     // Getters And Setters
-        public int getEntrainmentandavailableambienceindex() {
-            return entrainmentandavailableambienceindex;
+        public int getCreationindex() {
+            return creationindex;
         }
         public void setPlaybackindex(int playbackindex) {
                 this.playbackindex = playbackindex;
@@ -388,7 +388,7 @@ public class Session {
 
         public QiGong() {
             super("Qi-Gong");
-            super.entrainmentandavailableambienceindex = 0;
+            super.creationindex = 0;
         }
 
         @Override
@@ -440,7 +440,7 @@ public class Session {
 
         public Rin() {
             super("Rin");
-            super.entrainmentandavailableambienceindex = 1;
+            super.creationindex = 1;
             cutindex = 1;
             super.focuspoint = "Root Chakra";
             super.concept = "A Celebration Of The Spirit Coming Into The Body";
@@ -452,7 +452,7 @@ public class Session {
 
         public Kyo() {
             super("Kyo");
-            super.entrainmentandavailableambienceindex = 2;
+            super.creationindex = 2;
             cutindex = 2;
             super.focuspoint = "Navel Chakra";
             super.concept = "In Order To Become Powerful, Responsiblity Must Be Taken For All Actions";
@@ -464,7 +464,7 @@ public class Session {
 
         public Toh() {
             super("Toh");
-            super.entrainmentandavailableambienceindex = 3;
+            super.creationindex = 3;
             cutindex = 3;
             super.focuspoint = "Dan-tian";
             super.concept = "Conscious Dissolement Of All Personal Fights In Order To Achieve Harmony";
@@ -476,7 +476,7 @@ public class Session {
 
         public Sha() {
             super("Sha");
-            super.entrainmentandavailableambienceindex = 4;
+            super.creationindex = 4;
             cutindex = 4;
             super.focuspoint = "Solar Plexus Charkra";
             super.concept = "By Letting Go Of The Limits Of My Mind You Can Vibrate With The Power Of The Universe And Exist Fully Powerful";
@@ -488,7 +488,7 @@ public class Session {
 
         public Kai() {
             super("Kai");
-            super.entrainmentandavailableambienceindex = 5;
+            super.creationindex = 5;
             cutindex = 5;
             super.focuspoint = "Heart Chakra";
             super.concept = "Everything (Created Or Not) In The Universe Is One";
@@ -500,7 +500,7 @@ public class Session {
 
         public Jin() {
             super("Jin");
-            super.entrainmentandavailableambienceindex = 6;
+            super.creationindex = 6;
             cutindex = 6;
             super.focuspoint = "Throat Chakra";
             super.concept = "An Observation Of The Universe And What Binds Every Part Of Us To Every Part Of Everything Else";
@@ -512,7 +512,7 @@ public class Session {
 
         public Retsu() {
             super("Retsu");
-            super.entrainmentandavailableambienceindex = 7;
+            super.creationindex = 7;
             cutindex = 7;
             super.focuspoint = "Jade Gate Chakra";
             super.concept = "Transmute The Limits Of Perception By Remembering Our Wholeness As Spirit";
@@ -524,7 +524,7 @@ public class Session {
 
         public Zai() {
             super("Zai");
-            super.entrainmentandavailableambienceindex = 8;
+            super.creationindex = 8;
             cutindex = 8;
             super.focuspoint = "Third Eye Chakra";
             super.concept = "Works With Our Mind, Heart And Body In Order To Define Ourselves As A Spirit That Is Having A Human Experience, Rather Than A Human Being Sometimes Having A Spiritual Experience";
@@ -536,7 +536,7 @@ public class Session {
 
         public Zen() {
             super("Zen");
-            super.entrainmentandavailableambienceindex = 9;
+            super.creationindex = 9;
             cutindex = 9;
             super.focuspoint = "Crown Chakra";
             super.concept = "The Human Completely Relents Itself To The Spirit With Only The Consciousness Aspect Of The Human Remaining Active";
@@ -548,35 +548,35 @@ public class Session {
 
         public Earth() {
             super("Earth");
-            super.entrainmentandavailableambienceindex = 10;
+            super.creationindex = 10;
         }
     }
     public class Air extends Element {
 
         public Air() {
             super("Air");
-            super.entrainmentandavailableambienceindex = 11;
+            super.creationindex = 11;
         }
     }
     public class Fire extends Element {
 
         public Fire() {
             super("Fire");
-            super.entrainmentandavailableambienceindex = 12;
+            super.creationindex = 12;
         }
     }
     public class Water extends Element {
 
         public Water() {
             super("Water");
-            super.entrainmentandavailableambienceindex = 13;
+            super.creationindex = 13;
         }
     }
     public class Void extends Element {
 
         public Void() {
             super("Void");
-            super.entrainmentandavailableambienceindex = 14;
+            super.creationindex = 14;
         }
     }
 

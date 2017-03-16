@@ -13,7 +13,7 @@ import kujiin.xml.Session;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-public class SetOrAdjustDuration extends StyledStage {
+public class AdjustDuration extends StyledStage {
     public CheckBox RampOnlyCheckbox;
     public Spinner<Integer> HoursSpinner;
     public Spinner<Integer> MinutesSpinner;
@@ -23,9 +23,9 @@ public class SetOrAdjustDuration extends StyledStage {
     private Duration newduration;
     private boolean accepted = false;
 
-    public SetOrAdjustDuration(Session.PlaybackItem playbackItem) {
+    public AdjustDuration(Session.PlaybackItem playbackItem) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/SetOrAdjustDuration.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/AdjustDuration.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
@@ -44,9 +44,9 @@ public class SetOrAdjustDuration extends StyledStage {
             setListeners();
         } catch (IOException e) {e.printStackTrace();}
     }
-    public SetOrAdjustDuration(int numberofitems) {
+    public AdjustDuration(int numberofitems) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/SetOrAdjustDuration.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/AdjustDuration.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);

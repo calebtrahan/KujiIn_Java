@@ -101,7 +101,7 @@
                                              </items>
                                           </MenuButton>
                                           <Button fx:id="EditDurationsButton" mnemonicParsing="false" onAction="#editduration" text="Edit Duration" />
-                                          <Button fx:id="AddEditAmbienceButton" mnemonicParsing="false" onAction="#addeditambience" text="Edit Ambience" />
+                                          <Button fx:id="AddEditAmbienceButton" mnemonicParsing="false" onAction="#addoreditambience" text="Edit Ambience" />
                                           <Button fx:id="MoveUpButton" mnemonicParsing="false" onAction="#moveupincreatortable" text="Move Up" />
                                           <Button fx:id="MoveDownButton" mnemonicParsing="false" onAction="#movedownincreatortable" text="Move Down" />
                                           <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removefromcreatortable" text="Remove" />
