@@ -4,6 +4,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -132,11 +133,12 @@ public class Player extends Stage {
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().itemname);
             DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().duration);
             PercentColumn.setCellValueFactory(cellDate -> cellDate.getValue().percentcompleted);
-            PlaylistTableView.setSelectionModel(null);
+            PlaylistTableView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> PlaylistTableView.getSelectionModel().select(-1)));
             playerState = IDLE;
             setupTooltips();
             setOnCloseRequest(event -> closedialog());
             ReferenceTypeChoiceBox.setOnAction(event -> referencetypechanged());
+            ReferenceToggleCheckBox.setOnAction(event -> ReferenceToggleCheckboxtoggled());
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
     public void setupTooltips() {
@@ -156,7 +158,6 @@ public class Player extends Stage {
                 currententrainmentvolume = Preferences.getPlaybackOptions().getEntrainmentvolume();
                 currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume();
                 start();
-                displayreferencefile();
                 break;
             case PAUSED:
                 updateuitimeline.play();
@@ -232,16 +233,28 @@ public class Player extends Stage {
                     default:
                         break;
                 }
-            } else {ReferenceContentPane.setContent(new TextArea("Reference File Is Empty Or Missing"));}
-        } catch (NullPointerException ignored) {ReferenceContentPane.setContent(new TextArea("No Session Playing"));}
+            } else {
+                TextArea ta = new TextArea("Reference File Is Empty Or Missing");
+                ta.prefWidthProperty().bind(ReferenceContentPane.widthProperty());
+                ta.prefHeightProperty().bind(ReferenceContentPane.heightProperty());
+                ReferenceContentPane.setContent(ta);
+            }
+        } catch (NullPointerException ignored) {
+            TextArea ta = new TextArea("No Session Playing");
+            ta.prefWidthProperty().bind(ReferenceContentPane.widthProperty());
+            ta.prefHeightProperty().bind(ReferenceContentPane.heightProperty());
+            ReferenceContentPane.setContent(ta);
+        }
     }
     private void updateplaylist() {
         PlaylistTableView.getItems().clear();
         ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
+        PlaylistTableView.getSelectionModel().select(SessionInProgress.getPlaybackItems().indexOf(SelectedPlaybackItem));
         for (Session.PlaybackItem i : SessionInProgress.getPlaybackItems()) {
             float totalprogress = (float) i.getElapsedTime() / (float) i.getDuration();
             int percentage = new Double(totalprogress * 100).intValue();
-            playlistitems.add(new PlaylistTableItem(i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getDuration())), percentage + "%"));
+            String progress = Util.formatdurationtoStringDecimalWithColons(new Duration(i.getElapsedTime())) + " > " + Util.formatdurationtoStringDecimalWithColons(new Duration(i.getDuration()));
+            playlistitems.add(new PlaylistTableItem(i.getName(), progress, percentage + "%"));
         }
         PlaylistTableView.setItems(playlistitems);
     }
@@ -286,11 +299,7 @@ public class Player extends Stage {
         PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
         StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
         ReferenceToggleCheckBox.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
-        if (referencecurrentlyDisplayed()) {
-//            root.getSessionCreator().getDisplayReference().PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
-//            root.getSessionCreator().getDisplayReference().PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
-//            root.getSessionCreator().getDisplayReference().StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
-        }
+        ReferenceTypeChoiceBox.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
         String playbuttontext;
         String pausebuttontext;
         String stopbuttontext;
@@ -554,7 +563,6 @@ public class Player extends Stage {
         }
     }
     private void stop() {
-        closereferencefile();
         volume_unbindentrainment();
         if (fade_entrainment_stop != null) {
             if (fade_entrainment_stop.getStatus() == Animation.Status.RUNNING) {return;}
@@ -588,7 +596,7 @@ public class Player extends Stage {
                         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(index);
                         PlaylistTableView.getSelectionModel().select(index);
                         start();
-                        displayreferencefile();
+                        if (ReferenceToggleCheckBox.isSelected() && ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {loadreferencecontent();}
                     } catch (IndexOutOfBoundsException ignored) {
                         playerState = IDLE;
                         cleanupPlayersandAnimations();
@@ -596,7 +604,6 @@ public class Player extends Stage {
                     }
                     break;
                 case PLAYING:
-                    closereferencefile();
                     transition();
                     break;
             }
@@ -1114,62 +1121,36 @@ public class Player extends Stage {
 
 // Reference
     public void togglereference() {
-//        boolean buttontoggled = ReferenceToggleCheckBox.isSelected();
-//        Root.getPreferences().getSessionOptions().setReferenceoption(buttontoggled);
-//        if (! buttontoggled) {
-//            closereferencefile();
-//            togglevolumebinding();
-//        } else {
-//        if (selectReferenceType != null && selectReferenceType.isShowing()) {return;}
-//        else {selectReferenceType = new SelectReferenceType(Root, this, false, itemsinsession);}
-//        switch (playerState) {
-//            case IDLE:
-//                selectReferenceType.showAndWait();
-//                Root.getPreferences().getSessionOptions().setReferenceoption(selectReferenceType.getResult());
-//                if (selectReferenceType.getResult()) {
-//                    Root.getPreferences().getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
-//                    Root.getPreferences().getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
-//                } else {
-//                    ReferenceToggleCheckBox.setSelected(false);}
-//                break;
-//            case PLAYING:
-//                selectReferenceType.showAndWait();
-//                Root.getPreferences().getSessionOptions().setReferenceoption(selectReferenceType.getResult());
-//                if (selectReferenceType.getResult()) {
-//                    Root.getPreferences().getSessionOptions().setReferencetype(selectReferenceType.getReferenceType());
-//                    Root.getPreferences().getSessionOptions().setReferencefullscreen(selectReferenceType.getFullScreen());
-//                    displayreferencefile();
-//                    togglevolumebinding();
-//                }
-//                break;
-//            case PAUSED:
-//            case STOPPED:
-//            default:
-//                ReferenceToggleCheckBox.setSelected(false);
-//                break;
-//        }
+        boolean buttontoggled = ReferenceToggleCheckBox.isSelected();
+        if (buttontoggled && SelectedPlaybackItem != null) {
+            if (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {loadreferencecontent();}
+            else if (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() == -1) {ReferenceContentPane.setContent(new TextArea("Select Reference Type For " + SelectedPlaybackItem.getName()));}
+            else {ReferenceContentPane.setContent(new TextArea(""));}
+        } else {ReferenceContentPane.setContent(new TextArea(""));}
     }
-    public void displayreferencefile() {
-//        boolean notalreadyshowing = displayReference == null || ! displayReference.isShowing();
-//        boolean referenceenabledwithvalidtype = Root.getPreferences().getSessionOptions().getReferenceoption() &&
-//                (Root.getPreferences().getSessionOptions().getReferencetype() == ReferenceType.html || Root.getPreferences().getSessionOptions().getReferencetype() == ReferenceType.txt);
-//        if (notalreadyshowing && referenceenabledwithvalidtype) {
-//            displayReference = new DisplayReference(Root, this, false, currentsessionpart, itemsinsession.indexOf(currentsessionpart) == 0);
-//            displayReference.show();
-//            displayReference.setOnHidden(event -> {
-//                currentsessionpart.volume_rebindentrainment();
-//                if (ambienceenabled) {currentsessionpart.volume_rebindambience();}
-//            });
-//        }
-    }
-    public void closereferencefile() {
-//        if (referencecurrentlyDisplayed()) {
-//            displayReference.close();
-//        }
-    }
-    public boolean referencecurrentlyDisplayed() {
-        return true;
-//        return displayReference != null && displayReference.isShowing() && displayReference.EntrainmentVolumeSlider != null;
+    private void loadreferencecontent() {
+        switch (referenceType) {
+            case txt:
+                StringBuilder sb = new StringBuilder();
+                try (FileInputStream fis = new FileInputStream(SelectedPlaybackItem.getReferenceFile(referenceType));
+                     BufferedInputStream bis = new BufferedInputStream(fis)) {
+                    while (bis.available() > 0) {sb.append((char) bis.read());}
+                } catch (Exception ignored) {}
+                TextArea ta = new TextArea();
+                ta.setText(sb.toString());
+                ta.setWrapText(true);
+                ReferenceContentPane.setContent(ta);
+                break;
+            case html:
+                WebView browser = new WebView();
+                WebEngine webEngine = browser.getEngine();
+                webEngine.load(SelectedPlaybackItem.getReferenceFile(referenceType).toURI().toString());
+                webEngine.setUserStyleSheetLocation(kujiin.xml.Preferences.REFERENCE_THEMEFILE.toURI().toString());
+                ReferenceContentPane.setContent(browser);
+                break;
+            default:
+                break;
+        }
     }
 
     public void closedialog() {}

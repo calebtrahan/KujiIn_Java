@@ -1,29 +1,42 @@
-package kujiin.ui.dialogs;
-
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import kujiin.ui.MainController;
-import kujiin.util.enums.ReferenceType;
-
-public class DisplayReference {
-    public ScrollPane ContentPane;
-    public Slider EntrainmentVolumeSlider;
-    public Label EntrainmentVolumePercentage;
-    public Slider AmbienceVolumeSlider;
-    public Label AmbienceVolumePercentage;
-    public Button PlayButton;
-    public Button PauseButton;
-    public Button StopButton;
-    public ProgressBar TotalProgress;
-    public ProgressBar CurrentProgress;
-    public Label CurrentName;
-    public Label CurrentPercentage;
-    public Label TotalPercentage;
-    private Boolean fullscreenoption;
-    private Scene scene;
-    private ReferenceType referenceType;
-    private MainController Root;
-
+//package kujiin.ui.dialogs;
+//
+//import javafx.application.Platform;
+//import javafx.fxml.FXMLLoader;
+//import javafx.geometry.Rectangle2D;
+//import javafx.scene.Scene;
+//import javafx.scene.control.*;
+//import javafx.scene.web.WebEngine;
+//import javafx.scene.web.WebView;
+//import javafx.stage.Screen;
+//import javafx.stage.Stage;
+//import kujiin.ui.MainController;
+//import kujiin.util.enums.ReferenceType;
+//import kujiin.util.table.SessionItem;
+//import kujiin.xml.Preferences;
+//
+//import java.io.BufferedInputStream;
+//import java.io.FileInputStream;
+//import java.io.IOException;
+//
+//public class DisplayReference {
+//    public ScrollPane ContentPane;
+//    public Slider EntrainmentVolumeSlider;
+//    public Label EntrainmentVolumePercentage;
+//    public Slider AmbienceVolumeSlider;
+//    public Label AmbienceVolumePercentage;
+//    public Button PlayButton;
+//    public Button PauseButton;
+//    public Button StopButton;
+//    public ProgressBar TotalProgress;
+//    public ProgressBar CurrentProgress;
+//    public Label CurrentName;
+//    public Label CurrentPercentage;
+//    public Label TotalPercentage;
+//    private Boolean fullscreenoption;
+//    private Scene scene;
+//    private ReferenceType referenceType;
+//    private MainController Root;
+//
 //    public DisplayReference(MainController Root, Stage stage, boolean minimizeparent, SessionItem sessionItem, boolean showsuggestions) {
 //        super(Root, stage, minimizeparent);
 //        try {
@@ -127,39 +140,12 @@ public class DisplayReference {
 //    }
 //    public void loadcontent(File referencefile) {
 //        if (referencefile != null) {
-//            switch (referenceType) {
-//                case txt:
-//                    StringBuilder sb = new StringBuilder();
-//                    try (FileInputStream fis = new FileInputStream(referencefile);
-//                         BufferedInputStream bis = new BufferedInputStream(fis)) {
-//                        while (bis.available() > 0) {
-//                            sb.append((char) bis.read());
-//                        }
-//                    } catch (Exception ignored) {}
-//                    TextArea ta = new TextArea();
-//                    ta.setText(sb.toString());
-//                    ta.setWrapText(true);
-//                    ContentPane.setContent(ta);
-//                    getIcons().clear();
-//                    getIcons().add(PROGRAM_ICON);
-//                    String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-//                    if (themefile != null) {getScene().getStylesheets().add(themefile);}
-//                    break;
-//                case html:
-//                    WebView browser = new WebView();
-//                    WebEngine webEngine = browser.getEngine();
-//                    webEngine.load(referencefile.toURI().toString());
-//                    webEngine.setUserStyleSheetLocation(Preferences.REFERENCE_THEMEFILE.toURI().toString());
-//                    ContentPane.setContent(browser);
-//                    break;
-//                default:
-//                    break;
-//            }
+//
 //        } else {System.out.println("Reference File Is Null");}
 //    }
 //    public void untoggleplayerreference() {
 //        Root.getSessionCreator().getPlayer().ReferenceCheckBox.setSelected(false);
 //        Root.getSessionCreator().getPlayer().togglereference();
 //    }
-
-}
+//
+//}

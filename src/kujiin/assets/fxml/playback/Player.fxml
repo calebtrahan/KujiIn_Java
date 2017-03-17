@@ -35,7 +35,7 @@
                            <children>
                               <VBox layoutX="95.0" layoutY="169.0" prefHeight="237.0" prefWidth="108.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <HBox alignment="CENTER" maxHeight="25.0" minHeight="25.0">
+                                    <HBox alignment="CENTER" maxHeight="25.0" minHeight="30.0">
                                        <children>
                                           <CheckBox fx:id="ReferenceToggleCheckBox" mnemonicParsing="false" onAction="#ReferenceToggleCheckboxtoggled" text="Display Reference" textAlignment="CENTER" />
                                           <Label text="Type:">
@@ -64,7 +64,7 @@
                               <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                            </padding>
                         </AnchorPane>
-                      <AnchorPane maxWidth="255.0" minWidth="255.0">
+                      <AnchorPane maxWidth="300.0" minWidth="300.0">
                            <children>
                               <VBox alignment="TOP_CENTER" layoutX="67.0" layoutY="119.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
@@ -80,10 +80,10 @@
                                           </Label>
                                        </children>
                                     </HBox>
-                                    <TableView fx:id="PlaylistTableView" maxWidth="260.0" minWidth="180.0" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="PlaylistTableView" maxWidth="300.0" minWidth="300.0" VBox.vgrow="ALWAYS">
                                       <columns>
                                         <TableColumn fx:id="NameColumn" maxWidth="95.0" minWidth="85.0" prefWidth="89.0" sortable="false" text="Name" />
-                                        <TableColumn fx:id="DurationColumn" maxWidth="100.0" minWidth="95.0" prefWidth="110.0" sortable="false" text="Duration" />
+                                        <TableColumn fx:id="DurationColumn" maxWidth="149.0" minWidth="149.0" prefWidth="149.0" sortable="false" text="Progress" />
                                           <TableColumn fx:id="PercentColumn" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" sortable="false" text="\%" />
                                       </columns>
                                     </TableView>

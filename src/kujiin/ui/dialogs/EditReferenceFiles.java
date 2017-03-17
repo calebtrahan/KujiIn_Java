@@ -186,7 +186,7 @@ public class EditReferenceFiles extends Stage {
             if (! Util.String_validhtml(MainTextArea.getText())) {
                 if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Html Code In Text Area Is Not Valid HTML", "Preview Anyways", "Cancel").getResult()) {return;}
             }
-            new DisplayReference();
+//            new DisplayReference();
         }
     }
 
