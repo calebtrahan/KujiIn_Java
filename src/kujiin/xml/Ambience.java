@@ -158,7 +158,7 @@ public class Ambience {
             try {
                 SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
                 add(filetoadd);
-                duration = duration.add(Duration.millis(filetoadd.getDuration()));
+                currentduration = currentduration.add(Duration.millis(filetoadd.getDuration()));
             }
             catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
         }
@@ -178,7 +178,7 @@ public class Ambience {
         Collections.shuffle(ambiencelist);
         setAmbience(ambiencelist);
     }
-    public void clearambience() {Ambience.clear();}
+    public void clearambience() { if (Ambience != null) {Ambience.clear();}}
     public void remove(int index) {
         Ambience.remove(index);
     }

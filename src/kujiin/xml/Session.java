@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 import static kujiin.util.Util.dateFormat;
 
@@ -54,6 +55,43 @@ public class Session {
         this.elapsedtime = elapsedtime;
     }
     public double getElapsedTime() {return elapsedtime.toMillis();}
+    public PlaybackItem getplaybackitem(int index) {
+        switch (index) {
+            case 0:
+                return new QiGong();
+            case 1:
+                return new Rin();
+            case 2:
+                return new Kyo();
+            case 3:
+                return new Toh();
+            case 4:
+                return new Sha();
+            case 5:
+                return new Kai();
+            case 6:
+                return new Jin();
+            case 7:
+                return new Retsu();
+            case 8:
+                return new Zai();
+            case 9:
+                return new Zen();
+            case 10:
+                return new Earth();
+            case 11:
+                return new Air();
+            case 12:
+                return new Fire();
+            case 13:
+                return new Water();
+            case 14:
+                return new Void();
+            default:
+                return null;
+        }
+    }
+    public void addplaybackitems(List<PlaybackItem> playbackitems) {if (playbackItems == null) {playbackItems = new ArrayList<>();} playbackItems.addAll(playbackitems);}
     public void addplaybackitem(int index) {
         if (playbackItems == null) {playbackItems = new ArrayList<>();}
         switch (index) {
@@ -177,7 +215,7 @@ public class Session {
                 else {return Util.formatdurationtoStringSpelledOut(new Duration(getDuration()), maxchars);}
             }
         }
-        public String getAmbienceasString(double maxchars) {
+        public String getAmbienceasString() {
             if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {return "No Ambience Set";}
             else {return "Ambience Set " + "(" + ambience.getAmbience().size() + " Files)";}
         }
@@ -187,6 +225,9 @@ public class Session {
         }
         public Ambience getAmbience() {
             return ambience;
+        }
+        public void setAmbience(Ambience ambience) {
+            this.ambience = ambience;
         }
 
     // Utility Methods

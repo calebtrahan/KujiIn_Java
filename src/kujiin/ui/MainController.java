@@ -9,21 +9,19 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import kujiin.ui.boilerplate.IconImageView;
 import kujiin.ui.creation.AddOrEditAmbience;
 import kujiin.ui.creation.AdjustDuration;
+import kujiin.ui.creation.SetDurationAndAmbience;
 import kujiin.ui.dialogs.AmbienceEditor_Advanced;
 import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.ChangeProgramOptions;
 import kujiin.ui.dialogs.EditReferenceFiles;
-import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.ui.export.Exporter;
 import kujiin.ui.playback.Player;
 import kujiin.ui.table.CreatedSessionTableItem;
-import kujiin.util.Util;
 import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.ProgramState;
 import kujiin.xml.*;
@@ -369,45 +367,18 @@ public class MainController implements Initializable {
     }
     // Creation Table Methods
     private void add(int availableambienceindex) {
-        createdsession.addplaybackitem(availableambienceindex);
-        Session.PlaybackItem playbackItem = createdsession.getPlaybackItems().get(createdsession.getPlaybackItems().size() - 1);
-        AdjustDuration adjustDuration = new AdjustDuration(playbackItem);
+        Session.PlaybackItem playbackItem = createdsession.getplaybackitem(availableambienceindex);
+        SetDurationAndAmbience adjustDuration = new SetDurationAndAmbience(preferences, availableAmbiences, Collections.singletonList(playbackItem));
         adjustDuration.showAndWait();
-        if (adjustDuration.isAccepted()) {
-            createdsession.getPlaybackItems().get(createdsession.getPlaybackItems().size() - 1).setDuration(adjustDuration.getNewduration().toMillis());
-            if (availableAmbiences.getsessionpartAmbience(playbackItem.getCreationindex()).hasAny()) {
-                Util.AnswerType answerType = new AnswerDialog(preferences, getStage(), "Add Ambience", "Quick Add Ambience?", "Quick Add Shuffle or Repeat Ambience?", "Shuffle", "Repeat", "No").getResult();
-                if (answerType == Util.AnswerType.YES || answerType == Util.AnswerType.NO) {
-                    PlaybackItemAmbience playbackItemAmbience = availableAmbiences.getsessionpartAmbience(playbackItem.getCreationindex());
-                    List<SoundFile> ambience = playbackItemAmbience.getAmbience();
-                    int indexcount = 0;
-                    Duration duration = Duration.ZERO;
-                    while (duration.lessThan(Duration.millis(playbackItem.getDuration()))) {
-                        try {
-                            SoundFile filetoadd = ambience.get(indexcount);
-                            ambience.add(filetoadd);
-                            duration = duration.add(Duration.millis(filetoadd.getDuration()));
-                        }
-                        catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
-                    }
-                    if (answerType == Util.AnswerType.YES) {Collections.shuffle(ambience);}
-                    playbackItem.getAmbience().setAmbience(ambience);
-                    playbackItem.getAmbience().setEnabled(! ambience.isEmpty());
-                }
-            }
-        }
+        if (adjustDuration.isAccepted()) {createdsession.addplaybackitems(adjustDuration.getPlaybackItemList());}
         populatetable();
     }
     private void add(int[] availableambienceindexes) {
-        for (int i : availableambienceindexes) {createdsession.addplaybackitem(i);}
-        AdjustDuration adjustDuration = new AdjustDuration(availableambienceindexes.length);
+        List<Session.PlaybackItem> items = new ArrayList<>();
+        for (int i : availableambienceindexes) {items.add(createdsession.getplaybackitem(i));}
+        SetDurationAndAmbience adjustDuration = new SetDurationAndAmbience(preferences, availableAmbiences, items);
         adjustDuration.showAndWait();
-        if (adjustDuration.isAccepted()) {
-            int playbackitemssize = createdsession.getPlaybackItems().size();
-            for (int i = playbackitemssize - 1; i >= playbackitemssize - availableambienceindexes.length; i--) {
-                createdsession.getPlaybackItems().get(i).setDuration(adjustDuration.getNewduration().toMillis());
-            }
-        }
+        if (adjustDuration.isAccepted()) {createdsession.addplaybackitems(adjustDuration.getPlaybackItemList());}
         populatetable();
     }
     public void addallitems_kujiin() {
@@ -515,7 +486,7 @@ public class MainController implements Initializable {
             int number = 1;
             for (Session.PlaybackItem i : createdtableplaybackitems) {
                 createdtableitems.add(new CreatedSessionTableItem(number, i.getName(),
-                        i.getdurationasString(CreatedTableItemColumn.getWidth()), i.getAmbienceasString(CreatedTableAmbienceColumn.getWidth())));
+                        i.getdurationasString(CreatedTableItemColumn.getWidth()), i.getAmbienceasString()));
                 number++;
             }
             CreatedTableView.setItems(createdtableitems);

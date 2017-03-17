@@ -86,9 +86,6 @@ public class AdjustDuration extends StyledStage {
     }
 
 // Button Actions
-    public void ramptoggled() {
-        
-    }
     public void accept() {
         Duration tempduration = Duration.ZERO;
         tempduration = tempduration.add(Duration.hours(HoursSpinner.getValue()));
@@ -102,5 +99,6 @@ public class AdjustDuration extends StyledStage {
         accepted = false;
         close();
     }
+    public void ramptoggled() {}
 
 }

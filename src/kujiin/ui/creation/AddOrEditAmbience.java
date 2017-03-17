@@ -211,6 +211,7 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
     }
     public void cancel() {
         accepted = false;
+        close();
     }
 
 // Other Methods
