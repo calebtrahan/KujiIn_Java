@@ -93,6 +93,7 @@ public class MainController implements Initializable {
     public TableColumn<CreatedSessionTableItem, String> CreatedTableItemColumn;
     public TableColumn<CreatedSessionTableItem, String> CreatedTableDurationColumn;
     public TableColumn<CreatedSessionTableItem, String> CreatedTableAmbienceColumn;
+    public ToolBar CreationTableControlsToolBar;
     public MenuButton AddItemsMenu;
     public Menu AddAllMenu;
     public MenuItem AddAllKujiInMenuItem;
@@ -215,7 +216,7 @@ public class MainController implements Initializable {
         return RampFiles;
     }
 
-    // Window Methods
+// Window Methods
     private boolean cleanup() {
         availableAmbiences.marshall();
         AvailableEntrainments.marshall();
@@ -556,23 +557,5 @@ public class MainController implements Initializable {
     // Utility
     public List<Goals.Goal> getGoalsFor(Session.PlaybackItem playbackItem) {return goals.get(playbackItem);}
 
-// Startup Checks
-
-//    public void startupchecks_start() {
-//        programState = ProgramState.STARTING_UP;
-////        sessionCreator.setDisable(true, "");
-////        startupChecks = new StartupChecks(getSessionParts(0, 16));
-////        startupChecks.run();
-//    }
-//    public void startupchecks_finished() {
-////        sessionCreator.setDisable(false, "");
-//        programState = ProgramState.IDLE;
-//        startupChecks = null;
-////        Util.gui_showtimedmessageonlabel(CreatorStatusBar, "Startup Checks Completed", 3000);
-//    }
-//    class StartupChecks extends Task {
-
-
-/////////////////////// STARTUP CHECKS END ////////////////////////////////
 
 }

@@ -41,13 +41,21 @@
                            <children>
                               <ToolBar prefHeight="41.0" prefWidth="600.0">
                                 <items>
-                                    <MenuButton fx:id="CreateSessionMenu" mnemonicParsing="false" text="Create New Session">
+                                    <Label alignment="CENTER" text="Session:" textAlignment="CENTER">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                       <padding>
+                                          <Insets bottom="2.0" left="3.0" right="3.0" />
+                                       </padding>
+                                    </Label>
+                                    <MenuButton fx:id="CreateSessionMenu" mnemonicParsing="false" text="Create New">
                                       <items>
                                         <MenuItem fx:id="CreateBlankSessionMenuItem" mnemonicParsing="false" onAction="#createblanksession" text="Blank Session" />
                                         <MenuItem fx:id="OpenPresetsMenuItem" mnemonicParsing="false" onAction="#createwithpreset" text="Presets" />
                                       </items>
                                     </MenuButton>
-                                    <Button fx:id="OpenFileButton" mnemonicParsing="false" onAction="#opensessionfromfile" text="Open File" />
+                                    <Button fx:id="OpenFileButton" mnemonicParsing="false" onAction="#opensessionfromfile" text="Open From File" />
                                     <Button fx:id="OpenRecentSessionsButton" mnemonicParsing="false" onAction="#openrecentsession" text="Recent" />
                                     <Button fx:id="OpenFavoritesButton" mnemonicParsing="false" onAction="#openfavoritesession" text="Favorites" />
                                 </items>
@@ -57,15 +65,15 @@
                                     <TableView fx:id="CreatedTableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                       <columns>
                                         <TableColumn fx:id="CreatedTableNumberColumn" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" sortable="false" text="#" />
-                                        <TableColumn fx:id="CreatedTableItemColumn" minWidth="-1.0" prefWidth="-1.0" sortable="false" text="Playback Item" />
-                                          <TableColumn fx:id="CreatedTableDurationColumn" prefWidth="119.0" sortable="false" text="Duration" />
-                                          <TableColumn fx:id="CreatedTableAmbienceColumn" prefWidth="184.0" sortable="false" text="Preset Ambience" />
+                                        <TableColumn fx:id="CreatedTableItemColumn" minWidth="-1.0" prefWidth="213.0" resizable="false" sortable="false" text="Playback Item" />
+                                          <TableColumn fx:id="CreatedTableDurationColumn" prefWidth="223.0" resizable="false" sortable="false" text="Duration" />
+                                          <TableColumn fx:id="CreatedTableAmbienceColumn" prefWidth="222.0" resizable="false" sortable="false" text="Ambience" />
                                       </columns>
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
                                     </TableView>
-                                    <ToolBar maxHeight="39.0" VBox.vgrow="ALWAYS">
+                                    <ToolBar fx:id="CreationTableControlsToolBar" maxHeight="39.0" VBox.vgrow="ALWAYS">
                                       <items>
                                           <MenuButton fx:id="AddItemsMenu" maxHeight="27.0" mnemonicParsing="false" text="Add">
                                              <items>
