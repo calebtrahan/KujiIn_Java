@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.ui.boilerplate.IconImageView;
@@ -18,6 +19,7 @@ import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.ChangeProgramOptions;
 import kujiin.ui.dialogs.EditReferenceFiles;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.ui.export.Exporter;
 import kujiin.ui.playback.Player;
@@ -25,8 +27,11 @@ import kujiin.ui.table.CreatedSessionTableItem;
 import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.ProgramState;
 import kujiin.xml.*;
-import kujiin.xml.Preferences;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -343,7 +348,20 @@ public class MainController implements Initializable {
     public void createwithpreset() {
     }
     public void opensessionfromfile() {
-
+        File filetoload;
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select A Session To Open");
+        filetoload = fileChooser.showOpenDialog(getStage());
+        if (filetoload != null) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(Session.class);
+                Unmarshaller createMarshaller = context.createUnmarshaller();
+                createdsession = (Session) createMarshaller.unmarshal(filetoload);
+                populatetable();
+            } catch (JAXBException e) {
+                new ErrorDialog(preferences, "Invalid File", "'" + filetoload.getName() + "' Isn't A Valid Session File", "Select A Valid Session To Load");
+            }
+        }
     }
     public void openrecentsession() {
     }
