@@ -4,9 +4,9 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -95,7 +95,6 @@ public class Player extends Stage {
     private PlayerState playerState;
     private Preferences Preferences;
     private ReferenceType referenceType;
-    private Session.PlaybackItem SelectedPlaybackItem;
 // Toggles
     public Boolean displaynormaltime = true;
 // Event Handlers
@@ -133,12 +132,29 @@ public class Player extends Stage {
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().itemname);
             DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().duration);
             PercentColumn.setCellValueFactory(cellDate -> cellDate.getValue().percentcompleted);
-            PlaylistTableView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> PlaylistTableView.getSelectionModel().select(-1)));
+            PlaylistTableView.setOnMouseClicked(Event::consume);
             playerState = IDLE;
             setupTooltips();
             setOnCloseRequest(event -> closedialog());
             ReferenceTypeChoiceBox.setOnAction(event -> referencetypechanged());
             ReferenceToggleCheckBox.setOnAction(event -> ReferenceToggleCheckboxtoggled());
+            setOnCloseRequest(event -> {
+                if (playerState != IDLE && playerState != STOPPED) {
+                    pausewithoutanimation();
+                    if (new ConfirmationDialog(Root.getPreferences(), "Stop Session", "Session Is In Progress", "End This Session Prematurely?").getResult()) {
+                        cleanupPlayersandAnimations();
+                    } else {
+                        event.consume();
+                        resume();
+                    }
+                }
+            });
+            SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionDuration()));
+            PlayButton.requestFocus();
+            SessionProgressPercentage.setVisible(false);
+            SessionProgress.setOnMouseEntered(event -> SessionProgressPercentage.setVisible(true));
+            SessionProgress.setOnMouseExited(event -> SessionProgressPercentage.setVisible(false));
+            SessionProgress.setOnMouseClicked(event -> SessionProgressPercentage.setVisible(! SessionProgressPercentage.isVisible()));
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
     public void setupTooltips() {
@@ -157,6 +173,7 @@ public class Player extends Stage {
                 selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
                 currententrainmentvolume = Preferences.getPlaybackOptions().getEntrainmentvolume();
                 currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume();
+                setupsession();
                 start();
                 break;
             case PAUSED:
@@ -208,7 +225,7 @@ public class Player extends Stage {
     }
     private void loadreference() {
         try {
-            File referencefile = SelectedPlaybackItem.getReferenceFile(referenceType);
+            File referencefile = selectedPlaybackItem.getReferenceFile(referenceType);
             if (referencefile != null) {
                 switch (referenceType) {
                     case txt:
@@ -249,7 +266,7 @@ public class Player extends Stage {
     private void updateplaylist() {
         PlaylistTableView.getItems().clear();
         ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
-        PlaylistTableView.getSelectionModel().select(SessionInProgress.getPlaybackItems().indexOf(SelectedPlaybackItem));
+        PlaylistTableView.getSelectionModel().select(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem));
         for (Session.PlaybackItem i : SessionInProgress.getPlaybackItems()) {
             float totalprogress = (float) i.getElapsedTime() / (float) i.getDuration();
             int percentage = new Double(totalprogress * 100).intValue();
@@ -262,9 +279,10 @@ public class Player extends Stage {
 // Playback
     // UI Update
     private void updateplayerui() {
-        if (playerState == PLAYING) {
+        PlayerState p = playerState;
+        if (p == PLAYING || p == FADING_PLAY || p == FADING_PAUSE || p == FADING_RESUME || p == FADING_STOP) {
             try {
-                SelectedPlaybackItem.addelapsedtime(updateuifrequency);
+                selectedPlaybackItem.addelapsedtime(updateuifrequency);
                 SessionInProgress.addelapsedtime(updateuifrequency);
                 updateplaylist();
             // Update Total Progress
@@ -273,7 +291,7 @@ public class Player extends Stage {
                 if (SessionInProgress.getElapsedTime() > 0.0) {totalprogress = (float) SessionInProgress.getElapsedTime() / (float) SessionInProgress.getSessionDuration().toMillis();}
                 else {totalprogress = (float) 0.0;}
                 SessionProgress.setProgress(totalprogress);
-                BigDecimal bd = new BigDecimal(totalprogress);
+                BigDecimal bd = new BigDecimal(totalprogress * 100);
                 bd = bd.setScale(2, RoundingMode.HALF_UP);
                 SessionProgressPercentage.setText(bd.doubleValue() + "%");
                 if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionDuration()));}
@@ -371,13 +389,17 @@ public class Player extends Stage {
         if (selectedPlaybackItem.getAmbience().isEnabled()) {AmbienceVolume.setDisable(! enabled);}
     }
     // Playback Methods
-    private void start() {
-        SelectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
+    private void setupsession() {
+        PlaylistTableView.getSelectionModel().select(0);
+        PlaylistTableView.setOnMouseClicked(event -> PlaylistTableView.getSelectionModel().select(-1));
+        selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
         SessionInProgress.setElapsedtime(Duration.ZERO);
-        SelectedPlaybackItem.setElapsedtime(Duration.ZERO);
+        selectedPlaybackItem.setElapsedtime(Duration.ZERO);
         setupfadeanimations();
         volume_unbindentrainment();
-        PlaybackItemEntrainment playbackItemEntrainment = availableEntrainments.getsessionpartEntrainment(SelectedPlaybackItem);
+    }
+    private void start() {
+        PlaybackItemEntrainment playbackItemEntrainment = availableEntrainments.getsessionpartEntrainment(selectedPlaybackItem);
         if (! selectedPlaybackItem.isRampOnly() || selectedPlaybackItem.getPlaybackindex() == SessionInProgress.getPlaybackItems().size() - 1) {entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getFreq().getFile().toURI().toString()));}
         else {entrainmentplayer = new MediaPlayer(new Media(rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1)).getFile().toURI().toString()));}
         entrainmentplayer.setVolume(0.0);
@@ -513,7 +535,7 @@ public class Player extends Stage {
             volume_unbindentrainment();
             entrainmentplayer.dispose();
             entrainmentplayer = null;
-            entrainmentplayer = new MediaPlayer(new Media(availableEntrainments.getsessionpartEntrainment(SelectedPlaybackItem).getFreq().getFile().toURI().toString()));
+            entrainmentplayer = new MediaPlayer(new Media(availableEntrainments.getsessionpartEntrainment(selectedPlaybackItem).getFreq().getFile().toURI().toString()));
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
             entrainmentplayer.setVolume(currententrainmentvolume);
@@ -529,7 +551,7 @@ public class Player extends Stage {
             volume_unbindambience();
             ambienceplayer.dispose();
             ambienceplayer = null;
-            currentambiencesoundfile = SelectedPlaybackItem.getAmbience().getnextambienceforplayback();
+            currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextambienceforplayback();
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
@@ -592,7 +614,7 @@ public class Player extends Stage {
                 case TRANSITIONING:
                     try {
                         cleanupPlayersandAnimations();
-                        int index = SessionInProgress.getPlaybackItems().indexOf(SelectedPlaybackItem) + 1;
+                        int index = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1;
                         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(index);
                         PlaylistTableView.getSelectionModel().select(index);
                         start();
@@ -1122,9 +1144,9 @@ public class Player extends Stage {
 // Reference
     public void togglereference() {
         boolean buttontoggled = ReferenceToggleCheckBox.isSelected();
-        if (buttontoggled && SelectedPlaybackItem != null) {
+        if (buttontoggled && selectedPlaybackItem != null) {
             if (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {loadreferencecontent();}
-            else if (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() == -1) {ReferenceContentPane.setContent(new TextArea("Select Reference Type For " + SelectedPlaybackItem.getName()));}
+            else if (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() == -1) {ReferenceContentPane.setContent(new TextArea("Select Reference Type For " + selectedPlaybackItem.getName()));}
             else {ReferenceContentPane.setContent(new TextArea(""));}
         } else {ReferenceContentPane.setContent(new TextArea(""));}
     }
@@ -1132,7 +1154,7 @@ public class Player extends Stage {
         switch (referenceType) {
             case txt:
                 StringBuilder sb = new StringBuilder();
-                try (FileInputStream fis = new FileInputStream(SelectedPlaybackItem.getReferenceFile(referenceType));
+                try (FileInputStream fis = new FileInputStream(selectedPlaybackItem.getReferenceFile(referenceType));
                      BufferedInputStream bis = new BufferedInputStream(fis)) {
                     while (bis.available() > 0) {sb.append((char) bis.read());}
                 } catch (Exception ignored) {}
@@ -1144,7 +1166,7 @@ public class Player extends Stage {
             case html:
                 WebView browser = new WebView();
                 WebEngine webEngine = browser.getEngine();
-                webEngine.load(SelectedPlaybackItem.getReferenceFile(referenceType).toURI().toString());
+                webEngine.load(selectedPlaybackItem.getReferenceFile(referenceType).toURI().toString());
                 webEngine.setUserStyleSheetLocation(kujiin.xml.Preferences.REFERENCE_THEMEFILE.toURI().toString());
                 ReferenceContentPane.setContent(browser);
                 break;
@@ -1154,4 +1176,5 @@ public class Player extends Stage {
     }
 
     public void closedialog() {}
+
 }

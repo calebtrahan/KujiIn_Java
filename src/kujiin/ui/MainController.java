@@ -10,11 +10,11 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import kujiin.ui.ambience.AvailableAmbienceEditor;
 import kujiin.ui.boilerplate.IconImageView;
 import kujiin.ui.creation.AddOrEditAmbience;
 import kujiin.ui.creation.AdjustDuration;
 import kujiin.ui.creation.SetDurationAndAmbience;
-import kujiin.ui.dialogs.AmbienceEditor_Advanced;
 import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.ChangeProgramOptions;
 import kujiin.ui.dialogs.EditReferenceFiles;
@@ -312,12 +312,9 @@ public class MainController implements Initializable {
         new AdjustDuration(null).showAndWait();
     }
     public void editavailableambience() {
-        if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Simple")) {
-            AmbienceEditor_Simple ambienceEditor_simple = new AmbienceEditor_Simple(availableAmbiences, getPreferences());
-            ambienceEditor_simple.initModality(Modality.APPLICATION_MODAL);
-            ambienceEditor_simple.showAndWait();
-        }
-        else if (getPreferences().getAdvancedOptions().getDefaultambienceeditor().equals("Advanced")) {new AmbienceEditor_Advanced(availableAmbiences, preferences).showAndWait();}
+        AvailableAmbienceEditor availableAmbienceEditor = new AvailableAmbienceEditor(preferences, availableAmbiences);
+        availableAmbienceEditor.initModality(Modality.APPLICATION_MODAL);
+        availableAmbienceEditor.showAndWait();
     }
     public void editreferencefiles() {
        EditReferenceFiles editReferenceFiles = new EditReferenceFiles(this);

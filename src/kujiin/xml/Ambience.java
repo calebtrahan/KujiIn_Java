@@ -166,14 +166,24 @@ public class Ambience {
     public void addavailableambience_shuffle(Duration duration, PlaybackItemAmbience playbackItemAmbience) {
         List<SoundFile> ambiencelist = new ArrayList<>();
         Duration currentduration = Duration.ZERO;
-        int indexcount = 0;
+        List<Integer> indexhistory = new ArrayList<>();
+        int indexcount;
         while (currentduration.lessThan(duration)) {
+            int size = playbackItemAmbience.getAmbience().size();
+            if (size > 1) {
+                Random random = new Random();
+                while (true) {
+                    indexcount = random.nextInt(size);
+                    if (indexhistory.isEmpty()) {indexhistory.add(indexcount); break;}
+                    if (indexcount != indexhistory.get(indexhistory.size() - 1)) {break;}
+                }
+            } else {indexcount = 0;}
             try {
                 SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
                 ambiencelist.add(filetoadd);
-                duration = duration.add(Duration.millis(filetoadd.getDuration()));
+                currentduration = currentduration.add(Duration.millis(filetoadd.getDuration()));
             }
-            catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
+            catch (IndexOutOfBoundsException ignored) {}
         }
         Collections.shuffle(ambiencelist);
         setAmbience(ambiencelist);

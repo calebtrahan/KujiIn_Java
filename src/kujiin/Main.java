@@ -34,11 +34,11 @@ public class Main extends Application {
         primaryStage.getIcons().add(PROGRAM_ICON);
         String themefile = root.getPreferences().getUserInterfaceOptions().getThemefile();
         if (themefile != null) {primaryStage.getScene().getStylesheets().add(themefile);}
+        root.setFavoriteSessions(new FavoriteSessions());
+        root.setSessions(new Sessions(root));
         root.setAvailableAmbiences(new AvailableAmbiences(root));
         root.setAvailableEntrainments(new AvailableEntrainments(root));
         root.setRampFiles(new RampFiles(root));
-        root.setFavoriteSessions(new FavoriteSessions());
-        root.setSessions(new Sessions(root));
         AudioChecksDialog audioChecksDialog = new AudioChecksDialog(root);
         audioChecksDialog.initModality(Modality.APPLICATION_MODAL);
         audioChecksDialog.initOwner(primaryStage);

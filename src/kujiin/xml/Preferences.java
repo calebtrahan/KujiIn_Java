@@ -64,7 +64,7 @@ public class Preferences {
     public static final File ENTRAINMENTXMLFILE = new File(XMLDIRECTORY, "entrainment.xml");
     public static final File AMBIENCEXMLFILE = new File(XMLDIRECTORY, "ambience.xml");
     public static final File RAMPFILESXMLFILE = new File(XMLDIRECTORY, "rampfiles.xml");
-    public static final File AVAILABLEAMBIENCEXMLFILE = new File(XMLDIRECTORY, "availableambience.xml");
+    public static final File AVAILABLEAMBIENCEXMLFILE = new File(XMLDIRECTORY, "ambience.xml");
     public static final File FAVORITESESSIONSXMLFILE = new File(XMLDIRECTORY, "favoritesessions.xml");
     public final static File TESTFILE = new File(SOUNDDIRECTORY, "Test.mp3");
 

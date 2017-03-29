@@ -40,7 +40,7 @@ public class EditReferenceFiles extends Stage {
     public EditReferenceFiles(MainController Root) {
         try {
             this.Root = Root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/EditReferenceFiles.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/old/EditReferenceFiles.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
