@@ -15,11 +15,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
@@ -44,10 +44,7 @@ import static kujiin.util.enums.PlayerState.*;
 
 public class Player extends Stage {
     // UI Elements
-    public MenuBar TopMenuBar;
-    public MenuItem ToggleFullScreenMenuItem;
-    public MenuItem EnablePlaylistSelectionMenuItem;
-    public MenuItem AboutMenuItem;
+    public HBox ReferenceControls;
     public CheckBox ReferenceToggleCheckBox;
     public ChoiceBox<String> ReferenceTypeChoiceBox;
     public ScrollPane ReferenceContentPane;
@@ -97,7 +94,6 @@ public class Player extends Stage {
     private PlayerState playerState;
     private Preferences Preferences;
     private ReferenceType referenceType;
-    private LoadingDialog loadingdialog;
 // Toggles
     public Boolean displaynormaltime = true;
 // Event Handlers
@@ -159,8 +155,7 @@ public class Player extends Stage {
             SessionProgress.setOnMouseExited(event -> SessionProgressPercentage.setVisible(false));
             SessionProgress.setOnMouseClicked(event -> SessionProgressPercentage.setVisible(! SessionProgressPercentage.isVisible()));
             ReferenceTypeChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList("html", "txt")));
-            ReferenceTypeChoiceBox.setDisable(true);
-            ReferenceToggleCheckBox.setDisable(true);
+            ReferenceControls.setDisable(true);
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
     public void setupTooltips() {
@@ -322,8 +317,7 @@ public class Player extends Stage {
         PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop);
         PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
         StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
-        ReferenceToggleCheckBox.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
-        ReferenceTypeChoiceBox.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
+//        ReferenceControls.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
         String playbuttontext;
         String pausebuttontext;
         String stopbuttontext;
@@ -405,8 +399,7 @@ public class Player extends Stage {
         volume_unbindentrainment();
     }
     private void start() {
-        ReferenceTypeChoiceBox.setDisable(false);
-        ReferenceToggleCheckBox.setDisable(false);
+        ReferenceControls.setDisable(false);
         PlaybackItemEntrainment playbackItemEntrainment = availableEntrainments.getsessionpartEntrainment(selectedPlaybackItem);
         if (! selectedPlaybackItem.isRampOnly() || selectedPlaybackItem.getPlaybackindex() == SessionInProgress.getPlaybackItems().size() - 1) {entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getFreq().getFile().toURI().toString()));}
         else {entrainmentplayer = new MediaPlayer(new Media(rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1)).getFile().toURI().toString()));}
@@ -515,9 +508,6 @@ public class Player extends Stage {
         volume_unbindentrainment();
         if (fade_entrainment_pause != null) {
             if (fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
-            loadingdialog = new LoadingDialog("Pausing Session. Please wait...");
-            loadingdialog.initModality(Modality.APPLICATION_MODAL);
-            loadingdialog.show();
             playerState = FADING_PAUSE;
             fade_entrainment_pause.play();
             if (selectedPlaybackItem.getAmbience().isEnabled()) {
@@ -596,9 +586,6 @@ public class Player extends Stage {
     private void stop() {
         volume_unbindentrainment();
         if (fade_entrainment_stop != null) {
-            loadingdialog = new LoadingDialog("Stopping Session. Please Wait...");
-            loadingdialog.initModality(Modality.APPLICATION_MODAL);
-            loadingdialog.show();
             if (fade_entrainment_stop.getStatus() == Animation.Status.RUNNING) {return;}
             fade_entrainment_stop.play();
             playerState = FADING_STOP;
@@ -638,8 +625,7 @@ public class Player extends Stage {
                     }
                     break;
                 case PLAYING:
-                    ReferenceToggleCheckBox.setDisable(true);
-                    ReferenceTypeChoiceBox.setDisable(true);
+                    ReferenceControls.setDisable(true);
                     transition();
                     break;
             }
@@ -849,7 +835,6 @@ public class Player extends Stage {
                 }
             };
             fade_entrainment_pause.setOnFinished(event -> {
-                if (loadingdialog != null && loadingdialog.isShowing()) {loadingdialog.close();}
                 entrainmentplayer.pause();
                 timeline_progresstonextsessionpart.pause();
                 updateuitimeline.pause();
@@ -904,7 +889,6 @@ public class Player extends Stage {
                 }
             };
             fade_entrainment_stop.setOnFinished(event -> {
-                if (loadingdialog != null && loadingdialog.isShowing()) {loadingdialog.close();}
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
                 if (Preferences.getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {timeline_start_ending_ramp.stop();}

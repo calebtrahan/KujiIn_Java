@@ -6,21 +6,29 @@
 <?import javafx.scene.text.Font?>
 <VBox prefHeight="414.0" prefWidth="640.0" stylesheets="@../../styles/default.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <MenuBar fx:id="TopMenuBar">
+      <MenuBar>
         <menus>
-          <Menu mnemonicParsing="false" text="View">
+          <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem fx:id="ToggleFullScreenMenuItem" mnemonicParsing="false" text="Fullscreen" />
+              <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
             </items>
           </Menu>
-            <Menu mnemonicParsing="false" text="Tools">
-               <items>
-                  <MenuItem fx:id="EnablePlaylistSelectionMenuItem" mnemonicParsing="false" text="Enable Playlist Selection" />
-               </items>
-            </Menu>
+          <Menu mnemonicParsing="false" text="Controls">
+            <items>
+              <MenuItem fx:id="PlayMenuItem" mnemonicParsing="false" onAction="#playbuttonpressed" text="Play" />
+                  <MenuItem fx:id="PauseMenuItem" mnemonicParsing="false" onAction="#pausebuttonpressed" text="Pause" />
+                  <MenuItem fx:id="StopMenuItem" mnemonicParsing="false" onAction="#stopbuttonpressed" text="Stop" />
+                  <Menu fx:id="AmbienceMenu" mnemonicParsing="false" text="Ambience">
+                    <items>
+                        <MenuItem fx:id="NextAmbiencMenuItem" mnemonicParsing="false" onAction="#playnextambiencefromhistory" text="Next" />
+                        <MenuItem fx:id="PreviousAmbienceMenuItem" mnemonicParsing="false" onAction="#playpreviousambiencefromhistory" text="Previous" />
+                    </items>
+                  </Menu>
+            </items>
+          </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
-              <MenuItem fx:id="AboutMenuItem" mnemonicParsing="false" text="About" />
+              <MenuItem mnemonicParsing="false" text="Tips" />
             </items>
           </Menu>
         </menus>
@@ -35,9 +43,12 @@
                            <children>
                               <VBox layoutX="95.0" layoutY="169.0" prefHeight="237.0" prefWidth="108.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <HBox alignment="CENTER" maxHeight="25.0" minHeight="30.0">
+                                    <HBox fx:id="ReferenceControls" alignment="CENTER_LEFT" maxHeight="25.0" minHeight="30.0">
                                        <children>
-                                          <CheckBox fx:id="ReferenceToggleCheckBox" mnemonicParsing="false" onAction="#ReferenceToggleCheckboxtoggled" text="Display Reference" textAlignment="CENTER" />
+                                          <CheckBox fx:id="ReferenceToggleCheckBox" mnemonicParsing="false" onAction="#ReferenceToggleCheckboxtoggled" text="Reference" textAlignment="CENTER">
+                                             <HBox.margin>
+                                                <Insets right="5.0" />
+                                             </HBox.margin></CheckBox>
                                           <Label text="Type:">
                                              <HBox.margin>
                                                 <Insets left="20.0" />
