@@ -360,16 +360,13 @@
                                                                   </Label>
                                                                   <TableView fx:id="SessionBrowser_DetailsTable" VBox.vgrow="ALWAYS">
                                                                     <columns>
-                                                                        <TableColumn fx:id="SessionBrowser_DetailsTable_NumberColumn" prefWidth="58.0" sortable="false" text="#" />
-                                                                      <TableColumn fx:id="SessionBrowser_DetailsTable_ItemColumn" prefWidth="124.0" sortable="false" text="Session Item" />
-                                                                      <TableColumn fx:id="SessionBrowser_DetailsTable_TimePracticedColumn" prefWidth="182.0" sortable="false" text="Time Practiced" />
+                                                                        <TableColumn fx:id="SessionBrowser_DetailsTable_NumberColumn" prefWidth="52.0" sortable="false" text="#" />
+                                                                      <TableColumn fx:id="SessionBrowser_DetailsTable_ItemColumn" prefWidth="189.0" sortable="false" text="Session Item" />
+                                                                      <TableColumn fx:id="SessionBrowser_DetailsTable_TimePracticedColumn" prefWidth="229.0" sortable="false" text="Time Practiced" />
                                                                     </columns>
                                                                      <VBox.margin>
                                                                         <Insets bottom="5.0" />
                                                                      </VBox.margin>
-                                                                     <columnResizePolicy>
-                                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                                                     </columnResizePolicy>
                                                                   </TableView>
                                                                   <HBox alignment="CENTER_RIGHT" maxHeight="25.0">
                                                                      <children>
@@ -408,24 +405,33 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TabPane prefHeight="403.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <TabPane fx:id="GoalsTabPane" prefHeight="403.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <tabs>
-                            <Tab text="Overview">
+                            <Tab text="Current Goals Overview">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TableView fx:id="GoalsOverview_Table" layoutX="153.0" layoutY="142.0" prefHeight="374.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columns>
-                                              <TableColumn fx:id="GoalsOverview_ItemColumn" prefWidth="75.0" text="Session Item" />
-                                              <TableColumn fx:id="GoalsOverview_PracticedTimeColumn" prefWidth="75.0" text="Practiced Time" />
-                                                <TableColumn fx:id="GoalsOverview_CurrentGoalColumn" prefWidth="75.0" text="Current Goal" />
-                                                <TableColumn fx:id="GoalsOverview_PercentCompletedColumn" prefWidth="75.0" text="\% Completed" />
-                                                <TableColumn fx:id="GoalsOverview_GoalsCompletedColumn" prefWidth="75.0" text="Goals Completed" />
-                                            </columns>
-                                             <columnResizePolicy>
-                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                             </columnResizePolicy>
-                                          </TableView>
+                                          <VBox layoutX="5.0" layoutY="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <TableView fx:id="GoalsOverview_Table" prefHeight="374.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
+                                                  <columns>
+                                                    <TableColumn fx:id="GoalsOverview_ItemColumn" prefWidth="75.0" text="Session Item" />
+                                                    <TableColumn fx:id="GoalsOverview_PracticedTimeColumn" prefWidth="75.0" text="Practiced Time" />
+                                                      <TableColumn fx:id="GoalsOverview_CurrentGoalColumn" prefWidth="75.0" text="Current Goal" />
+                                                      <TableColumn fx:id="GoalsOverview_PercentCompletedColumn" prefWidth="75.0" text="\% Completed" />
+                                                      <TableColumn fx:id="GoalsOverview_GoalsCompletedColumn" prefWidth="75.0" text="Goals Completed" />
+                                                  </columns>
+                                                   <columnResizePolicy>
+                                                      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                   </columnResizePolicy>
+                                                </TableView>
+                                                <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="700.0">
+                                                   <children>
+                                                      <Button fx:id="GoalsOverview_GoToDetailsButton" mnemonicParsing="false" onAction="#gotogoaldetails" text="Go To Details" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
                                        </children>
                                        <padding>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -459,7 +465,7 @@
                                                             <Font size="15.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="GoalsIndividual_PracticedTime" editable="false" prefHeight="25.0" prefWidth="157.0">
+                                                      <TextField fx:id="GoalsIndividual_PracticedTime" editable="false" prefHeight="25.0" prefWidth="157.0" HBox.hgrow="ALWAYS">
                                                          <HBox.margin>
                                                             <Insets left="10.0" />
                                                          </HBox.margin>
@@ -469,7 +475,7 @@
                                                       <Insets bottom="5.0" />
                                                    </VBox.margin>
                                                    <padding>
-                                                      <Insets left="10.0" />
+                                                      <Insets left="5.0" right="5.0" />
                                                    </padding>
                                                 </HBox>
                                                 <TableView fx:id="GoalsIndividual_Table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">

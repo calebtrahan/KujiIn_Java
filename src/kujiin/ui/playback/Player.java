@@ -156,6 +156,8 @@ public class Player extends Stage {
                     a.setTitle("Cannot Close Player");
                     a.setHeaderText("Currently Pausing, Starting Playback Or Stopping");
                     a.setContentText("Please Wait Till Done Until Closing Player");
+                    DialogPane dialogPane = a.getDialogPane();
+                    dialogPane.getStylesheets().add(Preferences.getUserInterfaceOptions().getThemefile());
                     a.show();
                     event.consume();
                     return;
@@ -691,7 +693,9 @@ public class Player extends Stage {
         if (endofsession) {
             PlayButton.setText("Replay");
             PauseButton.setText("Stop");
+            PauseButton.setDisable(true);
             StopButton.setText("Stop");
+            StopButton.setDisable(true);
         }
         else {PlayButton.setText("Start");}
         SessionProgress.setProgress(0.0);

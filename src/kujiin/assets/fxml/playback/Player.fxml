@@ -118,7 +118,7 @@
                                                       <Label fx:id="CurrentGoalPercentage" text="Label" />
                                                    </children>
                                                 </StackPane>
-                                                <Label text="Label">
+                                                <Label fx:id="SessionPartGoalTime" text="Label">
                                                    <HBox.margin>
                                                       <Insets left="5.0" />
                                                    </HBox.margin>
@@ -173,8 +173,8 @@
                               <HBox minWidth="210.0" prefHeight="25.0">
                                  <children>
                                     <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#playbuttonpressed" text="Play" />
-                                    <Button fx:id="PauseButton" mnemonicParsing="false" onAction="#pausebuttonpressed" text="Pause" />
-                                    <Button fx:id="StopButton" mnemonicParsing="false" onAction="#stopbuttonpressed" text="Stop" />
+                                    <Button fx:id="PauseButton" disable="true" mnemonicParsing="false" onAction="#pausebuttonpressed" text="Pause" />
+                                    <Button fx:id="StopButton" disable="true" mnemonicParsing="false" onAction="#stopbuttonpressed" text="Stop" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" minWidth="350.0" HBox.hgrow="ALWAYS">

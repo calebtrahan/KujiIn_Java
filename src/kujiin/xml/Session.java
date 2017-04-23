@@ -34,7 +34,6 @@ public class Session {
     }
 
 // Getters And Setters
-
     public void setDate_Practiced(LocalDate date_Practiced) {Date_Practiced = date_Practiced.format(dateFormat);}
     public LocalDate getDate_Practiced() {return LocalDate.parse(Date_Practiced, dateFormat);}
     public Duration getSessionDuration() {
@@ -151,7 +150,6 @@ public class Session {
 // Utility Methods
     public void addelapsedtime(Duration duration) {
         elapsedtime = elapsedtime.add(duration);
-        System.out.println("Session Elapsed Time Is Now: " + elapsedtime.toMillis());
     }
     public boolean isValid() {
         return Duration.minutes(SessionDuration).greaterThan(Duration.ZERO);
