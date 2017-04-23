@@ -20,10 +20,10 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
-import kujiin.ui.dialogs.SessionDetails;
 import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.table.PlaylistTableItem;
@@ -43,27 +43,38 @@ import java.util.Arrays;
 import static kujiin.util.enums.PlayerState.*;
 
 public class Player extends Stage {
-    // UI Elements
+// UI Elements
+    // Reference
     public HBox ReferenceControls;
     public CheckBox ReferenceToggleCheckBox;
     public ChoiceBox<String> ReferenceTypeChoiceBox;
     public ScrollPane ReferenceContentPane;
+    // Playlist
     public TableView<PlaylistTableItem> PlaylistTableView;
     public TableColumn<PlaylistTableItem, String> NameColumn;
     public TableColumn<PlaylistTableItem, String> DurationColumn;
     public TableColumn<PlaylistTableItem, String> PercentColumn;
+    // Goals Progress
+    public Label GoalTopLabel;
+    public Label SessionPartElapsedTime;
+    public ProgressBar CurrentGoalProgress;
+    public Label CurrentGoalPercentage;
+    public Label SessionPartGoalTime;
+    // Session Progress
     public Label SessionCurrentTime;
     public ProgressBar SessionProgress;
     public Label SessionProgressPercentage;
     public Label SessionTotalTime;
+    // Controls
     public Slider EntrainmentVolume;
     public Label EntrainmentVolumePercentage;
+    public HBox AmbienceVolumeControls;
     public Slider AmbienceVolume;
     public Label AmbienceVolumePercentage;
     public Button PlayButton;
     public Button PauseButton;
     public Button StopButton;
-    // Animation
+// Animation
     private Animation fade_entrainment_play;
     private Animation fade_entrainment_resume;
     private Animation fade_entrainment_pause;
@@ -138,10 +149,24 @@ public class Player extends Stage {
             ReferenceTypeChoiceBox.setOnAction(event -> referencetypechanged());
             ReferenceToggleCheckBox.setOnAction(event -> ReferenceToggleCheckboxtoggled());
             setOnCloseRequest(event -> {
+                PlayerState p = playerState;
+                boolean animationinprogress = p == FADING_PAUSE || p == FADING_PLAY || p == FADING_RESUME || p == FADING_STOP;
+                if (animationinprogress) {
+                    Alert a = new Alert(Alert.AlertType.INFORMATION);
+                    a.setTitle("Cannot Close Player");
+                    a.setHeaderText("Currently Pausing, Starting Playback Or Stopping");
+                    a.setContentText("Please Wait Till Done Until Closing Player");
+                    a.show();
+                    event.consume();
+                    return;
+                }
                 if (playerState != IDLE && playerState != STOPPED) {
                     pausewithoutanimation();
                     if (new ConfirmationDialog(Root.getPreferences(), "Stop Session", "Session Is In Progress", "End This Session Prematurely?").getResult()) {
                         cleanupPlayersandAnimations();
+                        SessionComplete sessionComplete = new SessionComplete(SessionInProgress, false);
+                        sessionComplete.initModality(Modality.APPLICATION_MODAL);
+                        sessionComplete.showAndWait();
                     } else {
                         event.consume();
                         resume();
@@ -172,6 +197,7 @@ public class Player extends Stage {
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 updateuitimeline.play();
                 selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
+                AmbienceVolumeControls.setVisible(selectedPlaybackItem.getAmbience().isEnabled());
                 currententrainmentvolume = Preferences.getPlaybackOptions().getEntrainmentvolume();
                 currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume();
                 setupsession();
@@ -218,11 +244,11 @@ public class Player extends Stage {
     }
     public void referencetypechanged() {
         int index = ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex();
+        if (index != -1 && ! ReferenceToggleCheckBox.isSelected()) {ReferenceToggleCheckBox.setSelected(true);}
         switch (index) {
-            case 0: referenceType = ReferenceType.html; break;
-            case 1: referenceType = ReferenceType.txt; break;
+            case 0: referenceType = ReferenceType.html; loadreference(); return;
+            case 1: referenceType = ReferenceType.txt; loadreference();
         }
-        loadreference();
     }
     private void loadreference() {
         try {
@@ -303,7 +329,9 @@ public class Player extends Stage {
         }
     }
     private void updatesessionui() {}
-    private void updategoalui() {}
+    private void updategoalui() {
+
+    }
     private void toggleplayerbuttons() {
         if (playerState == null) {return;}
         boolean idle = playerState == PlayerState.IDLE;
@@ -399,6 +427,7 @@ public class Player extends Stage {
         volume_unbindentrainment();
     }
     private void start() {
+        setupfadeanimations();
         ReferenceControls.setDisable(false);
         PlaybackItemEntrainment playbackItemEntrainment = availableEntrainments.getsessionpartEntrainment(selectedPlaybackItem);
         if (! selectedPlaybackItem.isRampOnly() || selectedPlaybackItem.getPlaybackindex() == SessionInProgress.getPlaybackItems().size() - 1) {entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getFreq().getFile().toURI().toString()));}
@@ -460,13 +489,10 @@ public class Player extends Stage {
             ambienceplayer.play();
             if (fade_ambience_play != null) {fade_ambience_play.play();}
             else {
+                System.out.println("Fade_Ambience_Play Is Null");
                 ambienceplayer.setVolume(currentambiencevolume);
                 String percentage = new Double(currentambiencevolume * 100).intValue() + "%";
                 AmbienceVolumePercentage.setText(percentage);
-//                if (referencecurrentlyDisplayed()) {
-//                    displayReference.AmbienceVolumeSlider.setValue(currentambiencevolume);
-//                    displayReference.AmbienceVolumePercentage.setText(percentage);
-//                }
                 volume_bindambience();
             }
         }
@@ -507,7 +533,7 @@ public class Player extends Stage {
     private void pause() {
         volume_unbindentrainment();
         if (fade_entrainment_pause != null) {
-            if (fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
+            if (selectedPlaybackItem.getAmbience().isEnabled() && fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
             playerState = FADING_PAUSE;
             fade_entrainment_pause.play();
             if (selectedPlaybackItem.getAmbience().isEnabled()) {
@@ -559,7 +585,7 @@ public class Player extends Stage {
             ambienceplayer.setOnPlaying(this::volume_bindambience);
         } catch (IndexOutOfBoundsException ignored) {ambienceplayer.dispose();}
     }
-    private void playpreviousambiencefromhistory() {
+    public void playpreviousambiencefromhistory() {
         SoundFile previousambiencefile = selectedPlaybackItem.getAmbience().getpreviousambiencehistory();
         if (previousambiencefile != null) {
             volume_unbindambience();
@@ -571,7 +597,7 @@ public class Player extends Stage {
             ambienceplayer.setOnPlaying(this::volume_bindambience);
         }
     }
-    private void playnextambiencefromhistory() {
+    public void playnextambiencefromhistory() {
         SoundFile nextambiencefile = selectedPlaybackItem.getAmbience().getnextambiencehistory();
         if (nextambiencefile != null) {
             volume_unbindambience();
@@ -619,8 +645,8 @@ public class Player extends Stage {
                         start();
                         if (ReferenceToggleCheckBox.isSelected() && ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {loadreferencecontent();}
                     } catch (IndexOutOfBoundsException ignored) {
-                        playerState = IDLE;
                         cleanupPlayersandAnimations();
+                        playerState = IDLE;
                         endofsession();
                     }
                     break;
@@ -662,7 +688,11 @@ public class Player extends Stage {
         }
     }
     public void reset(boolean endofsession) {
-        if (endofsession) {PlayButton.setText("Replay");}
+        if (endofsession) {
+            PlayButton.setText("Replay");
+            PauseButton.setText("Stop");
+            StopButton.setText("Stop");
+        }
         else {PlayButton.setText("Start");}
         SessionProgress.setProgress(0.0);
         SessionProgressPercentage.setText("0.0%");
@@ -679,15 +709,16 @@ public class Player extends Stage {
     public void endofsession() {
         updateuitimeline.stop();
         updateuitimeline.setOnFinished(event -> reset(false));
-        PlayButton.setText("Replay");
         playerState = STOPPED;
         sessions.add(SessionInProgress);
         // TODO Prompt For Export
         updatesessionui();
         updategoalui();
         SessionInProgress = null;
-        new SessionDetails(SessionInProgress).show();
         reset(true);
+        SessionComplete sessionComplete = new SessionComplete(SessionInProgress, true);
+        sessionComplete.initModality(Modality.APPLICATION_MODAL);
+        sessionComplete.showAndWait();
     }
     public boolean endsessionprematurely() {
         if (playerState == PLAYING || playerState == PAUSED || playerState == TRANSITIONING) {
@@ -931,7 +962,7 @@ public class Player extends Stage {
             volume_unbindambience();
             if (entrainmentplayer != null) {entrainmentplayer.stop(); entrainmentplayer.dispose(); entrainmentplayer = null;}
             if (ambienceplayer != null) {ambienceplayer.stop(); ambienceplayer.dispose(); ambienceplayer = null;}
-            if (fade_entrainment_play != null) {fade_entrainment_play.stop(); fade_ambience_play = null;}
+            if (fade_entrainment_play != null) {fade_entrainment_play.stop(); fade_entrainment_play = null;}
             if (fade_entrainment_pause != null) {fade_entrainment_pause.stop(); fade_entrainment_pause = null;}
             if (fade_entrainment_resume != null) {fade_entrainment_resume.stop(); fade_entrainment_resume = null;}
             if (fade_entrainment_stop != null) {fade_entrainment_stop.stop(); fade_entrainment_stop = null;}
@@ -1174,7 +1205,6 @@ public class Player extends Stage {
                 break;
         }
     }
-
     public void closedialog() {}
 
 }
