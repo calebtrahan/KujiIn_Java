@@ -24,9 +24,10 @@ import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.ui.export.Exporter;
 import kujiin.ui.playback.Player;
-import kujiin.ui.table.CreatedSessionTableItem;
 import kujiin.ui.table.GoalDetailsTableItem;
 import kujiin.ui.table.GoalOverviewTableItem;
+import kujiin.ui.table.TableItem_Number_Name_Duration;
+import kujiin.ui.table.TableItem_Number_Name_Duration_Ambience;
 import kujiin.util.Util;
 import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.ProgramState;
@@ -92,11 +93,11 @@ public class MainController implements Initializable {
     public Button OpenFileButton;
     public Button OpenRecentSessionsButton;
     public Button OpenFavoritesButton;
-    public TableView<CreatedSessionTableItem> CreatedTableView;
-    public TableColumn<CreatedSessionTableItem, Integer> CreatedTableNumberColumn;
-    public TableColumn<CreatedSessionTableItem, String> CreatedTableItemColumn;
-    public TableColumn<CreatedSessionTableItem, String> CreatedTableDurationColumn;
-    public TableColumn<CreatedSessionTableItem, String> CreatedTableAmbienceColumn;
+    public TableView<TableItem_Number_Name_Duration_Ambience> CreatedTableView;
+    public TableColumn<TableItem_Number_Name_Duration_Ambience, Integer> CreatedTableNumberColumn;
+    public TableColumn<TableItem_Number_Name_Duration_Ambience, String> CreatedTableItemColumn;
+    public TableColumn<TableItem_Number_Name_Duration_Ambience, String> CreatedTableDurationColumn;
+    public TableColumn<TableItem_Number_Name_Duration_Ambience, String> CreatedTableAmbienceColumn;
     public ToolBar CreationTableControlsToolBar;
     public MenuButton AddItemsMenu;
     public Menu AddAllMenu;
@@ -134,17 +135,17 @@ public class MainController implements Initializable {
     public TextField ProgressOverviewItemWithMostProgress;
     public PieChart ProgressBalancePieChart;
         // Session Browser Tab
-    public ListView SessionBrowser_SelectSessionListView;
+    public ListView<String> SessionBrowser_SelectSessionListView;
     public DatePicker SessionBrowser_Filter_DateRange_From;
     public DatePicker SessionBrowser_Filter_DateRange_To;
     public TextField SessionBrowser_Filter_Duration_From_Hours;
     public TextField SessionBrowser_Filter_Duration_From_Minutes;
     public TextField SessionBrowser_Filter_Duration_To_Hours;
     public TextField SessionBrowser_Filter_Duration_To_Minutes;
-    public TableView SessionBrowser_DetailsTable;
-    public TableColumn SessionBrowser_DetailsTable_NumberColumn;
-    public TableColumn SessionBrowser_DetailsTable_ItemColumn;
-    public TableColumn SessionBrowser_DetailsTable_TimePracticedColumn;
+    public TableView<TableItem_Number_Name_Duration> SessionBrowser_DetailsTable;
+    public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_NumberColumn;
+    public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_ItemColumn;
+    public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_TimePracticedColumn;
     public TextField SessionBrowser_Details_TotalDuration;
     // Goals Pane
     public TabPane GoalsTabPane;
@@ -171,7 +172,7 @@ public class MainController implements Initializable {
     // Play/Export Tab
     private Session createdsession;
     private Session.PlaybackItem createdtableselecteditem;
-    private ObservableList<CreatedSessionTableItem> createdtableitems = FXCollections.observableArrayList();
+    private ObservableList<TableItem_Number_Name_Duration_Ambience> createdtableitems = FXCollections.observableArrayList();
     private ArrayList<Session.PlaybackItem> createdtableplaybackitems;
 
 
@@ -252,7 +253,7 @@ public class MainController implements Initializable {
     }
     private void setupCreationTable() {
         CreatedTableNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
-        CreatedTableItemColumn.setCellValueFactory(cellData -> cellData.getValue().itemname);
+        CreatedTableItemColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         CreatedTableDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
         CreatedTableAmbienceColumn.setCellValueFactory(cellData -> cellData.getValue().ambience);
         CreatedTableView.getSelectionModel().selectedItemProperty().addListener(
@@ -388,7 +389,7 @@ public class MainController implements Initializable {
     // Creation Table Listeners
     public void setupCreatedSessionTable() {
         CreatedTableNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
-        CreatedTableItemColumn.setCellValueFactory(cellData -> cellData.getValue().itemname);
+        CreatedTableItemColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         CreatedTableDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
         CreatedTableAmbienceColumn.setCellValueFactory(cellData -> cellData.getValue().ambience);
         CreatedTableView.getSelectionModel().selectedItemProperty().addListener(
@@ -521,7 +522,7 @@ public class MainController implements Initializable {
             createdtableplaybackitems.addAll(createdsession.getPlaybackItems());
             int number = 1;
             for (Session.PlaybackItem i : createdtableplaybackitems) {
-                createdtableitems.add(new CreatedSessionTableItem(number, i.getName(),
+                createdtableitems.add(new TableItem_Number_Name_Duration_Ambience(number, i.getName(),
                         i.getdurationasString(CreatedTableItemColumn.getWidth()), i.getAmbienceasString()));
                 number++;
             }
@@ -553,9 +554,31 @@ public class MainController implements Initializable {
     // Overview Tab Methods
     public void populateprogressoverviewchart() {}
     // Session Browser Tab Methods
-    public void populatesessionbrowserlistview() {}
-    public void populatesessionbrowsertable() {}
-    public void checkfilterdate_from() {}
+    public void populatesessionbrowserlistview() {
+        ObservableList<String> sessionlist = FXCollections.observableArrayList();
+        List<Session> allsessions = this.sessions.getSession();
+        // Filter Sessions Based On Selected Filter Checkboxes Here
+        for (Session i : allsessions) {
+            sessionlist.add(String.format("%s (%s)", i.getDate_Practiced().format(Util.dateFormat), Util.formatdurationtoStringDecimalWithColons(i.getSessionDuration())));
+        }
+        SessionBrowser_SelectSessionListView.setItems(sessionlist);
+    }
+    public void populatesessionbrowsertable() {
+        int index = SessionBrowser_SelectSessionListView.getSelectionModel().getSelectedIndex();
+        if (index != -1) {
+            Session selectedsession = this.sessions.get(index);
+            ObservableList<TableItem_Number_Name_Duration> sessionitems = FXCollections.observableArrayList();
+            int count = 1;
+            for (Session.PlaybackItem i : selectedsession.getPlaybackItems()) {
+                sessionitems.add(new TableItem_Number_Name_Duration(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getDuration()))));
+                count++;
+            }
+            SessionBrowser_DetailsTable.setItems(sessionitems);
+        }
+    }
+    public void checkfilterdate_from() {
+
+    }
     public void checkfilterdate_to() {}
     public void checkfilterduration_min() {}
     public void checkfilterduration_max() {}

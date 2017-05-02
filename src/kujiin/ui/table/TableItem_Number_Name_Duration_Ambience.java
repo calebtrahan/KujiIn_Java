@@ -1,21 +1,20 @@
 package kujiin.ui.table;
 
-
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class CreatedSessionTableItem {
+public class TableItem_Number_Name_Duration_Ambience {
     public IntegerProperty number;
-    public StringProperty itemname;
+    public StringProperty name;
     public StringProperty duration;
     public StringProperty ambience;
 
-    public CreatedSessionTableItem(int number, String itemname, String duration, String ambience) {
+    public TableItem_Number_Name_Duration_Ambience(int number, String name, String duration, String haspresetambience) {
         this.number = new SimpleIntegerProperty(number);
-        this.itemname = new SimpleStringProperty(itemname);
+        this.name = new SimpleStringProperty(name);
         this.duration = new SimpleStringProperty(duration);
-        this.ambience = new SimpleStringProperty(ambience);
+        this.ambience = new SimpleStringProperty(haspresetambience);
     }
 }

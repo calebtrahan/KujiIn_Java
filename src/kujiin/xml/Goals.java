@@ -225,6 +225,5 @@ public class Goals {
             } else {return "Goal Not Set";}
         }
     }
+
 }
-
-
