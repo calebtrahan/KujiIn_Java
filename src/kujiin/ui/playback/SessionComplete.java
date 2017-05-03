@@ -36,7 +36,7 @@ public class SessionComplete extends StyledStage {
             else {sessionsummary = "Session Ended";}
             setTitle(sessionsummary);
             TopLabel.setText(sessionsummary);
-            if (sessioncomplete) {DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getSessionDuration(), 1000.0));}
+            if (sessioncomplete) {DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getActualSessionDuration(), 1000.0));}
             else {DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(new Duration(session.getElapsedTime()), 1000.0));}
             XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
             Duration totalsessionduration = new Duration(0);

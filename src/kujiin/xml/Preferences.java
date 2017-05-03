@@ -168,7 +168,7 @@ public class Preferences {
                 setSessionOptions(preferences.getSessionOptions());
                 setPlaybackOptions(preferences.getPlaybackOptions());
                 setAdvancedOptions(preferences.getAdvancedOptions());
-            } catch (JAXBException ignored) {Platform.runLater(() -> new InformationDialog(this, "Information", "Couldn't Open Preferences", "Check Read File Permissions Of \n" + OPTIONSXMLFILE.getName()));}
+            } catch (JAXBException ignored) {Platform.runLater(() -> new InformationDialog(this, "Information", "Couldn't Open Preferences", "Check Read File Permissions Of \n" + OPTIONSXMLFILE.getName(), true));}
         } else {resettodefaults();}
     }
     public void marshall() {
@@ -178,7 +178,7 @@ public class Preferences {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, OPTIONSXMLFILE);
         } catch (JAXBException e) {
-            new InformationDialog(this, "Information", "Couldn't Save Preferences", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath());
+            new InformationDialog(this, "Information", "Couldn't Save Preferences", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath(), true);
         }
     }
     public void resettodefaults() {

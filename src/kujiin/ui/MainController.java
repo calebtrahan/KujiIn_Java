@@ -87,6 +87,7 @@ public class MainController implements Initializable {
     public MenuItem EditReferenceFilesMenuItem;
     public MenuItem AboutMenuItem;
     // Play/Export Tab
+    public Tab PlayExportTab;
     public MenuButton CreateSessionMenu;
     public MenuItem CreateBlankSessionMenuItem;
     public MenuItem OpenPresetsMenuItem;
@@ -128,7 +129,8 @@ public class MainController implements Initializable {
     public Button SaveAsFileButton;
     public Button ExportButton;
     public Label CreatorStatusBar;
-    // Progress Pane
+    // Progress Tab
+    public Tab ProgressTab;
         // Overview Tab
     public BarChart ProgressOverviewBarChart;
     public TextField ProgressOverviewTotalTimePracticed;
@@ -136,6 +138,10 @@ public class MainController implements Initializable {
     public PieChart ProgressBalancePieChart;
         // Session Browser Tab
     public ListView<String> SessionBrowser_SelectSessionListView;
+    public CheckBox SessionBrowser_Filter_DateRange_From_Checkbox;
+    public CheckBox SessionBrowser_Filter_DateRange_To_Checkbox;
+    public CheckBox SessionBrowser_Filter_Duration_Min_Checkbox;
+    public CheckBox SessionBrowser_Filter_Duration_Max_Checkbox;
     public DatePicker SessionBrowser_Filter_DateRange_From;
     public DatePicker SessionBrowser_Filter_DateRange_To;
     public TextField SessionBrowser_Filter_Duration_From_Hours;
@@ -148,6 +154,7 @@ public class MainController implements Initializable {
     public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_TimePracticedColumn;
     public TextField SessionBrowser_Details_TotalDuration;
     // Goals Pane
+    public Tab GoalsTab;
     public TabPane GoalsTabPane;
         // Overview Tab
     public TableView<GoalOverviewTableItem> GoalsOverview_Table;
@@ -248,18 +255,24 @@ public class MainController implements Initializable {
         setPreferences(new Preferences());
         getPreferences().unmarshall();
         setupIcons();
-        setupCreationTable();
-        setupGoalOverviewTable();
+        setupTables();
+        ProgressTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (ProgressTab.isSelected()) {
+                populateprogressoverviewchart();
+                populatesessionbrowserlistview();
+                populatesessiondetailstable();
+            }
+        });
     }
-    private void setupCreationTable() {
+    private void setupTables() {
+        // Creation Table
         CreatedTableNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
         CreatedTableItemColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         CreatedTableDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
         CreatedTableAmbienceColumn.setCellValueFactory(cellData -> cellData.getValue().ambience);
         CreatedTableView.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> tableselectionchanged());
-    }
-    private void setupGoalOverviewTable() {
+        // Goal Overview Table
         GoalsOverview_ItemColumn.setCellValueFactory(cellData -> cellData.getValue().sessionitem);
         GoalsOverview_PracticedTimeColumn.setCellValueFactory(cellData -> cellData.getValue().practicedtime);
         GoalsOverview_CurrentGoalColumn.setCellValueFactory(cellData -> cellData.getValue().currentgoal);
@@ -351,14 +364,13 @@ public class MainController implements Initializable {
     // Create/Open Toolbar Methods
     public void createblanksession() {
         if (createdsession != null && sessions.getSession().isEmpty() && getAvailableAmbiences().completelyempty()) {
-            if (new ConfirmationDialog(getPreferences(), "Add Available Ambience", "There Is No Available Ambience For Any Playback Items", "Open Ambience Editor To Add Ambience?").getResult()) {
+            if (new ConfirmationDialog(getPreferences(), "Add Available Ambience", "There Is No Available Ambience For Any Playback Items", "Open Ambience Editor To Add Ambience?", true).getResult()) {
                 AmbienceEditor_Simple ambienceEditor_simple = new AmbienceEditor_Simple(availableAmbiences, getPreferences());
                 ambienceEditor_simple.initModality(Modality.APPLICATION_MODAL);
                 ambienceEditor_simple.showAndWait();
             }
         }
-        if (createdsession != null && ! new ConfirmationDialog(preferences, "Load New Session",
-                "Really Load New Session?", "This will clear any unsaved changes you made to this session").getResult()) {
+        if (createdsession != null && ! new ConfirmationDialog(preferences, "Load New Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {
             return;
         }
         createdsession = new Session();
@@ -378,7 +390,7 @@ public class MainController implements Initializable {
                 createdsession = (Session) createMarshaller.unmarshal(filetoload);
                 populatetable();
             } catch (JAXBException e) {
-                new ErrorDialog(preferences, "Invalid File", "'" + filetoload.getName() + "' Isn't A Valid Session File", "Select A Valid Session To Load");
+                new ErrorDialog(preferences, "Invalid File", "'" + filetoload.getName() + "' Isn't A Valid Session File", "Select A Valid Session To Load", true);
             }
         }
     }
@@ -455,7 +467,7 @@ public class MainController implements Initializable {
                 createdtableplaybackitems.set(selectedindex, playbackItem);
                 populatetable();
             }
-        } else {new InformationDialog(preferences, "Cannot Edit Duration", "Select A Single Table Item To Edit Duration", null);}
+        } else {new InformationDialog(preferences, "Cannot Edit Duration", "Select A Single Table Item To Edit Duration", null, true);}
     }
     public void addoreditambience() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
@@ -495,7 +507,7 @@ public class MainController implements Initializable {
         if (createdsession != null) {
             String name = "";
             favoriteSessions.add(name, createdsession);
-            new InformationDialog(preferences, "Favorite Session Added", "Session Added To Favorites", null);
+            new InformationDialog(preferences, "Favorite Session Added", "Session Added To Favorites", null, true);
         }
     }
     public void savecreatedsessionasfile() {
@@ -552,19 +564,45 @@ public class MainController implements Initializable {
 
 // Progress Tab
     // Overview Tab Methods
-    public void populateprogressoverviewchart() {}
+    public void populateprogressoverviewchart() {
+
+    }
     // Session Browser Tab Methods
     public void populatesessionbrowserlistview() {
         ObservableList<String> sessionlist = FXCollections.observableArrayList();
         List<Session> allsessions = this.sessions.getSession();
-        // Filter Sessions Based On Selected Filter Checkboxes Here
+        List<Session> filteredsessions = new ArrayList<>();
         for (Session i : allsessions) {
-            sessionlist.add(String.format("%s (%s)", i.getDate_Practiced().format(Util.dateFormat), Util.formatdurationtoStringDecimalWithColons(i.getSessionDuration())));
+            if (SessionBrowser_Filter_DateRange_From_Checkbox.isSelected() && SessionBrowser_Filter_DateRange_From.getValue() != null) {
+                if (i.getDate_Practiced().isBefore(SessionBrowser_Filter_DateRange_From.getValue())) {continue;}
+            }
+            if (SessionBrowser_Filter_DateRange_To_Checkbox.isSelected() && SessionBrowser_Filter_DateRange_To.getValue() != null) {
+                if (i.getDate_Practiced().isAfter(SessionBrowser_Filter_DateRange_To.getValue())) {continue;}
+            }
+            Duration durationtotest = i.getActualSessionDuration();
+            if (SessionBrowser_Filter_Duration_Min_Checkbox.isSelected()) {
+                Duration minduration = Duration.ZERO;
+                minduration.add(Duration.hours(Integer.parseInt(SessionBrowser_Filter_Duration_From_Hours.getText())));
+                minduration.add(Duration.minutes(Integer.parseInt(SessionBrowser_Filter_Duration_From_Minutes.getText())));
+                if (durationtotest.lessThan(minduration)) {continue;}
+            }
+            if (SessionBrowser_Filter_Duration_Max_Checkbox.isSelected()) {
+                Duration maxduration = Duration.ZERO;
+                maxduration.add(Duration.hours(Integer.parseInt(SessionBrowser_Filter_Duration_To_Hours.getText())));
+                maxduration.add(Duration.minutes(Integer.parseInt(SessionBrowser_Filter_Duration_To_Minutes.getText())));
+                if (durationtotest.lessThan(maxduration)) {continue;}
+            }
+            filteredsessions.add(i);
+        }
+        for (Session i : filteredsessions) {
+            sessionlist.add(String.format("%s (%s)", i.getDate_Practiced().format(Util.dateFormat), Util.formatdurationtoStringDecimalWithColons(i.getActualSessionDuration())));
         }
         SessionBrowser_SelectSessionListView.setItems(sessionlist);
     }
-    public void populatesessionbrowsertable() {
+    public void populatesessiondetailstable() {
         int index = SessionBrowser_SelectSessionListView.getSelectionModel().getSelectedIndex();
+        SessionBrowser_DetailsTable.getItems().clear();
+        SessionBrowser_Details_TotalDuration.setText(null);
         if (index != -1) {
             Session selectedsession = this.sessions.get(index);
             ObservableList<TableItem_Number_Name_Duration> sessionitems = FXCollections.observableArrayList();
@@ -574,14 +612,31 @@ public class MainController implements Initializable {
                 count++;
             }
             SessionBrowser_DetailsTable.setItems(sessionitems);
+            SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(selectedsession.getActualSessionDuration(), SessionBrowser_Details_TotalDuration.getWidth()));
         }
     }
     public void checkfilterdate_from() {
+        if (SessionBrowser_Filter_DateRange_To.getValue() != null) {
+            if (SessionBrowser_Filter_DateRange_To.getValue().isBefore(SessionBrowser_Filter_DateRange_From.getValue())) {
+                new InformationDialog(preferences, "Invalid Date", "From Date Must Be Before To Date", null, true);
+                SessionBrowser_Filter_DateRange_From.setValue(null);
+            }
+        }
+    }
+    public void checkfilterdate_to() {
+        if (SessionBrowser_Filter_DateRange_From.getValue() != null) {
+            if (SessionBrowser_Filter_DateRange_From.getValue().isAfter(SessionBrowser_Filter_DateRange_To.getValue())) {
+                new InformationDialog(preferences, "Invalid Date", "To Date Must Be After From Date", null, true);
+                SessionBrowser_Filter_DateRange_To.setValue(null);
+            }
+        }
+    }
+    public void checkfilterduration_min() {
 
     }
-    public void checkfilterdate_to() {}
-    public void checkfilterduration_min() {}
-    public void checkfilterduration_max() {}
+    public void checkfilterduration_max() {
+
+    }
 
 
 // Goals Tab

@@ -41,7 +41,7 @@ public class AvailableEntrainments {
         if (! Root.getPreferences().getAdvancedOptions().getOS().equals(System.getProperty("os.name"))) {
             if (! Preferences.ENTRAINMENTXMLFILE.delete()) {
                 new ErrorDialog(Root.getPreferences(), "Error", "Cannot Write To PlaybackItemEntrainment's XML File",
-                        "Check Permissions For " + Preferences.ENTRAINMENTXMLFILE.getAbsolutePath());
+                        "Check Permissions For " + Preferences.ENTRAINMENTXMLFILE.getAbsolutePath(), false);
                 return;
             }
             Root.getPreferences().getAdvancedOptions().setOS(System.getProperty("os.name"));

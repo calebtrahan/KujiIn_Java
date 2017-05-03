@@ -24,6 +24,7 @@ public class Sessions {
     public Sessions() {}
     public Sessions(MainController root) {
         Root = root;
+        unmarshall();
     }
 
 // Getters And Setters

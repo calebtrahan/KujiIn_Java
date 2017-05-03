@@ -33,7 +33,7 @@
       </MenuBar>
       <TabPane prefHeight="200.0" prefWidth="200.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <tabs>
-            <Tab text="Play/Export">
+            <Tab fx:id="PlayExportTab" text="Play/Export">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -149,7 +149,7 @@
                   </AnchorPane>
               </content>
             </Tab>
-          <Tab text="Progress">
+          <Tab fx:id="ProgressTab" text="Progress">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -259,7 +259,7 @@
                                                                                                    <children>
                                                                                                       <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="176.0">
                                                                                                          <children>
-                                                                                                            <CheckBox minWidth="55.0" mnemonicParsing="false" onAction="#populatesessionbrowsertable" text="From">
+                                                                                                            <CheckBox fx:id="SessionBrowser_Filter_DateRange_From_Checkbox" minWidth="55.0" mnemonicParsing="false" onAction="#populatesessiondetailstable" text="From">
                                                                                                                <padding>
                                                                                                                   <Insets right="5.0" />
                                                                                                                </padding>
@@ -269,7 +269,7 @@
                                                                                                       </HBox>
                                                                                                       <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="135.0">
                                                                                                          <children>
-                                                                                                            <CheckBox minWidth="55.0" mnemonicParsing="false" onAction="#populatesessionbrowsertable" text="To">
+                                                                                                            <CheckBox fx:id="SessionBrowser_Filter_DateRange_To_Checkbox" minWidth="55.0" mnemonicParsing="false" onAction="#populatesessiondetailstable" text="To">
                                                                                                                <HBox.margin>
                                                                                                                   <Insets />
                                                                                                                </HBox.margin>
@@ -293,12 +293,12 @@
                                                                                                 </Label>
                                                                                                 <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="176.0">
                                                                                                    <children>
-                                                                                                      <CheckBox minWidth="50.0" mnemonicParsing="false" onAction="#populatesessionbrowsertable" text="Min">
+                                                                                                      <CheckBox fx:id="SessionBrowser_Filter_Duration_Min_Checkbox" minWidth="50.0" mnemonicParsing="false" onAction="#populatesessiondetailstable" text="Min">
                                                                                                          <padding>
                                                                                                             <Insets right="5.0" />
                                                                                                          </padding>
                                                                                                       </CheckBox>
-                                                                                                      <TextField fx:id="SessionBrowser_Filter_Duration_From_Hours" alignment="CENTER" onAction="#checkfilterduration_min" prefHeight="25.0" prefWidth="28.0" text="99" />
+                                                                                                      <TextField fx:id="SessionBrowser_Filter_Duration_From_Hours" alignment="CENTER" onAction="#checkfilterduration_min" prefHeight="27.0" prefWidth="36.0" text="99" />
                                                                                                       <Label text="hr(s)">
                                                                                                          <HBox.margin>
                                                                                                             <Insets left="2.0" right="5.0" />
@@ -310,12 +310,12 @@
                                                                                                 </HBox>
                                                                                                 <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="135.0">
                                                                                                    <children>
-                                                                                                      <CheckBox minWidth="50.0" mnemonicParsing="false" onAction="#populatesessionbrowsertable" text="Max">
+                                                                                                      <CheckBox fx:id="SessionBrowser_Filter_Duration_Max_Checkbox" minWidth="50.0" mnemonicParsing="false" onAction="#populatesessiondetailstable" text="Max">
                                                                                                          <HBox.margin>
                                                                                                             <Insets />
                                                                                                          </HBox.margin>
                                                                                                       </CheckBox>
-                                                                                                      <TextField fx:id="SessionBrowser_Filter_Duration_To_Hours" alignment="CENTER" onAction="#checkfilterduration_max" prefHeight="25.0" prefWidth="28.0" text="99" />
+                                                                                                      <TextField fx:id="SessionBrowser_Filter_Duration_To_Hours" alignment="CENTER" onAction="#checkfilterduration_max" prefHeight="27.0" prefWidth="34.0" text="99" />
                                                                                                       <Label text="hr(s)">
                                                                                                          <HBox.margin>
                                                                                                             <Insets left="2.0" />
@@ -370,7 +370,7 @@
                                                                   </TableView>
                                                                   <HBox alignment="CENTER_RIGHT" maxHeight="25.0">
                                                                      <children>
-                                                                        <Label text="Total Duration" />
+                                                                        <Label text="Session Duration" />
                                                                         <TextField fx:id="SessionBrowser_Details_TotalDuration" prefHeight="25.0" prefWidth="118.0">
                                                                            <HBox.margin>
                                                                               <Insets left="7.0" />
@@ -401,7 +401,7 @@
                      </children></AnchorPane>
             </content>
           </Tab>
-            <Tab text="Goals">
+            <Tab fx:id="GoalsTab" text="Goals">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>

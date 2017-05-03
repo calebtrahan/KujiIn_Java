@@ -98,7 +98,7 @@
                                           <TableColumn fx:id="PercentColumn" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" sortable="false" text="\%" />
                                       </columns>
                                     </TableView>
-                                    <VBox prefHeight="200.0" prefWidth="100.0">
+                                    <VBox maxHeight="41.0" prefHeight="200.0" prefWidth="100.0">
                                        <children>
                                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                                              <children>

@@ -96,7 +96,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             setResizable(false);
             setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (new AnswerDialog(preferences, this, "Save Changes", null, "You Have Unsaved Changes To " + selectedplaybackitemambience, "Save And Close", "Close", "Cancel").getResult()) {
+                    switch (new AnswerDialog(preferences, this, "Save Changes", null, "You Have Unsaved Changes To " + selectedplaybackitemambience, "Save And Close", "Close", "Cancel", true).getResult()) {
                         case YES:
                             save();
                             break;
@@ -138,9 +138,9 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             }
         } else {
             if (selected_temp_ambiencesong == null) {
-                new InformationDialog(preferences, "Information", "Cannot Transfer", "Nothing Selected");}
+                new InformationDialog(preferences, "Information", "Cannot Transfer", "Nothing Selected", true);}
             else {
-                new InformationDialog(preferences, "Information", "Cannot Transfer", "No SessionPart Selected");}
+                new InformationDialog(preferences, "Information", "Cannot Transfer", "No SessionPart Selected", true);}
         }
     }
     public void leftarrowpressed() {
@@ -216,7 +216,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         }
         if (validfilecount > 0) {
             if (Util.list_hasduplicates(files)) {
-                if (! new ConfirmationDialog(preferences, "Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard").getResult()) {
+                if (! new ConfirmationDialog(preferences, "Confirmation", "Duplicate Files Detected", "Include Duplicate Files?", "Include", "Discard", true).getResult()) {
                     files = Util.list_removeduplicates(files);
                 }
             }
@@ -225,7 +225,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             SoundFile soundFile = new SoundFile(i);
             addandcalculateduration(soundFile, table, soundfilelist, songlist);
         }
-        if (notvalidfilecount > 0) {new InformationDialog(preferences, "Information", notvalidfilecount + " Files Were Not Valid And Weren't Added", "");}
+        if (notvalidfilecount > 0) {new InformationDialog(preferences, "Information", notvalidfilecount + " Files Were Not Valid And Weren't Added", "", true);}
     }
     public void addandcalculateduration(SoundFile soundFile, TableView<AmbienceSong> table, ArrayList<SoundFile> soundfilelist, ObservableList<AmbienceSong> songlist) {
         MediaPlayer calculatedurationplayer = new MediaPlayer(new Media(soundFile.getFile().toURI().toString()));
@@ -245,7 +245,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         if (index != -1) {
             SoundFile soundFile = soundfilelist.get(index);
             switch (new AnswerDialog(preferences, this, "Removing File", null, "Removing Ambience From Table. Also Delete File " + soundFile.getName() + " From Disk? (This Cannot Be Undone)",
-                    "Remove And Delete File", "Remove But Keep File", "Cancel").getResult()) {
+                    "Remove And Delete File", "Remove But Keep File", "Cancel", true).getResult()) {
                 case YES: soundFile.getFile().delete(); break;
                 case CANCEL: return;
             }
@@ -255,7 +255,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             calculateactualtotalduration();
             calculatetemptotalduration();
         }
-        else {new InformationDialog(preferences, "Information", "Nothing Selected", "Select A Table Item To Remove");}
+        else {new InformationDialog(preferences, "Information", "Nothing Selected", "Select A Table Item To Remove", true);}
     }
     private void preview(AmbienceSong selectedsong) {
         if (selectedsong != null && selectedsong.getFile() != null && selectedsong.getFile().exists()) {
@@ -277,11 +277,11 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
-                new InformationDialog(preferences, "Information", selectedplaybackitemambience + " Has No Ambience", "Please Add Ambience To " + selectedplaybackitemambience);
+                new InformationDialog(preferences, "Information", selectedplaybackitemambience + " Has No Ambience", "Please Add Ambience To " + selectedplaybackitemambience, true);
                 return false;
             }
         } else {
-            new InformationDialog(preferences, "Information", "No SessionPart Loaded", "Load A SessionPart's Ambience First");
+            new InformationDialog(preferences, "Information", "No SessionPart Loaded", "Load A SessionPart's Ambience First", true);
             return false;
         }
     }
@@ -304,13 +304,13 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             actual_soundfilelist.stream().filter(i -> ! selectedplaybackitemambience.getAmbience().contains(i)).forEach(i -> selectedplaybackitemambience.getAmbience().add(i));
             availableAmbiences.setsessionpartAmbience(index, selectedplaybackitemambience);
             availableAmbiences.marshall();
-            new InformationDialog(preferences, "Saved", "Ambience Saved To " + selectedplaybackitemambience, "");
+            new InformationDialog(preferences, "Saved", "Ambience Saved To " + selectedplaybackitemambience, "", true);
         } else {
-            new InformationDialog(preferences, "Cannot Save", "No SessionPart Selected", "Cannot Save");}
+            new InformationDialog(preferences, "Cannot Save", "No SessionPart Selected", "Cannot Save", true);}
     }
     public void switchtosimple() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(preferences, this, "Switch To Simple Mode", null, "You Have Unsaved Changes To " + selectedplaybackitemambience, "Save Changes", "Switch Without Saving", "Cancel").getResult()) {
+            switch (new AnswerDialog(preferences, this, "Switch To Simple Mode", null, "You Have Unsaved Changes To " + selectedplaybackitemambience, "Save Changes", "Switch Without Saving", "Cancel", true).getResult()) {
                 case YES: save(); break;
                 case CANCEL: return;
             }

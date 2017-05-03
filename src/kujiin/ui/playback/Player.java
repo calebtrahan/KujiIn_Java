@@ -164,7 +164,7 @@ public class Player extends Stage {
                 }
                 if (playerState != IDLE && playerState != STOPPED) {
                     pausewithoutanimation();
-                    if (new ConfirmationDialog(Root.getPreferences(), "Stop Session", "Session Is In Progress", "End This Session Prematurely?").getResult()) {
+                    if (new ConfirmationDialog(Root.getPreferences(), "Stop Session", "Session Is In Progress", "End This Session Prematurely?", false).getResult()) {
                         cleanupPlayersandAnimations();
                         SessionComplete sessionComplete = new SessionComplete(SessionInProgress, false);
                         sessionComplete.initModality(Modality.APPLICATION_MODAL);
@@ -175,7 +175,7 @@ public class Player extends Stage {
                     }
                 }
             });
-            SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionDuration()));
+            SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));
             PlayButton.requestFocus();
             SessionProgressPercentage.setVisible(false);
             SessionProgress.setOnMouseEntered(event -> SessionProgressPercentage.setVisible(true));
@@ -317,14 +317,14 @@ public class Player extends Stage {
             // Update Total Progress
                 SessionCurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(SessionInProgress.getElapsedTime())));
                 Float totalprogress;
-                if (SessionInProgress.getElapsedTime() > 0.0) {totalprogress = (float) SessionInProgress.getElapsedTime() / (float) SessionInProgress.getSessionDuration().toMillis();}
+                if (SessionInProgress.getElapsedTime() > 0.0) {totalprogress = (float) SessionInProgress.getElapsedTime() / (float) SessionInProgress.getExpectedSessionDuration().toMillis();}
                 else {totalprogress = (float) 0.0;}
                 SessionProgress.setProgress(totalprogress);
                 BigDecimal bd = new BigDecimal(totalprogress * 100);
                 bd = bd.setScale(2, RoundingMode.HALF_UP);
                 SessionProgressPercentage.setText(bd.doubleValue() + "%");
-                if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionDuration()));}
-                else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionDuration().subtract(new Duration(SessionInProgress.getElapsedTime()))));}
+                if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));}
+                else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration().subtract(new Duration(SessionInProgress.getElapsedTime()))));}
                 updatesessionui();
                 updategoalui();
             } catch (Exception ignored) {ignored.printStackTrace();}

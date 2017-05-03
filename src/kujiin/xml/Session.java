@@ -22,13 +22,14 @@ import static kujiin.util.Util.dateFormat;
 public class Session {
     private String Date_Practiced;
     private ArrayList<PlaybackItem> playbackItems;
-    private Double SessionDuration; // In Millis
+    private Double ExpectedSessionDuration;
+    private Double ActualSessionDuration;
     private FreqType freqType;
     @XmlTransient
     private Duration elapsedtime;
 
     public Session() {
-        SessionDuration = 0.0;
+        ActualSessionDuration = 0.0;
         elapsedtime = Duration.ZERO;
         setDate_Practiced(LocalDate.now());
     }
@@ -36,12 +37,11 @@ public class Session {
 // Getters And Setters
     public void setDate_Practiced(LocalDate date_Practiced) {Date_Practiced = date_Practiced.format(dateFormat);}
     public LocalDate getDate_Practiced() {return LocalDate.parse(Date_Practiced, dateFormat);}
-    public Duration getSessionDuration() {
-        Duration totalduration = Duration.ZERO;
-        for (PlaybackItem i : playbackItems) {
-            totalduration = totalduration.add(new Duration(i.getDuration()));
-        }
-        return totalduration;
+    public Duration getActualSessionDuration() {
+        return new Duration(ActualSessionDuration);
+    }
+    public Duration getExpectedSessionDuration() {
+        return new Duration(ExpectedSessionDuration);
     }
     public void setPlaybackItems(ArrayList<PlaybackItem> playbackItems) {
         this.playbackItems = playbackItems;
@@ -148,11 +148,25 @@ public class Session {
     }
 
 // Utility Methods
+    protected void calculateactualduration() {
+        Duration duration = Duration.ZERO;
+        for (PlaybackItem i : getPlaybackItems()) {
+            duration = duration.add(Duration.millis(i.getElapsedTime()));
+        }
+        ActualSessionDuration = duration.toMillis();
+    }
+    protected void calculateexpectedduration() {
+        Duration duration = Duration.ZERO;
+        for (PlaybackItem i : getPlaybackItems()) {
+            duration = duration.add(Duration.millis(i.getDuration()));
+        }
+        ExpectedSessionDuration = duration.toMillis();
+    }
     public void addelapsedtime(Duration duration) {
         elapsedtime = elapsedtime.add(duration);
     }
     public boolean isValid() {
-        return Duration.minutes(SessionDuration).greaterThan(Duration.ZERO);
+        return Duration.minutes(ActualSessionDuration).greaterThan(Duration.ZERO);
     }
 
 // Subclasses
@@ -199,12 +213,14 @@ public class Session {
         }
         public void setDuration(double duration) {
             Duration = duration;
+            calculateexpectedduration();
         }
         public double getDuration() {
                 return Duration;
             }
         public void setElapsedtime(javafx.util.Duration elapsedtime) {
             this.elapsedtime = elapsedtime;
+            calculateactualduration();
         }
         public double getElapsedTime() {return elapsedtime.toMillis();}
         public String getdurationasString(double maxchars) {

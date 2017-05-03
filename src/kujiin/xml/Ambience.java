@@ -76,6 +76,7 @@ public class Ambience {
     }
     public SoundFile get(int index) throws IndexOutOfBoundsException {return Ambience.get(index);}
     public SoundFile getnextambienceforplayback() {
+        if (PlaybackHistory == null) {PlaybackHistory = new ArrayList<>();}
         try {
             SoundFile nextambiencefile = Ambience.get(currentplaycount);
             currentplaycount++;
