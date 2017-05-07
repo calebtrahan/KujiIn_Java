@@ -75,7 +75,7 @@
                               <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                            </padding>
                         </AnchorPane>
-                      <AnchorPane maxWidth="300.0" minWidth="300.0">
+                      <AnchorPane maxWidth="305.0" minWidth="305.0">
                            <children>
                               <VBox alignment="TOP_CENTER" layoutX="67.0" layoutY="119.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
@@ -126,6 +126,9 @@
                                              </children>
                                           </HBox>
                                        </children>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
                                     </VBox>
                                  </children>
                               </VBox>

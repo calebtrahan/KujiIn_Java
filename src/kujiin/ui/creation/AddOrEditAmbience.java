@@ -51,8 +51,6 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
     private boolean accepted = false;
     private Ambience ambience;
     private Duration playbackitemduration;
-    private SelectAvailableAmbience selectAvailableAmbience;
-    private PreviewFile previewFile;
     private Session.PlaybackItem playbackItem;
     private PlaybackItemAmbience playbackItemAmbience;
     private Preferences preferences;
@@ -68,14 +66,28 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
         UpButton.setOnAction(event -> moveup());
         DownButton.setOnAction(event -> movedown());
         AcceptButton.setOnAction(event -> accept());
-        CancelButton.setOnAction(event -> cancel());
+        CancelButton.setOnAction(event -> close());
         NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
         NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
+        AddOrEditAmbienceTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            RemoveButton.setDisable(newValue == null);
+            PreviewButton.setDisable(newValue == null);
+            if (newValue != null && AddOrEditAmbienceTable.getItems().size() > 1) {
+                UpButton.setDisable(AddOrEditAmbienceTable.getItems().indexOf(newValue) == 0);
+                DownButton.setDisable(AddOrEditAmbienceTable.getItems().indexOf(newValue) == AddOrEditAmbienceTable.getItems().size() - 1);
+            } else {
+                UpButton.setDisable(true);
+                DownButton.setDisable(true);
+            }
+        });
     }
     public AddOrEditAmbience(Preferences preferences, Session.PlaybackItem playbackItem, AvailableAmbiences availableAmbiences) {
         try {
-            ambience = playbackItem.getAmbience();
+            ambience = new Ambience();
+            if (playbackItem.getAmbience().getAmbience() != null) {
+                for (SoundFile i : playbackItem.getAmbience().getAmbience()) {ambience.add(i);}
+            }
             this.preferences = preferences;
             this.playbackItem = playbackItem;
             this.availableAmbiences = availableAmbiences;
@@ -88,6 +100,7 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
             setResizable(false);
             if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
             else {setTitle("Edit Ambience"); populatetable();}
+            AddOrEditAmbienceTable.setPlaceholder(new Label("No Ambience For " + playbackItem.getName()));
         } catch (IOException e) {e.printStackTrace();}
     }
 
@@ -95,11 +108,13 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
     public boolean isAccepted() {
         return accepted;
     }
+    public Session.PlaybackItem getPlaybackItem() {return playbackItem;}
 
 // Button Actions
     public void addfromavailableambience() {
         if (playbackItemAmbience.hasAny()) {
-            selectAvailableAmbience = new SelectAvailableAmbience(playbackItemAmbience);
+            SelectAvailableAmbience selectAvailableAmbience = new SelectAvailableAmbience(playbackItemAmbience);
+            selectAvailableAmbience.initModality(Modality.APPLICATION_MODAL);
             selectAvailableAmbience.showAndWait();
             if (selectAvailableAmbience.isAccepted() && ! selectAvailableAmbience.getAmbiencetoadd().isEmpty()) {
                 for (SoundFile i : selectAvailableAmbience.getAmbiencetoadd()) {ambience.add(i);}
@@ -157,7 +172,7 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
     public void preview() {
         int selectedindex = AddOrEditAmbienceTable.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1) {
-            previewFile = new PreviewFile(ambience.getAmbience().get(selectedindex).getFile());
+            PreviewFile previewFile = new PreviewFile(ambience.getAmbience().get(selectedindex).getFile());
             previewFile.initOwner(this);
             previewFile.initModality(Modality.APPLICATION_MODAL);
             previewFile.showAndWait();
@@ -206,23 +221,23 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
     }
     public void accept() {
         ambience.setEnabled(! ambience.getAmbience().isEmpty());
+        playbackItem.getAmbience().setAmbience(ambience.getAmbience());
         accepted = ! ambience.getAmbience().isEmpty();
-        close();
-    }
-    public void cancel() {
-        accepted = false;
         close();
     }
 
 // Other Methods
     private void populatetable() {
         AddOrEditAmbienceTable.getItems().clear();
-        ObservableList<AddOrEditAmbienceTableItem> items = FXCollections.observableArrayList();
-        int count = 1;
-        for (SoundFile i : ambience.getAmbience()) {
-            items.add(new AddOrEditAmbienceTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getDuration()))));
-        }
-        AddOrEditAmbienceTable.setItems(items);
+        if (! ambience.getAmbience().isEmpty()) {
+            ObservableList<AddOrEditAmbienceTableItem> items = FXCollections.observableArrayList();
+            int count = 1;
+            for (SoundFile i : ambience.getAmbience()) {
+                items.add(new AddOrEditAmbienceTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getDuration()))));
+                count++;
+            }
+            AddOrEditAmbienceTable.setItems(items);
+        } else {AddOrEditAmbienceTable.setPlaceholder(new Label("No Ambience For " + playbackItem.getName()));}
         updatestatusbar();
         syncbuttons();
     }
@@ -246,7 +261,7 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
         DownButton.setDisable(nothingselected || selectedindex == AddOrEditAmbienceTable.getItems().size() - 1);
     }
 
-    // Table Class
+// Table Class
     class AddOrEditAmbienceTableItem {
         IntegerProperty number;
         StringProperty name;

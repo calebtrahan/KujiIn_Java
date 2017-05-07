@@ -28,7 +28,7 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
     public Button AddButton;
     public Button CancelButton;
     private List<SoundFile> ambiencetoadd = new ArrayList<>();
-    private boolean accepted;
+    private boolean accepted = false;
     private PlaybackItemAmbience AvailableAmbience;
 
     @Override
@@ -72,9 +72,11 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
             }
             accepted = ! ambiencetoadd.isEmpty();
         }
+        close();
     }
     public void cancel() {
         accepted = false;
+        close();
     }
 
 // Table Class

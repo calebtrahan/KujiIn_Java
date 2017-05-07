@@ -155,7 +155,7 @@ public class Session {
         }
         ActualSessionDuration = duration.toMillis();
     }
-    protected void calculateexpectedduration() {
+    public void calculateexpectedduration() {
         Duration duration = Duration.ZERO;
         for (PlaybackItem i : getPlaybackItems()) {
             duration = duration.add(Duration.millis(i.getDuration()));
@@ -213,7 +213,6 @@ public class Session {
         }
         public void setDuration(double duration) {
             Duration = duration;
-            calculateexpectedduration();
         }
         public double getDuration() {
                 return Duration;

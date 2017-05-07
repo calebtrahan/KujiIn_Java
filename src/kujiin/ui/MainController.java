@@ -53,8 +53,6 @@ import static kujiin.xml.Preferences.*;
         // Percentage Isn't Calculating Correctly
     // TODO Find A Way To Reset Session After Stop Animation Ends
 
-// Features To Test
-
 // Additional Features To Definitely Add
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
     // TODO Exporter
@@ -419,7 +417,7 @@ public class MainController implements Initializable {
         Session.PlaybackItem playbackItem = createdsession.getplaybackitem(availableambienceindex);
         SetDurationAndAmbience adjustDuration = new SetDurationAndAmbience(preferences, availableAmbiences, Collections.singletonList(playbackItem));
         adjustDuration.showAndWait();
-        if (adjustDuration.isAccepted()) {createdsession.addplaybackitems(adjustDuration.getPlaybackItemList());}
+        if (adjustDuration.isAccepted()) {createdsession.addplaybackitems(adjustDuration.getPlaybackItemList()); createdsession.calculateexpectedduration();}
         populatetable();
     }
     private void add(int[] availableambienceindexes) {
@@ -427,7 +425,7 @@ public class MainController implements Initializable {
         for (int i : availableambienceindexes) {items.add(createdsession.getplaybackitem(i));}
         SetDurationAndAmbience adjustDuration = new SetDurationAndAmbience(preferences, availableAmbiences, items);
         adjustDuration.showAndWait();
-        if (adjustDuration.isAccepted()) {createdsession.addplaybackitems(adjustDuration.getPlaybackItemList());}
+        if (adjustDuration.isAccepted()) {createdsession.addplaybackitems(adjustDuration.getPlaybackItemList()); createdsession.calculateexpectedduration();}
         populatetable();
     }
     public void addallitems_kujiin() {
@@ -474,7 +472,10 @@ public class MainController implements Initializable {
         if (selectedindex != -1 && createdtableselecteditem != null) {
             AddOrEditAmbience addOrEditAmbience = new AddOrEditAmbience(preferences, createdtableselecteditem, availableAmbiences);
             addOrEditAmbience.showAndWait();
-            if (addOrEditAmbience.isAccepted()) {populatetable();}
+            if (addOrEditAmbience.isAccepted()) {
+                createdtableplaybackitems.set(createdtableplaybackitems.indexOf(createdtableselecteditem), addOrEditAmbience.getPlaybackItem());
+                populatetable();
+            }
         }
     }
     public void moveupincreatortable() {
