@@ -53,10 +53,10 @@ public class SessionPlaybackOverview {
 //            ambiencePlaybackType = Root.getPreferences().getSessionOptions().getAmbiencePlaybackType();
 //            if (ambiencePlaybackType != null) {
 //                switch (ambiencePlaybackType) {
-//                    case REPEAT:
+//                    case Repeat:
 //                        AmbienceTypeComboBox.getSelectionModel().select(0);
 //                        break;
-//                    case SHUFFLE:
+//                    case Shuffle:
 //                        AmbienceTypeComboBox.getSelectionModel().select(1);
 //                        break;
 //                    case CUSTOM:
@@ -197,8 +197,8 @@ public class SessionPlaybackOverview {
 //                        if (! selectedsessionpart.getAmbience().hasCustomAmbience()) {SetAmbienceButton.setText("Set Custom Ambience");}
 //                        else {SetAmbienceButton.setText("Edit Custom Ambience");}
 //                        break;
-//                    case SHUFFLE:
-//                    case REPEAT:
+//                    case Shuffle:
+//                    case Repeat:
 //                        if (! selectedsessionpart.getAmbience_hasAny() && index != -1) {
 //                            SetAmbienceButton.setDisable(false);
 //                            SetAmbienceButton.setText("Add Ambience");
@@ -340,13 +340,13 @@ public class SessionPlaybackOverview {
 //        if (! AmbienceSwitch.isSelected()) {return "Disabled";}
 //        else {
 //            switch (ambiencePlaybackType) {
-//                case REPEAT:
+//                case Repeat:
 //                    if (!sessionItem.getAmbience().hasAnyAmbience()) {
 //                        return "Has No Ambience";
 //                    } else {
 //                        return "Will Repeat";
 //                    }
-//                case SHUFFLE:
+//                case Shuffle:
 //                    if (!sessionItem.getAmbience().hasAnyAmbience()) {
 //                        return "Has No Ambience";
 //                    } else {
@@ -367,10 +367,10 @@ public class SessionPlaybackOverview {
 //        int index = AmbienceTypeComboBox.getSelectionModel().getSelectedIndex();
 //        switch (index) {
 //            case 0:
-//                ambiencePlaybackType = AmbiencePlaybackType.REPEAT;
+//                ambiencePlaybackType = AmbiencePlaybackType.Repeat;
 //                break;
 //            case 1:
-//                ambiencePlaybackType = AmbiencePlaybackType.SHUFFLE;
+//                ambiencePlaybackType = AmbiencePlaybackType.Shuffle;
 //                break;
 //            case 2:
 //                ambiencePlaybackType = AmbiencePlaybackType.CUSTOM;
@@ -476,8 +476,8 @@ public class SessionPlaybackOverview {
 //            Root.getSessionCreator().setAmbiencePlaybackType(ambiencePlaybackType);
 //            int count = 0;
 //            switch (ambiencePlaybackType) {
-//                case REPEAT:
-//                case SHUFFLE:
+//                case Repeat:
+//                case Shuffle:
 //                    for (SessionItem i : alladjustedsessionitems) {if (! i.getAmbience_hasAny()) {count++;}}
 //                    if (count > 0) {
 //                        new InformationDialog(Root.getPreferences(), "Information", "Missing Ambience For " + count + " Session Parts", "Please Add Ambience Or Disable Ambience From Session");

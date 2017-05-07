@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 
 import static kujiin.util.Util.SUPPORTEDAUDIOFORMATS;
 
-public class AddOrEditAmbience extends StyledStage implements Initializable {
+public class CustomizeAmbience extends StyledStage implements Initializable {
     public TableView<AddOrEditAmbienceTableItem> AddOrEditAmbienceTable;
     public TableColumn<AddOrEditAmbienceTableItem, Integer> NumberColumn;
     public TableColumn<AddOrEditAmbienceTableItem, String> NameColumn;
@@ -82,7 +82,7 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
             }
         });
     }
-    public AddOrEditAmbience(Preferences preferences, Session.PlaybackItem playbackItem, AvailableAmbiences availableAmbiences) {
+    public CustomizeAmbience(Preferences preferences, Session.PlaybackItem playbackItem, AvailableAmbiences availableAmbiences) {
         try {
             ambience = new Ambience();
             if (playbackItem.getAmbience().getAmbience() != null) {for (SoundFile i : playbackItem.getAmbience().getAmbience()) {ambience.add(i);}}
@@ -97,7 +97,7 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
             setScene(defaultscene);
             setResizable(false);
             if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
-            else {setTitle("Edit Ambience"); populatetable();}
+            else {setTitle("Customize Ambience"); populatetable();}
             AddOrEditAmbienceTable.setPlaceholder(new Label("No Ambience For " + playbackItem.getName()));
         } catch (IOException e) {e.printStackTrace();}
     }
@@ -242,7 +242,7 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
     private void updatestatusbar() {
         AcceptButton.setDisable(! ambience.gettotalDuration().greaterThan(playbackitemduration));
         if (ambience.gettotalDuration().greaterThan(playbackitemduration)) {
-            StatusBar.setText("Ambience Is Long Enough");
+            StatusBar.setText("");
         } else {
             Duration leftoverduration;
             if (ambience.gettotalDuration().greaterThan(Duration.ZERO)) {leftoverduration = playbackitemduration.subtract(ambience.gettotalDuration());}

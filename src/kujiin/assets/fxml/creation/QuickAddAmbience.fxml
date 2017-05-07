@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane prefHeight="76.0" prefWidth="232.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.assets.fxml.creation.QuickAddAmbience">
+   <children>
+      <VBox layoutX="10.0" layoutY="10.0" prefHeight="253.0" prefWidth="471.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="21.0" prefWidth="222.0">
+               <children>
+                  <Label text="Quick Add Ambience Type">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <RadioButton fx:id="RepeatRadioButton" mnemonicParsing="false" onAction="#repeatbuttonselected" text="Repeat">
+                     <HBox.margin>
+                        <Insets right="15.0" />
+                     </HBox.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="ShuffleRadioButton" mnemonicParsing="false" text="Shuffle" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="31.0" prefWidth="254.0">
+               <children>
+                  <Button fx:id="AddAmbienceButton" mnemonicParsing="false" onAction="#accept" text="Add Ambience" />
+                  <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+               </children>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</AnchorPane>

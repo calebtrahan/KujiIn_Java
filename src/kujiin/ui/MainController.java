@@ -13,9 +13,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.ambience.AvailableAmbienceEditor;
 import kujiin.ui.boilerplate.IconImageView;
-import kujiin.ui.creation.AddOrEditAmbience;
 import kujiin.ui.creation.AdjustDuration;
-import kujiin.ui.creation.SetDurationAndAmbience;
+import kujiin.ui.creation.CustomizeAmbience;
+import kujiin.ui.creation.QuickAddAmbience;
+import kujiin.ui.creation.SetDurationWithAmbienceOption;
 import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.ChangeProgramOptions;
 import kujiin.ui.dialogs.EditReferenceFiles;
@@ -44,8 +45,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static kujiin.xml.Preferences.*;
-// New Design
-    // TODO Set/Edit Preset Ambience On Session Details Dialog
 
 // Bugs To Fix
     // TODO Find NullPointer During Session Playback On Thread During Transition
@@ -117,8 +116,14 @@ public class MainController implements Initializable {
     public MenuItem AddFireMenuItem;
     public MenuItem AddWaterMenuItem;
     public MenuItem AddVoidMenuItem;
-    public Button EditDurationsButton;
-    public Button AddEditAmbienceButton;
+    public MenuButton DurationMenu;
+    public MenuItem Duration_SetRampOnlyMenuItem;
+    public MenuItem Duration_EditDurationMenuItem;
+    public MenuButton AmbienceMenu;
+    public Menu AmbienceQuickAddMenu;
+    public MenuItem AmbienceQuickAddMenu_Repeat;
+    public MenuItem AmbienceQuickAddMenu_Shuffle;
+    public MenuItem AmbienceCustomize;
     public Button MoveUpButton;
     public Button MoveDownButton;
     public Button RemoveButton;
@@ -286,8 +291,8 @@ public class MainController implements Initializable {
             OpenFileButton.setGraphic(new IconImageView(ICON_OPENFILE, fh));
             OpenRecentSessionsButton.setGraphic(new IconImageView(ICON_RECENTSESSIONS, fh));
             OpenFavoritesButton.setGraphic(new IconImageView(ICON_FAVORITES, fh));
-            EditDurationsButton.setGraphic(new IconImageView(ICON_EDITDURATION, fh));
-            AddEditAmbienceButton.setGraphic(new IconImageView(ICON_AMBIENCE, fh));
+            DurationMenu.setGraphic(new IconImageView(ICON_EDITDURATION, fh));
+            AmbienceMenu.setGraphic(new IconImageView(ICON_AMBIENCE, fh));
             MoveUpButton.setGraphic(new IconImageView(ICON_MOVEUP, fh));
             MoveDownButton.setGraphic(new IconImageView(ICON_MOVEDOWN, fh));
             RemoveButton.setGraphic(new IconImageView(ICON_REMOVE, fh));
@@ -297,13 +302,13 @@ public class MainController implements Initializable {
             ExportButton.setGraphic(new IconImageView(ICON_EXPORTTOAUDIO, fh));
         }
         if (dt == IconDisplayType.ICONS_ONLY) {
-            AddEditAmbienceButton.setText("");
+            AmbienceMenu.setText("");
             AddItemsMenu.setText("");
             CreateSessionMenu.setText("");
             OpenFileButton.setText("");
             OpenRecentSessionsButton.setText("");
             OpenFavoritesButton.setText("");
-            EditDurationsButton.setText("");
+            DurationMenu.setText("");
             MoveUpButton.setText("");
             MoveDownButton.setText("");
             RemoveButton.setText("");
@@ -317,8 +322,8 @@ public class MainController implements Initializable {
         OpenFileButton.setTooltip(new Tooltip("Open Session From File"));
         OpenRecentSessionsButton.setTooltip(new Tooltip("Open Recent Session"));
         OpenFavoritesButton.setTooltip(new Tooltip("Open Favorites"));
-        EditDurationsButton.setTooltip(new Tooltip("Edit Duration"));
-        AddEditAmbienceButton.setTooltip(new Tooltip("Add/Edit Ambience"));
+        DurationMenu.setTooltip(new Tooltip("Edit Duration"));
+        AmbienceMenu.setTooltip(new Tooltip("Add/Edit Ambience"));
         MoveUpButton.setTooltip(new Tooltip("Move Up In Table"));
         MoveDownButton.setTooltip(new Tooltip("Move Down In Table"));
         RemoveButton.setTooltip(new Tooltip("Remove"));
@@ -415,17 +420,35 @@ public class MainController implements Initializable {
     // Creation Table Methods
     private void add(int availableambienceindex) {
         Session.PlaybackItem playbackItem = createdsession.getplaybackitem(availableambienceindex);
-        SetDurationAndAmbience adjustDuration = new SetDurationAndAmbience(preferences, availableAmbiences, Collections.singletonList(playbackItem));
+        SetDurationWithAmbienceOption adjustDuration = new SetDurationWithAmbienceOption(preferences, availableAmbiences, Collections.singletonList(playbackItem), true);
+        adjustDuration.initModality(Modality.APPLICATION_MODAL);
         adjustDuration.showAndWait();
-        if (adjustDuration.isAccepted()) {createdsession.addplaybackitems(adjustDuration.getPlaybackItemList()); createdsession.calculateexpectedduration();}
+        if (adjustDuration.isAccepted()) {
+            if (adjustDuration.isQuickaddambience()) {
+                QuickAddAmbience quickAddAmbience = new QuickAddAmbience(preferences, availableAmbiences, Collections.singletonList(playbackItem));
+                quickAddAmbience.initModality(Modality.APPLICATION_MODAL);
+                quickAddAmbience.showAndWait();
+                if (quickAddAmbience.isAccepted()) {playbackItem = quickAddAmbience.getPlaybackItemList().get(0);}
+            }
+            createdsession.addplaybackitems(Collections.singletonList(playbackItem)); createdsession.calculateexpectedduration();}
         populatetable();
     }
     private void add(int[] availableambienceindexes) {
         List<Session.PlaybackItem> items = new ArrayList<>();
         for (int i : availableambienceindexes) {items.add(createdsession.getplaybackitem(i));}
-        SetDurationAndAmbience adjustDuration = new SetDurationAndAmbience(preferences, availableAmbiences, items);
+        SetDurationWithAmbienceOption adjustDuration = new SetDurationWithAmbienceOption(preferences, availableAmbiences, items, true);
+        adjustDuration.initModality(Modality.APPLICATION_MODAL);
         adjustDuration.showAndWait();
-        if (adjustDuration.isAccepted()) {createdsession.addplaybackitems(adjustDuration.getPlaybackItemList()); createdsession.calculateexpectedduration();}
+        if (adjustDuration.isAccepted()) {
+            items = adjustDuration.getPlaybackItemList();
+            if (adjustDuration.isQuickaddambience()) {
+                QuickAddAmbience quickAddAmbience = new QuickAddAmbience(preferences, availableAmbiences, items);
+                quickAddAmbience.initModality(Modality.APPLICATION_MODAL);
+                quickAddAmbience.showAndWait();
+                if (quickAddAmbience.isAccepted()) {items = quickAddAmbience.getPlaybackItemList();}
+            }
+            createdsession.addplaybackitems(items); createdsession.calculateexpectedduration();
+        }
         populatetable();
     }
     public void addallitems_kujiin() {
@@ -453,27 +476,46 @@ public class MainController implements Initializable {
     public void addFire() {add(12);}
     public void addWater() {add(13);}
     public void addVoid() {add(14);}
+    public void setramponly() {
+        if (createdtableselecteditem != null) {
+            createdtableselecteditem.setRampOnly(true);
+            createdtableselecteditem.setDuration(0.0);
+            populatetable();
+            syncbuttons();
+        }
+    }
     public void editduration() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1 && createdtableselecteditem != null) {
-            AdjustDuration adjustDuration = new AdjustDuration(createdtableselecteditem);
+            SetDurationWithAmbienceOption adjustDuration = new SetDurationWithAmbienceOption(preferences, availableAmbiences, Collections.singletonList(createdtableselecteditem), false);
             adjustDuration.initOwner(getStage());
             adjustDuration.showAndWait();
             if (adjustDuration.isAccepted()) {
-                Session.PlaybackItem playbackItem = createdtableselecteditem;
-                playbackItem.setDuration(adjustDuration.getNewduration().toMillis());
-                createdtableplaybackitems.set(selectedindex, playbackItem);
+                createdtableplaybackitems.set(selectedindex, adjustDuration.getPlaybackItemList().get(0));
                 populatetable();
+                syncbuttons();
             }
         } else {new InformationDialog(preferences, "Cannot Edit Duration", "Select A Single Table Item To Edit Duration", null, true);}
     }
-    public void addoreditambience() {
+    public void quickaddambience_repeat() {
+        if (createdtableselecteditem != null) {
+            createdtableselecteditem.getAmbience().addavailableambience_repeat(Duration.millis(createdtableselecteditem.getDuration()), availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
+            populatetable();
+        }
+    }
+    public void quickaddambience_shuffle() {
+        if (createdtableselecteditem != null) {
+            createdtableselecteditem.getAmbience().addavailableambience_shuffle(Duration.millis(createdtableselecteditem.getDuration()), availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
+            populatetable();
+        }
+    }
+    public void customizeambience() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1 && createdtableselecteditem != null) {
-            AddOrEditAmbience addOrEditAmbience = new AddOrEditAmbience(preferences, createdtableselecteditem, availableAmbiences);
-            addOrEditAmbience.showAndWait();
-            if (addOrEditAmbience.isAccepted()) {
-                createdtableplaybackitems.set(createdtableplaybackitems.indexOf(createdtableselecteditem), addOrEditAmbience.getPlaybackItem());
+            CustomizeAmbience customizeAmbience = new CustomizeAmbience(preferences, createdtableselecteditem, availableAmbiences);
+            customizeAmbience.showAndWait();
+            if (customizeAmbience.isAccepted()) {
+                createdtableplaybackitems.set(createdtableplaybackitems.indexOf(createdtableselecteditem), customizeAmbience.getPlaybackItem());
                 populatetable();
             }
         }
@@ -549,8 +591,8 @@ public class MainController implements Initializable {
         boolean tableempty = CreatedTableView.getItems().isEmpty();
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         AddItemsMenu.setDisable(nosessionloaded);
-        EditDurationsButton.setDisable(nosessionloaded || tableempty || selectedindex == -1);
-        AddEditAmbienceButton.setDisable(nosessionloaded || tableempty || selectedindex == -1);
+        DurationMenu.setDisable(nosessionloaded || tableempty || selectedindex == -1);
+        AmbienceMenu.setDisable(nosessionloaded || tableempty || selectedindex == -1);
         PlayButton.setDisable(nosessionloaded || tableempty);
         SaveAsFileButton.setDisable(nosessionloaded || tableempty);
         ExportButton.setDisable(nosessionloaded || tableempty);
@@ -573,6 +615,7 @@ public class MainController implements Initializable {
         ObservableList<String> sessionlist = FXCollections.observableArrayList();
         List<Session> allsessions = this.sessions.getSession();
         List<Session> filteredsessions = new ArrayList<>();
+        if (allsessions == null) {allsessions = new ArrayList<>();}
         for (Session i : allsessions) {
             if (SessionBrowser_Filter_DateRange_From_Checkbox.isSelected() && SessionBrowser_Filter_DateRange_From.getValue() != null) {
                 if (i.getDate_Practiced().isBefore(SessionBrowser_Filter_DateRange_From.getValue())) {continue;}

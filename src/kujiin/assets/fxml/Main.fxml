@@ -108,10 +108,25 @@
                                                 </Menu>
                                              </items>
                                           </MenuButton>
-                                          <Button fx:id="EditDurationsButton" mnemonicParsing="false" onAction="#editduration" text="Edit Duration" />
-                                          <Button fx:id="AddEditAmbienceButton" mnemonicParsing="false" onAction="#addoreditambience" text="Edit Ambience" />
-                                          <Button fx:id="MoveUpButton" mnemonicParsing="false" onAction="#moveupincreatortable" text="Move Up" />
-                                          <Button fx:id="MoveDownButton" mnemonicParsing="false" onAction="#movedownincreatortable" text="Move Down" />
+                                          <MenuButton fx:id="DurationMenu" mnemonicParsing="false" text="Duration">
+                                            <items>
+                                              <MenuItem fx:id="Duration_SetRampOnlyMenuItem" mnemonicParsing="false" onAction="#setramponly" text="Set Ramp Only" />
+                                              <MenuItem fx:id="Duration_EditDurationMenuItem" mnemonicParsing="false" onAction="#editduration" text="Edit Duration" />
+                                            </items>
+                                          </MenuButton>
+                                          <MenuButton fx:id="AmbienceMenu" mnemonicParsing="false" text="Ambience">
+                                            <items>
+                                                <Menu fx:id="AmbienceQuickAddMenu" mnemonicParsing="false" text="Quick Add">
+                                                  <items>
+                                                    <MenuItem fx:id="AmbienceQuickAddMenu_Repeat" mnemonicParsing="false" onAction="#quickaddambience_repeat" text="Repeat" />
+                                                      <MenuItem fx:id="AmbienceQuickAddMenu_Shuffle" mnemonicParsing="false" onAction="#quickaddambience_shuffle" text="Shuffle" />
+                                                  </items>
+                                                </Menu>
+                                              <MenuItem fx:id="AmbienceCustomize" mnemonicParsing="false" onAction="#customizeambience" text="Customize" />
+                                            </items>
+                                          </MenuButton>
+                                          <Button fx:id="MoveUpButton" mnemonicParsing="false" onAction="#moveupincreatortable" text="Up" />
+                                          <Button fx:id="MoveDownButton" mnemonicParsing="false" onAction="#movedownincreatortable" text="Down" />
                                           <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removefromcreatortable" text="Remove" />
                                       </items>
                                     </ToolBar>
