@@ -85,9 +85,7 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
     public AddOrEditAmbience(Preferences preferences, Session.PlaybackItem playbackItem, AvailableAmbiences availableAmbiences) {
         try {
             ambience = new Ambience();
-            if (playbackItem.getAmbience().getAmbience() != null) {
-                for (SoundFile i : playbackItem.getAmbience().getAmbience()) {ambience.add(i);}
-            }
+            if (playbackItem.getAmbience().getAmbience() != null) {for (SoundFile i : playbackItem.getAmbience().getAmbience()) {ambience.add(i);}}
             this.preferences = preferences;
             this.playbackItem = playbackItem;
             this.availableAmbiences = availableAmbiences;
@@ -273,4 +271,5 @@ public class AddOrEditAmbience extends StyledStage implements Initializable {
             this.duration = new SimpleStringProperty(duration);
         }
     }
+
 }

@@ -26,12 +26,12 @@
                 <MenuItem fx:id="AddOpenFiles" mnemonicParsing="false" text="From File(s)" />
               </items>
             </MenuButton>
-            <Button fx:id="RemoveButton" mnemonicParsing="false" text="Remove" />
-            <Button fx:id="PreviewButton" mnemonicParsing="false" text="Preview" />
+            <Button fx:id="RemoveButton" disable="true" mnemonicParsing="false" text="Remove" />
+            <Button fx:id="PreviewButton" disable="true" mnemonicParsing="false" text="Preview" />
             <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                <children>
-                  <Button fx:id="UpButton" mnemonicParsing="false" text="Up" />
-                  <Button fx:id="DownButton" mnemonicParsing="false" text="Down" />
+                  <Button fx:id="UpButton" disable="true" mnemonicParsing="false" text="Up" />
+                  <Button fx:id="DownButton" disable="true" mnemonicParsing="false" text="Down" />
                </children>
             </HBox>
          </children>
@@ -42,8 +42,14 @@
                <children>
                   <Label fx:id="StatusBar" text="Need To Add 00:43:00 Of Ambience" />
                </children>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+               <padding>
+                  <Insets left="2.0" />
+               </padding>
             </HBox>
-            <Button fx:id="AcceptButton" mnemonicParsing="false" text="Accept" />
+            <Button fx:id="AcceptButton" disable="true" mnemonicParsing="false" text="Accept" />
             <Button fx:id="CancelButton" mnemonicParsing="false" text="Cancel" />
          </children>
       </HBox>

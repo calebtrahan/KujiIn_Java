@@ -8,8 +8,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
+import kujiin.ui.dialogs.PreviewFile;
 import kujiin.util.Util;
 import kujiin.xml.PlaybackItemAmbience;
 import kujiin.xml.SoundFile;
@@ -27,6 +29,7 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
     public Label StatusBar;
     public Button AddButton;
     public Button CancelButton;
+    public Button PreviewButton;
     private List<SoundFile> ambiencetoadd = new ArrayList<>();
     private boolean accepted = false;
     private PlaybackItemAmbience AvailableAmbience;
@@ -38,6 +41,8 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
         DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
         AddButton.setOnAction(event -> accept());
         CancelButton.setOnAction(event -> cancel());
+        PreviewButton.setOnAction(event -> preview());
+        AvailableAmbienceTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> PreviewButton.setDisable(AvailableAmbienceTable.getSelectionModel().getSelectedItems().isEmpty() || AvailableAmbienceTable.getSelectionModel().getSelectedItems().size() > 1));
     }
     public SelectAvailableAmbience(PlaybackItemAmbience availableAmbience) {
         try {
@@ -64,11 +69,11 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
         return ambiencetoadd;
     }
 
-    // Button Actions
+// Button Actions
     public void accept() {
         if (! AvailableAmbienceTable.getSelectionModel().getSelectedItems().isEmpty()) {
             for (AvailableAmbienceTableItem i : AvailableAmbienceTable.getSelectionModel().getSelectedItems()) {
-                ambiencetoadd.add(AvailableAmbience.getAmbience().get(AvailableAmbienceTable.getSelectionModel().getSelectedItems().indexOf(i)));
+                ambiencetoadd.add(AvailableAmbience.getAmbience().get(AvailableAmbienceTable.getItems().indexOf(i)));
             }
             accepted = ! ambiencetoadd.isEmpty();
         }
@@ -77,6 +82,14 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
     public void cancel() {
         accepted = false;
         close();
+    }
+    public void preview() {
+        int index = AvailableAmbienceTable.getSelectionModel().getSelectedIndex();
+        if (index != -1) {
+            PreviewFile previewFile = new PreviewFile(AvailableAmbience.getAmbience().get(index).getFile());
+            previewFile.initModality(Modality.APPLICATION_MODAL);
+            previewFile.showAndWait();
+        }
     }
 
 // Table Class
@@ -90,4 +103,5 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
         }
 
     }
+
 }
