@@ -9,8 +9,8 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.xml.AvailableAmbiences;
+import kujiin.xml.PlaybackItem;
 import kujiin.xml.Preferences;
-import kujiin.xml.Session;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,12 +25,12 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     public CheckBox QuickAddAmbienceCheckbox;
     private boolean accepted = false;
     private boolean quickaddambience = false;
-    private List<Session.PlaybackItem> playbackItemList;
+    private List<PlaybackItem> playbackItemList;
     private Preferences preferences;
     private AvailableAmbiences availableAmbiences;
     private int missingambiencecount = 0;
 
-    public SetDurationWithAmbienceOption(Preferences preferences, AvailableAmbiences availableAmbiences, List<Session.PlaybackItem> playbackItemList, boolean quickaddambienceoption) {
+    public SetDurationWithAmbienceOption(Preferences preferences, AvailableAmbiences availableAmbiences, List<PlaybackItem> playbackItemList, boolean quickaddambienceoption) {
         this.preferences = preferences;
         this.availableAmbiences = availableAmbiences;
         try {
@@ -49,7 +49,7 @@ public class SetDurationWithAmbienceOption extends StyledStage {
             long minutes = 0;
             long seconds = 0;
             if (playbackItemList.size() == 1) {
-                long millis = (long) playbackItemList.get(0).getDuration();
+                long millis = (long) playbackItemList.get(0).getExpectedDuration();
                 hours = TimeUnit.MILLISECONDS.toHours(millis);
                 millis -= TimeUnit.HOURS.toMillis(hours);
                 minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
@@ -60,7 +60,7 @@ public class SetDurationWithAmbienceOption extends StyledStage {
             MinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) minutes));
             SecondsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) seconds));
             QuickAddAmbienceCheckbox.setVisible(quickaddambienceoption);
-            for (Session.PlaybackItem i : playbackItemList) {if (! availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {missingambiencecount++;}}
+            for (PlaybackItem i : playbackItemList) {if (! availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {missingambiencecount++;}}
             setListeners();
         } catch (IOException e) {e.printStackTrace();}
     }
@@ -86,7 +86,7 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     public boolean isAccepted() {
         return accepted;
     }
-    public List<Session.PlaybackItem> getPlaybackItemList() {
+    public List<PlaybackItem> getPlaybackItemList() {
         return playbackItemList;
     }
     public boolean isQuickaddambience() {
@@ -96,14 +96,14 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     // Button Actions
     public void accept() {
         double duration = getNewDuration().toMillis();
-        for (Session.PlaybackItem i : playbackItemList) {i.setDuration(duration);}
+        for (PlaybackItem i : playbackItemList) {i.setExpectedDuration(duration);}
         if (QuickAddAmbienceCheckbox.isVisible()) {quickaddambience = QuickAddAmbienceCheckbox.isSelected();}
         accepted = true;
         close();
     }
     public void cancel() {
         accepted = false;
-        for (Session.PlaybackItem i : playbackItemList) {i.getAmbience().clearambience();}
+        for (PlaybackItem i : playbackItemList) {i.getAmbience().clearambience();}
         close();
     }
 

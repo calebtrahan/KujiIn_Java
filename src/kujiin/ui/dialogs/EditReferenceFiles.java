@@ -13,8 +13,8 @@ import kujiin.ui.MainController;
 import kujiin.ui.dialogs.alerts.*;
 import kujiin.util.Util;
 import kujiin.util.enums.ReferenceType;
+import kujiin.xml.PlaybackItem;
 import kujiin.xml.Preferences;
-import kujiin.xml.Session;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class EditReferenceFiles extends Stage {
     public RadioButton HTMLVariation;
     public RadioButton TEXTVariation;
     private File selectedfile;
-    private Session.PlaybackItem selectedplaybackitem;
+    private PlaybackItem selectedplaybackitem;
     private ArrayList<Integer> userselectedindexes;
     private ReferenceType referenceType;
     private MainController Root;

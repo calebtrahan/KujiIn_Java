@@ -85,7 +85,7 @@ public class Ambiences {
     }
 
 // Other Methods
-    public Ambience getsessionpartAmbience(Session.PlaybackItem playbackitem) {
+    public Ambience getsessionpartAmbience(PlaybackItem playbackitem) {
         switch (playbackitem.getCreationindex()) {
             case 0:
                 if (Presession != null) {return Presession;} else {return new Ambience();}
@@ -123,7 +123,7 @@ public class Ambiences {
                 return null;
         }
     }
-    public void setsessionpartAmbience(Session.PlaybackItem playbackItem, Ambience ambience) {
+    public void setsessionpartAmbience(PlaybackItem playbackItem, Ambience ambience) {
         switch (playbackItem.getCreationindex()) {
             case 0:
                 Presession = ambience;

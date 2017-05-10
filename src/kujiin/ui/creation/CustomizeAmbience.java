@@ -51,7 +51,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     private boolean accepted = false;
     private Ambience ambience;
     private Duration playbackitemduration;
-    private Session.PlaybackItem playbackItem;
+    private PlaybackItem playbackItem;
     private PlaybackItemAmbience playbackItemAmbience;
     private Preferences preferences;
 
@@ -82,7 +82,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
             }
         });
     }
-    public CustomizeAmbience(Preferences preferences, Session.PlaybackItem playbackItem, AvailableAmbiences availableAmbiences) {
+    public CustomizeAmbience(Preferences preferences, PlaybackItem playbackItem, AvailableAmbiences availableAmbiences) {
         try {
             ambience = new Ambience();
             if (playbackItem.getAmbience().getAmbience() != null) {for (SoundFile i : playbackItem.getAmbience().getAmbience()) {ambience.add(i);}}
@@ -90,7 +90,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
             this.playbackItem = playbackItem;
             this.availableAmbiences = availableAmbiences;
             playbackItemAmbience = availableAmbiences.getsessionpartAmbience(playbackItem.getCreationindex());
-            playbackitemduration = new Duration(playbackItem.getDuration());
+            playbackitemduration = new Duration(playbackItem.getExpectedDuration());
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/AddOrEditAmbience.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -106,7 +106,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     public boolean isAccepted() {
         return accepted;
     }
-    public Session.PlaybackItem getPlaybackItem() {return playbackItem;}
+    public PlaybackItem getPlaybackItem() {return playbackItem;}
 
 // Button Actions
     public void addfromavailableambience() {

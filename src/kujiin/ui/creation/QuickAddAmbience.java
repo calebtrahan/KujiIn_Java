@@ -8,8 +8,8 @@ import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.xml.AvailableAmbiences;
+import kujiin.xml.PlaybackItem;
 import kujiin.xml.Preferences;
-import kujiin.xml.Session;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,13 +19,13 @@ public class QuickAddAmbience extends StyledStage {
     public RadioButton ShuffleRadioButton;
     public Button AcceptButton;
     public Button CancelButton;
-    private List<Session.PlaybackItem> playbackItemList;
+    private List<PlaybackItem> playbackItemList;
     private AvailableAmbiences availableAmbiences;
     private boolean accepted = false;
     private Preferences preferences;
     private QuickAmbienceType quickAmbienceType;
 
-    public QuickAddAmbience(Preferences preferences, AvailableAmbiences availableAmbiences, List<Session.PlaybackItem> playbackItemList) {
+    public QuickAddAmbience(Preferences preferences, AvailableAmbiences availableAmbiences, List<PlaybackItem> playbackItemList) {
         this.preferences = preferences;
         try {
             this.availableAmbiences = availableAmbiences;
@@ -40,7 +40,7 @@ public class QuickAddAmbience extends StyledStage {
     }
 
 // Getters And Setters
-    public List<Session.PlaybackItem> getPlaybackItemList() {return playbackItemList;}
+    public List<PlaybackItem> getPlaybackItemList() {return playbackItemList;}
     public boolean isAccepted() {
         return accepted;
     }
@@ -58,11 +58,11 @@ public class QuickAddAmbience extends StyledStage {
     }
     public void addambience() {
         int missingambiencecount = 0;
-        for (Session.PlaybackItem i : playbackItemList) {
+        for (PlaybackItem i : playbackItemList) {
             if (availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {
                 Duration duration;
                 if (i.isRampOnly()) {duration = Duration.minutes(1);}
-                else {duration = Duration.millis(i.getDuration());}
+                else {duration = Duration.millis(i.getExpectedDuration());}
                 i.getAmbience().clearambience();
                 if (quickAmbienceType == QuickAmbienceType.Repeat) {i.getAmbience().addavailableambience_repeat(duration, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
                 else if (quickAmbienceType == QuickAmbienceType.Shuffle) {i.getAmbience().addavailableambience_shuffle(duration, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
@@ -77,7 +77,9 @@ public class QuickAddAmbience extends StyledStage {
         close();
     }
 
+
     enum QuickAmbienceType {
         Repeat, Shuffle
     }
+
 }

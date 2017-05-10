@@ -20,10 +20,10 @@
             <Label fx:id="DurationCompletedLabel" text="You've Completed Duration" />
                 <BarChart fx:id="SessionBarChart" horizontalGridLinesVisible="false" prefHeight="280.0" prefWidth="714.0" VBox.vgrow="ALWAYS">
                     <xAxis>
-                        <CategoryAxis fx:id="SessionCategoryAxis" prefHeight="33.0" prefWidth="666.0" side="BOTTOM" />
+                        <CategoryAxis fx:id="SessionCategoryAxis" label="Playback Item" prefHeight="33.0" prefWidth="666.0" side="BOTTOM" />
                     </xAxis>
                     <yAxis>
-                        <NumberAxis fx:id="SessionNumbersAxis" minorTickCount="0" side="LEFT" tickLength="0.0" tickUnit="1.0" upperBound="3.0" />
+                        <NumberAxis fx:id="SessionNumbersAxis" label="Minutes" minorTickCount="0" side="LEFT" tickLength="0.0" tickUnit="1.0" upperBound="3.0" />
                     </yAxis>
                 </BarChart>
             </children>

@@ -97,7 +97,7 @@ public class Player extends Stage {
 // Class Objects
     private Session SessionTemplate;
     private Session SessionInProgress;
-    private Session.PlaybackItem selectedPlaybackItem;
+    private PlaybackItem selectedPlaybackItem;
     private Goals Goals;
     private AvailableEntrainments availableEntrainments;
     private RampFiles rampfiles;
@@ -163,16 +163,7 @@ public class Player extends Stage {
                     return;
                 }
                 if (playerState != IDLE && playerState != STOPPED) {
-                    pausewithoutanimation();
-                    if (new ConfirmationDialog(Root.getPreferences(), "Stop Session", "Session Is In Progress", "End This Session Prematurely?", false).getResult()) {
-                        cleanupPlayersandAnimations();
-                        SessionComplete sessionComplete = new SessionComplete(SessionInProgress, false);
-                        sessionComplete.initModality(Modality.APPLICATION_MODAL);
-                        sessionComplete.showAndWait();
-                    } else {
-                        event.consume();
-                        resume();
-                    }
+                    if (! endsessionprematurely(false)) {event.consume();}
                 }
             });
             SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));
@@ -219,11 +210,7 @@ public class Player extends Stage {
     }
     public void stopbuttonpressed() {
         if (playerState == PLAYING || playerState == PAUSED) {
-            if (new ConfirmationDialog(Preferences, "Stop Session", "Really Stop Session?", "Session Will Be Stopped And Cannot Be Resumed",
-                    "Stop Session", "Cancel").getResult()) {
-                stop();
-                updateuitimeline.stop();
-            }
+            endsessionprematurely(true);
         }
     }
     public void ReferenceToggleCheckboxtoggled() {
@@ -296,10 +283,10 @@ public class Player extends Stage {
         PlaylistTableView.getItems().clear();
         ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
         PlaylistTableView.getSelectionModel().select(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem));
-        for (Session.PlaybackItem i : SessionInProgress.getPlaybackItems()) {
-            float totalprogress = (float) i.getElapsedTime() / (float) i.getDuration();
+        for (PlaybackItem i : SessionInProgress.getPlaybackItems()) {
+            float totalprogress = (float) i.getPracticeTime() / (float) i.getExpectedDuration();
             int percentage = new Double(totalprogress * 100).intValue();
-            String progress = Util.formatdurationtoStringDecimalWithColons(new Duration(i.getElapsedTime())) + " > " + Util.formatdurationtoStringDecimalWithColons(new Duration(i.getDuration()));
+            String progress = Util.formatdurationtoStringDecimalWithColons(new Duration(i.getPracticeTime())) + " > " + Util.formatdurationtoStringDecimalWithColons(new Duration(i.getExpectedDuration()));
             playlistitems.add(new PlaylistTableItem(i.getName(), progress, percentage + "%"));
         }
         PlaylistTableView.setItems(playlistitems);
@@ -312,19 +299,19 @@ public class Player extends Stage {
         if (p == PLAYING || p == FADING_PLAY || p == FADING_PAUSE || p == FADING_RESUME || p == FADING_STOP) {
             try {
                 selectedPlaybackItem.addelapsedtime(updateuifrequency);
-                SessionInProgress.addelapsedtime(updateuifrequency);
+                SessionInProgress.addelapseduration(updateuifrequency);
                 updateplaylist();
             // Update Total Progress
-                SessionCurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(new Duration(SessionInProgress.getElapsedTime())));
+                SessionCurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionPracticedTime()));
                 Float totalprogress;
-                if (SessionInProgress.getElapsedTime() > 0.0) {totalprogress = (float) SessionInProgress.getElapsedTime() / (float) SessionInProgress.getExpectedSessionDuration().toMillis();}
+                if (SessionInProgress.getSessionPracticedTime().greaterThan(Duration.ZERO)) {totalprogress = (float) SessionInProgress.getSessionPracticedTime().toMillis() / (float) SessionInProgress.getExpectedSessionDuration().toMillis();}
                 else {totalprogress = (float) 0.0;}
                 SessionProgress.setProgress(totalprogress);
                 BigDecimal bd = new BigDecimal(totalprogress * 100);
                 bd = bd.setScale(2, RoundingMode.HALF_UP);
                 SessionProgressPercentage.setText(bd.doubleValue() + "%");
                 if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));}
-                else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration().subtract(new Duration(SessionInProgress.getElapsedTime()))));}
+                else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration().subtract(SessionInProgress.getSessionPracticedTime())));}
                 updatesessionui();
                 updategoalui();
             } catch (Exception ignored) {ignored.printStackTrace();}
@@ -423,8 +410,8 @@ public class Player extends Stage {
         PlaylistTableView.getSelectionModel().select(0);
         PlaylistTableView.setOnMouseClicked(event -> PlaylistTableView.getSelectionModel().select(-1));
         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
-        SessionInProgress.setElapsedtime(Duration.ZERO);
-        selectedPlaybackItem.setElapsedtime(Duration.ZERO);
+        SessionInProgress.setSessionPracticedTime(0.0);
+        SessionInProgress.calculateactualduration();
         setupfadeanimations();
         volume_unbindentrainment();
     }
@@ -438,12 +425,12 @@ public class Player extends Stage {
         if (! selectedPlaybackItem.isRampOnly()) {entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);}
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
-        timeline_progresstonextsessionpart = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getDuration()), ae -> progresstonextsessionpart()));
+        timeline_progresstonextsessionpart = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()), ae -> progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
         boolean isLastSessionPart = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) == SessionInProgress.getPlaybackItems().size() - 1;
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
             SoundFile rampfile = rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1));
-            timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getDuration()).subtract(Duration.millis(rampfile.getDuration())), ae -> {
+            timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration())), ae -> {
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
                 entrainmentplayer.dispose();
@@ -456,7 +443,7 @@ public class Player extends Stage {
             timeline_start_ending_ramp.play();
         }
         if (fade_entrainment_stop != null) {
-            Duration startfadeout = new Duration(selectedPlaybackItem.getDuration());
+            Duration startfadeout = new Duration(selectedPlaybackItem.getExpectedDuration());
             if (selectedPlaybackItem.isRampOnly()) {startfadeout = startfadeout.subtract(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
             else {startfadeout = startfadeout.subtract(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_stop_value()));}
             timeline_fadeout_timer = new Timeline(new KeyFrame(startfadeout, ae -> {
@@ -660,7 +647,7 @@ public class Player extends Stage {
         } catch (Exception ignored) {}
     }
     public void transition() {
-        selectedPlaybackItem.updateduration(new Duration(selectedPlaybackItem.getDuration()));
+        selectedPlaybackItem.updateduration(new Duration(selectedPlaybackItem.getExpectedDuration()));
         updatesessionui();
         updategoalui();
         if (Preferences.getSessionOptions().getAlertfunction()) {
@@ -711,6 +698,7 @@ public class Player extends Stage {
         StopButton.setDisable(true);
     }
     public void endofsession() {
+        System.out.println("Called End Of Session!");
         updateuitimeline.stop();
         updateuitimeline.setOnFinished(event -> reset(false));
         playerState = STOPPED;
@@ -724,19 +712,22 @@ public class Player extends Stage {
         sessionComplete.initModality(Modality.APPLICATION_MODAL);
         sessionComplete.showAndWait();
     }
-    public boolean endsessionprematurely() {
-        if (playerState == PLAYING || playerState == PAUSED || playerState == TRANSITIONING) {
-            pausewithoutanimation();
-            updateuitimeline.pause();
-            if (new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
-                sessions.add(SessionInProgress);
+    public boolean endsessionprematurely(boolean resetdialogcontrols) {
+        pausewithoutanimation();
+        updateuitimeline.pause();
+        if (new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
+            sessions.add(SessionInProgress);
+            if (resetdialogcontrols) {
                 updatesessionui();
                 updategoalui();
                 reset(true);
-                return true;
+                cleanupPlayersandAnimations();
             }
-            else {playbuttonpressed(); return false;}
-        } else {return true;}
+            SessionComplete sessionComplete = new SessionComplete(SessionInProgress, false);
+            sessionComplete.initModality(Modality.APPLICATION_MODAL);
+            sessionComplete.showAndWait();
+            return true;
+        } else {playbuttonpressed(); return false;}
     }
     public void togglevolumebinding() {
         if (selectedPlaybackItem != null && (playerState == IDLE || playerState == STOPPED)) {

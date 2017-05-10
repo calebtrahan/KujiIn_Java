@@ -8,7 +8,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
-import kujiin.xml.Session;
+import kujiin.xml.PlaybackItem;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -23,16 +23,16 @@ public class AdjustDuration extends StyledStage {
     private Duration newduration;
     private boolean accepted = false;
 
-    public AdjustDuration(Session.PlaybackItem playbackItem) {
+    public AdjustDuration(PlaybackItem playbackItem) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/AdjustDuration.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setResizable(false);
-            if (playbackItem.getDuration() > 0.0) {setTitle("Edit " + playbackItem.getName() + " Duration");}
+            if (playbackItem.getExpectedDuration() > 0.0) {setTitle("Edit " + playbackItem.getName() + " Duration");}
             else {setTitle("Set " + playbackItem.getName() + " Duration");}
-            long millis = (long) playbackItem.getDuration();
+            long millis = (long) playbackItem.getExpectedDuration();
             long hours = TimeUnit.MILLISECONDS.toHours(millis);
             millis -= TimeUnit.HOURS.toMillis(hours);
             long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);

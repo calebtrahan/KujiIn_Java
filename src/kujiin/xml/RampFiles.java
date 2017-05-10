@@ -54,12 +54,12 @@ public class RampFiles {
 // Utility Methods
     public void add(SoundFile soundFile) {RampFiles.add(soundFile);}
     public void remove(int index) {RampFiles.remove(index);}
-    public SoundFile getRampFile(Session.PlaybackItem from, Session.PlaybackItem to) {
+    public SoundFile getRampFile(PlaybackItem from, PlaybackItem to) {
         StringBuilder name = new StringBuilder();
-        if (from instanceof Session.QiGong || to instanceof Session.Element) {name.append("qi");}
+        if (from.getCreationindex() == 0 || to.getCreationindex() > 9) {name.append("qi");}
         else {name.append(from.getName());}
         name.append("to");
-        if (to instanceof Session.QiGong || to instanceof Session.Element) {name.append("qi");}
+        if (to.getCreationindex() == 0 || to.getCreationindex() > 9) {name.append("qi");}
         else {name.append(to.getName());}
         for (SoundFile i : RampFiles) {
             if (i.getName().equals(name.toString().toLowerCase())) {return i;}

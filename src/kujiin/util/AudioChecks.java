@@ -13,14 +13,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class AudioChecks extends Task {
-    private Session.PlaybackItem selectedplaybackitem;
+    private PlaybackItem selectedplaybackitem;
     private PlaybackItemEntrainment playbackItemEntrainment;
     private PlaybackItemAmbience playbackItemAmbience;
     private MediaPlayer startupcheckplayer;
-    private ArrayList<Session.PlaybackItem> partswithnoambience = new ArrayList<>();
-    private ArrayList<Session.PlaybackItem> partswithmissingentrainment = new ArrayList<>();
+    private ArrayList<PlaybackItem> partswithnoambience = new ArrayList<>();
+    private ArrayList<PlaybackItem> partswithmissingentrainment = new ArrayList<>();
     private MainController root;
-    private BlockingQueue<Session.PlaybackItem> playbackitemstocheck = new ArrayBlockingQueue<>(15);
+    private BlockingQueue<PlaybackItem> playbackitemstocheck = new ArrayBlockingQueue<>(15);
     private BlockingQueue<SoundFile> PlaybackItemEntrainmentFiles;
     private BlockingQueue<SoundFile> PlaybackItemAmbienceFiles;
     private BlockingQueue<SoundFile> TempSessionRampFiles;
@@ -46,10 +46,10 @@ public class AudioChecks extends Task {
     }
 
 // Getters And Setters
-    public ArrayList<Session.PlaybackItem> getPartswithmissingentrainment() {
+    public ArrayList<PlaybackItem> getPartswithmissingentrainment() {
         return partswithmissingentrainment;
     }
-    public ArrayList<Session.PlaybackItem> getPartswithnoambience() {
+    public ArrayList<PlaybackItem> getPartswithnoambience() {
         return partswithnoambience;
     }
 
@@ -147,7 +147,7 @@ public class AudioChecks extends Task {
         } catch (Exception ignored) {partswithnoambience.add(selectedplaybackitem);}
     }
     private void calculateworktodo() {
-        for (Session.PlaybackItem i : testsession.getPlaybackItems()) {
+        for (PlaybackItem i : testsession.getPlaybackItems()) {
             totaltasks += root.getAvailableEntrainments().getsessionpartEntrainment(i).getAllEntrainmentFiles().size();
             try {totaltasks += root.getAvailableAmbiences().getsessionpartAmbience(i.getCreationindex()).getAmbience().size();}
             catch (NullPointerException ignored) {}

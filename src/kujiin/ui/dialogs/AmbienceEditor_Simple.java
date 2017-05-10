@@ -92,7 +92,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
             AmbienceTable.setPlaceholder(new Label("Select A Playback Item To Edit Ambience"));
         } catch (IOException ignored) {}
     }
-    public AmbienceEditor_Simple(AvailableAmbiences availableAmbiences, Preferences preferences, Session.PlaybackItem playbackItem) {
+    public AmbienceEditor_Simple(AvailableAmbiences availableAmbiences, Preferences preferences, PlaybackItem playbackItem) {
         try {
 //            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             this.availableAmbiences = availableAmbiences;

@@ -12,8 +12,8 @@ import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.enums.ReferenceType;
+import kujiin.xml.PlaybackItem;
 import kujiin.xml.Preferences;
-import kujiin.xml.Session;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,9 +29,9 @@ public class SelectReferenceType extends Stage {
     private ArrayList<String> descriptions = new ArrayList<>();
     private boolean result = false;
     private MainController Root;
-    private List<Session.PlaybackItem> itemsinsession;
+    private List<PlaybackItem> itemsinsession;
 
-    public SelectReferenceType(MainController Root, List<Session.PlaybackItem> itemsinsession) {
+    public SelectReferenceType(MainController Root, List<PlaybackItem> itemsinsession) {
         try {
             this.itemsinsession = itemsinsession;
             this.Root = Root;

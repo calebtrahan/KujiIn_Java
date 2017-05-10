@@ -12,8 +12,8 @@ public class FavoriteSession {
     public FavoriteSession(String name, Session session) {
         this.name = name;
         this.session = session;
-        for (Session.PlaybackItem i : session.getPlaybackItems()) {
-            duration += i.getDuration();
+        for (PlaybackItem i : session.getPlaybackItems()) {
+            duration += i.getExpectedDuration();
         }
     }
 }

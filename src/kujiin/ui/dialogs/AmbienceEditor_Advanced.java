@@ -109,7 +109,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             tempdirectory = new File(Preferences.DIRECTORYTEMP, "AmbienceEditor");
         } catch (IOException e) {}
     }
-    public AmbienceEditor_Advanced(AvailableAmbiences availableAmbiences, Preferences preferences, Session.PlaybackItem playbackitem) {
+    public AmbienceEditor_Advanced(AvailableAmbiences availableAmbiences, Preferences preferences, PlaybackItem playbackitem) {
         try {
             this.availableAmbiences = availableAmbiences;
             this.preferences = preferences;

@@ -50,8 +50,7 @@ public class Sessions {
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, Preferences.SESSIONSXMLFILE);
-        } catch (JAXBException e) {
-            new InformationDialog(Root.getPreferences(), "Information", "Couldn't Write Sessions XML File", "Check Write File Permissions Of " + Preferences.SESSIONSXMLFILE.getAbsolutePath());}
+        } catch (JAXBException e) {e.printStackTrace();}
     }
 
 // Session Methods
@@ -77,34 +76,34 @@ public class Sessions {
     public void sort() {Session.sort(Comparator.comparing(kujiin.xml.Session::getDate_Practiced));}
 
 // Session Information Getters
-    public Duration gettotalpracticedtime(kujiin.xml.Session.PlaybackItem playbackItem, boolean includeqigong) {
+    public Duration gettotalpracticedtime(PlaybackItem playbackItem, boolean includeqigong) {
         try {
             Duration totalduration = Duration.ZERO;
             for (kujiin.xml.Session i : getSession()) {
-                for (kujiin.xml.Session.PlaybackItem x : i.getPlaybackItems()) {
+                for (PlaybackItem x : i.getPlaybackItems()) {
                     if (x.getCreationindex() == playbackItem.getCreationindex()) {
-                        totalduration = totalduration.add(new Duration(x.getDuration()));
+                        totalduration = totalduration.add(new Duration(x.getExpectedDuration()));
                     }
-                    if (includeqigong && ! (playbackItem instanceof kujiin.xml.Session.QiGong) && x instanceof kujiin.xml.Session.QiGong) {
-                        totalduration = totalduration.add(new Duration(x.getDuration()));
+                    if (includeqigong && ! (playbackItem.getCreationindex() == 0) && x.getCreationindex() == 0) {
+                        totalduration = totalduration.add(new Duration(x.getExpectedDuration()));
                     }
                 }
             }
             return totalduration;
         } catch (NullPointerException ignored) {return Duration.ZERO;}
     }
-    public Duration getaveragepracticedurationforallsessions(kujiin.xml.Session.PlaybackItem playbackitem, boolean includepreandpost) {
+    public Duration getaveragepracticedurationforallsessions(PlaybackItem playbackitem, boolean includepreandpost) {
         try {
             return new Duration(gettotalpracticedtime(playbackitem, includepreandpost).toMillis() / getsessioncount(playbackitem, includepreandpost));}
         catch (NullPointerException | ArithmeticException ignored) {return Duration.ZERO;}
     }
-    public int getsessioncount(kujiin.xml.Session.PlaybackItem playbackitem, boolean includeqigong) {
+    public int getsessioncount(PlaybackItem playbackitem, boolean includeqigong) {
         try {
             int sessioncount = 0;
             for (kujiin.xml.Session i : getSession()) {
-                for (kujiin.xml.Session.PlaybackItem x : i.getPlaybackItems()) {
-                    if (x.getCreationindex() == playbackitem.getCreationindex() && x.getDuration() > 0.0) {sessioncount++; continue;}
-                    if (includeqigong && ! (playbackitem instanceof kujiin.xml.Session.QiGong) && x.getDuration() > 0.0) {sessioncount++;}
+                for (PlaybackItem x : i.getPlaybackItems()) {
+                    if (x.getCreationindex() == playbackitem.getCreationindex() && x.getExpectedDuration() > 0.0) {sessioncount++; continue;}
+                    if (includeqigong && ! (playbackitem.getCreationindex() == 0) && x.getExpectedDuration() > 0.0) {sessioncount++;}
                 }
             }
             return sessioncount;

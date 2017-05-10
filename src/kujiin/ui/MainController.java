@@ -6,6 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -47,9 +48,11 @@ import java.util.ResourceBundle;
 import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
-    // TODO Find NullPointer During Session Playback On Thread During Transition
-    // TODO Startup Checks
-        // Percentage Isn't Calculating Correctly
+    // TODO Have Ambience Recalculate If Already Calculated And Ambience Is Not Long Enough
+
+    // TODO End And Playback Same Session Is Causing Nullpointer Exception
+    // TODO End Of Session Buttons Are Stuck On "Transitioning"
+
     // TODO Find A Way To Reset Session After Stop Animation Ends
 
 // Additional Features To Definitely Add
@@ -135,7 +138,7 @@ public class MainController implements Initializable {
     // Progress Tab
     public Tab ProgressTab;
         // Overview Tab
-    public BarChart ProgressOverviewBarChart;
+    public BarChart<String, Number> ProgressOverviewBarChart;
     public TextField ProgressOverviewTotalTimePracticed;
     public TextField ProgressOverviewItemWithMostProgress;
     public PieChart ProgressBalancePieChart;
@@ -181,9 +184,9 @@ public class MainController implements Initializable {
 // My Fields
     // Play/Export Tab
     private Session createdsession;
-    private Session.PlaybackItem createdtableselecteditem;
+    private PlaybackItem createdtableselecteditem;
     private ObservableList<TableItem_Number_Name_Duration_Ambience> createdtableitems = FXCollections.observableArrayList();
-    private ArrayList<Session.PlaybackItem> createdtableplaybackitems;
+    private ArrayList<PlaybackItem> createdtableplaybackitems;
 
 
 // Getters And Setters
@@ -261,7 +264,7 @@ public class MainController implements Initializable {
         setupTables();
         ProgressTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (ProgressTab.isSelected()) {
-                populateprogressoverviewchart();
+                populateprogressoverviewchartandbalancepie();
                 populatesessionbrowserlistview();
                 populatesessiondetailstable();
             }
@@ -419,7 +422,7 @@ public class MainController implements Initializable {
     }
     // Creation Table Methods
     private void add(int availableambienceindex) {
-        Session.PlaybackItem playbackItem = createdsession.getplaybackitem(availableambienceindex);
+        PlaybackItem playbackItem = createdsession.getplaybackitem(availableambienceindex);
         SetDurationWithAmbienceOption adjustDuration = new SetDurationWithAmbienceOption(preferences, availableAmbiences, Collections.singletonList(playbackItem), true);
         adjustDuration.initModality(Modality.APPLICATION_MODAL);
         adjustDuration.showAndWait();
@@ -434,7 +437,7 @@ public class MainController implements Initializable {
         populatetable();
     }
     private void add(int[] availableambienceindexes) {
-        List<Session.PlaybackItem> items = new ArrayList<>();
+        List<PlaybackItem> items = new ArrayList<>();
         for (int i : availableambienceindexes) {items.add(createdsession.getplaybackitem(i));}
         SetDurationWithAmbienceOption adjustDuration = new SetDurationWithAmbienceOption(preferences, availableAmbiences, items, true);
         adjustDuration.initModality(Modality.APPLICATION_MODAL);
@@ -479,7 +482,7 @@ public class MainController implements Initializable {
     public void setramponly() {
         if (createdtableselecteditem != null) {
             createdtableselecteditem.setRampOnly(true);
-            createdtableselecteditem.setDuration(0.0);
+            createdtableselecteditem.setExpectedDuration(0.0);
             populatetable();
             syncbuttons();
         }
@@ -499,13 +502,13 @@ public class MainController implements Initializable {
     }
     public void quickaddambience_repeat() {
         if (createdtableselecteditem != null) {
-            createdtableselecteditem.getAmbience().addavailableambience_repeat(Duration.millis(createdtableselecteditem.getDuration()), availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
+            createdtableselecteditem.getAmbience().addavailableambience_repeat(Duration.millis(createdtableselecteditem.getExpectedDuration()), availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
             populatetable();
         }
     }
     public void quickaddambience_shuffle() {
         if (createdtableselecteditem != null) {
-            createdtableselecteditem.getAmbience().addavailableambience_shuffle(Duration.millis(createdtableselecteditem.getDuration()), availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
+            createdtableselecteditem.getAmbience().addavailableambience_shuffle(Duration.millis(createdtableselecteditem.getExpectedDuration()), availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
             populatetable();
         }
     }
@@ -523,7 +526,7 @@ public class MainController implements Initializable {
     public void moveupincreatortable() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         if (selectedindex > 0) {
-            ArrayList<Session.PlaybackItem> itemsinsession = createdsession.getPlaybackItems();
+            ArrayList<PlaybackItem> itemsinsession = createdsession.getPlaybackItems();
             Collections.swap(itemsinsession, selectedindex, selectedindex - 1);
             createdsession.setPlaybackItems(itemsinsession);
             populatetable();
@@ -532,7 +535,7 @@ public class MainController implements Initializable {
     public void movedownincreatortable() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1 && selectedindex < createdtableplaybackitems.size() - 1) {
-            ArrayList<Session.PlaybackItem> itemsinsession = createdsession.getPlaybackItems();
+            ArrayList<PlaybackItem> itemsinsession = createdsession.getPlaybackItems();
             Collections.swap(itemsinsession, selectedindex, selectedindex + 1);
             createdsession.setPlaybackItems(itemsinsession);
             populatetable();
@@ -576,7 +579,7 @@ public class MainController implements Initializable {
         if (! createdsession.getPlaybackItems().isEmpty()) {
             createdtableplaybackitems.addAll(createdsession.getPlaybackItems());
             int number = 1;
-            for (Session.PlaybackItem i : createdtableplaybackitems) {
+            for (PlaybackItem i : createdtableplaybackitems) {
                 createdtableitems.add(new TableItem_Number_Name_Duration_Ambience(number, i.getName(),
                         i.getdurationasString(CreatedTableItemColumn.getWidth()), i.getAmbienceasString()));
                 number++;
@@ -607,8 +610,39 @@ public class MainController implements Initializable {
 
 // Progress Tab
     // Overview Tab Methods
-    public void populateprogressoverviewchart() {
-
+    public void populateprogressoverviewchartandbalancepie() {
+        if (sessions.getSession() != null) {
+            if (sessions.getSession().isEmpty()) {return;}
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            ArrayList<Duration> sessionpartdurations = new ArrayList<>();
+            Duration totaltimepracticed = Duration.ZERO;
+            for (int i = 0; i<15; i++) {sessionpartdurations.add(Duration.ZERO);}
+            for (Session i : sessions.getSession()) {
+                for (int x = 0; x<15; x++) {
+                    if (i.getplaybackitem(x).getExpectedDuration() > 0.0) {
+                        Duration duration = sessionpartdurations.get(x);
+                        duration = duration.add(Duration.millis(i.getplaybackitem(x).getExpectedDuration()));
+                        sessionpartdurations.set(x, duration);
+                    }
+                }
+                totaltimepracticed = totaltimepracticed.add(i.getSessionPracticedTime());
+            }
+            int count = 0;
+            int highestdurationpracticedindex = -1;
+            ObservableList<PieChart.Data> piechartvalues = FXCollections.observableArrayList();
+            for (Duration i : sessionpartdurations) {
+                if (highestdurationpracticedindex == -1) {highestdurationpracticedindex = 0;}
+                else if (i.greaterThan(sessionpartdurations.get(count - 1))) {highestdurationpracticedindex = count;}
+                series.getData().add(new XYChart.Data<>(ALLNAMES.get(count), i.toHours()));
+                piechartvalues.add(new PieChart.Data(ALLNAMES.get(count), i.toHours()));
+                count++;
+            }
+            ProgressBalancePieChart.setData(piechartvalues);
+            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringSpelledOut(totaltimepracticed, ProgressOverviewTotalTimePracticed.getWidth()));
+            ProgressOverviewItemWithMostProgress.setText(ALLNAMES.get(highestdurationpracticedindex));
+            ProgressOverviewBarChart.getData().add(series);
+            ProgressOverviewBarChart.setLegendVisible(false);
+        }
     }
     // Session Browser Tab Methods
     public void populatesessionbrowserlistview() {
@@ -623,7 +657,7 @@ public class MainController implements Initializable {
             if (SessionBrowser_Filter_DateRange_To_Checkbox.isSelected() && SessionBrowser_Filter_DateRange_To.getValue() != null) {
                 if (i.getDate_Practiced().isAfter(SessionBrowser_Filter_DateRange_To.getValue())) {continue;}
             }
-            Duration durationtotest = i.getActualSessionDuration();
+            Duration durationtotest = i.getSessionPracticedTime();
             if (SessionBrowser_Filter_Duration_Min_Checkbox.isSelected()) {
                 Duration minduration = Duration.ZERO;
                 minduration.add(Duration.hours(Integer.parseInt(SessionBrowser_Filter_Duration_From_Hours.getText())));
@@ -639,7 +673,7 @@ public class MainController implements Initializable {
             filteredsessions.add(i);
         }
         for (Session i : filteredsessions) {
-            sessionlist.add(String.format("%s (%s)", i.getDate_Practiced().format(Util.dateFormat), Util.formatdurationtoStringDecimalWithColons(i.getActualSessionDuration())));
+            sessionlist.add(String.format("%s (%s)", i.getDate_Practiced().format(Util.dateFormat), Util.formatdurationtoStringDecimalWithColons(i.getSessionPracticedTime())));
         }
         SessionBrowser_SelectSessionListView.setItems(sessionlist);
     }
@@ -651,12 +685,14 @@ public class MainController implements Initializable {
             Session selectedsession = this.sessions.get(index);
             ObservableList<TableItem_Number_Name_Duration> sessionitems = FXCollections.observableArrayList();
             int count = 1;
-            for (Session.PlaybackItem i : selectedsession.getPlaybackItems()) {
-                sessionitems.add(new TableItem_Number_Name_Duration(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getDuration()))));
+            for (PlaybackItem i : selectedsession.getPlaybackItems()) {
+                sessionitems.add(new TableItem_Number_Name_Duration(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getExpectedDuration()))));
                 count++;
             }
             SessionBrowser_DetailsTable.setItems(sessionitems);
-            SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(selectedsession.getActualSessionDuration(), SessionBrowser_Details_TotalDuration.getWidth()));
+            SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(selectedsession.getSessionPracticedTime(), SessionBrowser_Details_TotalDuration.getWidth()));
+        } else {
+            SessionBrowser_DetailsTable.setPlaceholder(new Label("Select A Session To View Details"));
         }
     }
     public void checkfilterdate_from() {
@@ -694,7 +730,7 @@ public class MainController implements Initializable {
             String currentgoal;
             String percentcompleted;
             String goalscompleted;
-            Session.PlaybackItem playbackItem = demosession.getplaybackitem(i);
+            PlaybackItem playbackItem = demosession.getplaybackitem(i);
             Duration practicedduration = sessions.gettotalpracticedtime(playbackItem, false);
             practicedtime = Util.formatdurationtoStringSpelledOut(practicedduration, 1000.0);
             Goals.Goal goal = goals.getCurrentGoal(i);
@@ -726,7 +762,7 @@ public class MainController implements Initializable {
         int index = GoalsIndividual_SelectedSessionItemChoiceBox.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             Session dummysession = new Session();
-            Session.PlaybackItem playbackItem = dummysession.getplaybackitem(index);
+            PlaybackItem playbackItem = dummysession.getplaybackitem(index);
             GoalsIndividual_PracticedTime.setText(Util.formatdurationtoStringSpelledOut(sessions.gettotalpracticedtime(playbackItem, false), GoalsIndividual_PracticedTime.getWidth()));
             ObservableList<GoalDetailsTableItem> tableitems = FXCollections.observableArrayList();
             for (Goals.Goal i :goals.get(index)) {

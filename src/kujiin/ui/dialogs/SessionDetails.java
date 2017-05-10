@@ -15,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.util.Util;
+import kujiin.xml.PlaybackItem;
 import kujiin.xml.Session;
 
 import java.io.IOException;
@@ -46,11 +47,11 @@ public class SessionDetails extends Stage {
             Duration totalsessionduration = new Duration(0);
             Duration highestduration = Duration.ZERO;
             ObservableList<String> completedgoalsitems = FXCollections.observableArrayList();
-            for (Session.PlaybackItem i : session.getPlaybackItems()) {
-                series.getData().add(new XYChart.Data<>(i.getName(), new Duration(i.getElapsedTime()).toMinutes()));
-                totalsessionduration = totalsessionduration.add(new Duration(i.getDuration()));
-                if (new Duration(i.getDuration()).greaterThan(highestduration)) {highestduration = new Duration(i.getDuration());}
-                completedgoalsitems.addAll(i.getGoalsCompletedThisSession().stream().map(x -> String.format("%s: %s Hours Completed (%s Current)", i.getName(), x.getDuration(), new Duration(i.getDuration()).toHours())).collect(Collectors.toList()));
+            for (PlaybackItem i : session.getPlaybackItems()) {
+                series.getData().add(new XYChart.Data<>(i.getName(), new Duration(i.getPracticeTime()).toMinutes()));
+                totalsessionduration = totalsessionduration.add(new Duration(i.getPracticeTime()));
+                if (new Duration(i.getExpectedDuration()).greaterThan(highestduration)) {highestduration = new Duration(i.getExpectedDuration());}
+                completedgoalsitems.addAll(i.getGoalsCompletedThisSession().stream().map(x -> String.format("%s: %s Hours Completed (%s Current)", i.getName(), x.getDuration(), new Duration(i.getExpectedDuration()).toHours())).collect(Collectors.toList()));
             }
             GoalsCompletedTopLabel.setText("Goals Completed This Session");
             if (completedgoalsitems.size() > 0) {GoalsCompletedListView.setItems(completedgoalsitems);}

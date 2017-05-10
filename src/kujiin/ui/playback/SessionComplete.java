@@ -3,14 +3,13 @@ package kujiin.ui.playback;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.util.Util;
+import kujiin.xml.PlaybackItem;
 import kujiin.xml.Session;
 
 import java.io.IOException;
@@ -19,8 +18,6 @@ public class SessionComplete extends StyledStage {
     public Label TopLabel;
     public Label DurationCompletedLabel;
     public BarChart<String, Number> SessionBarChart;
-    public CategoryAxis SessionCategoryAxis;
-    public NumberAxis SessionNumbersAxis;
     public Button CloseButton;
 
     public SessionComplete(Session session, boolean sessioncomplete) {
@@ -30,19 +27,18 @@ public class SessionComplete extends StyledStage {
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setResizable(false);
-            SessionNumbersAxis.setLabel("Minutes");
             String sessionsummary;
             if (sessioncomplete) {sessionsummary = "Session Completed";}
             else {sessionsummary = "Session Ended";}
             setTitle(sessionsummary);
             TopLabel.setText(sessionsummary);
-            if (sessioncomplete) {DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getActualSessionDuration(), 1000.0));}
-            else {DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(new Duration(session.getElapsedTime()), 1000.0));}
+            if (sessioncomplete) {DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getSessionPracticedTime(), 1000.0));}
+            else {DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getSessionPracticedTime(), 1000.0));}
             XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
             Duration totalsessionduration = new Duration(0);
-            for (Session.PlaybackItem i : session.getPlaybackItems()) {
-                series.getData().add(new XYChart.Data<>(i.getName(), new Duration(i.getElapsedTime()).toMinutes()));
-                totalsessionduration = totalsessionduration.add(new Duration(i.getDuration()));
+            for (PlaybackItem i : session.getPlaybackItems()) {
+                series.getData().add(new XYChart.Data<>(i.getName(), new Duration(i.getPracticeTime()).toMinutes()));
+                totalsessionduration = totalsessionduration.add(new Duration(i.getExpectedDuration()));
             }
             SessionBarChart.getData().add(series);
             SessionBarChart.setLegendVisible(false);
