@@ -24,10 +24,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
+import kujiin.ui.boilerplate.IconImageView;
 import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.table.PlaylistTableItem;
 import kujiin.util.Util;
+import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.PlayerState;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.*;
@@ -145,6 +147,7 @@ public class Player extends Stage {
             PlaylistTableView.setOnMouseClicked(Event::consume);
             playerState = IDLE;
             setupTooltips();
+            setupIcons();
             setOnCloseRequest(event -> closedialog());
             ReferenceTypeChoiceBox.setOnAction(event -> referencetypechanged());
             ReferenceToggleCheckBox.setOnAction(event -> ReferenceToggleCheckboxtoggled());
@@ -175,7 +178,23 @@ public class Player extends Stage {
             ReferenceControls.setDisable(true);
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
-    public void setupTooltips() {
+    private void setupTooltips() {
+        PlayButton.setTooltip(new Tooltip("Play"));
+        PauseButton.setTooltip(new Tooltip("Pause"));
+        StopButton.setTooltip(new Tooltip("Stop"));
+    }
+    private void setupIcons() {
+        IconDisplayType dt = Preferences.getUserInterfaceOptions().getIconDisplayType();
+        if (dt == IconDisplayType.ICONS_AND_TEXT || dt == IconDisplayType.ICONS_ONLY) {
+            PlayButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PLAY, 20.0));
+            PauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PAUSE, 20.0));
+            StopButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_STOP, 20.0));
+        }
+        if (dt == IconDisplayType.ICONS_ONLY) {
+            PlayButton.setText("");
+            PauseButton.setText("");
+            StopButton.setText("");
+        }
     }
 
 // UI Methods

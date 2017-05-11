@@ -134,6 +134,7 @@
                                        <children>
                                           <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                                              <children>
+                                                <Button fx:id="ClearButton" mnemonicParsing="false" onAction="#clearloadedsession" text="Clear" />
                                                 <Label fx:id="CreatorStatusBar" HBox.hgrow="ALWAYS" />
                                                 <HBox alignment="CENTER_RIGHT">
                                                    <children>

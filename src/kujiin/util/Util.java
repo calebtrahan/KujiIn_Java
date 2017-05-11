@@ -248,7 +248,6 @@ public class Util {
         else {return String.format("%02d:%02d", minutes, seconds);}
     }
     public static String formatdurationtoStringSpelledOut(Duration duration, Double maxcharlength) {
-        System.out.println("Maxcharlength Is: " + maxcharlength);
         int seconds = new Double(duration.toSeconds()).intValue();
         int minutes = 0;
         int hours = 0;
