@@ -265,6 +265,8 @@ public class MainController implements Initializable {
                 populatesessiondetailstable();
             }
         });
+        SessionBrowser_SelectSessionListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> populatesessiondetailstable());
+
     }
     private void setupTables() {
         // Creation Table
@@ -274,12 +276,17 @@ public class MainController implements Initializable {
         CreatedTableAmbienceColumn.setCellValueFactory(cellData -> cellData.getValue().ambience);
         CreatedTableView.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> tableselectionchanged());
+        // Session Browser Details Table
+        SessionBrowser_DetailsTable_NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asString());
+        SessionBrowser_DetailsTable_ItemColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+        SessionBrowser_DetailsTable_TimePracticedColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
         // Goal Overview Table
         GoalsOverview_ItemColumn.setCellValueFactory(cellData -> cellData.getValue().sessionitem);
         GoalsOverview_PracticedTimeColumn.setCellValueFactory(cellData -> cellData.getValue().practicedtime);
         GoalsOverview_CurrentGoalColumn.setCellValueFactory(cellData -> cellData.getValue().currentgoal);
         GoalsOverview_PercentCompletedColumn.setCellValueFactory(cellData -> cellData.getValue().percentcompleted);
         GoalsOverview_GoalsCompletedColumn.setCellValueFactory(cellData -> cellData.getValue().goalscompleted);
+
     }
     private void setupIcons() {
         IconDisplayType dt = preferences.getUserInterfaceOptions().getIconDisplayType();
@@ -700,9 +707,7 @@ public class MainController implements Initializable {
             }
             SessionBrowser_DetailsTable.setItems(sessionitems);
             SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(selectedsession.getSessionPracticedTime(), SessionBrowser_Details_TotalDuration.getWidth()));
-        } else {
-            SessionBrowser_DetailsTable.setPlaceholder(new Label("Select A Session To View Details"));
-        }
+        } else {SessionBrowser_DetailsTable.setPlaceholder(new Label("Select A Session To View Details"));}
     }
     public void checkfilterdate_from() {
         if (SessionBrowser_Filter_DateRange_To.getValue() != null) {

@@ -1,7 +1,6 @@
 package kujiin.ui.dialogs.alerts;
 
 import javafx.scene.control.Alert;
-import javafx.scene.control.DialogPane;
 import javafx.stage.Modality;
 import kujiin.xml.Preferences;
 
@@ -14,8 +13,7 @@ public class InformationDialog {
             a.setHeaderText(headertext);
         }
         a.setContentText(contexttext);
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(preferences.getUserInterfaceOptions().getThemefile());
+        a.getDialogPane().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());
         if (modal) {a.initModality(Modality.APPLICATION_MODAL);}
         a.showAndWait();
     }
@@ -26,8 +24,7 @@ public class InformationDialog {
             a.setHeaderText(headertext);
         }
         a.setContentText(contexttext);
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(preferences.getUserInterfaceOptions().getThemefile());
+        a.getDialogPane().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());
         a.showAndWait();
     }
 }

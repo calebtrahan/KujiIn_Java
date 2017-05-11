@@ -3,10 +3,9 @@ package kujiin.xml;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.util.enums.AmbiencePlaybackType;
 import kujiin.util.enums.IconDisplayType;
+import kujiin.util.enums.QuickAddAmbienceType;
 import kujiin.util.enums.ReferenceType;
-import org.apache.commons.io.FileUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -16,7 +15,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -90,20 +88,13 @@ public class Preferences {
     private static final Double DEFAULT_FADE_PAUSE_DURATION = 2.0;
     private static final Boolean DEFAULT_ALERTFUNCTION_OPTION = false;
     private static final String DEFAULT_ALERTFILELOCATION = null; // (Dialog Selecting A New Alert File)
-    private static final File DEFAULT_THEMEFILE = new File(DIRECTORYSTYLES, "default.css");
     public static final File REFERENCE_THEMEFILE = new File(DIRECTORYSTYLES, "referencefile.css");
     private static final Boolean DEFAULT_RAMP_ENABLED_OPTION = true;
-    private static final Boolean DEFAULT_PREPOST_RAMP_ENABLED_OPTION = true;
-    private static final AmbiencePlaybackType DEFAULT_AMBIENCE_PLAYBACK_TYPE = AmbiencePlaybackType.SHUFFLE;
+    private static final QuickAddAmbienceType DEFAULT_AMBIENCE_QUICKADD_TYPE = QuickAddAmbienceType.SHUFFLE;
     public static final ReferenceType DEFAULT_REFERENCE_TYPE_OPTION = ReferenceType.html;
     private static final Boolean DEFAULT_REFERENCE_DISPLAY = false;
-    private static final Boolean DEFAULT_REFERENCE_FULLSCREEN_OPTION = true;
-    private static final Boolean DEFAULT_AMBIENCE_OPTION = false;
-    public static final String[] AMBIENCE_EDITOR_TYPES = {"Simple", "Advanced"};
     public static final Integer DEFAULT_LONG_SESSIONPART_DURATION = 10;
     public static final Double DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION = 5.0;
-    public static final String NEWGOALTEXT = "New Goal";
-    public static final String GOALPACINGTEXT = "Goal Pacing";
     public static final Image PROGRAM_ICON = new Image(new File(Preferences.DIRECTORYICONS, "mainwinicon.jpg").toURI().toString());
     public final static String NO_ALERT_FILE_SELECTED_TEXT = "No Alert File Selected";
     public final static int SUGGESTED_ALERT_FILE_MAX_LENGTH = 10;
@@ -147,21 +138,6 @@ public class Preferences {
                 JAXBContext context = JAXBContext.newInstance(Preferences.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
                 Preferences preferences = (Preferences) unmarshaller.unmarshal(OPTIONSXMLFILE);
-                if (! preferences.getAdvancedOptions().getOS().equals(System.getProperty("os.name"))) {
-                // Correct Theme File Directory Names
-                    ArrayList<String> newfiles = new ArrayList<>();
-                    int currentthemeindex = -1;
-                    for (String i : preferences.getUserInterfaceOptions().getThemefiles()) {
-                        if (i.equals(preferences.getUserInterfaceOptions().getThemefile())) {currentthemeindex = preferences.getUserInterfaceOptions().getThemefiles().indexOf(i);}
-                        if (! i.equals("CASPIAN") && ! i.equals("MODENA")) {
-                            File newfile = new File(DIRECTORYSTYLES, i.substring(i.lastIndexOf("/")));
-                            newfiles.add(newfile.toURI().toString());
-                        }
-                    }
-                    if (currentthemeindex != -1) {preferences.getUserInterfaceOptions().setThemefile(newfiles.get(currentthemeindex));}
-                    else {preferences.getUserInterfaceOptions().setThemefile(DEFAULT_THEMEFILE.toURI().toString());}
-                    preferences.getAdvancedOptions().setOS(System.getProperty("os.name"));
-                }
                 setUserInterfaceOptions(preferences.getUserInterfaceOptions());
                 setCreationOptions(preferences.getCreationOptions());
                 setExportOptions(preferences.getExportOptions());
@@ -190,20 +166,14 @@ public class Preferences {
         AdvancedOptions advancedOptions = new AdvancedOptions();
         userInterfaceOptions.setTooltips(DEFAULT_TOOLTIPS_OPTION);
         userInterfaceOptions.setHelpdialogs(DEFAULT_HELP_DIALOGS_OPTION);
-        userInterfaceOptions.setThemefile(DEFAULT_THEMEFILE.toURI().toString());
-        userInterfaceOptions.setThemefiles(new ArrayList<>(Arrays.asList(DEFAULT_THEMEFILE.toURI().toString())));
-        userInterfaceOptions.setThemefilenames(new ArrayList<>(Arrays.asList("Default")));
         userInterfaceOptions.setIconDisplayType(IconDisplayType.ICONS_AND_TEXT);
         creationOptions.setScrollincrement(DEFAULT_SCROLL_INCREMENT);
+        creationOptions.setQuickaddambiencetype(DEFAULT_AMBIENCE_QUICKADD_TYPE);
         sessionOptions.setAlertfunction(DEFAULT_ALERTFUNCTION_OPTION);
         sessionOptions.setAlertfilelocation(DEFAULT_ALERTFILELOCATION);
         sessionOptions.setRampenabled(DEFAULT_RAMP_ENABLED_OPTION);
-        sessionOptions.setPrepostrampenabled(DEFAULT_PREPOST_RAMP_ENABLED_OPTION);
         sessionOptions.setReferenceoption(DEFAULT_REFERENCE_DISPLAY);
         sessionOptions.setReferencetype(DEFAULT_REFERENCE_TYPE_OPTION);
-        sessionOptions.setReferencefullscreen(DEFAULT_REFERENCE_FULLSCREEN_OPTION);
-        sessionOptions.setAmbienceoption(DEFAULT_AMBIENCE_OPTION);
-        sessionOptions.setAmbiencePlaybackType(DEFAULT_AMBIENCE_PLAYBACK_TYPE);
         playbackOptions.setAnimation_fade_play_enabled(DEFAULT_FADE_PLAY_ENABLED);
         playbackOptions.setAnimation_fade_play_value(DEFAULT_FADE_PLAY_DURATION);
         playbackOptions.setAnimation_fade_stop_enabled(DEFAULT_FADE_STOP_ENABLED);
@@ -214,7 +184,6 @@ public class Preferences {
         playbackOptions.setAnimation_fade_pause_value(DEFAULT_FADE_PAUSE_DURATION);
         playbackOptions.setEntrainmentvolume(DEFAULT_ENTRAINMENTVOLUME);
         playbackOptions.setAmbiencevolume(DEFAULT_AMBIENCEVOLUME);
-        advancedOptions.setDefaultambienceeditor(AMBIENCE_EDITOR_TYPES[0]);
         advancedOptions.setOS(System.getProperty("os.name"));
         advancedOptions.setDebugmode(false);
         setUserInterfaceOptions(userInterfaceOptions);
@@ -224,20 +193,6 @@ public class Preferences {
         setPlaybackOptions(playbackOptions);
         setAdvancedOptions(advancedOptions);
         marshall();
-    }
-    public void addthemefile(String name, String file_location) {
-        ArrayList<String> files = getUserInterfaceOptions().getThemefiles();
-        ArrayList<String> names =  getUserInterfaceOptions().getThemefilenames();
-        if (! files.contains(file_location)) {
-            try {
-                File newstylefile = new File(DIRECTORYSTYLES, file_location.substring(file_location.lastIndexOf("/")));
-                FileUtils.moveFile(new File(file_location), newstylefile);
-                files.add(newstylefile.toURI().toString());
-                names.add(name);
-                getUserInterfaceOptions().setThemefiles(files);
-                getUserInterfaceOptions().setThemefilenames(names);
-            } catch (IOException e) {e.printStackTrace();}
-        } else {}
     }
     public boolean hasValidAlertFile() {
         String location = getSessionOptions().getAlertfilelocation();
@@ -253,9 +208,6 @@ public class Preferences {
     public static class UserInterfaceOptions {
         private Boolean tooltips; // Show Tooltips (Checkbox)
         private Boolean helpdialogs; // Show Help Dialogs (Checkbox)
-        private String themefile;
-        private ArrayList<String> themefiles;
-        private ArrayList<String> themefilenames;
         private IconDisplayType iconDisplayType;
 
         public UserInterfaceOptions() {}
@@ -273,24 +225,6 @@ public class Preferences {
         public void setHelpdialogs(Boolean helpdialogs) {
             this.helpdialogs = helpdialogs;
     }
-        public String getThemefile() {
-            return themefile;
-        }
-        public void setThemefile(String themefile) {
-            this.themefile = themefile;
-        }
-        public ArrayList<String> getThemefiles() {
-            return themefiles;
-        }
-        public void setThemefiles(ArrayList<String> themefiles) {
-            this.themefiles = themefiles;
-        }
-        public ArrayList<String> getThemefilenames() {
-            return themefilenames;
-        }
-        public void setThemefilenames(ArrayList<String> themefilenames) {
-            this.themefilenames = themefilenames;
-        }
         public IconDisplayType getIconDisplayType() {
             return iconDisplayType;
         }
@@ -302,6 +236,7 @@ public class Preferences {
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class CreationOptions {
         private Integer scrollincrement;
+        private QuickAddAmbienceType quickaddambiencetype;
 
         public CreationOptions() {}
 
@@ -311,6 +246,12 @@ public class Preferences {
         }
         public void setScrollincrement(Integer scrollincrement) {
             this.scrollincrement = scrollincrement;
+        }
+        public QuickAddAmbienceType getQuickaddambiencetype() {
+            return quickaddambiencetype;
+        }
+        public void setQuickaddambiencetype(QuickAddAmbienceType quickaddambiencetype) {
+            this.quickaddambiencetype = quickaddambiencetype;
         }
 
     }
@@ -324,12 +265,8 @@ public class Preferences {
         private Boolean alertfunction;
         private String alertfilelocation;
         private Boolean rampenabled;
-        private Boolean prepostrampenabled;
         private Boolean referenceoption;
         private ReferenceType referencetype;
-        private Boolean referencefullscreen;
-        private Boolean ambienceoption;
-        private AmbiencePlaybackType ambiencePlaybackType;
 
         public SessionOptions() {}
 
@@ -345,12 +282,6 @@ public class Preferences {
         }
         public void setRampenabled(Boolean rampenabled) {
             this.rampenabled = rampenabled;
-        }
-        public Boolean getPrepostrampenabled() {
-            return prepostrampenabled;
-        }
-        public void setPrepostrampenabled(Boolean prepostrampenabled) {
-            this.prepostrampenabled = prepostrampenabled;
         }
         public Boolean getAlertfunction() {
             return alertfunction;
@@ -369,24 +300,6 @@ public class Preferences {
         }
         public void setReferencetype(ReferenceType referencetype) {
             this.referencetype = referencetype;
-        }
-        public Boolean getReferencefullscreen() {
-            return referencefullscreen;
-        }
-        public void setReferencefullscreen(Boolean referencefullscreen) {
-            this.referencefullscreen = referencefullscreen;
-        }
-        public Boolean getAmbienceoption() {
-            return ambienceoption;
-        }
-        public void setAmbienceoption(Boolean ambienceoption) {
-            this.ambienceoption = ambienceoption;
-        }
-        public AmbiencePlaybackType getAmbiencePlaybackType() {
-            return ambiencePlaybackType;
-        }
-        public void setAmbiencePlaybackType(AmbiencePlaybackType ambiencePlaybackType) {
-            this.ambiencePlaybackType = ambiencePlaybackType;
         }
 
     }
@@ -470,19 +383,12 @@ public class Preferences {
     }
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class AdvancedOptions {
-        private String defaultambienceeditor;
         private boolean debugmode;
         private String OS;
 
         public AdvancedOptions() {}
 
     // Getters And Setters
-        public String getDefaultambienceeditor() {
-            return defaultambienceeditor;
-        }
-        public void setDefaultambienceeditor(String defaultambienceeditor) {
-            this.defaultambienceeditor = defaultambienceeditor;
-        }
         public boolean isDebugmode() {
             return debugmode;
         }

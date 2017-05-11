@@ -56,9 +56,9 @@ public class SetDurationWithAmbienceOption extends StyledStage {
                 millis -= TimeUnit.MINUTES.toMillis(minutes);
                 seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
             }
-            HoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 50, (int) hours));
-            MinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) minutes));
-            SecondsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) seconds));
+            HoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 50, (int) hours, preferences.getCreationOptions().getScrollincrement()));
+            MinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) minutes, preferences.getCreationOptions().getScrollincrement()));
+            SecondsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) seconds, preferences.getCreationOptions().getScrollincrement()));
             QuickAddAmbienceCheckbox.setVisible(quickaddambienceoption);
             for (PlaybackItem i : playbackItemList) {if (! availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {missingambiencecount++;}}
             setListeners();

@@ -36,6 +36,14 @@ public class QuickAddAmbience extends StyledStage {
             setScene(defaultscene);
             setResizable(false);
             setTitle("Quick Add Ambience");
+            switch (preferences.getCreationOptions().getQuickaddambiencetype()) {
+                case REPEAT:
+                    RepeatRadioButton.setSelected(true);
+                    break;
+                case SHUFFLE:
+                    ShuffleRadioButton.setSelected(true);
+                    break;
+            }
         } catch (IOException e) {e.printStackTrace();}
     }
 

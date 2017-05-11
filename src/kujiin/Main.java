@@ -32,8 +32,7 @@ public class Main extends Application {
         root.setStage(primaryStage);
         primaryStage.getIcons().clear();
         primaryStage.getIcons().add(PROGRAM_ICON);
-        String themefile = root.getPreferences().getUserInterfaceOptions().getThemefile();
-        if (themefile != null) {primaryStage.getScene().getStylesheets().add(themefile);}
+        root.getScene().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());
         root.setFavoriteSessions(new FavoriteSessions());
         root.setSessions(new Sessions(root));
         root.setAvailableAmbiences(new AvailableAmbiences(root));

@@ -1,47 +1,36 @@
 package kujiin.ui.dialogs;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import kujiin.ui.MainController;
+import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.ExceptionDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.Util;
-import kujiin.util.enums.AmbiencePlaybackType;
+import kujiin.util.enums.QuickAddAmbienceType;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.Preferences;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static kujiin.xml.Preferences.AMBIENCE_EDITOR_TYPES;
-
-public class ChangeProgramOptions extends Stage {
-// User Interface Tab
+public class ChangeProgramOptions extends StyledStage {
+// User Interface & Creation Tab
     public CheckBox TooltipsCheckBox;
     public CheckBox HelpDialogsCheckBox;
-    public ChoiceBox<String> ProgramThemeChoiceBox;
-    public Button AddNewThemeButton;
-// Creation Tab
+    public ChoiceBox<String> AmbienceTypeChoiceBox;
     public TextField ScrollIncrement;
 // Session Tab
     public CheckBox AlertFileSwitch;
     public CheckBox RampSwitch;
-    public CheckBox PrePostRamp;
     public CheckBox ReferenceSwitch;
     public ChoiceBox<String> ReferenceTypeChoiceBox;
-    public CheckBox ReferenceFullScreenCheckBox;
-    public CheckBox AmbienceSwitch;
-    public ChoiceBox<String> AmbienceTypeChoiceBox;
 // Playback Tab
     public CheckBox FadeAnimation_PlaySwitch;
     public TextField FadeAnimation_PlayValue;
@@ -54,7 +43,6 @@ public class ChangeProgramOptions extends Stage {
     public TextField EntrainmentVolumePercentage;
     public TextField AmbienceVolumePercentage;
 // Advanced Tab
-    public ChoiceBox<String> AmbienceEditorDefaultChoiceBox;
     public Button DeleteAllGoalsButton;
     public Button DeleteAllSessionsProgressButton;
     public CheckBox DebugModeCheckbox;
@@ -92,7 +80,6 @@ public class ChangeProgramOptions extends Stage {
     // User Interface Tab
         TooltipsCheckBox.setSelected(Preferences.getUserInterfaceOptions().getTooltips());
         HelpDialogsCheckBox.setSelected(Preferences.getUserInterfaceOptions().getHelpdialogs());
-        populateappearancecheckbox();
     // Creation Tab
         ScrollIncrement.setText(Preferences.getCreationOptions().getScrollincrement().toString());
     // Session Tab
@@ -102,7 +89,6 @@ public class ChangeProgramOptions extends Stage {
                 Preferences.getSessionOptions().setAlertfunction(false); Preferences.getSessionOptions().setAlertfilelocation(null);}
         } else {AlertFileSwitch.setSelected(false);}
         RampSwitch.setSelected(Preferences.getSessionOptions().getRampenabled());
-        PrePostRamp.setSelected(Preferences.getSessionOptions().getPrepostrampenabled());
         ReferenceSwitch.setSelected(Preferences.getSessionOptions().getReferenceoption());
         ReferenceTypeChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList("HTML", "TEXT")));
         switch (Preferences.getSessionOptions().getReferencetype()) {
@@ -113,18 +99,13 @@ public class ChangeProgramOptions extends Stage {
                 ReferenceTypeChoiceBox.getSelectionModel().select(1);
                 break;
         }
-        ReferenceFullScreenCheckBox.setSelected(Preferences.getSessionOptions().getReferencefullscreen());
-        AmbienceSwitch.setSelected(Preferences.getSessionOptions().getAmbienceoption());
-        AmbienceTypeChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList("Repeat", "Shuffle", "Custom")));
-        switch (Preferences.getSessionOptions().getAmbiencePlaybackType()) {
+        AmbienceTypeChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList("Repeat", "Shuffle")));
+        switch (Preferences.getCreationOptions().getQuickaddambiencetype()) {
             case REPEAT:
                 AmbienceTypeChoiceBox.getSelectionModel().select(0);
                 break;
             case SHUFFLE:
                 AmbienceTypeChoiceBox.getSelectionModel().select(1);
-                break;
-            case CUSTOM:
-                AmbienceTypeChoiceBox.getSelectionModel().select(2);
                 break;
         }
     // Playback Tab
@@ -147,15 +128,6 @@ public class ChangeProgramOptions extends Stage {
         EntrainmentVolumePercentage.setText(String.valueOf(new Double(Preferences.getPlaybackOptions().getEntrainmentvolume() * 100).intValue()));
         AmbienceVolumePercentage.setText(String.valueOf(new Double(Preferences.getPlaybackOptions().getAmbiencevolume() * 100).intValue()));
     // Advanced Tab
-        AmbienceEditorDefaultChoiceBox.setItems(FXCollections.observableArrayList(AMBIENCE_EDITOR_TYPES));
-        switch (Preferences.getAdvancedOptions().getDefaultambienceeditor()) {
-            case "Simple":
-                AmbienceEditorDefaultChoiceBox.getSelectionModel().select(0);
-                break;
-            case "Advanced":
-                AmbienceEditorDefaultChoiceBox.getSelectionModel().select(1);
-                break;
-        }
         DebugModeCheckbox.setSelected(Preferences.getAdvancedOptions().isDebugmode());
     }
     public void setuptooltips() {
@@ -174,18 +146,13 @@ public class ChangeProgramOptions extends Stage {
     // User Interface Tab
         TooltipsCheckBox.setOnAction(event -> Preferences.getUserInterfaceOptions().setTooltips(TooltipsCheckBox.isSelected()));
         HelpDialogsCheckBox.setOnAction(event -> Preferences.getUserInterfaceOptions().setHelpdialogs(HelpDialogsCheckBox.isSelected()));
-        ProgramThemeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectnewtheme());
-        AddNewThemeButton.setOnAction(event -> addnewtheme());
     // Creation Tab
         Util.custom_textfield_integer(ScrollIncrement, 1, 15, 1);
     // Session Tab
         AlertFileSwitch.setOnAction(event -> alertfiletoggled());
         RampSwitch.setOnAction(event -> toggleramp());
-        PrePostRamp.setOnAction(event -> toggleprepostramp());
         ReferenceSwitch.setOnMouseClicked(event -> referencetoggled());
         ReferenceTypeChoiceBox.setOnAction(event -> referencetypetoggled());
-        ReferenceFullScreenCheckBox.setOnAction(event -> Preferences.getSessionOptions().setReferencefullscreen(ReferenceFullScreenCheckBox.isSelected()));
-        AmbienceSwitch.setOnAction(event -> ambiencetoggled());
         AmbienceTypeChoiceBox.setOnAction(event -> ambiencetypechanged());
     // Playback Tab
         Util.custom_textfield_double(FadeAnimation_PlayValue, 0.0, kujiin.xml.Preferences.FADE_VALUE_MAX_DURATION, 1, 1);
@@ -199,7 +166,6 @@ public class ChangeProgramOptions extends Stage {
         FadeAnimation_PauseSwitch.setOnAction(event -> togglepausefade());
         FadeAnimation_ResumeSwitch.setOnAction(event -> toggleresumefade());
     // Advanced Tab
-        AmbienceEditorDefaultChoiceBox.setOnAction(event -> ambienceeditordefaultchanged());
         DeleteAllSessionsProgressButton.setOnAction(event -> deleteallsessions());
         DeleteAllGoalsButton.setOnAction(event -> deleteallgoals());
         DebugModeCheckbox.setOnAction(event -> Preferences.getAdvancedOptions().setDebugmode(DebugModeCheckbox.isSelected()));
@@ -220,35 +186,17 @@ public class ChangeProgramOptions extends Stage {
         super.close();
     }
 
-// User Interface Tab
-    public void populateappearancecheckbox() {
-        ObservableList<String> appearanceitems = FXCollections.observableArrayList();
-        appearanceitems.add("System");
-        appearanceitems.addAll(Preferences. getUserInterfaceOptions().getThemefilenames());
-        ProgramThemeChoiceBox.setItems(appearanceitems);
-        if (Preferences.getUserInterfaceOptions().getThemefile() != null) {
-            try {
-                int index = Preferences.getUserInterfaceOptions().getThemefiles().indexOf(Preferences.getUserInterfaceOptions().getThemefile());
-                ProgramThemeChoiceBox.getSelectionModel().select(index);
-            } catch (Exception ignored) {}
-        } else {ProgramThemeChoiceBox.getSelectionModel().select(0);}
+// User Interface & Creation Tab Tab
+    public void ambiencetypechanged() {
+    switch (AmbienceTypeChoiceBox.getSelectionModel().getSelectedIndex()) {
+        case 0:
+            Preferences.getCreationOptions().setQuickaddambiencetype(QuickAddAmbienceType.REPEAT);
+            break;
+        case 1:
+            Preferences.getCreationOptions().setQuickaddambiencetype(QuickAddAmbienceType.SHUFFLE);
+            break;
     }
-    public void addnewtheme() {
-        File newfile = new FileChooser().showOpenDialog(this);
-        if (newfile == null) {return;}
-        Preferences.addthemefile(newfile.getName().substring(0, newfile.getName().lastIndexOf(".")), newfile.toURI().toString());
-        populateappearancecheckbox();
-    }
-    public void selectnewtheme() {
-        int index = ProgramThemeChoiceBox.getSelectionModel().getSelectedIndex();
-        if (index != -1) {
-            getScene().getStylesheets().clear();
-            if (index != 0) {
-                Preferences. getUserInterfaceOptions().setThemefile(Preferences.getUserInterfaceOptions().getThemefiles().get(index - 1));
-                getScene().getStylesheets().add(Preferences. getUserInterfaceOptions().getThemefile());
-            } else {Preferences.getUserInterfaceOptions().setThemefile(null);}
-        }
-    }
+}
 
 // Session Tab
     // Alert File
@@ -263,12 +211,7 @@ public class ChangeProgramOptions extends Stage {
     }
     // Ramp
     public void toggleramp() {
-        PrePostRamp.setSelected(RampSwitch.isSelected());
         Preferences.getSessionOptions().setRampenabled(RampSwitch.isSelected());
-        if (RampSwitch.isSelected()) {toggleprepostramp();}
-    }
-    public void toggleprepostramp() {
-        Preferences.getSessionOptions().setPrepostrampenabled(PrePostRamp.isSelected());
     }
     // Reference
     public void referencetoggled() {
@@ -306,24 +249,6 @@ public class ChangeProgramOptions extends Stage {
                 break;
         }
     }
-    // Ambience
-    public void ambiencetoggled() {
-        Preferences.getSessionOptions().setAlertfunction(AmbienceSwitch.isSelected());
-        AmbienceTypeChoiceBox.setDisable(! AmbienceSwitch.isSelected());
-    }
-    public void ambiencetypechanged() {
-        switch (AmbienceTypeChoiceBox.getSelectionModel().getSelectedIndex()) {
-            case 0:
-                Preferences.getSessionOptions().setAmbiencePlaybackType(AmbiencePlaybackType.REPEAT);
-                break;
-            case 1:
-                Preferences.getSessionOptions().setAmbiencePlaybackType(AmbiencePlaybackType.SHUFFLE);
-                break;
-            case 2:
-                Preferences.getSessionOptions().setAmbiencePlaybackType(AmbiencePlaybackType.CUSTOM);
-                break;
-        }
-    }
 
 // Playback Tab
     // Fade Animations
@@ -345,16 +270,6 @@ public class ChangeProgramOptions extends Stage {
     }
 
 // Advanced Tab
-    public void ambienceeditordefaultchanged() {
-        switch (AmbienceEditorDefaultChoiceBox.getSelectionModel().getSelectedIndex()) {
-            case 0:
-                Preferences.getAdvancedOptions().setDefaultambienceeditor("Simple");
-                break;
-            case 1:
-                Preferences.getAdvancedOptions().setDefaultambienceeditor("Advanced");
-                break;
-        }
-    }
     public void deleteallsessions() {
     if (new ConfirmationDialog(Preferences, "Confirmation", null, "This Will Permanently And Irreversible Delete All Sessions Progress And Reset The Progress Tracker", "Delete?", "Cancel").getResult()) {
         if (! kujiin.xml.Preferences.SESSIONSXMLFILE.delete()) {new ErrorDialog(Preferences, "Error", "Couldn't Delete Sessions File", "Check File Permissions For: " + kujiin.xml.Preferences.SESSIONSXMLFILE.getAbsolutePath());}
@@ -376,14 +291,14 @@ public class ChangeProgramOptions extends Stage {
         descriptionitems.add(new ItemWithDescription("Appearance Selection", "List Of The Available Appearance Themes For The Program"));
         descriptionitems.add(new ItemWithDescription("Add New Theme Button", "Add A New Theme To The List Of Available Themes"));
         descriptionitems.add(new ItemWithDescription("Scroll Increment", "The Amount The Value Will Be Incremented/Decremented On Mouse Scroll"));
-        descriptionitems.add(new ItemWithDescription("Alert File", "An Alert File Is An Optional Sound File Played In Between Session Elements"));
+        descriptionitems.add(new ItemWithDescription("Alert File", "An Alert File Is An Optional Sound File Played In Between Session Elements\n(Will Prompt For Long Session Playback)"));
         descriptionitems.add(new ItemWithDescription("Ramp Checkbox", "Enable/Disable A Ramp In Session Parts To Smooth Mental Transition"));
         descriptionitems.add(new ItemWithDescription("Pre/Post Ramp Checkbox", "Add A Ramp For Pre And Post Even If They Are Not In Session"));
-        descriptionitems.add(new ItemWithDescription("Display Reference", "Default To Display Reference Files During Session Playback\n(Can Be Changed In Session Creation)"));
-        descriptionitems.add(new ItemWithDescription("Reference Type", "Select Which Reference Type You Want To Display During Session Playaback\n(Can Be Changed In Session Creation)"));
+        descriptionitems.add(new ItemWithDescription("Display Reference", "Default To Display Reference Files During Session Playback\n(Can Be Toggled In Session Player)"));
+        descriptionitems.add(new ItemWithDescription("Reference Type", "Select Which Reference Type You Want To Display During Session Playaback\n(Can Be Toggled In Session Player)"));
         descriptionitems.add(new ItemWithDescription("Reference Full Screen", "Display Reference Files Full Screen"));
         descriptionitems.add(new ItemWithDescription("Ambience", "Default To Enable/Disable Ambience Playback During Session"));
-        descriptionitems.add(new ItemWithDescription("Ambience Type", "Default Ambience Playback Type To Playback During Session"));
+        descriptionitems.add(new ItemWithDescription("Ambience Type", "Default Ambience Quick Add Type In Session Creator"));
         descriptionitems.add(new ItemWithDescription("Playback Fade Animation", "Enable/Disable Fade In Audio When Playing"));
         descriptionitems.add(new ItemWithDescription("Playback Fade Animation", "Seconds To Fade In To Playback From Silent When Playing"));
         descriptionitems.add(new ItemWithDescription("Stop Fade Animation", "Enable/Disable Fade Out Audio When When Stopping"));
@@ -397,31 +312,21 @@ public class ChangeProgramOptions extends Stage {
         descriptionitems.add(new ItemWithDescription("Ambience Editor Default", "The Default Ambience Editor To Open When Adding/Editing Ambiences"));
         descriptionitems.add(new ItemWithDescription("Delete Session Button", "This Button Will Permanently Delete All Session Progress And Reset All Cut/Elements Progress"));
         descriptionitems.add(new ItemWithDescription("Delete Goal Button", "This Button Will Permanently Delete All Current And Completed Goals"));
-        descriptionitems.add(new ItemWithDescription("Debug Mode", "For People Who Want To Help My Find Issues With The Programming, This Will Display Alot Of Programming Jargon In The Console"));
+        descriptionitems.add(new ItemWithDescription("Debug Mode", "For People Who Want To Help Me Find Bugs In My Program, This Will Display Alot Of Programming Jargon In The Console"));
         TooltipsCheckBox.setOnMouseEntered(event -> populatedescriptionbox(0));
         TooltipsCheckBox.setOnMouseExited(event -> cleardescription());
         HelpDialogsCheckBox.setOnMouseEntered(event -> populatedescriptionbox(1));
         HelpDialogsCheckBox.setOnMouseExited(event -> cleardescription());
-        ProgramThemeChoiceBox.setOnMouseEntered(event -> populatedescriptionbox(2));
-        ProgramThemeChoiceBox.setOnMouseExited(event -> cleardescription());
-        AddNewThemeButton.setOnMouseEntered(event -> populatedescriptionbox(3));
-        AddNewThemeButton.setOnMouseExited(event -> cleardescription());
         ScrollIncrement.setOnMouseEntered(event -> populatedescriptionbox(4));
         ScrollIncrement.setOnMouseExited(event -> cleardescription());
         AlertFileSwitch.setOnMouseEntered(event -> populatedescriptionbox(5));
         AlertFileSwitch.setOnMouseExited(event -> cleardescription());
         RampSwitch.setOnMouseEntered(event -> populatedescriptionbox(6));
         RampSwitch.setOnMouseExited(event -> cleardescription());
-        PrePostRamp.setOnMouseEntered(event -> populatedescriptionbox(7));
-        PrePostRamp.setOnMouseExited(event -> cleardescription());
         ReferenceSwitch.setOnMouseEntered(event -> populatedescriptionbox(8));
         ReferenceSwitch.setOnMouseExited(event -> cleardescription());
         ReferenceTypeChoiceBox.setOnMouseEntered(event -> populatedescriptionbox(9));
         ReferenceTypeChoiceBox.setOnMouseExited(event -> cleardescription());
-        ReferenceFullScreenCheckBox.setOnMouseEntered(event -> populatedescriptionbox(10));
-        ReferenceFullScreenCheckBox.setOnMouseExited(event -> cleardescription());
-        AmbienceSwitch.setOnMouseEntered(event -> populatedescriptionbox(11));
-        AmbienceSwitch.setOnMouseExited(event -> cleardescription());
         AmbienceTypeChoiceBox.setOnMouseEntered(event -> populatedescriptionbox(12));
         AmbienceTypeChoiceBox.setOnMouseExited(event -> cleardescription());
         FadeAnimation_PlaySwitch.setOnMouseEntered(event -> populatedescriptionbox(13));
@@ -444,8 +349,6 @@ public class ChangeProgramOptions extends Stage {
         EntrainmentVolumePercentage.setOnMouseExited(event -> cleardescription());
         AmbienceVolumePercentage.setOnMouseEntered(event -> populatedescriptionbox(22));
         AmbienceVolumePercentage.setOnMouseExited(event -> cleardescription());
-        AmbienceEditorDefaultChoiceBox.setOnMouseEntered(event -> populatedescriptionbox(23));
-        AmbienceEditorDefaultChoiceBox.setOnMouseExited(event -> cleardescription());
         DeleteAllSessionsProgressButton.setOnMouseEntered(event -> populatedescriptionbox(24));
         DeleteAllSessionsProgressButton.setOnMouseExited(event -> cleardescription());
         DeleteAllGoalsButton.setOnMouseEntered(event -> populatedescriptionbox(25));

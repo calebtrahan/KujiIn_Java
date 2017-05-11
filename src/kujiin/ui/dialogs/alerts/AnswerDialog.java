@@ -2,7 +2,6 @@ package kujiin.ui.dialogs.alerts;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import kujiin.util.Util;
@@ -23,10 +22,8 @@ public class AnswerDialog {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION, content, yes, no, cancel);
         a.setTitle(title);
         if (header != null) {a.setHeaderText(header);}
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
+        a.getDialogPane().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());
         if (modal) {a.initModality(Modality.APPLICATION_MODAL);}
-        a.initOwner(stage);
         Optional<ButtonType> answer = a.showAndWait();
         if (answer.isPresent()) {
             ButtonType buttonanswer = answer.get();
@@ -45,9 +42,7 @@ public class AnswerDialog {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION, content, yes, no, cancel);
         a.setTitle(title);
         if (header != null) {a.setHeaderText(header);}
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
-        a.initOwner(stage);
+        a.getDialogPane().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());
         Optional<ButtonType> answer = a.showAndWait();
         if (answer.isPresent()) {
             ButtonType buttonanswer = answer.get();

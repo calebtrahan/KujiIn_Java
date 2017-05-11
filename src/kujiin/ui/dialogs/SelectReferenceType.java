@@ -63,7 +63,6 @@ public class SelectReferenceType extends Stage {
                     setdescriptiontoselectedtype();
                     break;
             }
-            FullScreenCheckbox.setSelected(Root.getPreferences().getSessionOptions().getReferencefullscreen());
         } catch (IOException ignored) {}
     }
 

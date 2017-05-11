@@ -3,7 +3,6 @@ package kujiin.ui.dialogs.alerts;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
 import javafx.stage.Modality;
 import kujiin.xml.Preferences;
 
@@ -32,8 +31,7 @@ public class ConfirmationDialog {
         if (headertext != null) {
             a.setHeaderText(headertext);
         }
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
+        a.getDialogPane().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());
         if (modal) {a.initModality(Modality.APPLICATION_MODAL);}
         Optional<ButtonType> answer = a.showAndWait();
         result = answer.isPresent() && answer.get() == yes;
@@ -58,8 +56,7 @@ public class ConfirmationDialog {
         if (headertext != null) {
             a.setHeaderText(headertext);
         }
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
+        a.getDialogPane().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());
         Optional<ButtonType> answer = a.showAndWait();
         result = answer.isPresent() && answer.get() == yes;
     }
@@ -68,8 +65,7 @@ public class ConfirmationDialog {
         a.setTitle(title);
         if (header != null) {a.setHeaderText(header);}
         if (content != null) {a.setContentText(content);}
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
+        a.getDialogPane().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());
         if (modal) {a.initModality(Modality.APPLICATION_MODAL);}
         Optional<ButtonType> answer = a.showAndWait();
         result = answer.isPresent() && answer.get() == ButtonType.OK;
@@ -79,8 +75,7 @@ public class ConfirmationDialog {
         a.setTitle(title);
         if (header != null) {a.setHeaderText(header);}
         if (content != null) {a.setContentText(content);}
-        DialogPane dialogPane = a.getDialogPane();
-        dialogPane.getStylesheets().add(preferences. getUserInterfaceOptions().getThemefile());
+        a.getDialogPane().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());
         Optional<ButtonType> answer = a.showAndWait();
         result = answer.isPresent() && answer.get() == ButtonType.OK;
     }

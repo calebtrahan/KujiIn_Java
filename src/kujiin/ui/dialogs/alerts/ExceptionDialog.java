@@ -7,16 +7,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.stage.Stage;
+import kujiin.ui.boilerplate.StyledStage;
 import kujiin.util.Util;
 import kujiin.xml.Preferences;
 
 import java.io.IOException;
 import java.time.LocalDate;
 
-import static kujiin.xml.Preferences.PROGRAM_ICON;
-
-public class ExceptionDialog extends Stage {
+public class ExceptionDialog extends StyledStage {
     public TextArea StackTraceTextField;
     public Button CloseButton;
     public Button ContinueButton;
@@ -29,10 +27,6 @@ public class ExceptionDialog extends Stage {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            getIcons().clear();
-            getIcons().add(PROGRAM_ICON);
-            String themefile = preferences.getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             System.out.println(String.format("Time %s Encountered: %s", exception.getClass().getName(), LocalDate.now()));
             exception.printStackTrace();
             setTitle("Program Error Occured");

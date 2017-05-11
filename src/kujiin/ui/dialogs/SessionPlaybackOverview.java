@@ -24,7 +24,7 @@ public class SessionPlaybackOverview {
 //    private ObservableList<kujiin.util.table.SessionItem> tableitems = FXCollections.observableArrayList();
 //    private boolean result;
 //    private MainController Root;
-//    private AmbiencePlaybackType ambiencePlaybackType;
+//    private QuickAddAmbienceType ambiencePlaybackType;
 //
 //    public SessionPlaybackOverview(MainController Root, Stage parent, boolean minimizeparent, List<SessionItem> itemsinsession) {
 //        super(Root, parent, minimizeparent);
@@ -367,13 +367,13 @@ public class SessionPlaybackOverview {
 //        int index = AmbienceTypeComboBox.getSelectionModel().getSelectedIndex();
 //        switch (index) {
 //            case 0:
-//                ambiencePlaybackType = AmbiencePlaybackType.Repeat;
+//                ambiencePlaybackType = QuickAddAmbienceType.Repeat;
 //                break;
 //            case 1:
-//                ambiencePlaybackType = AmbiencePlaybackType.Shuffle;
+//                ambiencePlaybackType = QuickAddAmbienceType.Shuffle;
 //                break;
 //            case 2:
-//                ambiencePlaybackType = AmbiencePlaybackType.CUSTOM;
+//                ambiencePlaybackType = QuickAddAmbienceType.CUSTOM;
 //                break;
 //        }
 //        populatetable();

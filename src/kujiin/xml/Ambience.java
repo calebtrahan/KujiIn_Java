@@ -1,7 +1,7 @@
 package kujiin.xml;
 
 import javafx.util.Duration;
-import kujiin.util.enums.AmbiencePlaybackType;
+import kujiin.util.enums.QuickAddAmbienceType;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -96,8 +96,8 @@ public class Ambience {
             return null;
         }
     }
-    public SoundFile ambiencegenerator(AmbiencePlaybackType ambiencePlaybackType, List<SoundFile> playbackhistory, SoundFile currentsoundfile) {
-        switch (ambiencePlaybackType) {
+    public SoundFile ambiencegenerator(QuickAddAmbienceType quickAddAmbienceType, List<SoundFile> playbackhistory, SoundFile currentsoundfile) {
+        switch (quickAddAmbienceType) {
             case REPEAT:
                 if (currentsoundfile != null) {
                     int currentambienceindex = Ambience.indexOf(currentsoundfile);
@@ -123,11 +123,6 @@ public class Ambience {
                         }
                     }
                 }
-            case CUSTOM:
-                if (currentsoundfile != null) {
-                    int index = Ambience.indexOf(currentsoundfile);
-                    return Ambience.get(index + 1);
-                } else {return Ambience.get(0);}
             default:
                 return null;
         }

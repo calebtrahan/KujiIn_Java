@@ -248,64 +248,40 @@ public class Util {
         else {return String.format("%02d:%02d", minutes, seconds);}
     }
     public static String formatdurationtoStringSpelledOut(Duration duration, Double maxcharlength) {
+        System.out.println("Maxcharlength Is: " + maxcharlength);
         int seconds = new Double(duration.toSeconds()).intValue();
         int minutes = 0;
         int hours = 0;
         if (seconds >= 3600) {hours = seconds / 3600; seconds -= hours * 3600;}
         if (seconds >= 60) {minutes = seconds / 60; seconds -= minutes * 60;}
-    // Long
-        if (hours == 0 && minutes == 0 && seconds == 0) {
-            if ("0 minutes".length() <= maxcharlength) {return "0 Minutes";}
-            else if ("0 Mins".length() <= maxcharlength) {return "0 Mins";}
+        if (!(hours > 0) && !(minutes > 0) && !(seconds > 0)) {
+            if ("0 Minutes".length() >= maxcharlength) {return "0 Minutes";}
+            else if ("0 Mins".length() >= maxcharlength) {return "0 Mins";}
             else {return "0 M";}
-        }
-        StringBuilder longtext = new StringBuilder();
-        if (hours > 0) {longtext.append(hours).append(" Hour"); if (hours > 1) {longtext.append("s");} if (minutes > 0) {longtext.append(" ");}}
-        if (minutes > 0) {
-            longtext.append(minutes);
-            longtext.append(" Minute");
-            if (minutes > 1) {longtext.append("s");}
-        }
-        if (seconds > 0) {
-            longtext.append(minutes);
-            longtext.append(" Second");
-            if (seconds > 1) {longtext.append("s");}
-        }
-        if (maxcharlength == null || longtext.toString().length() <= maxcharlength) {return longtext.toString();}
-        else {
-    // Short
+        } else {
+            StringBuilder longtext = new StringBuilder();
             StringBuilder shorttext = new StringBuilder();
-            if (hours > 0) {shorttext.append(hours).append("Hr"); if (hours > 1) {shorttext.append("s");} if (minutes > 0) {shorttext.append(" ");}}
+            StringBuilder reallyshorttext = new StringBuilder();
+            if (hours > 0) {
+                longtext.append(hours).append(" Hour"); if (hours > 1) {longtext.append("s");}
+                shorttext.append(hours).append(" Hr"); if (hours > 1) {shorttext.append("s");}
+                reallyshorttext.append(hours).append(" H");
+                if (minutes > 0) {longtext.append(" "); shorttext.append(" "); reallyshorttext.append(" ");}
+            }
             if (minutes > 0) {
-                shorttext.append(minutes);
-                shorttext.append(" Min");
-                if (minutes > 1) {shorttext.append("s");}
+                longtext.append(minutes).append(" Minute"); if (minutes > 1) {longtext.append("s");}
+                shorttext.append(minutes).append(" Min"); if (minutes > 1) {shorttext.append("s");}
+                reallyshorttext.append(minutes).append(" M");
+                if (seconds > 0) {longtext.append(" "); shorttext.append(" "); reallyshorttext.append(" ");}
             }
             if (seconds > 0) {
-                shorttext.append(minutes);
-                shorttext.append(" Second");
-                if (seconds > 1) {shorttext.append("s");}
+                longtext.append(seconds).append(" Second"); if (seconds > 1) {longtext.append("s");}
+                shorttext.append(seconds).append(" Sec"); if (seconds > 1) {shorttext.append("s");}
+                reallyshorttext.append(seconds).append(" S");
             }
-            if (shorttext.toString().length() <= maxcharlength) {return shorttext.toString();}
-            else {
-    // Really Short
-                StringBuilder reallyshorttext = new StringBuilder();
-                if (hours > 0) {
-                    reallyshorttext.append(hours);
-                    reallyshorttext.append("H");
-                    if (minutes > 0) {reallyshorttext.append(" ");}
-                }
-                if (minutes > 0) {
-                    reallyshorttext.append(minutes);
-                    reallyshorttext.append(" M");
-                }
-                if (seconds > 0) {
-                    reallyshorttext.append(minutes);
-                    reallyshorttext.append(" Second");
-                    if (seconds > 1) {reallyshorttext.append("s");}
-                }
-                return reallyshorttext.toString();
-            }
+            if (maxcharlength >= longtext.length()) {return longtext.toString();}
+            else if (maxcharlength >= shorttext.length()) {return shorttext.toString();}
+            else {return reallyshorttext.toString();}
         }
     }
 

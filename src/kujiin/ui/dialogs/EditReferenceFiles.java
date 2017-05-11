@@ -8,8 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import kujiin.ui.MainController;
+import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.alerts.*;
 import kujiin.util.Util;
 import kujiin.util.enums.ReferenceType;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import static kujiin.xml.Preferences.PROGRAM_ICON;
 
-public class EditReferenceFiles extends Stage {
+public class EditReferenceFiles extends StyledStage {
     public ChoiceBox<String> SessionPartNamesChoiceBox;
     public TextArea MainTextArea;
     public Button CloseButton;
@@ -47,9 +47,6 @@ public class EditReferenceFiles extends Stage {
             getIcons().clear();
             getIcons().add(PROGRAM_ICON);
             initModality(Modality.WINDOW_MODAL);
-            initOwner(Root.getStage());
-            String themefile = Root.getPreferences().getUserInterfaceOptions().getThemefile();
-            if (themefile != null) {getScene().getStylesheets().add(themefile);}
             setTitle("Reference Files Editor");
             ObservableList<String> sessionpartnames = FXCollections.observableArrayList();
             sessionpartnames.addAll(Preferences.ALLNAMES);

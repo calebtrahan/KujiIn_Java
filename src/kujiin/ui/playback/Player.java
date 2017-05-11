@@ -156,8 +156,7 @@ public class Player extends Stage {
                     a.setTitle("Cannot Close Player");
                     a.setHeaderText("Currently Pausing, Starting Playback Or Stopping");
                     a.setContentText("Please Wait Till Done Until Closing Player");
-                    DialogPane dialogPane = a.getDialogPane();
-                    dialogPane.getStylesheets().add(Preferences.getUserInterfaceOptions().getThemefile());
+                    a.getDialogPane().getStylesheets().add(kujiin.xml.Preferences.DEFAULTSTYLESHEET.toURI().toString());
                     a.show();
                     event.consume();
                     return;
