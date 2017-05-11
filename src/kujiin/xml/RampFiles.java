@@ -13,6 +13,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static kujiin.xml.Preferences.DIRECTORYRAMP;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
 public class RampFiles {
@@ -69,10 +71,11 @@ public class RampFiles {
     private void populatedefaults() {
         String[] names = {"rin", "kyo", "toh", "sha", "kai", "jin", "retsu", "zai", "zen"};
         ArrayList<SoundFile> filenames = new ArrayList<>();
+        for (String x : names) {filenames.add(new SoundFile(new File(DIRECTORYRAMP, "qito" + x + ".mp3")));}
         for (int i = 0; i < names.length; i++) {
             for (int x = 0; x < 2; x++) {
-                if (x == 0) {filenames.add(new SoundFile(new File(Preferences.DIRECTORYRAMP, names[i] + "to" + "qi.mp3")));}
-                else if (i < names.length - 1) {filenames.add(new SoundFile(new File(Preferences.DIRECTORYRAMP, names[i] + "to" + names[i + 1] + ".mp3")));}
+                if (x == 0) {filenames.add(new SoundFile(new File(DIRECTORYRAMP, names[i] + "to" + "qi.mp3")));}
+                else if (i < names.length - 1) {filenames.add(new SoundFile(new File(DIRECTORYRAMP, names[i] + "to" + names[i + 1] + ".mp3")));}
             }
         }
         if (RampFiles != null) {RampFiles.clear();} else {RampFiles = new ArrayList<>();}

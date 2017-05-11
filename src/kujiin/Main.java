@@ -46,7 +46,7 @@ public class Main extends Application {
         audioChecksDialog.showAndWait();
         primaryStage.setOnCloseRequest(event -> {
             if (root.getProgramState() == ProgramState.IDLE &&
-                    new ConfirmationDialog(root.getPreferences(), "Confirmation", null, "Really Exit?", "Exit", "Cancel").getResult()) {
+                    new ConfirmationDialog(root.getPreferences(), "Exit Kuji-In Program", null, "Really Exit?", "Exit", "Cancel").getResult()) {
                 root.close();
             } else {event.consume();}
         });

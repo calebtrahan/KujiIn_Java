@@ -48,11 +48,7 @@ import java.util.ResourceBundle;
 import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
-    // TODO Have Ambience Recalculate If Already Calculated And Ambience Is Not Long Enough
-
     // TODO End And Playback Same Session Is Causing Nullpointer Exception
-    // TODO End Of Session Buttons Are Stuck On "Transitioning"
-
     // TODO Find A Way To Reset Session After Stop Animation Ends
 
 // Additional Features To Definitely Add
@@ -495,6 +491,19 @@ public class MainController implements Initializable {
             adjustDuration.showAndWait();
             if (adjustDuration.isAccepted()) {
                 createdtableplaybackitems.set(selectedindex, adjustDuration.getPlaybackItemList().get(0));
+                if (createdtableselecteditem.getAmbience().isEnabled() && createdtableselecteditem.getAmbience().getCurrentAmbienceDuration().lessThan(new Duration(createdtableplaybackitems.get(selectedindex).getExpectedDuration()))) {
+                    if (new ConfirmationDialog(preferences, "Set Ambience", "Ambience Not Long Enough To Match New Duration", "Please Set More Ambience Or Disable Ambience", "Add Ambience", "Disable Ambience").getResult()) {
+                        customizeambience();
+                        PlaybackItem createdtableselecteditem = createdtableplaybackitems.get(selectedindex);
+                        if (createdtableselecteditem.getAmbience().getCurrentAmbienceDuration().lessThan(new Duration(createdtableplaybackitems.get(selectedindex).getExpectedDuration()))) {
+                            createdtableselecteditem.getAmbience().clearambience();
+                            createdtableselecteditem.getAmbience().setEnabled(false);
+                        }
+                    } else {
+                        createdtableselecteditem.getAmbience().clearambience();
+                        createdtableselecteditem.getAmbience().setEnabled(false);
+                    }
+                }
                 populatetable();
                 syncbuttons();
             }

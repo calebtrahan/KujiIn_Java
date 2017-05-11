@@ -430,6 +430,7 @@ public class Player extends Stage {
         boolean isLastSessionPart = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) == SessionInProgress.getPlaybackItems().size() - 1;
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
             SoundFile rampfile = rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1));
+            System.out.println("Ramp File Is Null: " + Boolean.toString(rampfile == null));
             timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration())), ae -> {
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
@@ -698,7 +699,6 @@ public class Player extends Stage {
         StopButton.setDisable(true);
     }
     public void endofsession() {
-        System.out.println("Called End Of Session!");
         updateuitimeline.stop();
         updateuitimeline.setOnFinished(event -> reset(false));
         playerState = STOPPED;

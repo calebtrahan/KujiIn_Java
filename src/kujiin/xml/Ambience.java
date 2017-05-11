@@ -28,6 +28,9 @@ public class Ambience {
     public Ambience(AvailableAmbiences availableAmbiences) {}
 
 // Getters And Setters
+    public void setAmbience(List<SoundFile> ambience) {
+    Ambience = ambience;}
+    public List<SoundFile> getAmbience() {return Ambience;}
     public boolean isEnabled() {
         return Enabled;
     }
@@ -47,21 +50,6 @@ public class Ambience {
             return files;
         } catch (NullPointerException ignored) {return new ArrayList<>();}
     }
-
-// Utility Methods
-//    public void startup_addambiencefromdirectory(SessionItem selectedsessionpart) {
-//        try {
-//            File ambiencedirectory = new File(Preferences.DIRECTORYAMBIENCE, selectedsessionpart.name);
-//            for (File i : ambiencedirectory.listFiles()) {
-//                if (Util.audio_isValid(i) && ! selectedsessionpart.getAmbience().getAmbienceFiles().contains(i)) {add(new SoundFile(i));}
-//            }
-//        } catch (NullPointerException ignored) {}
-//    }
-//    public void startup_checkfordeletedfiles() {
-////        if (AvailableAmbiences != null) {
-////            AvailableAmbiences.stream().filter(i -> !i.getFile().exists()).forEach(this::remove);
-////        }
-//    }
 
 // Ambience List Methods
     public void add(SoundFile soundFile) {
@@ -189,16 +177,15 @@ public class Ambience {
         Collections.shuffle(ambiencelist);
         setAmbience(ambiencelist);
     }
+    public Duration getCurrentAmbienceDuration() {
+        Duration totalduration = Duration.ZERO;
+        for (SoundFile i : Ambience) {totalduration = totalduration.add(new Duration(i.getDuration()));}
+        return totalduration;
+    }
     public void clearambience() { if (Ambience != null) {Ambience.clear();}}
     public void remove(int index) {
         Ambience.remove(index);
     }
-
-// Custom Ambience
-    public boolean hasCustomAmbience() {return Ambience != null && ! Ambience.isEmpty();}
-    public void setAmbience(List<SoundFile> ambience) {
-        Ambience = ambience;}
-    public List<SoundFile> getAmbience() {return Ambience;}
 
 // Validation Methods
     public Duration gettotalDuration() {
