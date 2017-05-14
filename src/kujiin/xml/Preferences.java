@@ -51,7 +51,7 @@ public class Preferences {
     public static final Image ICON_PAUSE = new Image(new File(DIRECTORYICONS, "Pause.png").toURI().toString());
     public static final Image ICON_PLAY = new Image(new File(DIRECTORYICONS, "Play.png").toURI().toString());
     public static final Image ICON_RECENTSESSIONS = new Image(new File(DIRECTORYICONS, "RecentlyPlayed.png").toURI().toString());
-    public static final Image ICON_CLEARSESSION = new Image(new File(DIRECTORYICONS, "ClearSesion.png").toURI().toString());
+    public static final Image ICON_CLEARSESSION = new Image(new File(DIRECTORYICONS, "ClearSession.png").toURI().toString());
     public static final Image ICON_SETTINGS = new Image(new File(DIRECTORYICONS, "Settings.png").toURI().toString());
     public static final Image ICON_STOP = new Image(new File(DIRECTORYICONS, "Stop.png").toURI().toString());
     public static final Image ICON_OPENFILE = new Image(new File(DIRECTORYICONS, "OpenFile.png").toURI().toString());

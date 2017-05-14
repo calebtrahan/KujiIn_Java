@@ -37,6 +37,7 @@ import kujiin.xml.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.net.URL;
@@ -583,7 +584,23 @@ public class MainController implements Initializable {
         }
     }
     public void savecreatedsessionasfile() {
-
+        if (createdsession != null && ! createdsession.getPlaybackItems().isEmpty()) {
+            FileChooser fileChooser = new FileChooser();
+            File savefile = fileChooser.showSaveDialog(getStage());
+            if (savefile != null) {
+                if (! savefile.getName().endsWith(".xml")) {savefile = new File(savefile + ".xml");}
+                try {
+                    JAXBContext context = JAXBContext.newInstance(Session.class);
+                    Marshaller createMarshaller = context.createMarshaller();
+                    createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                    createMarshaller.marshal(createdsession, savefile);
+                    new InformationDialog(preferences, "Session Saved", "Session Saved To: " + savefile.getAbsolutePath(), null, true);
+                } catch (JAXBException e) {
+                    e.printStackTrace();
+                    new ErrorDialog(preferences, "Cannot Save", "Cannot Save File", "Check File Permissions", true);
+                }
+            }
+        }
     }
     public void playcreatedsession() {
         if (createdsession != null) {

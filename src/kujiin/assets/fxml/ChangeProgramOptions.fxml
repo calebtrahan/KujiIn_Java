@@ -11,7 +11,7 @@
          <children>
             <TabPane prefHeight="216.0" prefWidth="430.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                  <Tab text="User Interface &amp; Creation">
+                  <Tab text="UI &amp; Creation">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="311.0" prefWidth="446.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="51.0" layoutY="82.0" prefHeight="313.0" prefWidth="446.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <TableView fx:id="RecentSessionsTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+              <columns>
+                  <TableColumn fx:id="NumberColumn" prefWidth="51.0" resizable="false" text="#" />
+                <TableColumn fx:id="DatePracticedColumn" prefWidth="142.0" resizable="false" text="Date Practiced" />
+                  <TableColumn fx:id="PlaybackItemsColumn" prefWidth="121.0" resizable="false" text="Playback Items" />
+                <TableColumn fx:id="DurationColumn" prefWidth="120.0" resizable="false" text="Duration" />
+              </columns>
+            </TableView>
+            <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="436.0">
+               <children>
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button fx:id="ShowMoreButton" mnemonicParsing="false" onAction="#showmorerecentsessions" text="Show More" />
+                     </children>
+                  </HBox>
+                  <Button fx:id="ViewDetailsButton" mnemonicParsing="false" onAction="#viewsessiondetails" text="View Details" />
+                  <Button fx:id="OpenButton" mnemonicParsing="false" onAction="#open" text="Open" />
+                  <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</AnchorPane>
