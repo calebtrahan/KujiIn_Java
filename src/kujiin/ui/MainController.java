@@ -14,10 +14,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.ambience.AvailableAmbienceEditor;
 import kujiin.ui.boilerplate.IconImageView;
-import kujiin.ui.creation.AdjustDuration;
-import kujiin.ui.creation.CustomizeAmbience;
-import kujiin.ui.creation.QuickAddAmbience;
-import kujiin.ui.creation.SetDurationWithAmbienceOption;
+import kujiin.ui.creation.*;
 import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.ChangeProgramOptions;
 import kujiin.ui.dialogs.EditReferenceFiles;
@@ -386,7 +383,7 @@ public class MainController implements Initializable {
                 ambienceEditor_simple.showAndWait();
             }
         }
-        if (createdsession != null && ! new ConfirmationDialog(preferences, "Load New Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
+        if (createdsession != null && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
         createdsession = new Session();
         populatetable();
     }
@@ -409,8 +406,26 @@ public class MainController implements Initializable {
         }
     }
     public void openrecentsession() {
+        if (createdsession != null) {
+            if (! new ConfirmationDialog(preferences, "Overwrite Session", "Really Open Recent Session?", "This will clear any unsaved changes you made to this session").getResult()) {
+                return;
+            }
+        }
+        OpenRecentSessions openRecentSessions = new OpenRecentSessions(sessions);
+        openRecentSessions.initModality(Modality.APPLICATION_MODAL);
+        openRecentSessions.showAndWait();
+        if (openRecentSessions.isAccepted()) {
+            createdsession = openRecentSessions.getSelectedsession();
+            populatetable();
+        }
     }
     public void openfavoritesession() {
+        if (createdsession != null) {
+            if (! new ConfirmationDialog(preferences, "Overwrite Session", "Really Open Favorite Session?", "This will clear any unsaved changes you made to this session").getResult()) {
+                return;
+            }
+        }
+
     }
     // Creation Table Listeners
     public void setupCreatedSessionTable() {
