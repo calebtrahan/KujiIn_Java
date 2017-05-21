@@ -27,15 +27,27 @@ public class FavoriteSessions {
         unmarshall();
     }
 
+// Getters And Setters
+    public List<FavoriteSession> getFavoriteSessions() {
+        return FavoriteSessions;
+    }
+    public void add(String name, Session session) {
+        if (FavoriteSessions == null) {FavoriteSessions = new ArrayList<>();}
+        FavoriteSessions.add(new FavoriteSession(name, session));
+        marshall();
+    }
+    public FavoriteSession get(int index) {return FavoriteSessions.get(index);}
+    public void remove(FavoriteSession favoriteSession) {FavoriteSessions.remove(favoriteSession); marshall();}
+
 // XML Processing
     public void unmarshall() {
         if (Preferences.FAVORITESESSIONSXMLFILE.exists()) {
             try {
-                JAXBContext context = JAXBContext.newInstance(AvailableEntrainments.class);
+                JAXBContext context = JAXBContext.newInstance(FavoriteSessions.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
                 FavoriteSessions favoriteSessions = (FavoriteSessions) createMarshaller.unmarshal(Preferences.FAVORITESESSIONSXMLFILE);
                 FavoriteSessions = favoriteSessions.FavoriteSessions;
-            } catch (JAXBException ignored) {}
+            } catch (JAXBException ignored) {ignored.printStackTrace();}
         } else {FavoriteSessions = new ArrayList<>();}
     }
     public void marshall() {
@@ -49,11 +61,5 @@ public class FavoriteSessions {
             new InformationDialog(root.getPreferences(), "Information", "Couldn't Write PlaybackItemEntrainment XML File", "Check Write File Permissions Of " + Preferences.ENTRAINMENTXMLFILE.getAbsolutePath());
         }
     }
-
-// Other Methods
-    public void add(String name, Session session) {
-        FavoriteSessions.add(new FavoriteSession(name, session));
-    }
-    public FavoriteSession get(int index) {return FavoriteSessions.get(index);}
 
 }

@@ -44,6 +44,13 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static kujiin.xml.Preferences.*;
+// Presets Menu
+    // Kuji-In
+        // 5 Minutes | 10 Minutes | 15 Minutes | 30 Minutes | 1 Hour
+    // Elements
+        // 5 Minutes | 10 Minutes | 15 Minutes | 30 Minutes | 1 Hour
+    // Kuji-In & Elements
+        // 5 Minutes | 10 Minutes | 15 Minutes | 30 Minutes | 1 Hour
 
 // Bugs To Fix
     // TODO End And Playback Same Session Is Causing Nullpointer Exception
@@ -406,24 +413,43 @@ public class MainController implements Initializable {
         }
     }
     public void openrecentsession() {
+        if (sessions.getSession() == null || sessions.getSession().isEmpty()) {
+            new InformationDialog(preferences, "No Recent Sessions", "No Recent Sessions", "No Sessions Practiced");
+            return;
+        }
         if (createdsession != null) {
             if (! new ConfirmationDialog(preferences, "Overwrite Session", "Really Open Recent Session?", "This will clear any unsaved changes you made to this session").getResult()) {
                 return;
             }
+            createdsession = null;
+            populatetable();
         }
-        OpenRecentSessions openRecentSessions = new OpenRecentSessions(sessions);
-        openRecentSessions.initModality(Modality.APPLICATION_MODAL);
-        openRecentSessions.showAndWait();
-        if (openRecentSessions.isAccepted()) {
-            createdsession = openRecentSessions.getSelectedsession();
+        SelectASession selectASession = new SelectASession(preferences, sessions);
+        selectASession.initModality(Modality.APPLICATION_MODAL);
+        selectASession.showAndWait();
+        if (selectASession.isAccepted()) {
+            createdsession = selectASession.getSelectedsession();
             populatetable();
         }
     }
     public void openfavoritesession() {
+        if (favoriteSessions.getFavoriteSessions() == null || favoriteSessions.getFavoriteSessions().isEmpty()) {
+            new InformationDialog(preferences, "No Favorite Sessions", "No Sessions Marked As Favorite", "Mark At Least One Session As Favorite To Use This Feature");
+            return;
+        }
         if (createdsession != null) {
             if (! new ConfirmationDialog(preferences, "Overwrite Session", "Really Open Favorite Session?", "This will clear any unsaved changes you made to this session").getResult()) {
                 return;
             }
+            createdsession = null;
+            populatetable();
+        }
+        SelectASession selectASession = new SelectASession(preferences, favoriteSessions);
+        selectASession.initModality(Modality.APPLICATION_MODAL);
+        selectASession.showAndWait();
+        if (selectASession.isAccepted()) {
+            createdsession = selectASession.getSelectedsession();
+            populatetable();
         }
 
     }
@@ -593,9 +619,16 @@ public class MainController implements Initializable {
     }
     public void addcreatedsessiontofavorites() {
         if (createdsession != null) {
-            String name = "";
-            favoriteSessions.add(name, createdsession);
-            new InformationDialog(preferences, "Favorite Session Added", "Session Added To Favorites", null, true);
+            NameFavoriteSession nameFavoriteSession = new NameFavoriteSession(favoriteSessions);
+            nameFavoriteSession.initModality(Modality.APPLICATION_MODAL);
+            nameFavoriteSession.showAndWait();
+            if (nameFavoriteSession.isAccepted()) {
+                favoriteSessions.add(nameFavoriteSession.getName(), createdsession);
+                new InformationDialog(preferences, "Favorite Session Added", "Session Added To Favorites", null, true);
+                for (FavoriteSession i : favoriteSessions.getFavoriteSessions()) {
+                    System.out.println(i.getName());
+                }
+            }
         }
     }
     public void savecreatedsessionasfile() {

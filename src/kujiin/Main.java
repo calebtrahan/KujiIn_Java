@@ -33,7 +33,7 @@ public class Main extends Application {
         primaryStage.getIcons().clear();
         primaryStage.getIcons().add(PROGRAM_ICON);
         root.getScene().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());
-        root.setFavoriteSessions(new FavoriteSessions());
+        root.setFavoriteSessions(new FavoriteSessions(root));
         root.setSessions(new Sessions(root));
         root.setAvailableAmbiences(new AvailableAmbiences(root));
         root.setAvailableEntrainments(new AvailableEntrainments(root));

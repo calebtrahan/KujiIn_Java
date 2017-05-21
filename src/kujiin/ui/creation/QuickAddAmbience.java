@@ -39,9 +39,11 @@ public class QuickAddAmbience extends StyledStage {
             switch (preferences.getCreationOptions().getQuickaddambiencetype()) {
                 case REPEAT:
                     RepeatRadioButton.setSelected(true);
+                    quickAmbienceType = QuickAmbienceType.Repeat;
                     break;
                 case SHUFFLE:
                     ShuffleRadioButton.setSelected(true);
+                    quickAmbienceType = QuickAmbienceType.Shuffle;
                     break;
             }
         } catch (IOException e) {e.printStackTrace();}

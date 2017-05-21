@@ -31,7 +31,7 @@
           </Menu>
         </menus>
       </MenuBar>
-      <TabPane prefHeight="200.0" prefWidth="200.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <tabs>
             <Tab fx:id="PlayExportTab" text="Play/Export">
               <content>
@@ -41,23 +41,15 @@
                            <children>
                               <ToolBar prefHeight="41.0" prefWidth="600.0">
                                 <items>
-                                    <Label alignment="CENTER" text="Session:" textAlignment="CENTER">
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                       <padding>
-                                          <Insets bottom="2.0" left="3.0" right="3.0" />
-                                       </padding>
-                                    </Label>
-                                    <MenuButton fx:id="CreateSessionMenu" mnemonicParsing="false" text="Create New">
+                                    <MenuButton fx:id="CreateSessionMenu" mnemonicParsing="false" text="Create New Session">
                                       <items>
                                         <MenuItem fx:id="CreateBlankSessionMenuItem" mnemonicParsing="false" onAction="#createblanksession" text="Blank Session" />
                                         <MenuItem fx:id="OpenPresetsMenuItem" mnemonicParsing="false" onAction="#createwithpreset" text="Presets" />
                                       </items>
                                     </MenuButton>
-                                    <Button fx:id="OpenFileButton" mnemonicParsing="false" onAction="#opensessionfromfile" text="Open From File" />
-                                    <Button fx:id="OpenRecentSessionsButton" mnemonicParsing="false" onAction="#openrecentsession" text="Recent" />
-                                    <Button fx:id="OpenFavoritesButton" mnemonicParsing="false" onAction="#openfavoritesession" text="Favorites" />
+                                    <Button fx:id="OpenFileButton" mnemonicParsing="false" onAction="#opensessionfromfile" text="Open Session From File" />
+                                    <Button fx:id="OpenRecentSessionsButton" mnemonicParsing="false" onAction="#openrecentsession" text="Recent Sessions" />
+                                    <Button fx:id="OpenFavoritesButton" mnemonicParsing="false" onAction="#openfavoritesession" text="Favorite Sessions" />
                                 </items>
                               </ToolBar>
                               <VBox VBox.vgrow="ALWAYS">

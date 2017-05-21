@@ -5,15 +5,21 @@ import javax.xml.bind.annotation.XmlAccessorType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FavoriteSession {
-    String name;
-    Session session;
-    Double duration;
+    private String name;
+    private Session session;
 
+    public FavoriteSession() {}
     public FavoriteSession(String name, Session session) {
         this.name = name;
         this.session = session;
-        for (PlaybackItem i : session.getPlaybackItems()) {
-            duration += i.getExpectedDuration();
-        }
     }
+
+// Getters And Setters
+    public String getName() {
+        return name;
+    }
+    public Session getSession() {
+        return session;
+    }
+
 }

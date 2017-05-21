@@ -14,7 +14,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,8 +49,8 @@ public class Goals {
 
 // List Getters
     public List<List<Goal>> getAll() {
-        return new ArrayList<>(Arrays.asList(QiGongGoals, RinGoals, KyoGoals, TohGoals, ShaGoals, KaiGoals, JinGoals, RetsuGoals, ZaiGoals, ZenGoals,
-                EarthGoals, AirGoals, FireGoals, WaterGoals, VoidGoals, TotalGoals));
+        return Arrays.asList(QiGongGoals, RinGoals, KyoGoals, TohGoals, ShaGoals, KaiGoals, JinGoals, RetsuGoals, ZaiGoals, ZenGoals,
+                EarthGoals, AirGoals, FireGoals, WaterGoals, VoidGoals, TotalGoals);
     }
     public List<Goal> get(int index) {
         switch (index) {
