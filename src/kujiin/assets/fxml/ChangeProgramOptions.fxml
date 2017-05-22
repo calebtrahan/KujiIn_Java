@@ -56,11 +56,11 @@
                                     <HBox alignment="CENTER_LEFT" prefHeight="0.0" prefWidth="430.0">
                                        <children>
                                           <Label text="Duration Scroll Incremement:" />
-                                          <TextField fx:id="ScrollIncrement" alignment="CENTER" prefHeight="26.0" prefWidth="33.0">
+                                          <Spinner fx:id="ScrollIncrement" prefHeight="27.0" prefWidth="65.0">
                                              <HBox.margin>
-                                                <Insets left="10.0" />
+                                                <Insets left="5.0" />
                                              </HBox.margin>
-                                          </TextField>
+                                          </Spinner>
                                        </children>
                                        <VBox.margin>
                                           <Insets left="10.0" />
@@ -189,14 +189,13 @@
                                     </Label>
                                     <HBox alignment="CENTER_LEFT" prefHeight="39.0" prefWidth="430.0">
                                        <children>
-                                          <HBox alignment="CENTER_LEFT" prefHeight="29.0" prefWidth="185.0">
+                                          <HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="200.0">
                                              <children>
-                                                <CheckBox fx:id="FadeAnimation_PlaySwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Play" />
-                                                <TextField fx:id="FadeAnimation_PlayValue" alignment="CENTER_RIGHT" prefWidth="45.0">
+                                                <CheckBox fx:id="FadeAnimation_PlaySwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Play">
                                                    <HBox.margin>
-                                                      <Insets left="5.0" />
-                                                   </HBox.margin>
-                                                </TextField>
+                                                      <Insets right="2.0" />
+                                                   </HBox.margin></CheckBox>
+                                                <Spinner fx:id="FadeAnimation_PlayValue" prefHeight="27.0" prefWidth="70.0" />
                                                 <Label text="sec(s)">
                                                    <HBox.margin>
                                                       <Insets left="3.0" />
@@ -209,12 +208,11 @@
                                           </HBox>
                                           <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="200.0">
                                              <children>
-                                                <CheckBox fx:id="FadeAnimation_StopSwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Stop" />
-                                                <TextField fx:id="FadeAnimation_StopValue" alignment="CENTER_RIGHT" prefWidth="45.0">
+                                                <CheckBox fx:id="FadeAnimation_StopSwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Stop">
                                                    <HBox.margin>
-                                                      <Insets left="5.0" />
-                                                   </HBox.margin>
-                                                </TextField>
+                                                      <Insets right="2.0" />
+                                                   </HBox.margin></CheckBox>
+                                                <Spinner fx:id="FadeAnimation_StopValue" prefHeight="27.0" prefWidth="70.0" />
                                                 <Label text="sec(s)">
                                                    <HBox.margin>
                                                       <Insets left="2.0" />
@@ -232,14 +230,13 @@
                                     </HBox>
                                     <HBox prefHeight="37.0" prefWidth="430.0">
                                        <children>
-                                          <HBox alignment="CENTER_LEFT" prefHeight="29.0" prefWidth="185.0">
+                                          <HBox alignment="CENTER_LEFT" prefHeight="27.0" prefWidth="200.0">
                                              <children>
-                                                <CheckBox fx:id="FadeAnimation_ResumeSwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Resume" />
-                                                <TextField fx:id="FadeAnimation_ResumeValue" alignment="CENTER_RIGHT" prefWidth="45.0">
+                                                <CheckBox fx:id="FadeAnimation_ResumeSwitch" minWidth="75.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Resume">
                                                    <HBox.margin>
-                                                      <Insets left="5.0" />
-                                                   </HBox.margin>
-                                                </TextField>
+                                                      <Insets right="2.0" />
+                                                   </HBox.margin></CheckBox>
+                                                <Spinner fx:id="FadeAnimation_ResumeValue" minWidth="70.0" prefHeight="27.0" prefWidth="70.0" />
                                                 <Label prefHeight="19.0" prefWidth="46.0" text="sec(s)">
                                                    <HBox.margin>
                                                       <Insets left="3.0" />
@@ -252,12 +249,11 @@
                                           </HBox>
                                           <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="200.0">
                                              <children>
-                                                <CheckBox fx:id="FadeAnimation_PauseSwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Pause" />
-                                                <TextField fx:id="FadeAnimation_PauseValue" alignment="CENTER_RIGHT" prefWidth="45.0">
+                                                <CheckBox fx:id="FadeAnimation_PauseSwitch" mnemonicParsing="false" prefHeight="19.0" prefWidth="75.0" text="Pause">
                                                    <HBox.margin>
-                                                      <Insets left="5.0" />
-                                                   </HBox.margin>
-                                                </TextField>
+                                                      <Insets right="2.0" />
+                                                   </HBox.margin></CheckBox>
+                                                <Spinner fx:id="FadeAnimation_PauseValue" prefHeight="27.0" prefWidth="70.0" />
                                                 <Label text="sec(s)">
                                                    <HBox.margin>
                                                       <Insets left="2.0" />
@@ -272,6 +268,9 @@
                                              </padding>
                                           </HBox>
                                        </children>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
                                     </HBox>
                                     <Label text="Volume Defaults">
                                        <font>
@@ -285,14 +284,10 @@
                                        <children>
                                           <Label text="Entrainment">
                                              <HBox.margin>
-                                                <Insets />
+                                                <Insets right="5.0" />
                                              </HBox.margin>
                                           </Label>
-                                          <TextField fx:id="EntrainmentVolumePercentage" alignment="CENTER" prefWidth="45.0">
-                                             <HBox.margin>
-                                                <Insets left="10.0" right="2.0" />
-                                             </HBox.margin>
-                                          </TextField>
+                                          <Spinner fx:id="EntrainmentVolumePercentage" prefHeight="27.0" prefWidth="75.0" />
                                           <Label text="\%">
                                              <HBox.margin>
                                                 <Insets left="2.0" />
@@ -300,17 +295,10 @@
                                           </Label>
                                           <Label text="Ambience">
                                              <HBox.margin>
-                                                <Insets left="15.0" />
+                                                <Insets left="15.0" right="5.0" />
                                              </HBox.margin>
                                           </Label>
-                                          <TextField fx:id="AmbienceVolumePercentage" alignment="CENTER" prefHeight="26.0" prefWidth="45.0">
-                                             <HBox.margin>
-                                                <Insets left="10.0" />
-                                             </HBox.margin>
-                                             <padding>
-                                                <Insets left="10.0" />
-                                             </padding>
-                                          </TextField>
+                                          <Spinner fx:id="AmbienceVolumePercentage" prefHeight="27.0" prefWidth="75.0" />
                                           <Label text="\%">
                                              <HBox.margin>
                                                 <Insets left="2.0" />

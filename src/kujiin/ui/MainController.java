@@ -668,7 +668,7 @@ public class MainController implements Initializable {
         if (createdtableplaybackitems != null) {createdtableplaybackitems.clear();}
         else {createdtableplaybackitems = new ArrayList<>();}
         if (! createdtableitems.isEmpty()) {createdtableitems.clear();}
-        if (! createdsession.getPlaybackItems().isEmpty()) {
+        if (createdsession.getPlaybackItems() != null && ! createdsession.getPlaybackItems().isEmpty()) {
             createdtableplaybackitems.addAll(createdsession.getPlaybackItems());
             int number = 1;
             for (PlaybackItem i : createdtableplaybackitems) {
@@ -807,6 +807,11 @@ public class MainController implements Initializable {
             if (newfromduration.greaterThanOrEqualTo(toduration)) {SessionBrowser_Filter_Duration_From_Hours.getValueFactory().setValue(oldValue);}
             populatesessionbrowsertable();
         });
+        SessionBrowser_Filter_Duration_From_Hours.setOnScroll(event -> {
+            Integer newvalue = SessionBrowser_Filter_Duration_From_Hours.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+            SessionBrowser_Filter_Duration_From_Hours.getValueFactory().setValue(newvalue);
+        });
         SessionBrowser_Filter_Duration_From_Minutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0));
         SessionBrowser_Filter_Duration_From_Minutes.valueProperty().addListener((observable, oldValue, newValue) -> {
             Duration newfromduration = Duration.minutes(new Double(newValue));
@@ -815,6 +820,11 @@ public class MainController implements Initializable {
             toduration = toduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
             if (newfromduration.greaterThanOrEqualTo(toduration)) {SessionBrowser_Filter_Duration_From_Minutes.getValueFactory().setValue(oldValue);}
             populatesessionbrowsertable();
+        });
+        SessionBrowser_Filter_Duration_From_Minutes.setOnScroll(event -> {
+            Integer newvalue = SessionBrowser_Filter_Duration_From_Minutes.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+            SessionBrowser_Filter_Duration_From_Minutes.getValueFactory().setValue(newvalue);
         });
         SessionBrowser_Filter_Duration_To_Hours.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, hours.intValue()));
         SessionBrowser_Filter_Duration_To_Hours.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -825,6 +835,11 @@ public class MainController implements Initializable {
             if (newtoduration.lessThanOrEqualTo(fromduration)) {SessionBrowser_Filter_Duration_To_Hours.getValueFactory().setValue(oldValue);}
             populatesessionbrowsertable();
         });
+        SessionBrowser_Filter_Duration_To_Hours.setOnScroll(event -> {
+            Integer newvalue = SessionBrowser_Filter_Duration_To_Hours.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+            SessionBrowser_Filter_Duration_To_Hours.getValueFactory().setValue(newvalue);
+        });
         SessionBrowser_Filter_Duration_To_Minutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, minutes.intValue()));
         SessionBrowser_Filter_Duration_To_Minutes.valueProperty().addListener((observable, oldValue, newValue) -> {
             Duration newtoduration = Duration.minutes(new Double(newValue));
@@ -833,6 +848,11 @@ public class MainController implements Initializable {
             fromduration = fromduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
             if (newtoduration.lessThanOrEqualTo(fromduration)) {SessionBrowser_Filter_Duration_To_Minutes.getValueFactory().setValue(oldValue);}
             populatesessionbrowsertable();
+        });
+        SessionBrowser_Filter_Duration_To_Minutes.setOnScroll(event -> {
+            Integer newvalue = SessionBrowser_Filter_Duration_To_Minutes.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+            SessionBrowser_Filter_Duration_To_Minutes.getValueFactory().setValue(newvalue);
         });
         LocalDate mindate = null;
         LocalDate maxdate = null;

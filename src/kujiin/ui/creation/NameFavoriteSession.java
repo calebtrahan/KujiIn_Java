@@ -34,9 +34,8 @@ public class NameFavoriteSession extends StyledStage {
             }
             NameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue == null || newValue.length() == 0) {AcceptButton.setDisable(true); return;}
-                boolean validvalue = false;
-                if (names.isEmpty()) {validvalue = true;}
-                for (String i : names) {if (i.toLowerCase().equals(newValue)) {validvalue = true; break;}}
+                boolean validvalue = true;
+                for (String i : names) {if (i.toLowerCase().equals(newValue.toLowerCase())) {validvalue = false; break;}}
                 AcceptButton.setDisable(! validvalue);
                 if (! validvalue) {
                     Tooltip tooltip = new Tooltip("There is Already A Favorite Session Named " + newValue + ". Select A Different Name");

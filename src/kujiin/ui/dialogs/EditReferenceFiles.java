@@ -1,5 +1,7 @@
 package kujiin.ui.dialogs;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -8,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
+import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.alerts.*;
@@ -129,7 +132,8 @@ public class EditReferenceFiles extends StyledStage {
         } else {
             MainTextArea.clear();
             StatusBar.setTextFill(Color.RED);
-            Util.gui_showtimedmessageonlabel(StatusBar, "No SessionPart Selected", 3000);
+            StatusBar.setText("No SessionPart Selected");
+            new Timeline(new KeyFrame(Duration.millis(3000), ae -> StatusBar.setText(""))).play();
         }
     }
 

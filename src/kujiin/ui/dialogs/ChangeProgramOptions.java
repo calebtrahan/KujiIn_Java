@@ -11,7 +11,6 @@ import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.ExceptionDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.util.Util;
 import kujiin.util.enums.QuickAddAmbienceType;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.Preferences;
@@ -25,7 +24,7 @@ public class ChangeProgramOptions extends StyledStage {
     public CheckBox TooltipsCheckBox;
     public CheckBox HelpDialogsCheckBox;
     public ChoiceBox<String> AmbienceTypeChoiceBox;
-    public TextField ScrollIncrement;
+    public Spinner<Integer> ScrollIncrement;
 // Session Tab
     public CheckBox AlertFileSwitch;
     public CheckBox RampSwitch;
@@ -33,15 +32,15 @@ public class ChangeProgramOptions extends StyledStage {
     public ChoiceBox<String> ReferenceTypeChoiceBox;
 // Playback Tab
     public CheckBox FadeAnimation_PlaySwitch;
-    public TextField FadeAnimation_PlayValue;
+    public Spinner<Double> FadeAnimation_PlayValue;
     public CheckBox FadeAnimation_StopSwitch;
-    public TextField FadeAnimation_StopValue;
+    public Spinner<Double> FadeAnimation_StopValue;
     public CheckBox FadeAnimation_ResumeSwitch;
-    public TextField FadeAnimation_ResumeValue;
+    public Spinner<Double> FadeAnimation_ResumeValue;
     public CheckBox FadeAnimation_PauseSwitch;
-    public TextField FadeAnimation_PauseValue;
-    public TextField EntrainmentVolumePercentage;
-    public TextField AmbienceVolumePercentage;
+    public Spinner<Double> FadeAnimation_PauseValue;
+    public Spinner<Integer> EntrainmentVolumePercentage;
+    public Spinner<Integer> AmbienceVolumePercentage;
 // Advanced Tab
     public Button DeleteAllGoalsButton;
     public Button DeleteAllSessionsProgressButton;
@@ -51,7 +50,6 @@ public class ChangeProgramOptions extends StyledStage {
     public Button DefaultsButton;
     public Label DescriptionBoxTopLabel;
     public TextArea DescriptionTextField;
-    public Label ProgramOptionsStatusBar;
 // Fields
     private Preferences Preferences;
     private ArrayList<ItemWithDescription> descriptionitems = new ArrayList<>();
@@ -81,7 +79,7 @@ public class ChangeProgramOptions extends StyledStage {
         TooltipsCheckBox.setSelected(Preferences.getUserInterfaceOptions().getTooltips());
         HelpDialogsCheckBox.setSelected(Preferences.getUserInterfaceOptions().getHelpdialogs());
     // Creation Tab
-        ScrollIncrement.setText(Preferences.getCreationOptions().getScrollincrement().toString());
+        ScrollIncrement.getValueFactory().setValue(Preferences.getCreationOptions().getScrollincrement());
     // Session Tab
         if (Preferences.getSessionOptions().getAlertfunction()) {
             AlertFileSwitch.setSelected(Preferences.hasValidAlertFile());
@@ -110,23 +108,21 @@ public class ChangeProgramOptions extends StyledStage {
         }
     // Playback Tab
         FadeAnimation_PlaySwitch.setSelected(Preferences.getPlaybackOptions().getAnimation_fade_play_enabled());
-        FadeAnimation_PlayValue.setText(String.format("%.2f", Preferences.getPlaybackOptions().getAnimation_fade_play_value()));
+        FadeAnimation_PlayValue.getValueFactory().setValue(Preferences.getPlaybackOptions().getAnimation_fade_play_value());
         FadeAnimation_PlayValue.setDisable(FadeAnimation_PlaySwitch.isSelected());
         toggleplayfade();
         FadeAnimation_StopSwitch.setSelected(Preferences.getPlaybackOptions().getAnimation_fade_stop_enabled());
-        FadeAnimation_StopValue.setText(String.format("%.2f", Preferences.getPlaybackOptions().getAnimation_fade_stop_value()));
+        FadeAnimation_StopValue.getValueFactory().setValue(Preferences.getPlaybackOptions().getAnimation_fade_stop_value());
         FadeAnimation_StopValue.setDisable(FadeAnimation_StopSwitch.isSelected());
         togglestopfade();
         FadeAnimation_ResumeSwitch.setSelected(Preferences.getPlaybackOptions().getAnimation_fade_resume_enabled());
-        FadeAnimation_ResumeValue.setText(String.format("%.2f", Preferences.getPlaybackOptions().getAnimation_fade_resume_value()));
+        FadeAnimation_ResumeValue.getValueFactory().setValue(Preferences.getPlaybackOptions().getAnimation_fade_resume_value());
         FadeAnimation_ResumeValue.setDisable(FadeAnimation_ResumeSwitch.isSelected());
         toggleresumefade();
         FadeAnimation_PauseSwitch.setSelected(Preferences.getPlaybackOptions().getAnimation_fade_pause_enabled());
-        FadeAnimation_PauseValue.setText(String.format("%.2f", Preferences.getPlaybackOptions().getAnimation_fade_pause_value()));
+        FadeAnimation_PauseValue.getValueFactory().setValue(Preferences.getPlaybackOptions().getAnimation_fade_pause_value());
         FadeAnimation_PauseValue.setDisable(FadeAnimation_PauseSwitch.isSelected());
         togglepausefade();
-        EntrainmentVolumePercentage.setText(String.valueOf(new Double(Preferences.getPlaybackOptions().getEntrainmentvolume() * 100).intValue()));
-        AmbienceVolumePercentage.setText(String.valueOf(new Double(Preferences.getPlaybackOptions().getAmbiencevolume() * 100).intValue()));
     // Advanced Tab
         DebugModeCheckbox.setSelected(Preferences.getAdvancedOptions().isDebugmode());
     }
@@ -147,7 +143,12 @@ public class ChangeProgramOptions extends StyledStage {
         TooltipsCheckBox.setOnAction(event -> Preferences.getUserInterfaceOptions().setTooltips(TooltipsCheckBox.isSelected()));
         HelpDialogsCheckBox.setOnAction(event -> Preferences.getUserInterfaceOptions().setHelpdialogs(HelpDialogsCheckBox.isSelected()));
     // Creation Tab
-        Util.custom_textfield_integer(ScrollIncrement, 1, 15, 1);
+        ScrollIncrement.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, Preferences.getCreationOptions().getScrollincrement()));
+        ScrollIncrement.setOnScroll(event -> {
+            Integer newvalue = ScrollIncrement.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+            ScrollIncrement.getValueFactory().setValue(newvalue);
+        });
     // Session Tab
         AlertFileSwitch.setOnAction(event -> alertfiletoggled());
         RampSwitch.setOnAction(event -> toggleramp());
@@ -155,16 +156,46 @@ public class ChangeProgramOptions extends StyledStage {
         ReferenceTypeChoiceBox.setOnAction(event -> referencetypetoggled());
         AmbienceTypeChoiceBox.setOnAction(event -> ambiencetypechanged());
     // Playback Tab
-        Util.custom_textfield_double(FadeAnimation_PlayValue, 0.0, kujiin.xml.Preferences.FADE_VALUE_MAX_DURATION, 1, 1);
-        Util.custom_textfield_double(FadeAnimation_StopValue, 0.0, kujiin.xml.Preferences.FADE_VALUE_MAX_DURATION, 1, 1);
-        Util.custom_textfield_double(FadeAnimation_PauseValue, 0.0, kujiin.xml.Preferences.FADE_VALUE_MAX_DURATION, 1, 1);
-        Util.custom_textfield_double(FadeAnimation_ResumeValue, 0.0, kujiin.xml.Preferences.FADE_VALUE_MAX_DURATION, 1, 1);
-        Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
-        Util.custom_textfield_integer(EntrainmentVolumePercentage, 1, 100, 5);
+        FadeAnimation_PlayValue.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 30.0, Preferences.getPlaybackOptions().getAnimation_fade_play_value(), 0.5));
+        FadeAnimation_PlayValue.setOnScroll(event -> {
+            Double newvalue = FadeAnimation_PlayValue.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 0.5;} else {newvalue += 0.5;}
+            FadeAnimation_PlayValue.getValueFactory().setValue(newvalue);
+        });
         FadeAnimation_PlaySwitch.setOnAction(event -> toggleplayfade());
+        FadeAnimation_StopValue.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 30.0, Preferences.getPlaybackOptions().getAnimation_fade_stop_value(), 0.5));
+        FadeAnimation_StopValue.setOnScroll(event -> {
+            Double newvalue = FadeAnimation_StopValue.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 0.5;} else {newvalue += 0.5;}
+            FadeAnimation_StopValue.getValueFactory().setValue(newvalue);
+        });
         FadeAnimation_StopSwitch.setOnAction(event -> togglestopfade());
+        FadeAnimation_PauseValue.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 10.0, Preferences.getPlaybackOptions().getAnimation_fade_pause_value(), 0.5));
+        FadeAnimation_PauseValue.setOnScroll(event -> {
+            Double newvalue = FadeAnimation_PauseValue.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 0.5;} else {newvalue += 0.5;}
+            FadeAnimation_PauseValue.getValueFactory().setValue(newvalue);
+        });
         FadeAnimation_PauseSwitch.setOnAction(event -> togglepausefade());
+        FadeAnimation_ResumeValue.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 10.0, Preferences.getPlaybackOptions().getAnimation_fade_resume_value(), 0.5));
+        FadeAnimation_ResumeValue.setOnScroll(event -> {
+            Double newvalue = FadeAnimation_ResumeValue.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 0.5;} else {newvalue += 0.5;}
+            FadeAnimation_ResumeValue.getValueFactory().setValue(newvalue);
+        });
         FadeAnimation_ResumeSwitch.setOnAction(event -> toggleresumefade());
+        EntrainmentVolumePercentage.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, new Double(Preferences.getPlaybackOptions().getEntrainmentvolume() * 100).intValue()));
+        EntrainmentVolumePercentage.setOnScroll(event -> {
+            Integer newvalue = EntrainmentVolumePercentage.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+            EntrainmentVolumePercentage.getValueFactory().setValue(newvalue);
+        });
+        AmbienceVolumePercentage.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, new Double(Preferences.getPlaybackOptions().getAmbiencevolume() * 100).intValue()));
+        AmbienceVolumePercentage.setOnScroll(event -> {
+            Integer newvalue = AmbienceVolumePercentage.getValue();
+            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+            AmbienceVolumePercentage.getValueFactory().setValue(newvalue);
+        });
     // Advanced Tab
         DeleteAllSessionsProgressButton.setOnAction(event -> deleteallsessions());
         DeleteAllGoalsButton.setOnAction(event -> deleteallgoals());
@@ -175,13 +206,13 @@ public class ChangeProgramOptions extends StyledStage {
     }
     @Override
     public void close() {
-        Preferences.getCreationOptions().setScrollincrement(Integer.parseInt(ScrollIncrement.getText()));
-        if (FadeAnimation_PlaySwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_play_value(Double.parseDouble(FadeAnimation_PlayValue.getText()));}
-        if (FadeAnimation_StopSwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_stop_value(Double.parseDouble(FadeAnimation_StopValue.getText()));}
-        if (FadeAnimation_ResumeSwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_resume_value(Double.parseDouble(FadeAnimation_ResumeValue.getText()));}
-        if (FadeAnimation_PauseSwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_pause_value(Double.parseDouble(FadeAnimation_PauseValue.getText()));}
-        Preferences.getPlaybackOptions().setEntrainmentvolume(Double.parseDouble(EntrainmentVolumePercentage.getText()) / 100);
-        Preferences.getPlaybackOptions().setAmbiencevolume(Double.parseDouble(AmbienceVolumePercentage.getText()) / 100);
+        Preferences.getCreationOptions().setScrollincrement(ScrollIncrement.getValue());
+        if (FadeAnimation_PlaySwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_play_value(FadeAnimation_PlayValue.getValue());}
+        if (FadeAnimation_StopSwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_stop_value(FadeAnimation_StopValue.getValue());}
+        if (FadeAnimation_ResumeSwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_resume_value(FadeAnimation_ResumeValue.getValue());}
+        if (FadeAnimation_PauseSwitch.isSelected()) {Preferences.getPlaybackOptions().setAnimation_fade_pause_value(FadeAnimation_PauseValue.getValue());}
+        Preferences.getPlaybackOptions().setEntrainmentvolume((double) (EntrainmentVolumePercentage.getValue() / 100));
+        Preferences.getPlaybackOptions().setAmbiencevolume((double) AmbienceVolumePercentage.getValue() / 100);
         Preferences.marshall();
         super.close();
     }
