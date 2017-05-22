@@ -4,6 +4,8 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -27,7 +29,6 @@ import kujiin.ui.MainController;
 import kujiin.ui.boilerplate.IconImageView;
 import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
-import kujiin.ui.table.PlaylistTableItem;
 import kujiin.util.Util;
 import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.PlayerState;
@@ -1230,4 +1231,17 @@ public class Player extends Stage {
     }
     public void closedialog() {}
 
+
+    public static class PlaylistTableItem {
+        public StringProperty itemname;
+        public StringProperty duration;
+        public StringProperty percentcompleted;
+
+        public PlaylistTableItem(String itemname, String duration, String percentcompleted) {
+            this.itemname = new SimpleStringProperty(itemname);
+            this.duration = new SimpleStringProperty(duration);
+            this.percentcompleted = new SimpleStringProperty(percentcompleted);
+        }
+
+    }
 }

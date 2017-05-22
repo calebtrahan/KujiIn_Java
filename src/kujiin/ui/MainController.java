@@ -6,9 +6,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.Duration;
 import kujiin.ui.ambience.AvailableAmbienceEditor;
 import kujiin.ui.boilerplate.IconImageView;
@@ -21,10 +23,7 @@ import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.ui.export.Exporter;
 import kujiin.ui.playback.Player;
-import kujiin.ui.table.GoalDetailsTableItem;
-import kujiin.ui.table.GoalOverviewTableItem;
-import kujiin.ui.table.TableItem_Number_Name_Duration;
-import kujiin.ui.table.TableItem_Number_Name_Duration_Ambience;
+import kujiin.ui.table.*;
 import kujiin.util.Util;
 import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.ProgramState;
@@ -36,6 +35,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -133,20 +133,23 @@ public class MainController implements Initializable {
     public NumberAxis ProgressOverviewNumbersAxis;
     public CategoryAxis ProgressOverviewCategoryAxis;
     public TextField ProgressOverviewTotalTimePracticed;
-    public TextField ProgressOverviewItemWithMostProgress;
+    public AnchorPane ProgressBalanceAnchorPane;
     public PieChart ProgressBalancePieChart;
         // Session Browser Tab
-    public ListView<String> SessionBrowser_SelectSessionListView;
+    public TableView<SessionBrowserTableItem> PracticedSessionListTable;
+    public TableColumn<SessionBrowserTableItem, String> PracticedSessionListTable_DateColumn;
+    public TableColumn<SessionBrowserTableItem, String> PracticedSessionListTable_ItemsColumn;
+    public TableColumn<SessionBrowserTableItem, String> PracticedSessionListTable_DurationColumn;
     public CheckBox SessionBrowser_Filter_DateRange_From_Checkbox;
     public CheckBox SessionBrowser_Filter_DateRange_To_Checkbox;
     public CheckBox SessionBrowser_Filter_Duration_Min_Checkbox;
     public CheckBox SessionBrowser_Filter_Duration_Max_Checkbox;
     public DatePicker SessionBrowser_Filter_DateRange_From;
     public DatePicker SessionBrowser_Filter_DateRange_To;
-    public TextField SessionBrowser_Filter_Duration_From_Hours;
-    public TextField SessionBrowser_Filter_Duration_From_Minutes;
-    public TextField SessionBrowser_Filter_Duration_To_Hours;
-    public TextField SessionBrowser_Filter_Duration_To_Minutes;
+    public Spinner<Integer> SessionBrowser_Filter_Duration_From_Hours;
+    public Spinner<Integer> SessionBrowser_Filter_Duration_From_Minutes;
+    public Spinner<Integer> SessionBrowser_Filter_Duration_To_Hours;
+    public Spinner<Integer> SessionBrowser_Filter_Duration_To_Minutes;
     public TableView<TableItem_Number_Name_Duration> SessionBrowser_DetailsTable;
     public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_NumberColumn;
     public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_ItemColumn;
@@ -259,12 +262,12 @@ public class MainController implements Initializable {
         ProgressTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (ProgressTab.isSelected()) {
                 populateprogressoverviewchartandbalancepie();
-                populatesessionbrowserlistview();
+                populatesessionbrowsertable();
+                populatesessionbrowserfilter();
                 populatesessiondetailstable();
             }
         });
-        SessionBrowser_SelectSessionListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> populatesessiondetailstable());
-
+        PracticedSessionListTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> populatesessiondetailstable());
     }
     private void setupTables() {
         // Creation Table
@@ -274,6 +277,10 @@ public class MainController implements Initializable {
         CreatedTableAmbienceColumn.setCellValueFactory(cellData -> cellData.getValue().ambience);
         CreatedTableView.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> tableselectionchanged());
+        // Session Browser List Table
+        PracticedSessionListTable_DateColumn.setCellValueFactory(cellData -> cellData.getValue().date);
+        PracticedSessionListTable_ItemsColumn.setCellValueFactory(cellData -> cellData.getValue().items);
+        PracticedSessionListTable_DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
         // Session Browser Details Table
         SessionBrowser_DetailsTable_NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asString());
         SessionBrowser_DetailsTable_ItemColumn.setCellValueFactory(cellData -> cellData.getValue().name);
@@ -716,29 +723,29 @@ public class MainController implements Initializable {
             boolean displayinhours = false;
             if (averageduration.greaterThanOrEqualTo(Duration.hours(2.5))) {displayinhours = true;}
             int count = 0;
-            int highestdurationpracticedindex = -1;
             ObservableList<PieChart.Data> piechartvalues = FXCollections.observableArrayList();
             for (Duration i : sessionpartdurations) {
                 double time;
                 if (displayinhours) {time = i.toHours(); ProgressOverviewNumbersAxis.setLabel("Hours");}
                 else {time = i.toMinutes(); ProgressOverviewNumbersAxis.setLabel("Minutes");}
-                if (highestdurationpracticedindex == -1) {highestdurationpracticedindex = 0;}
-                else if (i.greaterThan(sessionpartdurations.get(count - 1))) {highestdurationpracticedindex = count;}
-                System.out.println(ALLNAMES.get(count) + "'s Practice Time Is " + i.toMinutes() + " Minutes");
                 series.getData().add(new XYChart.Data<>(ALLNAMES.get(count), time));
-                piechartvalues.add(new PieChart.Data(ALLNAMES.get(count), time));
+                if (i.greaterThan(Duration.ZERO)) {piechartvalues.add(new PieChart.Data(ALLNAMES.get(count), time));}
                 count++;
             }
             ProgressBalancePieChart.setData(piechartvalues);
-            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringSpelledOut(totaltimepracticed, ProgressOverviewTotalTimePracticed.getWidth()));
-            ProgressOverviewItemWithMostProgress.setText(ALLNAMES.get(highestdurationpracticedindex));
+            double total = 0;
+            for (PieChart.Data d : ProgressBalancePieChart.getData()) {total += d.getPieValue();}
+            for (final PieChart.Data data : ProgressBalancePieChart.getData()) {
+                String name = String.format("%s (%.1f%%)", data.getName(), 100 * data.getPieValue() / total);
+                data.setName(name);
+            }
+            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringSpelledOut(totaltimepracticed, ProgressOverviewTotalTimePracticed.getLayoutBounds().getWidth()));
             ProgressOverviewBarChart.getData().add(series);
             ProgressOverviewBarChart.setLegendVisible(false);
         }
     }
     // Session Browser Tab Methods
-    public void populatesessionbrowserlistview() {
-        ObservableList<String> sessionlist = FXCollections.observableArrayList();
+    public void populatesessionbrowsertable() {
         List<Session> allsessions = this.sessions.getSession();
         List<Session> filteredsessions = new ArrayList<>();
         if (allsessions == null) {allsessions = new ArrayList<>();}
@@ -752,25 +759,26 @@ public class MainController implements Initializable {
             Duration durationtotest = i.getSessionPracticedTime();
             if (SessionBrowser_Filter_Duration_Min_Checkbox.isSelected()) {
                 Duration minduration = Duration.ZERO;
-                minduration.add(Duration.hours(Integer.parseInt(SessionBrowser_Filter_Duration_From_Hours.getText())));
-                minduration.add(Duration.minutes(Integer.parseInt(SessionBrowser_Filter_Duration_From_Minutes.getText())));
+                minduration.add(Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue()));
+                minduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
                 if (durationtotest.lessThan(minduration)) {continue;}
             }
             if (SessionBrowser_Filter_Duration_Max_Checkbox.isSelected()) {
                 Duration maxduration = Duration.ZERO;
-                maxduration.add(Duration.hours(Integer.parseInt(SessionBrowser_Filter_Duration_To_Hours.getText())));
-                maxduration.add(Duration.minutes(Integer.parseInt(SessionBrowser_Filter_Duration_To_Minutes.getText())));
+                maxduration.add(Duration.hours(SessionBrowser_Filter_Duration_To_Hours.getValue()));
+                maxduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
                 if (durationtotest.lessThan(maxduration)) {continue;}
             }
             filteredsessions.add(i);
         }
+        ObservableList<SessionBrowserTableItem> sessionlist = FXCollections.observableArrayList();
         for (Session i : filteredsessions) {
-            sessionlist.add(String.format("%s (%s)", i.getDate_Practiced().format(Util.dateFormat), Util.formatdurationtoStringDecimalWithColons(i.getSessionPracticedTime())));
+            sessionlist.add(new SessionBrowserTableItem(i.getDate_Practiced().format(Util.dateFormat), String.valueOf(i.getPlaybackItems().size()), Util.formatdurationtoStringDecimalWithColons(i.getSessionPracticedTime())));
         }
-        SessionBrowser_SelectSessionListView.setItems(sessionlist);
+        PracticedSessionListTable.setItems(sessionlist);
     }
     public void populatesessiondetailstable() {
-        int index = SessionBrowser_SelectSessionListView.getSelectionModel().getSelectedIndex();
+        int index = PracticedSessionListTable.getSelectionModel().getSelectedIndex();
         SessionBrowser_DetailsTable.getItems().clear();
         SessionBrowser_Details_TotalDuration.setText(null);
         if (index != -1) {
@@ -785,27 +793,92 @@ public class MainController implements Initializable {
             SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(selectedsession.getSessionPracticedTime(), SessionBrowser_Details_TotalDuration.getWidth()));
         } else {SessionBrowser_DetailsTable.setPlaceholder(new Label("Select A Session To View Details"));}
     }
-    public void checkfilterdate_from() {
-        if (SessionBrowser_Filter_DateRange_To.getValue() != null) {
-            if (SessionBrowser_Filter_DateRange_To.getValue().isBefore(SessionBrowser_Filter_DateRange_From.getValue())) {
-                new InformationDialog(preferences, "Invalid Date", "From Date Must Be Before To Date", null, true);
-                SessionBrowser_Filter_DateRange_From.setValue(null);
-            }
+    // Filter
+    public void populatesessionbrowserfilter() {
+        double totalpracticetimeinminutes = sessions.gettotalpracticedtime().toMinutes();
+        Double hours = totalpracticetimeinminutes / 60.0;
+        Double minutes = totalpracticetimeinminutes - (hours * 60.0);
+        SessionBrowser_Filter_Duration_From_Hours.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
+        SessionBrowser_Filter_Duration_From_Hours.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Duration newfromduration = Duration.hours(new Double(newValue));
+            newfromduration = newfromduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
+            Duration toduration = Duration.hours(SessionBrowser_Filter_Duration_To_Hours.getValue());
+            toduration = toduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
+            if (newfromduration.greaterThanOrEqualTo(toduration)) {SessionBrowser_Filter_Duration_From_Hours.getValueFactory().setValue(oldValue);}
+            populatesessionbrowsertable();
+        });
+        SessionBrowser_Filter_Duration_From_Minutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0));
+        SessionBrowser_Filter_Duration_From_Minutes.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Duration newfromduration = Duration.minutes(new Double(newValue));
+            newfromduration = newfromduration.add(Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue()));
+            Duration toduration = Duration.hours(SessionBrowser_Filter_Duration_To_Hours.getValue());
+            toduration = toduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
+            if (newfromduration.greaterThanOrEqualTo(toduration)) {SessionBrowser_Filter_Duration_From_Minutes.getValueFactory().setValue(oldValue);}
+            populatesessionbrowsertable();
+        });
+        SessionBrowser_Filter_Duration_To_Hours.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, hours.intValue()));
+        SessionBrowser_Filter_Duration_To_Hours.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Duration newtoduration = Duration.hours(new Double(newValue));
+            newtoduration = newtoduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
+            Duration fromduration = Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue());
+            fromduration = fromduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
+            if (newtoduration.lessThanOrEqualTo(fromduration)) {SessionBrowser_Filter_Duration_To_Hours.getValueFactory().setValue(oldValue);}
+            populatesessionbrowsertable();
+        });
+        SessionBrowser_Filter_Duration_To_Minutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, minutes.intValue()));
+        SessionBrowser_Filter_Duration_To_Minutes.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Duration newtoduration = Duration.minutes(new Double(newValue));
+            newtoduration = newtoduration.add(Duration.hours(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
+            Duration fromduration = Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue());
+            fromduration = fromduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
+            if (newtoduration.lessThanOrEqualTo(fromduration)) {SessionBrowser_Filter_Duration_To_Minutes.getValueFactory().setValue(oldValue);}
+            populatesessionbrowsertable();
+        });
+        LocalDate mindate = null;
+        LocalDate maxdate = null;
+        for (Session i : sessions.getSession()) {
+            LocalDate sessiondate = i.getDate_Practiced();
+            if (mindate == null) {mindate = sessiondate;}
+            else if (sessiondate.isBefore(mindate)) {mindate = sessiondate;}
+            if (maxdate == null) {maxdate = sessiondate;}
+            else if (sessiondate.isAfter(maxdate)) {maxdate = sessiondate;}
         }
-    }
-    public void checkfilterdate_to() {
-        if (SessionBrowser_Filter_DateRange_From.getValue() != null) {
-            if (SessionBrowser_Filter_DateRange_From.getValue().isAfter(SessionBrowser_Filter_DateRange_To.getValue())) {
-                new InformationDialog(preferences, "Invalid Date", "To Date Must Be After From Date", null, true);
-                SessionBrowser_Filter_DateRange_To.setValue(null);
+        SessionBrowser_Filter_DateRange_From.setValue(mindate);
+        LocalDate finalMindate = mindate;
+        LocalDate finalMaxdate = maxdate;
+        SessionBrowser_Filter_DateRange_From.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+            @Override
+            public DateCell call(DatePicker param) {
+                return new DateCell() {
+                    @Override
+                    public void updateItem(LocalDate item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item.isBefore(finalMindate) || item.isAfter(finalMaxdate)) {
+                            setDisable(true);
+                            setStyle("-fx-background-color: #ffc0cb;");
+                        }
+                    }
+                };
             }
-        }
-    }
-    public void checkfilterduration_min() {
-
-    }
-    public void checkfilterduration_max() {
-
+        });
+        SessionBrowser_Filter_DateRange_To.setValue(maxdate);
+        SessionBrowser_Filter_DateRange_To.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+            @Override
+            public DateCell call(DatePicker param) {
+                return new DateCell() {
+                    @Override
+                    public void updateItem(LocalDate item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item.isAfter(finalMaxdate) || item.isBefore(finalMindate)) {
+                            setDisable(true);
+                            setStyle("-fx-background-color: #ffc0cb;");
+                        }
+                    }
+                };
+            }
+        });
+        SessionBrowser_Filter_DateRange_From.setOnAction(event -> populatesessionbrowsertable());
+        SessionBrowser_Filter_DateRange_To.setOnAction(event -> populatesessionbrowsertable());
     }
 
 

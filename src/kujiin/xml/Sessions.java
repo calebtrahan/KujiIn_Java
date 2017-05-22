@@ -82,11 +82,22 @@ public class Sessions {
             for (kujiin.xml.Session i : getSession()) {
                 for (PlaybackItem x : i.getPlaybackItems()) {
                     if (x.getCreationindex() == playbackItem.getCreationindex()) {
-                        totalduration = totalduration.add(new Duration(x.getExpectedDuration()));
+                        totalduration = totalduration.add(new Duration(x.getPracticeTime()));
                     }
                     if (includeqigong && ! (playbackItem.getCreationindex() == 0) && x.getCreationindex() == 0) {
-                        totalduration = totalduration.add(new Duration(x.getExpectedDuration()));
+                        totalduration = totalduration.add(new Duration(x.getPracticeTime()));
                     }
+                }
+            }
+            return totalduration;
+        } catch (NullPointerException ignored) {return Duration.ZERO;}
+    }
+    public Duration gettotalpracticedtime() {
+        try {
+            Duration totalduration = Duration.ZERO;
+            for (kujiin.xml.Session i : getSession()) {
+                for (PlaybackItem x : i.getPlaybackItems()) {
+                    totalduration = totalduration.add(new Duration(x.getExpectedDuration()));
                 }
             }
             return totalduration;

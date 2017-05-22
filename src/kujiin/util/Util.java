@@ -51,6 +51,7 @@ public class Util {
     }
     public static void custom_textfield_integer(TextField textField, int minvalue, int maxvalue, int increment) {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Listener 1");
             try {
                 if (newValue.matches("\\d*")) {
                     Integer value = Integer.parseInt(newValue);
