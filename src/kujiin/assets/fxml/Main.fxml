@@ -33,7 +33,7 @@
       </MenuBar>
       <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <tabs>
-            <Tab fx:id="PlayExportTab" text="Play/Export">
+            <Tab fx:id="PlayExportTab" text="Session Creator">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -41,12 +41,7 @@
                            <children>
                               <ToolBar prefHeight="41.0" prefWidth="600.0">
                                 <items>
-                                    <MenuButton fx:id="CreateSessionMenu" mnemonicParsing="false" text="Create New Session">
-                                      <items>
-                                        <MenuItem fx:id="CreateBlankSessionMenuItem" mnemonicParsing="false" onAction="#createblanksession" text="Blank Session" />
-                                        <MenuItem fx:id="OpenPresetsMenuItem" mnemonicParsing="false" onAction="#createwithpreset" text="Presets" />
-                                      </items>
-                                    </MenuButton>
+                                    <Button fx:id="CreateNewSessionButton" mnemonicParsing="false" onAction="#createnewsession" text="Create New Session" />
                                     <Button fx:id="OpenFileButton" mnemonicParsing="false" onAction="#opensessionfromfile" text="Open Session From File" />
                                     <Button fx:id="OpenRecentSessionsButton" mnemonicParsing="false" onAction="#openrecentsession" text="Recent Sessions" />
                                     <Button fx:id="OpenFavoritesButton" mnemonicParsing="false" onAction="#openfavoritesession" text="Favorite Sessions" />
@@ -56,10 +51,10 @@
                                  <children>
                                     <TableView fx:id="CreatedTableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                       <columns>
-                                        <TableColumn fx:id="CreatedTableNumberColumn" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" sortable="false" text="#" />
-                                        <TableColumn fx:id="CreatedTableItemColumn" minWidth="-1.0" prefWidth="213.0" resizable="false" sortable="false" text="Playback Item" />
-                                          <TableColumn fx:id="CreatedTableDurationColumn" prefWidth="223.0" resizable="false" sortable="false" text="Duration" />
-                                          <TableColumn fx:id="CreatedTableAmbienceColumn" prefWidth="222.0" resizable="false" sortable="false" text="Ambience" />
+                                        <TableColumn fx:id="CreatedTableNumberColumn" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="#" />
+                                        <TableColumn fx:id="CreatedTableItemColumn" minWidth="-1.0" prefWidth="225.0" resizable="false" sortable="false" text="Playback Item" />
+                                          <TableColumn fx:id="CreatedTableDurationColumn" prefWidth="225.0" resizable="false" sortable="false" text="Duration" />
+                                          <TableColumn fx:id="CreatedTableAmbienceColumn" prefWidth="225.0" resizable="false" sortable="false" text="Ambience" />
                                       </columns>
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -177,10 +172,10 @@
                                                                <children>
                                                                   <BarChart fx:id="ProgressOverviewBarChart" prefHeight="282.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
                                                                     <xAxis>
-                                                                      <CategoryAxis label="Playback Item" side="BOTTOM" />
+                                                                      <CategoryAxis fx:id="ProgressOverviewCategoryAxis" animated="false" side="LEFT" />
                                                                     </xAxis>
                                                                     <yAxis>
-                                                                      <NumberAxis label="Hours" side="LEFT" />
+                                                                      <NumberAxis fx:id="ProgressOverviewNumberAxis" label="Hours" side="TOP" />
                                                                     </yAxis>
                                                                   </BarChart>
                                                                   <GridPane prefHeight="24.0" prefWidth="600.0">

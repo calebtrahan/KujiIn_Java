@@ -197,4 +197,7 @@ public class Ambience {
         PlaybackHistory.add(soundFile);
     }
 
+// Utility Methods
+    public void resetplaycount() {currentplaycount = 0;}
+
 }

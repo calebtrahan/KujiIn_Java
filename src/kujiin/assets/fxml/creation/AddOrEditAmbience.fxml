@@ -7,9 +7,9 @@
    <children>
       <TableView fx:id="AddOrEditAmbienceTable" prefHeight="200.0" prefWidth="313.0">
         <columns>
-          <TableColumn fx:id="NumberColumn" prefWidth="45.0" sortable="false" text="#" />
-          <TableColumn fx:id="NameColumn" prefWidth="154.0" sortable="false" text="Name" />
-            <TableColumn fx:id="DurationColumn" prefWidth="156.0" sortable="false" text="Duration" />
+          <TableColumn fx:id="NumberColumn" minWidth="-Infinity" prefWidth="45.0" sortable="false" text="#" />
+          <TableColumn fx:id="NameColumn" minWidth="-Infinity" prefWidth="154.0" sortable="false" text="Name" />
+            <TableColumn fx:id="DurationColumn" minWidth="-Infinity" prefWidth="156.0" sortable="false" text="Duration" />
         </columns>
       </TableView>
       <HBox alignment="CENTER_LEFT" prefHeight="31.0" prefWidth="357.0">

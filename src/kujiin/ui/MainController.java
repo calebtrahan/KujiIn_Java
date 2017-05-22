@@ -4,9 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -44,15 +42,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static kujiin.xml.Preferences.*;
-// Presets Menu
-    // Kuji-In
-        // 5 Minutes | 10 Minutes | 15 Minutes | 30 Minutes | 1 Hour
-    // Elements
-        // 5 Minutes | 10 Minutes | 15 Minutes | 30 Minutes | 1 Hour
-    // Kuji-In & Elements
-        // 5 Minutes | 10 Minutes | 15 Minutes | 30 Minutes | 1 Hour
-
 // Bugs To Fix
+    // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
     // TODO End And Playback Same Session Is Causing Nullpointer Exception
     // TODO Find A Way To Reset Session After Stop Animation Ends
 
@@ -89,9 +80,7 @@ public class MainController implements Initializable {
     public MenuItem AboutMenuItem;
     // Play/Export Tab
     public Tab PlayExportTab;
-    public MenuButton CreateSessionMenu;
-    public MenuItem CreateBlankSessionMenuItem;
-    public MenuItem OpenPresetsMenuItem;
+    public Button CreateNewSessionButton;
     public Button OpenFileButton;
     public Button OpenRecentSessionsButton;
     public Button OpenFavoritesButton;
@@ -141,6 +130,8 @@ public class MainController implements Initializable {
     public Tab ProgressTab;
         // Overview Tab
     public BarChart<String, Number> ProgressOverviewBarChart;
+    public NumberAxis ProgressOverviewNumbersAxis;
+    public CategoryAxis ProgressOverviewCategoryAxis;
     public TextField ProgressOverviewTotalTimePracticed;
     public TextField ProgressOverviewItemWithMostProgress;
     public PieChart ProgressBalancePieChart;
@@ -299,7 +290,7 @@ public class MainController implements Initializable {
         IconDisplayType dt = preferences.getUserInterfaceOptions().getIconDisplayType();
         if (dt == IconDisplayType.ICONS_AND_TEXT || dt == IconDisplayType.ICONS_ONLY) {
             AddItemsMenu.setGraphic(new IconImageView(ICON_ADD, 20.0));
-            CreateSessionMenu.setGraphic(new IconImageView(ICON_ADD, 20.0));
+            CreateNewSessionButton.setGraphic(new IconImageView(ICON_ADD, 20.0));
             OpenFileButton.setGraphic(new IconImageView(ICON_OPENFILE, 20.0));
             OpenRecentSessionsButton.setGraphic(new IconImageView(ICON_RECENTSESSIONS, 20.0));
             ClearButton.setGraphic(new IconImageView(ICON_CLEARSESSION, 20.0));
@@ -317,7 +308,7 @@ public class MainController implements Initializable {
         if (dt == IconDisplayType.ICONS_ONLY) {
             AmbienceMenu.setText("");
             AddItemsMenu.setText("");
-            CreateSessionMenu.setText("");
+            CreateNewSessionButton.setText("");
             OpenFileButton.setText("");
             OpenRecentSessionsButton.setText("");
             OpenFavoritesButton.setText("");
@@ -335,7 +326,7 @@ public class MainController implements Initializable {
     }
     private void setupToolTips() {
         AddItemsMenu.setTooltip(new Tooltip("Add Items"));
-        CreateSessionMenu.setTooltip(new Tooltip("Create New Session"));
+        CreateNewSessionButton.setTooltip(new Tooltip("Create New Session"));
         OpenFileButton.setTooltip(new Tooltip("Open Session From File"));
         OpenRecentSessionsButton.setTooltip(new Tooltip("Open Recent Session"));
         OpenFavoritesButton.setTooltip(new Tooltip("Open Favorites"));
@@ -382,7 +373,7 @@ public class MainController implements Initializable {
 
 // Play/Export Tab
     // Create/Open Toolbar Methods
-    public void createblanksession() {
+    public void createnewsession() {
         if (createdsession != null && sessions.getSession().isEmpty() && getAvailableAmbiences().completelyempty()) {
             if (new ConfirmationDialog(getPreferences(), "Add Available Ambience", "There Is No Available Ambience For Any Playback Items", "Open Ambience Editor To Add Ambience?", true).getResult()) {
                 AmbienceEditor_Simple ambienceEditor_simple = new AmbienceEditor_Simple(availableAmbiences, getPreferences());
@@ -393,8 +384,7 @@ public class MainController implements Initializable {
         if (createdsession != null && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
         createdsession = new Session();
         populatetable();
-    }
-    public void createwithpreset() {
+        AddItemsMenu.requestFocus();
     }
     public void opensessionfromfile() {
         File filetoload;
@@ -407,6 +397,7 @@ public class MainController implements Initializable {
                 Unmarshaller createMarshaller = context.createUnmarshaller();
                 createdsession = (Session) createMarshaller.unmarshal(filetoload);
                 populatetable();
+                PlayButton.requestFocus();
             } catch (JAXBException e) {
                 new ErrorDialog(preferences, "Invalid File", "'" + filetoload.getName() + "' Isn't A Valid Session File", "Select A Valid Session To Load", true);
             }
@@ -423,6 +414,7 @@ public class MainController implements Initializable {
             }
             createdsession = null;
             populatetable();
+            PlayButton.requestFocus();
         }
         SelectASession selectASession = new SelectASession(preferences, sessions);
         selectASession.initModality(Modality.APPLICATION_MODAL);
@@ -450,6 +442,7 @@ public class MainController implements Initializable {
         if (selectASession.isAccepted()) {
             createdsession = selectASession.getSelectedsession();
             populatetable();
+            PlayButton.requestFocus();
         }
 
     }
@@ -578,6 +571,7 @@ public class MainController implements Initializable {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1 && createdtableselecteditem != null) {
             CustomizeAmbience customizeAmbience = new CustomizeAmbience(preferences, createdtableselecteditem, availableAmbiences);
+            customizeAmbience.initModality(Modality.APPLICATION_MODAL);
             customizeAmbience.showAndWait();
             if (customizeAmbience.isAccepted()) {
                 createdtableplaybackitems.set(createdtableplaybackitems.indexOf(createdtableselecteditem), customizeAmbience.getPlaybackItem());
@@ -710,23 +704,29 @@ public class MainController implements Initializable {
             Duration totaltimepracticed = Duration.ZERO;
             for (int i = 0; i<15; i++) {sessionpartdurations.add(Duration.ZERO);}
             for (Session i : sessions.getSession()) {
-                for (int x = 0; x<15; x++) {
-                    if (i.getplaybackitem(x).getExpectedDuration() > 0.0) {
-                        Duration duration = sessionpartdurations.get(x);
-                        duration = duration.add(Duration.millis(i.getplaybackitem(x).getExpectedDuration()));
-                        sessionpartdurations.set(x, duration);
+                for (PlaybackItem x : i.getPlaybackItems()) {
+                    if (x.getPracticeTime() > 0.0) {
+                        Duration duration = sessionpartdurations.get(x.getCreationindex()).add(new Duration(x.getPracticeTime()));
+                        sessionpartdurations.set(x.getCreationindex(), duration);
                     }
                 }
                 totaltimepracticed = totaltimepracticed.add(i.getSessionPracticedTime());
             }
+            Duration averageduration = new Duration(totaltimepracticed.toMillis() / 15);
+            boolean displayinhours = false;
+            if (averageduration.greaterThanOrEqualTo(Duration.hours(2.5))) {displayinhours = true;}
             int count = 0;
             int highestdurationpracticedindex = -1;
             ObservableList<PieChart.Data> piechartvalues = FXCollections.observableArrayList();
             for (Duration i : sessionpartdurations) {
+                double time;
+                if (displayinhours) {time = i.toHours(); ProgressOverviewNumbersAxis.setLabel("Hours");}
+                else {time = i.toMinutes(); ProgressOverviewNumbersAxis.setLabel("Minutes");}
                 if (highestdurationpracticedindex == -1) {highestdurationpracticedindex = 0;}
                 else if (i.greaterThan(sessionpartdurations.get(count - 1))) {highestdurationpracticedindex = count;}
-                series.getData().add(new XYChart.Data<>(ALLNAMES.get(count), i.toHours()));
-                piechartvalues.add(new PieChart.Data(ALLNAMES.get(count), i.toHours()));
+                System.out.println(ALLNAMES.get(count) + "'s Practice Time Is " + i.toMinutes() + " Minutes");
+                series.getData().add(new XYChart.Data<>(ALLNAMES.get(count), time));
+                piechartvalues.add(new PieChart.Data(ALLNAMES.get(count), time));
                 count++;
             }
             ProgressBalancePieChart.setData(piechartvalues);
@@ -778,7 +778,7 @@ public class MainController implements Initializable {
             ObservableList<TableItem_Number_Name_Duration> sessionitems = FXCollections.observableArrayList();
             int count = 1;
             for (PlaybackItem i : selectedsession.getPlaybackItems()) {
-                sessionitems.add(new TableItem_Number_Name_Duration(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getExpectedDuration()))));
+                sessionitems.add(new TableItem_Number_Name_Duration(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getPracticeTime()))));
                 count++;
             }
             SessionBrowser_DetailsTable.setItems(sessionitems);

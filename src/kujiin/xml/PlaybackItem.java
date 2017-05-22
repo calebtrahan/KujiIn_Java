@@ -1,6 +1,5 @@
 package kujiin.xml;
 
-import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import kujiin.util.Util;
 import kujiin.util.enums.ReferenceType;
@@ -36,7 +35,7 @@ public class PlaybackItem {
         ambience = new Ambience();
     }
 
-    // Getters And Setters
+// Getters And Setters
     public int getCreationindex() {
         return creationindex;
     }
@@ -98,7 +97,7 @@ public class PlaybackItem {
         this.ambience = ambience;
     }
 
-    // Utility Methods
+// Utility Methods
     public void addelapsedtime(Duration duration) {
         PracticeTime = PracticeTime + duration.toMillis();}
     public void addCompletedGoal(Goals.Goal Goal) {
@@ -107,9 +106,8 @@ public class PlaybackItem {
         GoalsCompletedThisSession.add(Goal);
     }
     public boolean isValid() {return javafx.util.Duration.seconds(ExpectedDuration).greaterThan(javafx.util.Duration.ZERO);}
-    public Tooltip getTooltip() {return new Tooltip(toString());}
 
-    // Reference
+// Reference
     public File getReferenceFile(ReferenceType referenceType) {
         switch (referenceType) {
             case html: {
@@ -122,13 +120,6 @@ public class PlaybackItem {
                 return null;
         }
     }
-
-    // String Methods
-    @Override
-    public String toString() {
-        return Name;
-    }
-    public String getNameforFiles() {return Name.toLowerCase();}
 
     enum PlaybackItemType {
         QIGONG, CUT, ELEMENT

@@ -353,64 +353,66 @@ public class Player extends Stage {
         PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle);
         StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
 //        ReferenceControls.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
-        String playbuttontext;
-        String pausebuttontext;
-        String stopbuttontext;
-        switch (playerState) {
-            case IDLE:
-                playbuttontext = "Start";
-                pausebuttontext = "Pause";
-                stopbuttontext = "Stop";
-                break;
-            case PLAYING:
-                playbuttontext = "Playing";
-                pausebuttontext = "Pause";
-                stopbuttontext = "Stop";
-                break;
-            case PAUSED:
-                playbuttontext = "Resume";
-                pausebuttontext = "Paused";
-                stopbuttontext = "Stop";
-                break;
-            case STOPPED:
-                playbuttontext = "Play";
-                pausebuttontext = "Stopped";
-                stopbuttontext = "Stopped";
-                break;
-            case TRANSITIONING:
-                playbuttontext = "Transitioning";
-                pausebuttontext = "Transitioning";
-                stopbuttontext = "Transitioning";
-                break;
-            case FADING_PLAY:
-                playbuttontext = "Starting";
-                pausebuttontext = "Starting";
-                stopbuttontext = "Starting";
-                break;
-            case FADING_RESUME:
-                playbuttontext = "Resuming";
-                pausebuttontext = "Resuming";
-                stopbuttontext = "Resuming";
-                break;
-            case FADING_PAUSE:
-                playbuttontext = "Pausing";
-                pausebuttontext = "Pausing";
-                stopbuttontext = "Pausing";
-                break;
-            case FADING_STOP:
-                playbuttontext = "Stopping";
-                pausebuttontext = "Stopping";
-                stopbuttontext = "Stopping";
-                break;
-            default:
-                playbuttontext = "";
-                pausebuttontext = "";
-                stopbuttontext = "";
-                break;
+        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
+            String playbuttontext;
+            String pausebuttontext;
+            String stopbuttontext;
+            switch (playerState) {
+                case IDLE:
+                    playbuttontext = "Start";
+                    pausebuttontext = "Pause";
+                    stopbuttontext = "Stop";
+                    break;
+                case PLAYING:
+                    playbuttontext = "Playing";
+                    pausebuttontext = "Pause";
+                    stopbuttontext = "Stop";
+                    break;
+                case PAUSED:
+                    playbuttontext = "Resume";
+                    pausebuttontext = "Paused";
+                    stopbuttontext = "Stop";
+                    break;
+                case STOPPED:
+                    playbuttontext = "Play";
+                    pausebuttontext = "Stopped";
+                    stopbuttontext = "Stopped";
+                    break;
+                case TRANSITIONING:
+                    playbuttontext = "Transitioning";
+                    pausebuttontext = "Transitioning";
+                    stopbuttontext = "Transitioning";
+                    break;
+                case FADING_PLAY:
+                    playbuttontext = "Starting";
+                    pausebuttontext = "Starting";
+                    stopbuttontext = "Starting";
+                    break;
+                case FADING_RESUME:
+                    playbuttontext = "Resuming";
+                    pausebuttontext = "Resuming";
+                    stopbuttontext = "Resuming";
+                    break;
+                case FADING_PAUSE:
+                    playbuttontext = "Pausing";
+                    pausebuttontext = "Pausing";
+                    stopbuttontext = "Pausing";
+                    break;
+                case FADING_STOP:
+                    playbuttontext = "Stopping";
+                    pausebuttontext = "Stopping";
+                    stopbuttontext = "Stopping";
+                    break;
+                default:
+                    playbuttontext = "";
+                    pausebuttontext = "";
+                    stopbuttontext = "";
+                    break;
+            }
+            PlayButton.setText(playbuttontext);
+            PauseButton.setText(pausebuttontext);
+            StopButton.setText(stopbuttontext);
         }
-        PlayButton.setText(playbuttontext);
-        PauseButton.setText(pausebuttontext);
-        StopButton.setText(stopbuttontext);
 //        if (referencecurrentlyDisplayed()) {
 //            root.getSessionCreator().getDisplayReference().PlayButton.setText(playbuttontext);
 //            root.getSessionCreator().getDisplayReference().PauseButton.setText(pausebuttontext);
@@ -489,7 +491,8 @@ public class Player extends Stage {
         if (selectedPlaybackItem.getAmbience().isEnabled()) {
             currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume();
             volume_unbindambience();
-            currentambiencesoundfile = selectedPlaybackItem.getAmbience().get(0);
+            selectedPlaybackItem.getAmbience().resetplaycount();
+            currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextambienceforplayback();
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setVolume(0.0);
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
@@ -697,13 +700,20 @@ public class Player extends Stage {
     }
     public void reset(boolean endofsession) {
         if (endofsession) {
-            PlayButton.setText("Replay");
-            PauseButton.setText("Stop");
+            PlayButton.setTooltip(new Tooltip("Replay"));
+            if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
+                PlayButton.setText("Replay");
+                PauseButton.setText("Pause");
+                StopButton.setText("Stop");
+            }
             PauseButton.setDisable(true);
-            StopButton.setText("Stop");
             StopButton.setDisable(true);
         }
-        else {PlayButton.setText("Start");}
+        else {
+            if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
+                PlayButton.setText("Start");
+            }
+        }
         SessionProgress.setProgress(0.0);
         SessionProgressPercentage.setText("0.0%");
         SessionProgress.setDisable(true);

@@ -99,6 +99,9 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
             if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
             else {setTitle("Customize Ambience"); populatetable();}
             AddOrEditAmbienceTable.setPlaceholder(new Label("No Ambience For " + playbackItem.getName()));
+//            NumberColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(1 / 5));
+//            NameColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(3 / 5));
+//            DurationColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(1 / 5));
         } catch (IOException e) {e.printStackTrace();}
     }
 
