@@ -38,7 +38,7 @@ public class Main extends Application {
         root.setAvailableAmbiences(new AvailableAmbiences(root));
         root.setAvailableEntrainments(new AvailableEntrainments(root));
         root.setRampFiles(new RampFiles(root));
-        root.setGoals(new Goals(root));
+        root.setAllGoals(new AllGoals(root));
         AudioChecksDialog audioChecksDialog = new AudioChecksDialog(root);
         audioChecksDialog.initModality(Modality.APPLICATION_MODAL);
         audioChecksDialog.initOwner(primaryStage);

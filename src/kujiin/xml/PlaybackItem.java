@@ -25,6 +25,8 @@ public class PlaybackItem {
     private PlaybackItemEntrainment playbackItemEntrainment;
     private PlaybackItemType playbackItemType;
     @XmlTransient
+    private Duration totalpracticetime;
+    @XmlTransient
     private ArrayList<Goal> GoalsCompletedThisSession;
 
     public PlaybackItem() {}
@@ -96,16 +98,24 @@ public class PlaybackItem {
     public void setAmbience(Ambience ambience) {
         this.ambience = ambience;
     }
+    public Duration getTotalpracticetime() {
+        return totalpracticetime;
+    }
 
 // Utility Methods
     public void addelapsedtime(Duration duration) {
-        PracticeTime = PracticeTime + duration.toMillis();}
+        PracticeTime = PracticeTime + duration.toMillis();
+        totalpracticetime = totalpracticetime.add(duration);
+    }
     public void addCompletedGoal(Goal Goal) {
         if (GoalsCompletedThisSession == null) {
             GoalsCompletedThisSession = new ArrayList<>();}
         GoalsCompletedThisSession.add(Goal);
     }
     public boolean isValid() {return javafx.util.Duration.seconds(ExpectedDuration).greaterThan(javafx.util.Duration.ZERO);}
+    public void calculatetotalpracticetime(Sessions sessions) {
+        totalpracticetime = sessions.gettotalpracticedtime(this, false);
+    }
 
 // Reference
     public File getReferenceFile(ReferenceType referenceType) {

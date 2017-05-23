@@ -8,11 +8,11 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
+import kujiin.xml.AllGoals;
 import kujiin.xml.Goal;
-import kujiin.xml.Goals;
+import kujiin.xml.PlaybackItemGoals;
 
 import java.io.IOException;
-import java.util.List;
 
 public class SetNewGoalDialog extends StyledStage {
     public Label TopLabel;
@@ -20,22 +20,21 @@ public class SetNewGoalDialog extends StyledStage {
     public Spinner<Integer> MinutesSpinner;
     public Button AcceptButton;
     public Button CancelButton;
-    private List<Goal> playbackitemgoals;
     private Goal setgoal;
 
-    public SetNewGoalDialog(Goals goals, int playbackitemindex, String playbackitemname) {
+    public SetNewGoalDialog(AllGoals allGoals, int playbackitemindex, String playbackitemname) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/goals/SetGoalDialog.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setResizable(false);
-            playbackitemgoals = goals.getplaybackItemGoals(playbackitemindex);
-            Goal currrentgoal = goals.getCurrentGoal(playbackitemindex);
+            PlaybackItemGoals playbackitemgoals = allGoals.getplaybackItemGoals(playbackitemindex);
+            Goal currrentgoal = playbackitemgoals.getCurrentGoal();
             Duration minduration = null;
             int initialhours = 0;
             int initialminutes = 0;
-            if (playbackitemgoals != null && currrentgoal != null) {
+            if (currrentgoal != null) {
                 minduration = currrentgoal.getDuration();
                 double minutes = minduration.toMinutes();
                 double hours = minutes / 60;
@@ -69,7 +68,7 @@ public class SetNewGoalDialog extends StyledStage {
                 MinutesSpinner.getValueFactory().setValue(newvalue);
             });
             TopLabel.setText("Set A New Goal For " + playbackitemname);
-        } catch (IOException e) {}
+        } catch (IOException e) {e.printStackTrace();}
     }
 
     public Goal getSetgoal() {

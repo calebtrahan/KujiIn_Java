@@ -43,8 +43,13 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static kujiin.xml.Preferences.*;
+
+
+// Priorities
+    // TODO Figure Out When EndOfSession And Goal Dialog Aren't Showing At End Of Session
+    // TODO Calculate Fade Animations Dynamically With PlaybackItem Duration
+
 // Bugs To Fix
-    // TODO
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
     // TODO End And Playback Same Session Is Causing Nullpointer Exception
     // TODO Find A Way To Reset Session After Stop Animation Ends
@@ -71,7 +76,7 @@ public class MainController implements Initializable {
     private RampFiles RampFiles;
     private Sessions sessions;
     private FavoriteSessions favoriteSessions;
-    private Goals goals;
+    private AllGoals allGoals;
     private ProgramState programState = ProgramState.IDLE;
 // GUI Fields
     // Top Menu
@@ -157,7 +162,7 @@ public class MainController implements Initializable {
     public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_ItemColumn;
     public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_TimePracticedColumn;
     public TextField SessionBrowser_Details_TotalDuration;
-    // Goals Pane
+    // AllGoals Pane
     public Tab GoalsTab;
     public TabPane GoalsTabPane;
     public Tab GoalsOverviewTab;
@@ -236,11 +241,11 @@ public class MainController implements Initializable {
     public kujiin.xml.RampFiles getRampFiles() {
         return RampFiles;
     }
-    public Goals getGoals() {
-        return goals;
+    public AllGoals getAllGoals() {
+        return allGoals;
     }
-    public void setGoals(Goals goals) {
-        this.goals = goals;
+    public void setAllGoals(AllGoals allGoals) {
+        this.allGoals = allGoals;
     }
 
 // Window Methods
@@ -589,6 +594,7 @@ public class MainController implements Initializable {
                         createdtableselecteditem.getAmbience().setEnabled(false);
                     }
                 }
+                createdsession.calculateexpectedduration();
                 populatetable();
                 syncbuttons();
             }
@@ -686,7 +692,7 @@ public class MainController implements Initializable {
     public void playcreatedsession() {
         if (createdsession != null) {
             getStage().setIconified(true);
-            Player player = new Player(this, sessions, createdsession);
+            Player player = new Player(this, sessions, allGoals, createdsession);
             player.initModality(Modality.APPLICATION_MODAL);
             player.showAndWait();
             getStage().setIconified(false);
@@ -732,10 +738,11 @@ public class MainController implements Initializable {
         else {CreatedTableView.setPlaceholder(new Label("Session Is Empty"));}
     }
 
-
 // Progress Tab
     // Overview Tab Methods
     public void populateprogressoverviewchartandbalancepie() {
+        ProgressBalancePieChart.getData().clear();
+        ProgressOverviewBarChart.getData().clear();
         if (sessions.getSession() != null) {
             if (sessions.getSession().isEmpty()) {return;}
             XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -934,7 +941,7 @@ public class MainController implements Initializable {
     }
 
 
-// Goals Tab
+// AllGoals Tab
     // Overview Tab Methods
     private void populategoalsoverviewtable() {
         GoalsOverview_Table.getItems().clear();
@@ -948,7 +955,7 @@ public class MainController implements Initializable {
             PlaybackItem playbackItem = demosession.getplaybackitem(i);
             Duration practicedduration = sessions.gettotalpracticedtime(playbackItem, false);
             practicedtime = Util.formatdurationtoStringDecimalWithColons(practicedduration);
-            Goal goal = goals.getCurrentGoal(i);
+            Goal goal = allGoals.getplaybackItemGoals(i).getCurrentGoal();
             if (goal == null) {
                 currentgoal = "None";
                 percentcompleted = "-";
@@ -958,7 +965,7 @@ public class MainController implements Initializable {
                 percentcompleted = String.format("%.2f", (practicedduration.toMillis() / goal.getDuration().toMillis()) * 100) + "%";
             }
             int completedgoalcount = 0;
-            List<Goal> goallist = goals.getplaybackItemGoals(GoalsOverview_Table.getSelectionModel().getSelectedIndex());
+            List<Goal> goallist = allGoals.getplaybackItemGoals(i).getGoals();
             if (goallist != null) {
                 for (Goal x : goallist) {if (x.getCompleted()) {completedgoalcount++;}}
             }
@@ -984,7 +991,7 @@ public class MainController implements Initializable {
             PlaybackItem playbackItem = dummysession.getplaybackitem(index);
             GoalsIndividual_PracticedTime.setText(Util.formatdurationtoStringSpelledOut(sessions.gettotalpracticedtime(playbackItem, false), GoalsIndividual_PracticedTime.getWidth()));
             ObservableList<GoalDetailsTableItem> tableitems = FXCollections.observableArrayList();
-            List<Goal> goalList = goals.getplaybackItemGoals(index);
+            List<Goal> goalList = allGoals.getplaybackItemGoals(index).getGoals();
             if (goalList != null && ! goalList.isEmpty()) {
                 for (Goal i :goalList) {
                     if (! GoalsIndividual_ShowCompletedGoalsCheckbox.isSelected() && i.getCompleted()) {continue;}
@@ -1005,13 +1012,13 @@ public class MainController implements Initializable {
         } else {GoalsIndividual_Table.setPlaceholder(new Label("Select A Playback Item To View Goals"));}
     }
     private void setnewgoal(int playbackitemindex, String playbackitemname) {
-        SetNewGoalDialog setNewGoalDialog = new SetNewGoalDialog(goals, playbackitemindex, playbackitemname);
+        SetNewGoalDialog setNewGoalDialog = new SetNewGoalDialog(allGoals, playbackitemindex, playbackitemname);
         setNewGoalDialog.initModality(Modality.APPLICATION_MODAL);
         setNewGoalDialog.showAndWait();
         if (setNewGoalDialog.getSetgoal() != null) {
-            List<Goal> goalslist = goals.getplaybackItemGoals(playbackitemindex);
-            goalslist.add(setNewGoalDialog.getSetgoal());
-            goals.set(playbackitemindex, goalslist);
+            PlaybackItemGoals playbackItemGoals = allGoals.getplaybackItemGoals(playbackitemindex);
+            playbackItemGoals.add(setNewGoalDialog.getSetgoal());
+            allGoals.setPlaybackItemGoals(playbackitemindex, playbackItemGoals);
         }
     }
     public void setnewgoalfromdetailstab() {
@@ -1028,8 +1035,12 @@ public class MainController implements Initializable {
         if (new ConfirmationDialog(preferences, "Delete Goal", "This Will Permanently Delete This Goal", "Continue?").getResult()) {
             int tableindex = GoalsIndividual_Table.getSelectionModel().getSelectedIndex();
             int choiceboxindex = GoalsIndividual_SelectedSessionItemChoiceBox.getSelectionModel().getSelectedIndex();
-            Goal goal = goals.getGoalsForPlaybackItem(choiceboxindex, true, GoalsIndividual_ShowCompletedGoalsCheckbox.isSelected()).get(tableindex);
-            goals.remove(choiceboxindex, goal);
+            Goal goal;
+            if (! GoalsIndividual_ShowCompletedGoalsCheckbox.isSelected()) {goal = allGoals.getplaybackItemGoals(choiceboxindex).getCurrentGoals().get(tableindex);}
+            else {goal = allGoals.getplaybackItemGoals(choiceboxindex).getGoals().get(tableindex);}
+            PlaybackItemGoals playbackItemGoals = allGoals.getplaybackItemGoals(choiceboxindex);
+            playbackItemGoals.remove(goal);
+            allGoals.setPlaybackItemGoals(choiceboxindex, playbackItemGoals);
             populategoalsdetailstable();
         }
     }

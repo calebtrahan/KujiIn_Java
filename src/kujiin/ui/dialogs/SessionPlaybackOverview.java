@@ -495,9 +495,9 @@ public class SessionPlaybackOverview {
 //                    break;
 //            }
 //        }
-//        // Check Goals
+//        // Check AllGoals
 //        if (! indexesmissinggoals.isEmpty()) {
-//            if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", indexesmissinggoals.size() + " Session Parts Are Missing Goals", "Continue Playing Session Without Goals?",
+//            if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", indexesmissinggoals.size() + " Session Parts Are Missing AllGoals", "Continue Playing Session Without AllGoals?",
 //                    "Yes", "No").getResult()) {
 //                return;
 //            }

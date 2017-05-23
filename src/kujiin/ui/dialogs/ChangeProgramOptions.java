@@ -135,7 +135,7 @@ public class ChangeProgramOptions extends StyledStage {
 //        FadeOutValue.setTooltip(new Tooltip("Seconds To Fade Out Audio Out Of Session Part"));
 //        EntrainmentVolumePercentage.setTooltip(new Tooltip("Default Volume Percentage For PlaybackItemEntrainment (Changeable In Session)"));
 //        AmbienceVolumePercentage.setTooltip(new Tooltip("Default Volume Percentage For Ambience (Changeable In Session)"));
-//        DeleteAllGoalsButton.setTooltip(new Tooltip("Delete ALL Goals Past, Present And Completed (This CANNOT Be Undone)"));
+//        DeleteAllGoalsButton.setTooltip(new Tooltip("Delete ALL AllGoals Past, Present And Completed (This CANNOT Be Undone)"));
 //        DeleteAllSessionsProgressButton.setTooltip((new Tooltip("Delete ALL Sessions Past, Present And Completed (This CANNOT Be Undone)")));
     }
     public void setuplisteners() {
@@ -309,7 +309,7 @@ public class ChangeProgramOptions extends StyledStage {
 }
     public void deleteallgoals() {
         if (new ConfirmationDialog(Preferences, "Confirmation", null, "This Will Permanently And Irreversible Delete All Goals Completed And Current", "Delete", "Cancel").getResult()) {
-            if (! kujiin.xml.Preferences.SESSIONSXMLFILE.delete()) {new ErrorDialog(Preferences, "Error", "Couldn't Delete Goals File", "Check File Permissions For: " + kujiin.xml.Preferences.GOALSXMLFILE.getAbsolutePath());}
+            if (! kujiin.xml.Preferences.SESSIONSXMLFILE.delete()) {new ErrorDialog(Preferences, "Error", "Couldn't Delete AllGoals File", "Check File Permissions For: " + kujiin.xml.Preferences.GOALSXMLFILE.getAbsolutePath());}
             else {new InformationDialog(Preferences, "Success", null, "Successfully Deleted All Goals");}
         }
     }

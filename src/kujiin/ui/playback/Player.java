@@ -29,6 +29,7 @@ import kujiin.ui.MainController;
 import kujiin.ui.boilerplate.IconImageView;
 import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.goals.GoalsCompletedDialog;
 import kujiin.util.Util;
 import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.PlayerState;
@@ -57,7 +58,7 @@ public class Player extends Stage {
     public TableColumn<PlaylistTableItem, String> NameColumn;
     public TableColumn<PlaylistTableItem, String> DurationColumn;
     public TableColumn<PlaylistTableItem, String> PercentColumn;
-    // Goals Progress
+    // AllGoals Progress
     public Label GoalTopLabel;
     public Label SessionPartElapsedTime;
     public ProgressBar CurrentGoalProgress;
@@ -97,11 +98,13 @@ public class Player extends Stage {
     private SoundFile currentambiencesoundfile;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
+// Goals
+    private Duration totalpracticedtime;
 // Class Objects
     private Session SessionTemplate;
     private Session SessionInProgress;
     private PlaybackItem selectedPlaybackItem;
-    private Goals Goals;
+    private AllGoals AllGoals;
     private AvailableEntrainments availableEntrainments;
     private RampFiles rampfiles;
     private Sessions sessions;
@@ -128,14 +131,17 @@ public class Player extends Stage {
         }
     };
 
-    public Player(MainController Root, Sessions sessions, Session sessiontoplay) {
+    public Player(MainController Root, Sessions sessions, AllGoals allGoals, Session sessiontoplay) {
         try {
             Preferences = Root.getPreferences();
             SessionTemplate = sessiontoplay;
+            for (PlaybackItem i : SessionTemplate.getPlaybackItems()) {i.calculatetotalpracticetime(sessions);}
             SessionInProgress = SessionTemplate;
             availableEntrainments = Root.getAvailableEntrainments();
             rampfiles = Root.getRampFiles();
             this.sessions = sessions;
+            AllGoals = allGoals;
+            totalpracticedtime = sessions.gettotalpracticedtime();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/playback/Player.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -318,7 +324,10 @@ public class Player extends Stage {
         if (p == PLAYING || p == FADING_PLAY || p == FADING_PAUSE || p == FADING_RESUME || p == FADING_STOP) {
             try {
                 selectedPlaybackItem.addelapsedtime(updateuifrequency);
+                AllGoals.calculateifPlaybackItemgoalscompleted(selectedPlaybackItem.getCreationindex(), selectedPlaybackItem.getTotalpracticetime());
                 SessionInProgress.addelapseduration(updateuifrequency);
+                totalpracticedtime = totalpracticedtime.add(updateuifrequency);
+                AllGoals.calculateifTotalGoalsCompleted(totalpracticedtime);
                 updateplaylist();
             // Update Total Progress
                 SessionCurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionPracticedTime()));
@@ -376,34 +385,34 @@ public class Player extends Stage {
                     break;
                 case STOPPED:
                     playbuttontext = "Play";
-                    pausebuttontext = "Stopped";
+                    pausebuttontext = "Pause";
                     stopbuttontext = "Stopped";
                     break;
-                case TRANSITIONING:
-                    playbuttontext = "Transitioning";
-                    pausebuttontext = "Transitioning";
-                    stopbuttontext = "Transitioning";
-                    break;
-                case FADING_PLAY:
-                    playbuttontext = "Starting";
-                    pausebuttontext = "Starting";
-                    stopbuttontext = "Starting";
-                    break;
-                case FADING_RESUME:
-                    playbuttontext = "Resuming";
-                    pausebuttontext = "Resuming";
-                    stopbuttontext = "Resuming";
-                    break;
-                case FADING_PAUSE:
-                    playbuttontext = "Pausing";
-                    pausebuttontext = "Pausing";
-                    stopbuttontext = "Pausing";
-                    break;
-                case FADING_STOP:
-                    playbuttontext = "Stopping";
-                    pausebuttontext = "Stopping";
-                    stopbuttontext = "Stopping";
-                    break;
+//                case TRANSITIONING:
+//                    playbuttontext = "Transitioning";
+//                    pausebuttontext = "Transitioning";
+//                    stopbuttontext = "Transitioning";
+//                    break;
+//                case FADING_PLAY:
+//                    playbuttontext = "Starting";
+//                    pausebuttontext = "Starting";
+//                    stopbuttontext = "Starting";
+//                    break;
+//                case FADING_RESUME:
+//                    playbuttontext = "Resuming";
+//                    pausebuttontext = "Resuming";
+//                    stopbuttontext = "Resuming";
+//                    break;
+//                case FADING_PAUSE:
+//                    playbuttontext = "Pausing";
+//                    pausebuttontext = "Pausing";
+//                    stopbuttontext = "Pausing";
+//                    break;
+//                case FADING_STOP:
+//                    playbuttontext = "Stopping";
+//                    pausebuttontext = "Stopping";
+//                    stopbuttontext = "Stopping";
+//                    break;
                 default:
                     playbuttontext = "";
                     pausebuttontext = "";
@@ -728,6 +737,7 @@ public class Player extends Stage {
         StopButton.setDisable(true);
     }
     public void endofsession() {
+        System.out.println("Called End Of Session");
         updateuitimeline.stop();
         updateuitimeline.setOnFinished(event -> reset(false));
         playerState = STOPPED;
@@ -740,6 +750,11 @@ public class Player extends Stage {
         SessionComplete sessionComplete = new SessionComplete(SessionInProgress, true);
         sessionComplete.initModality(Modality.APPLICATION_MODAL);
         sessionComplete.showAndWait();
+        if (AllGoals.goalscompletedthissession()) {
+            GoalsCompletedDialog goalsCompletedDialog = new GoalsCompletedDialog(AllGoals);
+            goalsCompletedDialog.initModality(Modality.APPLICATION_MODAL);
+            goalsCompletedDialog.showAndWait();
+        }
     }
     public boolean endsessionprematurely(boolean resetdialogcontrols) {
         pausewithoutanimation();
