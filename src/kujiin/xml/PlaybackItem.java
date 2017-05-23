@@ -25,7 +25,7 @@ public class PlaybackItem {
     private PlaybackItemEntrainment playbackItemEntrainment;
     private PlaybackItemType playbackItemType;
     @XmlTransient
-    private ArrayList<Goals.Goal> GoalsCompletedThisSession;
+    private ArrayList<Goal> GoalsCompletedThisSession;
 
     public PlaybackItem() {}
     public PlaybackItem(Session session, String name) {
@@ -87,7 +87,7 @@ public class PlaybackItem {
         else {return "Ambience Set " + "(" + ambience.getAmbience().size() + " Files)";}
     }
     public void updateduration(Duration duration) {this.ExpectedDuration = duration.toMillis();}
-    public ArrayList<Goals.Goal> getGoalsCompletedThisSession() {
+    public ArrayList<Goal> getGoalsCompletedThisSession() {
         return GoalsCompletedThisSession;
     }
     public Ambience getAmbience() {
@@ -100,7 +100,7 @@ public class PlaybackItem {
 // Utility Methods
     public void addelapsedtime(Duration duration) {
         PracticeTime = PracticeTime + duration.toMillis();}
-    public void addCompletedGoal(Goals.Goal Goal) {
+    public void addCompletedGoal(Goal Goal) {
         if (GoalsCompletedThisSession == null) {
             GoalsCompletedThisSession = new ArrayList<>();}
         GoalsCompletedThisSession.add(Goal);

@@ -221,7 +221,7 @@ public class SessionPlaybackOverview {
 //        if (selectedindex == -1) {
 //            return;
 //        }
-//        if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
+//        if (tableitems.getplaybackItemGoals(selectedindex).name.getplaybackItemGoals().equals("Presession") || tableitems.getplaybackItemGoals(selectedindex).name.getplaybackItemGoals().equals("Postsession")) {
 //            new InformationDialog(Root.getPreferences(), "Information", "Cannot Move", "Presession And Postsession Cannot Be Moved");
 //            return;
 //        }
@@ -248,7 +248,7 @@ public class SessionPlaybackOverview {
 //        if (selectedindex == -1) {
 //            return;
 //        }
-//        if (tableitems.get(selectedindex).name.get().equals("Presession") || tableitems.get(selectedindex).name.get().equals("Postsession")) {
+//        if (tableitems.getplaybackItemGoals(selectedindex).name.getplaybackItemGoals().equals("Presession") || tableitems.getplaybackItemGoals(selectedindex).name.getplaybackItemGoals().equals("Postsession")) {
 //            new InformationDialog(Root.getPreferences(), "Information", "Cannot Move", tableitems.get(selectedindex).name + " Cannot Be Moved");
 //            return;
 //        }

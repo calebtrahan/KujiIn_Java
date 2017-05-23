@@ -419,7 +419,7 @@
                      <children>
                         <TabPane fx:id="GoalsTabPane" prefHeight="403.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <tabs>
-                            <Tab text="Current Goals Overview">
+                            <Tab fx:id="GoalsOverviewTab" text="Current Goals Overview">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
@@ -439,7 +439,8 @@
                                                 </TableView>
                                                 <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="700.0">
                                                    <children>
-                                                      <Button fx:id="GoalsOverview_GoToDetailsButton" mnemonicParsing="false" onAction="#gotogoaldetails" text="Go To Details" />
+                                                      <Button fx:id="GoalsOverview_SetNewGoalButton" disable="true" mnemonicParsing="false" onAction="#setnewgoalfromoverviewtab" text="Set New Goal" />
+                                                      <Button fx:id="GoalsOverview_GoToDetailsButton" disable="true" mnemonicParsing="false" onAction="#gotogoaldetails" text="View Details" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -451,7 +452,7 @@
                                     </AnchorPane>
                               </content>
                             </Tab>
-                            <Tab text="Details">
+                            <Tab fx:id="GoalDetailsTab" text="Details">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
@@ -505,11 +506,14 @@
                                                    <children>
                                                       <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                                                          <children>
-                                                            <CheckBox fx:id="GoalsIndividual_ShowCompletedGoalsCheckbox" mnemonicParsing="false" onAction="#populategoalsdetailstable" text="Show Completed Goals" />
+                                                            <CheckBox fx:id="GoalsIndividual_ShowCompletedGoalsCheckbox" disable="true" mnemonicParsing="false" onAction="#populategoalsdetailstable" text="Show Completed Goals">
+                                                               <HBox.margin>
+                                                                  <Insets left="1.0" />
+                                                               </HBox.margin></CheckBox>
                                                          </children>
                                                       </HBox>
-                                                      <Button fx:id="GoalsIndividual_SetNewGoalButton" mnemonicParsing="false" onAction="#setnewgoal" text="Set New Goal" />
-                                                      <Button fx:id="GoalsIndividual_DeleteGoalButton" mnemonicParsing="false" onAction="#deletegoal" text="Delete" />
+                                                      <Button fx:id="GoalsIndividual_SetNewGoalButton" disable="true" mnemonicParsing="false" onAction="#setnewgoalfromdetailstab" text="Set New Goal" />
+                                                      <Button fx:id="GoalsIndividual_DeleteGoalButton" disable="true" mnemonicParsing="false" onAction="#deletegoal" text="Delete" />
                                                    </children>
                                                 </HBox>
                                              </children>

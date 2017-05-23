@@ -16,4 +16,7 @@ public class GoalDetailsTableItem {
         this.datecompleted = new SimpleStringProperty(datecompleted);
         this.percentcompleted = new SimpleStringProperty(percentcompleted);
     }
+
+    public boolean isCompleted() {return iscompleted.get().equals("Yes");}
+
 }

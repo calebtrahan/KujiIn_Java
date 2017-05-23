@@ -22,6 +22,7 @@ import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.ui.export.Exporter;
+import kujiin.ui.goals.SetNewGoalDialog;
 import kujiin.ui.playback.Player;
 import kujiin.ui.table.*;
 import kujiin.util.Util;
@@ -43,6 +44,7 @@ import java.util.ResourceBundle;
 
 import static kujiin.xml.Preferences.*;
 // Bugs To Fix
+    // TODO
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
     // TODO End And Playback Same Session Is Causing Nullpointer Exception
     // TODO Find A Way To Reset Session After Stop Animation Ends
@@ -158,6 +160,8 @@ public class MainController implements Initializable {
     // Goals Pane
     public Tab GoalsTab;
     public TabPane GoalsTabPane;
+    public Tab GoalsOverviewTab;
+    public Tab GoalDetailsTab;
         // Overview Tab
     public TableView<GoalOverviewTableItem> GoalsOverview_Table;
     public TableColumn<GoalOverviewTableItem, String> GoalsOverview_ItemColumn;
@@ -165,9 +169,10 @@ public class MainController implements Initializable {
     public TableColumn<GoalOverviewTableItem, String> GoalsOverview_CurrentGoalColumn;
     public TableColumn<GoalOverviewTableItem, String> GoalsOverview_PercentCompletedColumn;
     public TableColumn<GoalOverviewTableItem, String> GoalsOverview_GoalsCompletedColumn;
+    public Button GoalsOverview_SetNewGoalButton;
     public Button GoalsOverview_GoToDetailsButton;
         // Individual Tab
-    public ChoiceBox GoalsIndividual_SelectedSessionItemChoiceBox;
+    public ChoiceBox<String> GoalsIndividual_SelectedSessionItemChoiceBox;
     public TextField GoalsIndividual_PracticedTime;
     public TableView<GoalDetailsTableItem> GoalsIndividual_Table;
     public TableColumn<GoalDetailsTableItem, String> GoalsIndividual_GoalTimeColumn;
@@ -185,7 +190,7 @@ public class MainController implements Initializable {
     private ArrayList<PlaybackItem> createdtableplaybackitems;
 
 
-// Getters And Setters
+    // Getters And Setters
     public Preferences getPreferences() {
         return preferences;
     }
@@ -259,7 +264,7 @@ public class MainController implements Initializable {
         setupIcons();
         setupToolTips();
         setupTables();
-        ProgressTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        ProgressTab.selectedProperty().addListener(observable -> {
             if (ProgressTab.isSelected()) {
                 populateprogressoverviewchartandbalancepie();
                 populatesessionbrowsertable();
@@ -267,7 +272,19 @@ public class MainController implements Initializable {
                 populatesessiondetailstable();
             }
         });
+        GoalsTab.selectedProperty().addListener(observable -> {
+            if (GoalsTab.isSelected()) {
+                populategoalsoverviewtable();
+            }
+        });
+        GoalDetailsTab.selectedProperty().addListener(observable -> {
+            int index = GoalsOverview_Table.getSelectionModel().getSelectedIndex();
+            if (index != -1) {GoalsIndividual_SelectedSessionItemChoiceBox.getSelectionModel().select(index);}
+            populategoalsdetailstable();
+        });
         PracticedSessionListTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> populatesessiondetailstable());
+        GoalsIndividual_SelectedSessionItemChoiceBox.setItems(FXCollections.observableArrayList(ALLNAMES));
+        GoalsIndividual_SelectedSessionItemChoiceBox.getSelectionModel().selectedIndexProperty().addListener(observable -> populategoalsdetailstable());
     }
     private void setupTables() {
         // Creation Table
@@ -291,7 +308,22 @@ public class MainController implements Initializable {
         GoalsOverview_CurrentGoalColumn.setCellValueFactory(cellData -> cellData.getValue().currentgoal);
         GoalsOverview_PercentCompletedColumn.setCellValueFactory(cellData -> cellData.getValue().percentcompleted);
         GoalsOverview_GoalsCompletedColumn.setCellValueFactory(cellData -> cellData.getValue().goalscompleted);
-
+        GoalsIndividual_GoalTimeColumn.setCellValueFactory(cellData -> cellData.getValue().goaltime);
+        GoalsIndividual_IsCompletedColumn.setCellValueFactory(cellData -> cellData.getValue().iscompleted);
+        GoalsIndividual_DateCompletedColumn.setCellValueFactory(cellData -> cellData.getValue().datecompleted);
+        GoalsIndividual_PercentCompletedColumn.setCellValueFactory(cellData -> cellData.getValue().percentcompleted);
+        GoalsOverview_Table.getSelectionModel().selectedIndexProperty().addListener(observable -> {
+            GoalsOverview_SetNewGoalButton.setDisable(GoalsOverview_Table.getSelectionModel().getSelectedIndex() == -1);
+            GoalsOverview_GoToDetailsButton.setDisable(GoalsOverview_Table.getSelectionModel().getSelectedIndex() == -1);
+        });
+        GoalsIndividual_SelectedSessionItemChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldvalue, newvalue) -> {
+            GoalsIndividual_SetNewGoalButton.setDisable(newvalue == null);
+            GoalsIndividual_ShowCompletedGoalsCheckbox.setDisable(newvalue == null);
+        });
+        GoalsIndividual_Table.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.isCompleted()) {GoalsIndividual_DeleteGoalButton.setDisable(true);}
+            else {GoalsIndividual_DeleteGoalButton.setDisable(false);}
+        });
     }
     private void setupIcons() {
         IconDisplayType dt = preferences.getUserInterfaceOptions().getIconDisplayType();
@@ -915,8 +947,8 @@ public class MainController implements Initializable {
             String goalscompleted;
             PlaybackItem playbackItem = demosession.getplaybackitem(i);
             Duration practicedduration = sessions.gettotalpracticedtime(playbackItem, false);
-            practicedtime = Util.formatdurationtoStringSpelledOut(practicedduration, 1000.0);
-            Goals.Goal goal = goals.getCurrentGoal(i);
+            practicedtime = Util.formatdurationtoStringDecimalWithColons(practicedduration);
+            Goal goal = goals.getCurrentGoal(i);
             if (goal == null) {
                 currentgoal = "None";
                 percentcompleted = "-";
@@ -926,7 +958,10 @@ public class MainController implements Initializable {
                 percentcompleted = String.format("%.2f", (practicedduration.toMillis() / goal.getDuration().toMillis()) * 100) + "%";
             }
             int completedgoalcount = 0;
-            for (Goals.Goal x : goals.get(GoalsOverview_Table.getSelectionModel().getSelectedIndex())) {if (x.getCompleted()) {completedgoalcount++;}}
+            List<Goal> goallist = goals.getplaybackItemGoals(GoalsOverview_Table.getSelectionModel().getSelectedIndex());
+            if (goallist != null) {
+                for (Goal x : goallist) {if (x.getCompleted()) {completedgoalcount++;}}
+            }
             goalscompleted = String.valueOf(completedgoalcount);
             tableitems.add(new GoalOverviewTableItem(playbackItem.getName(), practicedtime, currentgoal, percentcompleted, goalscompleted));
         }
@@ -944,32 +979,59 @@ public class MainController implements Initializable {
     public void populategoalsdetailstable() {
         int index = GoalsIndividual_SelectedSessionItemChoiceBox.getSelectionModel().getSelectedIndex();
         if (index != -1) {
+            GoalsIndividual_Table.getItems().clear();
             Session dummysession = new Session();
             PlaybackItem playbackItem = dummysession.getplaybackitem(index);
             GoalsIndividual_PracticedTime.setText(Util.formatdurationtoStringSpelledOut(sessions.gettotalpracticedtime(playbackItem, false), GoalsIndividual_PracticedTime.getWidth()));
             ObservableList<GoalDetailsTableItem> tableitems = FXCollections.observableArrayList();
-            for (Goals.Goal i :goals.get(index)) {
-                if (! GoalsIndividual_ShowCompletedGoalsCheckbox.isSelected() && i.getCompleted()) {continue;}
-                String goaltime = Util.formatdurationtoStringSpelledOut(i.getDuration(), 1000.0);
-                String datecompleted;
-                String percentcompleted;
-                if (i.getCompleted()) {
-                    datecompleted = i.getDate_Completed().format(Util.dateFormat);
-                    percentcompleted = "100%";
-                } else {
-                    datecompleted = "Not Completed";
-                    percentcompleted = String.format("%.2f", (sessions.gettotalpracticedtime(playbackItem, false).toMillis() / i.getDuration().toMillis()) * 100);
+            List<Goal> goalList = goals.getplaybackItemGoals(index);
+            if (goalList != null && ! goalList.isEmpty()) {
+                for (Goal i :goalList) {
+                    if (! GoalsIndividual_ShowCompletedGoalsCheckbox.isSelected() && i.getCompleted()) {continue;}
+                    String goaltime = Util.formatdurationtoStringSpelledOut(i.getDuration(), 1000.0);
+                    String datecompleted;
+                    String percentcompleted;
+                    if (i.getCompleted()) {
+                        datecompleted = i.getDate_Completed().format(Util.dateFormat);
+                        percentcompleted = "100%";
+                    } else {
+                        datecompleted = "Not Completed";
+                        percentcompleted = String.format("%.2f", (sessions.gettotalpracticedtime(playbackItem, false).toMillis() / i.getDuration().toMillis()) * 100);
+                    }
+                    tableitems.add(new GoalDetailsTableItem(goaltime, i.getCompleted(), datecompleted, percentcompleted));
                 }
-                tableitems.add(new GoalDetailsTableItem(goaltime, i.getCompleted(), datecompleted, percentcompleted));
-            }
-            GoalsIndividual_Table.setItems(tableitems);
+                GoalsIndividual_Table.setItems(tableitems);
+            } else {GoalsIndividual_Table.setPlaceholder(new Label("No Goals For " + playbackItem.getName()));}
+        } else {GoalsIndividual_Table.setPlaceholder(new Label("Select A Playback Item To View Goals"));}
+    }
+    private void setnewgoal(int playbackitemindex, String playbackitemname) {
+        SetNewGoalDialog setNewGoalDialog = new SetNewGoalDialog(goals, playbackitemindex, playbackitemname);
+        setNewGoalDialog.initModality(Modality.APPLICATION_MODAL);
+        setNewGoalDialog.showAndWait();
+        if (setNewGoalDialog.getSetgoal() != null) {
+            List<Goal> goalslist = goals.getplaybackItemGoals(playbackitemindex);
+            goalslist.add(setNewGoalDialog.getSetgoal());
+            goals.set(playbackitemindex, goalslist);
         }
     }
-    public void setnewgoal() {
-
+    public void setnewgoalfromdetailstab() {
+        int index = GoalsIndividual_SelectedSessionItemChoiceBox.getSelectionModel().getSelectedIndex();
+        setnewgoal(index, ALLNAMES.get(index));
+        populategoalsdetailstable();
+    }
+    public void setnewgoalfromoverviewtab() {
+        int index = GoalsOverview_Table.getSelectionModel().getSelectedIndex();
+        setnewgoal(index, ALLNAMES.get(index));
+        populategoalsoverviewtable();
     }
     public void deletegoal() {
-
+        if (new ConfirmationDialog(preferences, "Delete Goal", "This Will Permanently Delete This Goal", "Continue?").getResult()) {
+            int tableindex = GoalsIndividual_Table.getSelectionModel().getSelectedIndex();
+            int choiceboxindex = GoalsIndividual_SelectedSessionItemChoiceBox.getSelectionModel().getSelectedIndex();
+            Goal goal = goals.getGoalsForPlaybackItem(choiceboxindex, true, GoalsIndividual_ShowCompletedGoalsCheckbox.isSelected()).get(tableindex);
+            goals.remove(choiceboxindex, goal);
+            populategoalsdetailstable();
+        }
     }
 
 }

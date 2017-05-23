@@ -69,7 +69,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
 //                }
 //            });
 //            MenuItem previewitem = new MenuItem("Preview");
-//            previewitem.setOnAction(event -> new PreviewFile(SoundList.get(AmbienceTable.getSelectionModel().getSelectedIndex()).getFile()).showAndWait());
+//            previewitem.setOnAction(event -> new PreviewFile(SoundList.getplaybackItemGoals(AmbienceTable.getSelectionModel().getSelectedIndex()).getFile()).showAndWait());
 //            MenuItem removeItem = new MenuItem("Delete");
 //            removeItem.setOnAction(event -> remove());
 //            rowMenu.getItems().addAll(previewitem, removeItem);

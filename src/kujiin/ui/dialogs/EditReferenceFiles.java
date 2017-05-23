@@ -202,7 +202,7 @@ public class EditReferenceFiles extends StyledStage {
     public void loadselectedfile() {
         int index = SessionPartNamesChoiceBox.getSelectionModel().getSelectedIndex();
         if (index != -1 && (HTMLVariation.isSelected() || TEXTVariation.isSelected())) {
-//            selectedplaybackitem = Root.getAllSessionParts(false).get(index);
+//            selectedplaybackitem = Root.getAllSessionParts(false).getplaybackItemGoals(index);
             selectnewfile();
             String contents = Util.file_getcontents(selectedfile);
             MainTextArea.setText(contents);

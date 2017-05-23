@@ -2,14 +2,13 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="104.0" prefWidth="325.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="104.0" prefWidth="255.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox alignment="CENTER" layoutX="225.0" layoutY="110.0" prefHeight="139.0" prefWidth="325.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label fx:id="TopLabel" alignment="CENTER" prefHeight="34.0" prefWidth="322.0">
+            <Label fx:id="TopLabel" alignment="CENTER" prefHeight="34.0" prefWidth="322.0" text="Set A New Goal For Qi-Gong">
                <font>
                   <Font size="16.0" />
                </font>
@@ -19,34 +18,27 @@
             </Label>
             <HBox alignment="CENTER" prefHeight="59.0" prefWidth="324.0">
                <children>
-                  <TextField fx:id="HoursSpinner" alignment="CENTER" prefHeight="26.0" prefWidth="55.0">
+                  <Spinner fx:id="HoursSpinner" prefHeight="27.0" prefWidth="60.0">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>
-                     <cursor>
-                        <Cursor fx:constant="V_RESIZE" />
-                     </cursor>
-                  </TextField>
+                  </Spinner>
                   <Label text="Hours">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField fx:id="MinutesSpinner" alignment="CENTER" prefHeight="26.0" prefWidth="55.0">
+                  <Spinner fx:id="MinutesSpinner" prefHeight="27.0" prefWidth="60.0">
                      <HBox.margin>
                         <Insets right="5.0" />
                      </HBox.margin>
-                     <cursor>
-                        <Cursor fx:constant="V_RESIZE" />
-                     </cursor>
-                  </TextField>
+                  </Spinner>
                   <Label text="Mins" />
                </children>
             </HBox>
             <HBox alignment="CENTER_RIGHT" prefHeight="55.0" prefWidth="324.0">
                <children>
-                  <Label fx:id="StatusBar" prefHeight="16.0" prefWidth="193.0" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#accept" text="Accept" />
+                  <Button fx:id="AcceptButton" mnemonicParsing="false" onAction="#accept" text="Set Goal" />
                   <Button fx:id="CancelButton" mnemonicParsing="false" onAction="#close" text="Cancel">
                      <HBox.margin>
                         <Insets right="10.0" />
