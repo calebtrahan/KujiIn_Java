@@ -34,13 +34,16 @@ public class SetNewGoalDialog extends StyledStage {
             Duration minduration = null;
             int initialhours = 0;
             int initialminutes = 0;
+            System.out.println(currrentgoal.toString());
             if (currrentgoal != null) {
+                System.out.println("Duration: " + currrentgoal.getDuration().toMinutes());
                 minduration = currrentgoal.getDuration();
                 double minutes = minduration.toMinutes();
                 double hours = minutes / 60;
-                minutes = minutes - (hours * 60);
+                minutes = minutes % 60;
                 initialhours = (int) hours;
                 initialminutes = (int) minutes;
+                System.out.println("Hours: " + initialhours + " Minutes " + initialminutes);
             }
             HoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, initialhours));
             MinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, initialminutes));

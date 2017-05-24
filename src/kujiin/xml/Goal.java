@@ -37,7 +37,8 @@ public class Goal {
         this.ID = ID;
     }
     public LocalDate getDate_Completed() {
-        return LocalDate.parse(Date_Completed, dateFormat);
+        if (Date_Completed == null) {return null;}
+        else {return LocalDate.parse(Date_Completed, dateFormat);}
     }
     public void setDate_Completed(LocalDate date_Completed) {
         if (date_Completed != null) {Date_Completed = date_Completed.format(dateFormat);}

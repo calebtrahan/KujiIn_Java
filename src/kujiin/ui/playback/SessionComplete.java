@@ -44,6 +44,6 @@ public class SessionComplete extends StyledStage {
             SessionBarChart.setLegendVisible(false);
             SessionBarChart.requestFocus();
             CloseButton.setOnAction(event -> close());
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {ignored.printStackTrace();}
     }
 }

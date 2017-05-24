@@ -341,12 +341,12 @@ public class Player extends Stage {
                 if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));}
                 else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration().subtract(SessionInProgress.getSessionPracticedTime())));}
                 updatesessionui();
-                updategoalui();
+                updategoalsui();
             } catch (Exception ignored) {ignored.printStackTrace();}
         }
     }
     private void updatesessionui() {}
-    private void updategoalui() {
+    private void updategoalsui() {
 
     }
     private void toggleplayerbuttons() {
@@ -510,7 +510,6 @@ public class Player extends Stage {
             ambienceplayer.play();
             if (fade_ambience_play != null) {fade_ambience_play.play();}
             else {
-                System.out.println("Fade_Ambience_Play Is Null");
                 ambienceplayer.setVolume(currentambiencevolume);
                 String percentage = new Double(currentambiencevolume * 100).intValue() + "%";
                 AmbienceVolumePercentage.setText(percentage);
@@ -681,7 +680,7 @@ public class Player extends Stage {
     public void transition() {
         selectedPlaybackItem.updateduration(new Duration(selectedPlaybackItem.getExpectedDuration()));
         updatesessionui();
-        updategoalui();
+        updategoalsui();
         if (Preferences.getSessionOptions().getAlertfunction()) {
             Media alertmedia = new Media(Preferences.getSessionOptions().getAlertfilelocation());
             MediaPlayer alertplayer = new MediaPlayer(alertmedia);
@@ -718,8 +717,8 @@ public class Player extends Stage {
             }
             PauseButton.setDisable(true);
             StopButton.setDisable(true);
-        }
-        else {
+            if (updateuitimeline != null) {updateuitimeline.stop(); updateuitimeline = null;}
+        } else {
             if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
                 PlayButton.setText("Start");
             }
@@ -738,23 +737,42 @@ public class Player extends Stage {
     }
     public void endofsession() {
         System.out.println("Called End Of Session");
-        updateuitimeline.stop();
-        updateuitimeline.setOnFinished(event -> reset(false));
+//        updateuitimeline.setOnFinished(event -> reset(false));
         playerState = STOPPED;
         sessions.add(SessionInProgress);
         // TODO Prompt For Export
-        updatesessionui();
-        updategoalui();
-        SessionInProgress = null;
-        reset(true);
-        SessionComplete sessionComplete = new SessionComplete(SessionInProgress, true);
-        sessionComplete.initModality(Modality.APPLICATION_MODAL);
-        sessionComplete.showAndWait();
-        if (AllGoals.goalscompletedthissession()) {
-            GoalsCompletedDialog goalsCompletedDialog = new GoalsCompletedDialog(AllGoals);
-            goalsCompletedDialog.initModality(Modality.APPLICATION_MODAL);
-            goalsCompletedDialog.showAndWait();
+//        updatesessionui();
+//        updategoalsui();
+//        reset(true);
+        updateuitimeline.stop(); updateuitimeline = null;
+        System.out.println(Boolean.toString(fade_entrainment_play == null));
+        System.out.println(Boolean.toString(fade_entrainment_pause == null));
+        System.out.println(Boolean.toString(fade_entrainment_resume == null));
+        System.out.println(Boolean.toString(fade_entrainment_stop == null));
+        System.out.println(Boolean.toString(fade_ambience_play == null));
+        System.out.println(Boolean.toString(fade_ambience_pause == null));
+        System.out.println(Boolean.toString(fade_ambience_resume == null));
+        System.out.println(Boolean.toString(fade_ambience_stop == null));
+        System.out.println(Boolean.toString(timeline_progresstonextsessionpart == null));
+        System.out.println(Boolean.toString(timeline_start_ending_ramp == null));
+        System.out.println(Boolean.toString(updateuitimeline == null));
+        try {
+            SessionComplete sessionComplete = new SessionComplete(SessionInProgress, true);
+            sessionComplete.initModality(Modality.APPLICATION_MODAL);
+            sessionComplete.show();
+            sessionComplete.setOnHidden(event -> {
+                if (AllGoals.goalscompletedthissession()) {
+                    GoalsCompletedDialog goalsCompletedDialog = new GoalsCompletedDialog(AllGoals);
+                    goalsCompletedDialog.initModality(Modality.APPLICATION_MODAL);
+                    goalsCompletedDialog.show();
+                }
+            });{
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        SessionInProgress = null;
     }
     public boolean endsessionprematurely(boolean resetdialogcontrols) {
         pausewithoutanimation();
@@ -763,7 +781,7 @@ public class Player extends Stage {
             sessions.add(SessionInProgress);
             if (resetdialogcontrols) {
                 updatesessionui();
-                updategoalui();
+                updategoalsui();
                 reset(true);
                 cleanupPlayersandAnimations();
             }
@@ -1013,8 +1031,6 @@ public class Player extends Stage {
             if (timeline_start_ending_ramp != null) {timeline_fadeout_timer.stop(); timeline_start_ending_ramp = null;}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop(); timeline_fadeout_timer = null;}
             toggleplayerbuttons();
-//            System.out.println(name + "'s PlaybackItemEntrainment Player Status: " + entrainmentplayer.getStatus());
-//            System.out.println(name + "'s Ambience Player Status: " + ambienceplayer.getStatus());
         } catch (Exception ignored) {}
     }
     private void volume_bindentrainment() {

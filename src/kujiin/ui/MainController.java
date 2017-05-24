@@ -21,7 +21,6 @@ import kujiin.ui.dialogs.EditReferenceFiles;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
-import kujiin.ui.export.Exporter;
 import kujiin.ui.goals.SetNewGoalDialog;
 import kujiin.ui.playback.Player;
 import kujiin.ui.table.*;
@@ -48,6 +47,8 @@ import static kujiin.xml.Preferences.*;
 // Priorities
     // TODO Figure Out When EndOfSession And Goal Dialog Aren't Showing At End Of Session
     // TODO Calculate Fade Animations Dynamically With PlaybackItem Duration
+    // TODO Fix Startup Checks
+        //  Problem Files Listed On Dialog And Give User A Chance To Keep Or Delete Problem Files (From AvailableAmbience)
 
 // Bugs To Fix
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
@@ -699,7 +700,7 @@ public class MainController implements Initializable {
         }
     }
     public void exportcreatedsession() {
-        new Exporter();
+        new InformationDialog(preferences, "Under Construction", "This Feature Coming Soon!", "");
     }
     // Utility Methods
     private void populatetable() {
@@ -949,20 +950,19 @@ public class MainController implements Initializable {
         Session demosession = new Session();
         for (int i = 0; i < 15; i++) {
             String practicedtime;
-            String currentgoal;
+            String currentgoaltext;
             String percentcompleted;
             String goalscompleted;
             PlaybackItem playbackItem = demosession.getplaybackitem(i);
             Duration practicedduration = sessions.gettotalpracticedtime(playbackItem, false);
             practicedtime = Util.formatdurationtoStringDecimalWithColons(practicedduration);
-            Goal goal = allGoals.getplaybackItemGoals(i).getCurrentGoal();
-            if (goal == null) {
-                currentgoal = "None";
+            Goal currentgoal = allGoals.getplaybackItemGoals(i).getCurrentGoal();
+            if (currentgoal == null) {
+                currentgoaltext = "None";
                 percentcompleted = "-";
-            }
-            else {
-                currentgoal = Util.formatdurationtoStringSpelledOut(goal.getDuration(), 1000.0);
-                percentcompleted = String.format("%.2f", (practicedduration.toMillis() / goal.getDuration().toMillis()) * 100) + "%";
+            } else {
+                currentgoaltext = Util.formatdurationtoStringSpelledOut(currentgoal.getDuration(), 1000.0);
+                percentcompleted = String.format("%.2f", (practicedduration.toMillis() / currentgoal.getDuration().toMillis()) * 100) + "%";
             }
             int completedgoalcount = 0;
             List<Goal> goallist = allGoals.getplaybackItemGoals(i).getGoals();
@@ -970,7 +970,7 @@ public class MainController implements Initializable {
                 for (Goal x : goallist) {if (x.getCompleted()) {completedgoalcount++;}}
             }
             goalscompleted = String.valueOf(completedgoalcount);
-            tableitems.add(new GoalOverviewTableItem(playbackItem.getName(), practicedtime, currentgoal, percentcompleted, goalscompleted));
+            tableitems.add(new GoalOverviewTableItem(playbackItem.getName(), practicedtime, currentgoaltext, percentcompleted, goalscompleted));
         }
         GoalsOverview_Table.setItems(tableitems);
     }

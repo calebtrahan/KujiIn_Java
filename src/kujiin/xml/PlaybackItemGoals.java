@@ -60,6 +60,7 @@ public class PlaybackItemGoals {
     public void checkifgoalscompleted(Duration practiceduration) {
         if (Goals == null) {return;}
         int index = 0;
+        System.out.println(toString());
         for (Goal i : Goals) {
             if (! i.getCompleted() && practiceduration.greaterThanOrEqualTo(i.getDuration())) {
                 i.setCompleted(true);
@@ -67,9 +68,18 @@ public class PlaybackItemGoals {
                 Goals.set(index, i);
                 if (GoalsCompletedThisSession == null) {GoalsCompletedThisSession = new ArrayList<>();}
                 GoalsCompletedThisSession.add(i);
+                System.out.println(toString());
             }
             index++;
         }
+    }
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Goal i : Goals) {
+            stringBuilder.append(i.toString());
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
     }
     public boolean goalscompletedthisession() {
         return GoalsCompletedThisSession != null && GoalsCompletedThisSession.size() > 0;
