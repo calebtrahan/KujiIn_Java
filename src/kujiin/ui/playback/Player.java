@@ -183,6 +183,7 @@ public class Player extends Stage {
             SessionProgress.setOnMouseClicked(event -> SessionProgressPercentage.setVisible(! SessionProgressPercentage.isVisible()));
             ReferenceTypeChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList("html", "txt")));
             ReferenceControls.setDisable(true);
+            updategoalsui();
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
     private void setupTooltips() {
@@ -340,14 +341,31 @@ public class Player extends Stage {
                 SessionProgressPercentage.setText(bd.doubleValue() + "%");
                 if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));}
                 else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration().subtract(SessionInProgress.getSessionPracticedTime())));}
-                updatesessionui();
                 updategoalsui();
             } catch (Exception ignored) {ignored.printStackTrace();}
         }
     }
-    private void updatesessionui() {}
     private void updategoalsui() {
-
+        String goalprogressandpercentage;
+        String goaltime;
+        Double percentage;
+        if (selectedPlaybackItem != null && AllGoals.getplaybackItemGoals(selectedPlaybackItem.getCreationindex()) != null) {
+            PlaybackItemGoals playbackItemGoals = AllGoals.getplaybackItemGoals(selectedPlaybackItem.getCreationindex());
+            Goal currentgoal = playbackItemGoals.getCurrentGoal();
+            Duration practiceduration = sessions.gettotalpracticedtime(selectedPlaybackItem, false);
+            practiceduration = practiceduration.add(SessionInProgress.getSessionPracticedTime());
+            percentage = (practiceduration.toMillis() / currentgoal.getDuration().toMillis()) * 100;
+            goalprogressandpercentage = String.format("%s (%.1f%%)", Util.formatdurationtoStringDecimalWithColons(practiceduration), percentage);
+            percentage /= 100;
+            goaltime = Util.formatdurationtoStringDecimalWithColons(currentgoal.getDuration());
+        } else {
+            goalprogressandpercentage = "No Goal Set";
+            goaltime = "-";
+            percentage = 0.0;
+        }
+        CurrentGoalProgress.setProgress(percentage);
+        CurrentGoalPercentage.setText(goalprogressandpercentage);
+        SessionPartGoalTime.setText(goaltime);
     }
     private void toggleplayerbuttons() {
         if (playerState == null) {return;}
@@ -440,7 +458,7 @@ public class Player extends Stage {
         PlaylistTableView.getSelectionModel().select(0);
         PlaylistTableView.setOnMouseClicked(event -> PlaylistTableView.getSelectionModel().select(-1));
         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
-        SessionInProgress.setSessionPracticedTime(0.0);
+        SessionInProgress.setSessionPracticedTime();
         SessionInProgress.calculateactualduration();
         setupfadeanimations();
         volume_unbindentrainment();
@@ -679,7 +697,6 @@ public class Player extends Stage {
     }
     public void transition() {
         selectedPlaybackItem.updateduration(new Duration(selectedPlaybackItem.getExpectedDuration()));
-        updatesessionui();
         updategoalsui();
         if (Preferences.getSessionOptions().getAlertfunction()) {
             Media alertmedia = new Media(Preferences.getSessionOptions().getAlertfilelocation());
@@ -736,42 +753,26 @@ public class Player extends Stage {
         StopButton.setDisable(true);
     }
     public void endofsession() {
-        System.out.println("Called End Of Session");
-//        updateuitimeline.setOnFinished(event -> reset(false));
         playerState = STOPPED;
-        sessions.add(SessionInProgress);
         // TODO Prompt For Export
-//        updatesessionui();
-//        updategoalsui();
-//        reset(true);
-        updateuitimeline.stop(); updateuitimeline = null;
-        System.out.println(Boolean.toString(fade_entrainment_play == null));
-        System.out.println(Boolean.toString(fade_entrainment_pause == null));
-        System.out.println(Boolean.toString(fade_entrainment_resume == null));
-        System.out.println(Boolean.toString(fade_entrainment_stop == null));
-        System.out.println(Boolean.toString(fade_ambience_play == null));
-        System.out.println(Boolean.toString(fade_ambience_pause == null));
-        System.out.println(Boolean.toString(fade_ambience_resume == null));
-        System.out.println(Boolean.toString(fade_ambience_stop == null));
-        System.out.println(Boolean.toString(timeline_progresstonextsessionpart == null));
-        System.out.println(Boolean.toString(timeline_start_ending_ramp == null));
-        System.out.println(Boolean.toString(updateuitimeline == null));
+        updategoalsui();
+        reset(true);
+        final Session sessioninprogress = SessionInProgress;
         try {
             SessionComplete sessionComplete = new SessionComplete(SessionInProgress, true);
             sessionComplete.initModality(Modality.APPLICATION_MODAL);
             sessionComplete.show();
             sessionComplete.setOnHidden(event -> {
-                if (AllGoals.goalscompletedthissession()) {
+                if (sessionComplete.needtosetNotes()) {sessioninprogress.setNotes(sessionComplete.getNotes());}
+                if (AllGoals.sessionhasgoalscompleted()) {
                     GoalsCompletedDialog goalsCompletedDialog = new GoalsCompletedDialog(AllGoals);
                     goalsCompletedDialog.initModality(Modality.APPLICATION_MODAL);
                     goalsCompletedDialog.show();
                 }
-            });{
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            });
+        } catch (Exception e) {e.printStackTrace();}
+        SessionInProgress = sessioninprogress;
+        sessions.add(SessionInProgress);
         SessionInProgress = null;
     }
     public boolean endsessionprematurely(boolean resetdialogcontrols) {
@@ -780,7 +781,6 @@ public class Player extends Stage {
         if (new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
             sessions.add(SessionInProgress);
             if (resetdialogcontrols) {
-                updatesessionui();
                 updategoalsui();
                 reset(true);
                 cleanupPlayersandAnimations();

@@ -17,6 +17,7 @@ import kujiin.util.Util;
 import kujiin.xml.*;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class SelectASession extends StyledStage {
     public TableView<RecentSessionTableItem> RecentSessionsTable;
@@ -54,8 +55,9 @@ public class SelectASession extends StyledStage {
             ViewDetailsButton.setDisable(true);
             OpenButton.setDisable(true);
             RecentSessionsTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-                if (RecentSessionsTable.getSelectionModel().getSelectedIndex() != -1) {
-                    if (newValue != null) {selectedsession = sessions.get((sessions.getSession().size() - 1) - newValue.intValue());}
+                RecentSessionTableItem recentSessionTableItem = RecentSessionsTable.getSelectionModel().getSelectedItem();
+                if (recentSessionTableItem != null) {
+                    if (newValue != null) {selectedsession = sessions.get(recentSessionTableItem.id);}
                     else {selectedsession = null;}
                 }
                 ViewDetailsButton.setDisable(newValue == null);
@@ -81,9 +83,9 @@ public class SelectASession extends StyledStage {
             ViewDetailsButton.setDisable(true);
             OpenButton.setDisable(true);
             ShowMoreButton.setVisible(false);
-            RecentSessionsTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-                if (RecentSessionsTable.getSelectionModel().getSelectedIndex() != -1) {
-                    if (newValue != null) {favoriteSession = favoriteSessions.get(RecentSessionsTable.getSelectionModel().getSelectedIndex());}
+            RecentSessionsTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    if (newValue != null) {favoriteSession = favoriteSessions.get(newValue.id);}
                     else {favoriteSession = null;}
                 }
                 ViewDetailsButton.setDisable(newValue == null);
@@ -168,16 +170,16 @@ public class SelectASession extends StyledStage {
         ObservableList<RecentSessionTableItem> tableitems = FXCollections.observableArrayList();
         try {
             int size;
-            Session selectedsession;
             switch (selectSessionType) {
                 case FAVORITE:
-                    size = favoriteSessions.getFavoriteSessions().size();
-                    for (int i = 0; i < size; i++) {
-                        selectedsession = favoriteSessions.getFavoriteSessions().get(i).getSession();
-                        tableitems.add(new RecentSessionTableItem(favoriteSessions.getFavoriteSessions().get(i).getName(), selectedsession.getDate_Practiced().format(Util.dateFormat), String.valueOf(selectedsession.getPlaybackItems().size()), Util.formatdurationtoStringDecimalWithColons(selectedsession.getExpectedSessionDuration())));
+                    int count = 1;
+                    for (FavoriteSession i : favoriteSessions.getFavoriteSessions()) {
+                        tableitems.add(new RecentSessionTableItem(String.valueOf(count), i));
+                        count++;
                     }
                     break;
                 case RECENT:
+                    Session selectedsession;
                     int number = 1;
                     size = sessions.getSession().size() - 1;
                     int leftover;
@@ -185,7 +187,7 @@ public class SelectASession extends StyledStage {
                     else {leftover = 0; ShowMoreButton.setVisible(false);}
                     for (int i = size; i >= leftover; i--) {
                         selectedsession = sessions.getSession().get(i);
-                        tableitems.add(new RecentSessionTableItem(String.valueOf(number), selectedsession.getDate_Practiced().format(Util.dateFormat), String.valueOf(selectedsession.getPlaybackItems().size()), Util.formatdurationtoStringDecimalWithColons(selectedsession.getSessionPracticedTime())));
+                        tableitems.add(new RecentSessionTableItem(String.valueOf(number), selectedsession));
                         number++;
                     }
                     break;
@@ -195,17 +197,28 @@ public class SelectASession extends StyledStage {
     }
 
     class RecentSessionTableItem {
-        private StringProperty number;
-        private StringProperty datepracticed;
-        private StringProperty playbackitems;
-        private StringProperty duration;
+        public UUID id;
+        public StringProperty number;
+        public StringProperty datepracticed;
+        public StringProperty playbackitems;
+        public StringProperty duration;
 
-        public RecentSessionTableItem(String number, String datepracticed, String playbackitems, String duration) {
+        public RecentSessionTableItem(String number, Session session) {
+            id = session.getId();
             this.number = new SimpleStringProperty(number);
-            this.datepracticed = new SimpleStringProperty(datepracticed);
-            this.playbackitems = new SimpleStringProperty(playbackitems);
-            this.duration = new SimpleStringProperty(duration);
+            this.datepracticed = new SimpleStringProperty(session.getDate_Practiced().format(Util.dateFormat));
+            this.playbackitems = new SimpleStringProperty(String.valueOf(session.getPlaybackItems().size()));
+            this.duration = new SimpleStringProperty(Util.formatdurationtoStringDecimalWithColons(session.getSessionPracticedTime()));
         }
+        public RecentSessionTableItem(String number, FavoriteSession favoriteSession) {
+            id = favoriteSession.getId();
+            Session session = favoriteSession.getSession();
+            this.number = new SimpleStringProperty(number);
+            this.datepracticed = new SimpleStringProperty(session.getDate_Practiced().format(Util.dateFormat));
+            this.playbackitems = new SimpleStringProperty(String.valueOf(session.getPlaybackItems().size()));
+            this.duration = new SimpleStringProperty(Util.formatdurationtoStringDecimalWithColons(session.getExpectedSessionDuration()));
+        }
+
     }
     enum SelectSessionType {
         FAVORITE, RECENT

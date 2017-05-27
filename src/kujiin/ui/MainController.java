@@ -23,6 +23,7 @@ import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.ui.goals.SetNewGoalDialog;
 import kujiin.ui.playback.Player;
+import kujiin.ui.progress.EditSessionNotes;
 import kujiin.ui.table.*;
 import kujiin.util.Util;
 import kujiin.util.enums.IconDisplayType;
@@ -43,9 +44,9 @@ import java.util.ResourceBundle;
 
 import static kujiin.xml.Preferences.*;
 
+// TODO Design Journal Tab. Encrypt The Viewing Of The Information
 
 // Priorities
-    // TODO Figure Out When EndOfSession And Goal Dialog Aren't Showing At End Of Session
     // TODO Calculate Fade Animations Dynamically With PlaybackItem Duration
     // TODO Fix Startup Checks
         //  Problem Files Listed On Dialog And Give User A Chance To Keep Or Delete Problem Files (From AvailableAmbience)
@@ -53,7 +54,6 @@ import static kujiin.xml.Preferences.*;
 // Bugs To Fix
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
     // TODO End And Playback Same Session Is Causing Nullpointer Exception
-    // TODO Find A Way To Reset Session After Stop Animation Ends
 
 // Additional Features To Definitely Add
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
@@ -148,6 +148,7 @@ public class MainController implements Initializable {
     public TableColumn<SessionBrowserTableItem, String> PracticedSessionListTable_DateColumn;
     public TableColumn<SessionBrowserTableItem, String> PracticedSessionListTable_ItemsColumn;
     public TableColumn<SessionBrowserTableItem, String> PracticedSessionListTable_DurationColumn;
+    public Accordion SessionBrowser_Filter;
     public CheckBox SessionBrowser_Filter_DateRange_From_Checkbox;
     public CheckBox SessionBrowser_Filter_DateRange_To_Checkbox;
     public CheckBox SessionBrowser_Filter_Duration_Min_Checkbox;
@@ -162,6 +163,8 @@ public class MainController implements Initializable {
     public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_NumberColumn;
     public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_ItemColumn;
     public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_TimePracticedColumn;
+    public Button SessionBrowser_ViewNotesButton;
+    public Label SessionBrowser_Details_TotalDuration_Label;
     public TextField SessionBrowser_Details_TotalDuration;
     // AllGoals Pane
     public Tab GoalsTab;
@@ -196,7 +199,7 @@ public class MainController implements Initializable {
     private ArrayList<PlaybackItem> createdtableplaybackitems;
 
 
-    // Getters And Setters
+// Getters And Setters
     public Preferences getPreferences() {
         return preferences;
     }
@@ -453,7 +456,7 @@ public class MainController implements Initializable {
             new InformationDialog(preferences, "No Recent Sessions", "No Recent Sessions", "No Sessions Practiced");
             return;
         }
-        if (createdsession != null) {
+        if (createdsession != null && ! createdsession.isEmpty()) {
             if (! new ConfirmationDialog(preferences, "Overwrite Session", "Really Open Recent Session?", "This will clear any unsaved changes you made to this session").getResult()) {
                 return;
             }
@@ -474,7 +477,7 @@ public class MainController implements Initializable {
             new InformationDialog(preferences, "No Favorite Sessions", "No Sessions Marked As Favorite", "Mark At Least One Session As Favorite To Use This Feature");
             return;
         }
-        if (createdsession != null) {
+        if (createdsession != null && ! createdsession.isEmpty()) {
             if (! new ConfirmationDialog(preferences, "Overwrite Session", "Really Open Favorite Session?", "This will clear any unsaved changes you made to this session").getResult()) {
                 return;
             }
@@ -489,7 +492,6 @@ public class MainController implements Initializable {
             populatetable();
             PlayButton.requestFocus();
         }
-
     }
     // Creation Table Listeners
     public void setupCreatedSessionTable() {
@@ -786,43 +788,43 @@ public class MainController implements Initializable {
     }
     // Session Browser Tab Methods
     public void populatesessionbrowsertable() {
-        List<Session> allsessions = this.sessions.getSession();
-        List<Session> filteredsessions = new ArrayList<>();
-        if (allsessions == null) {allsessions = new ArrayList<>();}
-        for (Session i : allsessions) {
-            if (SessionBrowser_Filter_DateRange_From_Checkbox.isSelected() && SessionBrowser_Filter_DateRange_From.getValue() != null) {
-                if (i.getDate_Practiced().isBefore(SessionBrowser_Filter_DateRange_From.getValue())) {continue;}
+        if (sessions.getSession() != null) {
+            List<Session> filteredsessions = new ArrayList<>();
+            for (Session i : sessions.getSession()) {
+                if (SessionBrowser_Filter_DateRange_From_Checkbox.isSelected() && SessionBrowser_Filter_DateRange_From.getValue() != null) {
+                    if (i.getDate_Practiced().isBefore(SessionBrowser_Filter_DateRange_From.getValue())) {continue;}
+                }
+                if (SessionBrowser_Filter_DateRange_To_Checkbox.isSelected() && SessionBrowser_Filter_DateRange_To.getValue() != null) {
+                    if (i.getDate_Practiced().isAfter(SessionBrowser_Filter_DateRange_To.getValue())) {continue;}
+                }
+                Duration durationtotest = i.getSessionPracticedTime();
+                if (SessionBrowser_Filter_Duration_Min_Checkbox.isSelected()) {
+                    Duration minduration = Duration.ZERO;
+                    minduration.add(Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue()));
+                    minduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
+                    if (durationtotest.lessThan(minduration)) {continue;}
+                }
+                if (SessionBrowser_Filter_Duration_Max_Checkbox.isSelected()) {
+                    Duration maxduration = Duration.ZERO;
+                    maxduration.add(Duration.hours(SessionBrowser_Filter_Duration_To_Hours.getValue()));
+                    maxduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
+                    if (durationtotest.lessThan(maxduration)) {continue;}
+                }
+                filteredsessions.add(i);
             }
-            if (SessionBrowser_Filter_DateRange_To_Checkbox.isSelected() && SessionBrowser_Filter_DateRange_To.getValue() != null) {
-                if (i.getDate_Practiced().isAfter(SessionBrowser_Filter_DateRange_To.getValue())) {continue;}
-            }
-            Duration durationtotest = i.getSessionPracticedTime();
-            if (SessionBrowser_Filter_Duration_Min_Checkbox.isSelected()) {
-                Duration minduration = Duration.ZERO;
-                minduration.add(Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue()));
-                minduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
-                if (durationtotest.lessThan(minduration)) {continue;}
-            }
-            if (SessionBrowser_Filter_Duration_Max_Checkbox.isSelected()) {
-                Duration maxduration = Duration.ZERO;
-                maxduration.add(Duration.hours(SessionBrowser_Filter_Duration_To_Hours.getValue()));
-                maxduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
-                if (durationtotest.lessThan(maxduration)) {continue;}
-            }
-            filteredsessions.add(i);
-        }
-        ObservableList<SessionBrowserTableItem> sessionlist = FXCollections.observableArrayList();
-        for (Session i : filteredsessions) {
-            sessionlist.add(new SessionBrowserTableItem(i.getDate_Practiced().format(Util.dateFormat), String.valueOf(i.getPlaybackItems().size()), Util.formatdurationtoStringDecimalWithColons(i.getSessionPracticedTime())));
-        }
-        PracticedSessionListTable.setItems(sessionlist);
+            ObservableList<SessionBrowserTableItem> sessionlist = FXCollections.observableArrayList();
+            for (Session i : filteredsessions) {sessionlist.add(new SessionBrowserTableItem(i));}
+            PracticedSessionListTable.setItems(sessionlist);
+        } else {PracticedSessionListTable.setPlaceholder(new Label("No Practiced Sessions"));}
     }
     public void populatesessiondetailstable() {
-        int index = PracticedSessionListTable.getSelectionModel().getSelectedIndex();
+        SessionBrowserTableItem item = PracticedSessionListTable.getSelectionModel().getSelectedItem();
         SessionBrowser_DetailsTable.getItems().clear();
         SessionBrowser_Details_TotalDuration.setText(null);
-        if (index != -1) {
-            Session selectedsession = this.sessions.get(index);
+        SessionBrowser_Details_TotalDuration_Label.setDisable(item == null);
+        SessionBrowser_Details_TotalDuration.setDisable(item == null);
+        if (item != null) {
+            Session selectedsession = this.sessions.get(item.uuid);
             ObservableList<TableItem_Number_Name_Duration> sessionitems = FXCollections.observableArrayList();
             int count = 1;
             for (PlaybackItem i : selectedsession.getPlaybackItems()) {
@@ -831,9 +833,34 @@ public class MainController implements Initializable {
             }
             SessionBrowser_DetailsTable.setItems(sessionitems);
             SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(selectedsession.getSessionPracticedTime(), SessionBrowser_Details_TotalDuration.getWidth()));
+            SessionBrowser_ViewNotesButton.setDisable(selectedsession.getNotes() == null || selectedsession.getNotes().isEmpty());
         } else {SessionBrowser_DetailsTable.setPlaceholder(new Label("Select A Session To View Details"));}
     }
-    // Filter
+    public void viewsessionnotes() {
+        SessionBrowserTableItem item = PracticedSessionListTable.getSelectionModel().getSelectedItem();
+        if (item != null) {
+            EditSessionNotes editSessionNotes = new EditSessionNotes(sessions.get(item.uuid), "Session Notes", true);
+            editSessionNotes.initModality(Modality.APPLICATION_MODAL);
+            editSessionNotes.showAndWait();
+        }
+    }
+    public void editsessionnotes(Session session) {
+        EditSessionNotes editSessionNotes = new EditSessionNotes(session, "Edit Session Notes", false);
+        editSessionNotes.initModality(Modality.APPLICATION_MODAL);
+        editSessionNotes.showAndWait();
+        if (editSessionNotes.isAccepted()) {
+            Session editedsession = editSessionNotes.getEditedSession();
+            List<Session> sessionlist = sessions.getSession();
+            for (Session i : sessions.getSession()) {
+                if (i.getId().equals(editedsession.getId())) {
+                    int index = sessions.getSession().indexOf(i);
+                    sessionlist.set(index, editedsession);
+                }
+            }
+            this.sessions.setSession(sessionlist);
+        }
+    }
+        // Filter
     public void populatesessionbrowserfilter() {
         double totalpracticetimeinminutes = sessions.gettotalpracticedtime().toMinutes();
         Double hours = totalpracticetimeinminutes / 60.0;
@@ -894,53 +921,55 @@ public class MainController implements Initializable {
             if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
             SessionBrowser_Filter_Duration_To_Minutes.getValueFactory().setValue(newvalue);
         });
-        LocalDate mindate = null;
-        LocalDate maxdate = null;
-        for (Session i : sessions.getSession()) {
-            LocalDate sessiondate = i.getDate_Practiced();
-            if (mindate == null) {mindate = sessiondate;}
-            else if (sessiondate.isBefore(mindate)) {mindate = sessiondate;}
-            if (maxdate == null) {maxdate = sessiondate;}
-            else if (sessiondate.isAfter(maxdate)) {maxdate = sessiondate;}
+        SessionBrowser_Filter.setDisable(sessions.getSession() == null);
+        if (sessions.getSession() != null) {
+            LocalDate mindate = null;
+            LocalDate maxdate = null;
+            for (Session i : sessions.getSession()) {
+                LocalDate sessiondate = i.getDate_Practiced();
+                if (mindate == null) {mindate = sessiondate;}
+                else if (sessiondate.isBefore(mindate)) {mindate = sessiondate;}
+                if (maxdate == null) {maxdate = sessiondate;}
+                else if (sessiondate.isAfter(maxdate)) {maxdate = sessiondate;}
+            }
+            SessionBrowser_Filter_DateRange_From.setValue(mindate);
+            LocalDate finalMindate = mindate;
+            LocalDate finalMaxdate = maxdate;
+            SessionBrowser_Filter_DateRange_From.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+                @Override
+                public DateCell call(DatePicker param) {
+                    return new DateCell() {
+                        @Override
+                        public void updateItem(LocalDate item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (item.isBefore(finalMindate) || item.isAfter(finalMaxdate)) {
+                                setDisable(true);
+                                setStyle("-fx-background-color: #ffc0cb;");
+                            }
+                        }
+                    };
+                }
+            });
+            SessionBrowser_Filter_DateRange_To.setValue(maxdate);
+            SessionBrowser_Filter_DateRange_To.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+                @Override
+                public DateCell call(DatePicker param) {
+                    return new DateCell() {
+                        @Override
+                        public void updateItem(LocalDate item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (item.isAfter(finalMaxdate) || item.isBefore(finalMindate)) {
+                                setDisable(true);
+                                setStyle("-fx-background-color: #ffc0cb;");
+                            }
+                        }
+                    };
+                }
+            });
+            SessionBrowser_Filter_DateRange_From.setOnAction(event -> populatesessionbrowsertable());
+            SessionBrowser_Filter_DateRange_To.setOnAction(event -> populatesessionbrowsertable());
         }
-        SessionBrowser_Filter_DateRange_From.setValue(mindate);
-        LocalDate finalMindate = mindate;
-        LocalDate finalMaxdate = maxdate;
-        SessionBrowser_Filter_DateRange_From.setDayCellFactory(new Callback<DatePicker, DateCell>() {
-            @Override
-            public DateCell call(DatePicker param) {
-                return new DateCell() {
-                    @Override
-                    public void updateItem(LocalDate item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item.isBefore(finalMindate) || item.isAfter(finalMaxdate)) {
-                            setDisable(true);
-                            setStyle("-fx-background-color: #ffc0cb;");
-                        }
-                    }
-                };
-            }
-        });
-        SessionBrowser_Filter_DateRange_To.setValue(maxdate);
-        SessionBrowser_Filter_DateRange_To.setDayCellFactory(new Callback<DatePicker, DateCell>() {
-            @Override
-            public DateCell call(DatePicker param) {
-                return new DateCell() {
-                    @Override
-                    public void updateItem(LocalDate item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item.isAfter(finalMaxdate) || item.isBefore(finalMindate)) {
-                            setDisable(true);
-                            setStyle("-fx-background-color: #ffc0cb;");
-                        }
-                    }
-                };
-            }
-        });
-        SessionBrowser_Filter_DateRange_From.setOnAction(event -> populatesessionbrowsertable());
-        SessionBrowser_Filter_DateRange_To.setOnAction(event -> populatesessionbrowsertable());
     }
-
 
 // AllGoals Tab
     // Overview Tab Methods

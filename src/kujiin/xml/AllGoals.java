@@ -153,7 +153,7 @@ public class AllGoals {
     public void calculateifTotalGoalsCompleted(Duration duration) {
         getplaybackItemGoals(15).checkifgoalscompleted(duration);
     }
-    public boolean goalscompletedthissession() {
+    public boolean sessionhasgoalscompleted() {
         for (int i = 0; i < 16; i++) {
             if (getplaybackItemGoals(i).goalscompletedthisession()) {return true;}
         }

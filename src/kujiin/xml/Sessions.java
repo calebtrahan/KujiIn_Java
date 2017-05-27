@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 @XmlRootElement(name = "Sessions")
 @XmlAccessorType(XmlAccessType.PROPERTY)
@@ -56,15 +57,20 @@ public class Sessions {
 // Session Methods
     public void add(Session session) {
         if (Session == null) {Session = new ArrayList<>();}
-        if (session.isValid()) {
+        if (! session.isEmpty()) {
             Session.add(session);
             sort();
             marshall();
         }
     }
-    public Session get(int index) {
-        try {return Session.get(index);}
-        catch (IndexOutOfBoundsException ignored) {return null;}
+    public Session get(UUID uuid) {
+        if (Session == null) {return null;}
+        else {
+            for (kujiin.xml.Session i : Session) {
+                if (i.getId().equals(uuid)) {return i;}
+            }
+        }
+        return null;
     }
     public void remove(Session session) {
         if (Session != null) {

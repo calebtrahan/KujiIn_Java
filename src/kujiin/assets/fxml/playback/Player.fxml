@@ -100,25 +100,20 @@
                                     </TableView>
                                     <VBox maxHeight="41.0" prefHeight="200.0" prefWidth="100.0">
                                        <children>
+                                          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" />
                                           <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                                              <children>
-                                                <Label fx:id="GoalTopLabel" text="Current Goal Progress For " />
-                                             </children>
-                                          </HBox>
-                                          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                                             <children>
-                                                <Label fx:id="SessionPartElapsedTime" text="Label">
+                                                <Label fx:id="GoalTopLabel" prefHeight="17.0" prefWidth="92.0" text="Goal Progress">
                                                    <HBox.margin>
-                                                      <Insets right="5.0" />
-                                                   </HBox.margin>
-                                                </Label>
-                                                <StackPane HBox.hgrow="ALWAYS">
+                                                      <Insets bottom="2.0" />
+                                                   </HBox.margin></Label>
+                                                <StackPane prefHeight="20.0" prefWidth="131.0" HBox.hgrow="ALWAYS">
                                                    <children>
                                                       <ProgressBar fx:id="CurrentGoalProgress" prefWidth="200.0" progress="0.0" />
-                                                      <Label fx:id="CurrentGoalPercentage" text="Label" />
+                                                      <Label fx:id="CurrentGoalPercentage" />
                                                    </children>
                                                 </StackPane>
-                                                <Label fx:id="SessionPartGoalTime" text="Label">
+                                                <Label fx:id="SessionPartGoalTime" alignment="CENTER" minWidth="20.0">
                                                    <HBox.margin>
                                                       <Insets left="5.0" />
                                                    </HBox.margin>
@@ -127,7 +122,7 @@
                                           </HBox>
                                        </children>
                                        <VBox.margin>
-                                          <Insets top="5.0" />
+                                          <Insets left="5.0" right="5.0" top="5.0" />
                                        </VBox.margin>
                                     </VBox>
                                  </children>

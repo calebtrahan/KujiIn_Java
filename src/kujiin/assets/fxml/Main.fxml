@@ -182,9 +182,9 @@
                                                                      <children>
                                                                         <Label text="Total Time Practiced">
                                                                            <HBox.margin>
-                                                                              <Insets right="5.0" />
+                                                                              <Insets right="10.0" />
                                                                            </HBox.margin></Label>
-                                                                        <TextField fx:id="ProgressOverviewTotalTimePracticed" prefHeight="27.0" prefWidth="200.0" />
+                                                                        <TextField fx:id="ProgressOverviewTotalTimePracticed" alignment="CENTER" prefHeight="27.0" prefWidth="200.0" />
                                                                      </children>
                                                                      <VBox.margin>
                                                                         <Insets right="10.0" />
@@ -238,7 +238,7 @@
                                                                         <TableColumn fx:id="PracticedSessionListTable_DurationColumn" prefWidth="89.0" text="Duration" />
                                                                     </columns>
                                                                   </TableView>
-                                                                  <Accordion prefHeight="0.0" prefWidth="246.0" VBox.vgrow="ALWAYS">
+                                                                  <Accordion fx:id="SessionBrowser_Filter" prefHeight="0.0" prefWidth="246.0" VBox.vgrow="ALWAYS">
                                                                     <panes>
                                                                       <TitledPane animated="false" text="Filter">
                                                                         <content>
@@ -382,7 +382,12 @@
                                                                   </TableView>
                                                                   <HBox alignment="CENTER_RIGHT" maxHeight="25.0">
                                                                      <children>
-                                                                        <Label text="Total Session Duration" />
+                                                                        <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                                                                           <children>
+                                                                              <Button fx:id="SessionBrowser_ViewNotesButton" disable="true" mnemonicParsing="false" onAction="#viewsessionnotes" text="View Notes" />
+                                                                           </children>
+                                                                        </HBox>
+                                                                        <Label fx:id="SessionBrowser_Details_TotalDuration_Label" disable="true" text="Session Duration" />
                                                                         <TextField fx:id="SessionBrowser_Details_TotalDuration" editable="false" prefHeight="25.0" prefWidth="118.0">
                                                                            <HBox.margin>
                                                                               <Insets left="7.0" />

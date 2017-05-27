@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
@@ -36,7 +37,13 @@ public class FavoriteSessions {
         FavoriteSessions.add(new FavoriteSession(name, session));
         marshall();
     }
-    public FavoriteSession get(int index) {return FavoriteSessions.get(index);}
+    public FavoriteSession get(UUID id) {
+        if (FavoriteSessions == null) {return null;}
+        for (FavoriteSession i : FavoriteSessions) {
+            if (i.getId().equals(id)) {return i;}
+        }
+        return null;
+    }
     public void remove(FavoriteSession favoriteSession) {FavoriteSessions.remove(favoriteSession); marshall();}
 
 // XML Processing

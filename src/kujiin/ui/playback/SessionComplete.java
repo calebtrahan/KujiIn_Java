@@ -5,7 +5,9 @@ import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.util.Util;
@@ -15,12 +17,16 @@ import kujiin.xml.Session;
 import java.io.IOException;
 
 public class SessionComplete extends StyledStage {
+    private final Session session;
     public Label TopLabel;
     public Label DurationCompletedLabel;
     public BarChart<String, Number> SessionBarChart;
+    public CheckBox AddSessionNotesCheckbox;
+    public TextArea SessionNotesTextArea;
     public Button CloseButton;
 
     public SessionComplete(Session session, boolean sessioncomplete) {
+        this.session = session;
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/playback/SessionCompleteDialog.fxml"));
             fxmlLoader.setController(this);
@@ -33,17 +39,35 @@ public class SessionComplete extends StyledStage {
             setTitle(sessionsummary);
             TopLabel.setText(sessionsummary);
             if (sessioncomplete) {DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getSessionPracticedTime(), 1000.0));}
-            else {DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getSessionPracticedTime(), 1000.0));}
+            else {
+                DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getSessionPracticedTime(), 1000.0));
+                AddSessionNotesCheckbox.setVisible(false);
+            }
             XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
             Duration totalsessionduration = new Duration(0);
             for (PlaybackItem i : session.getPlaybackItems()) {
                 series.getData().add(new XYChart.Data<>(i.getName(), new Duration(i.getPracticeTime()).toMinutes()));
                 totalsessionduration = totalsessionduration.add(new Duration(i.getExpectedDuration()));
             }
+            AddSessionNotesCheckbox.selectedProperty().addListener(observable -> SessionNotesTextArea.setDisable(! AddSessionNotesCheckbox.isSelected()));
             SessionBarChart.getData().add(series);
             SessionBarChart.setLegendVisible(false);
             SessionBarChart.requestFocus();
             CloseButton.setOnAction(event -> close());
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
+
+    public boolean needtosetNotes() {
+        return AddSessionNotesCheckbox.isSelected() && ! SessionNotesTextArea.getText().isEmpty();
+    }
+    public String getNotes() {
+        return session.getNotes();
+    }
+
+    @Override
+    public void close() {
+        if (needtosetNotes()) {session.setNotes(SessionNotesTextArea.getText());}
+        super.close();
+    }
+
 }

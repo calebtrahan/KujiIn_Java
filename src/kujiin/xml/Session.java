@@ -9,30 +9,43 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static kujiin.util.Util.dateFormat;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
 public class Session {
+    private UUID id;
     private String Date_Practiced;
     private ArrayList<PlaybackItem> playbackItems;
     private Double ExpectedSessionDuration;
     private Double SessionPracticedTime;
+    private String Notes;
     private FreqType freqType;
 
     public Session() {
+        id = UUID.randomUUID();
         setDate_Practiced(LocalDate.now());
     }
 
 // Getters And Setters
+    public UUID getId() {
+        return id;
+    }
+    public String getNotes() {
+        return Notes;
+    }
+    public void setNotes(String notes) {
+        Notes = notes;
+    }
     public void setDate_Practiced(LocalDate date_Practiced) {Date_Practiced = date_Practiced.format(dateFormat);}
     public LocalDate getDate_Practiced() {return LocalDate.parse(Date_Practiced, dateFormat);}
     public Duration getSessionPracticedTime() {
         return new Duration(SessionPracticedTime);
     }
-    public void setSessionPracticedTime(Double sessionPracticedTime) {
-        SessionPracticedTime = sessionPracticedTime;
+    public void setSessionPracticedTime() {
+        SessionPracticedTime = 0.0;
     }
     public Duration getExpectedSessionDuration() {
         return new Duration(ExpectedSessionDuration);
@@ -148,8 +161,11 @@ public class Session {
     public void addelapseduration(Duration duration) {
         SessionPracticedTime = SessionPracticedTime + duration.toMillis();
     }
-    public boolean isValid() {
+    public boolean isPracticed() {
         return getSessionPracticedTime().greaterThan(Duration.ZERO);
+    }
+    public boolean isEmpty() {
+        return playbackItems == null || playbackItems.isEmpty();
     }
 
 }
