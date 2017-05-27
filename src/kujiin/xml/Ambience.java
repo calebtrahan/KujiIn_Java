@@ -135,10 +135,13 @@ public class Ambience {
         for (SoundFile i : Ambience) {if (i.getFile().equals(file)) return i;}
         return null;
     }
-    public void addavailableambience_repeat(Duration duration, PlaybackItemAmbience playbackItemAmbience) {
+    public void addavailableambience_repeat(PlaybackItem playbackItem, PlaybackItemAmbience playbackItemAmbience) {
         Duration currentduration = Duration.ZERO;
+        Duration maxduration;
+        if (playbackItem.isRampOnly()) {maxduration = Duration.minutes(1);}
+        else {maxduration = new Duration(playbackItem.getExpectedDuration());}
         int indexcount = 0;
-        while (currentduration.lessThan(duration)) {
+        while (currentduration.lessThan(maxduration)) {
             try {
                 SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
                 add(filetoadd);
@@ -147,12 +150,15 @@ public class Ambience {
             catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
         }
     }
-    public void addavailableambience_shuffle(Duration duration, PlaybackItemAmbience playbackItemAmbience) {
+    public void addavailableambience_shuffle(PlaybackItem playbackItem, PlaybackItemAmbience playbackItemAmbience) {
         List<SoundFile> ambiencelist = new ArrayList<>();
         Duration currentduration = Duration.ZERO;
         List<Integer> indexhistory = new ArrayList<>();
         int indexcount;
-        while (currentduration.lessThan(duration)) {
+        Duration maxduration;
+        if (playbackItem.isRampOnly()) {maxduration = Duration.minutes(1);}
+        else {maxduration = new Duration(playbackItem.getExpectedDuration());}
+        while (currentduration.lessThan(maxduration)) {
             int size = playbackItemAmbience.getAmbience().size();
             if (size > 1) {
                 Random random = new Random();

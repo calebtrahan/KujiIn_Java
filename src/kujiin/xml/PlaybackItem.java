@@ -78,7 +78,7 @@ public class PlaybackItem {
         return PracticeTime;
     }
     public String getdurationasString(double maxchars) {
-        if (ExpectedDuration == 0.0 && ! RampOnly) {return "No ExpectedDuration Set";}
+        if (ExpectedDuration == 0.0 && ! RampOnly) {return "No Duration Set";}
         else {
             if (ExpectedDuration == 0.0 && RampOnly) {return "Ramp Only";}
             else {return Util.formatdurationtoStringSpelledOut(new Duration(getExpectedDuration()), maxchars);}
@@ -115,6 +115,9 @@ public class PlaybackItem {
     public boolean isValid() {return javafx.util.Duration.seconds(ExpectedDuration).greaterThan(javafx.util.Duration.ZERO);}
     public void calculatetotalpracticetime(Sessions sessions) {
         totalpracticetime = sessions.gettotalpracticedtime(this, false);
+    }
+    public void resetpracticetime() {
+        PracticeTime = 0.0;
     }
 
 // Reference

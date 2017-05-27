@@ -42,6 +42,7 @@ public class SessionComplete extends StyledStage {
             else {
                 DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getSessionPracticedTime(), 1000.0));
                 AddSessionNotesCheckbox.setVisible(false);
+                SessionNotesTextArea.setVisible(false);
             }
             XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
             Duration totalsessionduration = new Duration(0);

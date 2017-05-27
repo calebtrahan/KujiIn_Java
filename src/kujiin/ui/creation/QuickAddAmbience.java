@@ -4,7 +4,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
-import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.xml.AvailableAmbiences;
@@ -70,12 +69,9 @@ public class QuickAddAmbience extends StyledStage {
         int missingambiencecount = 0;
         for (PlaybackItem i : playbackItemList) {
             if (availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {
-                Duration duration;
-                if (i.isRampOnly()) {duration = Duration.minutes(1);}
-                else {duration = Duration.millis(i.getExpectedDuration());}
                 i.getAmbience().clearambience();
-                if (quickAmbienceType == QuickAmbienceType.Repeat) {i.getAmbience().addavailableambience_repeat(duration, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
-                else if (quickAmbienceType == QuickAmbienceType.Shuffle) {i.getAmbience().addavailableambience_shuffle(duration, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
+                if (quickAmbienceType == QuickAmbienceType.Repeat) {i.getAmbience().addavailableambience_repeat(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
+                else if (quickAmbienceType == QuickAmbienceType.Shuffle) {i.getAmbience().addavailableambience_shuffle(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
                 i.getAmbience().setEnabled(true);
             } else {i.getAmbience().setEnabled(false); missingambiencecount++;}
         }

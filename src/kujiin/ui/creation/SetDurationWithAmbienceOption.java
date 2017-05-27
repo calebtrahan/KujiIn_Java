@@ -27,12 +27,11 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     private boolean quickaddambience = false;
     private List<PlaybackItem> playbackItemList;
     private Preferences preferences;
-    private AvailableAmbiences availableAmbiences;
     private int missingambiencecount = 0;
 
     public SetDurationWithAmbienceOption(Preferences preferences, AvailableAmbiences availableAmbiences, List<PlaybackItem> playbackItemList, boolean quickaddambienceoption) {
         this.preferences = preferences;
-        this.availableAmbiences = availableAmbiences;
+        AvailableAmbiences availableAmbiences1 = availableAmbiences;
         try {
             this.playbackItemList = playbackItemList;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/SetDurationAndAmbience.fxml"));
@@ -95,8 +94,10 @@ public class SetDurationWithAmbienceOption extends StyledStage {
 
     // Button Actions
     public void accept() {
-        double duration = getNewDuration().toMillis();
-        for (PlaybackItem i : playbackItemList) {i.setExpectedDuration(duration);}
+        double expectedduration = getNewDuration().toMillis();
+        double fadedurations = 0.0;
+    // Fade Animations
+        for (PlaybackItem i : playbackItemList) {i.setExpectedDuration(expectedduration);}
         if (QuickAddAmbienceCheckbox.isVisible()) {quickaddambience = QuickAddAmbienceCheckbox.isSelected();}
         accepted = true;
         close();

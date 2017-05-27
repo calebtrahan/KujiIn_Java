@@ -156,11 +156,11 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
         }
     }
     public void quickaddrepeatambience() {
-        ambience.addavailableambience_repeat(playbackitemduration, playbackItemAmbience);
+        ambience.addavailableambience_repeat(playbackItem, playbackItemAmbience);
         populatetable();
     }
     public void quickaddshuffleambience() {
-        ambience.addavailableambience_shuffle(playbackitemduration, playbackItemAmbience);
+        ambience.addavailableambience_shuffle(playbackItem, playbackItemAmbience);
         populatetable();
     }
     public void removefromtable() {

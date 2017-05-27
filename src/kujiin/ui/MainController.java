@@ -429,7 +429,7 @@ public class MainController implements Initializable {
                 ambienceEditor_simple.showAndWait();
             }
         }
-        if (createdsession != null && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
+        if ((createdsession != null && ! createdsession.getPlaybackItems().isEmpty()) && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
         createdsession = new Session();
         populatetable();
         AddItemsMenu.requestFocus();
@@ -605,13 +605,15 @@ public class MainController implements Initializable {
     }
     public void quickaddambience_repeat() {
         if (createdtableselecteditem != null) {
-            createdtableselecteditem.getAmbience().addavailableambience_repeat(Duration.millis(createdtableselecteditem.getExpectedDuration()), availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
+            createdtableselecteditem.getAmbience().addavailableambience_repeat(createdtableselecteditem, availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
+            createdtableselecteditem.getAmbience().setEnabled(createdtableselecteditem.getAmbience().getAmbience() != null);
             populatetable();
         }
     }
     public void quickaddambience_shuffle() {
         if (createdtableselecteditem != null) {
-            createdtableselecteditem.getAmbience().addavailableambience_shuffle(Duration.millis(createdtableselecteditem.getExpectedDuration()), availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
+            createdtableselecteditem.getAmbience().addavailableambience_shuffle(createdtableselecteditem, availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
+            createdtableselecteditem.getAmbience().setEnabled(createdtableselecteditem.getAmbience().getAmbience() != null);
             populatetable();
         }
     }
@@ -694,6 +696,15 @@ public class MainController implements Initializable {
     }
     public void playcreatedsession() {
         if (createdsession != null) {
+            boolean updatesession = false;
+            for (PlaybackItem i : createdsession.getPlaybackItems()) {
+                if (i.isRampOnly()) {
+                    SoundFile rampfile = RampFiles.getRampFile(i, createdsession.getPlaybackItems().get(createdsession.getPlaybackItems().indexOf(i) + 1));
+                    i.setExpectedDuration(rampfile.getDuration());
+                    updatesession = true;
+                }
+            }
+            if (updatesession) {createdsession.calculateexpectedduration();}
             getStage().setIconified(true);
             Player player = new Player(this, sessions, allGoals, createdsession);
             player.initModality(Modality.APPLICATION_MODAL);

@@ -92,6 +92,8 @@ public class Player extends Stage {
     private Animation timeline_start_ending_ramp;
     private Animation updateuitimeline;
     private final Duration updateuifrequency = Duration.millis(100);
+    private Duration fade_play_value;
+    private Duration fade_stop_value;
 // Playback
     private MediaPlayer entrainmentplayer;
     private MediaPlayer ambienceplayer;
@@ -137,6 +139,7 @@ public class Player extends Stage {
             SessionTemplate = sessiontoplay;
             for (PlaybackItem i : SessionTemplate.getPlaybackItems()) {i.calculatetotalpracticetime(sessions);}
             SessionInProgress = SessionTemplate;
+            resetsessionpracticedtime();
             availableEntrainments = Root.getAvailableEntrainments();
             rampfiles = Root.getRampFiles();
             this.sessions = sessions;
@@ -337,7 +340,7 @@ public class Player extends Stage {
                 else {totalprogress = (float) 0.0;}
                 SessionProgress.setProgress(totalprogress);
                 BigDecimal bd = new BigDecimal(totalprogress * 100);
-                bd = bd.setScale(2, RoundingMode.HALF_UP);
+                bd = bd.setScale(1, RoundingMode.HALF_UP);
                 SessionProgressPercentage.setText(bd.doubleValue() + "%");
                 if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));}
                 else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration().subtract(SessionInProgress.getSessionPracticedTime())));}
@@ -354,10 +357,12 @@ public class Player extends Stage {
             Goal currentgoal = playbackItemGoals.getCurrentGoal();
             Duration practiceduration = sessions.gettotalpracticedtime(selectedPlaybackItem, false);
             practiceduration = practiceduration.add(SessionInProgress.getSessionPracticedTime());
-            percentage = (practiceduration.toMillis() / currentgoal.getDuration().toMillis()) * 100;
+            if (currentgoal != null) {percentage = (practiceduration.toMillis() / currentgoal.getDuration().toMillis()) * 100;}
+            else {percentage = 0.0;}
             goalprogressandpercentage = String.format("%s (%.1f%%)", Util.formatdurationtoStringDecimalWithColons(practiceduration), percentage);
             percentage /= 100;
-            goaltime = Util.formatdurationtoStringDecimalWithColons(currentgoal.getDuration());
+            if (currentgoal != null) {goaltime = Util.formatdurationtoStringDecimalWithColons(currentgoal.getDuration());}
+            else {goaltime = "-";}
         } else {
             goalprogressandpercentage = "No Goal Set";
             goaltime = "-";
@@ -382,28 +387,21 @@ public class Player extends Stage {
         StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle);
 //        ReferenceControls.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
         if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
-            String playbuttontext;
-            String pausebuttontext;
-            String stopbuttontext;
+            String playbuttontext = "Play";
+            String pausebuttontext = "Pause";
+            String stopbuttontext = "Stop";
             switch (playerState) {
                 case IDLE:
                     playbuttontext = "Start";
-                    pausebuttontext = "Pause";
-                    stopbuttontext = "Stop";
                     break;
                 case PLAYING:
                     playbuttontext = "Playing";
-                    pausebuttontext = "Pause";
-                    stopbuttontext = "Stop";
                     break;
                 case PAUSED:
                     playbuttontext = "Resume";
                     pausebuttontext = "Paused";
-                    stopbuttontext = "Stop";
                     break;
                 case STOPPED:
-                    playbuttontext = "Play";
-                    pausebuttontext = "Pause";
                     stopbuttontext = "Stopped";
                     break;
 //                case TRANSITIONING:
@@ -431,15 +429,14 @@ public class Player extends Stage {
 //                    pausebuttontext = "Stopping";
 //                    stopbuttontext = "Stopping";
 //                    break;
-                default:
-                    playbuttontext = "";
-                    pausebuttontext = "";
-                    stopbuttontext = "";
-                    break;
             }
             PlayButton.setText(playbuttontext);
             PauseButton.setText(pausebuttontext);
             StopButton.setText(stopbuttontext);
+        } else {
+            PlayButton.setText("");
+            PauseButton.setText("");
+            StopButton.setText("");
         }
 //        if (referencecurrentlyDisplayed()) {
 //            root.getSessionCreator().getDisplayReference().PlayButton.setText(playbuttontext);
@@ -460,14 +457,23 @@ public class Player extends Stage {
         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
         SessionInProgress.setSessionPracticedTime();
         SessionInProgress.calculateactualduration();
-        setupfadeanimations();
         volume_unbindentrainment();
     }
     private void start() {
+        fade_play_value = Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_play_value());
+        fade_stop_value = Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_stop_value());
+        Duration playbackitemduration = new Duration(selectedPlaybackItem.getExpectedDuration());
+        if (playbackitemduration.lessThan(fade_play_value.add(fade_stop_value))) {
+            while (fade_play_value.add(fade_stop_value).greaterThanOrEqualTo(playbackitemduration)) {
+                fade_play_value = fade_play_value.subtract(Duration.seconds(0.5));
+                fade_stop_value = fade_stop_value.subtract(Duration.seconds(0.5));
+            }
+        }
         setupfadeanimations();
         ReferenceControls.setDisable(false);
         PlaybackItemEntrainment playbackItemEntrainment = availableEntrainments.getsessionpartEntrainment(selectedPlaybackItem);
-        if (! selectedPlaybackItem.isRampOnly() || selectedPlaybackItem.getPlaybackindex() == SessionInProgress.getPlaybackItems().size() - 1) {entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getFreq().getFile().toURI().toString()));}
+        boolean isLastSessionPart = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) == SessionInProgress.getPlaybackItems().size() - 1;
+        if (! selectedPlaybackItem.isRampOnly() || isLastSessionPart) {entrainmentplayer = new MediaPlayer(new Media(playbackItemEntrainment.getFreq().getFile().toURI().toString()));}
         else {entrainmentplayer = new MediaPlayer(new Media(rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1)).getFile().toURI().toString()));}
         entrainmentplayer.setVolume(0.0);
         if (! selectedPlaybackItem.isRampOnly()) {entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);}
@@ -475,10 +481,8 @@ public class Player extends Stage {
         entrainmentplayer.play();
         timeline_progresstonextsessionpart = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()), ae -> progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
-        boolean isLastSessionPart = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) == SessionInProgress.getPlaybackItems().size() - 1;
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
             SoundFile rampfile = rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1));
-            System.out.println("Ramp File Is Null: " + Boolean.toString(rampfile == null));
             timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration())), ae -> {
                 volume_unbindentrainment();
                 entrainmentplayer.stop();
@@ -494,7 +498,7 @@ public class Player extends Stage {
         if (fade_entrainment_stop != null) {
             Duration startfadeout = new Duration(selectedPlaybackItem.getExpectedDuration());
             if (selectedPlaybackItem.isRampOnly()) {startfadeout = startfadeout.subtract(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
-            else {startfadeout = startfadeout.subtract(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_stop_value()));}
+            else {startfadeout = startfadeout.subtract(fade_stop_value);}
             timeline_fadeout_timer = new Timeline(new KeyFrame(startfadeout, ae -> {
                 volume_unbindentrainment();
                 fade_entrainment_stop.play();
@@ -540,7 +544,7 @@ public class Player extends Stage {
     private void resume() {
         volume_unbindentrainment();
         entrainmentplayer.play();
-        if (fade_entrainment_resume != null) {
+        if (fade_entrainment_resume != null && sessionparttimeleft().greaterThan(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_resume_value()))) {
             entrainmentplayer.setVolume(0.0);
             if (fade_entrainment_resume.getStatus() == Animation.Status.RUNNING) {return;}
             playerState = FADING_RESUME;
@@ -570,7 +574,7 @@ public class Player extends Stage {
     }
     private void pause() {
         volume_unbindentrainment();
-        if (fade_entrainment_pause != null) {
+        if (fade_entrainment_pause != null && sessionparttimeleft().greaterThan(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_pause_value()))) {
             if (selectedPlaybackItem.getAmbience().isEnabled() && fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
             playerState = FADING_PAUSE;
             fade_entrainment_pause.play();
@@ -649,7 +653,7 @@ public class Player extends Stage {
     }
     private void stop() {
         volume_unbindentrainment();
-        if (fade_entrainment_stop != null) {
+        if (fade_entrainment_stop != null && sessionparttimeleft().greaterThan(fade_stop_value)) {
             if (fade_entrainment_stop.getStatus() == Animation.Status.RUNNING) {return;}
             fade_entrainment_stop.play();
             playerState = FADING_STOP;
@@ -740,6 +744,7 @@ public class Player extends Stage {
                 PlayButton.setText("Start");
             }
         }
+        SessionCurrentTime.setText("00:00");
         SessionProgress.setProgress(0.0);
         SessionProgressPercentage.setText("0.0%");
         SessionProgress.setDisable(true);
@@ -779,6 +784,7 @@ public class Player extends Stage {
         pausewithoutanimation();
         updateuitimeline.pause();
         if (new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
+            playerState = STOPPED;
             sessions.add(SessionInProgress);
             if (resetdialogcontrols) {
                 updategoalsui();
@@ -788,6 +794,7 @@ public class Player extends Stage {
             SessionComplete sessionComplete = new SessionComplete(SessionInProgress, false);
             sessionComplete.initModality(Modality.APPLICATION_MODAL);
             sessionComplete.showAndWait();
+            resetsessionpracticedtime();
             return true;
         } else {playbuttonpressed(); return false;}
     }
@@ -797,13 +804,17 @@ public class Player extends Stage {
             if (selectedPlaybackItem.getAmbience().isEnabled()) {volume_rebindambience();}
         }
     }
+    private void resetsessionpracticedtime() {
+        for (PlaybackItem i : SessionInProgress.getPlaybackItems()) {i.resetpracticetime();}
+        SessionInProgress.resetpracticetime();
+    }
     // Animation
     private void setupfadeanimations() {
         // PLAY
         if (selectedPlaybackItem.isRampOnly() || (Preferences.getPlaybackOptions().getAnimation_fade_play_enabled() && Preferences.getPlaybackOptions().getAnimation_fade_play_value() > 0.0)) {
             fade_entrainment_play = new Transition() {
                 {if (selectedPlaybackItem.isRampOnly()) {setCycleDuration(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
-                else {setCycleDuration(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_play_value()));}}
+                else {setCycleDuration(fade_play_value);}}
 
                 @Override
                 protected void interpolate(double frac) {
@@ -828,7 +839,7 @@ public class Player extends Stage {
             if (selectedPlaybackItem.getAmbience().isEnabled()) {
                 fade_ambience_play = new Transition() {
                     {if (selectedPlaybackItem.isRampOnly()) {setCycleDuration(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
-                    else {setCycleDuration(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_play_value()));}}
+                    else {setCycleDuration(fade_play_value);}}
 
                     @Override
                     protected void interpolate(double frac) {
@@ -959,7 +970,7 @@ public class Player extends Stage {
         if (selectedPlaybackItem.isRampOnly() || (Preferences.getPlaybackOptions().getAnimation_fade_stop_enabled() && Preferences.getPlaybackOptions().getAnimation_fade_stop_value() > 0.0)) {
             fade_entrainment_stop = new Transition() {
                 {if (selectedPlaybackItem.isRampOnly()) {setCycleDuration(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
-                else {setCycleDuration(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_stop_value()));}}
+                else {setCycleDuration(fade_stop_value);}}
 
                 @Override
                 protected void interpolate(double frac) {
@@ -989,7 +1000,7 @@ public class Player extends Stage {
             if (selectedPlaybackItem.getAmbience().isEnabled()) {
                 fade_ambience_stop = new Transition() {
                     {if (selectedPlaybackItem.isRampOnly()) {setCycleDuration(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
-                    else {setCycleDuration(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_stop_value()));}}
+                    else {setCycleDuration(fade_stop_value);}}
 
                     @Override
                     protected void interpolate(double frac) {
@@ -1191,6 +1202,9 @@ public class Player extends Stage {
     }
     private void volume_rebindambience() {volume_unbindambience(); volume_bindambience();}
     private void volume_rebindentrainment() {volume_unbindentrainment(); volume_bindentrainment();}
+    private Duration sessionparttimeleft() {
+        return new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(new Duration(selectedPlaybackItem.getPracticeTime()));
+    }
     // Error Handling
     private void entrainmenterror() {
         System.out.println("PlaybackItemEntrainment Error");

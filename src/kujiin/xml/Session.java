@@ -167,5 +167,8 @@ public class Session {
     public boolean isEmpty() {
         return playbackItems == null || playbackItems.isEmpty();
     }
+    public void resetpracticetime() {
+        SessionPracticedTime = 0.0;
+    }
 
 }

@@ -33,7 +33,17 @@ public class PlaybackItemGoals {
     }
     public Goal getCurrentGoal() {
         if (Goals == null || Goals.isEmpty()) {return null;}
-        return Goals.get(Goals.size() - 1);
+        else {
+            final List<Goal> nonfilteredgoals = Goals;
+            List<Goal> filteredgoals = new ArrayList<>();
+            for (Goal i : nonfilteredgoals) {
+                if (! i.getCompleted()) {
+                    filteredgoals.add(i);
+                }
+            }
+            try {return filteredgoals.get(filteredgoals.size() - 1);}
+            catch (ArrayIndexOutOfBoundsException e) {return null;}
+        }
     }
     public List<Goal> getCurrentGoals() {
         List<Goal> goalList = new ArrayList<>();
