@@ -49,7 +49,7 @@ public class SoundFile {
 // Method Overrides
     @Override
     public String toString() {
-        return "Name: " + getName() + ". File: " + file.getAbsolutePath() + ". Duration: " + getDuration() + " Milliseconds";
+        return "Name: " + getName() + " Duration: " + getDuration() + " Milliseconds";
     }
 
 }

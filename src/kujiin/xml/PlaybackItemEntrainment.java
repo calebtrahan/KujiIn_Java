@@ -19,7 +19,10 @@ public class PlaybackItemEntrainment {
     }
 
 // Getters And Setters
-    public List<SoundFile> getAllEntrainmentFiles() {return Arrays.asList(freq);}
+    public List<SoundFile> getAllEntrainmentFiles() {
+//        System.out.println("Adding " + freq.getName());
+        return Arrays.asList(freq);
+    }
     public SoundFile getFreq() {
         return freq;
     }
