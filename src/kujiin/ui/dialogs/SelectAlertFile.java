@@ -5,9 +5,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
+import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.alerts.AnswerDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
-public class SelectAlertFile extends Stage {
+public class SelectAlertFile extends StyledStage {
     public Button HelpButton;
     public Button AcceptButton;
     public Button CancelButton;
@@ -28,12 +28,12 @@ public class SelectAlertFile extends Stage {
     public Button PreviewButton;
     private File alertfile;
     private MainController Root;
+    private boolean accepted = false;
 
     public SelectAlertFile(MainController Root) {
         try {
-            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             this.Root = Root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ChangeAlertDialog.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/ChangeAlertDialog.fxml"));
             fxmlLoader.setController(this);
             setScene(new Scene(fxmlLoader.load()));
             setTitle("Alert File Editor");
@@ -50,16 +50,24 @@ public class SelectAlertFile extends Stage {
         } catch (IOException ignored) {}
     }
 
+// Getters And Setters
+    public File getAlertfile() {
+        return alertfile;
+    }
+    public boolean enableAlertFile() {
+        return AlertFileToggleButton.isSelected();
+    }
+    public boolean isAccepted() {
+        return accepted;
+    }
+
 // Button Actions
     public void accept() {
         if (AlertFileToggleButton.isSelected() && alertfile == null) {
             new InformationDialog(Root.getPreferences(), "No Alert File Selected", "No Alert File Selected And Alert Function Enabled", "Please Select An Alert File Or Turn Off Alert Function");
             return;
         }
-        Root.getPreferences().getSessionOptions().setAlertfunction(AlertFileToggleButton.isSelected());
-        if (alertfile != null) {Root.getPreferences().getSessionOptions().setAlertfilelocation(alertfile.toURI().toString());}
-        else {Root.getPreferences().getSessionOptions().setAlertfilelocation(null);}
-        Root.getPreferences().marshall();
+        accepted = true;
         close();
     }
     public void cancel() {
@@ -185,9 +193,4 @@ public class SelectAlertFile extends Stage {
 //            return good;
 //        }
 
-    @Override
-    public void close() {
-        super.close();
-        if (Root.getStage().isIconified()) {Root.getStage().setIconified(false);}
-    }
 }

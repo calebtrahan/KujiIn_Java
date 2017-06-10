@@ -29,7 +29,7 @@ public class PreviewFile extends Stage {
     public PreviewFile(File filetopreview) {
         if (Util.audio_isValid(filetopreview)) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/old/PreviewAudioDialog.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/playback/PreviewAudioDialog.fxml"));
                 fxmlLoader.setController(this);
                 Scene defaultscene = new Scene(fxmlLoader.load());
                 setScene(defaultscene);

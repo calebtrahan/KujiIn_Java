@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-// TODO Not Calculating Void Ambience
-
 public class AudioChecks extends Task {
     private PlaybackItem selectedplaybackitem;
     private PlaybackItemEntrainment playbackItemEntrainment;

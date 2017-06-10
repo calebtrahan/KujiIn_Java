@@ -29,7 +29,7 @@ public class AudioChecksDialog extends Stage {
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setTitle("Kuji-In Start Up");
-            setOnShowing(event -> {
+            setOnShown(event -> {
                 audioChecks.setOnRunning(event1 -> {
                     StatusBar.textProperty().bind(audioChecks.messageProperty());
                     Progress.progressProperty().bind(audioChecks.progressProperty());
@@ -40,7 +40,7 @@ public class AudioChecksDialog extends Stage {
                         StatusBar.textProperty().unbind();
                         Progress.progressProperty().unbind();
                         StatusBar.setText("Audio Checks Completed!");
-                        new Timeline(new KeyFrame(Duration.millis(1500), ae -> close())).play();
+                        new Timeline(new KeyFrame(Duration.millis(200), ae -> close())).play();
                     }
                 });
                 audioChecks.run();

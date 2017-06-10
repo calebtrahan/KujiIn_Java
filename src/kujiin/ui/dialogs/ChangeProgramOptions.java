@@ -70,7 +70,7 @@ public class ChangeProgramOptions extends StyledStage {
             setupdescriptions();
             populatefromxml();
             referencetoggled();
-        } catch (IOException e) {new ExceptionDialog(Preferences, e).showAndWait();}
+        } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
     }
 
 // Setup Methods
@@ -235,9 +235,13 @@ public class ChangeProgramOptions extends StyledStage {
         if (AlertFileSwitch.isSelected()) {
             SelectAlertFile selectAlertFile = new SelectAlertFile(Root);
             selectAlertFile.initModality(Modality.APPLICATION_MODAL);
-            selectAlertFile.initOwner(this);
             selectAlertFile.showAndWait();
-            AlertFileSwitch.setSelected(Preferences.getSessionOptions().getAlertfunction() && Preferences.hasValidAlertFile());
+            if (selectAlertFile.isAccepted() && selectAlertFile.enableAlertFile()) {
+                Root.getPreferences().getSessionOptions().setAlertfunction(selectAlertFile.enableAlertFile());
+                Root.getPreferences().getSessionOptions().setAlertfilelocation(selectAlertFile.getAlertfile().toURI().toString());
+                Root.getPreferences().marshall();
+                AlertFileSwitch.setSelected(true);
+            } else {AlertFileSwitch.setSelected(false);}
         }
     }
     // Ramp

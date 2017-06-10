@@ -483,17 +483,20 @@ public class Player extends Stage {
         timeline_progresstonextsessionpart.play();
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
             SoundFile rampfile = rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1));
-            timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration())), ae -> {
-                volume_unbindentrainment();
-                entrainmentplayer.stop();
-                entrainmentplayer.dispose();
-                entrainmentplayer = new MediaPlayer(new Media(rampfile.getFile().toURI().toString()));
-                entrainmentplayer.setOnError(this::entrainmenterror);
-                entrainmentplayer.setVolume(currententrainmentvolume);
-                entrainmentplayer.play();
-                entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
-            }));
-            timeline_start_ending_ramp.play();
+            Duration timetillendingramp = new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration()));
+            if (timetillendingramp.greaterThan(Duration.ZERO)) {
+                timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration())), ae -> {
+                    volume_unbindentrainment();
+                    entrainmentplayer.stop();
+                    entrainmentplayer.dispose();
+                    entrainmentplayer = new MediaPlayer(new Media(rampfile.getFile().toURI().toString()));
+                    entrainmentplayer.setOnError(this::entrainmenterror);
+                    entrainmentplayer.setVolume(currententrainmentvolume);
+                    entrainmentplayer.play();
+                    entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
+                }));
+                timeline_start_ending_ramp.play();
+            }
         }
         if (fade_entrainment_stop != null) {
             Duration startfadeout = new Duration(selectedPlaybackItem.getExpectedDuration());
@@ -676,10 +679,12 @@ public class Player extends Stage {
         toggleplayerbuttons();
     }
     public void progresstonextsessionpart() {
+        System.out.println("Called Progress To Next Session Part!!");
         try {
             switch (playerState) {
                 case TRANSITIONING:
                     try {
+                        System.out.println("Called Progress To Next Session Part");
                         cleanupPlayersandAnimations();
                         int index = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1;
                         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(index);
@@ -697,7 +702,7 @@ public class Player extends Stage {
                     transition();
                     break;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {ignored.printStackTrace();}
     }
     public void transition() {
         selectedPlaybackItem.updateduration(new Duration(selectedPlaybackItem.getExpectedDuration()));
@@ -708,42 +713,25 @@ public class Player extends Stage {
             alertplayer.play();
             playerState = TRANSITIONING;
             alertplayer.setOnEndOfMedia(() -> {
-                alertplayer.stop();
+                System.out.println("Alert File Done Playing");
                 alertplayer.dispose();
                 progresstonextsessionpart();
             });
-//                alertplayer.setOnError(() -> {
-//                    if (new ConfirmationDialog(preferences, "Alert File Playback Error", null, "An Error Occured While Playing The Alert File.",
-//                            "Retry", "Skip")) {
-//                        alertplayer.stop();
-//                        alertplayer.play();
-//                    } else {
-//                        alertplayer.stop();
-//                        alertplayer.dispose();
-//                        player_progresstonextsessionpart();
-//                    }
-//                });
         } else {
             playerState = TRANSITIONING;
             progresstonextsessionpart();
         }
     }
-    public void reset(boolean endofsession) {
-        if (endofsession) {
-            PlayButton.setTooltip(new Tooltip("Replay"));
-            if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
-                PlayButton.setText("Replay");
-                PauseButton.setText("Pause");
-                StopButton.setText("Stop");
-            }
-            PauseButton.setDisable(true);
-            StopButton.setDisable(true);
-            if (updateuitimeline != null) {updateuitimeline.stop(); updateuitimeline = null;}
-        } else {
-            if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
-                PlayButton.setText("Start");
-            }
+    public void reset() {
+        PlayButton.setTooltip(new Tooltip("Replay"));
+        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
+            PlayButton.setText("Replay");
+            PauseButton.setText("Pause");
+            StopButton.setText("Stop");
         }
+        PauseButton.setDisable(true);
+        StopButton.setDisable(true);
+        if (updateuitimeline != null) {updateuitimeline.stop(); updateuitimeline = null;}
         SessionCurrentTime.setText("00:00");
         SessionProgress.setProgress(0.0);
         SessionProgressPercentage.setText("0.0%");
@@ -761,7 +749,7 @@ public class Player extends Stage {
         playerState = STOPPED;
         // TODO Prompt For Export
         updategoalsui();
-        reset(true);
+        reset();
         final Session sessioninprogress = SessionInProgress;
         try {
             SessionComplete sessionComplete = new SessionComplete(SessionInProgress, true);
@@ -788,7 +776,7 @@ public class Player extends Stage {
             sessions.add(SessionInProgress);
             if (resetdialogcontrols) {
                 updategoalsui();
-                reset(true);
+                reset();
                 cleanupPlayersandAnimations();
             }
             SessionComplete sessionComplete = new SessionComplete(SessionInProgress, false);

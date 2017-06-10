@@ -44,23 +44,19 @@ import java.util.ResourceBundle;
 
 import static kujiin.xml.Preferences.*;
 
-// TODO Design Journal Tab. Encrypt The Viewing Of The Information
-
-// Priorities
-    // TODO Calculate Fade Animations Dynamically With PlaybackItem Duration
-    // TODO Fix Startup Checks
-        //  Problem Files Listed On Dialog And Give User A Chance To Keep Or Delete Problem Files (From AvailableAmbience)
-
 // Bugs To Fix
+    // TODO Alert File Preventing Playback From Progressing To Next Session Part
+    // TODO Alert File Function Not Saving To XML From Preferences
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
-    // TODO End And Playback Same Session Is Causing Nullpointer Exception
 
 // Additional Features To Definitely Add
+    // TODO Session Well Formedness Checks Before Playback, Save Or Export
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
     // TODO Exporter
     // TODO Add Logging (And Write To Log File) For Troubleshooting
 
 // Optional Additional Features
+    // TODO Design Journal Tab. Encrypt The Viewing Of The Information
     // TODO Refactor Freq Files So There Can Be 2 or 3 Different Frequency Octaves For The Same Session Part (Use enum FreqType)
 
 // Mind Workstation
@@ -81,6 +77,7 @@ public class MainController implements Initializable {
     private ProgramState programState = ProgramState.IDLE;
 // GUI Fields
     // Top Menu
+    public MenuBar TopMenuBar;
     public MenuItem PreferenceMenuItem;
     public MenuItem CloseMenuItem;
     public MenuItem EditAvailableAmbienceMenuItem;
@@ -268,6 +265,7 @@ public class MainController implements Initializable {
 // Setup Methods
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        TopMenuBar.setUseSystemMenuBar(true);
         setPreferences(new Preferences());
         getPreferences().unmarshall();
         setupIcons();
@@ -294,6 +292,7 @@ public class MainController implements Initializable {
         PracticedSessionListTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> populatesessiondetailstable());
         GoalsIndividual_SelectedSessionItemChoiceBox.setItems(FXCollections.observableArrayList(ALLNAMES));
         GoalsIndividual_SelectedSessionItemChoiceBox.getSelectionModel().selectedIndexProperty().addListener(observable -> populategoalsdetailstable());
+
     }
     private void setupTables() {
         // Creation Table

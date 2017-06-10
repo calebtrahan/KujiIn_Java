@@ -4,7 +4,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -43,7 +42,7 @@ public class EditReferenceFiles extends StyledStage {
     public EditReferenceFiles(MainController Root) {
         try {
             this.Root = Root;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/old/EditReferenceFiles.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/reference/EditReferenceFiles.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
@@ -86,7 +85,7 @@ public class EditReferenceFiles extends StyledStage {
             PreviewButton.setOnAction(event -> preview());
             SaveButton.setOnAction(event -> saveselectedfile());
             CloseButton.setOnAction(event -> close());
-        } catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e).showAndWait();}
+        } catch (IOException e) {new ExceptionDialog(e).showAndWait();}
     }
 
     // Text Area Methods
@@ -222,20 +221,15 @@ public class EditReferenceFiles extends StyledStage {
         if (referenceType == null || selectedplaybackitem == null) {selectedfile = null; return;}
         switch (referenceType) {
             case html:
-//                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "html"), selectedplaybackitem.getNameForReference() + ".html");
-                if (! selectedfile.exists()) {try {if (! selectedfile.createNewFile()) throw new IOException();} catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e);}}
+                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "html"), selectedplaybackitem.getName().toUpperCase() + ".html");
+                if (! selectedfile.exists()) {try {if (! selectedfile.createNewFile()) throw new IOException();} catch (IOException e) {new ExceptionDialog(e);}}
                 break;
             case txt:
-//                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "txt"), selectedplaybackitem.getNameForReference() + ".txt");
-                if (! selectedfile.exists()) {try {if (! selectedfile.createNewFile()) throw new IOException();} catch (IOException e) {new ExceptionDialog(Root.getPreferences(), e);}}
+                selectedfile = new File(new File(Preferences.DIRECTORYREFERENCE, "txt"), selectedplaybackitem.getName().toUpperCase() + ".txt");
+                if (! selectedfile.exists()) {try {if (! selectedfile.createNewFile()) throw new IOException();} catch (IOException e) {new ExceptionDialog(e);}}
                 break;
         }
-    }
-
-    // Dialog Methods
-    public void closewindow(Event event) {
-        // Check If Unsaved Text
-        this.close();
+        System.out.println("File Exists: " + Boolean.toString(selectedfile.exists()) + " Location: " + selectedfile.getAbsolutePath());
     }
 
 }

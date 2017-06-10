@@ -10,7 +10,7 @@
 <?import javafx.scene.text.*?>
 <VBox prefHeight="526.0" prefWidth="743.0" stylesheets="@../styles/default.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kujiin.ui.MainController">
    <children>
-      <MenuBar>
+      <MenuBar fx:id="TopMenuBar">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
@@ -39,7 +39,7 @@
                      <children>
                         <VBox layoutX="71.0" layoutY="208.0" prefHeight="390.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <ToolBar prefHeight="41.0" prefWidth="600.0">
+                              <ToolBar prefHeight="9.0" prefWidth="743.0">
                                 <items>
                                     <Button fx:id="CreateNewSessionButton" mnemonicParsing="false" onAction="#createnewsession" text="Create New Session" />
                                     <Button fx:id="OpenFileButton" mnemonicParsing="false" onAction="#opensessionfromfile" text="Open Session From File" />
@@ -60,7 +60,7 @@
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
                                     </TableView>
-                                    <ToolBar fx:id="CreationTableControlsToolBar" maxHeight="39.0" VBox.vgrow="ALWAYS">
+                                    <ToolBar fx:id="CreationTableControlsToolBar" maxHeight="39.0" prefHeight="0.0" prefWidth="733.0" VBox.vgrow="ALWAYS">
                                       <items>
                                           <MenuButton fx:id="AddItemsMenu" maxHeight="27.0" mnemonicParsing="false" text="Add">
                                              <items>
