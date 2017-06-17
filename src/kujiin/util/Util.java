@@ -100,7 +100,6 @@ public class Util {
         } catch (FileNotFoundException ignored) {return false;}
     }
     public static String file_getcontents(File file) {
-        System.out.println(Boolean.toString(file == null));
         try {
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 StringBuilder sb = new StringBuilder();

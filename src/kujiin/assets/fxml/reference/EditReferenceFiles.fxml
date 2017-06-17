@@ -41,7 +41,7 @@
                      </HBox.margin>
                   </Button>
                   <Button fx:id="SaveButton" minWidth="50.0" mnemonicParsing="false" text="Save" />
-                  <Button fx:id="CloseButton" minWidth="50.0" mnemonicParsing="false" onMousePressed="#closewindow" text="Close" />
+                  <Button fx:id="CloseButton" minWidth="50.0" mnemonicParsing="false" onMousePressed="#close" text="Close" />
                </children>
             </HBox>
          </children>
