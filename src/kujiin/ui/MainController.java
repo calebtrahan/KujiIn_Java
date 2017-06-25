@@ -724,7 +724,7 @@ public class MainController implements Initializable {
             int number = 1;
             for (PlaybackItem i : createdtableplaybackitems) {
                 createdtableitems.add(new TableItem_Number_Name_Duration_Ambience(number, i.getName(),
-                        i.getdurationasString(CreatedTableItemColumn.getWidth()), i.getAmbienceasString()));
+                        i.getdurationasString(), i.getAmbienceasString()));
                 number++;
             }
             CreatedTableView.setItems(createdtableitems);
@@ -791,7 +791,8 @@ public class MainController implements Initializable {
                 String name = String.format("%s (%.1f%%)", data.getName(), 100 * data.getPieValue() / total);
                 data.setName(name);
             }
-            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringSpelledOut(totaltimepracticed, ProgressOverviewTotalTimePracticed.getLayoutBounds().getWidth()));
+            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringDecimalWithColons(totaltimepracticed));
+            ProgressOverviewTotalTimePracticed.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(totaltimepracticed, Double.MAX_VALUE)));
             ProgressOverviewBarChart.getData().add(series);
             ProgressOverviewBarChart.setLegendVisible(false);
         }
@@ -842,7 +843,8 @@ public class MainController implements Initializable {
                 count++;
             }
             SessionBrowser_DetailsTable.setItems(sessionitems);
-            SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(selectedsession.getSessionPracticedTime(), SessionBrowser_Details_TotalDuration.getWidth()));
+            SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringDecimalWithColons(selectedsession.getSessionPracticedTime()));
+            SessionBrowser_Details_TotalDuration.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(selectedsession.getSessionPracticedTime(), Double.MAX_VALUE)));
             SessionBrowser_ViewNotesButton.setDisable(selectedsession.getNotes() == null || selectedsession.getNotes().isEmpty());
         } else {SessionBrowser_DetailsTable.setPlaceholder(new Label("Select A Session To View Details"));}
     }
@@ -872,9 +874,12 @@ public class MainController implements Initializable {
     }
         // Filter
     public void populatesessionbrowserfilter() {
-        double totalpracticetimeinminutes = sessions.gettotalpracticedtime().toMinutes();
-        Double hours = totalpracticetimeinminutes / 60.0;
-        Double minutes = totalpracticetimeinminutes - (hours * 60.0);
+        Duration highestduration = Duration.ZERO;
+        for (Session i : sessions.getSession()) {
+            if (i.getSessionPracticedTime().greaterThanOrEqualTo(highestduration)) {highestduration = i.getSessionPracticedTime();}
+        }
+        Double hours = highestduration.toMinutes() / 60.0;
+        Double minutes = highestduration.toMinutes() % 60.0;
         SessionBrowser_Filter_Duration_From_Hours.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
         SessionBrowser_Filter_Duration_From_Hours.valueProperty().addListener((observable, oldValue, newValue) -> {
             Duration newfromduration = Duration.hours(new Double(newValue));
@@ -1000,7 +1005,7 @@ public class MainController implements Initializable {
                 currentgoaltext = "None";
                 percentcompleted = "-";
             } else {
-                currentgoaltext = Util.formatdurationtoStringSpelledOut(currentgoal.getDuration(), 1000.0);
+                currentgoaltext = Util.formatdurationtoStringDecimalWithColons(currentgoal.getDuration());
                 percentcompleted = String.format("%.2f", (practicedduration.toMillis() / currentgoal.getDuration().toMillis()) * 100) + "%";
             }
             int completedgoalcount = 0;
@@ -1028,13 +1033,15 @@ public class MainController implements Initializable {
             GoalsIndividual_Table.getItems().clear();
             Session dummysession = new Session();
             PlaybackItem playbackItem = dummysession.getplaybackitem(index);
-            GoalsIndividual_PracticedTime.setText(Util.formatdurationtoStringSpelledOut(sessions.gettotalpracticedtime(playbackItem, false), GoalsIndividual_PracticedTime.getWidth()));
+            Duration duration = sessions.gettotalpracticedtime(playbackItem, false);
+            GoalsIndividual_PracticedTime.setText(Util.formatdurationtoStringDecimalWithColons(duration));
+            GoalsIndividual_PracticedTime.setTooltip(new Tooltip(Util.formatdurationtoStringDecimalWithColons(duration)));
             ObservableList<GoalDetailsTableItem> tableitems = FXCollections.observableArrayList();
             List<Goal> goalList = allGoals.getplaybackItemGoals(index).getGoals();
             if (goalList != null && ! goalList.isEmpty()) {
                 for (Goal i :goalList) {
                     if (! GoalsIndividual_ShowCompletedGoalsCheckbox.isSelected() && i.getCompleted()) {continue;}
-                    String goaltime = Util.formatdurationtoStringSpelledOut(i.getDuration(), 1000.0);
+                    String goaltime = Util.formatdurationtoStringDecimalWithColons(i.getDuration());
                     String datecompleted;
                     String percentcompleted;
                     if (i.getCompleted()) {

@@ -6,8 +6,7 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.util.Util;
@@ -21,6 +20,8 @@ public class SessionDetails extends StyledStage {
     public BarChart<String, Number> SessionBarChart;
     public CategoryAxis SessionCategoryAxis;
     public NumberAxis SessionNumbersAxis;
+    public CheckBox AddSessionNotesCheckbox;
+    public TextArea SessionNotesTextArea;
     public Label DurationCompletedLabel;
     public Button CloseButton;
 
@@ -43,14 +44,19 @@ public class SessionDetails extends StyledStage {
                 if (new Duration(i.getExpectedDuration()).greaterThan(highestduration)) {highestduration = new Duration(i.getExpectedDuration());}
             }
             StringBuilder stringBuilder = new StringBuilder();
-            if (sessionjustcompleted) {stringBuilder.append("You've Completed ");
-            } else {stringBuilder.append("Session Duration: ");}
-            stringBuilder.append(Util.formatdurationtoStringSpelledOut(totalsessionduration, Double.MAX_VALUE));
+            StringBuilder tooltiptext = new StringBuilder();
+            if (sessionjustcompleted) {stringBuilder.append("You've Completed "); tooltiptext.append("You've Completed ");}
+            else {stringBuilder.append("Session Duration: "); tooltiptext.append("Session DurationL ");}
+            stringBuilder.append(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
+            tooltiptext.append(Util.formatdurationtoStringSpelledOut(totalsessionduration, Double.MAX_VALUE));
             DurationCompletedLabel.setText(stringBuilder.toString());
+            DurationCompletedLabel.setTooltip(new Tooltip(tooltiptext.toString()));
             SessionBarChart.getData().add(series);
             SessionBarChart.setLegendVisible(false);
-            Duration finalTotalsessionduration = totalsessionduration;
             SessionBarChart.requestFocus();
+            AddSessionNotesCheckbox.setSelected(! sessionjustcompleted);
+            AddSessionNotesCheckbox.setDisable(! sessionjustcompleted);
+            SessionNotesTextArea.setDisable(! sessionjustcompleted);
             CloseButton.setOnAction(event -> close());
         } catch (IOException ignored) {}
     }
@@ -73,13 +79,15 @@ public class SessionDetails extends StyledStage {
                 if (new Duration(i.getExpectedDuration()).greaterThan(highestduration)) {highestduration = new Duration(i.getExpectedDuration());}
             }
             StringBuilder stringBuilder = new StringBuilder();
-            if (sessionjustcompleted) {stringBuilder.append("You've Completed ");
-            } else {stringBuilder.append("Session Duration: ");}
-            stringBuilder.append(Util.formatdurationtoStringSpelledOut(totalsessionduration, Double.MAX_VALUE));
+            StringBuilder tooltiptext = new StringBuilder();
+            if (sessionjustcompleted) {stringBuilder.append("You've Completed "); tooltiptext.append("You've Completed ");}
+            else {stringBuilder.append("Session Duration: "); tooltiptext.append("Session DurationL ");}
+            stringBuilder.append(Util.formatdurationtoStringDecimalWithColons(totalsessionduration));
+            tooltiptext.append(Util.formatdurationtoStringSpelledOut(totalsessionduration, Double.MAX_VALUE));
             DurationCompletedLabel.setText(stringBuilder.toString());
+            DurationCompletedLabel.setTooltip(new Tooltip(tooltiptext.toString()));
             SessionBarChart.getData().add(series);
             SessionBarChart.setLegendVisible(false);
-            Duration finalTotalsessionduration = totalsessionduration;
             SessionBarChart.requestFocus();
             CloseButton.setOnAction(event -> close());
         } catch (IOException ignored) {}

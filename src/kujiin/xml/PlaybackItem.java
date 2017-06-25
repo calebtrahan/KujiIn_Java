@@ -77,11 +77,11 @@ public class PlaybackItem {
     public double getPracticeTime() {
         return PracticeTime;
     }
-    public String getdurationasString(double maxchars) {
+    public String getdurationasString() {
         if (ExpectedDuration == 0.0 && ! RampOnly) {return "No Duration Set";}
         else {
             if (ExpectedDuration == 0.0 && RampOnly) {return "Ramp Only";}
-            else {return Util.formatdurationtoStringSpelledOut(new Duration(getExpectedDuration()), maxchars);}
+            else {return Util.formatdurationtoStringDecimalWithColons(new Duration(getExpectedDuration()));}
         }
     }
     public String getAmbienceasString() {

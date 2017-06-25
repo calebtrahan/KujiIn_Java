@@ -4,10 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.util.Util;
@@ -38,9 +35,11 @@ public class SessionComplete extends StyledStage {
             else {sessionsummary = "Session Ended";}
             setTitle(sessionsummary);
             TopLabel.setText(sessionsummary);
-            if (sessioncomplete) {DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getSessionPracticedTime(), 1000.0));}
-            else {
-                DurationCompletedLabel.setText("You've Completed " + Util.formatdurationtoStringSpelledOut(session.getSessionPracticedTime(), 1000.0));
+            String tooltiptext = "You've Completed " + Util.formatdurationtoStringSpelledOut(session.getSessionPracticedTime(), 1000.0);
+            String text = "You've Completed " + Util.formatdurationtoStringDecimalWithColons(session.getSessionPracticedTime());
+            DurationCompletedLabel.setText(text);
+            DurationCompletedLabel.setTooltip(new Tooltip(tooltiptext));
+            if (! sessioncomplete) {
                 AddSessionNotesCheckbox.setVisible(false);
                 SessionNotesTextArea.setVisible(false);
             }

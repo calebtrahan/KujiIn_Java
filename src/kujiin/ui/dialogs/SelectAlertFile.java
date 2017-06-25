@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.ui.boilerplate.StyledStage;
@@ -110,9 +111,11 @@ public class SelectAlertFile extends StyledStage {
                         String.format("Alert File Is %s Which Is Too Long And Will Break Immersion", Util.formatdurationtoStringDecimalWithColons(alertfileduration)));
                 return;
             }
-            String durationtext = Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), alertfileTextField.getLayoutBounds().getWidth());
+            Duration durationtodisplay = new Duration(duration * 1000);
+            String durationtext = Util.formatdurationtoStringDecimalWithColons(durationtodisplay);
             String text = String.format("%s (%s)", alertfile.getName(), durationtext);
             alertfileTextField.setText(text);
+            alertfileTextField.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(durationtodisplay, Double.MAX_VALUE)));
         } else {
             if (alertfile != null) {alertfile = null; alertfiletoggled();}
             alertfileTextField.setText(Preferences.NO_ALERT_FILE_SELECTED_TEXT);
@@ -134,10 +137,10 @@ public class SelectAlertFile extends StyledStage {
             new InformationDialog(Root.getPreferences(), "Invalid File", "Invalid Audio File", "Audio File Has Zero Length Or Is Corrupt. Cannot Use As Alert File"); return false;}
         else if (duration >= (Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH) && duration < (Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH)) {
             String confirmationtext = String.format("%s Is %s Which Is Longer Than The Suggested Maximum Duration %s. This May Break Session Immersion", testfile.getName(),
-                    Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000), null));
+                    Util.formatdurationtoStringDecimalWithColons(new Duration(duration * 1000)), Util.formatdurationtoStringDecimalWithColons(new Duration(Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000)));
             return new ConfirmationDialog(Root.getPreferences(), "Alert File Too Long", null, confirmationtext, "Use As Alert File", "Cancel").getResult();
         } else if (duration >= Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-            String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringSpelledOut(new Duration(duration * 1000), null), Util.formatdurationtoStringSpelledOut(new Duration(Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000), null));
+            String errortext = String.format("%s Is Longer Than The Maximum Allowable Duration %s", Util.formatdurationtoStringDecimalWithColons(new Duration(duration * 1000)), Util.formatdurationtoStringDecimalWithColons(new Duration(Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH * 1000)));
             new InformationDialog(Root.getPreferences(), "Invalid File", errortext, "Cannot Use As Alert File As It Will Break Immersion");
             return false;
         } else {return true;}

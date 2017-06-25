@@ -305,13 +305,13 @@
                                                                                                             <Insets right="5.0" />
                                                                                                          </HBox.margin>
                                                                                                       </CheckBox>
-                                                                                                      <Spinner fx:id="SessionBrowser_Filter_Duration_From_Hours" prefHeight="27.0" prefWidth="55.0" />
+                                                                                                      <Spinner fx:id="SessionBrowser_Filter_Duration_From_Hours" prefHeight="27.0" prefWidth="59.0" />
                                                                                                       <Label text="hr(s)">
                                                                                                          <HBox.margin>
                                                                                                             <Insets left="2.0" right="5.0" />
                                                                                                          </HBox.margin>
                                                                                                       </Label>
-                                                                                                      <Spinner fx:id="SessionBrowser_Filter_Duration_From_Minutes" prefHeight="27.0" prefWidth="55.0" />
+                                                                                                      <Spinner fx:id="SessionBrowser_Filter_Duration_From_Minutes" prefHeight="27.0" prefWidth="59.0" />
                                                                                                       <Label text="min(s)">
                                                                                                          <HBox.margin>
                                                                                                             <Insets left="2.0" />
@@ -325,13 +325,13 @@
                                                                                                             <Insets right="5.0" />
                                                                                                          </HBox.margin>
                                                                                                       </CheckBox>
-                                                                                                      <Spinner fx:id="SessionBrowser_Filter_Duration_To_Hours" prefHeight="27.0" prefWidth="55.0" />
+                                                                                                      <Spinner fx:id="SessionBrowser_Filter_Duration_To_Hours" prefHeight="27.0" prefWidth="59.0" />
                                                                                                       <Label text="hr(s)">
                                                                                                          <HBox.margin>
                                                                                                             <Insets left="2.0" right="5.0" />
                                                                                                          </HBox.margin>
                                                                                                       </Label>
-                                                                                                      <Spinner fx:id="SessionBrowser_Filter_Duration_To_Minutes" prefHeight="27.0" prefWidth="55.0" />
+                                                                                                      <Spinner fx:id="SessionBrowser_Filter_Duration_To_Minutes" prefHeight="27.0" prefWidth="59.0" />
                                                                                                       <Label text="min(s)">
                                                                                                          <HBox.margin>
                                                                                                             <Insets left="2.0" />
@@ -388,7 +388,7 @@
                                                                            </children>
                                                                         </HBox>
                                                                         <Label fx:id="SessionBrowser_Details_TotalDuration_Label" disable="true" text="Session Duration" />
-                                                                        <TextField fx:id="SessionBrowser_Details_TotalDuration" editable="false" prefHeight="25.0" prefWidth="118.0">
+                                                                        <TextField fx:id="SessionBrowser_Details_TotalDuration" alignment="CENTER" editable="false" prefHeight="27.0" prefWidth="103.0">
                                                                            <HBox.margin>
                                                                               <Insets left="7.0" />
                                                                            </HBox.margin>
@@ -463,7 +463,7 @@
                                        <children>
                                           <VBox prefHeight="171.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="600.0">
+                                                <HBox alignment="CENTER" prefHeight="34.0" prefWidth="600.0">
                                                    <children>
                                                       <Label text="Select Session Item">
                                                          <font>
@@ -483,7 +483,7 @@
                                                             <Font size="15.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="GoalsIndividual_PracticedTime" editable="false" prefHeight="25.0" prefWidth="157.0" HBox.hgrow="ALWAYS">
+                                                      <TextField fx:id="GoalsIndividual_PracticedTime" alignment="CENTER" editable="false" prefHeight="27.0" prefWidth="120.0">
                                                          <HBox.margin>
                                                             <Insets left="10.0" />
                                                          </HBox.margin>

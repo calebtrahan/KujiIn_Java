@@ -99,7 +99,7 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
 
         public AvailableAmbienceTableItem(String name, Duration duration) {
             this.name = new SimpleStringProperty(name);
-            this.duration = new SimpleStringProperty(Util.formatdurationtoStringSpelledOut(duration, DurationColumn.getWidth()));
+            this.duration = new SimpleStringProperty(Util.formatdurationtoStringDecimalWithColons(duration));
         }
 
     }
