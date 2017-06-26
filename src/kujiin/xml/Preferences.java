@@ -15,6 +15,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -131,7 +133,7 @@ public class Preferences {
     public Preferences.PlaybackOptions getPlaybackOptions() {return PlaybackOptions;}
     public void setPlaybackOptions(Preferences.PlaybackOptions playbackOptions) {PlaybackOptions = playbackOptions;}
 
-    // XML Processing
+// XML Processing
     public void unmarshall() {
         if (OPTIONSXMLFILE.exists()) {
             try {
@@ -195,12 +197,14 @@ public class Preferences {
         marshall();
     }
     public boolean hasValidAlertFile() {
-        String location = getSessionOptions().getAlertfilelocation();
-        if (location == null || location.equals("")) {return false;}
-        else {
-            try {return new File(location).exists();}
-            catch (Exception e) {return false;}
-        }
+        try {
+            URI location = new URI(getSessionOptions().getAlertfilelocation());
+            if (location == null) {return false;}
+            else {
+                try {return new File(location).exists();}
+                catch (Exception e) {return false;}
+            }
+        } catch (URISyntaxException e) {return false;}
     }
 
 // Subclasses

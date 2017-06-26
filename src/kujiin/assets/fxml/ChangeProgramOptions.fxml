@@ -366,7 +366,7 @@
             </TabPane>
             <HBox alignment="CENTER_LEFT" prefHeight="17.0" prefWidth="430.0">
                <children>
-                  <Label fx:id="DescriptionBoxTopLabel" prefHeight="16.0" prefWidth="414.0" text="Node Name Description">
+                  <Label fx:id="DescriptionBoxTopLabel" prefHeight="16.0" prefWidth="414.0" text="Description">
                      <HBox.margin>
                         <Insets bottom="5.0" left="15.0" />
                      </HBox.margin>

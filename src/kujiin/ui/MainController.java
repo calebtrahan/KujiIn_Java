@@ -45,8 +45,7 @@ import java.util.ResourceBundle;
 import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
-    // TODO Alert File Preventing Playback From Progressing To Next Session Part
-    // TODO Alert File Function Not Saving To XML From Preferences
+    // TODO Alert File Is Setting PlayerState To Stopped Somehow Preventing Transition
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
 
 // Additional Features To Definitely Add
@@ -163,7 +162,7 @@ public class MainController implements Initializable {
     public Button SessionBrowser_ViewNotesButton;
     public Label SessionBrowser_Details_TotalDuration_Label;
     public TextField SessionBrowser_Details_TotalDuration;
-    // AllGoals Pane
+    // All Goals Pane
     public Tab GoalsTab;
     public TabPane GoalsTabPane;
     public Tab GoalsOverviewTab;

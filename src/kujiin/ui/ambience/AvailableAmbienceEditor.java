@@ -48,7 +48,7 @@ public class AvailableAmbienceEditor extends StyledStage {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            setTitle("Available Ambience Editor");
+            setTitle("Edit Available Ambience");
             String[] names = {"Qi-Gong", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Earth", "Air", "Fire", "Water", "Void"};
             ObservableList<String> allnames = FXCollections.observableArrayList(names);
             PlaybackItemsListView.setItems(allnames);
@@ -64,7 +64,7 @@ public class AvailableAmbienceEditor extends StyledStage {
                 PreviewButton.setDisable(AmbienceTable.getSelectionModel().getSelectedIndex() == -1);
                 RemoveButton.setDisable(AmbienceTable.getSelectionModel().getSelectedIndex() == -1);
             });
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
     }
 
 // Utility Methods

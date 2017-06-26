@@ -50,7 +50,6 @@ public class Main extends Application {
             } else {event.consume();}
         });
         primaryStage.show();
-        test();
     }
 
     public void test() {

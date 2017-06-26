@@ -83,8 +83,7 @@ public class ChangeProgramOptions extends StyledStage {
     // Session Tab
         if (Preferences.getSessionOptions().getAlertfunction()) {
             AlertFileSwitch.setSelected(Preferences.hasValidAlertFile());
-            if (! AlertFileSwitch.isSelected()) {
-                Preferences.getSessionOptions().setAlertfunction(false); Preferences.getSessionOptions().setAlertfilelocation(null);}
+            if (! AlertFileSwitch.isSelected()) {Preferences.getSessionOptions().setAlertfunction(false); Preferences.getSessionOptions().setAlertfilelocation(null);}
         } else {AlertFileSwitch.setSelected(false);}
         RampSwitch.setSelected(Preferences.getSessionOptions().getRampenabled());
         ReferenceSwitch.setSelected(Preferences.getSessionOptions().getReferenceoption());
@@ -217,7 +216,7 @@ public class ChangeProgramOptions extends StyledStage {
         super.close();
     }
 
-// User Interface & Creation Tab Tab
+// User Interface & Creation Tab
     public void ambiencetypechanged() {
     switch (AmbienceTypeChoiceBox.getSelectionModel().getSelectedIndex()) {
         case 0:

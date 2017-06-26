@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Collections;
 
 public class SelectAlertFile extends StyledStage {
-    public Button HelpButton;
     public Button AcceptButton;
     public Button CancelButton;
     public CheckBox AlertFileToggleButton;
@@ -37,12 +36,11 @@ public class SelectAlertFile extends StyledStage {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/ChangeAlertDialog.fxml"));
             fxmlLoader.setController(this);
             setScene(new Scene(fxmlLoader.load()));
-            setTitle("Alert File Editor");
+            setTitle("Add Or Edit Alert File");
             AlertFileToggleButton.setSelected(Root.getPreferences().getSessionOptions().getAlertfunction());
             String alertfilelocation = Root.getPreferences().getSessionOptions().getAlertfilelocation();
             if (alertfilelocation != null) {alertfile = new File(Root.getPreferences().getSessionOptions().getAlertfilelocation());}
             alertfiletoggled();
-            HelpButton.setOnAction(event -> help());
             PreviewButton.setOnAction(event -> preview());
             AcceptButton.setOnAction(event -> accept());
             CancelButton.setOnAction(event -> cancel());
@@ -86,8 +84,10 @@ public class SelectAlertFile extends StyledStage {
         }
     }
     public void alertfiletoggled() {
-        if (AlertFileToggleButton.isSelected()) {AlertFileToggleButton.setText("ON");}
-        else {AlertFileToggleButton.setText("OFF");}
+        if (AlertFileToggleButton.isSelected()) {
+            AlertFileToggleButton.setText("ON");
+            if (alertfile == null) {openandtestnewfile();}
+        } else {AlertFileToggleButton.setText("OFF");}
         PreviewButton.setDisable(! AlertFileToggleButton.isSelected() || alertfile == null);
         openFileButton.setDisable(! AlertFileToggleButton.isSelected());
         alertfileTextField.setDisable(! AlertFileToggleButton.isSelected() || alertfile == null);
@@ -120,6 +120,8 @@ public class SelectAlertFile extends StyledStage {
             if (alertfile != null) {alertfile = null; alertfiletoggled();}
             alertfileTextField.setText(Preferences.NO_ALERT_FILE_SELECTED_TEXT);
         }
+        AcceptButton.setDisable(! AlertFileToggleButton.isSelected() || alertfile == null);
+        PreviewButton.setDisable(! AlertFileToggleButton.isSelected() || alertfile == null);
     }
     public void help() {
         new InformationDialog(Root.getPreferences(), "What Is An Alert File?", "", "The 'alert file' is a short audible warning\nthat is played in between parts of the session\nto inform you it's time to player_transition to the next\npart of the session");
