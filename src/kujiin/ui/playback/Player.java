@@ -205,6 +205,10 @@ public class Player extends Stage {
             PlayButton.setText("");
             PauseButton.setText("");
             StopButton.setText("");
+        } else {
+            PlayButton.setText("Play");
+            PauseButton.setText("Pause");
+            StopButton.setText("Stop");
         }
     }
     private void setPlayerstate(PlayerState playerstate) {

@@ -45,7 +45,6 @@ import java.util.ResourceBundle;
 import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
-    // TODO Alert File Is Setting PlayerState To Stopped Somehow Preventing Transition
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
 
 // Additional Features To Definitely Add
@@ -367,6 +366,39 @@ public class MainController implements Initializable {
             PlayButton.setText("");
             SaveAsFileButton.setText("");
             ExportButton.setText("");
+        } else {
+            AmbienceMenu.setText("Ambience");
+            AddItemsMenu.setText("Add");
+            CreateNewSessionButton.setText("Create New Session");
+            OpenFileButton.setText("Open Session From File");
+            OpenRecentSessionsButton.setText("Recent Sessions");
+            OpenFavoritesButton.setText("Favorite Sessions");
+            DurationMenu.setText("Duration");
+            MoveUpButton.setText("Up");
+            MoveDownButton.setText("Down");
+            RemoveButton.setText("Remove");
+            ClearButton.setText("Clear Session");
+            AddToFavoritesButton.setText("Add To Favorites");
+            PlayButton.setText("Play");
+            SaveAsFileButton.setText("Save As");
+            ExportButton.setText("Export");
+        }
+        if (dt == IconDisplayType.TEXT_ONLY) {
+            AddItemsMenu.setGraphic(null);
+            CreateNewSessionButton.setGraphic(null);
+            OpenFileButton.setGraphic(null);
+            OpenRecentSessionsButton.setGraphic(null);
+            ClearButton.setGraphic(null);
+            OpenFavoritesButton.setGraphic(null);
+            DurationMenu.setGraphic(null);
+            AmbienceMenu.setGraphic(null);
+            MoveUpButton.setGraphic(null);
+            MoveDownButton.setGraphic(null);
+            RemoveButton.setGraphic(null);
+            AddToFavoritesButton.setGraphic(null);
+            PlayButton.setGraphic(null);
+            SaveAsFileButton.setGraphic(null);
+            ExportButton.setGraphic(null);
         }
         syncbuttons();
     }
@@ -397,6 +429,7 @@ public class MainController implements Initializable {
             changeProgramOptions.initOwner(getStage());
             changeProgramOptions.showAndWait();
             preferences.marshall();
+            setupIcons();
         }
     }
     public void closeprogram() {

@@ -11,6 +11,7 @@ import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.ExceptionDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
+import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.QuickAddAmbienceType;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.Preferences;
@@ -23,8 +24,9 @@ public class ChangeProgramOptions extends StyledStage {
 // User Interface & Creation Tab
     public CheckBox TooltipsCheckBox;
     public CheckBox HelpDialogsCheckBox;
-    public ChoiceBox<String> AmbienceTypeChoiceBox;
+    public ChoiceBox<String> UIDisplayTypeComboBox;
     public Spinner<Integer> ScrollIncrement;
+    public ChoiceBox<String> AmbienceTypeChoiceBox;
 // Session Tab
     public CheckBox AlertFileSwitch;
     public CheckBox RampSwitch;
@@ -78,6 +80,18 @@ public class ChangeProgramOptions extends StyledStage {
     // User Interface Tab
         TooltipsCheckBox.setSelected(Preferences.getUserInterfaceOptions().getTooltips());
         HelpDialogsCheckBox.setSelected(Preferences.getUserInterfaceOptions().getHelpdialogs());
+        UIDisplayTypeComboBox.setItems(FXCollections.observableArrayList("Icons And Text", "Icons Only", "Text Only"));
+        switch (Preferences.getUserInterfaceOptions().getIconDisplayType()) {
+            case TEXT_ONLY:
+                UIDisplayTypeComboBox.getSelectionModel().select(2);
+                break;
+            case ICONS_ONLY:
+                UIDisplayTypeComboBox.getSelectionModel().select(1);
+                break;
+            case ICONS_AND_TEXT:
+                UIDisplayTypeComboBox.getSelectionModel().select(0);
+                break;
+        }
     // Creation Tab
         ScrollIncrement.getValueFactory().setValue(Preferences.getCreationOptions().getScrollincrement());
     // Session Tab
@@ -141,6 +155,7 @@ public class ChangeProgramOptions extends StyledStage {
     // User Interface Tab
         TooltipsCheckBox.setOnAction(event -> Preferences.getUserInterfaceOptions().setTooltips(TooltipsCheckBox.isSelected()));
         HelpDialogsCheckBox.setOnAction(event -> Preferences.getUserInterfaceOptions().setHelpdialogs(HelpDialogsCheckBox.isSelected()));
+        UIDisplayTypeComboBox.setOnAction(event -> uidisplaytypechanged());
     // Creation Tab
         ScrollIncrement.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, Preferences.getCreationOptions().getScrollincrement()));
         ScrollIncrement.setOnScroll(event -> {
@@ -227,6 +242,19 @@ public class ChangeProgramOptions extends StyledStage {
             break;
     }
 }
+    public void uidisplaytypechanged() {
+        switch (UIDisplayTypeComboBox.getSelectionModel().getSelectedIndex()) {
+            case 0:
+                Preferences.getUserInterfaceOptions().setIconDisplayType(IconDisplayType.ICONS_AND_TEXT);
+                break;
+            case 1:
+                Preferences.getUserInterfaceOptions().setIconDisplayType(IconDisplayType.ICONS_ONLY);
+                break;
+            case 2:
+                Preferences.getUserInterfaceOptions().setIconDisplayType(IconDisplayType.TEXT_ONLY);
+                break;
+        }
+    }
 
 // Session Tab
     // Alert File

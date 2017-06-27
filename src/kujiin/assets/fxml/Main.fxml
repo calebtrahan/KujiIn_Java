@@ -121,10 +121,10 @@
                                        <children>
                                           <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <Button fx:id="ClearButton" mnemonicParsing="false" onAction="#clearloadedsession" text="Clear Session" />
                                                 <Label fx:id="CreatorStatusBar" HBox.hgrow="ALWAYS" />
                                                 <HBox alignment="CENTER_RIGHT">
                                                    <children>
+                                                      <Button fx:id="ClearButton" mnemonicParsing="false" onAction="#clearloadedsession" text="Clear Session" />
                                                       <Button fx:id="AddToFavoritesButton" mnemonicParsing="false" onAction="#addcreatedsessiontofavorites" text="Add To Favorites" HBox.hgrow="ALWAYS" />
                                                       <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#playcreatedsession" text="Play" />
                                                       <Button fx:id="SaveAsFileButton" mnemonicParsing="false" onAction="#savecreatedsessionasfile" text="Save As" />

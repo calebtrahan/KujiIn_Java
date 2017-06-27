@@ -75,6 +75,7 @@ public class Preferences {
     private static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
     private static final Boolean DEFAULT_HELP_DIALOGS_OPTION = true;
     private static final Integer DEFAULT_SCROLL_INCREMENT = 1;
+    private static final IconDisplayType DEFAULT_ICON_DISPLAY_TYPE = IconDisplayType.ICONS_AND_TEXT;
     // Session Preferences
     public static final Double FADE_VALUE_MAX_DURATION = 15.0;
     public static final Double VOLUME_SLIDER_ADJUSTMENT_INCREMENT = 5.0;
@@ -168,7 +169,7 @@ public class Preferences {
         AdvancedOptions advancedOptions = new AdvancedOptions();
         userInterfaceOptions.setTooltips(DEFAULT_TOOLTIPS_OPTION);
         userInterfaceOptions.setHelpdialogs(DEFAULT_HELP_DIALOGS_OPTION);
-        userInterfaceOptions.setIconDisplayType(IconDisplayType.ICONS_AND_TEXT);
+        userInterfaceOptions.setIconDisplayType(DEFAULT_ICON_DISPLAY_TYPE);
         creationOptions.setScrollincrement(DEFAULT_SCROLL_INCREMENT);
         creationOptions.setQuickaddambiencetype(DEFAULT_AMBIENCE_QUICKADD_TYPE);
         sessionOptions.setAlertfunction(DEFAULT_ALERTFUNCTION_OPTION);
