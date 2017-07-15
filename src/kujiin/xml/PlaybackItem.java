@@ -38,6 +38,12 @@ public class PlaybackItem {
     }
 
 // Getters And Setters
+    public PlaybackItemType getPlaybackItemType() {
+        return playbackItemType;
+    }
+    public void setPlaybackItemType(PlaybackItemType playbackItemType) {
+        this.playbackItemType = playbackItemType;
+    }
     public int getCreationindex() {
         return creationindex;
     }
@@ -134,7 +140,7 @@ public class PlaybackItem {
         }
     }
 
-    enum PlaybackItemType {
+    public enum PlaybackItemType {
         QIGONG, CUT, ELEMENT
     }
 }

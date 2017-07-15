@@ -144,6 +144,18 @@ public class Session {
     }
 
 // Utility Methods
+    public boolean hasCuts() {
+        for (PlaybackItem i : getPlaybackItems()) {
+            if (i.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT) {return true;}
+        }
+        return false;
+    }
+    public boolean hasElements() {
+        for (PlaybackItem i : getPlaybackItems()) {
+            if (i.getPlaybackItemType() == PlaybackItem.PlaybackItemType.ELEMENT) {return true;}
+        }
+        return false;
+    }
     public void calculateactualduration() {
         Duration duration = Duration.ZERO;
         for (PlaybackItem i : getPlaybackItems()) {
