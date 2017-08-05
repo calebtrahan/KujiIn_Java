@@ -16,7 +16,7 @@ import java.util.List;
 public class QuickAddAmbience extends StyledStage {
     public RadioButton RepeatRadioButton;
     public RadioButton ShuffleRadioButton;
-    public Button AcceptButton;
+    public Button AddAmbienceButton;
     public Button CancelButton;
     private List<PlaybackItem> playbackItemList;
     private AvailableAmbiences availableAmbiences;
@@ -45,6 +45,7 @@ public class QuickAddAmbience extends StyledStage {
                     quickAmbienceType = QuickAmbienceType.Shuffle;
                     break;
             }
+            AddAmbienceButton.requestFocus();
         } catch (IOException e) {e.printStackTrace();}
     }
 

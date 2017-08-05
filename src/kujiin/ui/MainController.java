@@ -558,7 +558,18 @@ public class MainController implements Initializable {
                 quickAddAmbience.showAndWait();
                 if (quickAddAmbience.isAccepted()) {playbackItem = quickAddAmbience.getPlaybackItemList().get(0);}
             }
-            createdsession.addplaybackitems(Collections.singletonList(playbackItem)); createdsession.calculateexpectedduration();}
+            boolean needstomerge = false;
+            int startindex = 0;
+            if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1) {
+                startindex = CreatedTableView.getSelectionModel().getSelectedIndex();
+                if (createdsession.getplaybackitem(startindex).getCreationindex() == playbackItem.getCreationindex()) {needstomerge = true;}
+            }
+            createdsession.addplaybackitems(startindex, Collections.singletonList(playbackItem)); createdsession.calculateexpectedduration();
+            if (needstomerge) {
+                populatetable();
+                mergeitems(createdsession.getplaybackitem(startindex), createdsession.getplaybackitem(startindex + 1));
+            }
+        }
         populatetable();
     }
     private void add(int[] availableambienceindexes) {
@@ -581,7 +592,17 @@ public class MainController implements Initializable {
                 quickAddAmbience.showAndWait();
                 if (quickAddAmbience.isAccepted()) {items = quickAddAmbience.getPlaybackItemList();}
             }
-            createdsession.addplaybackitems(items); createdsession.calculateexpectedduration();
+            boolean needstomerge = false;
+            int startindex = 0;
+            if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1) {
+                startindex = CreatedTableView.getSelectionModel().getSelectedIndex();
+                if (createdsession.getplaybackitem(startindex).getCreationindex() == items.get(0).getCreationindex()) {needstomerge = true;}
+            }
+            createdsession.addplaybackitems(startindex, items); createdsession.calculateexpectedduration();
+            if (needstomerge) {
+                populatetable();
+                mergeitems(createdsession.getplaybackitem(startindex), createdsession.getplaybackitem(startindex + 1));
+            }
         }
         populatetable();
     }
@@ -673,43 +694,19 @@ public class MainController implements Initializable {
     }
     public void moveupincreatortable() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
-        ArrayList<PlaybackItem> itemsinsession = createdsession.getPlaybackItems();
         if (selectedindex > 0) {
+            ArrayList<PlaybackItem> itemsinsession = createdsession.getPlaybackItems();
             PlaybackItem currentitem = createdsession.getPlaybackItems().get(selectedindex);
             PlaybackItem oneitemup = createdsession.getPlaybackItems().get(selectedindex - 1);
-        // Check If Moving Will Place Cuts Out Of Order
             if (currentitem.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT && oneitemup.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT) {
                 if (currentitem.getCreationindex() > oneitemup.getCreationindex()) {
                     if (! new ConfirmationDialog(preferences, "Confirmation", "This Will Place Cuts Out Of Order", "This Is Not Recommended", "Proceed Anyway", "Cancel").getResult()) {return;}
                 }
             }
-        // Check If Item Above Needs To Be Merged (Is The Same)
             if (selectedindex > 1 ) {
                 PlaybackItem twoitemsup = createdsession.getPlaybackItems().get(selectedindex - 2);
-                if (twoitemsup.getCreationindex() == oneitemup.getCreationindex()) {
-                    if (new ConfirmationDialog(preferences, "Confirmation", "Duplicate Playback Items Detected", "Merge?").getResult()) {
-                        itemsinsession.remove(oneitemup);
-                        Duration newduration = new Duration(oneitemup.getExpectedDuration());
-                        newduration = newduration.add(new Duration(twoitemsup.getExpectedDuration()));
-                        twoitemsup.setExpectedDuration(newduration.toMillis());
-                        if (twoitemsup.getAmbience().gettotalDuration().lessThan(newduration)) {
-                            String[] options = {"Quick Add Ambience", "Customize Ambience", "Don't Add Ambience"};
-                            ChoiceDialog<String> addambiencechoicedialog = new ChoiceDialog<>(options[0], options);
-                            addambiencechoicedialog.setHeaderText("Ambience For Playback Item Is Too Short");
-                            addambiencechoicedialog.setContentText("Select How You Would Like To Add Ambience");
-                            addambiencechoicedialog.showAndWait();
-                            switch (addambiencechoicedialog.getSelectedItem()) {
-                                case "Quick Add Ambience":
-                                    break;
-                                case "Customize Ambience":
-                                    break;
-                                case "Don't Add Ambience":
-                                    break;
-                            }
-                        }
-                        itemsinsession.set(itemsinsession.indexOf(twoitemsup), twoitemsup);
-                    } else {Collections.swap(itemsinsession, selectedindex, selectedindex - 1);}
-                } else {Collections.swap(itemsinsession, selectedindex, selectedindex - 1);}
+                if (twoitemsup.getCreationindex() == currentitem.getCreationindex()) {mergeitems(twoitemsup, currentitem); }
+                else {Collections.swap(itemsinsession, selectedindex, selectedindex - 1);}
             } else {Collections.swap(itemsinsession, selectedindex, selectedindex - 1);}
             createdsession.setPlaybackItems(itemsinsession);
             populatetable();
@@ -719,16 +716,73 @@ public class MainController implements Initializable {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1 && selectedindex < createdtableplaybackitems.size() - 1) {
             ArrayList<PlaybackItem> itemsinsession = createdsession.getPlaybackItems();
-            Collections.swap(itemsinsession, selectedindex, selectedindex + 1);
+            PlaybackItem currentitem = createdsession.getPlaybackItems().get(selectedindex);
+            PlaybackItem oneitemdown = createdsession.getPlaybackItems().get(selectedindex + 1);
+            if (currentitem.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT && oneitemdown.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT) {
+                if (currentitem.getCreationindex() > oneitemdown.getCreationindex()) {
+                    if (! new ConfirmationDialog(preferences, "Confirmation", "This Will Place Cuts Out Of Order", "This Is Not Recommended", "Proceed Anyway", "Cancel").getResult()) {return;}
+                }
+            }
+            if (selectedindex < createdtableplaybackitems.size() - 2) {
+                PlaybackItem twoitemsdown = createdsession.getPlaybackItems().get(selectedindex + 2);
+                if (twoitemsdown.getCreationindex() == currentitem.getCreationindex()) {mergeitems(twoitemsdown, currentitem); }
+                else {Collections.swap(itemsinsession, selectedindex, selectedindex + 1);}
+            } else {Collections.swap(itemsinsession, selectedindex, selectedindex + 1);}
             createdsession.setPlaybackItems(itemsinsession);
             populatetable();
         }
+
     }
     public void removefromcreatortable() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1 && createdtableitems != null) {
             createdsession.removeplaybackitem(selectedindex);
             populatetable();
+        }
+    }
+    private void mergeitems(PlaybackItem item1, PlaybackItem item2) {
+        if (new ConfirmationDialog(preferences, "Confirmation", "Duplicate Playback Item  + '" + item1.getName() + "' Detected", "Merge? (This Will Clear Ambience For Merged Items)").getResult()) {
+            ArrayList<PlaybackItem> itemsinsession = createdsession.getPlaybackItems();
+            int item1index = itemsinsession.indexOf(item1);
+            itemsinsession.remove(item2);
+            boolean ambiencewasenabled = item1.getAmbience().isEnabled() || item2.getAmbience().isEnabled();
+            Duration newduration = new Duration(item1.getExpectedDuration());
+            newduration = newduration.add(new Duration(item2.getExpectedDuration()));
+            item1.setExpectedDuration(newduration.toMillis());
+            item1.getAmbience().setAmbience(new ArrayList<>());
+            item1.getAmbience().setEnabled(false);
+            if (ambiencewasenabled) {
+                Duration ambienceduration = Duration.ZERO;
+                if (item1.getAmbience().isEnabled()) {ambienceduration = ambienceduration.add(item1.getAmbience().gettotalDuration());}
+                if (item2.getAmbience().isEnabled()) {ambienceduration = ambienceduration.add(item2.getAmbience().gettotalDuration());}
+                if (ambienceduration.lessThan(newduration)) {
+                    String[] options = {"Quick Add Ambience", "Customize Ambience", "Don't Add Ambience"};
+                    ChoiceDialog<String> addambiencechoicedialog = new ChoiceDialog<>(options[0], options);
+                    addambiencechoicedialog.setHeaderText("Ambience Was Cleared But Previously Enabled For One Or Both Of These Playback Items");
+                    addambiencechoicedialog.setContentText("Select How You Would Like To Add Ambience");
+                    addambiencechoicedialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(addambiencechoicedialog.selectedItemProperty().isNull());
+                    if (addambiencechoicedialog.showAndWait().isPresent()) {
+                        System.out.println(addambiencechoicedialog.getSelectedItem());
+                        switch (addambiencechoicedialog.getSelectedItem()) {
+                            case "Quick Add Ambience":
+                                QuickAddAmbience quickAddAmbience = new QuickAddAmbience(preferences, availableAmbiences, Collections.singletonList(item1));
+                                quickAddAmbience.initModality(Modality.APPLICATION_MODAL);
+                                quickAddAmbience.showAndWait();
+                                if (quickAddAmbience.isAccepted()) { item1 = quickAddAmbience.getPlaybackItemList().get(0); }
+                                break;
+                            case "Customize Ambience":
+                                CustomizeAmbience customizeAmbience = new CustomizeAmbience(preferences, item1, availableAmbiences);
+                                customizeAmbience.showAndWait();
+                                if (customizeAmbience.isAccepted()) { item1 = customizeAmbience.getPlaybackItem(); }
+                                break;
+                            case "Don't Add Ambience":
+                                break;
+                        }
+                    }
+                }
+            }
+            itemsinsession.set(item1index, item1);
+            createdsession.setPlaybackItems(itemsinsession);
         }
     }
     // Action Toolbar
@@ -771,12 +825,6 @@ public class MainController implements Initializable {
             }
         }
     }
-    private boolean wellformednesschecks() {
-        if (createdsession.hasCuts()) {
-
-        }
-        return false;
-    }
     public void playcreatedsession() {
         if (createdsession != null) {
             boolean updatesession = false;
@@ -807,8 +855,7 @@ public class MainController implements Initializable {
             createdtableplaybackitems.addAll(createdsession.getPlaybackItems());
             int number = 1;
             for (PlaybackItem i : createdtableplaybackitems) {
-                createdtableitems.add(new TableItem_Number_Name_Duration_Ambience(number, i.getName(),
-                        i.getdurationasString(), i.getAmbienceasString()));
+                createdtableitems.add(new TableItem_Number_Name_Duration_Ambience(number, i.getName(), i.getdurationasString(), i.getAmbienceasString()));
                 number++;
             }
             CreatedTableView.setItems(createdtableitems);
