@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
@@ -39,6 +38,11 @@
       </TextArea>
       <HBox alignment="CENTER_RIGHT">
          <children>
+            <CheckBox fx:id="KeepPlayerOpenButton" mnemonicParsing="false" text="Keep Player Open">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </CheckBox>
             <Button fx:id="CloseButton" mnemonicParsing="false" text="Close" />
          </children>
       </HBox>

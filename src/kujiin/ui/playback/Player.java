@@ -687,7 +687,7 @@ public class Player extends Stage {
     public void transition() {
         selectedPlaybackItem.updateduration(new Duration(selectedPlaybackItem.getExpectedDuration()));
         updategoalsui();
-        if (Preferences.getSessionOptions().getAlertfunction()) {
+        if (Preferences.getSessionOptions().getAlertfunction() && ! selectedPlaybackItem.equals(SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().size() - 1))) {
             Media alertmedia = new Media(Preferences.getSessionOptions().getAlertfilelocation());
             MediaPlayer alertplayer = new MediaPlayer(alertmedia);
             alertplayer.play();
@@ -706,6 +706,7 @@ public class Player extends Stage {
         }
     }
     public void reset() {
+        PlayButton.setDisable(false);
         PlayButton.setTooltip(new Tooltip("Replay"));
         if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
             PlayButton.setText("Replay");
@@ -725,8 +726,6 @@ public class Player extends Stage {
         AmbienceVolume.setDisable(true);
         AmbienceVolume.setValue(0.0);
         AmbienceVolumePercentage.setText("0%");
-        PauseButton.setDisable(true);
-        StopButton.setDisable(true);
     }
     public void endofsession() {
         setPlayerstate(STOPPED);
@@ -740,6 +739,7 @@ public class Player extends Stage {
             sessionComplete.show();
             sessionComplete.setOnHidden(event -> {
                 if (sessionComplete.needtosetNotes()) {sessioninprogress.setNotes(sessionComplete.getNotes());}
+                if (! sessionComplete.keepplayeropen()) {close();}
                 if (AllGoals.sessionhasgoalscompleted()) {
                     GoalsCompletedDialog goalsCompletedDialog = new GoalsCompletedDialog(AllGoals);
                     goalsCompletedDialog.initModality(Modality.APPLICATION_MODAL);
@@ -765,6 +765,7 @@ public class Player extends Stage {
             SessionComplete sessionComplete = new SessionComplete(SessionInProgress, false);
             sessionComplete.initModality(Modality.APPLICATION_MODAL);
             sessionComplete.showAndWait();
+            if (! sessionComplete.keepplayeropen()) {close();}
             resetsessionpracticedtime();
             return true;
         } else {playbuttonpressed(); return false;}

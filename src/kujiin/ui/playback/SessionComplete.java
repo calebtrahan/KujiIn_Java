@@ -20,6 +20,7 @@ public class SessionComplete extends StyledStage {
     public BarChart<String, Number> SessionBarChart;
     public CheckBox AddSessionNotesCheckbox;
     public TextArea SessionNotesTextArea;
+    public CheckBox KeepPlayerOpenButton;
     public Button CloseButton;
 
     public SessionComplete(Session session, boolean sessioncomplete) {
@@ -42,6 +43,10 @@ public class SessionComplete extends StyledStage {
             if (! sessioncomplete) {
                 AddSessionNotesCheckbox.setVisible(false);
                 SessionNotesTextArea.setVisible(false);
+            } else {
+                AddSessionNotesCheckbox.setSelected(false);
+                SessionNotesTextArea.setDisable(true);
+                AddSessionNotesCheckbox.selectedProperty().addListener(observable -> SessionNotesTextArea.setDisable(! AddSessionNotesCheckbox.isSelected()));
             }
             XYChart.Series<String, java.lang.Number> series = new XYChart.Series<>();
             Duration totalsessionduration = new Duration(0);
@@ -49,7 +54,6 @@ public class SessionComplete extends StyledStage {
                 series.getData().add(new XYChart.Data<>(i.getName(), new Duration(i.getPracticeTime()).toMinutes()));
                 totalsessionduration = totalsessionduration.add(new Duration(i.getExpectedDuration()));
             }
-            AddSessionNotesCheckbox.selectedProperty().addListener(observable -> SessionNotesTextArea.setDisable(! AddSessionNotesCheckbox.isSelected()));
             SessionBarChart.getData().add(series);
             SessionBarChart.setLegendVisible(false);
             SessionBarChart.requestFocus();
@@ -62,6 +66,9 @@ public class SessionComplete extends StyledStage {
     }
     public String getNotes() {
         return session.getNotes();
+    }
+    public boolean keepplayeropen() {
+        return KeepPlayerOpenButton.isSelected();
     }
 
     @Override

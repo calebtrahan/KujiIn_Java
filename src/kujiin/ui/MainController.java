@@ -46,6 +46,10 @@ import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
+    // TODO Get Adding Cuts And Moving Cuts To Work Properly (Adds Before Or After Then Displays Will Place Cuts Out Of Dialog Even If It Won't)
+    // TODO Get Playlist Selection Highlight Working (Use Changelistenrs To Void Out Mouse Selection And Drag, Then Select Playing Cut In Code)
+    // TODO Correct Shuffle Algorithm So It Plays All Audio Files Before Looking Any
+    // TODO TOH Does Not Play Ambience (Possible Timing Error? NullPointerException When Setting Ambience Player Volume)
 
 // Additional Features To Definitely Add
     // TODO Session Well Formedness Checks Before Playback, Save Or Export
