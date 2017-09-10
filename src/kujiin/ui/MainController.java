@@ -46,7 +46,6 @@ import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
-    // TODO Correct Shuffle Algorithm So It Plays All Audio Files Before Looking Any
     // TODO TOH Does Not Play Ambience (Possible Timing Error? NullPointerException When Setting Ambience Player Volume)
 
 // Additional Features To Definitely Add

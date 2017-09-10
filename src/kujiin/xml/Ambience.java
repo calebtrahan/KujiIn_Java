@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -164,29 +163,31 @@ public class Ambience {
         List<Integer> indexhistory = new ArrayList<>();
         int indexcount;
         Duration maxduration;
+        int size = playbackItemAmbience.getAmbience().size();
         if (playbackItem.isRampOnly()) {maxduration = Duration.minutes(1);}
         else {maxduration = new Duration(playbackItem.getExpectedDuration());}
         if (playbackItem.getAmbience().getAmbience() != null && ! playbackItem.getAmbience().getAmbience().isEmpty()) {
             currentduration = playbackItem.getAmbience().gettotalDuration();
-            for (SoundFile i : playbackItem.getAmbience().getAmbience()) { indexhistory.add(playbackItemAmbience.getAmbience().indexOf(i)); }
+//            for (SoundFile i : playbackItem.getAmbience().getAmbience()) { indexhistory.add(playbackItemAmbience.getAmbience().indexOf(i)); }
         } else { currentduration = Duration.ZERO; }
         while (currentduration.lessThan(maxduration)) {
-            int size = playbackItemAmbience.getAmbience().size();
             if (size > 1) {
                 Random random = new Random();
                 while (true) {
                     indexcount = random.nextInt(size);
                     if (indexhistory.isEmpty()) {indexhistory.add(indexcount); break;}
-                    if (indexcount != indexhistory.get(indexhistory.size() - 1)) {break;}
+                    if (indexhistory.size() <= size) {
+                        if (! indexhistory.contains(indexcount)) {break;}
+                    } else if (indexcount != indexhistory.get(indexhistory.size() - 1)) {break;}
                 }
             } else {indexcount = 0;}
             try {
                 SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
                 ambiencelist.add(filetoadd);
                 currentduration = currentduration.add(Duration.millis(filetoadd.getDuration()));
+                indexhistory.add(indexcount);
             } catch (IndexOutOfBoundsException ignored) {}
         }
-        Collections.shuffle(ambiencelist);
         setAmbience(ambiencelist);
     }
     public Duration getCurrentAmbienceDuration() {
