@@ -134,7 +134,11 @@ public class Session {
         }
         return playbackItem;
     }
-    public void addplaybackitems(int startindex, List<PlaybackItem> playbackitems) {if (playbackItems == null) {playbackItems = new ArrayList<>();} playbackItems.addAll(startindex, playbackitems);}
+    public void addplaybackitems(Integer startindex, List<PlaybackItem> playbackitems) {
+        if (playbackItems == null) {playbackItems = new ArrayList<>();}
+        if (startindex != null) { playbackItems.addAll(startindex, playbackitems); }
+        else { playbackItems.addAll(playbackitems); }
+    }
     public void addplaybackitem(int index) {
         if (playbackItems == null) {playbackItems = new ArrayList<>();}
         playbackItems.add(getplaybackitem(index));

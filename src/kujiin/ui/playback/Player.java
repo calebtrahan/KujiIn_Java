@@ -167,7 +167,22 @@ public class Player extends Stage {
                 if (animationinprogress) {
                     Alert a = new Alert(Alert.AlertType.INFORMATION);
                     a.setTitle("Cannot Close Player");
-                    a.setHeaderText("Currently Pausing, Starting Playback Or Stopping");
+                    String state = "";
+                    switch (p) {
+                        case FADING_PLAY:
+                            state = "Starting Playback";
+                            break;
+                        case FADING_PAUSE:
+                            state = "Pausing Playback";
+                            break;
+                        case FADING_RESUME:
+                            state = "Resuming Playback";
+                            break;
+                        case FADING_STOP:
+                            state = "Stopping Playback";
+                            break;
+                    }
+                    a.setHeaderText("Currently " + state);
                     a.setContentText("Please Wait Till Done Until Closing Player");
                     a.getDialogPane().getStylesheets().add(kujiin.xml.Preferences.DEFAULTSTYLESHEET.toURI().toString());
                     a.show();
@@ -179,7 +194,6 @@ public class Player extends Stage {
                 }
             });
             SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));
-            PlayButton.requestFocus();
             SessionProgressPercentage.setVisible(false);
             SessionProgress.setOnMouseEntered(event -> SessionProgressPercentage.setVisible(true));
             SessionProgress.setOnMouseExited(event -> SessionProgressPercentage.setVisible(false));
@@ -187,6 +201,7 @@ public class Player extends Stage {
             ReferenceTypeChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList("html", "txt")));
             ReferenceControls.setDisable(true);
             updategoalsui();
+            new Timeline(new KeyFrame(Duration.millis(100), ae -> {PlayButton.requestFocus();})).play();
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
     private void setupTooltips() {
@@ -317,7 +332,6 @@ public class Player extends Stage {
     private void updateplaylist() {
         PlaylistTableView.getItems().clear();
         ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
-        PlaylistTableView.getSelectionModel().select(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem));
         for (PlaybackItem i : SessionInProgress.getPlaybackItems()) {
             float totalprogress = (float) i.getPracticeTime() / (float) i.getExpectedDuration();
             int percentage = new Double(totalprogress * 100).intValue();
@@ -325,6 +339,7 @@ public class Player extends Stage {
             playlistitems.add(new PlaylistTableItem(i.getName(), progress, percentage + "%"));
         }
         PlaylistTableView.setItems(playlistitems);
+        PlaylistTableView.getSelectionModel().select(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem));
     }
 
 // Playback
@@ -429,8 +444,6 @@ public class Player extends Stage {
     }
     // Playback Methods
     private void setupsession() {
-        PlaylistTableView.getSelectionModel().select(0);
-        PlaylistTableView.setOnMouseClicked(event -> PlaylistTableView.getSelectionModel().select(-1));
         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
         SessionInProgress.setSessionPracticedTime();
         SessionInProgress.calculateactualduration();
@@ -665,7 +678,6 @@ public class Player extends Stage {
                         cleanupPlayersandAnimations();
                         int index = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1;
                         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(index);
-                        PlaylistTableView.getSelectionModel().select(index);
                         start();
                         if (ReferenceToggleCheckBox.isSelected() && ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {loadreferencecontent();}
                     } catch (IndexOutOfBoundsException ignored) {

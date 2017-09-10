@@ -46,8 +46,6 @@ import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
-    // TODO Get Adding Cuts And Moving Cuts To Work Properly (Adds Before Or After Then Displays Will Place Cuts Out Of Dialog Even If It Won't)
-    // TODO Get Playlist Selection Highlight Working (Use Changelistenrs To Void Out Mouse Selection And Drag, Then Select Playing Cut In Code)
     // TODO Correct Shuffle Algorithm So It Plays All Audio Files Before Looking Any
     // TODO TOH Does Not Play Ambience (Possible Timing Error? NullPointerException When Setting Ambience Player Volume)
 
@@ -562,14 +560,15 @@ public class MainController implements Initializable {
                 quickAddAmbience.showAndWait();
                 if (quickAddAmbience.isAccepted()) {playbackItem = quickAddAmbience.getPlaybackItemList().get(0);}
             }
-            boolean needstomerge = false;
-            int startindex = 0;
+            int startindex;
             if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1) {
                 startindex = CreatedTableView.getSelectionModel().getSelectedIndex();
-                if (createdsession.getplaybackitem(startindex).getCreationindex() == playbackItem.getCreationindex()) {needstomerge = true;}
+                createdsession.addplaybackitems(startindex, Collections.singletonList(playbackItem)); createdsession.calculateexpectedduration();
+            } else {
+                startindex = createdsession.getPlaybackItems().size() - 1;
+                createdsession.addplaybackitems(null, Collections.singletonList(playbackItem)); createdsession.calculateexpectedduration();
             }
-            createdsession.addplaybackitems(startindex, Collections.singletonList(playbackItem)); createdsession.calculateexpectedduration();
-            if (needstomerge) {
+            if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1 && createdsession.getplaybackitem(startindex).getCreationindex() == playbackItem.getCreationindex()) {
                 populatetable();
                 mergeitems(createdsession.getplaybackitem(startindex), createdsession.getplaybackitem(startindex + 1));
             }
@@ -596,14 +595,15 @@ public class MainController implements Initializable {
                 quickAddAmbience.showAndWait();
                 if (quickAddAmbience.isAccepted()) {items = quickAddAmbience.getPlaybackItemList();}
             }
-            boolean needstomerge = false;
-            int startindex = 0;
+            int startindex;
             if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1) {
                 startindex = CreatedTableView.getSelectionModel().getSelectedIndex();
-                if (createdsession.getplaybackitem(startindex).getCreationindex() == items.get(0).getCreationindex()) {needstomerge = true;}
+                createdsession.addplaybackitems(startindex, items); createdsession.calculateexpectedduration();
+            } else {
+                startindex = createdsession.getPlaybackItems().size() - 1;
+                createdsession.addplaybackitems(null, items); createdsession.calculateexpectedduration();
             }
-            createdsession.addplaybackitems(startindex, items); createdsession.calculateexpectedduration();
-            if (needstomerge) {
+            if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1 && createdsession.getplaybackitem(startindex).getCreationindex() == items.get(0).getCreationindex()) {
                 populatetable();
                 mergeitems(createdsession.getplaybackitem(startindex), createdsession.getplaybackitem(startindex + 1));
             }
@@ -723,7 +723,7 @@ public class MainController implements Initializable {
             PlaybackItem currentitem = createdsession.getPlaybackItems().get(selectedindex);
             PlaybackItem oneitemdown = createdsession.getPlaybackItems().get(selectedindex + 1);
             if (currentitem.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT && oneitemdown.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT) {
-                if (currentitem.getCreationindex() > oneitemdown.getCreationindex()) {
+                if (currentitem.getCreationindex() < oneitemdown.getCreationindex()) {
                     if (! new ConfirmationDialog(preferences, "Confirmation", "This Will Place Cuts Out Of Order", "This Is Not Recommended", "Proceed Anyway", "Cancel").getResult()) {return;}
                 }
             }
