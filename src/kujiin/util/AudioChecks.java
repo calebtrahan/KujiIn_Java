@@ -31,7 +31,6 @@ public class AudioChecks extends Task {
     private BlockingQueue<SoundFile> SessionRampFiles;
     private int totaltasks = 0;
     private int currenttaskcount = 0;
-    private int selectedplaybackitemindex = 0;
     private final Session testsession;
 
     public AudioChecks(MainController Root) {
@@ -66,8 +65,6 @@ public class AudioChecks extends Task {
                 root.getAvailableEntrainments().setsessionpartEntrainment(selectedplaybackitem, playbackItemEntrainment);
                 root.getAvailableAmbiences().setsessionpartAmbience(selectedplaybackitem.getCreationindex(), playbackItemAmbience);
                 return null;
-            } else {
-                System.out.println("Pulled " + soundFile);
             }
             // Check If File Exists
             if (! soundFile.getFile().exists()) {
@@ -118,7 +115,6 @@ public class AudioChecks extends Task {
 
 // Utility Methods
     private SoundFile getnextsoundFile() throws InterruptedException {
-        System.out.println("Called GetNextSoundFile");
         if (! TempSessionRampFiles.isEmpty()) {
             audioCheckingType = AudioCheckingType.Ramp;
             return TempSessionRampFiles.take();
@@ -131,7 +127,6 @@ public class AudioChecks extends Task {
 //            if (selectedplaybackitemindex == 14 && PlaybackItemAmbienceFiles.isEmpty()) { selectedplaybackitemindex++; return null;}
             if (PlaybackItemEntrainmentFiles.isEmpty() && (PlaybackItemAmbienceFiles == null || PlaybackItemAmbienceFiles.isEmpty())) {
                 selectedplaybackitem = playbackitemstocheck.take();
-                selectedplaybackitemindex++;
                 populatefilestocheckforSelectedPlaybackItem();
             }
             if (!PlaybackItemEntrainmentFiles.isEmpty()) {

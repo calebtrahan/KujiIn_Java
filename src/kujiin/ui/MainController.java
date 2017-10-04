@@ -1,5 +1,7 @@
 package kujiin.ui;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
@@ -37,6 +39,8 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +49,7 @@ import java.util.ResourceBundle;
 import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
-    // TODO Player Is EXTREMELEY MEMORY CONSUMING FIND THE LOOP!!!!
+    // TODO Player Is EXTREMELEY MEMORY CONSUMING FOR MAC
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
 // Additional Features To Definitely Add
     // TODO Session Well Formedness Checks Before Playback, Save Or Export
@@ -123,6 +127,8 @@ public class MainController implements Initializable {
     public Button MoveUpButton;
     public Button MoveDownButton;
     public Button RemoveButton;
+    public TextField SessionSummary_CompletionTime;
+    public TextField SessionSummary_Duration;
     public Button ClearButton;
     public Button AddToFavoritesButton;
     public Button PlayButton;
@@ -192,7 +198,7 @@ public class MainController implements Initializable {
     private PlaybackItem createdtableselecteditem;
     private ObservableList<TableItem_Number_Name_Duration_Ambience> createdtableitems = FXCollections.observableArrayList();
     private ArrayList<PlaybackItem> createdtableplaybackitems;
-
+    private Timeline updatecompletiontime;
 
 // Getters And Setters
     public Preferences getPreferences() {
@@ -370,9 +376,9 @@ public class MainController implements Initializable {
 //            AmbienceMenu.setText("Ambience");
 //            AddItemsMenu.setText("Add");
             CreateNewSessionButton.setText("Create New Session");
-            OpenFileButton.setText("Open Session From File");
-            OpenRecentSessionsButton.setText("Recent Sessions");
-            OpenFavoritesButton.setText("Favorite Sessions");
+            OpenFileButton.setText("Open Session");
+            OpenRecentSessionsButton.setText("Recent");
+            OpenFavoritesButton.setText("Favorites");
 //            DurationMenu.setText("Duration");
 //            MoveUpButton.setText("Up");
 //            MoveDownButton.setText("Down");
@@ -864,6 +870,7 @@ public class MainController implements Initializable {
         }
         createdtableselecteditem = null;
         syncbuttons();
+        calculatedurationandestimatedcompletion();
     }
     private void syncbuttons() {
         boolean nosessionloaded = createdsession == null;
@@ -882,6 +889,24 @@ public class MainController implements Initializable {
         ClearButton.setDisable(nosessionloaded || tableempty);
         if (nosessionloaded) {CreatedTableView.setPlaceholder(new Label("Please Create Or Load A Session"));}
         else {CreatedTableView.setPlaceholder(new Label("Session Is Empty"));}
+    }
+    private void calculatedurationandestimatedcompletion() {
+        if (createdsession != null && ! createdsession.getPlaybackItems().isEmpty()) {
+            SessionSummary_Duration.setText(Util.formatdurationtoStringSpelledOutShort(createdsession.getExpectedSessionDuration(), false));
+            LocalTime now = LocalTime.now();
+            LocalTime completiontime = now.plusMinutes((int) createdsession.getExpectedSessionDuration().toMinutes());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+            String completiontext = completiontime.format(formatter);
+            SessionSummary_CompletionTime.setText(completiontext);
+            SessionSummary_CompletionTime.setTooltip(new Tooltip("Completion Time If You Start Now"));
+            updatecompletiontime = null;
+            new Timeline(new KeyFrame(Duration.millis(5000), ae -> calculatedurationandestimatedcompletion())).play();
+        } else {
+            SessionSummary_CompletionTime.setText(null);
+            SessionSummary_CompletionTime.setTooltip(null);
+            SessionSummary_Duration.setText(null);
+            SessionSummary_Duration.setTooltip(null);
+        }
     }
 
 // Progress Tab
@@ -924,7 +949,7 @@ public class MainController implements Initializable {
                 String name = String.format("%s (%.1f%%)", data.getName(), 100 * data.getPieValue() / total);
                 data.setName(name);
             }
-            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringDecimalWithColons(totaltimepracticed));
+            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringSpelledOutShort(totaltimepracticed, true));
             ProgressOverviewTotalTimePracticed.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(totaltimepracticed, Double.MAX_VALUE)));
             ProgressOverviewBarChart.getData().add(series);
             ProgressOverviewBarChart.setLegendVisible(false);

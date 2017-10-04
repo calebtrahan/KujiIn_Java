@@ -30,6 +30,11 @@ public class Main extends Application {
         primaryStage.setResizable(false);
         root.setScene(Scene);
         root.setStage(primaryStage);
+        if ( ! System.getProperty("os.name").equals(root.getPreferences().getAdvancedOptions().getOS())) {
+            Preferences.AMBIENCEXMLFILE.delete();
+            Preferences.ENTRAINMENTXMLFILE.delete();
+            Preferences.RAMPFILESXMLFILE.delete();
+        }
         primaryStage.getIcons().clear();
         primaryStage.getIcons().add(PROGRAM_ICON);
         root.getScene().getStylesheets().add(Preferences.DEFAULTSTYLESHEET.toURI().toString());

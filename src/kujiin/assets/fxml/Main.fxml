@@ -42,9 +42,9 @@
                               <ToolBar prefHeight="9.0" prefWidth="743.0">
                                 <items>
                                     <Button fx:id="CreateNewSessionButton" mnemonicParsing="false" onAction="#createnewsession" text="Create New Session" />
-                                    <Button fx:id="OpenFileButton" mnemonicParsing="false" onAction="#opensessionfromfile" text="Open Session From File" />
-                                    <Button fx:id="OpenRecentSessionsButton" mnemonicParsing="false" onAction="#openrecentsession" text="Recent Sessions" />
-                                    <Button fx:id="OpenFavoritesButton" mnemonicParsing="false" onAction="#openfavoritesession" text="Favorite Sessions" />
+                                    <Button fx:id="OpenFileButton" mnemonicParsing="false" onAction="#opensessionfromfile" text="Open Session" />
+                                    <Button fx:id="OpenRecentSessionsButton" mnemonicParsing="false" onAction="#openrecentsession" text="Recent" />
+                                    <Button fx:id="OpenFavoritesButton" mnemonicParsing="false" onAction="#openfavoritesession" text="Favorite" />
                                 </items>
                               </ToolBar>
                               <VBox VBox.vgrow="ALWAYS">
@@ -115,20 +115,20 @@
                                           <Button fx:id="MoveUpButton" mnemonicParsing="false" onAction="#moveupincreatortable" />
                                           <Button fx:id="MoveDownButton" mnemonicParsing="false" onAction="#movedownincreatortable" />
                                           <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removefromcreatortable" />
-                                          <HBox alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="529.0">
+                                          <HBox alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="410.0">
                                              <children>
-                                                <Label text="Estimated Completion Time">
+                                                <Label text="Completion Time">
                                                    <HBox.margin>
                                                       <Insets right="10.0" />
                                                    </HBox.margin>
                                                 </Label>
-                                                <TextField prefHeight="27.0" prefWidth="101.0" />
-                                                <Label text="Session Duration">
+                                                <TextField fx:id="SessionSummary_CompletionTime" alignment="CENTER" editable="false" prefHeight="27.0" prefWidth="101.0" />
+                                                <Label text=" Duration">
                                                    <HBox.margin>
                                                       <Insets left="10.0" right="10.0" />
                                                    </HBox.margin>
                                                 </Label>
-                                                <TextField prefHeight="27.0" prefWidth="101.0" />
+                                                <TextField fx:id="SessionSummary_Duration" alignment="CENTER" editable="false" prefHeight="27.0" prefWidth="101.0" />
                                              </children>
                                           </HBox>
                                       </items>

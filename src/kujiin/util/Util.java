@@ -45,6 +45,18 @@ public class Util {
         if (hours > 0) {return String.format("%02d:%02d:%02d", hours, minutes, seconds);}
         else {return String.format("%02d:%02d", minutes, seconds);}
     }
+    public static String formatdurationtoStringSpelledOutShort(Duration duration, boolean includeseconds) {
+        int seconds = new Double(duration.toSeconds()).intValue();
+        int hours = 0;
+        int minutes = 0;
+        if (seconds >= 3600) {hours = seconds / 3600; seconds -= hours * 3600;}
+        if (seconds >= 60) {minutes = seconds / 60; seconds -= minutes * 60;}
+        StringBuilder durationtext = new StringBuilder();
+        if (hours > 0) {durationtext.append(hours).append("h").append(" ");}
+        if (minutes > 0) {durationtext.append(minutes).append("m");}
+        if (includeseconds) { if (seconds > 0) {durationtext.append(" ").append(seconds).append("s");} }
+        return durationtext.toString();
+    }
     public static String formatdurationtoStringSpelledOut(Duration duration, Double maxcharlength) {
         int seconds = new Double(duration.toSeconds()).intValue();
         int minutes = 0;
