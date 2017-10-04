@@ -60,9 +60,9 @@
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
                                     </TableView>
-                                    <ToolBar fx:id="CreationTableControlsToolBar" maxHeight="39.0" prefHeight="0.0" prefWidth="733.0" VBox.vgrow="ALWAYS">
+                                    <ToolBar fx:id="CreationTableControlsToolBar" maxHeight="39.0" prefHeight="18.0" prefWidth="733.0" VBox.vgrow="ALWAYS">
                                       <items>
-                                          <MenuButton fx:id="AddItemsMenu" maxHeight="27.0" mnemonicParsing="false" text="Add">
+                                          <MenuButton fx:id="AddItemsMenu" maxHeight="27.0" mnemonicParsing="false">
                                              <items>
                                                 <Menu fx:id="AddAllMenu" mnemonicParsing="false" text="All">
                                                   <items>
@@ -95,13 +95,13 @@
                                                 </Menu>
                                              </items>
                                           </MenuButton>
-                                          <MenuButton fx:id="DurationMenu" mnemonicParsing="false" text="Duration">
+                                          <MenuButton fx:id="DurationMenu" mnemonicParsing="false">
                                             <items>
                                               <MenuItem fx:id="Duration_SetRampOnlyMenuItem" mnemonicParsing="false" onAction="#setramponly" text="Set Ramp Only" />
                                               <MenuItem fx:id="Duration_EditDurationMenuItem" mnemonicParsing="false" onAction="#editduration" text="Edit Duration" />
                                             </items>
                                           </MenuButton>
-                                          <MenuButton fx:id="AmbienceMenu" mnemonicParsing="false" text="Ambience">
+                                          <MenuButton fx:id="AmbienceMenu" mnemonicParsing="false">
                                             <items>
                                                 <Menu fx:id="AmbienceQuickAddMenu" mnemonicParsing="false" text="Quick Add">
                                                   <items>
@@ -112,9 +112,25 @@
                                               <MenuItem fx:id="AmbienceCustomize" mnemonicParsing="false" onAction="#customizeambience" text="Customize" />
                                             </items>
                                           </MenuButton>
-                                          <Button fx:id="MoveUpButton" mnemonicParsing="false" onAction="#moveupincreatortable" text="Up" />
-                                          <Button fx:id="MoveDownButton" mnemonicParsing="false" onAction="#movedownincreatortable" text="Down" />
-                                          <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removefromcreatortable" text="Remove" />
+                                          <Button fx:id="MoveUpButton" mnemonicParsing="false" onAction="#moveupincreatortable" />
+                                          <Button fx:id="MoveDownButton" mnemonicParsing="false" onAction="#movedownincreatortable" />
+                                          <Button fx:id="RemoveButton" mnemonicParsing="false" onAction="#removefromcreatortable" />
+                                          <HBox alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="529.0">
+                                             <children>
+                                                <Label text="Estimated Completion Time">
+                                                   <HBox.margin>
+                                                      <Insets right="10.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                                <TextField prefHeight="27.0" prefWidth="101.0" />
+                                                <Label text="Session Duration">
+                                                   <HBox.margin>
+                                                      <Insets left="10.0" right="10.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                                <TextField prefHeight="27.0" prefWidth="101.0" />
+                                             </children>
+                                          </HBox>
                                       </items>
                                     </ToolBar>
                                     <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="590.0">
@@ -184,7 +200,7 @@
                                                                            <HBox.margin>
                                                                               <Insets right="10.0" />
                                                                            </HBox.margin></Label>
-                                                                        <TextField fx:id="ProgressOverviewTotalTimePracticed" alignment="CENTER" prefHeight="27.0" prefWidth="200.0" />
+                                                                        <TextField fx:id="ProgressOverviewTotalTimePracticed" alignment="CENTER" prefHeight="27.0" prefWidth="136.0" />
                                                                      </children>
                                                                      <VBox.margin>
                                                                         <Insets right="10.0" />

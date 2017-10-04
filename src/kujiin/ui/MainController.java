@@ -45,9 +45,8 @@ import java.util.ResourceBundle;
 import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
+    // TODO Player Is EXTREMELEY MEMORY CONSUMING FIND THE LOOP!!!!
     // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
-    // TODO TOH Does Not Play Ambience (Possible Timing Error? NullPointerException When Setting Ambience Player Volume)
-
 // Additional Features To Definitely Add
     // TODO Session Well Formedness Checks Before Playback, Save Or Export
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
@@ -368,16 +367,16 @@ public class MainController implements Initializable {
             SaveAsFileButton.setText("");
             ExportButton.setText("");
         } else {
-            AmbienceMenu.setText("Ambience");
-            AddItemsMenu.setText("Add");
+//            AmbienceMenu.setText("Ambience");
+//            AddItemsMenu.setText("Add");
             CreateNewSessionButton.setText("Create New Session");
             OpenFileButton.setText("Open Session From File");
             OpenRecentSessionsButton.setText("Recent Sessions");
             OpenFavoritesButton.setText("Favorite Sessions");
-            DurationMenu.setText("Duration");
-            MoveUpButton.setText("Up");
-            MoveDownButton.setText("Down");
-            RemoveButton.setText("Remove");
+//            DurationMenu.setText("Duration");
+//            MoveUpButton.setText("Up");
+//            MoveDownButton.setText("Down");
+//            RemoveButton.setText("Remove");
             ClearButton.setText("Clear Session");
             AddToFavoritesButton.setText("Add To Favorites");
             PlayButton.setText("Play");

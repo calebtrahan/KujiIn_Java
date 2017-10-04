@@ -9,6 +9,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,21 +20,25 @@ import static kujiin.xml.Preferences.DIRECTORYRAMP;
 @XmlRootElement
 public class RampFiles {
     private List<SoundFile> RampFiles;
+    @XmlTransient
+    private MainController Root;
 
     public RampFiles() {}
     public RampFiles(MainController root) {
+        Root = root;
         unmarshall();
     }
 
 // XML Processing
     public void unmarshall() {
-        if (Preferences.RAMPFILESXMLFILE.exists()) {
+        if (Preferences.RAMPFILESXMLFILE.exists() && System.getProperty("os.name").equals(Root.getPreferences().getAdvancedOptions().getOS())) {
             try {
                 JAXBContext context = JAXBContext.newInstance(RampFiles.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
                 RampFiles rampfiles = (RampFiles) createMarshaller.unmarshal(Preferences.RAMPFILESXMLFILE);
-                RampFiles = rampfiles.getRampFiles();
-            } catch (JAXBException ignored) {populatedefaults();}
+                if (rampfiles.getRampFiles() != null) { RampFiles = rampfiles.getRampFiles(); }
+                else {populatedefaults();}
+            } catch (JAXBException ignored) {ignored.printStackTrace(); populatedefaults();}
         } else {populatedefaults();}
     }
     public void marshall() {
@@ -69,6 +74,7 @@ public class RampFiles {
         return null;
     }
     private void populatedefaults() {
+        System.out.println("Populated Ramp Defaults");
         String[] names = {"rin", "kyo", "toh", "sha", "kai", "jin", "retsu", "zai", "zen"};
         ArrayList<SoundFile> filenames = new ArrayList<>();
         for (String x : names) {filenames.add(new SoundFile(new File(DIRECTORYRAMP, "qito" + x + ".mp3")));}
@@ -81,5 +87,4 @@ public class RampFiles {
         if (RampFiles != null) {RampFiles.clear();} else {RampFiles = new ArrayList<>();}
         RampFiles.addAll(filenames);
     }
-
 }

@@ -9,6 +9,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
@@ -28,15 +29,18 @@ public class AvailableAmbiences {
     private PlaybackItemAmbience Fire;
     private PlaybackItemAmbience Water;
     private PlaybackItemAmbience Void;
+    @XmlTransient
+    private MainController Root;
 
     public AvailableAmbiences() {}
     public AvailableAmbiences(MainController Root) {
+        this.Root = Root;
         unmarshall();
     }
 
 // XML Processing
     public void unmarshall() {
-        if (Preferences.AVAILABLEAMBIENCEXMLFILE.exists()) {
+        if (Preferences.AVAILABLEAMBIENCEXMLFILE.exists() && System.getProperty("os.name").equals(Root.getPreferences().getAdvancedOptions().getOS())) {
             try {
                 JAXBContext context = JAXBContext.newInstance(AvailableAmbiences.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();

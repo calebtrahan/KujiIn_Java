@@ -51,7 +51,7 @@ public class AvailableEntrainments {
 
 // XML Processing
     public void unmarshall() {
-        if (Preferences.ENTRAINMENTXMLFILE.exists()) {
+        if (Preferences.ENTRAINMENTXMLFILE.exists() && System.getProperty("os.name").equals(Root.getPreferences().getAdvancedOptions().getOS())) {
             try {
                 JAXBContext context = JAXBContext.newInstance(AvailableEntrainments.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
