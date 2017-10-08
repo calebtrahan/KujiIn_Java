@@ -54,7 +54,7 @@ public class Util {
         StringBuilder durationtext = new StringBuilder();
         if (hours > 0) {durationtext.append(hours).append("h").append(" ");}
         if (minutes > 0) {durationtext.append(minutes).append("m");}
-        if (includeseconds) { if (seconds > 0) {durationtext.append(" ").append(seconds).append("s");} }
+        if (includeseconds && seconds > 0) { durationtext.append(" ").append(seconds).append("s"); }
         return durationtext.toString();
     }
     public static String formatdurationtoStringSpelledOut(Duration duration, Double maxcharlength) {

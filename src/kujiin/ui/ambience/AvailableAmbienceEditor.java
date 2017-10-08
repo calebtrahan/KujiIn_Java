@@ -16,6 +16,7 @@ import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.PreviewFile;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.Util;
 import kujiin.xml.AvailableAmbiences;
 import kujiin.xml.PlaybackItemAmbience;
@@ -39,6 +40,8 @@ public class AvailableAmbienceEditor extends StyledStage {
     private AvailableAmbiences availableAmbiences;
     private PlaybackItemAmbience playbackitemambience;
     private Preferences preferences;
+    private boolean working = false;
+    private int workcompleted;
 
     public AvailableAmbienceEditor(Preferences preferences, AvailableAmbiences availableAmbiences) {
         try {
@@ -52,18 +55,26 @@ public class AvailableAmbienceEditor extends StyledStage {
             String[] names = {"Qi-Gong", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Earth", "Air", "Fire", "Water", "Void"};
             ObservableList<String> allnames = FXCollections.observableArrayList(names);
             PlaybackItemsListView.setItems(allnames);
-            PlaybackItemsListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> playbackitemchanged());
+            PlaybackItemsListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+                if (working) {
+                    PlaybackItemsListView.getSelectionModel().select(oldValue.intValue());
+                    new InformationDialog(preferences, "Cannot Change Selected Playback Item", "Currently Working", null);
+                } else { playbackitemchanged(); }
+            });
             AddFilesButton.setOnAction(event -> additems());
             PreviewButton.setOnAction(event -> preview());
             RemoveButton.setOnAction(event -> removeitem());
-            AmbienceTable.setPlaceholder(new Label("No Playback Item Selected"));
+            AmbienceTable.setPlaceholder(new Label("Select A Playback Item"));
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
             DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().duration);
-            TableTopLabel.setText("No Playback Item Selected");
+//            TableTopLabel.setText("");
             AmbienceTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
                 PreviewButton.setDisable(AmbienceTable.getSelectionModel().getSelectedIndex() == -1);
                 RemoveButton.setDisable(AmbienceTable.getSelectionModel().getSelectedIndex() == -1);
             });
+            AddFilesButton.setDisable(true);
+            PreviewButton.setDisable(true);
+            RemoveButton.setDisable(true);
         } catch (IOException ignored) {}
     }
 
@@ -72,7 +83,7 @@ public class AvailableAmbienceEditor extends StyledStage {
         int index = PlaybackItemsListView.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             playbackitemambience = availableAmbiences.getsessionpartAmbience(index);
-            TableTopLabel.setText("Ambience For " + playbackitemambience.getName());
+            TableTopLabel.setText("Available Ambience For " + playbackitemambience.getName());
             populateambiencetable();
         }
     }
@@ -90,6 +101,11 @@ public class AvailableAmbienceEditor extends StyledStage {
                 AmbienceTable.setPlaceholder(new Label("No Ambience For " + playbackitemambience.getName()));
                 TotalDurationTextField.setText("-");
             }
+            AddFilesButton.setDisable(false);
+            PreviewButton.setDisable(true);
+            RemoveButton.setDisable(true);
+        } else {
+            AddFilesButton.setDisable(true);
             PreviewButton.setDisable(true);
             RemoveButton.setDisable(true);
         }
@@ -109,12 +125,15 @@ public class AvailableAmbienceEditor extends StyledStage {
         }
     }
     private void additems() {
+        if (working) {new InformationDialog(preferences, "Still Working", "Please Wait For Operation To Finish", null);}
         if (playbackitemambience != null) {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select Ambience Files To Add");
             fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Audio Files", Util.SUPPORTEDAUDIOFORMATS));
             List<File> files = fileChooser.showOpenMultipleDialog(this);
             if (files != null && ! files.isEmpty()) {
+                workcompleted = 0;
+                working = true;
                 for (File i : files) {
                     Media media = new Media(i.toURI().toString());
                     MediaPlayer mediaPlayer = new MediaPlayer(media);
@@ -123,6 +142,11 @@ public class AvailableAmbienceEditor extends StyledStage {
                         x.setDuration(mediaPlayer.getTotalDuration().toMillis());
                         playbackitemambience.add(x);
                         populateambiencetable();
+                        workcompleted++;
+                        if (workcompleted == files.size()) {
+                            working = false;
+                            availableAmbiences.setsessionpartAmbience(PlaybackItemsListView.getSelectionModel().getSelectedIndex(), playbackitemambience);
+                        }
                     });
                 }
             }

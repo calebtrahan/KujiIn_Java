@@ -170,9 +170,9 @@
                            <children>
                               <HBox minWidth="210.0" prefHeight="25.0">
                                  <children>
-                                    <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#playbuttonpressed" text="Play" />
-                                    <Button fx:id="PauseButton" disable="true" mnemonicParsing="false" onAction="#pausebuttonpressed" text="Pause" />
-                                    <Button fx:id="StopButton" disable="true" mnemonicParsing="false" onAction="#stopbuttonpressed" text="Stop" />
+                                    <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#playbuttonpressed" />
+                                    <Button fx:id="PauseButton" disable="true" mnemonicParsing="false" onAction="#pausebuttonpressed" />
+                                    <Button fx:id="StopButton" disable="true" mnemonicParsing="false" onAction="#stopbuttonpressed" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" minWidth="350.0" HBox.hgrow="ALWAYS">

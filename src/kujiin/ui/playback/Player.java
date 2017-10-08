@@ -408,33 +408,33 @@ public class Player extends Stage {
         PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
         StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
 //        ReferenceControls.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
-        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
-            String playbuttontext = "Play";
-            String pausebuttontext = "Pause";
-            String stopbuttontext = "Stop";
-            switch (playerState) {
-                case IDLE:
-                    playbuttontext = "Start";
-                    break;
-                case PLAYING:
-                    playbuttontext = "Playing";
-                    break;
-                case PAUSED:
-                    playbuttontext = "Resume";
-                    pausebuttontext = "Paused";
-                    break;
-                case STOPPED:
-                    stopbuttontext = "Stopped";
-                    break;
-            }
-            PlayButton.setText(playbuttontext);
-            PauseButton.setText(pausebuttontext);
-            StopButton.setText(stopbuttontext);
-        } else {
-            PlayButton.setText("");
-            PauseButton.setText("");
-            StopButton.setText("");
-        }
+//        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
+//            String playbuttontext = "Play";
+//            String pausebuttontext = "Pause";
+//            String stopbuttontext = "Stop";
+//            switch (playerState) {
+//                case IDLE:
+//                    playbuttontext = "Start";
+//                    break;
+//                case PLAYING:
+//                    playbuttontext = "Playing";
+//                    break;
+//                case PAUSED:
+//                    playbuttontext = "Resume";
+//                    pausebuttontext = "Paused";
+//                    break;
+//                case STOPPED:
+//                    stopbuttontext = "Stopped";
+//                    break;
+//            }
+//            PlayButton.setText(playbuttontext);
+//            PauseButton.setText(pausebuttontext);
+//            StopButton.setText(stopbuttontext);
+//        } else {
+//            PlayButton.setText("");
+//            PauseButton.setText("");
+//            StopButton.setText("");
+//        }
         toggleplayervolumecontrols();
     }
     private void toggleplayervolumecontrols() {

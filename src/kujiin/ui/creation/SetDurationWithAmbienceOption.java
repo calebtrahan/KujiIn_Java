@@ -2,12 +2,10 @@ package kujiin.ui.creation;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
+import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.xml.AvailableAmbiences;
 import kujiin.xml.PlaybackItem;
 import kujiin.xml.Preferences;
@@ -26,12 +24,9 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     private boolean accepted = false;
     private boolean quickaddambience = false;
     private List<PlaybackItem> playbackItemList;
-    private Preferences preferences;
     private int missingambiencecount = 0;
 
     public SetDurationWithAmbienceOption(Preferences preferences, AvailableAmbiences availableAmbiences, List<PlaybackItem> playbackItemList, boolean quickaddambienceoption) {
-        this.preferences = preferences;
-        AvailableAmbiences availableAmbiences1 = availableAmbiences;
         try {
             this.playbackItemList = playbackItemList;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/SetDurationAndAmbience.fxml"));
@@ -60,10 +55,24 @@ public class SetDurationWithAmbienceOption extends StyledStage {
             SecondsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) seconds, preferences.getCreationOptions().getScrollincrement()));
             QuickAddAmbienceCheckbox.setVisible(quickaddambienceoption);
             for (PlaybackItem i : playbackItemList) {if (! availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {missingambiencecount++;}}
-            setListeners();
+            setScrollListeners();
+            boolean hassomeambience = false;
+            for (PlaybackItem i : playbackItemList) {
+                if (availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {hassomeambience = true;}
+                else {missingambiencecount++;}
+            }
+            QuickAddAmbienceCheckbox.setDisable(! hassomeambience);
+            if (! hassomeambience) {QuickAddAmbienceCheckbox.setTooltip(new Tooltip("Cannot Add As There Is No Ambience For Any Playback Items"));}
+            QuickAddAmbienceCheckbox.selectedProperty().addListener(observable -> {
+                if (QuickAddAmbienceCheckbox.isSelected() && missingambiencecount > 0) {
+                    if (! new ConfirmationDialog(preferences, "Missing Ambience", "Missing Ambience For " + missingambiencecount + " Playback Items", "Add Partial Ambience?").getResult()) {
+                        QuickAddAmbienceCheckbox.setSelected(false);
+                    }
+                }
+            });
         } catch (IOException e) {e.printStackTrace();}
     }
-    private void setListeners() {
+    private void setScrollListeners() {
         HoursSpinner.setOnScroll(event -> {
             Integer value = HoursSpinner.getValue();
             if (event.getDeltaY() < 0) {value -= 1; } else {value += 1;}

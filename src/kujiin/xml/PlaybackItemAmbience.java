@@ -18,10 +18,6 @@ public class PlaybackItemAmbience {
 
 // Getters And Setters
     public List<SoundFile> getAmbience() {
-//        System.out.println("Getting Ambience For " + Name);
-//        for (SoundFile i : Ambience) {
-//            System.out.println("Adding " + i.getName());
-//        }
         return Ambience;
     }
     public void setAmbience(List<SoundFile> ambience) {

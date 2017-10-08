@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-// TODO Not Iterating Into Rampfiles If Ambience Does Not Exist
-
 public class AudioChecks extends Task {
     private AudioCheckingType audioCheckingType;
     private PlaybackItem selectedplaybackitem;
@@ -152,7 +150,6 @@ public class AudioChecks extends Task {
                 break;
         }
     }
-
     private void populaterampfilestocheck() {
         TempSessionRampFiles = new ArrayBlockingQueue<>(root.getRampFiles().getRampFiles().size());
         SessionRampFiles = new ArrayBlockingQueue<>(root.getRampFiles().getRampFiles().size());

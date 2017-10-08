@@ -1,0 +1,995 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ambiences>
+    <air>
+        <ambience>
+            <duration>1778860.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Alfatetha Waves-Satori_.mp3</file>
+            <name>01-Alfatetha Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1190524.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Aquasphere-Alexander Forselius_.mp3</file>
+            <name>01-Aquasphere-Alexander Forselius_</name>
+        </ambience>
+        <ambience>
+            <duration>420231.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Cold Reflections-Cari Live_.mp3</file>
+            <name>01-Cold Reflections-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>419371.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Ice Castle-Kirsty Hawkshaw_.mp3</file>
+            <name>01-Ice Castle-Kirsty Hawkshaw_</name>
+        </ambience>
+        <ambience>
+            <duration>1730788.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Immersing In A Trance-Satori_.mp3</file>
+            <name>01-Immersing In A Trance-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>579209.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Wabi Sabi-Cari Live_.mp3</file>
+            <name>01-Wabi Sabi-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>974293.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Northeastern Corridor-DAC Crowell_.mp3</file>
+            <name>02-Northeastern Corridor-DAC Crowell_</name>
+        </ambience>
+        <ambience>
+            <duration>1765166.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Returning To Sources-Satori_.mp3</file>
+            <name>02-Returning To Sources-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>268452.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Saddest Day In September-Cari Live_.mp3</file>
+            <name>02-Saddest Day In September-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>1776460.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Tethadelta Waves-Satori_.mp3</file>
+            <name>02-Tethadelta Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1246317.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/03-Meditation 3-Cari Live_.mp3</file>
+            <name>03-Meditation 3-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>361622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/05-River Meditation-Satori_.mp3</file>
+            <name>05-River Meditation-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>271661.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/07-Ambient Space Flute-Cari Live_.mp3</file>
+            <name>07-Ambient Space Flute-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>222572.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/09-Eternal Flame-Ion_.mp3</file>
+            <name>09-Eternal Flame-Ion_</name>
+        </ambience>
+    </air>
+    <earth>
+        <ambience>
+            <duration>1778860.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Alfatetha Waves-Satori_.mp3</file>
+            <name>01-Alfatetha Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1190524.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Aquasphere-Alexander Forselius_.mp3</file>
+            <name>01-Aquasphere-Alexander Forselius_</name>
+        </ambience>
+        <ambience>
+            <duration>420231.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Cold Reflections-Cari Live_.mp3</file>
+            <name>01-Cold Reflections-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>419371.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Ice Castle-Kirsty Hawkshaw_.mp3</file>
+            <name>01-Ice Castle-Kirsty Hawkshaw_</name>
+        </ambience>
+        <ambience>
+            <duration>1730788.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Immersing In A Trance-Satori_.mp3</file>
+            <name>01-Immersing In A Trance-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>579209.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Wabi Sabi-Cari Live_.mp3</file>
+            <name>01-Wabi Sabi-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>974293.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Northeastern Corridor-DAC Crowell_.mp3</file>
+            <name>02-Northeastern Corridor-DAC Crowell_</name>
+        </ambience>
+        <ambience>
+            <duration>1765166.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Returning To Sources-Satori_.mp3</file>
+            <name>02-Returning To Sources-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>268452.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Saddest Day In September-Cari Live_.mp3</file>
+            <name>02-Saddest Day In September-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>1776460.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Tethadelta Waves-Satori_.mp3</file>
+            <name>02-Tethadelta Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1246317.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/03-Meditation 3-Cari Live_.mp3</file>
+            <name>03-Meditation 3-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>271661.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/07-Ambient Space Flute-Cari Live_.mp3</file>
+            <name>07-Ambient Space Flute-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>222572.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/09-Eternal Flame-Ion_.mp3</file>
+            <name>09-Eternal Flame-Ion_</name>
+        </ambience>
+        <ambience>
+            <duration>361622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/05-River Meditation-Satori_.mp3</file>
+            <name>05-River Meditation-Satori_</name>
+        </ambience>
+    </earth>
+    <fire>
+        <ambience>
+            <duration>1778860.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Alfatetha Waves-Satori_.mp3</file>
+            <name>01-Alfatetha Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1190524.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Aquasphere-Alexander Forselius_.mp3</file>
+            <name>01-Aquasphere-Alexander Forselius_</name>
+        </ambience>
+        <ambience>
+            <duration>420231.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Cold Reflections-Cari Live_.mp3</file>
+            <name>01-Cold Reflections-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>419371.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Ice Castle-Kirsty Hawkshaw_.mp3</file>
+            <name>01-Ice Castle-Kirsty Hawkshaw_</name>
+        </ambience>
+        <ambience>
+            <duration>1730788.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Immersing In A Trance-Satori_.mp3</file>
+            <name>01-Immersing In A Trance-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>579209.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Wabi Sabi-Cari Live_.mp3</file>
+            <name>01-Wabi Sabi-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>974293.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Northeastern Corridor-DAC Crowell_.mp3</file>
+            <name>02-Northeastern Corridor-DAC Crowell_</name>
+        </ambience>
+        <ambience>
+            <duration>1765166.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Returning To Sources-Satori_.mp3</file>
+            <name>02-Returning To Sources-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>268452.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Saddest Day In September-Cari Live_.mp3</file>
+            <name>02-Saddest Day In September-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>1776460.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Tethadelta Waves-Satori_.mp3</file>
+            <name>02-Tethadelta Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1246317.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/03-Meditation 3-Cari Live_.mp3</file>
+            <name>03-Meditation 3-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>361622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/05-River Meditation-Satori_.mp3</file>
+            <name>05-River Meditation-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>271661.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/07-Ambient Space Flute-Cari Live_.mp3</file>
+            <name>07-Ambient Space Flute-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>222572.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/09-Eternal Flame-Ion_.mp3</file>
+            <name>09-Eternal Flame-Ion_</name>
+        </ambience>
+    </fire>
+    <jin>
+        <ambience>
+            <duration>771913.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/JIN/01-Spectral Navigator-Ray Carl Daye_.mp3</file>
+            <name>01-Spectral Navigator-Ray Carl Daye_</name>
+        </ambience>
+        <ambience>
+            <duration>2127072.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/JIN/02-Prinsengracht Extensions-DAC Crowell_.mp3</file>
+            <name>02-Prinsengracht Extensions-DAC Crowell_</name>
+        </ambience>
+        <ambience>
+            <duration>80392.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/JIN/02-Windamere Sky-Ray Carl Daye_.mp3</file>
+            <name>02-Windamere Sky-Ray Carl Daye_</name>
+        </ambience>
+        <ambience>
+            <duration>303613.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/JIN/03-Try to Keep an Open Mind-Cari Live_.mp3</file>
+            <name>03-Try to Keep an Open Mind-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>492717.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/JIN/06-Atlantis-Giorgio Costantini_.mp3</file>
+            <name>06-Atlantis-Giorgio Costantini_</name>
+        </ambience>
+        <ambience>
+            <duration>424535.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/JIN/07-Urge-Alexander Forselius_.mp3</file>
+            <name>07-Urge-Alexander Forselius_</name>
+        </ambience>
+        <ambience>
+            <duration>670084.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/JIN/07-Gate Of Heaven-Paul Avgerinos_.mp3</file>
+            <name>07-Gate Of Heaven-Paul Avgerinos_</name>
+        </ambience>
+    </jin>
+    <kai>
+        <ambience>
+            <duration>244977.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/01-In My Arms-Paul Avgerinos_.mp3</file>
+            <name>01-In My Arms-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>439507.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/01-Love Is-Paul Avgerinos_.mp3</file>
+            <name>01-Love Is-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>427665.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/02-Acceptance-Paul Avgerinos_.mp3</file>
+            <name>02-Acceptance-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>310447.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/02-Glassified-Cari Live_.mp3</file>
+            <name>02-Glassified-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>479336.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/02-Wandering Thoughts-Cari Live_.mp3</file>
+            <name>02-Wandering Thoughts-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>322940.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/03-Falling Together-Chad Lawson_.mp3</file>
+            <name>03-Falling Together-Chad Lawson_</name>
+        </ambience>
+        <ambience>
+            <duration>445245.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/03-Fertile Soil Of Peace-Paul Avgerinos_.mp3</file>
+            <name>03-Fertile Soil Of Peace-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>462930.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/04-Seven Deep Breaths-Paul Avgerinos_.mp3</file>
+            <name>04-Seven Deep Breaths-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>433429.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/05-Surrender-Paul Avgerinos_.mp3</file>
+            <name>05-Surrender-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>525269.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/06-Healing Touch-Paul Avgerinos_.mp3</file>
+            <name>06-Healing Touch-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>240439.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/07-Rivers Of Love-Paul Avgerinos_.mp3</file>
+            <name>07-Rivers Of Love-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>227736.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/12-Surrender-Cari Live_.mp3</file>
+            <name>12-Surrender-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>209765.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KAI/13-Acceptance-Cari Live_.mp3</file>
+            <name>13-Acceptance-Cari Live_</name>
+        </ambience>
+    </kai>
+    <kyo>
+        <ambience>
+            <duration>596502.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KYO/01-A Thousand Miles of Moonlight Later-Rildrim_.mp3</file>
+            <name>01-A Thousand Miles of Moonlight Later-Rildrim_</name>
+        </ambience>
+        <ambience>
+            <duration>563194.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KYO/01-Future Forever-Ion_.mp3</file>
+            <name>01-Future Forever-Ion_</name>
+        </ambience>
+        <ambience>
+            <duration>514914.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KYO/02-Electromagnetic Ripples-Rildrim_.mp3</file>
+            <name>02-Electromagnetic Ripples-Rildrim_</name>
+        </ambience>
+        <ambience>
+            <duration>347407.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KYO/02-Mythos-Robert Rich_.mp3</file>
+            <name>02-Mythos-Robert Rich_</name>
+        </ambience>
+        <ambience>
+            <duration>441724.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KYO/06-The Lonely Wizard-Rildrim_.mp3</file>
+            <name>06-The Lonely Wizard-Rildrim_</name>
+        </ambience>
+        <ambience>
+            <duration>350563.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KYO/08-Theoria (Human Response)-Magnatune_.mp3</file>
+            <name>08-Theoria (Human Response)-Magnatune_</name>
+        </ambience>
+        <ambience>
+            <duration>309560.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/KYO/13-Terra Meta-Robert Rich_.mp3</file>
+            <name>13-Terra Meta-Robert Rich_</name>
+        </ambience>
+    </kyo>
+    <postsession>
+        <ambience>
+            <duration>1778860.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/01-Alfatetha Waves-Satori_.mp3</file>
+            <name>01-Alfatetha Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1190524.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/01-Aquasphere-Alexander Forselius_.mp3</file>
+            <name>01-Aquasphere-Alexander Forselius_</name>
+        </ambience>
+        <ambience>
+            <duration>420231.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/01-Cold Reflections-Cari Live_.mp3</file>
+            <name>01-Cold Reflections-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>419371.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/01-Ice Castle-Kirsty Hawkshaw_.mp3</file>
+            <name>01-Ice Castle-Kirsty Hawkshaw_</name>
+        </ambience>
+        <ambience>
+            <duration>1730788.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/01-Immersing In A Trance-Satori_.mp3</file>
+            <name>01-Immersing In A Trance-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>579209.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/01-Wabi Sabi-Cari Live_.mp3</file>
+            <name>01-Wabi Sabi-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>974293.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/02-Northeastern Corridor-DAC Crowell_.mp3</file>
+            <name>02-Northeastern Corridor-DAC Crowell_</name>
+        </ambience>
+        <ambience>
+            <duration>1765166.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/02-Returning To Sources-Satori_.mp3</file>
+            <name>02-Returning To Sources-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>268452.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/02-Saddest Day In September-Cari Live_.mp3</file>
+            <name>02-Saddest Day In September-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>1776460.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/02-Tethadelta Waves-Satori_.mp3</file>
+            <name>02-Tethadelta Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1246317.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/03-Meditation 3-Cari Live_.mp3</file>
+            <name>03-Meditation 3-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>361622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/05-River Meditation-Satori_.mp3</file>
+            <name>05-River Meditation-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>271661.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/07-Ambient Space Flute-Cari Live_.mp3</file>
+            <name>07-Ambient Space Flute-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>222572.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Postsession/09-Eternal Flame-Ion_.mp3</file>
+            <name>09-Eternal Flame-Ion_</name>
+        </ambience>
+    </postsession>
+    <presession>
+        <ambience>
+            <duration>1778860.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/01-Alfatetha Waves-Satori_.mp3</file>
+            <name>01-Alfatetha Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1190524.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/01-Aquasphere-Alexander Forselius_.mp3</file>
+            <name>01-Aquasphere-Alexander Forselius_</name>
+        </ambience>
+        <ambience>
+            <duration>420231.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/01-Cold Reflections-Cari Live_.mp3</file>
+            <name>01-Cold Reflections-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>419371.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/01-Ice Castle-Kirsty Hawkshaw_.mp3</file>
+            <name>01-Ice Castle-Kirsty Hawkshaw_</name>
+        </ambience>
+        <ambience>
+            <duration>1730788.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/01-Immersing In A Trance-Satori_.mp3</file>
+            <name>01-Immersing In A Trance-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>579209.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/01-Wabi Sabi-Cari Live_.mp3</file>
+            <name>01-Wabi Sabi-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>974293.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/02-Northeastern Corridor-DAC Crowell_.mp3</file>
+            <name>02-Northeastern Corridor-DAC Crowell_</name>
+        </ambience>
+        <ambience>
+            <duration>1765166.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/02-Returning To Sources-Satori_.mp3</file>
+            <name>02-Returning To Sources-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>268452.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/02-Saddest Day In September-Cari Live_.mp3</file>
+            <name>02-Saddest Day In September-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>1776460.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/02-Tethadelta Waves-Satori_.mp3</file>
+            <name>02-Tethadelta Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1246317.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/03-Meditation 3-Cari Live_.mp3</file>
+            <name>03-Meditation 3-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>271661.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/07-Ambient Space Flute-Cari Live_.mp3</file>
+            <name>07-Ambient Space Flute-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>222572.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/Presession/09-Eternal Flame-Ion_.mp3</file>
+            <name>09-Eternal Flame-Ion_</name>
+        </ambience>
+    </presession>
+    <retsu>
+        <ambience>
+            <duration>1363013.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RETSU/01-Astral Flight-Satori_.mp3</file>
+            <name>01-Astral Flight-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>395583.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RETSU/01-Intro-Satori_.mp3</file>
+            <name>01-Intro-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>433951.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RETSU/02-Immersing-Satori_.mp3</file>
+            <name>02-Immersing-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>659076.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RETSU/06-Space Flute 5-Cari Live_.mp3</file>
+            <name>06-Space Flute 5-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>479336.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RETSU/07-In Flight-Cari Live_.mp3</file>
+            <name>07-In Flight-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>156685.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RETSU/09-Returning-Satori_.mp3</file>
+            <name>09-Returning-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>396548.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RETSU/11-Voyager-Ion_.mp3</file>
+            <name>11-Voyager-Ion_</name>
+        </ambience>
+    </retsu>
+    <rin>
+        <ambience>
+            <duration>604667.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RIN/01-First Flight-SkinMechanix_.mp3</file>
+            <name>01-First Flight-SkinMechanix_</name>
+        </ambience>
+        <ambience>
+            <duration>294901.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RIN/01-Mural-Stargarden_.mp3</file>
+            <name>01-Mural-Stargarden_</name>
+        </ambience>
+        <ambience>
+            <duration>523991.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RIN/03-Ultravista-SkinMechanix_.mp3</file>
+            <name>03-Ultravista-SkinMechanix_</name>
+        </ambience>
+        <ambience>
+            <duration>303587.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RIN/04-Day Dreams - The Flames are Awakened-Paul Avgerinos_.mp3</file>
+            <name>04-Day Dreams - The Flames are Awakened-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>336947.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RIN/04-Set Future-Stephen Schweyen_.mp3</file>
+            <name>04-Set Future-Stephen Schweyen_</name>
+        </ambience>
+        <ambience>
+            <duration>159789.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RIN/05-The Great Discovery-SkinMechanix_.mp3</file>
+            <name>05-The Great Discovery-SkinMechanix_</name>
+        </ambience>
+        <ambience>
+            <duration>597963.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RIN/07-Dimension Jump-SkinMechanix_.mp3</file>
+            <name>07-Dimension Jump-SkinMechanix_</name>
+        </ambience>
+        <ambience>
+            <duration>394748.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/RIN/08-Elementary-SkinMechanix_.mp3</file>
+            <name>08-Elementary-SkinMechanix_</name>
+        </ambience>
+    </rin>
+    <sha>
+        <ambience>
+            <duration>148037.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/1_18_13th Emperor -28No Choir-29.mp3</file>
+            <name>1_18_13th Emperor -28No Choir-29</name>
+        </ambience>
+        <ambience>
+            <duration>103501.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/1-06 Ad Victoriam (No Choir) (build @ 1_29).mp3</file>
+            <name>1-06 Ad Victoriam (No Choir) (build @ 1_29)</name>
+        </ambience>
+        <ambience>
+            <duration>115082.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/1-10 Day of Reckoning (No Choir) (build @ 1_30).mp3</file>
+            <name>1-10 Day of Reckoning (No Choir) (build @ 1_30)</name>
+        </ambience>
+        <ambience>
+            <duration>151338.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/1-12 Gothicus (No Choir) (build @ 1_56).mp3</file>
+            <name>1-12 Gothicus (No Choir) (build @ 1_56)</name>
+        </ambience>
+        <ambience>
+            <duration>103058.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/1-16 Hammer of the Gods II (No Choir) (build @ 1_19).mp3</file>
+            <name>1-16 Hammer of the Gods II (No Choir) (build @ 1_19)</name>
+        </ambience>
+        <ambience>
+            <duration>159085.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/1-24 Vigilantes (No Choir) (build @ 1_53).mp3</file>
+            <name>1-24 Vigilantes (No Choir) (build @ 1_53)</name>
+        </ambience>
+        <ambience>
+            <duration>119438.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/2-06 Caligula (No Choir) (build @ 1_12).mp3</file>
+            <name>2-06 Caligula (No Choir) (build @ 1_12)</name>
+        </ambience>
+        <ambience>
+            <duration>64876.99999999999</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/04 - Audiomachine - Massacre (No Choir).mp3</file>
+            <name>04 - Audiomachine - Massacre (No Choir)</name>
+        </ambience>
+        <ambience>
+            <duration>123273.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/04 - Audio Machine - Massive Attack (No Choir).mp3</file>
+            <name>04 - Audio Machine - Massive Attack (No Choir)</name>
+        </ambience>
+        <ambience>
+            <duration>64516.99999999999</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/07 - Audiomachine - Blackmail (No Choir).mp3</file>
+            <name>07 - Audiomachine - Blackmail (No Choir)</name>
+        </ambience>
+        <ambience>
+            <duration>59597.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/10 - Audiomachine - Damnation (No Choir).mp3</file>
+            <name>10 - Audiomachine - Damnation (No Choir)</name>
+        </ambience>
+        <ambience>
+            <duration>84917.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/13 - Audiomachine - Abduction (No Choir).mp3</file>
+            <name>13 - Audiomachine - Abduction (No Choir)</name>
+        </ambience>
+        <ambience>
+            <duration>51569.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/20 - Audio Machine - Detonation (No Choir).mp3</file>
+            <name>20 - Audio Machine - Detonation (No Choir)</name>
+        </ambience>
+        <ambience>
+            <duration>60490.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/54 Descent Into Hell (No Choir).mp3</file>
+            <name>54 Descent Into Hell (No Choir)</name>
+        </ambience>
+        <ambience>
+            <duration>93068.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/SHA/56 Clash Of The Titans (No Choir).mp3</file>
+            <name>56 Clash Of The Titans (No Choir)</name>
+        </ambience>
+    </sha>
+    <toh>
+        <ambience>
+            <duration>491700.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/01.Pure Meditation.mp3</file>
+            <name>01.Pure Meditation</name>
+        </ambience>
+        <ambience>
+            <duration>474485.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/01-In Deep-Giorgio Costantini_.mp3</file>
+            <name>01-In Deep-Giorgio Costantini_</name>
+        </ambience>
+        <ambience>
+            <duration>233866.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/01-Light and Shadow-Cari Live_.mp3</file>
+            <name>01-Light and Shadow-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>241717.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/02-Blue Water-Satori_.mp3</file>
+            <name>02-Blue Water-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>469737.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/02-Free-Giorgio Costantini_.mp3</file>
+            <name>02-Free-Giorgio Costantini_</name>
+        </ambience>
+        <ambience>
+            <duration>452209.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/04-The Light-Giorgio Costantini_.mp3</file>
+            <name>04-The Light-Giorgio Costantini_</name>
+        </ambience>
+        <ambience>
+            <duration>503959.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/05-Krikelin-Alexander Forselius_.mp3</file>
+            <name>05-Krikelin-Alexander Forselius_</name>
+        </ambience>
+        <ambience>
+            <duration>240908.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/05-Sweet Home-Cari Live_.mp3</file>
+            <name>05-Sweet Home-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>202044.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/06-Touch of Gray-Cari Live_.mp3</file>
+            <name>06-Touch of Gray-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>419449.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/06-Winters End-Cari Live_.mp3</file>
+            <name>06-Winters End-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>549344.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/07.Portrait of Peace.mp3</file>
+            <name>07.Portrait of Peace</name>
+        </ambience>
+        <ambience>
+            <duration>475789.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/07-Descent-Giorgio Costantini_.mp3</file>
+            <name>07-Descent-Giorgio Costantini_</name>
+        </ambience>
+        <ambience>
+            <duration>551248.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/07-Peaceful-Paul Avgerinos_.mp3</file>
+            <name>07-Peaceful-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>221268.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/09-Flow-Cari Live_.mp3</file>
+            <name>09-Flow-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>266679.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/TOH/10-Space Bass 2-Cari Live_.mp3</file>
+            <name>10-Space Bass 2-Cari Live_</name>
+        </ambience>
+    </toh>
+    <void>
+        <ambience>
+            <duration>1778860.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Alfatetha Waves-Satori_.mp3</file>
+            <name>01-Alfatetha Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1190524.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Aquasphere-Alexander Forselius_.mp3</file>
+            <name>01-Aquasphere-Alexander Forselius_</name>
+        </ambience>
+        <ambience>
+            <duration>420231.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Cold Reflections-Cari Live_.mp3</file>
+            <name>01-Cold Reflections-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>419371.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Ice Castle-Kirsty Hawkshaw_.mp3</file>
+            <name>01-Ice Castle-Kirsty Hawkshaw_</name>
+        </ambience>
+        <ambience>
+            <duration>1730788.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Immersing In A Trance-Satori_.mp3</file>
+            <name>01-Immersing In A Trance-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>579209.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Wabi Sabi-Cari Live_.mp3</file>
+            <name>01-Wabi Sabi-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>974293.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Northeastern Corridor-DAC Crowell_.mp3</file>
+            <name>02-Northeastern Corridor-DAC Crowell_</name>
+        </ambience>
+        <ambience>
+            <duration>1765166.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Returning To Sources-Satori_.mp3</file>
+            <name>02-Returning To Sources-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>268452.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Saddest Day In September-Cari Live_.mp3</file>
+            <name>02-Saddest Day In September-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>1776460.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Tethadelta Waves-Satori_.mp3</file>
+            <name>02-Tethadelta Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1246317.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/03-Meditation 3-Cari Live_.mp3</file>
+            <name>03-Meditation 3-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>361622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/05-River Meditation-Satori_.mp3</file>
+            <name>05-River Meditation-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>271661.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/07-Ambient Space Flute-Cari Live_.mp3</file>
+            <name>07-Ambient Space Flute-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>222572.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/09-Eternal Flame-Ion_.mp3</file>
+            <name>09-Eternal Flame-Ion_</name>
+        </ambience>
+    </void>
+    <water>
+        <ambience>
+            <duration>1778860.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Alfatetha Waves-Satori_.mp3</file>
+            <name>01-Alfatetha Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1190524.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Aquasphere-Alexander Forselius_.mp3</file>
+            <name>01-Aquasphere-Alexander Forselius_</name>
+        </ambience>
+        <ambience>
+            <duration>420231.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Cold Reflections-Cari Live_.mp3</file>
+            <name>01-Cold Reflections-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>419371.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Ice Castle-Kirsty Hawkshaw_.mp3</file>
+            <name>01-Ice Castle-Kirsty Hawkshaw_</name>
+        </ambience>
+        <ambience>
+            <duration>1730788.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Immersing In A Trance-Satori_.mp3</file>
+            <name>01-Immersing In A Trance-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>579209.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/01-Wabi Sabi-Cari Live_.mp3</file>
+            <name>01-Wabi Sabi-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>974293.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Northeastern Corridor-DAC Crowell_.mp3</file>
+            <name>02-Northeastern Corridor-DAC Crowell_</name>
+        </ambience>
+        <ambience>
+            <duration>1765166.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Returning To Sources-Satori_.mp3</file>
+            <name>02-Returning To Sources-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>268452.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Saddest Day In September-Cari Live_.mp3</file>
+            <name>02-Saddest Day In September-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>1776460.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/02-Tethadelta Waves-Satori_.mp3</file>
+            <name>02-Tethadelta Waves-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>1246317.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/03-Meditation 3-Cari Live_.mp3</file>
+            <name>03-Meditation 3-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>361622.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/05-River Meditation-Satori_.mp3</file>
+            <name>05-River Meditation-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>271661.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/07-Ambient Space Flute-Cari Live_.mp3</file>
+            <name>07-Ambient Space Flute-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>222572.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/General/09-Eternal Flame-Ion_.mp3</file>
+            <name>09-Eternal Flame-Ion_</name>
+        </ambience>
+    </water>
+    <zai>
+        <ambience>
+            <duration>1014462.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZAI/01-Aurora-Satori_.mp3</file>
+            <name>01-Aurora-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>447254.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZAI/01-Rain Surround-Satori_.mp3</file>
+            <name>01-Rain Surround-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>241717.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZAI/01-Relaxation-Satori_.mp3</file>
+            <name>01-Relaxation-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>467677.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZAI/02.Soaring on the Wings of the Astral Body.mp3</file>
+            <name>02.Soaring on the Wings of the Astral Body</name>
+        </ambience>
+        <ambience>
+            <duration>260732.00000000003</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZAI/02-Dolphin's heart-Satori_.mp3</file>
+            <name>02-Dolphin's heart-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>528216.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZAI/02-Meditation 2-Satori_.mp3</file>
+            <name>02-Meditation 2-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>471928.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZAI/03-Meditation 3-Satori_.mp3</file>
+            <name>03-Meditation 3-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>491204.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZAI/03-Sea Surround-Satori_.mp3</file>
+            <name>03-Sea Surround-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>304134.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZAI/04-Forest Surround-Satori_.mp3</file>
+            <name>04-Forest Surround-Satori_</name>
+        </ambience>
+        <ambience>
+            <duration>454400.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZAI/04-Rain-Satori_.mp3</file>
+            <name>04-Rain-Satori_</name>
+        </ambience>
+    </zai>
+    <zen>
+        <ambience>
+            <duration>214538.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/01-Angel's Breath-Paul Avgerinos_.mp3</file>
+            <name>01-Angel's Breath-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>361700.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/01-Bliss Is-Paul Avgerinos_.mp3</file>
+            <name>01-Bliss Is-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>232875.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/02-Blue 3-Cari Live_.mp3</file>
+            <name>02-Blue 3-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>350328.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/02-Contentment-Paul Avgerinos_.mp3</file>
+            <name>02-Contentment-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>212843.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/02-Gleam (Etherine)-Magnatune_.mp3</file>
+            <name>02-Gleam (Etherine)-Magnatune_</name>
+        </ambience>
+        <ambience>
+            <duration>215738.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/03-Space Tribe-Cari Live_.mp3</file>
+            <name>03-Space Tribe-Cari Live_</name>
+        </ambience>
+        <ambience>
+            <duration>378211.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/04-Flowering Of Grace-Paul Avgerinos_.mp3</file>
+            <name>04-Flowering Of Grace-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>454479.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/07-Law of Attraction-Paul Avgerinos_.mp3</file>
+            <name>07-Law of Attraction-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>351502.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/08-Flying Over Blue Waters-Ion_.mp3</file>
+            <name>08-Flying Over Blue Waters-Ion_</name>
+        </ambience>
+        <ambience>
+            <duration>454609.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/08-Heaven and Earth-Paul Avgerinos_.mp3</file>
+            <name>08-Heaven and Earth-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>304630.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/09-Graceful-Paul Avgerinos_.mp3</file>
+            <name>09-Graceful-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>610327.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/10-Stillness-Paul Avgerinos_.mp3</file>
+            <name>10-Stillness-Paul Avgerinos_</name>
+        </ambience>
+        <ambience>
+            <duration>670057.0</duration>
+            <file>/home/caleb/Programming/Java/Kuji-In/src/kujiin/assets/sound/ambience/ZEN/11-We Are Heaven-Paul Avgerinos_.mp3</file>
+            <name>11-We Are Heaven-Paul Avgerinos_</name>
+        </ambience>
+    </zen>
+</ambiences>

@@ -43,7 +43,7 @@ public class Sessions {
             } catch (JAXBException e) {
                 new InformationDialog(Root.getPreferences(), "Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Preferences.SESSIONSXMLFILE.getAbsolutePath());
             }
-        }
+        } else {marshall();}
     }
     public void marshall() {
         try {

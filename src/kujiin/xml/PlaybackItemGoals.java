@@ -58,8 +58,15 @@ public class PlaybackItemGoals {
     public String getPlaybackItemName() {
         return PlaybackItemName;
     }
+    public boolean hasCompletedGoals() {
+        boolean hascompletedgoals = false;
+        for (Goal i : getGoals()) {
+            if (i.getCompleted()) {hascompletedgoals = true; break;}
+        }
+        return hascompletedgoals;
+    }
 
-    // Utility Methods
+// Utility Methods
     public void add(Goal goal) {
         if (Goals == null) {Goals = new ArrayList<>();}
         Goals.add(goal);

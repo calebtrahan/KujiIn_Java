@@ -60,7 +60,7 @@ public class AvailableAmbiences {
                 Fire = ambiences.Fire;
                 Water = ambiences.Water;
                 Void = ambiences.Void;
-            } catch (JAXBException ignored) {}
+            } catch (JAXBException ignored) {ignored.printStackTrace();}
         } else {
             QiGong = new PlaybackItemAmbience("Qi-Gong");
             Rin = new PlaybackItemAmbience("Rin");
@@ -80,6 +80,7 @@ public class AvailableAmbiences {
         }
     }
     public void marshall() {
+        System.out.println("Marshalled Available Ambience");
         try {
             JAXBContext context = JAXBContext.newInstance(AvailableAmbiences.class);
             Marshaller createMarshaller = context.createMarshaller();

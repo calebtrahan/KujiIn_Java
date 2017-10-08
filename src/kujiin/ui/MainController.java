@@ -253,6 +253,7 @@ public class MainController implements Initializable {
         this.allGoals = allGoals;
     }
 
+
 // Window Methods
     private boolean cleanup() {
         availableAmbiences.marshall();
@@ -455,7 +456,6 @@ public class MainController implements Initializable {
     public void aboutthisprogram() {
     }
 
-
 // Play/Export Tab
     // Create/Open Toolbar Methods
     public void createnewsession() {
@@ -573,8 +573,9 @@ public class MainController implements Initializable {
                 createdsession.addplaybackitems(null, Collections.singletonList(playbackItem)); createdsession.calculateexpectedduration();
             }
             if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1 && createdsession.getplaybackitem(startindex).getCreationindex() == playbackItem.getCreationindex()) {
-                populatetable();
                 mergeitems(createdsession.getplaybackitem(startindex), createdsession.getplaybackitem(startindex + 1));
+                populatetable();
+                return;
             }
         }
         populatetable();
@@ -608,8 +609,9 @@ public class MainController implements Initializable {
                 createdsession.addplaybackitems(null, items); createdsession.calculateexpectedduration();
             }
             if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1 && createdsession.getplaybackitem(startindex).getCreationindex() == items.get(0).getCreationindex()) {
-                populatetable();
                 mergeitems(createdsession.getplaybackitem(startindex), createdsession.getplaybackitem(startindex + 1));
+                populatetable();
+                return;
             }
         }
         populatetable();
@@ -617,12 +619,10 @@ public class MainController implements Initializable {
     public void addallitems_kujiin() {
         int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         add(indexes);
-        populatetable();
     }
     public void addallitems_elements() {
         int[] indexes = {10, 11, 12, 13, 14};
         add(indexes);
-        populatetable();
     }
     public void add_QiGong() {add(0);}
     public void addRin() {add(1);}
@@ -856,6 +856,7 @@ public class MainController implements Initializable {
     }
     // Utility Methods
     private void populatetable() {
+        calculatedurationandestimatedcompletion();
         if (createdtableplaybackitems != null) {createdtableplaybackitems.clear();}
         else {createdtableplaybackitems = new ArrayList<>();}
         if (! createdtableitems.isEmpty()) {createdtableitems.clear();}
@@ -870,7 +871,6 @@ public class MainController implements Initializable {
         }
         createdtableselecteditem = null;
         syncbuttons();
-        calculatedurationandestimatedcompletion();
     }
     private void syncbuttons() {
         boolean nosessionloaded = createdsession == null;
@@ -895,7 +895,7 @@ public class MainController implements Initializable {
             SessionSummary_Duration.setText(Util.formatdurationtoStringSpelledOutShort(createdsession.getExpectedSessionDuration(), false));
             LocalTime now = LocalTime.now();
             LocalTime completiontime = now.plusMinutes((int) createdsession.getExpectedSessionDuration().toMinutes());
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
             String completiontext = completiontime.format(formatter);
             SessionSummary_CompletionTime.setText(completiontext);
             SessionSummary_CompletionTime.setTooltip(new Tooltip("Completion Time If You Start Now"));
@@ -1001,7 +1001,7 @@ public class MainController implements Initializable {
                 count++;
             }
             SessionBrowser_DetailsTable.setItems(sessionitems);
-            SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringDecimalWithColons(selectedsession.getSessionPracticedTime()));
+            SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringSpelledOutShort(selectedsession.getSessionPracticedTime(), true));
             SessionBrowser_Details_TotalDuration.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(selectedsession.getSessionPracticedTime(), Double.MAX_VALUE)));
             SessionBrowser_ViewNotesButton.setDisable(selectedsession.getNotes() == null || selectedsession.getNotes().isEmpty());
         } else {SessionBrowser_DetailsTable.setPlaceholder(new Label("Select A Session To View Details"));}
@@ -1033,114 +1033,120 @@ public class MainController implements Initializable {
         // Filter
     public void populatesessionbrowserfilter() {
         Duration highestduration = Duration.ZERO;
-        for (Session i : sessions.getSession()) {
-            if (i.getSessionPracticedTime().greaterThanOrEqualTo(highestduration)) {highestduration = i.getSessionPracticedTime();}
-        }
-        Double hours = highestduration.toMinutes() / 60.0;
-        Double minutes = highestduration.toMinutes() % 60.0;
-        SessionBrowser_Filter_Duration_From_Hours.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
-        SessionBrowser_Filter_Duration_From_Hours.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Duration newfromduration = Duration.hours(new Double(newValue));
-            newfromduration = newfromduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
-            Duration toduration = Duration.hours(SessionBrowser_Filter_Duration_To_Hours.getValue());
-            toduration = toduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
-            if (newfromduration.greaterThanOrEqualTo(toduration)) {SessionBrowser_Filter_Duration_From_Hours.getValueFactory().setValue(oldValue);}
-            populatesessionbrowsertable();
-        });
-        SessionBrowser_Filter_Duration_From_Hours.setOnScroll(event -> {
-            Integer newvalue = SessionBrowser_Filter_Duration_From_Hours.getValue();
-            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
-            SessionBrowser_Filter_Duration_From_Hours.getValueFactory().setValue(newvalue);
-        });
-        SessionBrowser_Filter_Duration_From_Minutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0));
-        SessionBrowser_Filter_Duration_From_Minutes.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Duration newfromduration = Duration.minutes(new Double(newValue));
-            newfromduration = newfromduration.add(Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue()));
-            Duration toduration = Duration.hours(SessionBrowser_Filter_Duration_To_Hours.getValue());
-            toduration = toduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
-            if (newfromduration.greaterThanOrEqualTo(toduration)) {SessionBrowser_Filter_Duration_From_Minutes.getValueFactory().setValue(oldValue);}
-            populatesessionbrowsertable();
-        });
-        SessionBrowser_Filter_Duration_From_Minutes.setOnScroll(event -> {
-            Integer newvalue = SessionBrowser_Filter_Duration_From_Minutes.getValue();
-            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
-            SessionBrowser_Filter_Duration_From_Minutes.getValueFactory().setValue(newvalue);
-        });
-        SessionBrowser_Filter_Duration_To_Hours.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, hours.intValue()));
-        SessionBrowser_Filter_Duration_To_Hours.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Duration newtoduration = Duration.hours(new Double(newValue));
-            newtoduration = newtoduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
-            Duration fromduration = Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue());
-            fromduration = fromduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
-            if (newtoduration.lessThanOrEqualTo(fromduration)) {SessionBrowser_Filter_Duration_To_Hours.getValueFactory().setValue(oldValue);}
-            populatesessionbrowsertable();
-        });
-        SessionBrowser_Filter_Duration_To_Hours.setOnScroll(event -> {
-            Integer newvalue = SessionBrowser_Filter_Duration_To_Hours.getValue();
-            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
-            SessionBrowser_Filter_Duration_To_Hours.getValueFactory().setValue(newvalue);
-        });
-        SessionBrowser_Filter_Duration_To_Minutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, minutes.intValue()));
-        SessionBrowser_Filter_Duration_To_Minutes.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Duration newtoduration = Duration.minutes(new Double(newValue));
-            newtoduration = newtoduration.add(Duration.hours(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
-            Duration fromduration = Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue());
-            fromduration = fromduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
-            if (newtoduration.lessThanOrEqualTo(fromduration)) {SessionBrowser_Filter_Duration_To_Minutes.getValueFactory().setValue(oldValue);}
-            populatesessionbrowsertable();
-        });
-        SessionBrowser_Filter_Duration_To_Minutes.setOnScroll(event -> {
-            Integer newvalue = SessionBrowser_Filter_Duration_To_Minutes.getValue();
-            if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
-            SessionBrowser_Filter_Duration_To_Minutes.getValueFactory().setValue(newvalue);
-        });
-        SessionBrowser_Filter.setDisable(sessions.getSession() == null);
         if (sessions.getSession() != null) {
-            LocalDate mindate = null;
-            LocalDate maxdate = null;
             for (Session i : sessions.getSession()) {
-                LocalDate sessiondate = i.getDate_Practiced();
-                if (mindate == null) {mindate = sessiondate;}
-                else if (sessiondate.isBefore(mindate)) {mindate = sessiondate;}
-                if (maxdate == null) {maxdate = sessiondate;}
-                else if (sessiondate.isAfter(maxdate)) {maxdate = sessiondate;}
+                if (i.getSessionPracticedTime().greaterThanOrEqualTo(highestduration)) {
+                    highestduration = i.getSessionPracticedTime();
+                }
             }
-            SessionBrowser_Filter_DateRange_From.setValue(mindate);
-            LocalDate finalMindate = mindate;
-            LocalDate finalMaxdate = maxdate;
-            SessionBrowser_Filter_DateRange_From.setDayCellFactory(new Callback<DatePicker, DateCell>() {
-                @Override
-                public DateCell call(DatePicker param) {
-                    return new DateCell() {
-                        @Override
-                        public void updateItem(LocalDate item, boolean empty) {
-                            super.updateItem(item, empty);
-                            if (item.isBefore(finalMindate) || item.isAfter(finalMaxdate)) {
-                                setDisable(true);
-                                setStyle("-fx-background-color: #ffc0cb;");
-                            }
-                        }
-                    };
-                }
+            Double hours = highestduration.toMinutes() / 60.0;
+            Double minutes = highestduration.toMinutes() % 60.0;
+            SessionBrowser_Filter_Duration_From_Hours.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0));
+            SessionBrowser_Filter_Duration_From_Hours.valueProperty().addListener((observable, oldValue, newValue) -> {
+                Duration newfromduration = Duration.hours(new Double(newValue));
+                newfromduration = newfromduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
+                Duration toduration = Duration.hours(SessionBrowser_Filter_Duration_To_Hours.getValue());
+                toduration = toduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
+                if (newfromduration.greaterThanOrEqualTo(toduration)) {SessionBrowser_Filter_Duration_From_Hours.getValueFactory().setValue(oldValue);}
+                populatesessionbrowsertable();
             });
-            SessionBrowser_Filter_DateRange_To.setValue(maxdate);
-            SessionBrowser_Filter_DateRange_To.setDayCellFactory(new Callback<DatePicker, DateCell>() {
-                @Override
-                public DateCell call(DatePicker param) {
-                    return new DateCell() {
-                        @Override
-                        public void updateItem(LocalDate item, boolean empty) {
-                            super.updateItem(item, empty);
-                            if (item.isAfter(finalMaxdate) || item.isBefore(finalMindate)) {
-                                setDisable(true);
-                                setStyle("-fx-background-color: #ffc0cb;");
-                            }
-                        }
-                    };
-                }
+            SessionBrowser_Filter_Duration_From_Hours.setOnScroll(event -> {
+                Integer newvalue = SessionBrowser_Filter_Duration_From_Hours.getValue();
+                if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+                SessionBrowser_Filter_Duration_From_Hours.getValueFactory().setValue(newvalue);
             });
-            SessionBrowser_Filter_DateRange_From.setOnAction(event -> populatesessionbrowsertable());
-            SessionBrowser_Filter_DateRange_To.setOnAction(event -> populatesessionbrowsertable());
+            SessionBrowser_Filter_Duration_From_Minutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0));
+            SessionBrowser_Filter_Duration_From_Minutes.valueProperty().addListener((observable, oldValue, newValue) -> {
+                Duration newfromduration = Duration.minutes(new Double(newValue));
+                newfromduration = newfromduration.add(Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue()));
+                Duration toduration = Duration.hours(SessionBrowser_Filter_Duration_To_Hours.getValue());
+                toduration = toduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
+                if (newfromduration.greaterThanOrEqualTo(toduration)) {SessionBrowser_Filter_Duration_From_Minutes.getValueFactory().setValue(oldValue);}
+                populatesessionbrowsertable();
+            });
+            SessionBrowser_Filter_Duration_From_Minutes.setOnScroll(event -> {
+                Integer newvalue = SessionBrowser_Filter_Duration_From_Minutes.getValue();
+                if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+                SessionBrowser_Filter_Duration_From_Minutes.getValueFactory().setValue(newvalue);
+            });
+            SessionBrowser_Filter_Duration_To_Hours.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, hours.intValue()));
+            SessionBrowser_Filter_Duration_To_Hours.valueProperty().addListener((observable, oldValue, newValue) -> {
+                Duration newtoduration = Duration.hours(new Double(newValue));
+                newtoduration = newtoduration.add(Duration.minutes(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
+                Duration fromduration = Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue());
+                fromduration = fromduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
+                if (newtoduration.lessThanOrEqualTo(fromduration)) {SessionBrowser_Filter_Duration_To_Hours.getValueFactory().setValue(oldValue);}
+                populatesessionbrowsertable();
+            });
+            SessionBrowser_Filter_Duration_To_Hours.setOnScroll(event -> {
+                Integer newvalue = SessionBrowser_Filter_Duration_To_Hours.getValue();
+                if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+                SessionBrowser_Filter_Duration_To_Hours.getValueFactory().setValue(newvalue);
+            });
+            SessionBrowser_Filter_Duration_To_Minutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, minutes.intValue()));
+            SessionBrowser_Filter_Duration_To_Minutes.valueProperty().addListener((observable, oldValue, newValue) -> {
+                Duration newtoduration = Duration.minutes(new Double(newValue));
+                newtoduration = newtoduration.add(Duration.hours(SessionBrowser_Filter_Duration_To_Minutes.getValue()));
+                Duration fromduration = Duration.hours(SessionBrowser_Filter_Duration_From_Hours.getValue());
+                fromduration = fromduration.add(Duration.minutes(SessionBrowser_Filter_Duration_From_Minutes.getValue()));
+                if (newtoduration.lessThanOrEqualTo(fromduration)) {SessionBrowser_Filter_Duration_To_Minutes.getValueFactory().setValue(oldValue);}
+                populatesessionbrowsertable();
+            });
+            SessionBrowser_Filter_Duration_To_Minutes.setOnScroll(event -> {
+                Integer newvalue = SessionBrowser_Filter_Duration_To_Minutes.getValue();
+                if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
+                SessionBrowser_Filter_Duration_To_Minutes.getValueFactory().setValue(newvalue);
+            });
+            SessionBrowser_Filter.setDisable(sessions.getSession() == null);
+            if (sessions.getSession() != null) {
+                LocalDate mindate = null;
+                LocalDate maxdate = null;
+                for (Session i : sessions.getSession()) {
+                    LocalDate sessiondate = i.getDate_Practiced();
+                    if (mindate == null) {mindate = sessiondate;}
+                    else if (sessiondate.isBefore(mindate)) {mindate = sessiondate;}
+                    if (maxdate == null) {maxdate = sessiondate;}
+                    else if (sessiondate.isAfter(maxdate)) {maxdate = sessiondate;}
+                }
+                SessionBrowser_Filter_DateRange_From.setValue(mindate);
+                LocalDate finalMindate = mindate;
+                LocalDate finalMaxdate = maxdate;
+                SessionBrowser_Filter_DateRange_From.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+                    @Override
+                    public DateCell call(DatePicker param) {
+                        return new DateCell() {
+                            @Override
+                            public void updateItem(LocalDate item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item.isBefore(finalMindate) || item.isAfter(finalMaxdate)) {
+                                    setDisable(true);
+                                    setStyle("-fx-background-color: #ffc0cb;");
+                                }
+                            }
+                        };
+                    }
+                });
+                SessionBrowser_Filter_DateRange_To.setValue(maxdate);
+                SessionBrowser_Filter_DateRange_To.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+                    @Override
+                    public DateCell call(DatePicker param) {
+                        return new DateCell() {
+                            @Override
+                            public void updateItem(LocalDate item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (item.isAfter(finalMaxdate) || item.isBefore(finalMindate)) {
+                                    setDisable(true);
+                                    setStyle("-fx-background-color: #ffc0cb;");
+                                }
+                            }
+                        };
+                    }
+                });
+                SessionBrowser_Filter_DateRange_From.setOnAction(event -> populatesessionbrowsertable());
+                SessionBrowser_Filter_DateRange_To.setOnAction(event -> populatesessionbrowsertable());
+            }
+        } else {
+
         }
     }
 
@@ -1157,13 +1163,13 @@ public class MainController implements Initializable {
             String goalscompleted;
             PlaybackItem playbackItem = demosession.getplaybackitem(i);
             Duration practicedduration = sessions.gettotalpracticedtime(playbackItem, false);
-            practicedtime = Util.formatdurationtoStringDecimalWithColons(practicedduration);
+            practicedtime = Util.formatdurationtoStringSpelledOutShort(practicedduration, true);
             Goal currentgoal = allGoals.getplaybackItemGoals(i).getCurrentGoal();
             if (currentgoal == null) {
                 currentgoaltext = "None";
                 percentcompleted = "-";
             } else {
-                currentgoaltext = Util.formatdurationtoStringDecimalWithColons(currentgoal.getDuration());
+                currentgoaltext = Util.formatdurationtoStringSpelledOutShort(currentgoal.getDuration(), true);
                 percentcompleted = String.format("%.2f", (practicedduration.toMillis() / currentgoal.getDuration().toMillis()) * 100) + "%";
             }
             int completedgoalcount = 0;
@@ -1196,6 +1202,10 @@ public class MainController implements Initializable {
             GoalsIndividual_PracticedTime.setTooltip(new Tooltip(Util.formatdurationtoStringDecimalWithColons(duration)));
             ObservableList<GoalDetailsTableItem> tableitems = FXCollections.observableArrayList();
             List<Goal> goalList = allGoals.getplaybackItemGoals(index).getGoals();
+            boolean hascompletedgoals = allGoals.getplaybackItemGoals(index).hasCompletedGoals();
+            GoalsIndividual_ShowCompletedGoalsCheckbox.setDisable(! hascompletedgoals);
+            if (hascompletedgoals) { GoalsIndividual_ShowCompletedGoalsCheckbox.setTooltip(null); }
+            else {GoalsIndividual_ShowCompletedGoalsCheckbox.setTooltip(new Tooltip("No Completed Goals For " + GoalsIndividual_SelectedSessionItemChoiceBox.getValue()));}
             if (goalList != null && ! goalList.isEmpty()) {
                 for (Goal i :goalList) {
                     if (! GoalsIndividual_ShowCompletedGoalsCheckbox.isSelected() && i.getCompleted()) {continue;}
