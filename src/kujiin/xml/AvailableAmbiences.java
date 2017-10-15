@@ -80,7 +80,6 @@ public class AvailableAmbiences {
         }
     }
     public void marshall() {
-        System.out.println("Marshalled Available Ambience");
         try {
             JAXBContext context = JAXBContext.newInstance(AvailableAmbiences.class);
             Marshaller createMarshaller = context.createMarshaller();

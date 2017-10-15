@@ -216,15 +216,15 @@ public class Player extends Stage {
             PauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PAUSE, 20.0));
             StopButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_STOP, 20.0));
         }
-        if (dt == IconDisplayType.ICONS_ONLY) {
-            PlayButton.setText("");
-            PauseButton.setText("");
-            StopButton.setText("");
-        } else {
-            PlayButton.setText("Play");
-            PauseButton.setText("Pause");
-            StopButton.setText("Stop");
-        }
+//        if (dt == IconDisplayType.ICONS_ONLY) {
+//            PlayButton.setText("");
+//            PauseButton.setText("");
+//            StopButton.setText("");
+//        } else {
+//            PlayButton.setText("Play");
+//            PauseButton.setText("Pause");
+//            StopButton.setText("Stop");
+//        }
     }
     private void setPlayerstate(PlayerState playerstate) {
 
@@ -720,11 +720,11 @@ public class Player extends Stage {
     public void reset() {
         PlayButton.setDisable(false);
         PlayButton.setTooltip(new Tooltip("Replay"));
-        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
-            PlayButton.setText("Replay");
-            PauseButton.setText("Pause");
-            StopButton.setText("Stop");
-        }
+//        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
+//            PlayButton.setText("Replay");
+//            PauseButton.setText("Pause");
+//            StopButton.setText("Stop");
+//        }
         PauseButton.setDisable(true);
         StopButton.setDisable(true);
         if (updateuitimeline != null) {updateuitimeline.stop(); updateuitimeline = null;}
@@ -803,11 +803,13 @@ public class Player extends Stage {
                 @Override
                 protected void interpolate(double frac) {
                     if (entrainmentplayer != null) {
-                        double entrainmentvolume = frac * currententrainmentvolume;
-                        String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
-                        entrainmentplayer.setVolume(entrainmentvolume);
-                        EntrainmentVolume.setValue(entrainmentvolume);
-                        EntrainmentVolumePercentage.setText(percentage);
+                        try {
+                            double entrainmentvolume = frac * currententrainmentvolume;
+                            String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
+                            entrainmentplayer.setVolume(entrainmentvolume);
+                            EntrainmentVolume.setValue(entrainmentvolume);
+                            EntrainmentVolumePercentage.setText(percentage);
+                        } catch (RuntimeException ignored) {}
 //                        if (referencecurrentlyDisplayed()) {
 //                            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
 //                            root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
@@ -828,11 +830,13 @@ public class Player extends Stage {
                     @Override
                     protected void interpolate(double frac) {
                         if (ambienceplayer != null) {
-                            double ambiencevolume = frac * currentambiencevolume;
-                            String percentage = new Double(ambiencevolume * 100).intValue() + "%";
-                            ambienceplayer.setVolume(ambiencevolume);
-                            AmbienceVolume.setValue(ambiencevolume);
-                            AmbienceVolumePercentage.setText(percentage);
+                            try {
+                                double ambiencevolume = frac * currentambiencevolume;
+                                String percentage = new Double(ambiencevolume * 100).intValue() + "%";
+                                ambienceplayer.setVolume(ambiencevolume);
+                                AmbienceVolume.setValue(ambiencevolume);
+                                AmbienceVolumePercentage.setText(percentage);
+                            } catch (RuntimeException ignored) {}
 //                            if (referencecurrentlyDisplayed()) {
 //                                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
 //                                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
@@ -851,11 +855,13 @@ public class Player extends Stage {
                 @Override
                 protected void interpolate(double frac) {
                     if (entrainmentplayer != null) {
-                        double entrainmentvolume = frac * currententrainmentvolume;
-                        String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
-                        entrainmentplayer.setVolume(entrainmentvolume);
-                        EntrainmentVolume.setValue(entrainmentvolume);
-                        EntrainmentVolumePercentage.setText(percentage);
+                        try {
+                            double entrainmentvolume = frac * currententrainmentvolume;
+                            String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
+                            entrainmentplayer.setVolume(entrainmentvolume);
+                            EntrainmentVolume.setValue(entrainmentvolume);
+                            EntrainmentVolumePercentage.setText(percentage);
+                        } catch (RuntimeException ignored) {}
 //                        if (referencecurrentlyDisplayed()) {
 //                            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
 //                            root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
@@ -882,15 +888,13 @@ public class Player extends Stage {
                     @Override
                     protected void interpolate(double frac) {
                         if (ambienceplayer != null) {
-                            double ambiencevolume = frac * currentambiencevolume;
-                            String percentage = new Double(ambiencevolume * 100).intValue() + "%";
-                            ambienceplayer.setVolume(ambiencevolume);
-                            AmbienceVolume.setValue(ambiencevolume);
-                            AmbienceVolumePercentage.setText(percentage);
-//                            if (referencecurrentlyDisplayed()) {
-//                                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
-//                                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
-//                            }
+                            try {
+                                double ambiencevolume = frac * currentambiencevolume;
+                                String percentage = new Double(ambiencevolume * 100).intValue() + "%";
+                                ambienceplayer.setVolume(ambiencevolume);
+                                AmbienceVolume.setValue(ambiencevolume);
+                                AmbienceVolumePercentage.setText(percentage);
+                            } catch (RuntimeException ignored) {}
                         }
                     }
                 };
@@ -905,11 +909,13 @@ public class Player extends Stage {
                 @Override
                 protected void interpolate(double frac) {
                     if (entrainmentplayer != null) {
-                        double fadeoutvolume = currententrainmentvolume - (frac * currententrainmentvolume);
-                        String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
-                        entrainmentplayer.setVolume(fadeoutvolume);
-                        EntrainmentVolume.setValue(fadeoutvolume);
-                        EntrainmentVolumePercentage.setText(percentage);
+                        try {
+                            double entrainmentvolume = frac * currententrainmentvolume;
+                            String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
+                            entrainmentplayer.setVolume(entrainmentvolume);
+                            EntrainmentVolume.setValue(entrainmentvolume);
+                            EntrainmentVolumePercentage.setText(percentage);
+                        } catch (RuntimeException ignored) {}
 //                        if (referencecurrentlyDisplayed()) {
 //                            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
 //                            root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
@@ -935,11 +941,13 @@ public class Player extends Stage {
                     @Override
                     protected void interpolate(double frac) {
                         if (ambienceplayer != null) {
-                            double fadeoutvolume = currentambiencevolume - (frac * currentambiencevolume);
-                            String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
-                            ambienceplayer.setVolume(fadeoutvolume);
-                            AmbienceVolume.setValue(fadeoutvolume);
-                            AmbienceVolumePercentage.setText(percentage);
+                            try {
+                                double ambiencevolume = frac * currentambiencevolume;
+                                String percentage = new Double(ambiencevolume * 100).intValue() + "%";
+                                ambienceplayer.setVolume(ambiencevolume);
+                                AmbienceVolume.setValue(ambiencevolume);
+                                AmbienceVolumePercentage.setText(percentage);
+                            } catch (RuntimeException ignored) {}
 //                            if (referencecurrentlyDisplayed()) {
 //                                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(fadeoutvolume);
 //                                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
@@ -959,11 +967,13 @@ public class Player extends Stage {
                 @Override
                 protected void interpolate(double frac) {
                     if (entrainmentplayer != null) {
-                        double fadeoutvolume = currententrainmentvolume - (frac * currententrainmentvolume);
-                        String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
-                        entrainmentplayer.setVolume(fadeoutvolume);
-                        EntrainmentVolume.setValue(fadeoutvolume);
-                        EntrainmentVolumePercentage.setText(percentage);
+                        try {
+                            double entrainmentvolume = frac * currententrainmentvolume;
+                            String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
+                            entrainmentplayer.setVolume(entrainmentvolume);
+                            EntrainmentVolume.setValue(entrainmentvolume);
+                            EntrainmentVolumePercentage.setText(percentage);
+                        } catch (RuntimeException ignored) {}
 //                        if (referencecurrentlyDisplayed()) {
 //                            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(fadeoutvolume);
 //                            root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
@@ -988,11 +998,13 @@ public class Player extends Stage {
                     @Override
                     protected void interpolate(double frac) {
                         if (ambienceplayer != null) {
-                            double fadeoutvolume = currentambiencevolume - (frac * currentambiencevolume);
-                            String percentage = new Double(fadeoutvolume * 100).intValue() + "%";
-                            ambienceplayer.setVolume(fadeoutvolume);
-                            AmbienceVolume.setValue(fadeoutvolume);
-                            AmbienceVolumePercentage.setText(percentage);
+                            try {
+                                double ambiencevolume = frac * currentambiencevolume;
+                                String percentage = new Double(ambiencevolume * 100).intValue() + "%";
+                                ambienceplayer.setVolume(ambiencevolume);
+                                AmbienceVolume.setValue(ambiencevolume);
+                                AmbienceVolumePercentage.setText(percentage);
+                            } catch (RuntimeException ignored) {}
 //                            if (referencecurrentlyDisplayed()) {
 //                                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(fadeoutvolume);
 //                                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);

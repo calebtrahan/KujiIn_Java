@@ -50,7 +50,9 @@ import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
     // TODO Player Is EXTREMELEY MEMORY CONSUMING FOR MAC
-    // TODO Get CustomizeAmbience Dialog To Set Dynamic Width
+    // TODO Player Is Cutting Off:
+        // Entrainment At 5:30/6:00 for RIN
+        // Entrainment At 5:30 for KYO
 // Additional Features To Definitely Add
     // TODO Session Well Formedness Checks Before Playback, Save Or Export
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
@@ -64,6 +66,13 @@ import static kujiin.xml.Preferences.*;
 // Mind Workstation
     // TODO Add Low (And Possibly Medium) Variations Of All Session Parts
     // TODO Add Ramps To Connect Low (And Possibly Medium) Variations Of Session Parts With Each Other
+
+
+// Startup Wizard
+    // Welcome To The Program ......(Description Of Program). This A Short Tutorial To Teach You About Some Of The Features Of This Program
+    // Session Creation
+    // Ambience & Playback
+    // Ambience
 
 public class MainController implements Initializable {
     private Scene Scene;
@@ -455,6 +464,7 @@ public class MainController implements Initializable {
     }
     public void aboutthisprogram() {
     }
+
 
 // Play/Export Tab
     // Create/Open Toolbar Methods
@@ -909,6 +919,7 @@ public class MainController implements Initializable {
         }
     }
 
+
 // Progress Tab
     // Overview Tab Methods
     public void populateprogressoverviewchartandbalancepie() {
@@ -1149,6 +1160,7 @@ public class MainController implements Initializable {
 
         }
     }
+
 
 // AllGoals Tab
     // Overview Tab Methods
