@@ -38,7 +38,12 @@ public class Sessions {
             try {
                 JAXBContext context = JAXBContext.newInstance(Sessions.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
-                Sessions noises1 = (Sessions) createMarshaller.unmarshal(Preferences.SESSIONSXMLFILE);
+                Sessions noises1;
+                if (Root.isTestingmode()) {
+                    noises1 = (Sessions) createMarshaller.unmarshal(Preferences.SESSIONSXMLFILE_TESTING);
+                } else {
+                    noises1 = (Sessions) createMarshaller.unmarshal(Preferences.SESSIONSXMLFILE);
+                }
                 setSession(noises1.getSession());
             } catch (JAXBException e) {
                 new InformationDialog(Root.getPreferences(), "Information", "Couldn't Read Sessions XML File", "Check Read File Permissions Of " + Preferences.SESSIONSXMLFILE.getAbsolutePath());
@@ -50,7 +55,11 @@ public class Sessions {
             JAXBContext context = JAXBContext.newInstance(Sessions.class);
             Marshaller createMarshaller = context.createMarshaller();
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            createMarshaller.marshal(this, Preferences.SESSIONSXMLFILE);
+            if (Root.isTestingmode()) {
+                createMarshaller.marshal(this, Preferences.SESSIONSXMLFILE_TESTING);
+            } else {
+                createMarshaller.marshal(this, Preferences.SESSIONSXMLFILE);
+            }
         } catch (JAXBException e) {e.printStackTrace();}
     }
 

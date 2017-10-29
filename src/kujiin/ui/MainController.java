@@ -30,6 +30,7 @@ import kujiin.ui.table.*;
 import kujiin.util.Util;
 import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.ProgramState;
+import kujiin.util.enums.QuickAddAmbienceType;
 import kujiin.xml.*;
 
 import javax.xml.bind.JAXBContext;
@@ -49,8 +50,10 @@ import java.util.ResourceBundle;
 import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
-    // TODO Player Is EXTREMELEY MEMORY CONSUMING FOR MAC
+    // TODO Ramp File Playback Is Broken!!! Loads File, Says Is Playing But No Sound
+    // TODO Add 'Don't Ask Again For This Session' for Quick Adding Ambience
     // TODO Player Is Cutting Off:
+        // Firing Fade In Instead Of Fade Out On Session Close
         // Entrainment At 5:30/6:00 for RIN
         // Entrainment At 5:30 for KYO
 // Additional Features To Definitely Add
@@ -75,6 +78,7 @@ import static kujiin.xml.Preferences.*;
     // Ambience
 
 public class MainController implements Initializable {
+    private boolean testingmode = true;
     private Scene Scene;
     private Stage Stage;
 // Controller Classes
@@ -261,7 +265,7 @@ public class MainController implements Initializable {
     public void setAllGoals(AllGoals allGoals) {
         this.allGoals = allGoals;
     }
-
+    public boolean isTestingmode() {return testingmode;}
 
 // Window Methods
     private boolean cleanup() {
@@ -557,6 +561,22 @@ public class MainController implements Initializable {
         } else {createdtableselecteditem = null;}
     }
     // Creation Table Methods
+    private List<PlaybackItem> quickaddambience(QuickAddAmbienceType quickAddAmbienceType, List<PlaybackItem> items) {
+        int missingambiencecount = 0;
+        for (PlaybackItem i : items) {
+            if (availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {
+                i.getAmbience().clearambience();
+                if (quickAddAmbienceType == QuickAddAmbienceType.REPEAT) {i.getAmbience().addavailableambience_repeat(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
+                else if (quickAddAmbienceType == QuickAddAmbienceType.SHUFFLE) {i.getAmbience().addavailableambience_shuffle(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
+                i.getAmbience().setEnabled(true);
+            } else {i.getAmbience().setEnabled(false); missingambiencecount++;}
+        }
+        if (missingambiencecount > 0) {
+//            new InformationDialog(preferences, "Missing Ambience", "Missing Ambience For " + missingambiencecount + " Playback Items",
+//                    "Added " + quickAmbienceType.toString() + " Ambience For " + (playbackItemList.size() - missingambiencecount) + " Playback Items");
+        }
+        return items;
+    }
     private void add(int availableambienceindex) {
         PlaybackItem playbackItem = createdsession.getplaybackitem(availableambienceindex);
         PlaybackItem.PlaybackItemType playbackItemType;
@@ -569,10 +589,14 @@ public class MainController implements Initializable {
         adjustDuration.showAndWait();
         if (adjustDuration.isAccepted()) {
             if (adjustDuration.isQuickaddambience()) {
-                QuickAddAmbience quickAddAmbience = new QuickAddAmbience(preferences, availableAmbiences, Collections.singletonList(playbackItem));
-                quickAddAmbience.initModality(Modality.APPLICATION_MODAL);
-                quickAddAmbience.showAndWait();
-                if (quickAddAmbience.isAccepted()) {playbackItem = quickAddAmbience.getPlaybackItemList().get(0);}
+                switch (adjustDuration.getQuickAddAmbienceType()) {
+                    case 0:
+                        playbackItem = quickaddambience(QuickAddAmbienceType.REPEAT, Collections.singletonList(playbackItem)).get(0);
+                        break;
+                    case 1:
+                        playbackItem = quickaddambience(QuickAddAmbienceType.SHUFFLE, Collections.singletonList(playbackItem)).get(0);
+                        break;
+                }
             }
             int startindex;
             if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1) {
@@ -605,10 +629,14 @@ public class MainController implements Initializable {
         if (adjustDuration.isAccepted()) {
             items = adjustDuration.getPlaybackItemList();
             if (adjustDuration.isQuickaddambience()) {
-                QuickAddAmbience quickAddAmbience = new QuickAddAmbience(preferences, availableAmbiences, items);
-                quickAddAmbience.initModality(Modality.APPLICATION_MODAL);
-                quickAddAmbience.showAndWait();
-                if (quickAddAmbience.isAccepted()) {items = quickAddAmbience.getPlaybackItemList();}
+                switch (adjustDuration.getQuickAddAmbienceType()) {
+                    case 0:
+                        items = quickaddambience(QuickAddAmbienceType.REPEAT, items);
+                        break;
+                    case 1:
+                        items = quickaddambience(QuickAddAmbienceType.SHUFFLE, items);
+                        break;
+                }
             }
             int startindex;
             if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1) {

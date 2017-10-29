@@ -1,5 +1,6 @@
 package kujiin.ui.creation;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -21,6 +22,7 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     public Button AcceptButton;
     public Button CancelButton;
     public CheckBox QuickAddAmbienceCheckbox;
+    public ChoiceBox<String> QuickAddAmbienceChoiceBox;
     private boolean accepted = false;
     private boolean quickaddambience = false;
     private List<PlaybackItem> playbackItemList;
@@ -62,14 +64,18 @@ public class SetDurationWithAmbienceOption extends StyledStage {
                 else {missingambiencecount++;}
             }
             QuickAddAmbienceCheckbox.setDisable(! hassomeambience);
+            QuickAddAmbienceChoiceBox.setDisable(! hassomeambience);
             if (! hassomeambience) {QuickAddAmbienceCheckbox.setTooltip(new Tooltip("Cannot Add As There Is No Ambience For Any Playback Items"));}
             QuickAddAmbienceCheckbox.selectedProperty().addListener(observable -> {
+                QuickAddAmbienceChoiceBox.setDisable(! QuickAddAmbienceCheckbox.isSelected());
                 if (QuickAddAmbienceCheckbox.isSelected() && missingambiencecount > 0) {
                     if (! new ConfirmationDialog(preferences, "Missing Ambience", "Missing Ambience For " + missingambiencecount + " Playback Items", "Add Partial Ambience?").getResult()) {
                         QuickAddAmbienceCheckbox.setSelected(false);
                     }
                 }
             });
+            QuickAddAmbienceChoiceBox.setItems(FXCollections.observableArrayList("Repeat", "Shuffle"));
+            QuickAddAmbienceChoiceBox.getSelectionModel().select(1);
         } catch (IOException e) {e.printStackTrace();}
     }
     private void setScrollListeners() {
@@ -100,8 +106,9 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     public boolean isQuickaddambience() {
         return quickaddambience;
     }
+    public int getQuickAddAmbienceType() {return QuickAddAmbienceChoiceBox.getSelectionModel().getSelectedIndex();}
 
-    // Button Actions
+// Button Actions
     public void accept() {
         double expectedduration = getNewDuration().toMillis();
         double fadedurations = 0.0;

@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -474,9 +475,10 @@ public class Player extends Stage {
         timeline_progresstonextsessionpart.play();
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
             SoundFile rampfile = rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1));
+            System.out.println("Ramp File Is Located At: " + rampfile.getFile().getAbsolutePath());
             Duration timetillendingramp = new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration()));
             if (timetillendingramp.greaterThan(Duration.ZERO)) {
-                timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration())), ae -> {
+                timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration())), (ActionEvent ae) -> {
                     volume_unbindentrainment();
                     entrainmentplayer.stop();
                     entrainmentplayer.dispose();
@@ -810,10 +812,6 @@ public class Player extends Stage {
                             EntrainmentVolume.setValue(entrainmentvolume);
                             EntrainmentVolumePercentage.setText(percentage);
                         } catch (RuntimeException ignored) {}
-//                        if (referencecurrentlyDisplayed()) {
-//                            root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(entrainmentvolume);
-//                            root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
-//                        }
                     }
                 }
             };
@@ -910,7 +908,7 @@ public class Player extends Stage {
                 protected void interpolate(double frac) {
                     if (entrainmentplayer != null) {
                         try {
-                            double entrainmentvolume = frac * currententrainmentvolume;
+                            double entrainmentvolume = 1.0 - (frac * currententrainmentvolume);
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
                             entrainmentplayer.setVolume(entrainmentvolume);
                             EntrainmentVolume.setValue(entrainmentvolume);
@@ -942,7 +940,7 @@ public class Player extends Stage {
                     protected void interpolate(double frac) {
                         if (ambienceplayer != null) {
                             try {
-                                double ambiencevolume = frac * currentambiencevolume;
+                                double ambiencevolume = 1.0 - (frac * currentambiencevolume);
                                 String percentage = new Double(ambiencevolume * 100).intValue() + "%";
                                 ambienceplayer.setVolume(ambiencevolume);
                                 AmbienceVolume.setValue(ambiencevolume);
@@ -968,7 +966,7 @@ public class Player extends Stage {
                 protected void interpolate(double frac) {
                     if (entrainmentplayer != null) {
                         try {
-                            double entrainmentvolume = frac * currententrainmentvolume;
+                            double entrainmentvolume = 1.0 - (frac * currententrainmentvolume);
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
                             entrainmentplayer.setVolume(entrainmentvolume);
                             EntrainmentVolume.setValue(entrainmentvolume);
@@ -999,7 +997,7 @@ public class Player extends Stage {
                     protected void interpolate(double frac) {
                         if (ambienceplayer != null) {
                             try {
-                                double ambiencevolume = frac * currentambiencevolume;
+                                double ambiencevolume = 1.0 - (frac * currentambiencevolume);
                                 String percentage = new Double(ambiencevolume * 100).intValue() + "%";
                                 ambienceplayer.setVolume(ambiencevolume);
                                 AmbienceVolume.setValue(ambiencevolume);
@@ -1046,12 +1044,6 @@ public class Player extends Stage {
             String percentage = new Double(EntrainmentVolume.getValue() * 100).intValue() + "%";
             currententrainmentvolume =EntrainmentVolume.getValue();
             EntrainmentVolumePercentage.setText(percentage);
-//            if (referencecurrentlyDisplayed()) {
-//                root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
-//                root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(currententrainmentvolume);
-//                root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
-//                root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
-//            }
         });
         EntrainmentVolume.setOnScroll(event -> {
             Double newvalue =EntrainmentVolume.getValue();
@@ -1064,12 +1056,6 @@ public class Player extends Stage {
                 EntrainmentVolume.setValue(roundedvalue / 100);
                 EntrainmentVolume.setTooltip(new Tooltip(percentage));
                 EntrainmentVolumePercentage.setText(percentage);
-//                if (referencecurrentlyDisplayed()) {
-//                    root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().unbindBidirectional(entrainmentplayer.volumeProperty());
-//                    root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.setValue(currententrainmentvolume);
-//                    root.getSessionCreator().getDisplayReference().EntrainmentVolumeSlider.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
-//                    root.getSessionCreator().getDisplayReference().EntrainmentVolumePercentage.setText(percentage);
-//                }
             }
         });
     }
