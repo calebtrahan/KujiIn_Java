@@ -66,6 +66,7 @@ public class AvailableAmbienceEditor extends StyledStage {
             RemoveButton.setOnAction(event -> removeitem());
             AmbienceTable.setPlaceholder(new Label("Select A Playback Item"));
             NameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+            NameColumn.setStyle("-fx-alignment: CENTER-LEFT;");
             DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().duration);
 //            TableTopLabel.setText("");
             AmbienceTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {

@@ -91,7 +91,7 @@ public class PlaybackItem {
         }
     }
     public String getAmbienceasString() {
-        if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {return "No Ambience Set";}
+        if (! ambience.hasAmbience()) {return "No Ambience Set";}
         else {return "Ambience Set " + "(" + ambience.getAmbience().size() + " Files)";}
     }
     public void updateduration(Duration duration) {this.ExpectedDuration = duration.toMillis();}

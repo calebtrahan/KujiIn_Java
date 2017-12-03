@@ -99,6 +99,28 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
             if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
             else {setTitle("Customize Ambience"); populatetable();}
             AddOrEditAmbienceTable.setPlaceholder(new Label("No Ambience For " + playbackItem.getName()));
+            AddOrEditAmbienceTable.setOnMousePressed(event -> {
+                int selectedindex = AddOrEditAmbienceTable.getSelectionModel().getSelectedIndex();
+                if (selectedindex != -1) {
+                    if (event.isSecondaryButtonDown() && event.getClickCount() == 1) {
+                        ContextMenu contextMenu = new ContextMenu();
+                        MenuItem preview = new MenuItem("Preview");
+                        preview.setOnAction(event1 -> preview());
+                        MenuItem moveup = new MenuItem("Move Up");
+                        moveup.setOnAction(event1 -> moveup());
+                        MenuItem movedown = new MenuItem("Move Down");
+                        movedown.setOnAction(event1 -> movedown());
+                        MenuItem remove = new MenuItem("Remove");
+                        remove.setOnAction(event1 -> removefromtable());
+                        contextMenu.getItems().add(preview);
+                        if (selectedindex < AddOrEditAmbienceTable.getItems().size() - 1) {contextMenu.getItems().add(movedown);}
+                        if (selectedindex > 0) {contextMenu.getItems().add(moveup);}
+                        contextMenu.getItems().add(remove);
+                        AddOrEditAmbienceTable.setContextMenu(contextMenu);
+                    }
+                    if (event.isPrimaryButtonDown() && event.getClickCount() == 2) { preview(); }
+                }
+            });
 //            NumberColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(1 / 5));
 //            NameColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(3 / 5));
 //            DurationColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(1 / 5));
@@ -156,18 +178,25 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
         }
     }
     public void quickaddrepeatambience() {
-        ambience.addavailableambience_repeat(playbackItem, playbackItemAmbience);
+        boolean clearambience;
+        clearambience = ! ambience.getAmbience().isEmpty() && new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult();
+        ambience.addavailableambience_repeat(playbackItem, playbackItemAmbience, clearambience);
         populatetable();
+        AcceptButton.requestFocus();
     }
     public void quickaddshuffleambience() {
-        ambience.addavailableambience_shuffle(playbackItem, playbackItemAmbience);
+        boolean clearambience;
+        clearambience = ! ambience.getAmbience().isEmpty() && new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult();
+        ambience.addavailableambience_shuffle(playbackItem, playbackItemAmbience, clearambience);
         populatetable();
+        AcceptButton.requestFocus();
     }
     public void removefromtable() {
         int selectedindex = AddOrEditAmbienceTable.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1) {
             ambience.remove(selectedindex);
             populatetable();
+            AddMenu.requestFocus();
         }
     }
     public void preview() {
@@ -221,16 +250,17 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
         }
     }
     public void accept() {
-        ambience.setEnabled(! ambience.getAmbience().isEmpty());
+        ambience.setEnabled(! ambience.hasAmbience());
         playbackItem.getAmbience().setAmbience(ambience.getAmbience());
-        accepted = ! ambience.getAmbience().isEmpty();
+        playbackItem.getAmbience().setEnabled(ambience.isEnabled());
+        accepted = ! ambience.hasAmbience();
         close();
     }
 
 // Other Methods
     private void populatetable() {
         AddOrEditAmbienceTable.getItems().clear();
-        if (! ambience.getAmbience().isEmpty()) {
+        if (! ambience.hasAmbience()) {
             ObservableList<AddOrEditAmbienceTableItem> items = FXCollections.observableArrayList();
             int count = 1;
             for (SoundFile i : ambience.getAmbience()) {

@@ -56,6 +56,7 @@ public class SetDurationWithAmbienceOption extends StyledStage {
             MinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) minutes, preferences.getCreationOptions().getScrollincrement()));
             SecondsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) seconds, preferences.getCreationOptions().getScrollincrement()));
             QuickAddAmbienceCheckbox.setVisible(quickaddambienceoption);
+            QuickAddAmbienceChoiceBox.setVisible(quickaddambienceoption);
             for (PlaybackItem i : playbackItemList) {if (! availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {missingambiencecount++;}}
             setScrollListeners();
             boolean hassomeambience = false;
@@ -64,7 +65,7 @@ public class SetDurationWithAmbienceOption extends StyledStage {
                 else {missingambiencecount++;}
             }
             QuickAddAmbienceCheckbox.setDisable(! hassomeambience);
-            QuickAddAmbienceChoiceBox.setDisable(! hassomeambience);
+            QuickAddAmbienceChoiceBox.setDisable(true);
             if (! hassomeambience) {QuickAddAmbienceCheckbox.setTooltip(new Tooltip("Cannot Add As There Is No Ambience For Any Playback Items"));}
             QuickAddAmbienceCheckbox.selectedProperty().addListener(observable -> {
                 QuickAddAmbienceChoiceBox.setDisable(! QuickAddAmbienceCheckbox.isSelected());

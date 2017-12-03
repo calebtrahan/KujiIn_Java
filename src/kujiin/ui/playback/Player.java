@@ -104,6 +104,7 @@ public class Player extends Stage {
 // Goals
     private Duration totalpracticedtime;
 // Class Objects
+    private boolean testingmode;
     private Session SessionTemplate;
     private Session SessionInProgress;
     private PlaybackItem selectedPlaybackItem;
@@ -136,6 +137,7 @@ public class Player extends Stage {
 
     public Player(MainController Root, Sessions sessions, AllGoals allGoals, Session sessiontoplay) {
         try {
+            testingmode = Root.isTestingmode();
             Preferences = Root.getPreferences();
             SessionTemplate = sessiontoplay;
             for (PlaybackItem i : SessionTemplate.getPlaybackItems()) {i.calculatetotalpracticetime(sessions);}
@@ -475,7 +477,6 @@ public class Player extends Stage {
         timeline_progresstonextsessionpart.play();
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
             SoundFile rampfile = rampfiles.getRampFile(selectedPlaybackItem, SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1));
-            System.out.println("Ramp File Is Located At: " + rampfile.getFile().getAbsolutePath());
             Duration timetillendingramp = new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration()));
             if (timetillendingramp.greaterThan(Duration.ZERO)) {
                 timeline_start_ending_ramp = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(Duration.millis(rampfile.getDuration())), (ActionEvent ae) -> {
@@ -517,7 +518,7 @@ public class Player extends Stage {
             volume_bindentrainment();
         }
         if (selectedPlaybackItem.getAmbience().isEnabled()) {
-            currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume();
+            if (currentambiencevolume == null) { currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume(); }
             volume_unbindambience();
             selectedPlaybackItem.getAmbience().resetplaycount();
             currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextambienceforplayback();
@@ -762,7 +763,7 @@ public class Player extends Stage {
             });
         } catch (Exception e) {e.printStackTrace();}
         SessionInProgress = sessioninprogress;
-        sessions.add(SessionInProgress);
+        if (! testingmode) { sessions.add(SessionInProgress); }
         SessionInProgress = null;
     }
     public boolean endsessionprematurely(boolean resetdialogcontrols) {
@@ -770,7 +771,7 @@ public class Player extends Stage {
         updateuitimeline.pause();
         if (new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
             setPlayerstate(STOPPED);
-            sessions.add(SessionInProgress);
+            if (! testingmode) { sessions.add(SessionInProgress); }
             if (resetdialogcontrols) {
                 updategoalsui();
                 reset();
@@ -804,7 +805,7 @@ public class Player extends Stage {
 
                 @Override
                 protected void interpolate(double frac) {
-                    if (entrainmentplayer != null) {
+                    if (entrainmentplayer != null && currententrainmentvolume > 0.0) {
                         try {
                             double entrainmentvolume = frac * currententrainmentvolume;
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
@@ -827,7 +828,7 @@ public class Player extends Stage {
 
                     @Override
                     protected void interpolate(double frac) {
-                        if (ambienceplayer != null) {
+                        if (ambienceplayer != null && currentambiencevolume > 0.0) {
                             try {
                                 double ambiencevolume = frac * currentambiencevolume;
                                 String percentage = new Double(ambiencevolume * 100).intValue() + "%";
@@ -852,7 +853,7 @@ public class Player extends Stage {
 
                 @Override
                 protected void interpolate(double frac) {
-                    if (entrainmentplayer != null) {
+                    if (entrainmentplayer != null && currententrainmentvolume > 0.0) {
                         try {
                             double entrainmentvolume = frac * currententrainmentvolume;
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
@@ -885,7 +886,7 @@ public class Player extends Stage {
 
                     @Override
                     protected void interpolate(double frac) {
-                        if (ambienceplayer != null) {
+                        if (ambienceplayer != null && currentambiencevolume > 0.0) {
                             try {
                                 double ambiencevolume = frac * currentambiencevolume;
                                 String percentage = new Double(ambiencevolume * 100).intValue() + "%";
@@ -906,7 +907,7 @@ public class Player extends Stage {
 
                 @Override
                 protected void interpolate(double frac) {
-                    if (entrainmentplayer != null) {
+                    if (entrainmentplayer != null && currententrainmentvolume > 0.0) {
                         try {
                             double entrainmentvolume = 1.0 - (frac * currententrainmentvolume);
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
@@ -938,7 +939,7 @@ public class Player extends Stage {
 
                     @Override
                     protected void interpolate(double frac) {
-                        if (ambienceplayer != null) {
+                        if (ambienceplayer != null && currentambiencevolume > 0.0) {
                             try {
                                 double ambiencevolume = 1.0 - (frac * currentambiencevolume);
                                 String percentage = new Double(ambiencevolume * 100).intValue() + "%";
@@ -964,7 +965,7 @@ public class Player extends Stage {
 
                 @Override
                 protected void interpolate(double frac) {
-                    if (entrainmentplayer != null) {
+                    if (entrainmentplayer != null && currententrainmentvolume > 0.0) {
                         try {
                             double entrainmentvolume = 1.0 - (frac * currententrainmentvolume);
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
@@ -995,7 +996,7 @@ public class Player extends Stage {
 
                     @Override
                     protected void interpolate(double frac) {
-                        if (ambienceplayer != null) {
+                        if (ambienceplayer != null && currentambiencevolume > 0.0) {
                             try {
                                 double ambiencevolume = 1.0 - (frac * currentambiencevolume);
                                 String percentage = new Double(ambiencevolume * 100).intValue() + "%";
@@ -1042,7 +1043,7 @@ public class Player extends Stage {
         EntrainmentVolume.setDisable(false);
         EntrainmentVolume.setOnMouseDragged(event1 -> {
             String percentage = new Double(EntrainmentVolume.getValue() * 100).intValue() + "%";
-            currententrainmentvolume =EntrainmentVolume.getValue();
+            currententrainmentvolume = EntrainmentVolume.getValue();
             EntrainmentVolumePercentage.setText(percentage);
         });
         EntrainmentVolume.setOnScroll(event -> {

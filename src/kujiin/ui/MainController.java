@@ -50,13 +50,15 @@ import java.util.ResourceBundle;
 import static kujiin.xml.Preferences.*;
 
 // Bugs To Fix
-    // TODO Ramp File Playback Is Broken!!! Loads File, Says Is Playing But No Sound
-    // TODO Add 'Don't Ask Again For This Session' for Quick Adding Ambience
-    // TODO Player Is Cutting Off:
-        // Firing Fade In Instead Of Fade Out On Session Close
-        // Entrainment At 5:30/6:00 for RIN
-        // Entrainment At 5:30 for KYO
+    // TODO Fix Ramp Volume Out If Volume Changed
+    // TODO Player Button Don't Disable On Fade OUt
+    // TODO Fade Out Math Is Wrong
+
+
 // Additional Features To Definitely Add
+    // TODO Find A Way To Get Ambience Control/Selection Into Player | Maybe In A ContextMenu?
+    // TODO Add Users Function, Tracking Everything To Each User
+
     // TODO Session Well Formedness Checks Before Playback, Save Or Export
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
     // TODO Exporter
@@ -70,7 +72,6 @@ import static kujiin.xml.Preferences.*;
     // TODO Add Low (And Possibly Medium) Variations Of All Session Parts
     // TODO Add Ramps To Connect Low (And Possibly Medium) Variations Of Session Parts With Each Other
 
-
 // Startup Wizard
     // Welcome To The Program ......(Description Of Program). This A Short Tutorial To Teach You About Some Of The Features Of This Program
     // Session Creation
@@ -78,7 +79,7 @@ import static kujiin.xml.Preferences.*;
     // Ambience
 
 public class MainController implements Initializable {
-    private boolean testingmode = true;
+    private boolean testingmode;
     private Scene Scene;
     private Stage Stage;
 // Controller Classes
@@ -318,8 +319,65 @@ public class MainController implements Initializable {
         CreatedTableItemColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         CreatedTableDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
         CreatedTableAmbienceColumn.setCellValueFactory(cellData -> cellData.getValue().ambience);
-        CreatedTableView.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, newValue) -> tableselectionchanged());
+//        CreatedTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> tableselectionchanged());
+        CreatedTableView.setOnMousePressed(event -> {
+            int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
+            if (selectedindex != -1) {
+                tableselectionchanged();
+                if (event.isSecondaryButtonDown()) {
+                    ContextMenu contextMenu = new ContextMenu();
+
+                    MenuItem moveup = new MenuItem("Move Up");
+                    moveup.setOnAction(event1 -> moveupincreatortable());
+                    MenuItem movedown = new MenuItem("Move Down");
+                    movedown.setOnAction(event1 -> movedownincreatortable());
+
+                    Menu durationmenu = new Menu("Duration");
+                    MenuItem setduration = new MenuItem("Adjust Duration");
+                    setduration.setOnAction(event1 -> editduration());
+                    MenuItem ramponly = new MenuItem("Set Ramp Only");
+                    ramponly.setOnAction(event1 -> setramponly());
+                    durationmenu.getItems().add(setduration);
+                    if (! createdtableselecteditem.isRampOnly()) {durationmenu.getItems().add(ramponly);}
+
+                    Menu ambiencemenu = new Menu("Ambience");
+                    Menu quickaddambience = new Menu("Quick Add");
+                    MenuItem repeat = new MenuItem("Repeat");
+                    repeat.setOnAction(event1 -> quickaddambience_repeat());
+                    MenuItem shuffle = new MenuItem("Shuffle");
+                    shuffle.setOnAction(event1 -> quickaddambience_shuffle());
+                    quickaddambience.getItems().addAll(repeat, shuffle);
+                    MenuItem customizeambience = new MenuItem("Customize Ambience");
+                    customizeambience.setOnAction(event1 -> customizeambience());
+                    ambiencemenu.getItems().addAll(quickaddambience, customizeambience);
+                    MenuItem clearambience = new MenuItem("Clear Ambience");
+                    clearambience.setOnAction(event1 -> clearambience());
+                    if (createdtableselecteditem.getAmbience().hasAmbience()) {ambiencemenu.getItems().add(clearambience);}
+
+                    MenuItem remove = new MenuItem("Remove");
+                    remove.setOnAction(event1 -> removefromcreatortable());
+
+                    if (selectedindex > 0) {contextMenu.getItems().add(moveup);}
+                    if (selectedindex < CreatedTableView.getItems().size() - 1) {contextMenu.getItems().add(movedown);}
+                    contextMenu.getItems().add(durationmenu);
+                    if (availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()).hasAny()) {contextMenu.getItems().add(ambiencemenu);}
+                    contextMenu.getItems().add(remove);
+                    CreatedTableView.setContextMenu(contextMenu);
+                }
+                if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
+                    TablePosition pos = CreatedTableView.getSelectionModel().getSelectedCells().get(0);
+                    int column = pos.getColumn();
+                    switch (column) {
+                        case 2:
+                            editduration();
+                            break;
+                        case 3:
+                            customizeambience();
+                            break;
+                    }
+                }
+            }
+        });
         // Session Browser List Table
         PracticedSessionListTable_DateColumn.setCellValueFactory(cellData -> cellData.getValue().date);
         PracticedSessionListTable_ItemsColumn.setCellValueFactory(cellData -> cellData.getValue().items);
@@ -565,9 +623,13 @@ public class MainController implements Initializable {
         int missingambiencecount = 0;
         for (PlaybackItem i : items) {
             if (availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {
-                i.getAmbience().clearambience();
-                if (quickAddAmbienceType == QuickAddAmbienceType.REPEAT) {i.getAmbience().addavailableambience_repeat(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
-                else if (quickAddAmbienceType == QuickAddAmbienceType.SHUFFLE) {i.getAmbience().addavailableambience_shuffle(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
+                boolean clearambience = true;
+                if (i.getAmbience().hasAmbience()) {
+                    clearambience = new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult();
+                    if (clearambience) { i.getAmbience().clearambience();}
+                }
+                if (quickAddAmbienceType == QuickAddAmbienceType.REPEAT) {i.getAmbience().addavailableambience_repeat(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()), clearambience);}
+                else if (quickAddAmbienceType == QuickAddAmbienceType.SHUFFLE) {i.getAmbience().addavailableambience_shuffle(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()), clearambience);}
                 i.getAmbience().setEnabled(true);
             } else {i.getAmbience().setEnabled(false); missingambiencecount++;}
         }
@@ -664,7 +726,7 @@ public class MainController implements Initializable {
     }
     public void add_QiGong() {add(0);}
     public void addRin() {add(1);}
-    public void addkyo() {add(2);}
+    public void addKyo() {add(2);}
     public void addToh() {add(3);}
     public void addSha() {add(4);}
     public void addKai() {add(5);}
@@ -714,15 +776,15 @@ public class MainController implements Initializable {
     }
     public void quickaddambience_repeat() {
         if (createdtableselecteditem != null) {
-            createdtableselecteditem.getAmbience().addavailableambience_repeat(createdtableselecteditem, availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
-            createdtableselecteditem.getAmbience().setEnabled(createdtableselecteditem.getAmbience().getAmbience() != null);
+            List<PlaybackItem> items = quickaddambience(QuickAddAmbienceType.REPEAT, Collections.singletonList(createdtableselecteditem));
+            createdtableselecteditem = items.get(0);
             populatetable();
         }
     }
     public void quickaddambience_shuffle() {
         if (createdtableselecteditem != null) {
-            createdtableselecteditem.getAmbience().addavailableambience_shuffle(createdtableselecteditem, availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()));
-            createdtableselecteditem.getAmbience().setEnabled(createdtableselecteditem.getAmbience().getAmbience() != null);
+            List<PlaybackItem> items = quickaddambience(QuickAddAmbienceType.SHUFFLE, Collections.singletonList(createdtableselecteditem));
+            createdtableselecteditem = items.get(0);
             populatetable();
         }
     }
@@ -737,6 +799,10 @@ public class MainController implements Initializable {
                 populatetable();
             }
         }
+    }
+    private void clearambience() {
+        createdtableselecteditem.getAmbience().clearambience();
+        populatetable();
     }
     public void moveupincreatortable() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
@@ -882,6 +948,7 @@ public class MainController implements Initializable {
                 }
             }
             if (updatesession) {createdsession.calculateexpectedduration();}
+            testingmode = new ConfirmationDialog(preferences, "Confirmation", "Is This A Test Session?", null, "Yes", "No").getResult();
             getStage().setIconified(true);
             Player player = new Player(this, sessions, allGoals, createdsession);
             player.initModality(Modality.APPLICATION_MODAL);

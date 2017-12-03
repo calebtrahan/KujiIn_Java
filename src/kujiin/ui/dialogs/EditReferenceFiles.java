@@ -13,6 +13,7 @@ import javafx.util.Duration;
 import kujiin.ui.MainController;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.alerts.*;
+import kujiin.ui.reference.DisplayReference;
 import kujiin.util.Util;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.Preferences;
@@ -188,7 +189,7 @@ public class EditReferenceFiles extends StyledStage {
             if (! Util.String_validhtml(MainTextArea.getText())) {
                 if (! new ConfirmationDialog(Root.getPreferences(), "Confirmation", null, "Html Code In Text Area Is Not Valid HTML", "Preview Anyways", "Cancel").getResult()) {return;}
             }
-//            new DisplayReference();
+            new DisplayReference(MainTextArea.getText()).showAndWait();
         }
     }
 

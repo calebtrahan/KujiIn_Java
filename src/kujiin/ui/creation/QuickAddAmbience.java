@@ -25,8 +25,8 @@ public class QuickAddAmbience extends StyledStage {
     private QuickAmbienceType quickAmbienceType;
 
     public QuickAddAmbience(Preferences preferences, AvailableAmbiences availableAmbiences, List<PlaybackItem> playbackItemList) {
-        this.preferences = preferences;
         try {
+            this.preferences = preferences;
             this.availableAmbiences = availableAmbiences;
             this.playbackItemList = playbackItemList;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/QuickAddAmbience.fxml"));
@@ -71,8 +71,8 @@ public class QuickAddAmbience extends StyledStage {
         for (PlaybackItem i : playbackItemList) {
             if (availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {
                 i.getAmbience().clearambience();
-                if (quickAmbienceType == QuickAmbienceType.Repeat) {i.getAmbience().addavailableambience_repeat(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
-                else if (quickAmbienceType == QuickAmbienceType.Shuffle) {i.getAmbience().addavailableambience_shuffle(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()));}
+                if (quickAmbienceType == QuickAmbienceType.Repeat) {i.getAmbience().addavailableambience_repeat(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()), true);}
+                else if (quickAmbienceType == QuickAmbienceType.Shuffle) {i.getAmbience().addavailableambience_shuffle(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()), true);}
                 i.getAmbience().setEnabled(true);
             } else {i.getAmbience().setEnabled(false); missingambiencecount++;}
         }

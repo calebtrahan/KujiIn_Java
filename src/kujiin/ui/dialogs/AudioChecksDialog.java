@@ -14,7 +14,6 @@ import kujiin.util.AudioChecks;
 import java.io.IOException;
 
 public class AudioChecksDialog extends Stage {
-    private MainController root;
     public ProgressBar Progress;
     public Label ProgressPercentage;
     public Label StatusBar;
@@ -23,7 +22,6 @@ public class AudioChecksDialog extends Stage {
     public AudioChecksDialog(MainController Root) {
         try {
             audioChecks = new AudioChecks(Root);
-            root = Root;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/AudioChecksDialog.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());

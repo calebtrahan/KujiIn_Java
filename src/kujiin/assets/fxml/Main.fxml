@@ -74,7 +74,7 @@
                                                 <Menu mnemonicParsing="false" text="Kuji-In">
                                                    <items>
                                                       <MenuItem fx:id="AddRinMenuItem" mnemonicParsing="false" onAction="#addRin" text="Rin" />
-                                                      <MenuItem fx:id="AddKyoMenuItem" mnemonicParsing="false" onAction="#addkyo" text="Kyo" />
+                                                      <MenuItem fx:id="AddKyoMenuItem" mnemonicParsing="false" onAction="#addKyo" text="Kyo" />
                                                       <MenuItem fx:id="AddTohMenuItem" mnemonicParsing="false" onAction="#addToh" text="Toh" />
                                                       <MenuItem fx:id="AddShaMenuItem" mnemonicParsing="false" onAction="#addSha" text="Sha" />
                                                       <MenuItem fx:id="AddKaiMenuItem" mnemonicParsing="false" onAction="#addKai" text="Kai" />
