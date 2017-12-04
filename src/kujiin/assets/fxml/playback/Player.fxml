@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<VBox prefHeight="414.0" prefWidth="640.0" stylesheets="@../../styles/default.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="414.0" prefWidth="640.0" stylesheets="@../../styles/default.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <MenuBar>
         <menus>
@@ -16,9 +16,9 @@
           <Menu mnemonicParsing="false" text="Controls">
             <items>
               <MenuItem fx:id="PlayMenuItem" mnemonicParsing="false" onAction="#playbuttonpressed" text="Play" />
-                  <MenuItem fx:id="PauseMenuItem" mnemonicParsing="false" onAction="#pausebuttonpressed" text="Pause" />
-                  <MenuItem fx:id="StopMenuItem" mnemonicParsing="false" onAction="#stopbuttonpressed" text="Stop" />
-                  <Menu fx:id="AmbienceMenu" mnemonicParsing="false" text="Ambience">
+                  <MenuItem fx:id="PauseMenuItem" disable="true" mnemonicParsing="false" onAction="#pausebuttonpressed" text="Pause" />
+                  <MenuItem fx:id="StopMenuItem" disable="true" mnemonicParsing="false" onAction="#stopbuttonpressed" text="Stop" />
+                  <Menu fx:id="AmbienceMenu" disable="true" mnemonicParsing="false" text="Ambience">
                     <items>
                         <MenuItem fx:id="NextAmbiencMenuItem" mnemonicParsing="false" onAction="#playnextambiencefromhistory" text="Next" />
                         <MenuItem fx:id="PreviousAmbienceMenuItem" mnemonicParsing="false" onAction="#playpreviousambiencefromhistory" text="Previous" />

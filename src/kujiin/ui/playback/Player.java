@@ -49,6 +49,11 @@ import static kujiin.util.enums.PlayerState.*;
 
 public class Player extends Stage {
 // UI Elements
+    // Menu
+    public MenuItem PlayMenuItem;
+    public MenuItem PauseMenuItem;
+    public MenuItem StopMenuItem;
+    public Menu AmbienceMenu;
     // Reference
     public HBox ReferenceControls;
     public CheckBox ReferenceToggleCheckBox;
@@ -245,6 +250,7 @@ public class Player extends Stage {
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
                 AmbienceVolumeControls.setVisible(selectedPlaybackItem.getAmbience().isEnabled());
+                AmbienceMenu.setVisible(selectedPlaybackItem.getAmbience().isEnabled());
                 currententrainmentvolume = Preferences.getPlaybackOptions().getEntrainmentvolume();
                 currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume();
                 setupsession();
@@ -408,8 +414,12 @@ public class Player extends Stage {
         boolean fade_stop = playerState == FADING_STOP;
         boolean transitioning = playerState == TRANSITIONING;
         PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop || transitioning);
+        PlayMenuItem.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop || transitioning);
         PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
+        PauseMenuItem.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
         StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
+        StopMenuItem.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
+        AmbienceMenu.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
 //        ReferenceControls.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
 //        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
 //            String playbuttontext = "Play";
@@ -640,6 +650,7 @@ public class Player extends Stage {
         }
     }
     public void playnextambiencefromhistory() {
+
         SoundFile nextambiencefile = selectedPlaybackItem.getAmbience().getnextambiencehistory();
         if (nextambiencefile != null) {
             volume_unbindambience();

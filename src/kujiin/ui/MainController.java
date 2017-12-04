@@ -54,9 +54,10 @@ import static kujiin.xml.Preferences.*;
 // Bugs To Fix
 
 // Additional Features To Definitely Add
+    // TODO Implement Ambience Next/Previous In Controls Menu
+
     // TODO Find A Way To Get Ambience Control/Selection Into Player | Maybe In A ContextMenu?
     // TODO Add Users Function, Tracking Everything To Each User
-
     // TODO Session Well Formedness Checks Before Playback, Save Or Export
     // TODO Create Goal Progress Similar To Session Details And Add To Session Details Dialog
     // TODO Exporter
@@ -139,7 +140,9 @@ public class MainController implements Initializable {
     public Button MoveUpButton;
     public Button MoveDownButton;
     public Button RemoveButton;
+    public Label SessionSummary_CompletionTime_Label;
     public TextField SessionSummary_CompletionTime;
+    public Label SessionSummary_Duration_Label;
     public TextField SessionSummary_Duration;
     public Button ClearButton;
     public Button AddToFavoritesButton;
@@ -990,6 +993,10 @@ public class MainController implements Initializable {
         MoveDownButton.setDisable(nosessionloaded || tableempty || selectedindex == -1 || selectedindex == CreatedTableView.getItems().size() -1);
         AddToFavoritesButton.setDisable(nosessionloaded || tableempty);
         ClearButton.setDisable(nosessionloaded || tableempty);
+        SessionSummary_CompletionTime_Label.setDisable(nosessionloaded || tableempty);
+        SessionSummary_CompletionTime.setDisable(nosessionloaded || tableempty);
+        SessionSummary_Duration.setDisable(nosessionloaded || tableempty);
+        SessionSummary_Duration_Label.setDisable(nosessionloaded || tableempty);
         if (nosessionloaded) {CreatedTableView.setPlaceholder(new Label("Please Create Or Load A Session"));}
         else {CreatedTableView.setPlaceholder(new Label("Session Is Empty"));}
     }
@@ -1011,7 +1018,6 @@ public class MainController implements Initializable {
             SessionSummary_Duration.setTooltip(null);
         }
     }
-
 
 // Progress Tab
     // Overview Tab Methods
