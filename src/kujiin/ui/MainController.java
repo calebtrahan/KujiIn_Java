@@ -49,11 +49,9 @@ import java.util.ResourceBundle;
 
 import static kujiin.xml.Preferences.*;
 
-// Bugs To Fix
-    // TODO Fix Ramp Volume Out If Volume Changed
-    // TODO Player Button Don't Disable On Fade OUt
-    // TODO Fade Out Math Is Wrong
+// Dialog At End To Set Entrainment/Ambience Volume As Default?
 
+// Bugs To Fix
 
 // Additional Features To Definitely Add
     // TODO Find A Way To Get Ambience Control/Selection Into Player | Maybe In A ContextMenu?

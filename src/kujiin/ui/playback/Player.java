@@ -497,6 +497,8 @@ public class Player extends Stage {
             if (selectedPlaybackItem.isRampOnly()) {startfadeout = startfadeout.subtract(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
             else {startfadeout = startfadeout.subtract(fade_stop_value);}
             timeline_fadeout_timer = new Timeline(new KeyFrame(startfadeout, ae -> {
+                setPlayerstate(FADING_STOP);
+                toggleplayerbuttons();
                 volume_unbindentrainment();
                 fade_entrainment_stop.play();
                 if (fade_ambience_stop != null) {
@@ -690,6 +692,7 @@ public class Player extends Stage {
                     }
                     break;
                 case PLAYING:
+                case FADING_STOP:
                     ReferenceControls.setDisable(true);
                     transition();
                     break;
@@ -909,7 +912,7 @@ public class Player extends Stage {
                 protected void interpolate(double frac) {
                     if (entrainmentplayer != null && currententrainmentvolume > 0.0) {
                         try {
-                            double entrainmentvolume = 1.0 - (frac * currententrainmentvolume);
+                            double entrainmentvolume = currententrainmentvolume - (frac * currententrainmentvolume);
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
                             entrainmentplayer.setVolume(entrainmentvolume);
                             EntrainmentVolume.setValue(entrainmentvolume);
@@ -941,7 +944,7 @@ public class Player extends Stage {
                     protected void interpolate(double frac) {
                         if (ambienceplayer != null && currentambiencevolume > 0.0) {
                             try {
-                                double ambiencevolume = 1.0 - (frac * currentambiencevolume);
+                                double ambiencevolume = currentambiencevolume - (frac * currentambiencevolume);
                                 String percentage = new Double(ambiencevolume * 100).intValue() + "%";
                                 ambienceplayer.setVolume(ambiencevolume);
                                 AmbienceVolume.setValue(ambiencevolume);
@@ -967,7 +970,7 @@ public class Player extends Stage {
                 protected void interpolate(double frac) {
                     if (entrainmentplayer != null && currententrainmentvolume > 0.0) {
                         try {
-                            double entrainmentvolume = 1.0 - (frac * currententrainmentvolume);
+                            double entrainmentvolume = currententrainmentvolume - (frac * currententrainmentvolume);
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
                             entrainmentplayer.setVolume(entrainmentvolume);
                             EntrainmentVolume.setValue(entrainmentvolume);
@@ -998,7 +1001,7 @@ public class Player extends Stage {
                     protected void interpolate(double frac) {
                         if (ambienceplayer != null && currentambiencevolume > 0.0) {
                             try {
-                                double ambiencevolume = 1.0 - (frac * currentambiencevolume);
+                                double ambiencevolume = currentambiencevolume - (frac * currentambiencevolume);
                                 String percentage = new Double(ambiencevolume * 100).intValue() + "%";
                                 ambienceplayer.setVolume(ambiencevolume);
                                 AmbienceVolume.setValue(ambiencevolume);
