@@ -37,7 +37,8 @@ public class SetDurationWithAmbienceOption extends StyledStage {
             setScene(defaultscene);
             setResizable(false);
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Set ");
+            if (playbackItemList.size() == 1 && playbackItemList.get(0).getExpectedDuration() > 0.0) { stringBuilder.append("Edit "); }
+            else { stringBuilder.append("Set "); }
             if (playbackItemList.size() > 1) {stringBuilder.append(playbackItemList.size()).append(" Durations");}
             else {stringBuilder.append(playbackItemList.get(0).getName()).append(" Duration");}
             setTitle(stringBuilder.toString());

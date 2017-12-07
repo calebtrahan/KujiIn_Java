@@ -85,7 +85,6 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     public CustomizeAmbience(Preferences preferences, PlaybackItem playbackItem, AvailableAmbiences availableAmbiences) {
         try {
             ambience = new Ambience();
-            if (playbackItem.getAmbience().getAmbience() != null) {for (SoundFile i : playbackItem.getAmbience().getAmbience()) {ambience.add(i);}}
             this.preferences = preferences;
             this.playbackItem = playbackItem;
             this.availableAmbiences = availableAmbiences;
@@ -96,8 +95,6 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setResizable(false);
-            if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
-            else {setTitle("Customize Ambience"); populatetable();}
             AddOrEditAmbienceTable.setPlaceholder(new Label("No Ambience For " + playbackItem.getName()));
             AddOrEditAmbienceTable.setOnMousePressed(event -> {
                 int selectedindex = AddOrEditAmbienceTable.getSelectionModel().getSelectedIndex();
@@ -121,6 +118,12 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
                     if (event.isPrimaryButtonDown() && event.getClickCount() == 2) { preview(); }
                 }
             });
+            if (playbackItem.getAmbience().getAmbience() != null) {
+                for (SoundFile i : playbackItem.getAmbience().getAmbience()) {ambience.add(i);}
+                populatetable();
+            }
+            if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
+            else {setTitle("Customize Ambience"); populatetable();}
 //            NumberColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(1 / 5));
 //            NameColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(3 / 5));
 //            DurationColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(1 / 5));
@@ -260,7 +263,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
 // Other Methods
     private void populatetable() {
         AddOrEditAmbienceTable.getItems().clear();
-        if (! ambience.hasAmbience()) {
+        if (ambience.hasAmbience()) {
             ObservableList<AddOrEditAmbienceTableItem> items = FXCollections.observableArrayList();
             int count = 1;
             for (SoundFile i : ambience.getAmbience()) {

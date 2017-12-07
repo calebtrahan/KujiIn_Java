@@ -50,6 +50,7 @@ import java.util.ResourceBundle;
 import static kujiin.xml.Preferences.*;
 
 // Dialog At End To Set Entrainment/Ambience Volume As Default?
+// TODO Customize Ambience Does Not Pass In Ambience Even If Already Exists
 
 // Bugs To Fix
 
@@ -1039,9 +1040,10 @@ public class MainController implements Initializable {
                 }
                 totaltimepracticed = totaltimepracticed.add(i.getSessionPracticedTime());
             }
-            Duration averageduration = new Duration(totaltimepracticed.toMillis() / 15);
             boolean displayinhours = false;
-            if (averageduration.greaterThanOrEqualTo(Duration.hours(2.5))) {displayinhours = true;}
+            for (Duration i : sessionpartdurations) {
+                if (i.greaterThanOrEqualTo(Duration.hours(2.5))) { displayinhours = true; break;}
+            }
             int count = 0;
             ObservableList<PieChart.Data> piechartvalues = FXCollections.observableArrayList();
             for (Duration i : sessionpartdurations) {
