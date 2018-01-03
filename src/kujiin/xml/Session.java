@@ -6,6 +6,7 @@ import kujiin.util.enums.FreqType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +24,17 @@ public class Session {
     private Double SessionPracticedTime;
     private String Notes;
     private FreqType freqType;
+    private boolean missedsession;
+    private int playcount;
+    private int completedcount;
+    @XmlTransient
+    private List<Playback> playbacklist;
 
     public Session() {
         id = UUID.randomUUID();
         setDate_Practiced(LocalDate.now());
+        playcount = 0;
+        completedcount = 0;
     }
 
 // Getters And Setters
@@ -36,6 +44,14 @@ public class Session {
     public String getNotes() {
         return Notes;
     }
+    public int getPlaycount() {
+        return playcount;
+    }
+    public int getCompletedcount() {
+        return completedcount;
+    }
+    public void addPlaycount() {playcount++;}
+    public void addCompletedcount() {completedcount++;}
     public void setNotes(String notes) {
         Notes = notes;
     }
@@ -51,6 +67,7 @@ public class Session {
         return new Duration(ExpectedSessionDuration);
     }
     public void setPlaybackItems(ArrayList<PlaybackItem> playbackItems) {
+        System.out.println("Set " + playbackItems.size() + " Playback Items");
         this.playbackItems = playbackItems;
     }
     public ArrayList<PlaybackItem> getPlaybackItems() {
@@ -144,6 +161,7 @@ public class Session {
         playbackItems.add(getplaybackitem(index));
     }
     public void removeplaybackitem(int index) {
+        System.out.println("Removed Item " + index);
         playbackItems.remove(index);
     }
 
@@ -180,11 +198,43 @@ public class Session {
     public boolean isPracticed() {
         return getSessionPracticedTime().greaterThan(Duration.ZERO);
     }
-    public boolean isEmpty() {
-        return playbackItems == null || playbackItems.isEmpty();
+    public boolean hasItems() {
+        return playbackItems != null && ! playbackItems.isEmpty();
     }
     public void resetpracticetime() {
         SessionPracticedTime = 0.0;
+    }
+
+
+    class Playback {
+        LocalDate timestarted;
+        LocalDate timefinished;
+        int pausecount;
+        boolean completed = false;
+
+        public Playback(LocalDate startime) {
+            timestarted = startime;
+        }
+
+    // Getters And Setters
+        public LocalDate getTimestarted() {
+            return timestarted;
+        }
+        public LocalDate getTimefinished() {
+            return timefinished;
+        }
+        public int getPausecount() {
+            return pausecount;
+        }
+        public boolean isCompleted() {
+            return completed;
+        }
+        public void setCompleted(LocalDate timefinished) {
+            completed = true;
+            this.timefinished = timefinished;
+        }
+
+
     }
 
 }

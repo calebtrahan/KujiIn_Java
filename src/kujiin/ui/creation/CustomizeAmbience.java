@@ -45,6 +45,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     public Label StatusBar;
     public Button AcceptButton;
     public Button CancelButton;
+    public Menu QuickAddMenu;
     public MenuItem QuickAddRepeatAmbience;
     public MenuItem QuickAddShuffleAmbience;
     private AvailableAmbiences availableAmbiences;
@@ -95,6 +96,9 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setResizable(false);
+            boolean hasavailableambience = availableAmbiences.getsessionpartAmbience(playbackItem.getCreationindex()).hasAny();
+            QuickAddMenu.setDisable(! hasavailableambience);
+            AddFromAmbienceDirectory.setDisable(! hasavailableambience);
             AddOrEditAmbienceTable.setPlaceholder(new Label("No Ambience For " + playbackItem.getName()));
             AddOrEditAmbienceTable.setOnMousePressed(event -> {
                 int selectedindex = AddOrEditAmbienceTable.getSelectionModel().getSelectedIndex();
@@ -181,15 +185,23 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
         }
     }
     public void quickaddrepeatambience() {
-        boolean clearambience;
-        clearambience = ! ambience.getAmbience().isEmpty() && new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult();
+        boolean clearambience = false;
+        if (ambience.hasAmbience()) {
+            if (new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult()) {
+                clearambience = true;
+            }
+        }
         ambience.addavailableambience_repeat(playbackItem, playbackItemAmbience, clearambience);
         populatetable();
         AcceptButton.requestFocus();
     }
     public void quickaddshuffleambience() {
-        boolean clearambience;
-        clearambience = ! ambience.getAmbience().isEmpty() && new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult();
+        boolean clearambience = false;
+        if (ambience.hasAmbience()) {
+            if (new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult()) {
+                clearambience = true;
+            }
+        }
         ambience.addavailableambience_shuffle(playbackItem, playbackItemAmbience, clearambience);
         populatetable();
         AcceptButton.requestFocus();
@@ -253,10 +265,10 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
         }
     }
     public void accept() {
-        ambience.setEnabled(! ambience.hasAmbience());
+        ambience.setEnabled(ambience.hasAmbience());
         playbackItem.getAmbience().setAmbience(ambience.getAmbience());
         playbackItem.getAmbience().setEnabled(ambience.isEnabled());
-        accepted = ! ambience.hasAmbience();
+        accepted = ambience.hasAmbience();
         close();
     }
 

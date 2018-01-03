@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.xml.AvailableAmbiences;
 import kujiin.xml.PlaybackItem;
 import kujiin.xml.Preferences;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class SetDurationWithAmbienceOption extends StyledStage {
+    private final Preferences preferences;
+    private Duration minduration = Duration.minutes(1.0);
     public Spinner<Integer> HoursSpinner;
     public Spinner<Integer> MinutesSpinner;
     public Spinner<Integer> SecondsSpinner;
@@ -29,6 +32,7 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     private int missingambiencecount = 0;
 
     public SetDurationWithAmbienceOption(Preferences preferences, AvailableAmbiences availableAmbiences, List<PlaybackItem> playbackItemList, boolean quickaddambienceoption) {
+        this.preferences = preferences;
         try {
             this.playbackItemList = playbackItemList;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/SetDurationAndAmbience.fxml"));
@@ -58,7 +62,6 @@ public class SetDurationWithAmbienceOption extends StyledStage {
             SecondsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) seconds, preferences.getCreationOptions().getScrollincrement()));
             QuickAddAmbienceCheckbox.setVisible(quickaddambienceoption);
             QuickAddAmbienceChoiceBox.setVisible(quickaddambienceoption);
-            for (PlaybackItem i : playbackItemList) {if (! availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {missingambiencecount++;}}
             setScrollListeners();
             boolean hassomeambience = false;
             for (PlaybackItem i : playbackItemList) {
@@ -109,10 +112,15 @@ public class SetDurationWithAmbienceOption extends StyledStage {
         return quickaddambience;
     }
     public int getQuickAddAmbienceType() {return QuickAddAmbienceChoiceBox.getSelectionModel().getSelectedIndex();}
+    public double getDuration() {return getNewDuration().toMillis();}
 
 // Button Actions
     public void accept() {
         double expectedduration = getNewDuration().toMillis();
+        if (getNewDuration().lessThan(minduration)) {
+            new InformationDialog(preferences, "Cannot Add", "Cannot Add Item(s)", "Duration Is Less Than 1 Minute");
+            return;
+        }
         double fadedurations = 0.0;
     // Fade Animations
         for (PlaybackItem i : playbackItemList) {i.setExpectedDuration(expectedduration);}

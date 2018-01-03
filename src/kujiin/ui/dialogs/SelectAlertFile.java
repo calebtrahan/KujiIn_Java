@@ -95,7 +95,7 @@ public class SelectAlertFile extends StyledStage {
             Double duration = Util.audio_getduration(alertfile);
             Duration alertfileduration = new Duration(duration * 1000);
             if (duration >= Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH && duration < Preferences.ABSOLUTE_ALERT_FILE_MAX_LENGTH) {
-                switch (new AnswerDialog(Root.getPreferences(), this, "Alert File Longer Than Suggested Duration", null,
+                switch (new AnswerDialog(Root.getPreferences(), "Alert File Longer Than Suggested Duration", null,
                         String.format("Alert File Is %s Which Is Longer Than Suggested Duration: %s And May Break Immersion",
                                 Util.formatdurationtoStringDecimalWithColons(alertfileduration),
                                 Util.formatdurationtoStringDecimalWithColons(new Duration(Preferences.SUGGESTED_ALERT_FILE_MAX_LENGTH * 1000))),

@@ -184,7 +184,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
     }
     public void closedialog() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(preferences, this, "Unsaved Changes", "You Have Unsaved Changes To " + selectedplaybackitemambience.getName(), "Save Changes?","Save", "Discard", "Cancel").getResult()) {
+            switch (new AnswerDialog(preferences, "Unsaved Changes", "You Have Unsaved Changes To " + selectedplaybackitemambience.getName(), "Save Changes?","Save", "Discard", "Cancel").getResult()) {
                 case YES: save();
                 case NO: close();
             }

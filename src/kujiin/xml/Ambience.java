@@ -137,7 +137,16 @@ public class Ambience {
     }
     public void addavailableambience_repeat(PlaybackItem playbackItem, PlaybackItemAmbience playbackItemAmbience, boolean clearambience) {
         if (clearambience) {clearambience();}
-        Duration currentduration;
+        List<SoundFile> ambiencelist = new ArrayList<>();
+        Duration currentduration = Duration.ZERO;
+        List<Integer> indexhistory = new ArrayList<>();
+        if (! clearambience && playbackItem.getAmbience().hasAmbience()) {
+            for (SoundFile i : playbackItem.getAmbience().getAmbience()) {
+                ambiencelist.add(i);
+                indexhistory.add(playbackItem.getAmbience().getAmbience().indexOf(i));
+            }
+            currentduration = playbackItem.getAmbience().gettotalDuration();
+        }
         Duration maxduration;
         if (playbackItem.isRampOnly()) {maxduration = Duration.minutes(1);}
         else {maxduration = new Duration(playbackItem.getExpectedDuration());}
@@ -164,7 +173,7 @@ public class Ambience {
         List<SoundFile> ambiencelist = new ArrayList<>();
         Duration currentduration = Duration.ZERO;
         List<Integer> indexhistory = new ArrayList<>();
-        if (! clearambience && ! playbackItem.getAmbience().hasAmbience()) {
+        if (! clearambience && playbackItem.getAmbience().hasAmbience()) {
             for (SoundFile i : playbackItem.getAmbience().getAmbience()) {
                 ambiencelist.add(i);
                 indexhistory.add(playbackItem.getAmbience().getAmbience().indexOf(i));
@@ -173,7 +182,8 @@ public class Ambience {
         }
         int indexcount;
         Duration maxduration;
-        int size = playbackItemAmbience.getAmbience().size();
+        int size = 0;
+        if (playbackItemAmbience.hasAny()) { size = playbackItemAmbience.getAmbience().size(); }
         if (playbackItem.isRampOnly()) {maxduration = Duration.minutes(1);}
         else {maxduration = new Duration(playbackItem.getExpectedDuration());}
         while (currentduration.lessThan(maxduration)) {
@@ -201,7 +211,7 @@ public class Ambience {
         for (SoundFile i : Ambience) {totalduration = totalduration.add(new Duration(i.getDuration()));}
         return totalduration;
     }
-    public void clearambience() { if (Ambience != null) {Ambience.clear();}}
+    public void clearambience() { if (Ambience != null) {Ambience.clear(); setEnabled(false);}}
     public void remove(int index) {
         Ambience.remove(index);
     }

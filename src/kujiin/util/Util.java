@@ -4,7 +4,6 @@ import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import kujiin.xml.Preferences;
-import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -126,10 +125,11 @@ public class Util {
         } catch (IOException e) {e.printStackTrace(); return null;}
     }
     public static boolean file_writecontents(File file, String contents) {
-        try {
-            org.apache.commons.io.FileUtils.writeStringToFile(file, contents);
-            return true;
-        } catch (IOException ignored) {return false;}
+//        try {
+////            org.apache.commons.io.FileUtils.writeStringToFile(file, contents);
+//            return true;
+//        } catch (IOException ignored) {return false;}
+        return true;
     }
     public static File filechooser_single(Scene scene, String dialogtitle, File initialdirectory) {
         FileChooser fileChooser = new FileChooser();
@@ -320,7 +320,7 @@ public class Util {
         try {
             // ffmpeg -i input.mp3 -ss 00:02:54.583 -t 300 -acodec copy output.mp3
             File tempfile = new File(Preferences.DIRECTORYTEMP, "Export/temptrim.mp3");
-            FileUtils.moveFile(filetotrim, tempfile);
+//            FileUtils.moveFile(filetotrim, tempfile);
             ArrayList<String> cmdarraylist = new ArrayList<>();
             cmdarraylist.add("ffmpeg");
             cmdarraylist.add("-i");

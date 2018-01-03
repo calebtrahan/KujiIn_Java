@@ -120,10 +120,9 @@ public class Player extends Stage {
     private PlayerState playerState;
     private Preferences Preferences;
     private ReferenceType referenceType;
-// Toggles
-    public Boolean displaynormaltime = true;
-// Event Handlers
-    EventHandler<KeyEvent> AmbienceSwitchWithKeyboard = new EventHandler<KeyEvent>() {
+    private boolean exitprogram = false;
+    // Event Handlers
+    private EventHandler<KeyEvent> AmbienceSwitchWithKeyboard = new EventHandler<KeyEvent>() {
         KeyCodeCombination forwardambience = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
         KeyCodeCombination backambience = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
 
@@ -139,9 +138,33 @@ public class Player extends Stage {
             }
         }
     };
+    private EventHandler<KeyEvent> SpaceBarPressed = new EventHandler<KeyEvent>() {
+
+        @Override
+        public void handle(KeyEvent event) {
+            System.out.println("Key Pressed");
+            try {
+                if (event.getCode() == KeyCode.SPACE) {
+                    switch (playerState) {
+                        case IDLE:
+                        case STOPPED:
+                        case PAUSED:
+                            playbuttonpressed();
+                            break;
+                        case PLAYING:
+                            pausebuttonpressed();
+                            break;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
     public Player(MainController Root, Sessions sessions, AllGoals allGoals, Session sessiontoplay) {
         try {
+            exitprogram = false;
             testingmode = Root.isTestingmode();
             Preferences = Root.getPreferences();
             SessionTemplate = sessiontoplay;
@@ -209,6 +232,7 @@ public class Player extends Stage {
             ReferenceTypeChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList("html", "txt")));
             ReferenceControls.setDisable(true);
             updategoalsui();
+            getScene().addEventHandler(KeyEvent.KEY_PRESSED, SpaceBarPressed);
             new Timeline(new KeyFrame(Duration.millis(100), ae -> {PlayButton.requestFocus();})).play();
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
@@ -238,8 +262,11 @@ public class Player extends Stage {
 
         playerState = playerstate;
     }
+    public boolean isExitprogram() {
+        return exitprogram;
+    }
 
-// UI Methods
+    // UI Methods
     public void playbuttonpressed() {
         switch (playerState) {
             case IDLE:
@@ -372,6 +399,7 @@ public class Player extends Stage {
                 BigDecimal bd = new BigDecimal(totalprogress * 100);
                 bd = bd.setScale(1, RoundingMode.HALF_UP);
                 SessionProgressPercentage.setText(bd.doubleValue() + "%");
+                Boolean displaynormaltime = true;
                 if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));}
                 else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration().subtract(SessionInProgress.getSessionPracticedTime())));}
                 updategoalsui();
@@ -461,6 +489,7 @@ public class Player extends Stage {
         SessionInProgress.setSessionPracticedTime();
         SessionInProgress.calculateactualduration();
         volume_unbindentrainment();
+        SessionInProgress.addPlaycount();
     }
     private void start() {
         updateuitimeline.play();
@@ -686,7 +715,7 @@ public class Player extends Stage {
         }
         toggleplayerbuttons();
     }
-    public void progresstonextsessionpart() {
+    private void progresstonextsessionpart() {
         try {
             switch (playerState) {
                 case TRANSITIONING:
@@ -713,7 +742,7 @@ public class Player extends Stage {
             ignored.printStackTrace();
         }
     }
-    public void transition() {
+    private void transition() {
         selectedPlaybackItem.updateduration(new Duration(selectedPlaybackItem.getExpectedDuration()));
         updategoalsui();
         if (Preferences.getSessionOptions().getAlertfunction() && ! selectedPlaybackItem.equals(SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().size() - 1))) {
@@ -734,7 +763,7 @@ public class Player extends Stage {
             progresstonextsessionpart();
         }
     }
-    public void reset() {
+    private void reset() {
         PlayButton.setDisable(false);
         PlayButton.setTooltip(new Tooltip("Replay"));
 //        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
@@ -756,11 +785,12 @@ public class Player extends Stage {
         AmbienceVolume.setValue(0.0);
         AmbienceVolumePercentage.setText("0%");
     }
-    public void endofsession() {
+    private void endofsession() {
         setPlayerstate(STOPPED);
         // TODO Prompt For Export
         updategoalsui();
         reset();
+        SessionInProgress.addCompletedcount();
         final Session sessioninprogress = SessionInProgress;
         try {
             SessionComplete sessionComplete = new SessionComplete(SessionInProgress, true);
@@ -768,11 +798,23 @@ public class Player extends Stage {
             sessionComplete.show();
             sessionComplete.setOnHidden(event -> {
                 if (sessionComplete.needtosetNotes()) {sessioninprogress.setNotes(sessionComplete.getNotes());}
-                if (! sessionComplete.keepplayeropen()) {close();}
                 if (AllGoals.sessionhasgoalscompleted()) {
                     GoalsCompletedDialog goalsCompletedDialog = new GoalsCompletedDialog(AllGoals);
                     goalsCompletedDialog.initModality(Modality.APPLICATION_MODAL);
                     goalsCompletedDialog.show();
+                }
+                if (sessionComplete.getSessionCompleteDirections() != null) {
+                    switch (sessionComplete.getSessionCompleteDirections()) {
+                        case EXITPROGRAM:
+                            exitprogram = true;
+                            close();
+                            break;
+                        case KEEPPLAYEROPEN:
+                            break;
+                        case CLOSEPLAYER:
+                            close();
+                            break;
+                    }
                 }
             });
         } catch (Exception e) {e.printStackTrace();}
@@ -780,7 +822,7 @@ public class Player extends Stage {
         if (! testingmode) { sessions.add(SessionInProgress); }
         SessionInProgress = null;
     }
-    public boolean endsessionprematurely(boolean resetdialogcontrols) {
+    private boolean endsessionprematurely(boolean resetdialogcontrols) {
         pausewithoutanimation();
         updateuitimeline.pause();
         if (new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
@@ -794,8 +836,20 @@ public class Player extends Stage {
             SessionComplete sessionComplete = new SessionComplete(SessionInProgress, false);
             sessionComplete.initModality(Modality.APPLICATION_MODAL);
             sessionComplete.showAndWait();
-            if (! sessionComplete.keepplayeropen()) {close();}
             resetsessionpracticedtime();
+            if (sessionComplete.getSessionCompleteDirections() != null) {
+                switch (sessionComplete.getSessionCompleteDirections()) {
+                    case EXITPROGRAM:
+                        exitprogram = true;
+                        close();
+                        break;
+                    case KEEPPLAYEROPEN:
+                        break;
+                    case CLOSEPLAYER:
+                        close();
+                        break;
+                }
+            }
             return true;
         } else {playbuttonpressed(); return false;}
     }
@@ -1130,7 +1184,7 @@ public class Player extends Stage {
     private void entrainmenterror() {
         System.out.println("PlaybackItemEntrainment Error");
         // Pause Ambience If Exists
-        switch (new AnswerDialog(Preferences, this, "PlaybackItemEntrainment Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
+        switch (new AnswerDialog(Preferences, "PlaybackItemEntrainment Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
                 "'s PlaybackItemEntrainment. Problem File Is: '" + entrainmentplayer.getMedia().getSource() + "'",
                 "Retry Playback", "Mute PlaybackItemEntrainment", "Stop SessionInProgress Playback").getResult()) {
             case YES:
@@ -1146,7 +1200,7 @@ public class Player extends Stage {
     private void ambienceerror() {
         System.out.println("Ambience Error!");
         // Pause PlaybackItemEntrainment
-        switch (new AnswerDialog(Preferences, this, "Ambience Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
+        switch (new AnswerDialog(Preferences, "Ambience Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
                 "'s Ambience. Problem File Is: '" + ambienceplayer.getMedia().getSource() + "'",
                 "Retry Playback", "Mute Ambience", "Stop SessionInProgress Playback").getResult()) {
             case YES:

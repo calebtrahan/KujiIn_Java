@@ -17,7 +17,7 @@ import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.Util;
 import kujiin.util.table.AmbienceSong;
 import kujiin.xml.*;
-import org.apache.commons.io.FileUtils;
+//import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,7 +96,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
             setResizable(false);
             setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (new AnswerDialog(preferences, this, "Save Changes", null, "You Have Unsaved Changes To " + selectedplaybackitemambience, "Save And Close", "Close", "Cancel", true).getResult()) {
+                    switch (new AnswerDialog(preferences, "Save Changes", null, "You Have Unsaved Changes To " + selectedplaybackitemambience, "Save And Close", "Close", "Cancel", true).getResult()) {
                         case YES:
                             save();
                             break;
@@ -172,8 +172,9 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         Temp_TotalDuration.setText(Util.formatdurationtoStringSpelledOut(temptotalduration, Temp_TotalDuration.getLayoutBounds().getWidth()));
     }
     public void deletetempambiencefromdirectory() {
-        try {
-            FileUtils.cleanDirectory(tempdirectory);} catch (IOException ignored) {}
+//        try {
+////            FileUtils.cleanDirectory(tempdirectory);
+//        } catch (IOException ignored) {}
     }
 
 // Actual Ambience Methods
@@ -244,7 +245,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
         int index = table.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             SoundFile soundFile = soundfilelist.get(index);
-            switch (new AnswerDialog(preferences, this, "Removing File", null, "Removing Ambience From Table. Also Delete File " + soundFile.getName() + " From Disk? (This Cannot Be Undone)",
+            switch (new AnswerDialog(preferences, "Removing File", null, "Removing Ambience From Table. Also Delete File " + soundFile.getName() + " From Disk? (This Cannot Be Undone)",
                     "Remove And Delete File", "Remove But Keep File", "Cancel", true).getResult()) {
                 case YES: soundFile.getFile().delete(); break;
                 case CANCEL: return;
@@ -310,7 +311,7 @@ public class AmbienceEditor_Advanced extends Stage implements Initializable {
     }
     public void switchtosimple() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(preferences, this, "Switch To Simple Mode", null, "You Have Unsaved Changes To " + selectedplaybackitemambience, "Save Changes", "Switch Without Saving", "Cancel", true).getResult()) {
+            switch (new AnswerDialog(preferences, "Switch To Simple Mode", null, "You Have Unsaved Changes To " + selectedplaybackitemambience, "Save Changes", "Switch Without Saving", "Cancel", true).getResult()) {
                 case YES: save(); break;
                 case CANCEL: return;
             }

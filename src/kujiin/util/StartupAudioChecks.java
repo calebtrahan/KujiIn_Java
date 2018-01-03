@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-public class AudioChecks extends Task {
-    private AudioCheckingType audioCheckingType;
+
+public class StartupAudioChecks extends Task {
+    private StartupAudioCheckingType startupAudioCheckingType;
     private PlaybackItem selectedplaybackitem;
     private PlaybackItemEntrainment playbackItemEntrainment;
     private PlaybackItemAmbience playbackItemAmbience;
@@ -31,7 +32,7 @@ public class AudioChecks extends Task {
     private int currenttaskcount = 0;
     private final Session testsession;
 
-    public AudioChecks(MainController Root) {
+    public StartupAudioChecks(MainController Root) {
         root = Root;
         testsession = new Session();
         for (int i = 0; i < 15; i++) {
@@ -67,7 +68,7 @@ public class AudioChecks extends Task {
             // Check If File Exists
             if (! soundFile.getFile().exists()) {
                 System.out.println(soundFile.getName() + " Does Not Exist!!!");
-                if (audioCheckingType == AudioCheckingType.Ambience) {
+                if (startupAudioCheckingType == StartupAudioCheckingType.Ambience) {
                     playbackItemAmbience.remove(playbackItemAmbience.getAmbience().indexOf(soundFile));
                 }
                 return call();
@@ -80,7 +81,7 @@ public class AudioChecks extends Task {
                         if (startupcheckplayer.getTotalDuration().greaterThan(Duration.ZERO)) {
                             currenttaskcount++;
                             soundFile.setDuration(startupcheckplayer.getTotalDuration().toMillis());
-                            if (audioCheckingType == AudioCheckingType.Ramp) { SessionRampFiles.put(soundFile); }
+                            if (startupAudioCheckingType == StartupAudioCheckingType.Ramp) { SessionRampFiles.put(soundFile); }
                             startupcheckplayer.dispose();
                             startupcheckplayer = null;
                             updateProgress(currenttaskcount, totaltasks);
@@ -100,7 +101,7 @@ public class AudioChecks extends Task {
                     } catch (InterruptedException e) { e.printStackTrace(); }
                 });
             } else {
-                if (audioCheckingType == AudioCheckingType.Ramp) { SessionRampFiles.put(soundFile); }
+                if (startupAudioCheckingType == StartupAudioCheckingType.Ramp) { SessionRampFiles.put(soundFile); }
                 currenttaskcount++;
                 updateProgress(currenttaskcount, totaltasks);
                 updateMessage("Please Wait (" + new Double(getProgress() * 100).intValue() + "%)");
@@ -114,7 +115,7 @@ public class AudioChecks extends Task {
 // Utility Methods
     private SoundFile getnextsoundFile() throws InterruptedException {
         if (! TempSessionRampFiles.isEmpty()) {
-            audioCheckingType = AudioCheckingType.Ramp;
+            startupAudioCheckingType = StartupAudioCheckingType.Ramp;
             return TempSessionRampFiles.take();
         } else if (SessionRampFiles.isEmpty()) {
             List<SoundFile> rampfiles = new ArrayList<>();
@@ -128,17 +129,17 @@ public class AudioChecks extends Task {
                 populatefilestocheckforSelectedPlaybackItem();
             }
             if (!PlaybackItemEntrainmentFiles.isEmpty()) {
-                audioCheckingType = AudioCheckingType.Entrainment;
+                startupAudioCheckingType = StartupAudioCheckingType.Entrainment;
                 return PlaybackItemEntrainmentFiles.take();
             } else if (PlaybackItemAmbienceFiles != null && !PlaybackItemAmbienceFiles.isEmpty()) {
-                audioCheckingType = AudioCheckingType.Ambience;
+                startupAudioCheckingType = StartupAudioCheckingType.Ambience;
                 return PlaybackItemAmbienceFiles.take();
             }
         } else {return null;}
         return null;
     }
     private void setAdjustedSoundFile(SoundFile soundFile) throws InterruptedException {
-        switch (audioCheckingType) {
+        switch (startupAudioCheckingType) {
             case Ambience:
                 PlaybackItemAmbienceFiles.put(soundFile);
                 break;
@@ -177,6 +178,6 @@ public class AudioChecks extends Task {
     }
 }
 
-enum AudioCheckingType {
+enum StartupAudioCheckingType {
     Ambience, Entrainment, Ramp
 }

@@ -20,8 +20,10 @@ public class SessionComplete extends StyledStage {
     public BarChart<String, Number> SessionBarChart;
     public CheckBox AddSessionNotesCheckbox;
     public TextArea SessionNotesTextArea;
-    public CheckBox KeepPlayerOpenButton;
-    public Button CloseButton;
+    public Button ReturnToPlayerButton;
+    public Button ReturnToCreatorButton;
+    public Button ExitProgramButton;
+    private SessionCompleteDirections sessionCompleteDirections;
 
     public SessionComplete(Session session, boolean sessioncomplete) {
         this.session = session;
@@ -57,24 +59,33 @@ public class SessionComplete extends StyledStage {
             SessionBarChart.getData().add(series);
             SessionBarChart.setLegendVisible(false);
             SessionBarChart.requestFocus();
-            CloseButton.setOnAction(event -> close());
+            ExitProgramButton.setOnAction(event -> {sessionCompleteDirections = SessionCompleteDirections.EXITPROGRAM; close();});
+            ReturnToPlayerButton.setOnAction(event -> {sessionCompleteDirections = SessionCompleteDirections.KEEPPLAYEROPEN; close();});
+            ReturnToCreatorButton.setOnAction(event -> {sessionCompleteDirections = SessionCompleteDirections.CLOSEPLAYER; close();});
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
 
+// Getters And Setters
     public boolean needtosetNotes() {
         return AddSessionNotesCheckbox.isSelected() && ! SessionNotesTextArea.getText().isEmpty();
     }
     public String getNotes() {
         return session.getNotes();
     }
-    public boolean keepplayeropen() {
-        return KeepPlayerOpenButton.isSelected();
+    public SessionCompleteDirections getSessionCompleteDirections() {
+        return sessionCompleteDirections;
     }
 
+    // Button Actions
     @Override
     public void close() {
+        if (sessionCompleteDirections == null) {sessionCompleteDirections = SessionCompleteDirections.KEEPPLAYEROPEN;}
         if (needtosetNotes()) {session.setNotes(SessionNotesTextArea.getText());}
         super.close();
     }
 
+
+    enum SessionCompleteDirections {
+        EXITPROGRAM, KEEPPLAYEROPEN, CLOSEPLAYER
+    }
 }

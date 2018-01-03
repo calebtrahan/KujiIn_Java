@@ -66,7 +66,7 @@ public class Sessions {
 // Session Methods
     public void add(Session session) {
         if (Session == null) {Session = new ArrayList<>();}
-        if (! session.isEmpty()) {
+        if (session.hasItems()) {
             Session.add(session);
             sort();
             marshall();

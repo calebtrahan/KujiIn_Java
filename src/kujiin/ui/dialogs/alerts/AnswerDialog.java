@@ -12,7 +12,7 @@ import java.util.Optional;
 public class AnswerDialog {
     private Util.AnswerType result;
 
-    public AnswerDialog(Preferences preferences, Stage stage, String title, String header, String content, String yesbuttontext, String nobuttontext, String cancelbuttontext, boolean modal) {
+    public AnswerDialog(Preferences preferences, String title, String header, String content, String yesbuttontext, String nobuttontext, String cancelbuttontext, boolean modal) {
         ButtonType yes;
         ButtonType no;
         ButtonType cancel;
@@ -32,7 +32,7 @@ public class AnswerDialog {
             else if (buttonanswer == cancel) {result = Util.AnswerType.CANCEL;}
         }
     }
-    public AnswerDialog(Preferences preferences, Stage stage, String title, String header, String content, String yesbuttontext, String nobuttontext, String cancelbuttontext) {
+    public AnswerDialog(Preferences preferences, String title, String header, String content, String yesbuttontext, String nobuttontext, String cancelbuttontext) {
         ButtonType yes;
         ButtonType no;
         ButtonType cancel;

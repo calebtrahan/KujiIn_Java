@@ -120,6 +120,9 @@ public class SelectASession extends StyledStage {
         }
         return null;
     }
+    public String getFavoriteSessionName() {
+        return favoriteSession.getName();
+    }
 
 // Button Actions
     public void showmorerecentsessions() {recentsessionmax+= 10; populatetable();}

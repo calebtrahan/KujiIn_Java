@@ -70,7 +70,7 @@ public class EditReferenceFiles extends StyledStage {
             String referencename = referenceType.name();
             this.setOnCloseRequest(event -> {
                 if (unsavedchanges()) {
-                    switch (new AnswerDialog(Root.getPreferences(), this, "Confirmation", null, SessionPartNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes",
+                    switch (new AnswerDialog(Root.getPreferences(), "Confirmation", null, SessionPartNamesChoiceBox.getValue() + " " + referencename + " Variation Has Unsaved Changes",
                             "Save And Close", "Close Without Saving", "Cancel").getResult()) {
                         case YES:
                             saveselectedfile();
@@ -101,7 +101,7 @@ public class EditReferenceFiles extends StyledStage {
         HTMLVariation.setDisable(getselectedindex() == -1);
         TEXTVariation.setDisable(getselectedindex() == -1);
         if (userselectedindexes.size() > 0 && selectedfile != null && unsavedchanges()) {
-            Util.AnswerType answerType = new AnswerDialog(Root.getPreferences(), Root.getStage(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+            Util.AnswerType answerType = new AnswerDialog(Root.getPreferences(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
                     "Save And Close", "Close Without Saving", "Cancel").getResult();
             switch (answerType) {
                 case YES:
@@ -142,7 +142,7 @@ public class EditReferenceFiles extends StyledStage {
     // Button Methods
     private void htmlselected() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getPreferences(), Root.getStage(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+            switch (new AnswerDialog(Root.getPreferences(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
                     "Save And Close", "Close Without Saving", "Cancel").getResult()) {
                 case YES:
                     saveselectedfile();
@@ -164,7 +164,7 @@ public class EditReferenceFiles extends StyledStage {
     }
     private void textselected() {
         if (unsavedchanges()) {
-            switch (new AnswerDialog(Root.getPreferences(), Root.getStage(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
+            switch (new AnswerDialog(Root.getPreferences(), "Confirmation", null, "Previous Reference File Has Unsaved Changes",
                     "Save And Close", "Close Without Saving", "Cancel").getResult()) {
                 case YES:
                     saveselectedfile();

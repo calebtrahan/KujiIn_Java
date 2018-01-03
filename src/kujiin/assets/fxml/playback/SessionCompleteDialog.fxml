@@ -4,10 +4,15 @@
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<VBox alignment="TOP_CENTER" prefHeight="405.0" prefWidth="714.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+
+<VBox alignment="TOP_CENTER" prefHeight="405.0" prefWidth="714.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
       <children>
           <Label fx:id="TopLabel" alignment="CENTER" prefHeight="20.0" prefWidth="726.0" text="Session Complete" textAlignment="CENTER">
               <font>
@@ -38,12 +43,9 @@
       </TextArea>
       <HBox alignment="CENTER_RIGHT">
          <children>
-            <CheckBox fx:id="KeepPlayerOpenButton" mnemonicParsing="false" text="Keep Player Open">
-               <HBox.margin>
-                  <Insets right="10.0" />
-               </HBox.margin>
-            </CheckBox>
-            <Button fx:id="CloseButton" mnemonicParsing="false" text="Close" />
+            <Button fx:id="ReturnToPlayerButton" mnemonicParsing="false" text="Return To Player" />
+            <Button fx:id="ReturnToCreatorButton" mnemonicParsing="false" text="Return To Creator" />
+            <Button fx:id="ExitProgramButton" mnemonicParsing="false" text="Exit Program" />
          </children>
       </HBox>
       </children>
