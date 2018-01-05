@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -48,6 +49,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static kujiin.xml.Preferences.*;
+
+// Use Mind Workstation As UI Model
 
 public class MainController implements Initializable {
     private boolean testingmode;
@@ -118,7 +121,9 @@ public class MainController implements Initializable {
     public Label SessionSummary_Duration_Label;
     public TextField SessionSummary_Duration;
     public Button ClearButton;
-    public Button AddToFavoritesButton;
+    public MenuButton AddSessionAsMenuButton;
+    public MenuItem FavoriteMenuItem;
+    public MenuItem MissedSessionMenuItem;
     public Button PlayButton;
     public Button SaveAsFileButton;
     public Button ExportButton;
@@ -385,10 +390,10 @@ public class MainController implements Initializable {
         });
     }
     private void setupIcons() {
-        IconDisplayType dt = preferences.getUserInterfaceOptions().getIconDisplayType();
+        IconDisplayType dt = IconDisplayType.ICONS_ONLY;
         if (dt == IconDisplayType.ICONS_AND_TEXT || dt == IconDisplayType.ICONS_ONLY) {
             AddItemsMenu.setGraphic(new IconImageView(ICON_ADD, 20.0));
-            CreateNewSessionButton.setGraphic(new IconImageView(ICON_ADD, 20.0));
+            CreateNewSessionButton.setGraphic(new IconImageView(new Image(new File(DIRECTORYICONS, "NewDocument.png").toURI().toString()), 20.0));
             OpenFileButton.setGraphic(new IconImageView(ICON_OPENFILE, 20.0));
             OpenRecentSessionsButton.setGraphic(new IconImageView(ICON_RECENTSESSIONS, 20.0));
             ClearButton.setGraphic(new IconImageView(ICON_CLEARSESSION, 20.0));
@@ -398,31 +403,31 @@ public class MainController implements Initializable {
             MoveUpButton.setGraphic(new IconImageView(ICON_MOVEUP, 20.0));
             MoveDownButton.setGraphic(new IconImageView(ICON_MOVEDOWN, 20.0));
             RemoveButton.setGraphic(new IconImageView(ICON_REMOVE, 20.0));
-            AddToFavoritesButton.setGraphic(new IconImageView(ICON_ADDTOFAVORITE, 20.0));
+            AddSessionAsMenuButton.setGraphic(new IconImageView(new Image(new File(DIRECTORYICONS, "AddAs.png").toURI().toString()), 20.0));
+            FavoriteMenuItem.setGraphic(new IconImageView(ICON_ADDTOFAVORITE, 20.0));
+            MissedSessionMenuItem.setGraphic(new IconImageView(new Image(new File(DIRECTORYICONS, "MissedSession.png").toURI().toString()), 20.0));
             PlayButton.setGraphic(new IconImageView(ICON_PLAY, 20.0));
             SaveAsFileButton.setGraphic(new IconImageView(ICON_EXPORTTODOCUMENT, 20.0));
             ExportButton.setGraphic(new IconImageView(ICON_EXPORTTOAUDIO, 20.0));
         }
         if (dt == IconDisplayType.ICONS_ONLY) {
-            AmbienceMenu.setText("");
-            AddItemsMenu.setText("");
-            CreateNewSessionButton.setText("");
             OpenFileButton.setText("");
             OpenRecentSessionsButton.setText("");
             OpenFavoritesButton.setText("");
+            AmbienceMenu.setText("");
+            AddItemsMenu.setText("");
             DurationMenu.setText("");
             MoveUpButton.setText("");
             MoveDownButton.setText("");
             RemoveButton.setText("");
             ClearButton.setText("");
-            AddToFavoritesButton.setText("");
+            AddSessionAsMenuButton.setText("");
             PlayButton.setText("");
             SaveAsFileButton.setText("");
             ExportButton.setText("");
         } else {
 //            AmbienceMenu.setText("Ambience");
 //            AddItemsMenu.setText("Add");
-            CreateNewSessionButton.setText("Create New Session");
             OpenFileButton.setText("Open Session");
             OpenRecentSessionsButton.setText("Recent");
             OpenFavoritesButton.setText("Favorites");
@@ -431,7 +436,7 @@ public class MainController implements Initializable {
 //            MoveDownButton.setText("Down");
 //            RemoveButton.setText("Remove");
             ClearButton.setText("Clear Session");
-            AddToFavoritesButton.setText("Add To Favorites");
+            AddSessionAsMenuButton.setText("Add Session As");
             PlayButton.setText("Play");
             SaveAsFileButton.setText("Save As");
             ExportButton.setText("Export");
@@ -448,7 +453,9 @@ public class MainController implements Initializable {
             MoveUpButton.setGraphic(null);
             MoveDownButton.setGraphic(null);
             RemoveButton.setGraphic(null);
-            AddToFavoritesButton.setGraphic(null);
+            AddSessionAsMenuButton.setGraphic(null);
+            FavoriteMenuItem.setGraphic(null);
+            MissedSessionMenuItem.setGraphic(null);
             PlayButton.setGraphic(null);
             SaveAsFileButton.setGraphic(null);
             ExportButton.setGraphic(null);
@@ -467,7 +474,7 @@ public class MainController implements Initializable {
         MoveDownButton.setTooltip(new Tooltip("Move Down In Table"));
         RemoveButton.setTooltip(new Tooltip("Remove"));
         ClearButton.setTooltip(new Tooltip("Clear Session"));
-        AddToFavoritesButton.setTooltip(new Tooltip("Add This Session To Favorites"));
+        AddSessionAsMenuButton.setTooltip(new Tooltip("Add Session As..."));
         SaveAsFileButton.setTooltip(new Tooltip("Save As Document"));
         PlayButton.setTooltip(new Tooltip("Play This Session"));
         ExportButton.setTooltip(new Tooltip("Export To Audio File"));
@@ -518,7 +525,7 @@ public class MainController implements Initializable {
         if ((createdsession != null && ! createdsession.getPlaybackItems().isEmpty()) && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
         createdsession = new Session();
         populatetable();
-        displayStatusBarMessage("New Session Created", Duration.seconds(0.7));
+        displayStatusBarMessage("New Session Created", Duration.seconds(1.0));
         AddItemsMenu.requestFocus();
     }
     public void opensessionfromfile() {
@@ -920,6 +927,29 @@ public class MainController implements Initializable {
             populatetable();
         } else { updatecompletiontime.play(); }
     }
+    public void addasmissedsession() {
+        updatecompletiontime.stop();
+        if (createdsession.hasItems() && new ConfirmationDialog(preferences, "Confirmation", "Really Add As Missed Session? ", "This Will Mark The Session As Practiced And Add To Progress").getResult()) {
+            AddMissedSession addMissedSession = new AddMissedSession(preferences, createdsession);
+            addMissedSession.showAndWait();
+            if (addMissedSession.isAccepted()) {
+                Session missedsession = createdsession;
+                missedsession.setDate_Practiced(addMissedSession.getDate());
+                missedsession.setasMissedSession();
+                LocalDate sessiondate = addMissedSession.getDate();
+                int index = 0;
+                for (int i = 0; i < sessions.getSession().size(); i++) {
+                    Session x = sessions.getSession().get(i);
+                    if (x.getDate_Practiced().isEqual(sessiondate) || x.getDate_Practiced().isAfter(sessiondate)) {
+                        index = i;
+                        break;
+                    }
+                }
+                sessions.add(index, missedsession);
+            }
+        }
+        updatecompletiontime.play();
+    }
     public void addcreatedsessiontofavorites() {
         if (createdsession != null) {
             updatecompletiontime.stop();
@@ -1020,13 +1050,12 @@ public class MainController implements Initializable {
         RemoveButton.setDisable(nosessionloaded || tableempty || selectedindex == -1);
         MoveUpButton.setDisable(nosessionloaded || tableempty || selectedindex == -1 || selectedindex == 0);
         MoveDownButton.setDisable(nosessionloaded || tableempty || selectedindex == -1 || selectedindex == CreatedTableView.getItems().size() -1);
-        AddToFavoritesButton.setDisable(nosessionloaded || tableempty);
-        ClearButton.setDisable(nosessionloaded || tableempty);
+        AddSessionAsMenuButton.setDisable(nosessionloaded || tableempty);
         SessionSummary_CompletionTime_Label.setDisable(nosessionloaded || tableempty);
         SessionSummary_CompletionTime.setDisable(nosessionloaded || tableempty);
         SessionSummary_Duration.setDisable(nosessionloaded || tableempty);
         SessionSummary_Duration_Label.setDisable(nosessionloaded || tableempty);
-        if (nosessionloaded) {CreatedTableView.setPlaceholder(new Label("Please Create Or Load A Session"));}
+        if (nosessionloaded) {CreatedTableView.setPlaceholder(new Label("Please Create Or Open A Session"));}
         else {CreatedTableView.setPlaceholder(new Label("Session Is Empty"));}
     }
     private void calculatedurationandestimatedcompletion() {

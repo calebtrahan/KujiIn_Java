@@ -26,7 +26,7 @@ public class NameFavoriteSession extends StyledStage {
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
-            setTitle("Enter Name");
+            setTitle("Add Favorite Session");
             if (favoriteSessions.getFavoriteSessions() != null) {
                 for (FavoriteSession i : favoriteSessions.getFavoriteSessions()) {
                     names.add(i.getName());

@@ -27,8 +27,13 @@ public class Session {
     private boolean missedsession;
     private int playcount;
     private int completedcount;
+    private LocalDate timestarted;
+    private LocalDate timefinished;
+    private boolean completed = false;
+    private List<Break> breaks;
     @XmlTransient
-    private List<Playback> playbacklist;
+    private Break currentbreak;
+
 
     public Session() {
         id = UUID.randomUUID();
@@ -62,6 +67,9 @@ public class Session {
     }
     public void setSessionPracticedTime() {
         SessionPracticedTime = 0.0;
+    }
+    public void setSessionPracticedTime(double practicetime) {
+        SessionPracticedTime = practicetime;
     }
     public Duration getExpectedSessionDuration() {
         return new Duration(ExpectedSessionDuration);
@@ -151,6 +159,24 @@ public class Session {
         }
         return playbackItem;
     }
+    public LocalDate getTimestarted() {
+        return timestarted;
+    }
+    public LocalDate getTimefinished() {
+        return timefinished;
+    }
+    public void setTimefinished(LocalDate timefinished) {
+        this.timefinished = timefinished;
+    }
+    public boolean isCompleted() {
+        return completed;
+    }
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+    public List<Break> getBreaks() {
+        return breaks;
+    }
     public void addplaybackitems(Integer startindex, List<PlaybackItem> playbackitems) {
         if (playbackItems == null) {playbackItems = new ArrayList<>();}
         if (startindex != null) { playbackItems.addAll(startindex, playbackitems); }
@@ -204,37 +230,29 @@ public class Session {
     public void resetpracticetime() {
         SessionPracticedTime = 0.0;
     }
-
-
-    class Playback {
-        LocalDate timestarted;
-        LocalDate timefinished;
-        int pausecount;
-        boolean completed = false;
-
-        public Playback(LocalDate startime) {
-            timestarted = startime;
+    public void setasMissedSession() {
+        missedsession = true;
+        for (PlaybackItem i : playbackItems) {
+            i.setPracticeTime(i.getExpectedDuration());
         }
+        setSessionPracticedTime(getSessionPracticedTime().toMillis());
+    }
 
-    // Getters And Setters
-        public LocalDate getTimestarted() {
-            return timestarted;
-        }
-        public LocalDate getTimefinished() {
-            return timefinished;
-        }
-        public int getPausecount() {
-            return pausecount;
-        }
-        public boolean isCompleted() {
-            return completed;
-        }
-        public void setCompleted(LocalDate timefinished) {
-            completed = true;
-            this.timefinished = timefinished;
-        }
-
-
+// Playback Methods
+    public void startplayback() {
+        timestarted = LocalDate.now();
+    }
+    public void endplayback(boolean completed) {
+        setTimefinished(LocalDate.now());
+        setCompleted(completed);
+    }
+    public void startbreak() {
+        if (breaks == null) {breaks = new ArrayList<>();}
+        currentbreak = new Break(LocalDate.now());
+    }
+    public void endbreak() {
+        breaks.add(currentbreak);
+        currentbreak = null;
     }
 
 }

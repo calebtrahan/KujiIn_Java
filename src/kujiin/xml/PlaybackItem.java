@@ -83,6 +83,7 @@ public class PlaybackItem {
     public double getPracticeTime() {
         return PracticeTime;
     }
+    public void setPracticeTime(double practiceTime) {PracticeTime = practiceTime;}
     public String getdurationasString() {
         if (ExpectedDuration == 0.0 && ! RampOnly) {return "No Duration Set";}
         else {

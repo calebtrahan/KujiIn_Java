@@ -689,7 +689,7 @@ public class Player_New extends Stage {
             sessionComplete.show();
             sessionComplete.setOnHidden(event -> {
                 if (sessionComplete.needtosetNotes()) {sessioninprogress.setNotes(sessionComplete.getNotes());}
-                if (! sessionComplete.keepplayeropen()) {close();}
+//                if (! sessionComplete.keepplayeropen()) {close();}
                 if (AllGoals.sessionhasgoalscompleted()) {
                     GoalsCompletedDialog goalsCompletedDialog = new GoalsCompletedDialog(AllGoals);
                     goalsCompletedDialog.initModality(Modality.APPLICATION_MODAL);
@@ -715,7 +715,7 @@ public class Player_New extends Stage {
             SessionComplete sessionComplete = new SessionComplete(SessionInProgress, false);
             sessionComplete.initModality(Modality.APPLICATION_MODAL);
             sessionComplete.showAndWait();
-            if (! sessionComplete.keepplayeropen()) {close();}
+//            if (! sessionComplete.keepplayeropen()) {close();}
             resetsessionpracticedtime();
             return true;
         } else {playbuttonpressed(); return false;}
@@ -823,7 +823,7 @@ public class Player_New extends Stage {
     private void entrainmenterror() {
         System.out.println("PlaybackItemEntrainment Error");
         // Pause Ambience If Exists
-        switch (new AnswerDialog(Preferences, this, "PlaybackItemEntrainment Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
+        switch (new AnswerDialog(Preferences, "PlaybackItemEntrainment Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
                 "'s PlaybackItemEntrainment. Problem File Is: '" + entrainmentplayer.getMedia().getSource() + "'",
                 "Retry Playback", "Mute PlaybackItemEntrainment", "Stop SessionInProgress Playback").getResult()) {
             case YES:
@@ -839,7 +839,7 @@ public class Player_New extends Stage {
     private void ambienceerror() {
         System.out.println("Ambience Error!");
         // Pause PlaybackItemEntrainment
-        switch (new AnswerDialog(Preferences, this, "Ambience Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
+        switch (new AnswerDialog(Preferences, "Ambience Playback Error", null, "An Error Occured While Playing " + selectedPlaybackItem.getName() +
                 "'s Ambience. Problem File Is: '" + ambienceplayer.getMedia().getSource() + "'",
                 "Retry Playback", "Mute Ambience", "Stop SessionInProgress Playback").getResult()) {
             case YES:

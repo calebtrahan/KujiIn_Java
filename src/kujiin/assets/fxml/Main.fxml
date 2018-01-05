@@ -15,6 +15,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
@@ -63,10 +64,13 @@
                            <children>
                               <ToolBar prefHeight="9.0" prefWidth="743.0">
                                 <items>
-                                    <Button fx:id="CreateNewSessionButton" mnemonicParsing="false" onAction="#createnewsession" text="Create New Session" />
+                                    <Button fx:id="CreateNewSessionButton" mnemonicParsing="false" onAction="#createnewsession" text="" />
+                                    <Separator prefHeight="27.0" prefWidth="10.0" />
                                     <Button fx:id="OpenFileButton" mnemonicParsing="false" onAction="#opensessionfromfile" text="Open Session" />
                                     <Button fx:id="OpenRecentSessionsButton" mnemonicParsing="false" onAction="#openrecentsession" text="Recent" />
                                     <Button fx:id="OpenFavoritesButton" mnemonicParsing="false" onAction="#openfavoritesession" text="Favorite" />
+                                    <Separator prefWidth="10.0" />
+                                    <Button fx:id="ClearButton" mnemonicParsing="false" onAction="#clearloadedsession" text="Clear Session" />
                                 </items>
                               </ToolBar>
                               <VBox VBox.vgrow="ALWAYS">
@@ -170,9 +174,13 @@
                                           </HBox>
                                           <HBox alignment="CENTER_RIGHT">
                                              <children>
-                                                <Button fx:id="ClearButton" mnemonicParsing="false" onAction="#clearloadedsession" text="Clear Session" />
-                                                <Button fx:id="AddToFavoritesButton" mnemonicParsing="false" onAction="#addcreatedsessiontofavorites" text="Add To Favorites" HBox.hgrow="ALWAYS" />
                                                 <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#playcreatedsession" text="Play" />
+                                                <MenuButton fx:id="AddSessionAsMenuButton" mnemonicParsing="false" text="Add As">
+                                                  <items>
+                                                    <MenuItem fx:id="FavoriteMenuItem" mnemonicParsing="false" onAction="#addcreatedsessiontofavorites" text="Favorite " />
+                                                    <MenuItem fx:id="MissedSessionMenuItem" mnemonicParsing="false" onAction="#addasmissedsession" text="Missed Session" />
+                                                  </items>
+                                                </MenuButton>
                                                 <Button fx:id="SaveAsFileButton" mnemonicParsing="false" onAction="#savecreatedsessionasfile" text="Save As" />
                                                 <Button fx:id="ExportButton" mnemonicParsing="false" onAction="#exportcreatedsession" text="Export" />
                                              </children>

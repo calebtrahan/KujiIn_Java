@@ -17,10 +17,12 @@ import static kujiin.xml.Preferences.PROGRAM_ICON;
     // TODO Customize Ambience Does Not Set Ambience Enabled
         // Customize Ambience > Populate Session Creator Table Deletes All Playback Items
     // TODO Fix Session Complete Dialog So It Can Exit Program Or Return To Program (Return To Player Works)
+    // TODO Rearrange Creator UI So Buttons Fix
 
 // Additional Features To Add
-    // TODO Implement Add As... Missed Session To Creator Page
-
+    // TODO Finish Missed Session By Adding Session To Sessions With Sort Algorithm (Date)
+    // TODO Add Missed Session Toggle To Session Browser Filter
+    // TODO Add Presets In MenuBar On Set Duration (5 Mins, 10 Mins, 15, 30 1 hour...)
 
     // TODO Add Clear Session To Right Click On Menu Options
     // TODO Get Merge Logic On Add Items Functional

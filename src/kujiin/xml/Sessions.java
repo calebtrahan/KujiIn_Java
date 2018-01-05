@@ -64,6 +64,14 @@ public class Sessions {
     }
 
 // Session Methods
+    public void add(int index, Session session) {
+        if (Session == null) {Session = new ArrayList<>();}
+        if (session.hasItems()) {
+            Session.add(index, session);
+            sort();
+            marshall();
+        }
+    }
     public void add(Session session) {
         if (Session == null) {Session = new ArrayList<>();}
         if (session.hasItems()) {
