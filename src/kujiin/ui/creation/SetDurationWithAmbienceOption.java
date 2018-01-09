@@ -134,6 +134,33 @@ public class SetDurationWithAmbienceOption extends StyledStage {
         close();
     }
 
+// Presets
+    public void setfiveminutes() {
+        HoursSpinner.getValueFactory().setValue(0);
+        MinutesSpinner.getValueFactory().setValue(5);
+        SecondsSpinner.getValueFactory().setValue(0);
+    }
+    public void settenminutes() {
+        HoursSpinner.getValueFactory().setValue(0);
+        MinutesSpinner.getValueFactory().setValue(10);
+        SecondsSpinner.getValueFactory().setValue(0);
+    }
+    public void setfifteenminutes() {
+        HoursSpinner.getValueFactory().setValue(0);
+        MinutesSpinner.getValueFactory().setValue(15);
+        SecondsSpinner.getValueFactory().setValue(0);
+    }
+    public void setthirtyminutes() {
+        HoursSpinner.getValueFactory().setValue(0);
+        MinutesSpinner.getValueFactory().setValue(30);
+        SecondsSpinner.getValueFactory().setValue(0);
+    }
+    public void setonehour() {
+        HoursSpinner.getValueFactory().setValue(1);
+        MinutesSpinner.getValueFactory().setValue(0);
+        SecondsSpinner.getValueFactory().setValue(0);
+    }
+
 // Utility Methods
     private Duration getNewDuration() {
         Duration tempduration = Duration.ZERO;

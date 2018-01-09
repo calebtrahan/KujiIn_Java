@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,10 +29,12 @@ public class Session {
     private boolean missedsession;
     private int playcount;
     private int completedcount;
-    private LocalDate timestarted;
-    private LocalDate timefinished;
+    private String timestarted;
+    private String timefinished;
     private boolean completed = false;
     private List<Break> breaks;
+    @XmlTransient
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy MM dd H m s S");
     @XmlTransient
     private Break currentbreak;
 
@@ -159,14 +163,17 @@ public class Session {
         }
         return playbackItem;
     }
-    public LocalDate getTimestarted() {
-        return timestarted;
+    public LocalDateTime getTimestarted() {
+        return LocalDateTime.parse(timestarted, dateTimeFormatter);
     }
-    public LocalDate getTimefinished() {
-        return timefinished;
+    public LocalDateTime getTimefinished() {
+        return LocalDateTime.parse(timefinished, dateTimeFormatter);
     }
-    public void setTimefinished(LocalDate timefinished) {
-        this.timefinished = timefinished;
+    public void setTimestarted(LocalDateTime timestarted) {
+        this.timestarted = timestarted.format(dateTimeFormatter);
+    }
+    public void setTimefinished(LocalDateTime timefinished) {
+        this.timefinished = timefinished.format(dateTimeFormatter);
     }
     public boolean isCompleted() {
         return completed;
@@ -190,8 +197,11 @@ public class Session {
         System.out.println("Removed Item " + index);
         playbackItems.remove(index);
     }
+    public boolean isMissedsession() {
+        return missedsession;
+    }
 
-// Utility Methods
+    // Utility Methods
     public boolean hasCuts() {
         for (PlaybackItem i : getPlaybackItems()) {
             if (i.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT) {return true;}
@@ -240,10 +250,10 @@ public class Session {
 
 // Playback Methods
     public void startplayback() {
-        timestarted = LocalDate.now();
+        timestarted = LocalDateTime.now().format(dateTimeFormatter);
     }
     public void endplayback(boolean completed) {
-        setTimefinished(LocalDate.now());
+        setTimefinished(LocalDateTime.now());
         setCompleted(completed);
     }
     public void startbreak() {

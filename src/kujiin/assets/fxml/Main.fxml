@@ -292,6 +292,11 @@
                                                                                  <children>
                                                                                     <VBox prefHeight="162.0" prefWidth="210.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                                                        <children>
+                                                                                          <CheckBox fx:id="SessionBrowser_Filter_ShowMissedSessions" mnemonicParsing="false" text="Show Missed Sessions">
+                                                                                             <VBox.margin>
+                                                                                                <Insets top="5.0" />
+                                                                                             </VBox.margin>
+                                                                                          </CheckBox>
                                                                                           <VBox>
                                                                                              <children>
                                                                                                 <Label text="By Date Practiced">
@@ -431,6 +436,7 @@
                                                                         <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                                                                            <children>
                                                                               <Button fx:id="SessionBrowser_ViewNotesButton" disable="true" mnemonicParsing="false" onAction="#viewsessionnotes" text="View Notes" />
+                                                                              <Button fx:id="SessionBrowser_DeleteSessionButton" disable="true" mnemonicParsing="false" onAction="#deletesession" text="Delete Session" />
                                                                            </children>
                                                                         </HBox>
                                                                         <Label fx:id="SessionBrowser_Details_TotalDuration_Label" disable="true" text="Session Duration" />

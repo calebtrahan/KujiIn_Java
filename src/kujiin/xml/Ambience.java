@@ -22,9 +22,12 @@ public class Ambience {
     private int currentplaycount = 0;
     @XmlTransient
     private int currentplaybackhistorycount = 0;
+    @XmlTransient
+    private AvailableAmbiences availableAmbiences;
 
     public Ambience() {}
-    public Ambience(AvailableAmbiences availableAmbiences) {}
+    public Ambience(AvailableAmbiences availableAmbiences) {
+    }
 
 // Getters And Setters
     public void setAmbience(List<SoundFile> ambience) {
@@ -78,6 +81,24 @@ public class Ambience {
             return Ambience.get(0);
         }
     }
+    public SoundFile getpreviousambienceforplayback() {
+        if (PlaybackHistory == null) {PlaybackHistory = new ArrayList<>();}
+        try {
+            SoundFile nextambiencefile = Ambience.get(currentplaycount--);
+            currentplaycount--;
+            PlaybackHistory.add(nextambiencefile);
+            currentplaybackhistorycount++;
+            return nextambiencefile;
+        } catch (IndexOutOfBoundsException ignored) {
+            int lastindex = Ambience.size() - 1;
+            currentplaycount = lastindex;
+            PlaybackHistory.add(Ambience.get(lastindex));
+            currentplaybackhistorycount++;
+            return Ambience.get(lastindex);
+        }
+    }
+
+
     public SoundFile getnextambiencehistory() {
         try {
             currentplaybackhistorycount++;
@@ -151,6 +172,7 @@ public class Ambience {
         if (playbackItem.isRampOnly()) {maxduration = Duration.minutes(1);}
         else {maxduration = new Duration(playbackItem.getExpectedDuration());}
         int indexcount;
+        int addedcount = 0;
         if (playbackItem.getAmbience().hasAmbience()) {
             currentduration = playbackItem.getAmbience().gettotalDuration();
             SoundFile soundFile = playbackItem.getAmbience().get(playbackItem.getAmbience().getAmbience().size() - 1);
@@ -159,12 +181,14 @@ public class Ambience {
             currentduration = Duration.ZERO;
             indexcount = 0;
         }
-        while (currentduration.lessThan(maxduration)) {
+        int size = playbackItemAmbience.getAmbience().size();
+        while (currentduration.lessThan(maxduration) && addedcount < size) {
             try {
                 SoundFile filetoadd = playbackItemAmbience.getAmbience().get(indexcount);
                 add(filetoadd);
                 currentduration = currentduration.add(Duration.millis(filetoadd.getDuration()));
                 indexcount++;
+                addedcount++;
             }
             catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
         }
@@ -181,12 +205,14 @@ public class Ambience {
             currentduration = playbackItem.getAmbience().gettotalDuration();
         }
         int indexcount;
+        int addedcount = 0;
         Duration maxduration;
         int size = 0;
         if (playbackItemAmbience.hasAny()) { size = playbackItemAmbience.getAmbience().size(); }
         if (playbackItem.isRampOnly()) {maxduration = Duration.minutes(1);}
         else {maxduration = new Duration(playbackItem.getExpectedDuration());}
-        while (currentduration.lessThan(maxduration)) {
+        int maxsize = playbackItemAmbience.getAmbience().size();
+        while (currentduration.lessThan(maxduration) && addedcount < maxsize) {
             if (size > 1) {
                 Random random = new Random();
                 while (true) {
@@ -202,6 +228,7 @@ public class Ambience {
                 ambiencelist.add(filetoadd);
                 currentduration = currentduration.add(Duration.millis(filetoadd.getDuration()));
                 indexhistory.add(indexcount);
+                addedcount++;
             } catch (IndexOutOfBoundsException ignored) {}
         }
         setAmbience(ambiencelist);

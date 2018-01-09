@@ -143,6 +143,7 @@ public class MainController implements Initializable {
     public TableColumn<SessionBrowserTableItem, String> PracticedSessionListTable_ItemsColumn;
     public TableColumn<SessionBrowserTableItem, String> PracticedSessionListTable_DurationColumn;
     public Accordion SessionBrowser_Filter;
+    public CheckBox SessionBrowser_Filter_ShowMissedSessions;
     public CheckBox SessionBrowser_Filter_DateRange_From_Checkbox;
     public CheckBox SessionBrowser_Filter_DateRange_To_Checkbox;
     public CheckBox SessionBrowser_Filter_Duration_Min_Checkbox;
@@ -158,6 +159,7 @@ public class MainController implements Initializable {
     public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_ItemColumn;
     public TableColumn<TableItem_Number_Name_Duration, String> SessionBrowser_DetailsTable_TimePracticedColumn;
     public Button SessionBrowser_ViewNotesButton;
+    public Button SessionBrowser_DeleteSessionButton;
     public Label SessionBrowser_Details_TotalDuration_Label;
     public TextField SessionBrowser_Details_TotalDuration;
     // All Goals Pane
@@ -193,6 +195,8 @@ public class MainController implements Initializable {
     private ArrayList<PlaybackItem> createdtableplaybackitems;
     private Timeline updatecompletiontime;
     private Duration addduration = Duration.seconds(1.5);
+    // Progress Tab
+    private Session selectedsessionbrowsersession;
 
 // Getters And Setters
     public Preferences getPreferences() {
@@ -337,11 +341,15 @@ public class MainController implements Initializable {
                     MenuItem remove = new MenuItem("Remove");
                     remove.setOnAction(event1 -> removefromcreatortable());
 
+                    MenuItem clearsession = new MenuItem("Clear Session");
+                    clearsession.setOnAction(event1 -> clearloadedsession());
+
                     if (selectedindex > 0) {contextMenu.getItems().add(moveup);}
                     if (selectedindex < CreatedTableView.getItems().size() - 1) {contextMenu.getItems().add(movedown);}
                     contextMenu.getItems().add(durationmenu);
                     if (availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()).hasAny()) {contextMenu.getItems().add(ambiencemenu);}
                     contextMenu.getItems().add(remove);
+                    contextMenu.getItems().add(clearsession);
                     CreatedTableView.setContextMenu(contextMenu);
                 }
                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
@@ -524,7 +532,7 @@ public class MainController implements Initializable {
         }
         if ((createdsession != null && ! createdsession.getPlaybackItems().isEmpty()) && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
         createdsession = new Session();
-        populatetable();
+        populatecreatedsessiontable();
         displayStatusBarMessage("New Session Created", Duration.seconds(1.0));
         AddItemsMenu.requestFocus();
     }
@@ -539,7 +547,7 @@ public class MainController implements Initializable {
                 JAXBContext context = JAXBContext.newInstance(Session.class);
                 Unmarshaller createMarshaller = context.createUnmarshaller();
                 createdsession = (Session) createMarshaller.unmarshal(filetoload);
-                populatetable();
+                populatecreatedsessiontable();
                 displayStatusBarMessage("Opened Session From File: " + filetoload.getName(), Duration.seconds(2));
                 PlayButton.requestFocus();
             } catch (JAXBException e) {
@@ -566,7 +574,7 @@ public class MainController implements Initializable {
         else {createdsession = null;}
         if (selectASession.isAccepted()) {
             createdsession = selectASession.getSelectedsession();
-            populatetable();
+            populatecreatedsessiontable();
             displayStatusBarMessage("Recent Session Successfully Opened", Duration.seconds(1.0));
             PlayButton.requestFocus();
         }
@@ -589,7 +597,7 @@ public class MainController implements Initializable {
         else {createdsession = null;}
         if (selectASession.isAccepted()) {
             createdsession = selectASession.getSelectedsession();
-            populatetable();
+            populatecreatedsessiontable();
             displayStatusBarMessage("Favorite Session \"" + selectASession.getFavoriteSessionName() + "\" Loaded", Duration.seconds(2));
             PlayButton.requestFocus();
         }
@@ -632,7 +640,7 @@ public class MainController implements Initializable {
         }
         return items;
     }
-    private void add(int[] availableambienceindexes) {
+    private boolean add(int[] availableambienceindexes) {
         updatecompletiontime.stop();
         List<PlaybackItem> items = new ArrayList<>();
         for (int i : availableambienceindexes) {
@@ -667,102 +675,123 @@ public class MainController implements Initializable {
             }
             if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1 && createdsession.getplaybackitem(startindex).getCreationindex() == items.get(0).getCreationindex()) {
                 mergeitems(createdsession.getplaybackitem(startindex), createdsession.getplaybackitem(startindex + 1));
-                populatetable();
-                return;
+                populatecreatedsessiontable();
+                return true;
             }
+            populatecreatedsessiontable();
+            return true;
+        } else {
+            populatecreatedsessiontable();
+            return false;
         }
-        populatetable();
     }
     public void addallitems_kujiin() {
         int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-        add(indexes);
-        displayStatusBarMessage("Added 9 Playback Items", addduration);
+        if (add(indexes)) {
+            displayStatusBarMessage("Added 9 Playback Items", addduration);
+        }
     }
     public void addallitems_elements() {
         int[] indexes = {10, 11, 12, 13, 14};
-        add(indexes);
-        displayStatusBarMessage("Added 5 Playback Items", addduration);
+        if (add(indexes)) {
+            displayStatusBarMessage("Added 5 Playback Items", addduration);
+        }
     }
     public void add_QiGong() {
         int[] items = {0};
-        add(items);
-        displayStatusBarMessage("Added Qi-Gong To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Qi-Gong To Session", addduration);
+        }
     }
     public void addRin() {
         int[] items = {1};
-        add(items);
-        displayStatusBarMessage("Added Rin To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Rin To Session", addduration);
+        }
     }
     public void addKyo() {
         int[] items = {2};
-        add(items);
-        displayStatusBarMessage("Added Kyo To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Kyo To Session", addduration);
+        }
     }
     public void addToh() {
         int[] items = {3};
-        add(items);
-        displayStatusBarMessage("Added Toh To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Toh To Session", addduration);
+        }
     }
     public void addSha() {
         int[] items = {4};
-        add(items);
-        displayStatusBarMessage("Added Sha To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Sha To Session", addduration);
+        }
     }
     public void addKai() {
         int[] items = {5};
-        add(items);
-        displayStatusBarMessage("Added Kai To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Kai To Session", addduration);
+        }
     }
     public void addJin() {
         int[] items = {6};
-        add(items);
-        displayStatusBarMessage("Added Jin To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Jin To Session", addduration);
+        }
     }
     public void addRetsu() {
         int[] items = {7};
-        add(items);
-        displayStatusBarMessage("Added Retsu To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Retsu To Session", addduration);
+        }
     }
     public void addZai() {
         int[] items = {8};
-        add(items);
-        displayStatusBarMessage("Added Zai To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Zai To Session", addduration);
+        }
     }
     public void addZen() {
         int[] items = {9};
-        add(items);
-        displayStatusBarMessage("Added Zen To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Zen To Session", addduration);
+        }
     }
     public void addEarth() {
         int[] items = {10};
-        add(items);
-        displayStatusBarMessage("Added Earth To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Earth To Session", addduration);
+        }
     }
     public void addAir() {
         int[] items = {11};
-        add(items);
-        displayStatusBarMessage("Added Air To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Air To Session", addduration);
+        }
     }
     public void addFire() {
         int[] items = {12};
-        add(items);
-        displayStatusBarMessage("Added Fire To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Fire To Session", addduration);
+        }
     }
     public void addWater() {
         int[] items = {13};
-        add(items);
-        displayStatusBarMessage("Added Water To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Water To Session", addduration);
+        }
     }
     public void addVoid() {
         int[] items = {14};
-        add(items);
-        displayStatusBarMessage("Added Void To Session", addduration);
+        if (add(items)) {
+            displayStatusBarMessage("Added Void To Session", addduration);
+        }
     }
     public void setramponly() {
         if (createdtableselecteditem != null) {
             createdtableselecteditem.setRampOnly(true);
             createdtableselecteditem.setExpectedDuration(0.0);
-            populatetable();
+            populatecreatedsessiontable();
             syncbuttons();
         }
     }
@@ -789,7 +818,7 @@ public class MainController implements Initializable {
                     }
                 }
                 createdsession.calculateexpectedduration();
-                populatetable();
+                populatecreatedsessiontable();
                 displayStatusBarMessage("Duration Edited", Duration.seconds(1.5));
                 syncbuttons();
             } else {updatecompletiontime.play();}
@@ -799,14 +828,14 @@ public class MainController implements Initializable {
         if (createdtableselecteditem != null) {
             List<PlaybackItem> items = quickaddambience(QuickAddAmbienceType.REPEAT, Collections.singletonList(createdtableselecteditem));
             createdtableselecteditem = items.get(0);
-            populatetable();
+            populatecreatedsessiontable();
         }
     }
     public void quickaddambience_shuffle() {
         if (createdtableselecteditem != null) {
             List<PlaybackItem> items = quickaddambience(QuickAddAmbienceType.SHUFFLE, Collections.singletonList(createdtableselecteditem));
             createdtableselecteditem = items.get(0);
-            populatetable();
+            populatecreatedsessiontable();
         }
     }
     public void customizeambience() {
@@ -818,13 +847,13 @@ public class MainController implements Initializable {
             customizeAmbience.showAndWait();
             if (customizeAmbience.isAccepted()) {
                 createdtableplaybackitems.set(createdtableplaybackitems.indexOf(createdtableselecteditem), customizeAmbience.getPlaybackItem());
-                populatetable();
+                populatecreatedsessiontable();
             } else { updatecompletiontime.play(); }
         }
     }
     private void clearambience() {
         createdtableselecteditem.getAmbience().clearambience();
-        populatetable();
+        populatecreatedsessiontable();
     }
     public void moveupincreatortable() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
@@ -843,7 +872,7 @@ public class MainController implements Initializable {
                 else {Collections.swap(itemsinsession, selectedindex, selectedindex - 1);}
             } else {Collections.swap(itemsinsession, selectedindex, selectedindex - 1);}
             createdsession.setPlaybackItems(itemsinsession);
-            populatetable();
+            populatecreatedsessiontable();
         }
     }
     public void movedownincreatortable() {
@@ -863,7 +892,7 @@ public class MainController implements Initializable {
                 else {Collections.swap(itemsinsession, selectedindex, selectedindex + 1);}
             } else {Collections.swap(itemsinsession, selectedindex, selectedindex + 1);}
             createdsession.setPlaybackItems(itemsinsession);
-            populatetable();
+            populatecreatedsessiontable();
         }
 
     }
@@ -871,7 +900,7 @@ public class MainController implements Initializable {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1 && createdtableitems != null) {
             createdsession.removeplaybackitem(selectedindex);
-            populatetable();
+            populatecreatedsessiontable();
         }
     }
     private void mergeitems(PlaybackItem item1, PlaybackItem item2) {
@@ -924,7 +953,7 @@ public class MainController implements Initializable {
         updatecompletiontime.stop();
         if (createdsession != null && new ConfirmationDialog(preferences, "Clear Session", "Really Clear Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {
             createdsession = new Session();
-            populatetable();
+            populatecreatedsessiontable();
         } else { updatecompletiontime.play(); }
     }
     public void addasmissedsession() {
@@ -1018,7 +1047,7 @@ public class MainController implements Initializable {
         new Timeline(new KeyFrame(duration, ae -> CreatorStatusBar.setText(""))).play();
     }
     // Utility Methods
-    private void populatetable() {
+    private void populatecreatedsessiontable() {
         updatecompletiontime.stop();
         calculatedurationandestimatedcompletion();
         if (createdtableplaybackitems != null) {createdtableplaybackitems.clear();}
@@ -1129,6 +1158,7 @@ public class MainController implements Initializable {
         if (sessions.getSession() != null) {
             List<Session> filteredsessions = new ArrayList<>();
             for (Session i : sessions.getSession()) {
+                if (! SessionBrowser_Filter_ShowMissedSessions.isSelected() && i.isMissedsession()) {continue;}
                 if (SessionBrowser_Filter_DateRange_From_Checkbox.isSelected() && SessionBrowser_Filter_DateRange_From.getValue() != null) {
                     if (i.getDate_Practiced().isBefore(SessionBrowser_Filter_DateRange_From.getValue())) {continue;}
                 }
@@ -1161,19 +1191,23 @@ public class MainController implements Initializable {
         SessionBrowser_Details_TotalDuration.setText(null);
         SessionBrowser_Details_TotalDuration_Label.setDisable(item == null);
         SessionBrowser_Details_TotalDuration.setDisable(item == null);
+        SessionBrowser_DeleteSessionButton.setDisable(item == null);
         if (item != null) {
-            Session selectedsession = this.sessions.get(item.uuid);
+            selectedsessionbrowsersession = this.sessions.get(item.uuid);
             ObservableList<TableItem_Number_Name_Duration> sessionitems = FXCollections.observableArrayList();
             int count = 1;
-            for (PlaybackItem i : selectedsession.getPlaybackItems()) {
+            for (PlaybackItem i : selectedsessionbrowsersession.getPlaybackItems()) {
                 sessionitems.add(new TableItem_Number_Name_Duration(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getPracticeTime()))));
                 count++;
             }
             SessionBrowser_DetailsTable.setItems(sessionitems);
-            SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringSpelledOutShort(selectedsession.getSessionPracticedTime(), true));
-            SessionBrowser_Details_TotalDuration.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(selectedsession.getSessionPracticedTime(), Double.MAX_VALUE)));
-            SessionBrowser_ViewNotesButton.setDisable(selectedsession.getNotes() == null || selectedsession.getNotes().isEmpty());
-        } else {SessionBrowser_DetailsTable.setPlaceholder(new Label("Select A Session To View Details"));}
+            SessionBrowser_Details_TotalDuration.setText(Util.formatdurationtoStringSpelledOutShort(selectedsessionbrowsersession.getSessionPracticedTime(), true));
+            SessionBrowser_Details_TotalDuration.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(selectedsessionbrowsersession.getSessionPracticedTime(), Double.MAX_VALUE)));
+            SessionBrowser_ViewNotesButton.setDisable(selectedsessionbrowsersession.getNotes() == null || selectedsessionbrowsersession.getNotes().isEmpty());
+        } else {
+            selectedsessionbrowsersession = null;
+            SessionBrowser_DetailsTable.setPlaceholder(new Label("Select A Session To View Details"));
+        }
     }
     public void viewsessionnotes() {
         SessionBrowserTableItem item = PracticedSessionListTable.getSelectionModel().getSelectedItem();
@@ -1181,6 +1215,16 @@ public class MainController implements Initializable {
             EditSessionNotes editSessionNotes = new EditSessionNotes(sessions.get(item.uuid), "Session Notes", true);
             editSessionNotes.initModality(Modality.APPLICATION_MODAL);
             editSessionNotes.showAndWait();
+        }
+    }
+    public void deletesession() {
+        if (selectedsessionbrowsersession != null && new ConfirmationDialog(preferences, "Delete Session", "Really Delete Session?", "This Cannot Be Undone").getResult()) {
+            List<Session> sessionlist = sessions.getSession();
+            sessionlist.remove(selectedsessionbrowsersession);
+            sessions.setSession(sessionlist);
+            sessions.marshall();
+            populatesessionbrowsertable();
+            populategoalsdetailstable();
         }
     }
     public void editsessionnotes(Session session) {
@@ -1318,7 +1362,6 @@ public class MainController implements Initializable {
 
         }
     }
-
 
 // AllGoals Tab
     // Overview Tab Methods

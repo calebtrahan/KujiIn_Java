@@ -26,8 +26,8 @@
               <items>
                   <Menu fx:id="QuickAddMenu" mnemonicParsing="false" text="Quick Add">
                     <items>
-                      <MenuItem fx:id="QuickAddRepeatAmbience" mnemonicParsing="false" text="Repeat Available Ambience" />
-                        <MenuItem fx:id="QuickAddShuffleAmbience" mnemonicParsing="false" text="Shuffle Available Ambience" />
+                      <MenuItem fx:id="QuickAddRepeatAmbience" mnemonicParsing="false" text="Repeat" />
+                        <MenuItem fx:id="QuickAddShuffleAmbience" mnemonicParsing="false" text="Shuffle" />
                     </items>
                   </Menu>
                 <MenuItem fx:id="AddFromAmbienceDirectory" mnemonicParsing="false" text="From Ambience Directory" />

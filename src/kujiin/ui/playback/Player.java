@@ -4,6 +4,8 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -14,10 +16,9 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -43,7 +44,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static kujiin.util.enums.PlayerState.*;
 
@@ -59,17 +64,31 @@ public class Player extends Stage {
     public CheckBox ReferenceToggleCheckBox;
     public ChoiceBox<String> ReferenceTypeChoiceBox;
     public ScrollPane ReferenceContentPane;
-    // Playlist
+    // Sidebar
+        // Playlist
+    public Tab PlaylistTab;
     public TableView<PlaylistTableItem> PlaylistTableView;
     public TableColumn<PlaylistTableItem, String> NameColumn;
     public TableColumn<PlaylistTableItem, String> DurationColumn;
     public TableColumn<PlaylistTableItem, String> PercentColumn;
-    // AllGoals Progress
-    public Label GoalTopLabel;
-    public Label SessionPartElapsedTime;
-    public ProgressBar CurrentGoalProgress;
-    public Label CurrentGoalPercentage;
-    public Label SessionPartGoalTime;
+        // Ambience
+    public Tab AmbienceTab;
+    public TableView<AmbiencePlaylistTableItem> AmbiencePlaylistTable;
+    public TableColumn<AmbiencePlaylistTableItem, Integer> AmbiencePlaylistNumberColumn;
+    public TableColumn<AmbiencePlaylistTableItem, String> AmbiencePlaylistNameColumn;
+    public TableColumn<AmbiencePlaylistTableItem, String> AmbiencePlaylistDurationColumn;
+    public ProgressBar CurrentAmbienceProgressBar;
+    public Label CurrentAmbiencePercentage;
+    public Button AmbienceShuffleButton;
+    public Button AmbiencePreviousButton;
+    public Button AmbiencePauseButton;
+    public Button AmbienceNextButton;
+        // Goals
+    public Tab GoalsTab;
+    public HBox GoalLabels;
+    public Label Goals_SessionPartPracticedTime;
+    public Label Goals_SessionPartGoalTime;
+    public ProgressIndicator GoalProgress;
     // Session Progress
     public Label SessionCurrentTime;
     public ProgressBar SessionProgress;
@@ -182,10 +201,7 @@ public class Player extends Stage {
             setScene(defaultscene);
             setTitle("Session Player");
             updateplaylist();
-            NameColumn.setCellValueFactory(cellData -> cellData.getValue().itemname);
-            DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().duration);
-            PercentColumn.setCellValueFactory(cellDate -> cellDate.getValue().percentcompleted);
-            PlaylistTableView.setOnMouseClicked(Event::consume);
+            setupTables();
             setPlayerstate(IDLE);
             setupTooltips();
             setupIcons();
@@ -232,9 +248,26 @@ public class Player extends Stage {
             ReferenceTypeChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList("html", "txt")));
             ReferenceControls.setDisable(true);
             updategoalsui();
+            updateambienceui();
             getScene().addEventHandler(KeyEvent.KEY_PRESSED, SpaceBarPressed);
             new Timeline(new KeyFrame(Duration.millis(100), ae -> {PlayButton.requestFocus();})).play();
         } catch (IOException ignored) {ignored.printStackTrace();}
+    }
+    private void setupTables() {
+        NameColumn.setCellValueFactory(cellData -> cellData.getValue().itemname);
+        DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().duration);
+        PercentColumn.setCellValueFactory(cellDate -> cellDate.getValue().percentcompleted);
+        PlaylistTableView.setOnMouseClicked(Event::consume);
+        AmbiencePlaylistNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
+        AmbiencePlaylistNameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+        AmbiencePlaylistDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
+        AmbiencePlaylistTable.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown() && event.getClickCount() == 2 && playerState == PLAYING) {
+                int index = AmbiencePlaylistTable.getSelectionModel().getSelectedIndex();
+                SoundFile i = selectedPlaybackItem.getAmbience().get(index);
+                playambience(i);
+            }
+        });
     }
     private void setupTooltips() {
         PlayButton.setTooltip(new Tooltip("Play"));
@@ -247,6 +280,10 @@ public class Player extends Stage {
             PlayButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PLAY, 20.0));
             PauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PAUSE, 20.0));
             StopButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_STOP, 20.0));
+            AmbienceNextButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_NEXT, 20.0));
+            AmbiencePreviousButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PREVIOUS, 20.0));
+            AmbiencePauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PAUSE, 20.0));
+            AmbienceShuffleButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_SHUFFLE, 20.0));
         }
 //        if (dt == IconDisplayType.ICONS_ONLY) {
 //            PlayButton.setText("");
@@ -266,7 +303,7 @@ public class Player extends Stage {
         return exitprogram;
     }
 
-    // UI Methods
+// UI Methods
     public void playbuttonpressed() {
         switch (playerState) {
             case IDLE:
@@ -365,21 +402,10 @@ public class Player extends Stage {
             ReferenceContentPane.setContent(ta);
         }
     }
-    private void updateplaylist() {
-        PlaylistTableView.getItems().clear();
-        ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
-        for (PlaybackItem i : SessionInProgress.getPlaybackItems()) {
-            float totalprogress = (float) i.getPracticeTime() / (float) i.getExpectedDuration();
-            int percentage = new Double(totalprogress * 100).intValue();
-            String progress = Util.formatdurationtoStringDecimalWithColons(new Duration(i.getPracticeTime())) + " > " + Util.formatdurationtoStringDecimalWithColons(new Duration(i.getExpectedDuration()));
-            playlistitems.add(new PlaylistTableItem(i.getName(), progress, percentage + "%"));
-        }
-        PlaylistTableView.setItems(playlistitems);
-        PlaylistTableView.getSelectionModel().select(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem));
-    }
 
 // Playback
     // UI Update
+        // Player
     private void updateplayerui() {
         PlayerState p = playerState;
         if (p == PLAYING || p == FADING_PLAY || p == FADING_PAUSE || p == FADING_RESUME || p == FADING_STOP) {
@@ -403,32 +429,9 @@ public class Player extends Stage {
                 if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));}
                 else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration().subtract(SessionInProgress.getSessionPracticedTime())));}
                 updategoalsui();
+                updateambienceui();
             } catch (Exception ignored) {ignored.printStackTrace();}
         }
-    }
-    private void updategoalsui() {
-        String goalprogressandpercentage;
-        String goaltime;
-        Double percentage;
-        if (selectedPlaybackItem != null && AllGoals.getplaybackItemGoals(selectedPlaybackItem.getCreationindex()) != null) {
-            PlaybackItemGoals playbackItemGoals = AllGoals.getplaybackItemGoals(selectedPlaybackItem.getCreationindex());
-            Goal currentgoal = playbackItemGoals.getCurrentGoal();
-            Duration practiceduration = sessions.gettotalpracticedtime(selectedPlaybackItem, false);
-            practiceduration = practiceduration.add(SessionInProgress.getSessionPracticedTime());
-            if (currentgoal != null) {percentage = (practiceduration.toMillis() / currentgoal.getDuration().toMillis()) * 100;}
-            else {percentage = 0.0;}
-            goalprogressandpercentage = String.format("%s (%.1f%%)", Util.formatdurationtoStringDecimalWithColons(practiceduration), percentage);
-            percentage /= 100;
-            if (currentgoal != null) {goaltime = Util.formatdurationtoStringDecimalWithColons(currentgoal.getDuration());}
-            else {goaltime = "-";}
-        } else {
-            goalprogressandpercentage = "No Goal Set";
-            goaltime = "-";
-            percentage = 0.0;
-        }
-        CurrentGoalProgress.setProgress(percentage);
-        CurrentGoalPercentage.setText(goalprogressandpercentage);
-        SessionPartGoalTime.setText(goaltime);
     }
     private void toggleplayerbuttons() {
         if (playerState == null) {return;}
@@ -448,6 +451,10 @@ public class Player extends Stage {
         StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
         StopMenuItem.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
         AmbienceMenu.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
+        AmbienceShuffleButton.setDisable(! playing);
+        AmbiencePreviousButton.setDisable(! playing);
+        AmbiencePauseButton.setDisable(! playing);
+        AmbienceNextButton.setDisable(! playing);
 //        ReferenceControls.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
 //        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
 //            String playbuttontext = "Play";
@@ -483,6 +490,111 @@ public class Player extends Stage {
         EntrainmentVolume.setDisable(! enabled);
         if (selectedPlaybackItem.getAmbience().isEnabled()) {AmbienceVolume.setDisable(! enabled);}
     }
+        // Playlist
+    private void updateplaylist() {
+        PlaylistTableView.getItems().clear();
+        ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
+        for (PlaybackItem i : SessionInProgress.getPlaybackItems()) {
+            float totalprogress = (float) i.getPracticeTime() / (float) i.getExpectedDuration();
+            int percentage = new Double(totalprogress * 100).intValue();
+            String progress = Util.formatdurationtoStringDecimalWithColons(new Duration(i.getPracticeTime())) + " > " + Util.formatdurationtoStringDecimalWithColons(new Duration(i.getExpectedDuration()));
+            playlistitems.add(new PlaylistTableItem(i.getName(), progress, percentage + "%"));
+        }
+        PlaylistTableView.setItems(playlistitems);
+        PlaylistTableView.getSelectionModel().select(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem));
+    }
+        // Ambience
+    private void populateambienceplaylist() {
+        ObservableList<AmbiencePlaylistTableItem> items = FXCollections.observableArrayList();
+        List<SoundFile> ambience = selectedPlaybackItem.getAmbience().getAmbience();
+        int count = 1;
+        for (SoundFile i : ambience) {
+            items.add(new AmbiencePlaylistTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getDuration()))));
+            count++;
+        }
+        AmbiencePlaylistTable.setItems(items);
+    }
+    private void updateambienceui() {
+        if (selectedPlaybackItem == null || ! selectedPlaybackItem.getAmbience().hasAmbience()) {
+            AmbienceTab.setDisable(true);
+            return;
+        }
+        if (ambienceplayer != null) {
+            AmbienceTab.setDisable(false);
+            if (currentambiencesoundfile != null) {
+                double percentage;
+                percentage = ambienceplayer.getCurrentTime().toMillis() / ambienceplayer.getTotalDuration().toMillis();
+                CurrentAmbienceProgressBar.setProgress(percentage);
+                String name;
+                name = currentambiencesoundfile.getName();
+                if (name.length() > 24) { name = name.substring(0, 24); }
+                String percenttext = String.format("(%.1f%%)", percentage * 100);
+                CurrentAmbiencePercentage.setText(name + " " + percenttext);
+            }
+        } else {
+            CurrentAmbiencePercentage.setText("Nothing Playing");
+            CurrentAmbienceProgressBar.setProgress(0.0);
+        }
+    }
+    public void nextambiencebuttonpressed() {
+        playnextambience();
+    }
+    public void previousambiencebuttonpressed() {
+        playpreviousambience();
+    }
+    public void pauseambiencebuttonpressed() {
+        if (selectedPlaybackItem != null && currentambiencesoundfile != null) {
+            switch (ambienceplayer.getStatus()) {
+                case PAUSED:
+                    resumeambience();
+                    // TODO Set Play Button Icon Here
+                    break;
+                case PLAYING:
+                    pauseambience();
+                    // TODO Set Pause Button Icon Here
+                    break;
+            }
+        }
+    }
+    public void shuffleambiencebuttonpressed() {
+        if (selectedPlaybackItem != null && selectedPlaybackItem.getAmbience().hasAmbience()) {
+            List<SoundFile> ambiencelist = selectedPlaybackItem.getAmbience().getAmbience();
+            while (true) {
+                Collections.shuffle(ambiencelist);
+                if (ambiencelist.size() > 2) {
+                    if (ambiencelist.get(0).equals(currentambiencesoundfile) && ! ambiencelist.get(1).equals(currentambiencesoundfile)) {break;}
+                } else { break; }
+            }
+            selectedPlaybackItem.getAmbience().setAmbience(ambiencelist);
+            updateambienceui();
+        }
+    }
+        // Goals
+    private void updategoalsui() {
+            Duration practiceduration = sessions.gettotalpracticedtime(selectedPlaybackItem, false);
+            practiceduration = practiceduration.add(SessionInProgress.getSessionPracticedTime());
+            String practicetime = Util.formatdurationtoStringSpelledOut(practiceduration, 186.0);
+            Goals_SessionPartPracticedTime.setText(practicetime);
+            String goaltime;
+            Double percentage;
+            if (selectedPlaybackItem != null && AllGoals.getplaybackItemGoals(selectedPlaybackItem.getCreationindex()) != null) {
+                PlaybackItemGoals playbackItemGoals = AllGoals.getplaybackItemGoals(selectedPlaybackItem.getCreationindex());
+                Goal currentgoal = playbackItemGoals.getCurrentGoal();
+                if (currentgoal != null) {percentage = (practiceduration.toMillis() / currentgoal.getDuration().toMillis());}
+                else {percentage = 0.0;}
+//            percentagetext = String.format("(%.1f%%)", percentage * 100);
+                if (currentgoal != null) {goaltime = Util.formatdurationtoStringSpelledOut(currentgoal.getDuration(), 186.0);}
+                else {goaltime = "No Goal Set";}
+            } else {
+//            percentagetext = "No Goal Set";
+                goaltime = "No Goal Set";
+                percentage = 0.0;
+            }
+            Goals_SessionPartGoalTime.setText(goaltime);
+            GoalProgress.setDisable(percentage == 0.0);
+            if (percentage > 0.0) { GoalProgress.setProgress(percentage); }
+            else {GoalProgress.setProgress(0.0);}
+        }
     // Playback Methods
     private void setupsession() {
         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
@@ -490,6 +602,7 @@ public class Player extends Stage {
         SessionInProgress.calculateactualduration();
         volume_unbindentrainment();
         SessionInProgress.addPlaycount();
+        SessionInProgress.setTimestarted(LocalDateTime.now());
     }
     private void start() {
         updateuitimeline.play();
@@ -559,6 +672,7 @@ public class Player extends Stage {
             volume_bindentrainment();
         }
         if (selectedPlaybackItem.getAmbience().isEnabled()) {
+            populateambienceplaylist();
             if (currentambiencevolume == null) { currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume(); }
             volume_unbindambience();
             selectedPlaybackItem.getAmbience().resetplaycount();
@@ -582,6 +696,7 @@ public class Player extends Stage {
     private void resume() {
         updateuitimeline.play();
         volume_unbindentrainment();
+        SessionInProgress.endbreak();
         entrainmentplayer.play();
         if (fade_entrainment_resume != null && sessionparttimeleft().greaterThan(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_resume_value()))) {
             entrainmentplayer.setVolume(0.0);
@@ -613,6 +728,7 @@ public class Player extends Stage {
     }
     private void pause() {
         volume_unbindentrainment();
+        SessionInProgress.startbreak();
         if (fade_entrainment_pause != null && sessionparttimeleft().greaterThan(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_pause_value()))) {
             if (selectedPlaybackItem.getAmbience().isEnabled() && fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
             setPlayerstate(FADING_PAUSE);
@@ -634,61 +750,6 @@ public class Player extends Stage {
         if (selectedPlaybackItem.getAmbience().isEnabled()) {
             volume_unbindambience();
             ambienceplayer.pause();
-        }
-    }
-    private void playnextentrainment() {
-        try {
-            volume_unbindentrainment();
-            entrainmentplayer.dispose();
-            entrainmentplayer = null;
-            entrainmentplayer = new MediaPlayer(new Media(availableEntrainments.getsessionpartEntrainment(selectedPlaybackItem).getFreq().getFile().toURI().toString()));
-            entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
-            entrainmentplayer.setOnError(this::entrainmenterror);
-            entrainmentplayer.setVolume(currententrainmentvolume);
-            entrainmentplayer.play();
-            entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
-        } catch (IndexOutOfBoundsException ignored) {
-            entrainmentplayer.dispose();
-            cleanupPlayersandAnimations();
-        }
-    }
-    private void playnextambience() {
-        try {
-            volume_unbindambience();
-            ambienceplayer.dispose();
-            ambienceplayer = null;
-            currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextambienceforplayback();
-            ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
-            ambienceplayer.setOnEndOfMedia(this::playnextambience);
-            ambienceplayer.setOnError(this::ambienceerror);
-            ambienceplayer.setVolume(currentambiencevolume);
-            ambienceplayer.play();
-            ambienceplayer.setOnPlaying(this::volume_bindambience);
-        } catch (IndexOutOfBoundsException ignored) {ambienceplayer.dispose();}
-    }
-    public void playpreviousambiencefromhistory() {
-        SoundFile previousambiencefile = selectedPlaybackItem.getAmbience().getpreviousambiencehistory();
-        if (previousambiencefile != null) {
-            volume_unbindambience();
-            ambienceplayer = new MediaPlayer(new Media(previousambiencefile.getFile().toURI().toString()));
-            ambienceplayer.setOnEndOfMedia(this::playnextambience);
-            ambienceplayer.setOnError(this::ambienceerror);
-            ambienceplayer.setVolume(currentambiencevolume);
-            ambienceplayer.play();
-            ambienceplayer.setOnPlaying(this::volume_bindambience);
-        }
-    }
-    public void playnextambiencefromhistory() {
-
-        SoundFile nextambiencefile = selectedPlaybackItem.getAmbience().getnextambiencehistory();
-        if (nextambiencefile != null) {
-            volume_unbindambience();
-            ambienceplayer = new MediaPlayer(new Media(nextambiencefile.getFile().toURI().toString()));
-            ambienceplayer.setOnEndOfMedia(this::playnextambience);
-            ambienceplayer.setOnError(this::ambienceerror);
-            ambienceplayer.setVolume(currentambiencevolume);
-            ambienceplayer.play();
-            ambienceplayer.setOnPlaying(this::volume_bindambience);
         }
     }
     private void stop() {
@@ -745,6 +806,7 @@ public class Player extends Stage {
     private void transition() {
         selectedPlaybackItem.updateduration(new Duration(selectedPlaybackItem.getExpectedDuration()));
         updategoalsui();
+        updateambienceui();
         if (Preferences.getSessionOptions().getAlertfunction() && ! selectedPlaybackItem.equals(SessionInProgress.getPlaybackItems().get(SessionInProgress.getPlaybackItems().size() - 1))) {
             Media alertmedia = new Media(Preferences.getSessionOptions().getAlertfilelocation());
             MediaPlayer alertplayer = new MediaPlayer(alertmedia);
@@ -763,6 +825,83 @@ public class Player extends Stage {
             progresstonextsessionpart();
         }
     }
+    // Entrainment
+    private void playnextentrainment() {
+        try {
+            volume_unbindentrainment();
+            entrainmentplayer.dispose();
+            entrainmentplayer = null;
+            entrainmentplayer = new MediaPlayer(new Media(availableEntrainments.getsessionpartEntrainment(selectedPlaybackItem).getFreq().getFile().toURI().toString()));
+            entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
+            entrainmentplayer.setOnError(this::entrainmenterror);
+            entrainmentplayer.setVolume(currententrainmentvolume);
+            entrainmentplayer.play();
+            entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
+        } catch (IndexOutOfBoundsException ignored) {
+            entrainmentplayer.dispose();
+            cleanupPlayersandAnimations();
+        }
+    }
+    // Ambience
+    private void pauseambience() {
+        if (playerState == PLAYING) {
+            AmbiencePauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PLAY, 20.0));
+            ambienceplayer.pause();
+        }
+    }
+    private void resumeambience() {
+        if (playerState == PLAYING) {
+            AmbiencePauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PAUSE, 20.0));
+            ambienceplayer.play();
+        }
+    }
+    private void playambience(SoundFile soundFile) {
+        volume_unbindambience();
+        ambienceplayer.dispose();
+        ambienceplayer = null;
+        currentambiencesoundfile = soundFile;
+        ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
+        ambienceplayer.setOnEndOfMedia(this::playnextambience);
+        ambienceplayer.setOnError(this::ambienceerror);
+        ambienceplayer.setVolume(currentambiencevolume);
+        ambienceplayer.play();
+        ambienceplayer.setOnPlaying(() -> {
+            volume_bindambience();
+            updateambienceui();
+            AmbiencePlaylistTable.getSelectionModel().select(selectedPlaybackItem.getAmbience().getAmbience().indexOf(soundFile));
+        });
+    }
+    private void playnextambience() {
+        playambience(selectedPlaybackItem.getAmbience().getnextambienceforplayback());
+    }
+    private void playpreviousambience() {
+        playambience(selectedPlaybackItem.getAmbience().getpreviousambienceforplayback());
+    }
+    public void playpreviousambiencefromhistory() {
+        SoundFile previousambiencefile = selectedPlaybackItem.getAmbience().getpreviousambiencehistory();
+        if (previousambiencefile != null) {
+            volume_unbindambience();
+            ambienceplayer = new MediaPlayer(new Media(previousambiencefile.getFile().toURI().toString()));
+            ambienceplayer.setOnEndOfMedia(this::playnextambience);
+            ambienceplayer.setOnError(this::ambienceerror);
+            ambienceplayer.setVolume(currentambiencevolume);
+            ambienceplayer.play();
+            ambienceplayer.setOnPlaying(this::volume_bindambience);
+        }
+    }
+    public void playnextambiencefromhistory() {
+        SoundFile nextambiencefile = selectedPlaybackItem.getAmbience().getnextambiencehistory();
+        if (nextambiencefile != null) {
+            volume_unbindambience();
+            ambienceplayer = new MediaPlayer(new Media(nextambiencefile.getFile().toURI().toString()));
+            ambienceplayer.setOnEndOfMedia(this::playnextambience);
+            ambienceplayer.setOnError(this::ambienceerror);
+            ambienceplayer.setVolume(currentambiencevolume);
+            ambienceplayer.play();
+            ambienceplayer.setOnPlaying(this::volume_bindambience);
+        }
+    }
+    // End Of Session
     private void reset() {
         PlayButton.setDisable(false);
         PlayButton.setTooltip(new Tooltip("Replay"));
@@ -789,37 +928,40 @@ public class Player extends Stage {
         setPlayerstate(STOPPED);
         // TODO Prompt For Export
         updategoalsui();
+        updateambienceui();
         reset();
-        SessionInProgress.addCompletedcount();
-        final Session sessioninprogress = SessionInProgress;
-        try {
-            SessionComplete sessionComplete = new SessionComplete(SessionInProgress, true);
-            sessionComplete.initModality(Modality.APPLICATION_MODAL);
-            sessionComplete.show();
-            sessionComplete.setOnHidden(event -> {
-                if (sessionComplete.needtosetNotes()) {sessioninprogress.setNotes(sessionComplete.getNotes());}
-                if (AllGoals.sessionhasgoalscompleted()) {
-                    GoalsCompletedDialog goalsCompletedDialog = new GoalsCompletedDialog(AllGoals);
-                    goalsCompletedDialog.initModality(Modality.APPLICATION_MODAL);
-                    goalsCompletedDialog.show();
-                }
-                if (sessionComplete.getSessionCompleteDirections() != null) {
-                    switch (sessionComplete.getSessionCompleteDirections()) {
-                        case EXITPROGRAM:
-                            exitprogram = true;
-                            close();
-                            break;
-                        case KEEPPLAYEROPEN:
-                            break;
-                        case CLOSEPLAYER:
-                            close();
-                            break;
+        if (! testingmode) {
+            SessionInProgress.addCompletedcount();
+            final Session sessioninprogress = SessionInProgress;
+            try {
+                SessionComplete sessionComplete = new SessionComplete(SessionInProgress, true);
+                sessionComplete.initModality(Modality.APPLICATION_MODAL);
+                sessionComplete.show();
+                sessionComplete.setOnHidden(event -> {
+                    if (sessionComplete.needtosetNotes()) {sessioninprogress.setNotes(sessionComplete.getNotes());}
+                    if (AllGoals.sessionhasgoalscompleted()) {
+                        GoalsCompletedDialog goalsCompletedDialog = new GoalsCompletedDialog(AllGoals);
+                        goalsCompletedDialog.initModality(Modality.APPLICATION_MODAL);
+                        goalsCompletedDialog.show();
                     }
-                }
-            });
-        } catch (Exception e) {e.printStackTrace();}
-        SessionInProgress = sessioninprogress;
-        if (! testingmode) { sessions.add(SessionInProgress); }
+                    if (sessionComplete.getSessionCompleteDirections() != null) {
+                        switch (sessionComplete.getSessionCompleteDirections()) {
+                            case EXITPROGRAM:
+                                exitprogram = true;
+                                closedialog();
+                                break;
+                            case KEEPPLAYEROPEN:
+                                break;
+                            case CLOSEPLAYER:
+                                closedialog();
+                                break;
+                        }
+                    }
+                });
+            } catch (Exception e) {e.printStackTrace();}
+            SessionInProgress = sessioninprogress;
+            sessions.add(SessionInProgress);
+        }
         SessionInProgress = null;
     }
     private boolean endsessionprematurely(boolean resetdialogcontrols) {
@@ -830,6 +972,7 @@ public class Player extends Stage {
             if (! testingmode) { sessions.add(SessionInProgress); }
             if (resetdialogcontrols) {
                 updategoalsui();
+                updateambienceui();
                 reset();
                 cleanupPlayersandAnimations();
             }
@@ -1249,13 +1392,13 @@ public class Player extends Stage {
                 break;
         }
     }
-    public void closedialog() {}
+    private void closedialog() {close();}
 
 
     public static class PlaylistTableItem {
-        public StringProperty itemname;
-        public StringProperty duration;
-        public StringProperty percentcompleted;
+        StringProperty itemname;
+        StringProperty duration;
+        StringProperty percentcompleted;
 
         public PlaylistTableItem(String itemname, String duration, String percentcompleted) {
             this.itemname = new SimpleStringProperty(itemname);
@@ -1263,5 +1406,16 @@ public class Player extends Stage {
             this.percentcompleted = new SimpleStringProperty(percentcompleted);
         }
 
+    }
+    class AmbiencePlaylistTableItem {
+        public IntegerProperty number;
+        public StringProperty name;
+        public StringProperty duration;
+
+        public AmbiencePlaylistTableItem(int number, String name, String duration) {
+            this.number = new SimpleIntegerProperty(number);
+            this.name = new SimpleStringProperty(name);
+            this.duration = new SimpleStringProperty(duration);
+        }
     }
 }

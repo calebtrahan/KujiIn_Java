@@ -52,6 +52,9 @@ public class Preferences {
     public static final Image ICON_MOVEUP = new Image(new File(DIRECTORYICONS, "MoveUp.png").toURI().toString());
     public static final Image ICON_PAUSE = new Image(new File(DIRECTORYICONS, "Pause.png").toURI().toString());
     public static final Image ICON_PLAY = new Image(new File(DIRECTORYICONS, "Play.png").toURI().toString());
+    public static final Image ICON_NEXT = new Image(new File(DIRECTORYICONS, "Next.png").toURI().toString());
+    public static final Image ICON_PREVIOUS = new Image(new File(DIRECTORYICONS, "Previous.png").toURI().toString());
+    public static final Image ICON_SHUFFLE = new Image(new File(DIRECTORYICONS, "Shuffle.png").toURI().toString());
     public static final Image ICON_RECENTSESSIONS = new Image(new File(DIRECTORYICONS, "RecentlyPlayed.png").toURI().toString());
     public static final Image ICON_CLEARSESSION = new Image(new File(DIRECTORYICONS, "ClearSession.png").toURI().toString());
     public static final Image ICON_SETTINGS = new Image(new File(DIRECTORYICONS, "Settings.png").toURI().toString());
@@ -70,7 +73,7 @@ public class Preferences {
     public final static File TESTFILE = new File(SOUNDDIRECTORY, "Test.mp3");
     // Name Constants
     public static final ArrayList<String> ALLNAMES = new ArrayList<>(Arrays.asList("Qi-Gong", "Rin", "Kyo", "Toh", "Sha", "Kai", "Jin", "Retsu", "Zai", "Zen", "Earth", "Air", "Fire", "Water", "Void"));
-/// Default Option Values
+// Default Option Values
     // Program Preferences
     private static final Boolean DEFAULT_TOOLTIPS_OPTION = true;
     private static final Boolean DEFAULT_HELP_DIALOGS_OPTION = true;
