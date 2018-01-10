@@ -122,11 +122,11 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
                     if (event.isPrimaryButtonDown() && event.getClickCount() == 2) { preview(); }
                 }
             });
-            if (playbackItem.getAmbience().getAmbience() != null) {
-                for (SoundFile i : playbackItem.getAmbience().getAmbience()) {ambience.add(i);}
+            if (playbackItem.getAmbience().getSessionAmbience() != null) {
+                for (SoundFile i : playbackItem.getAmbience().getSessionAmbience()) {ambience.addPreset(i);}
                 populatetable();
             }
-            if (ambience.getAmbience() == null || ambience.getAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
+            if (ambience.getSessionAmbience() == null || ambience.getSessionAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
             else {setTitle("Customize Ambience"); populatetable();}
 //            NumberColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(1 / 5));
 //            NameColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(3 / 5));
@@ -147,7 +147,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
             selectAvailableAmbience.initModality(Modality.APPLICATION_MODAL);
             selectAvailableAmbience.showAndWait();
             if (selectAvailableAmbience.isAccepted() && ! selectAvailableAmbience.getAmbiencetoadd().isEmpty()) {
-                for (SoundFile i : selectAvailableAmbience.getAmbiencetoadd()) {ambience.add(i);}
+                for (SoundFile i : selectAvailableAmbience.getAmbiencetoadd()) {ambience.addPreset(i);}
                 populatetable();
             } else {syncbuttons();}
         } else {
@@ -191,7 +191,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
                 clearambience = true;
             }
         }
-        ambience.addavailableambience_repeat(playbackItem, playbackItemAmbience, clearambience);
+        ambience.quickadd_repeat(playbackItem, clearambience);
         populatetable();
         AcceptButton.requestFocus();
     }
@@ -202,14 +202,14 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
                 clearambience = true;
             }
         }
-        ambience.addavailableambience_shuffle(playbackItem, playbackItemAmbience, clearambience);
+        ambience.quickadd_shuffle(playbackItem, clearambience);
         populatetable();
         AcceptButton.requestFocus();
     }
     public void removefromtable() {
         int selectedindex = AddOrEditAmbienceTable.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1) {
-            ambience.remove(selectedindex);
+            ambience.removePreset(selectedindex);
             populatetable();
             AddMenu.requestFocus();
         }
@@ -217,7 +217,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     public void preview() {
         int selectedindex = AddOrEditAmbienceTable.getSelectionModel().getSelectedIndex();
         if (selectedindex != -1) {
-            PreviewFile previewFile = new PreviewFile(ambience.getAmbience().get(selectedindex).getFile());
+            PreviewFile previewFile = new PreviewFile(ambience.getSessionAmbience().get(selectedindex).getFile());
             previewFile.initOwner(this);
             previewFile.initModality(Modality.APPLICATION_MODAL);
             previewFile.showAndWait();
@@ -236,9 +236,9 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
                     alert.showAndWait();
                     break;
                 default:
-                    List<SoundFile> newambiencelist = ambience.getAmbience();
+                    List<SoundFile> newambiencelist = ambience.getSessionAmbience();
                     Collections.swap(newambiencelist, selectedindex, selectedindex -1);
-                    ambience.setAmbience(newambiencelist);
+                    ambience.setSessionAmbience(newambiencelist);
                     populatetable();
                     break;
             }
@@ -256,9 +256,9 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
                     alert.initOwner(this);
                     alert.showAndWait();
                 } else {
-                    List<SoundFile> newambiencelist = ambience.getAmbience();
+                    List<SoundFile> newambiencelist = ambience.getSessionAmbience();
                     Collections.swap(newambiencelist, selectedindex, selectedindex + 1);
-                    ambience.setAmbience(newambiencelist);
+                    ambience.setSessionAmbience(newambiencelist);
                     populatetable();
                 }
             }
@@ -266,7 +266,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     }
     public void accept() {
         ambience.setEnabled(ambience.hasAmbience());
-        playbackItem.getAmbience().setAmbience(ambience.getAmbience());
+        playbackItem.getAmbience().setSessionAmbience(ambience.getSessionAmbience());
         playbackItem.getAmbience().setEnabled(ambience.isEnabled());
         accepted = ambience.hasAmbience();
         close();
@@ -278,7 +278,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
         if (ambience.hasAmbience()) {
             ObservableList<AddOrEditAmbienceTableItem> items = FXCollections.observableArrayList();
             int count = 1;
-            for (SoundFile i : ambience.getAmbience()) {
+            for (SoundFile i : ambience.getSessionAmbience()) {
                 items.add(new AddOrEditAmbienceTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getDuration()))));
                 count++;
             }
@@ -288,12 +288,12 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
         syncbuttons();
     }
     private void updatestatusbar() {
-        AcceptButton.setDisable(! ambience.gettotalDuration().greaterThan(playbackitemduration));
-        if (ambience.gettotalDuration().greaterThan(playbackitemduration)) {
+        AcceptButton.setDisable(! ambience.getPresetAmbienceDuration().greaterThan(playbackitemduration));
+        if (ambience.getPresetAmbienceDuration().greaterThan(playbackitemduration)) {
             StatusBar.setText("");
         } else {
             Duration leftoverduration;
-            if (ambience.gettotalDuration().greaterThan(Duration.ZERO)) {leftoverduration = playbackitemduration.subtract(ambience.gettotalDuration());}
+            if (ambience.getPresetAmbienceDuration().greaterThan(Duration.ZERO)) {leftoverduration = playbackitemduration.subtract(ambience.getPresetAmbienceDuration());}
             else {leftoverduration = playbackitemduration;}
             StatusBar.setText("Still Need " + Util.formatdurationtoStringDecimalWithColons(leftoverduration));
         }

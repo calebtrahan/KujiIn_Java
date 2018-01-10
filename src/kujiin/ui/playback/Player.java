@@ -4,6 +4,8 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -16,8 +18,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
@@ -44,7 +44,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,10 +72,16 @@ public class Player extends Stage {
     public TableColumn<PlaylistTableItem, String> PercentColumn;
         // Ambience
     public Tab AmbienceTab;
-    public TableView<AmbiencePlaylistTableItem> AmbiencePlaylistTable;
-    public TableColumn<AmbiencePlaylistTableItem, Integer> AmbiencePlaylistNumberColumn;
-    public TableColumn<AmbiencePlaylistTableItem, String> AmbiencePlaylistNameColumn;
-    public TableColumn<AmbiencePlaylistTableItem, String> AmbiencePlaylistDurationColumn;
+    public Tab AmbiencePresetTab;
+    public TableView<AmbiencePlaylistTableItem> AmbiencePlaylistTable_Preset;
+    public TableColumn<AmbiencePlaylistTableItem, Integer> AmbiencePlaylistPresetNumberColumn;
+    public TableColumn<AmbiencePlaylistTableItem, String> AmbiencePlaylistPresetNameColumn;
+    public TableColumn<AmbiencePlaylistTableItem, String> AmbiencePlaylistPresetDurationColumn;
+    public Tab AmbienceAvailableTab;
+    public TableView<AmbiencePlaylistTableItem> AmbiencePlaylistTable_Available;
+    public TableColumn<AmbiencePlaylistTableItem, Integer> AmbiencePlaylistAvailableNumberColumn;
+    public TableColumn<AmbiencePlaylistTableItem, String> AmbiencePlaylistAvailableNameColumn;
+    public TableColumn<AmbiencePlaylistTableItem, String> AmbiencePlaylistAvailableDurationColumn;
     public ProgressBar CurrentAmbienceProgressBar;
     public Label CurrentAmbiencePercentage;
     public Button AmbienceShuffleButton;
@@ -258,15 +263,35 @@ public class Player extends Stage {
         DurationColumn.setCellValueFactory(cellDate -> cellDate.getValue().duration);
         PercentColumn.setCellValueFactory(cellDate -> cellDate.getValue().percentcompleted);
         PlaylistTableView.setOnMouseClicked(Event::consume);
-        AmbiencePlaylistNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
-        AmbiencePlaylistNameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
-        AmbiencePlaylistDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
-        AmbiencePlaylistTable.setOnMousePressed(event -> {
+        AmbiencePlaylistPresetNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
+        AmbiencePlaylistPresetNameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+        AmbiencePlaylistPresetDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
+        AmbiencePlaylistTable_Preset.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2 && playerState == PLAYING) {
-                int index = AmbiencePlaylistTable.getSelectionModel().getSelectedIndex();
-                SoundFile i = selectedPlaybackItem.getAmbience().get(index);
+                int index = AmbiencePlaylistTable_Preset.getSelectionModel().getSelectedIndex();
+                SoundFile i = selectedPlaybackItem.getAmbience().getPreset(index);
                 playambience(i);
             }
+        });
+        AmbiencePlaylistAvailableNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
+        AmbiencePlaylistAvailableNameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+        AmbiencePlaylistAvailableDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
+        AmbiencePlaylistTable_Available.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown() && event.getClickCount() == 2 && playerState == PLAYING) {
+                int index = AmbiencePlaylistTable_Available.getSelectionModel().getSelectedIndex();
+                SoundFile i = selectedPlaybackItem.getAmbience().getAvailable(index);
+                playambience(i);
+            }
+        });
+        AmbiencePresetTab.selectedProperty().addListener(observable -> {
+            AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
+            AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
+            AmbienceShuffleButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() < 3);
+        });
+        AmbienceAvailableTab.selectedProperty().addListener(observable -> {
+            AmbienceShuffleButton.setDisable(true);
+            AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
+            AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
         });
     }
     private void setupTooltips() {
@@ -455,34 +480,14 @@ public class Player extends Stage {
         AmbiencePreviousButton.setDisable(! playing);
         AmbiencePauseButton.setDisable(! playing);
         AmbienceNextButton.setDisable(! playing);
-//        ReferenceControls.setDisable(fade_play || fade_resume || fade_pause || fade_stop);
-//        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
-//            String playbuttontext = "Play";
-//            String pausebuttontext = "Pause";
-//            String stopbuttontext = "Stop";
-//            switch (playerState) {
-//                case IDLE:
-//                    playbuttontext = "Start";
-//                    break;
-//                case PLAYING:
-//                    playbuttontext = "Playing";
-//                    break;
-//                case PAUSED:
-//                    playbuttontext = "Resume";
-//                    pausebuttontext = "Paused";
-//                    break;
-//                case STOPPED:
-//                    stopbuttontext = "Stopped";
-//                    break;
-//            }
-//            PlayButton.setText(playbuttontext);
-//            PauseButton.setText(pausebuttontext);
-//            StopButton.setText(stopbuttontext);
-//        } else {
-//            PlayButton.setText("");
-//            PauseButton.setText("");
-//            StopButton.setText("");
-//        }
+        if (AmbiencePresetTab.isSelected()) {
+            AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
+            AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
+            AmbienceShuffleButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() < 3);
+        } else if (AmbienceAvailableTab.isSelected()) {
+            AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
+            AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
+        }
         toggleplayervolumecontrols();
     }
     private void toggleplayervolumecontrols() {
@@ -505,14 +510,33 @@ public class Player extends Stage {
     }
         // Ambience
     private void populateambienceplaylist() {
-        ObservableList<AmbiencePlaylistTableItem> items = FXCollections.observableArrayList();
-        List<SoundFile> ambience = selectedPlaybackItem.getAmbience().getAmbience();
+    // Preset
+        ObservableList<AmbiencePlaylistTableItem> presetitems = FXCollections.observableArrayList();
+        List<SoundFile> presetambience = selectedPlaybackItem.getAmbience().getSessionAmbience();
         int count = 1;
-        for (SoundFile i : ambience) {
-            items.add(new AmbiencePlaylistTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getDuration()))));
+        for (SoundFile i : presetambience) {
+            presetitems.add(new AmbiencePlaylistTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getDuration()))));
             count++;
         }
-        AmbiencePlaylistTable.setItems(items);
+        AmbiencePlaylistTable_Preset.setItems(presetitems);
+    // Available
+        ObservableList<AmbiencePlaylistTableItem> availableitems = FXCollections.observableArrayList();
+        List<SoundFile> availableambience = selectedPlaybackItem.getAmbience().getAvailableAmbience();
+        int counted = 1;
+        for (SoundFile i : availableambience) {
+            availableitems.add(new AmbiencePlaylistTableItem(counted, i.getName(), Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getDuration()))));
+            counted++;
+        }
+        AmbiencePlaylistTable_Available.setItems(availableitems);
+    // Sync Buttons
+        if (AmbiencePresetTab.isSelected()) {
+            AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
+            AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
+            AmbienceShuffleButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() < 3);
+        } else {
+            AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
+            AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
+        }
     }
     private void updateambienceui() {
         if (selectedPlaybackItem == null || ! selectedPlaybackItem.getAmbience().hasAmbience()) {
@@ -558,14 +582,14 @@ public class Player extends Stage {
     }
     public void shuffleambiencebuttonpressed() {
         if (selectedPlaybackItem != null && selectedPlaybackItem.getAmbience().hasAmbience()) {
-            List<SoundFile> ambiencelist = selectedPlaybackItem.getAmbience().getAmbience();
+            List<SoundFile> ambiencelist = selectedPlaybackItem.getAmbience().getSessionAmbience();
             while (true) {
                 Collections.shuffle(ambiencelist);
                 if (ambiencelist.size() > 2) {
                     if (ambiencelist.get(0).equals(currentambiencesoundfile) && ! ambiencelist.get(1).equals(currentambiencesoundfile)) {break;}
                 } else { break; }
             }
-            selectedPlaybackItem.getAmbience().setAmbience(ambiencelist);
+            selectedPlaybackItem.getAmbience().setSessionAmbience(ambiencelist);
             updateambienceui();
         }
     }
@@ -573,7 +597,7 @@ public class Player extends Stage {
     private void updategoalsui() {
             Duration practiceduration = sessions.gettotalpracticedtime(selectedPlaybackItem, false);
             practiceduration = practiceduration.add(SessionInProgress.getSessionPracticedTime());
-            String practicetime = Util.formatdurationtoStringSpelledOut(practiceduration, 186.0);
+            String practicetime = Util.formatdurationtoStringSpelledOutShort(practiceduration, true);
             Goals_SessionPartPracticedTime.setText(practicetime);
             String goaltime;
             Double percentage;
@@ -583,7 +607,7 @@ public class Player extends Stage {
                 if (currentgoal != null) {percentage = (practiceduration.toMillis() / currentgoal.getDuration().toMillis());}
                 else {percentage = 0.0;}
 //            percentagetext = String.format("(%.1f%%)", percentage * 100);
-                if (currentgoal != null) {goaltime = Util.formatdurationtoStringSpelledOut(currentgoal.getDuration(), 186.0);}
+                if (currentgoal != null) {goaltime = Util.formatdurationtoStringSpelledOutShort(currentgoal.getDuration(), true);}
                 else {goaltime = "No Goal Set";}
             } else {
 //            percentagetext = "No Goal Set";
@@ -675,8 +699,7 @@ public class Player extends Stage {
             populateambienceplaylist();
             if (currentambiencevolume == null) { currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume(); }
             volume_unbindambience();
-            selectedPlaybackItem.getAmbience().resetplaycount();
-            currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextambienceforplayback();
+            currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextpresetambienceforplayback(null);
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setVolume(0.0);
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
@@ -868,14 +891,22 @@ public class Player extends Stage {
         ambienceplayer.setOnPlaying(() -> {
             volume_bindambience();
             updateambienceui();
-            AmbiencePlaylistTable.getSelectionModel().select(selectedPlaybackItem.getAmbience().getAmbience().indexOf(soundFile));
+            if (AmbiencePresetTab.isSelected()) {
+                AmbiencePlaylistTable_Preset.getSelectionModel().select(selectedPlaybackItem.getAmbience().getSessionAmbience().indexOf(soundFile));
+            } else {
+                AmbiencePlaylistTable_Available.getSelectionModel().select(selectedPlaybackItem.getAmbience().getAvailableAmbience().indexOf(soundFile));
+            }
         });
     }
     private void playnextambience() {
-        playambience(selectedPlaybackItem.getAmbience().getnextambienceforplayback());
+        if (AmbiencePresetTab.isSelected()) {
+            playambience(selectedPlaybackItem.getAmbience().getnextpresetambienceforplayback(currentambiencesoundfile));
+        } else {
+            playambience(selectedPlaybackItem.getAmbience().getnextavailableambienceforplayback(currentambiencesoundfile));
+        }
     }
     private void playpreviousambience() {
-        playambience(selectedPlaybackItem.getAmbience().getpreviousambienceforplayback());
+        playambience(selectedPlaybackItem.getAmbience().getpreviouspresetambienceforplayback(currentambiencesoundfile));
     }
     public void playpreviousambiencefromhistory() {
         SoundFile previousambiencefile = selectedPlaybackItem.getAmbience().getpreviousambiencehistory();

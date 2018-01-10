@@ -531,7 +531,7 @@ public class MainController implements Initializable {
             }
         }
         if ((createdsession != null && ! createdsession.getPlaybackItems().isEmpty()) && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
-        createdsession = new Session();
+        createdsession = new Session(availableAmbiences);
         populatecreatedsessiontable();
         displayStatusBarMessage("New Session Created", Duration.seconds(1.0));
         AddItemsMenu.requestFocus();
@@ -627,10 +627,10 @@ public class MainController implements Initializable {
                 boolean clearambience = true;
                 if (i.getAmbience().hasAmbience()) {
                     clearambience = new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult();
-                    if (clearambience) { i.getAmbience().clearambience();}
+                    if (clearambience) { i.getAmbience().clearPresetambience();}
                 }
-                if (quickAddAmbienceType == QuickAddAmbienceType.REPEAT) {i.getAmbience().addavailableambience_repeat(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()), clearambience);}
-                else if (quickAddAmbienceType == QuickAddAmbienceType.SHUFFLE) {i.getAmbience().addavailableambience_shuffle(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()), clearambience);}
+                if (quickAddAmbienceType == QuickAddAmbienceType.REPEAT) {i.getAmbience().quickadd_repeat(i, clearambience);}
+                else if (quickAddAmbienceType == QuickAddAmbienceType.SHUFFLE) {i.getAmbience().quickadd_shuffle(i, clearambience);}
                 i.getAmbience().setEnabled(true);
             } else {i.getAmbience().setEnabled(false); missingambiencecount++;}
         }
@@ -644,7 +644,7 @@ public class MainController implements Initializable {
         updatecompletiontime.stop();
         List<PlaybackItem> items = new ArrayList<>();
         for (int i : availableambienceindexes) {
-            PlaybackItem playbackItem = createdsession.getplaybackitem(i);
+            PlaybackItem playbackItem = createdsession.getplaybackitemwithambience(i);
             if (i == 0) {playbackItem.setPlaybackItemType(PlaybackItem.PlaybackItemType.QIGONG);}
             else if (i > 0 && i < 10) {playbackItem.setPlaybackItemType(PlaybackItem.PlaybackItemType.CUT);}
             else {playbackItem.setPlaybackItemType(PlaybackItem.PlaybackItemType.ELEMENT);}
@@ -673,8 +673,8 @@ public class MainController implements Initializable {
                 startindex = createdsession.getPlaybackItems().size() - 1;
                 createdsession.addplaybackitems(null, items); createdsession.calculateexpectedduration();
             }
-            if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1 && createdsession.getplaybackitem(startindex).getCreationindex() == items.get(0).getCreationindex()) {
-                mergeitems(createdsession.getplaybackitem(startindex), createdsession.getplaybackitem(startindex + 1));
+            if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1 && createdsession.getplaybackitemwithambience(startindex).getCreationindex() == items.get(0).getCreationindex()) {
+                mergeitems(createdsession.getplaybackitemwithambience(startindex), createdsession.getplaybackitemwithambience(startindex + 1));
                 populatecreatedsessiontable();
                 return true;
             }
@@ -804,16 +804,16 @@ public class MainController implements Initializable {
             adjustDuration.showAndWait();
             if (adjustDuration.isAccepted()) {
                 createdtableplaybackitems.set(selectedindex, adjustDuration.getPlaybackItemList().get(0));
-                if (createdtableselecteditem.getAmbience().isEnabled() && createdtableselecteditem.getAmbience().getCurrentAmbienceDuration().lessThan(new Duration(createdtableplaybackitems.get(selectedindex).getExpectedDuration()))) {
+                if (createdtableselecteditem.getAmbience().isEnabled() && createdtableselecteditem.getAmbience().getPresetAmbienceDuration().lessThan(new Duration(createdtableplaybackitems.get(selectedindex).getExpectedDuration()))) {
                     if (new ConfirmationDialog(preferences, "Set Ambience", "Ambience Not Long Enough To Match New Duration", "Please Set More Ambience Or Disable Ambience", "Add Ambience", "Disable Ambience").getResult()) {
                         customizeambience();
                         PlaybackItem createdtableselecteditem = createdtableplaybackitems.get(selectedindex);
-                        if (createdtableselecteditem.getAmbience().getCurrentAmbienceDuration().lessThan(new Duration(createdtableplaybackitems.get(selectedindex).getExpectedDuration()))) {
-                            createdtableselecteditem.getAmbience().clearambience();
+                        if (createdtableselecteditem.getAmbience().getPresetAmbienceDuration().lessThan(new Duration(createdtableplaybackitems.get(selectedindex).getExpectedDuration()))) {
+                            createdtableselecteditem.getAmbience().clearPresetambience();
                             createdtableselecteditem.getAmbience().setEnabled(false);
                         }
                     } else {
-                        createdtableselecteditem.getAmbience().clearambience();
+                        createdtableselecteditem.getAmbience().clearPresetambience();
                         createdtableselecteditem.getAmbience().setEnabled(false);
                     }
                 }
@@ -852,7 +852,7 @@ public class MainController implements Initializable {
         }
     }
     private void clearambience() {
-        createdtableselecteditem.getAmbience().clearambience();
+        createdtableselecteditem.getAmbience().clearPresetambience();
         populatecreatedsessiontable();
     }
     public void moveupincreatortable() {
@@ -912,12 +912,12 @@ public class MainController implements Initializable {
             Duration newduration = new Duration(item1.getExpectedDuration());
             newduration = newduration.add(new Duration(item2.getExpectedDuration()));
             item1.setExpectedDuration(newduration.toMillis());
-            item1.getAmbience().setAmbience(new ArrayList<>());
+            item1.getAmbience().setSessionAmbience(new ArrayList<>());
             item1.getAmbience().setEnabled(false);
             if (ambiencewasenabled) {
                 Duration ambienceduration = Duration.ZERO;
-                if (item1.getAmbience().isEnabled()) {ambienceduration = ambienceduration.add(item1.getAmbience().gettotalDuration());}
-                if (item2.getAmbience().isEnabled()) {ambienceduration = ambienceduration.add(item2.getAmbience().gettotalDuration());}
+                if (item1.getAmbience().isEnabled()) {ambienceduration = ambienceduration.add(item1.getAmbience().getPresetAmbienceDuration());}
+                if (item2.getAmbience().isEnabled()) {ambienceduration = ambienceduration.add(item2.getAmbience().getPresetAmbienceDuration());}
                 if (ambienceduration.lessThan(newduration)) {
                     String[] options = {"Quick Add Ambience", "Customize Ambience", "Don't Add Ambience"};
                     ChoiceDialog<String> addambiencechoicedialog = new ChoiceDialog<>(options[0], options);
@@ -952,7 +952,7 @@ public class MainController implements Initializable {
     public void clearloadedsession() {
         updatecompletiontime.stop();
         if (createdsession != null && new ConfirmationDialog(preferences, "Clear Session", "Really Clear Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {
-            createdsession = new Session();
+            createdsession = new Session(availableAmbiences);
             populatecreatedsessiontable();
         } else { updatecompletiontime.play(); }
     }

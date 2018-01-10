@@ -130,7 +130,7 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     }
     public void cancel() {
         accepted = false;
-        for (PlaybackItem i : playbackItemList) {i.getAmbience().clearambience();}
+        for (PlaybackItem i : playbackItemList) {i.getAmbience().clearPresetambience();}
         close();
     }
 

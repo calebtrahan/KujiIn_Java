@@ -70,9 +70,9 @@ public class QuickAddAmbience extends StyledStage {
         int missingambiencecount = 0;
         for (PlaybackItem i : playbackItemList) {
             if (availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {
-                i.getAmbience().clearambience();
-                if (quickAmbienceType == QuickAmbienceType.Repeat) {i.getAmbience().addavailableambience_repeat(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()), true);}
-                else if (quickAmbienceType == QuickAmbienceType.Shuffle) {i.getAmbience().addavailableambience_shuffle(i, availableAmbiences.getsessionpartAmbience(i.getCreationindex()), true);}
+                i.getAmbience().clearPresetambience();
+                if (quickAmbienceType == QuickAmbienceType.Repeat) {i.getAmbience().quickadd_repeat(i, true);}
+                else if (quickAmbienceType == QuickAmbienceType.Shuffle) {i.getAmbience().quickadd_shuffle(i, true);}
                 i.getAmbience().setEnabled(true);
             } else {i.getAmbience().setEnabled(false); missingambiencecount++;}
         }

@@ -581,8 +581,7 @@ public class Player_New extends Stage {
         ambienceplayer = null;
         currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume();
         volume_unbindambience();
-        selectedPlaybackItem.getAmbience().resetplaycount();
-        currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextambienceforplayback();
+        currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextpresetambienceforplayback(null);
         ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
         setAmbienceVolume(0.0);
         ambienceplayer.setOnEndOfMedia(this::playnextambience);
@@ -623,7 +622,7 @@ public class Player_New extends Stage {
             volume_unbindambience();
             ambienceplayer.stop();
             ambienceplayer = null;
-            currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextambienceforplayback();
+            currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextpresetambienceforplayback(currentambiencesoundfile);
             ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);

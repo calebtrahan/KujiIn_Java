@@ -36,6 +36,13 @@ public class PlaybackItem {
         PracticeTime = 0.0;
         ambience = new Ambience();
     }
+    public PlaybackItem(Session session, String name, PlaybackItemAmbience playbackItemAmbience) {
+        this.session = session;
+        this.Name = name;
+        PracticeTime = 0.0;
+        ambience = new Ambience();
+        ambience.setAvailableAmbience(playbackItemAmbience.getAmbience());
+    }
 
 // Getters And Setters
     public PlaybackItemType getPlaybackItemType() {
@@ -93,7 +100,7 @@ public class PlaybackItem {
     }
     public String getAmbienceasString() {
         if (! ambience.hasAmbience()) {return "No Ambience Set";}
-        else {return "Ambience Set " + "(" + ambience.getAmbience().size() + " Files)";}
+        else {return "Ambience Set " + "(" + ambience.getSessionAmbience().size() + " Files)";}
     }
     public void updateduration(Duration duration) {this.ExpectedDuration = duration.toMillis();}
     public ArrayList<Goal> getGoalsCompletedThisSession() {

@@ -13,7 +13,11 @@ import kujiin.xml.*;
 
 import static kujiin.xml.Preferences.PROGRAM_ICON;
 
-// TODO Add All Ambience Even If Too Long To Player Not Working
+// Maybe Add Goals In Bar Chart To Session Complete?
+// Add Goals Completed Label Into Bottom Of Goals Tab On Player
+
+// Rename "Available" Ambience?
+
 
 // Bugs To Fix
     // TODO Customize Ambience Does Not Set Ambience Enabled
@@ -21,7 +25,6 @@ import static kujiin.xml.Preferences.PROGRAM_ICON;
     // TODO Fix Session Complete Dialog So It Can Exit Program Or Return To Program (Return To Player Works)
 
 // Additional Features To Add
-    // TODO Finish Implementing Ambience Player Controls In Player
     // TODO Implement Start Time/Stop Time/Breaks Session Functionality Into Player
 
     // TODO Get Merge Logic On Add Items Functional

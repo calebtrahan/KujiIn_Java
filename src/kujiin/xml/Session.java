@@ -37,6 +37,7 @@ public class Session {
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy MM dd H m s S");
     @XmlTransient
     private Break currentbreak;
+    private AvailableAmbiences availableAmbiences;
 
 
     public Session() {
@@ -44,6 +45,9 @@ public class Session {
         setDate_Practiced(LocalDate.now());
         playcount = 0;
         completedcount = 0;
+    }
+    public Session(AvailableAmbiences availableAmbiences) {
+        this.availableAmbiences = availableAmbiences;
     }
 
 // Getters And Setters
@@ -156,6 +160,83 @@ public class Session {
                 break;
             case 14:
                 playbackItem = new PlaybackItem(this,"Void");
+                playbackItem.setCreationindex(14);
+                break;
+            default:
+                return null;
+        }
+        return playbackItem;
+    }
+    public PlaybackItem getplaybackitemwithambience(int index) {
+        PlaybackItem playbackItem;
+        switch (index) {
+            case 0:
+                playbackItem = new PlaybackItem(this, "Qi-Gong", availableAmbiences.getsessionpartAmbience(0));
+                playbackItem.setCreationindex(0);
+                break;
+            case 1:
+                playbackItem = new PlaybackItem(this,"Rin", availableAmbiences.getsessionpartAmbience(1));
+                playbackItem.setCreationindex(1);
+                playbackItem.setTypeindex(1);
+                break;
+            case 2:
+                playbackItem = new PlaybackItem(this,"Kyo", availableAmbiences.getsessionpartAmbience(2));
+                playbackItem.setCreationindex(2);
+                playbackItem.setTypeindex(2);
+                break;
+            case 3:
+                playbackItem = new PlaybackItem(this,"Toh", availableAmbiences.getsessionpartAmbience(3));
+                playbackItem.setCreationindex(3);
+                playbackItem.setTypeindex(3);
+                break;
+            case 4:
+                playbackItem = new PlaybackItem(this,"Sha", availableAmbiences.getsessionpartAmbience(4));
+                playbackItem.setCreationindex(4);
+                playbackItem.setTypeindex(4);
+                break;
+            case 5:
+                playbackItem = new PlaybackItem(this,"Kai", availableAmbiences.getsessionpartAmbience(5));
+                playbackItem.setCreationindex(5);
+                playbackItem.setTypeindex(5);
+                break;
+            case 6:
+                playbackItem = new PlaybackItem(this,"Jin", availableAmbiences.getsessionpartAmbience(6));
+                playbackItem.setCreationindex(6);
+                playbackItem.setTypeindex(6);
+                break;
+            case 7:
+                playbackItem = new PlaybackItem(this,"Retsu", availableAmbiences.getsessionpartAmbience(7));
+                playbackItem.setCreationindex(7);
+                playbackItem.setTypeindex(7);
+                break;
+            case 8:
+                playbackItem = new PlaybackItem(this,"Zai", availableAmbiences.getsessionpartAmbience(8));
+                playbackItem.setCreationindex(8);
+                playbackItem.setTypeindex(8);
+                break;
+            case 9:
+                playbackItem = new PlaybackItem(this,"Zen", availableAmbiences.getsessionpartAmbience(9));
+                playbackItem.setCreationindex(9);
+                playbackItem.setTypeindex(9);
+                break;
+            case 10:
+                playbackItem = new PlaybackItem(this,"Earth", availableAmbiences.getsessionpartAmbience(10));
+                playbackItem.setCreationindex(10);
+                break;
+            case 11:
+                playbackItem = new PlaybackItem(this,"Air", availableAmbiences.getsessionpartAmbience(11));
+                playbackItem.setCreationindex(11);
+                break;
+            case 12:
+                playbackItem = new PlaybackItem(this,"Fire", availableAmbiences.getsessionpartAmbience(12));
+                playbackItem.setCreationindex(12);
+                break;
+            case 13:
+                playbackItem = new PlaybackItem(this,"Water", availableAmbiences.getsessionpartAmbience(13));
+                playbackItem.setCreationindex(13);
+                break;
+            case 14:
+                playbackItem = new PlaybackItem(this,"Void", availableAmbiences.getsessionpartAmbience(14));
                 playbackItem.setCreationindex(14);
                 break;
             default:
