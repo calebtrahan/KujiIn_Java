@@ -28,7 +28,8 @@ public class Preferences {
     public static final File ROOTDIRECTORY = new File(PROJECTROOT, "src/kujiin/");
     public static final File DIRECTORYREFERENCE = new File(ROOTDIRECTORY, "assets/reference/");
     public static final File LOGFILE = new File(ROOTDIRECTORY, "assets/sessionlog.txt");
-    public static final File XMLDIRECTORY = new File(ROOTDIRECTORY, "assets/xml/");
+    public static final File USERDIRECTORY = new File(System.getProperty("user.home"), "Documents/KujiIn/");
+    public static final File XMLDIRECTORY = new File(USERDIRECTORY, "xml/");
     public static final File DIRECTORYSTYLES = new File(ROOTDIRECTORY, "assets/styles/");
     public static final File SOUNDDIRECTORY = new File(ROOTDIRECTORY, "assets/sound/");
     public static final File DIRECTORYTEMP = new File(SOUNDDIRECTORY, "temp/");
@@ -160,6 +161,7 @@ public class Preferences {
             createMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             createMarshaller.marshal(this, OPTIONSXMLFILE);
         } catch (JAXBException e) {
+            e.printStackTrace();
             new InformationDialog(this, "Information", "Couldn't Save Preferences", "Check Write File Permissions Of " + OPTIONSXMLFILE.getAbsolutePath(), true);
         }
     }

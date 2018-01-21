@@ -129,12 +129,7 @@
                                           </MenuButton>
                                           <MenuButton fx:id="AmbienceMenu" mnemonicParsing="false">
                                             <items>
-                                                <Menu fx:id="AmbienceQuickAddMenu" mnemonicParsing="false" text="Quick Add">
-                                                  <items>
-                                                    <MenuItem fx:id="AmbienceQuickAddMenu_Repeat" mnemonicParsing="false" onAction="#quickaddambience_repeat" text="Repeat" />
-                                                      <MenuItem fx:id="AmbienceQuickAddMenu_Shuffle" mnemonicParsing="false" onAction="#quickaddambience_shuffle" text="Shuffle" />
-                                                  </items>
-                                                </Menu>
+                                                <MenuItem fx:id="Ambience_QuickAdd" mnemonicParsing="false" onAction="#quickaddambience_shuffle" text="Quick Add" />
                                               <MenuItem fx:id="AmbienceCustomize" mnemonicParsing="false" onAction="#customizeambience" text="Customize" />
                                             </items>
                                           </MenuButton>
@@ -210,12 +205,22 @@
                                        <children>
                                           <TabPane prefHeight="460.0" prefWidth="743.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <tabs>
-                                              <Tab text="Overview">
+                                              <Tab fx:id="ProgressOverviewTab" text="Overview">
                                                 <content>
                                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                          <children>
                                                             <VBox prefHeight="167.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                                <children>
+                                                                  <HBox alignment="CENTER" prefHeight="39.0" prefWidth="700.0">
+                                                                     <children>
+                                                                        <Label text="Progress For:">
+                                                                           <HBox.margin>
+                                                                              <Insets right="7.0" />
+                                                                           </HBox.margin>
+                                                                        </Label>
+                                                                        <ChoiceBox fx:id="ProgressOverviewTypeChoiceBox" prefWidth="150.0" />
+                                                                     </children>
+                                                                  </HBox>
                                                                   <BarChart fx:id="ProgressOverviewBarChart" prefHeight="282.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
                                                                     <xAxis>
                                                                       <CategoryAxis fx:id="ProgressOverviewCategoryAxis" animated="false" side="LEFT" tickMarkVisible="false" />
@@ -226,7 +231,7 @@
                                                                   </BarChart>
                                                                   <HBox alignment="CENTER_RIGHT" prefHeight="44.0" prefWidth="700.0">
                                                                      <children>
-                                                                        <Label text="Total Time Practiced">
+                                                                        <Label fx:id="ProgressOverviewTotalTimePracticedLabel" text="Total Time Practiced">
                                                                            <HBox.margin>
                                                                               <Insets right="10.0" />
                                                                            </HBox.margin></Label>
@@ -245,11 +250,25 @@
                                                       </AnchorPane>
                                                 </content>
                                               </Tab>
-                                              <Tab text="Balance">
+                                              <Tab fx:id="ProgressBalanceTab" text="Balance">
                                                 <content>
                                                   <AnchorPane fx:id="ProgressBalanceAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                          <children>
-                                                            <PieChart fx:id="ProgressBalancePieChart" layoutX="76.0" layoutY="79.0" prefHeight="493.0" prefWidth="677.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                            <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                               <children>
+                                                                  <HBox alignment="CENTER" prefHeight="39.0" prefWidth="700.0">
+                                                                     <children>
+                                                                        <Label text="Balance Of:">
+                                                                           <HBox.margin>
+                                                                              <Insets right="7.0" />
+                                                                           </HBox.margin>
+                                                                        </Label>
+                                                                        <ChoiceBox fx:id="ProgressBalanceTypeChoiceBox" prefWidth="150.0" />
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <PieChart fx:id="ProgressBalancePieChart" VBox.vgrow="ALWAYS" />
+                                                               </children>
+                                                            </VBox>
                                                          </children>
                                                       </AnchorPane>
                                                 </content>
@@ -292,7 +311,7 @@
                                                                                  <children>
                                                                                     <VBox prefHeight="162.0" prefWidth="210.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                                                        <children>
-                                                                                          <CheckBox fx:id="SessionBrowser_Filter_ShowMissedSessions" mnemonicParsing="false" text="Show Missed Sessions">
+                                                                                          <CheckBox fx:id="SessionBrowser_Filter_ShowMissedSessions" mnemonicParsing="false" onAction="#populatesessionbrowsertable" selected="true" text="Show Missed Sessions">
                                                                                              <VBox.margin>
                                                                                                 <Insets top="5.0" />
                                                                                              </VBox.margin>

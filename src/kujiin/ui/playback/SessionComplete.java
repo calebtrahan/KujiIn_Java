@@ -14,7 +14,7 @@ import kujiin.xml.Session;
 import java.io.IOException;
 
 public class SessionComplete extends StyledStage {
-    private final Session session;
+    private Session session;
     public Label TopLabel;
     public Label DurationCompletedLabel;
     public BarChart<String, Number> SessionBarChart;
@@ -26,8 +26,8 @@ public class SessionComplete extends StyledStage {
     private SessionCompleteDirections sessionCompleteDirections;
 
     public SessionComplete(Session session, boolean sessioncomplete) {
-        this.session = session;
         try {
+            this.session = session;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/playback/SessionCompleteDialog.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -79,9 +79,9 @@ public class SessionComplete extends StyledStage {
     // Button Actions
     @Override
     public void close() {
+        super.close();
         if (sessionCompleteDirections == null) {sessionCompleteDirections = SessionCompleteDirections.KEEPPLAYEROPEN;}
         if (needtosetNotes()) {session.setNotes(SessionNotesTextArea.getText());}
-        super.close();
     }
 
 

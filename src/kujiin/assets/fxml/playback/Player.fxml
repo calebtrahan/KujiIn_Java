@@ -137,7 +137,7 @@
                                                    <children>
                                                       <TabPane VBox.vgrow="ALWAYS">
                                                          <tabs>
-                                                            <Tab fx:id="AmbiencePresetTab" closable="false" text="Preset">
+                                                            <Tab fx:id="AmbiencePresetTab" closable="false" text="This Session">
                                                                <content>
                                                                   <VBox alignment="TOP_CENTER" prefHeight="276.0" prefWidth="301.0">
                                                                      <children>
@@ -155,7 +155,7 @@
                                                                   </VBox>
                                                                </content>
                                                             </Tab>
-                                                            <Tab fx:id="AmbienceAvailableTab" closable="false" text="Available">
+                                                            <Tab fx:id="AmbienceAvailableTab" closable="false" text="All Available">
                                                                <content>
                                                                   <VBox alignment="TOP_CENTER" prefHeight="276.0" prefWidth="301.0">
                                                                      <children>

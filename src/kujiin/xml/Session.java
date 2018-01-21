@@ -39,14 +39,14 @@ public class Session {
     private Break currentbreak;
     private AvailableAmbiences availableAmbiences;
 
-
     public Session() {
-        id = UUID.randomUUID();
+
+    }
+    public Session(AvailableAmbiences availableAmbiences) {
+        newID();
         setDate_Practiced(LocalDate.now());
         playcount = 0;
         completedcount = 0;
-    }
-    public Session(AvailableAmbiences availableAmbiences) {
         this.availableAmbiences = availableAmbiences;
     }
 
@@ -83,7 +83,6 @@ public class Session {
         return new Duration(ExpectedSessionDuration);
     }
     public void setPlaybackItems(ArrayList<PlaybackItem> playbackItems) {
-        System.out.println("Set " + playbackItems.size() + " Playback Items");
         this.playbackItems = playbackItems;
     }
     public ArrayList<PlaybackItem> getPlaybackItems() {
@@ -282,7 +281,9 @@ public class Session {
         return missedsession;
     }
 
+
     // Utility Methods
+    public void newID() {id = UUID.randomUUID();}
     public boolean hasCuts() {
         for (PlaybackItem i : getPlaybackItems()) {
             if (i.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT) {return true;}
@@ -326,7 +327,7 @@ public class Session {
         for (PlaybackItem i : playbackItems) {
             i.setPracticeTime(i.getExpectedDuration());
         }
-        setSessionPracticedTime(getSessionPracticedTime().toMillis());
+        setSessionPracticedTime(getExpectedSessionDuration().toMillis());
     }
 
 // Playback Methods

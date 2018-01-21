@@ -14,9 +14,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
-import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.PreviewFile;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
+import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.util.Util;
 import kujiin.xml.*;
 
@@ -45,21 +45,16 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     public Label StatusBar;
     public Button AcceptButton;
     public Button CancelButton;
-    public Menu QuickAddMenu;
-    public MenuItem QuickAddRepeatAmbience;
-    public MenuItem QuickAddShuffleAmbience;
-    private AvailableAmbiences availableAmbiences;
+    public MenuItem QuickAddAmbience;
     private boolean accepted = false;
     private Ambience ambience;
     private Duration playbackitemduration;
     private PlaybackItem playbackItem;
-    private PlaybackItemAmbience playbackItemAmbience;
     private Preferences preferences;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        QuickAddRepeatAmbience.setOnAction(event -> quickaddrepeatambience());
-        QuickAddShuffleAmbience.setOnAction(event -> quickaddshuffleambience());
+        QuickAddAmbience.setOnAction(event -> quickaddshuffleambience());
         AddFromAmbienceDirectory.setOnAction(event -> addfromavailableambience());
         AddOpenFiles.setOnAction(event -> addfromfiles());
         RemoveButton.setOnAction(event -> removefromtable());
@@ -83,21 +78,19 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
             }
         });
     }
-    public CustomizeAmbience(Preferences preferences, PlaybackItem playbackItem, AvailableAmbiences availableAmbiences) {
+    public CustomizeAmbience(Preferences preferences, PlaybackItem playbackItem) {
         try {
-            ambience = new Ambience();
+            ambience = playbackItem.getAmbience();
             this.preferences = preferences;
             this.playbackItem = playbackItem;
-            this.availableAmbiences = availableAmbiences;
-            playbackItemAmbience = availableAmbiences.getsessionpartAmbience(playbackItem.getCreationindex());
             playbackitemduration = new Duration(playbackItem.getExpectedDuration());
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/AddOrEditAmbience.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
             setResizable(false);
-            boolean hasavailableambience = availableAmbiences.getsessionpartAmbience(playbackItem.getCreationindex()).hasAny();
-            QuickAddMenu.setDisable(! hasavailableambience);
+            boolean hasavailableambience = playbackItem.getAmbience().hasAvailableAmbience();
+            QuickAddAmbience.setDisable(! hasavailableambience);
             AddFromAmbienceDirectory.setDisable(! hasavailableambience);
             AddOrEditAmbienceTable.setPlaceholder(new Label("No Ambience For " + playbackItem.getName()));
             AddOrEditAmbienceTable.setOnMousePressed(event -> {
@@ -142,8 +135,8 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
 
 // Button Actions
     public void addfromavailableambience() {
-        if (playbackItemAmbience.hasAny()) {
-            SelectAvailableAmbience selectAvailableAmbience = new SelectAvailableAmbience(playbackItemAmbience);
+        if (playbackItem.getAmbience().hasAvailableAmbience()) {
+            SelectAvailableAmbience selectAvailableAmbience = new SelectAvailableAmbience(playbackItem);
             selectAvailableAmbience.initModality(Modality.APPLICATION_MODAL);
             selectAvailableAmbience.showAndWait();
             if (selectAvailableAmbience.isAccepted() && ! selectAvailableAmbience.getAmbiencetoadd().isEmpty()) {
@@ -151,14 +144,8 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
                 populatetable();
             } else {syncbuttons();}
         } else {
-            if (new ConfirmationDialog(preferences, "No Ambience Found", "No Available Ambience Found", "Add Ambience To " +
-            playbackItem.getName() + "?").getResult()) {
-                AmbienceEditor_Simple amb = new AmbienceEditor_Simple(availableAmbiences, preferences, playbackItem);
-                amb.initOwner(this);
-                amb.initModality(Modality.APPLICATION_MODAL);
-                amb.showAndWait();
-                addfromavailableambience();
-            }
+            new InformationDialog(preferences, "No Ambience Found", "No Available Ambience Found For " +
+                    playbackItem.getName(), "Add Ambience To Use This Feature");
         }
     }
     public void addfromfiles() {
@@ -186,7 +173,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     }
     public void quickaddrepeatambience() {
         boolean clearambience = false;
-        if (ambience.hasAmbience()) {
+        if (ambience.hasPresetAmbience()) {
             if (new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult()) {
                 clearambience = true;
             }
@@ -197,7 +184,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     }
     public void quickaddshuffleambience() {
         boolean clearambience = false;
-        if (ambience.hasAmbience()) {
+        if (ambience.hasPresetAmbience()) {
             if (new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult()) {
                 clearambience = true;
             }
@@ -265,17 +252,17 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
         }
     }
     public void accept() {
-        ambience.setEnabled(ambience.hasAmbience());
+        ambience.setEnabled(ambience.hasPresetAmbience());
         playbackItem.getAmbience().setSessionAmbience(ambience.getSessionAmbience());
         playbackItem.getAmbience().setEnabled(ambience.isEnabled());
-        accepted = ambience.hasAmbience();
+        accepted = ambience.hasPresetAmbience();
         close();
     }
 
 // Other Methods
     private void populatetable() {
         AddOrEditAmbienceTable.getItems().clear();
-        if (ambience.hasAmbience()) {
+        if (ambience.hasPresetAmbience()) {
             ObservableList<AddOrEditAmbienceTableItem> items = FXCollections.observableArrayList();
             int count = 1;
             for (SoundFile i : ambience.getSessionAmbience()) {

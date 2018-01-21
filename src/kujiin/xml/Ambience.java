@@ -51,7 +51,6 @@ public class Ambience {
             return files;
         } catch (NullPointerException ignored) {return new ArrayList<>();}
     }
-    public boolean hasAmbience() {return SessionAmbience != null && ! SessionAmbience.isEmpty();}
     public List<SoundFile> getAvailableAmbience() {
         return AvailableAmbience;
     }
@@ -99,7 +98,9 @@ public class Ambience {
     }
     public Duration getPresetAmbienceDuration() {
         Duration totalduration = Duration.ZERO;
-        for (SoundFile i : SessionAmbience) {totalduration = totalduration.add(new Duration(i.getDuration()));}
+        if (SessionAmbience != null) {
+            for (SoundFile i : SessionAmbience) {totalduration = totalduration.add(new Duration(i.getDuration()));}
+        }
         return totalduration;
     }
     public void removePreset(int index) {
@@ -211,9 +212,9 @@ public class Ambience {
         else {maxduration = new Duration(playbackItem.getExpectedDuration());}
     // Set Ambience Size
         int indexcount;
+        Random random = new Random();
         while (currentduration.lessThan(maxduration)) {
             if (! indexhistory.isEmpty()) {
-                Random random = new Random();
                 while (true) {
                     indexcount = random.nextInt(AvailableAmbience.size());
                     if (indexhistory.isEmpty()) {indexhistory.add(indexcount); break;}
@@ -221,7 +222,7 @@ public class Ambience {
                         if (! indexhistory.contains(indexcount)) {break;}
                     } else if (indexcount != indexhistory.get(indexhistory.size() - 1)) {break;}
                 }
-            } else {indexcount = 0;}
+            } else {indexcount = random.nextInt(AvailableAmbience.size());}
             try {
                 SoundFile filetoadd = getAvailable(indexcount);
                 ambiencelist.add(filetoadd);

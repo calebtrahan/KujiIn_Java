@@ -74,7 +74,6 @@ public class RampFiles {
         return null;
     }
     private void populatedefaults() {
-        System.out.println("Populated Ramp Defaults");
         String[] names = {"rin", "kyo", "toh", "sha", "kai", "jin", "retsu", "zai", "zen"};
         ArrayList<SoundFile> filenames = new ArrayList<>();
         for (String x : names) {filenames.add(new SoundFile(new File(DIRECTORYRAMP, "qito" + x + ".mp3")));}

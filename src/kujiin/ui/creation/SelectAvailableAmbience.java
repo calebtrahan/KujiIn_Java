@@ -13,6 +13,8 @@ import javafx.util.Duration;
 import kujiin.ui.boilerplate.StyledStage;
 import kujiin.ui.dialogs.PreviewFile;
 import kujiin.util.Util;
+import kujiin.xml.Ambience;
+import kujiin.xml.PlaybackItem;
 import kujiin.xml.PlaybackItemAmbience;
 import kujiin.xml.SoundFile;
 
@@ -32,7 +34,7 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
     public Button PreviewButton;
     private List<SoundFile> ambiencetoadd = new ArrayList<>();
     private boolean accepted = false;
-    private PlaybackItemAmbience AvailableAmbience;
+    private Ambience selecteditemambience;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -44,9 +46,9 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
         PreviewButton.setOnAction(event -> preview());
         AvailableAmbienceTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> PreviewButton.setDisable(AvailableAmbienceTable.getSelectionModel().getSelectedItems().isEmpty() || AvailableAmbienceTable.getSelectionModel().getSelectedItems().size() > 1));
     }
-    public SelectAvailableAmbience(PlaybackItemAmbience availableAmbience) {
+    public SelectAvailableAmbience(PlaybackItem playbackItem) {
         try {
-            AvailableAmbience = availableAmbience;
+            selecteditemambience = playbackItem.getAmbience();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/SelectAvailableAmbience.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
@@ -54,7 +56,7 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
             setResizable(false);
             setTitle("Select Ambience File(s) To Add");
             ObservableList<AvailableAmbienceTableItem> ambienceTableItems = FXCollections.observableArrayList();
-            for (SoundFile i : AvailableAmbience.getAmbience()) {
+            for (SoundFile i : selecteditemambience.getAvailableAmbience()) {
                 ambienceTableItems.add(new AvailableAmbienceTableItem(i.getName(), new Duration(i.getDuration())));
             }
             AvailableAmbienceTable.setItems(ambienceTableItems);
@@ -73,7 +75,7 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
     public void accept() {
         if (! AvailableAmbienceTable.getSelectionModel().getSelectedItems().isEmpty()) {
             for (AvailableAmbienceTableItem i : AvailableAmbienceTable.getSelectionModel().getSelectedItems()) {
-                ambiencetoadd.add(AvailableAmbience.getAmbience().get(AvailableAmbienceTable.getItems().indexOf(i)));
+                ambiencetoadd.add(selecteditemambience.getAvailableAmbience().get(AvailableAmbienceTable.getItems().indexOf(i)));
             }
             accepted = ! ambiencetoadd.isEmpty();
         }
@@ -86,7 +88,7 @@ public class SelectAvailableAmbience extends StyledStage implements Initializabl
     public void preview() {
         int index = AvailableAmbienceTable.getSelectionModel().getSelectedIndex();
         if (index != -1) {
-            PreviewFile previewFile = new PreviewFile(AvailableAmbience.getAmbience().get(index).getFile());
+            PreviewFile previewFile = new PreviewFile(selecteditemambience.getAvailableAmbience().get(index).getFile());
             previewFile.initModality(Modality.APPLICATION_MODAL);
             previewFile.showAndWait();
         }

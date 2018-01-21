@@ -25,7 +25,6 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     public Button AcceptButton;
     public Button CancelButton;
     public CheckBox QuickAddAmbienceCheckbox;
-    public ChoiceBox<String> QuickAddAmbienceChoiceBox;
     private boolean accepted = false;
     private boolean quickaddambience = false;
     private List<PlaybackItem> playbackItemList;
@@ -61,7 +60,6 @@ public class SetDurationWithAmbienceOption extends StyledStage {
             MinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) minutes, preferences.getCreationOptions().getScrollincrement()));
             SecondsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, (int) seconds, preferences.getCreationOptions().getScrollincrement()));
             QuickAddAmbienceCheckbox.setVisible(quickaddambienceoption);
-            QuickAddAmbienceChoiceBox.setVisible(quickaddambienceoption);
             setScrollListeners();
             boolean hassomeambience = false;
             for (PlaybackItem i : playbackItemList) {
@@ -69,18 +67,14 @@ public class SetDurationWithAmbienceOption extends StyledStage {
                 else {missingambiencecount++;}
             }
             QuickAddAmbienceCheckbox.setDisable(! hassomeambience);
-            QuickAddAmbienceChoiceBox.setDisable(true);
             if (! hassomeambience) {QuickAddAmbienceCheckbox.setTooltip(new Tooltip("Cannot Add As There Is No Ambience For Any Playback Items"));}
             QuickAddAmbienceCheckbox.selectedProperty().addListener(observable -> {
-                QuickAddAmbienceChoiceBox.setDisable(! QuickAddAmbienceCheckbox.isSelected());
                 if (QuickAddAmbienceCheckbox.isSelected() && missingambiencecount > 0) {
                     if (! new ConfirmationDialog(preferences, "Missing Ambience", "Missing Ambience For " + missingambiencecount + " Playback Items", "Add Partial Ambience?").getResult()) {
                         QuickAddAmbienceCheckbox.setSelected(false);
                     }
                 }
             });
-            QuickAddAmbienceChoiceBox.setItems(FXCollections.observableArrayList("Repeat", "Shuffle"));
-            QuickAddAmbienceChoiceBox.getSelectionModel().select(1);
         } catch (IOException e) {e.printStackTrace();}
     }
     private void setScrollListeners() {
@@ -111,7 +105,6 @@ public class SetDurationWithAmbienceOption extends StyledStage {
     public boolean isQuickaddambience() {
         return quickaddambience;
     }
-    public int getQuickAddAmbienceType() {return QuickAddAmbienceChoiceBox.getSelectionModel().getSelectedIndex();}
     public double getDuration() {return getNewDuration().toMillis();}
 
 // Button Actions

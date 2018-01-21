@@ -17,6 +17,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.chart.StackedBarChart;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
@@ -295,9 +296,24 @@ public class Player extends Stage {
         });
     }
     private void setupTooltips() {
+        StackedBarChart<String, Integer> barchart;
         PlayButton.setTooltip(new Tooltip("Play"));
         PauseButton.setTooltip(new Tooltip("Pause"));
         StopButton.setTooltip(new Tooltip("Stop"));
+        AmbiencePlaylistTable_Preset.setRowFactory(tv -> new TableRow<AmbiencePlaylistTableItem>() {
+            private Tooltip tooltip = new Tooltip();
+            @Override
+            protected void updateItem(AmbiencePlaylistTableItem item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    tooltip.setText(
+                            "Name: " + item.name.get() + "\n" +
+                            "Location: " + item.getFile().getAbsolutePath()
+                    );
+                    setTooltip(tooltip);
+                } else {setTooltip(null);}
+            }
+        });
     }
     private void setupIcons() {
         IconDisplayType dt = Preferences.getUserInterfaceOptions().getIconDisplayType();
@@ -459,7 +475,7 @@ public class Player extends Stage {
         }
     }
     private void toggleplayerbuttons() {
-        if (playerState == null) {return;}
+        if (playerState == null || selectedPlaybackItem == null) {return;}
         boolean idle = playerState == IDLE;
         boolean playing = playerState == PLAYING;
         boolean paused = playerState == PAUSED;
@@ -515,7 +531,7 @@ public class Player extends Stage {
         List<SoundFile> presetambience = selectedPlaybackItem.getAmbience().getSessionAmbience();
         int count = 1;
         for (SoundFile i : presetambience) {
-            presetitems.add(new AmbiencePlaylistTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getDuration()))));
+            presetitems.add(new AmbiencePlaylistTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getDuration())), i.getFile()));
             count++;
         }
         AmbiencePlaylistTable_Preset.setItems(presetitems);
@@ -524,7 +540,7 @@ public class Player extends Stage {
         List<SoundFile> availableambience = selectedPlaybackItem.getAmbience().getAvailableAmbience();
         int counted = 1;
         for (SoundFile i : availableambience) {
-            availableitems.add(new AmbiencePlaylistTableItem(counted, i.getName(), Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getDuration()))));
+            availableitems.add(new AmbiencePlaylistTableItem(counted, i.getName(), Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getDuration())), i.getFile()));
             counted++;
         }
         AmbiencePlaylistTable_Available.setItems(availableitems);
@@ -539,7 +555,7 @@ public class Player extends Stage {
         }
     }
     private void updateambienceui() {
-        if (selectedPlaybackItem == null || ! selectedPlaybackItem.getAmbience().hasAmbience()) {
+        if (selectedPlaybackItem == null) {
             AmbienceTab.setDisable(true);
             return;
         }
@@ -581,7 +597,7 @@ public class Player extends Stage {
         }
     }
     public void shuffleambiencebuttonpressed() {
-        if (selectedPlaybackItem != null && selectedPlaybackItem.getAmbience().hasAmbience()) {
+        if (selectedPlaybackItem != null && selectedPlaybackItem.getAmbience().hasPresetAmbience()) {
             List<SoundFile> ambiencelist = selectedPlaybackItem.getAmbience().getSessionAmbience();
             while (true) {
                 Collections.shuffle(ambiencelist);
@@ -956,6 +972,7 @@ public class Player extends Stage {
         AmbienceVolumePercentage.setText("0%");
     }
     private void endofsession() {
+        System.out.println("Called End Of Session");
         setPlayerstate(STOPPED);
         // TODO Prompt For Export
         updategoalsui();
@@ -974,6 +991,7 @@ public class Player extends Stage {
                         GoalsCompletedDialog goalsCompletedDialog = new GoalsCompletedDialog(AllGoals);
                         goalsCompletedDialog.initModality(Modality.APPLICATION_MODAL);
                         goalsCompletedDialog.show();
+                        AllGoals.marshall();
                     }
                     if (sessionComplete.getSessionCompleteDirections() != null) {
                         switch (sessionComplete.getSessionCompleteDirections()) {
@@ -1442,11 +1460,20 @@ public class Player extends Stage {
         public IntegerProperty number;
         public StringProperty name;
         public StringProperty duration;
+        private File file;
 
-        public AmbiencePlaylistTableItem(int number, String name, String duration) {
+        public AmbiencePlaylistTableItem(int number, String name, String duration, File file) {
             this.number = new SimpleIntegerProperty(number);
             this.name = new SimpleStringProperty(name);
             this.duration = new SimpleStringProperty(duration);
+            this.file = file;
         }
+
+        public File getFile() {
+            return file;
+        }
+    }
+    enum PlayerExitState {
+        NOT_STARTED, IN_PROGRESS, COMPLETED
     }
 }

@@ -2,6 +2,9 @@ package kujiin.ui;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
@@ -10,6 +13,7 @@ import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -21,6 +25,7 @@ import kujiin.ui.creation.*;
 import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.ChangeProgramOptions;
 import kujiin.ui.dialogs.EditReferenceFiles;
+import kujiin.ui.dialogs.SelectDate;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
 import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.ui.dialogs.alerts.InformationDialog;
@@ -49,8 +54,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static kujiin.xml.Preferences.*;
-
-// Use Mind Workstation As UI Model
 
 public class MainController implements Initializable {
     private boolean testingmode;
@@ -109,9 +112,7 @@ public class MainController implements Initializable {
     public MenuItem Duration_SetRampOnlyMenuItem;
     public MenuItem Duration_EditDurationMenuItem;
     public MenuButton AmbienceMenu;
-    public Menu AmbienceQuickAddMenu;
-    public MenuItem AmbienceQuickAddMenu_Repeat;
-    public MenuItem AmbienceQuickAddMenu_Shuffle;
+    public MenuItem Ambience_QuickAdd;
     public MenuItem AmbienceCustomize;
     public Button MoveUpButton;
     public Button MoveDownButton;
@@ -131,11 +132,17 @@ public class MainController implements Initializable {
     // Progress Tab
     public Tab ProgressTab;
         // Overview Tab
+    public Tab ProgressOverviewTab;
+    public ChoiceBox<String> ProgressOverviewTypeChoiceBox;
     public BarChart<String, Number> ProgressOverviewBarChart;
     public NumberAxis ProgressOverviewNumbersAxis;
     public CategoryAxis ProgressOverviewCategoryAxis;
+    public Label ProgressOverviewTotalTimePracticedLabel;
     public TextField ProgressOverviewTotalTimePracticed;
     public AnchorPane ProgressBalanceAnchorPane;
+        // Balance Tab
+    public Tab ProgressBalanceTab;
+    public ChoiceBox<String> ProgressBalanceTypeChoiceBox;
     public PieChart ProgressBalancePieChart;
         // Session Browser Tab
     public TableView<SessionBrowserTableItem> PracticedSessionListTable;
@@ -190,7 +197,6 @@ public class MainController implements Initializable {
 // My Fields
     // Play/Export Tab
     private Session createdsession;
-    private PlaybackItem createdtableselecteditem;
     private ObservableList<TableItem_Number_Name_Duration_Ambience> createdtableitems = FXCollections.observableArrayList();
     private ArrayList<PlaybackItem> createdtableplaybackitems;
     private Timeline updatecompletiontime;
@@ -261,9 +267,10 @@ public class MainController implements Initializable {
         return true;
     }
     public void close() {
-        if (cleanup()) {System.exit(0);}
+        Platform.runLater(() -> {
+            if (cleanup()) {System.exit(0);}
+        });
     }
-
 
 // Setup Methods
     @Override
@@ -276,7 +283,8 @@ public class MainController implements Initializable {
         setupTables();
         ProgressTab.selectedProperty().addListener(observable -> {
             if (ProgressTab.isSelected()) {
-                populateprogressoverviewchartandbalancepie();
+                populateprogressoverview(ProgressOverviewTypeChoiceBox.getValue());
+                populateprogressbalance(ProgressBalanceTypeChoiceBox.getValue());
                 populatesessionbrowsertable();
                 populatesessionbrowserfilter();
                 populatesessiondetailstable();
@@ -298,17 +306,18 @@ public class MainController implements Initializable {
         updatecompletiontime = new Timeline(new KeyFrame(Duration.seconds(1.0), ae -> calculatedurationandestimatedcompletion()));
     }
     private void setupTables() {
-        // Creation Table
+    // Creation Table
         CreatedTableNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
         CreatedTableItemColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         CreatedTableDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
         CreatedTableAmbienceColumn.setCellValueFactory(cellData -> cellData.getValue().ambience);
-//        CreatedTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> tableselectionchanged());
         CreatedTableView.setOnMousePressed(event -> {
-            int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
-            if (selectedindex != -1) {
+            ObservableList<Integer> indexes = CreatedTableView.getSelectionModel().getSelectedIndices();
+            if (! indexes.isEmpty()) {
                 tableselectionchanged();
                 if (event.isSecondaryButtonDown()) {
+                    boolean singleitemselected = indexes.size() == 1;
+
                     ContextMenu contextMenu = new ContextMenu();
 
                     MenuItem moveup = new MenuItem("Move Up");
@@ -322,33 +331,41 @@ public class MainController implements Initializable {
                     MenuItem ramponly = new MenuItem("Set Ramp Only");
                     ramponly.setOnAction(event1 -> setramponly());
                     durationmenu.getItems().add(setduration);
-                    if (! createdtableselecteditem.isRampOnly()) {durationmenu.getItems().add(ramponly);}
+                    durationmenu.getItems().add(ramponly);
 
                     Menu ambiencemenu = new Menu("Ambience");
-                    Menu quickaddambience = new Menu("Quick Add");
-                    MenuItem repeat = new MenuItem("Repeat");
-                    repeat.setOnAction(event1 -> quickaddambience_repeat());
-                    MenuItem shuffle = new MenuItem("Shuffle");
-                    shuffle.setOnAction(event1 -> quickaddambience_shuffle());
-                    quickaddambience.getItems().addAll(repeat, shuffle);
+                    MenuItem quickaddambience = new MenuItem("Quick Add");
+                    quickaddambience.setOnAction(event1 -> quickaddambience_shuffle());
                     MenuItem customizeambience = new MenuItem("Customize Ambience");
                     customizeambience.setOnAction(event1 -> customizeambience());
-                    ambiencemenu.getItems().addAll(quickaddambience, customizeambience);
+                    ambiencemenu.getItems().add(quickaddambience);
                     MenuItem clearambience = new MenuItem("Clear Ambience");
                     clearambience.setOnAction(event1 -> clearambience());
-                    if (createdtableselecteditem.getAmbience().hasAmbience()) {ambiencemenu.getItems().add(clearambience);}
+
+                    if (singleitemselected) { ambiencemenu.getItems().add(customizeambience); }
+                    boolean hasambience = false;
+                    boolean missingambience = false;
+                    for (PlaybackItem i : createdtableplaybackitems) {
+                        if (i.getAmbience().hasPresetAmbience()) {hasambience = true;}
+                        if (! availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {missingambience = true;}
+                    }
+                    if (hasambience) {ambiencemenu.getItems().add(clearambience);}
 
                     MenuItem remove = new MenuItem("Remove");
                     remove.setOnAction(event1 -> removefromcreatortable());
 
+                    if (singleitemselected) {
+                        if (indexes.size() == 1 && indexes.get(0) > 0) {contextMenu.getItems().add(moveup);}
+                        if (indexes.size() ==1 && indexes.get(0) < CreatedTableView.getItems().size() - 1) {contextMenu.getItems().add(movedown);}
+                    }
+                    contextMenu.getItems().add(durationmenu);
+
+
+                    if (! missingambience) {contextMenu.getItems().add(ambiencemenu);}
+                    contextMenu.getItems().add(remove);
+
                     MenuItem clearsession = new MenuItem("Clear Session");
                     clearsession.setOnAction(event1 -> clearloadedsession());
-
-                    if (selectedindex > 0) {contextMenu.getItems().add(moveup);}
-                    if (selectedindex < CreatedTableView.getItems().size() - 1) {contextMenu.getItems().add(movedown);}
-                    contextMenu.getItems().add(durationmenu);
-                    if (availableAmbiences.getsessionpartAmbience(createdtableselecteditem.getCreationindex()).hasAny()) {contextMenu.getItems().add(ambiencemenu);}
-                    contextMenu.getItems().add(remove);
                     contextMenu.getItems().add(clearsession);
                     CreatedTableView.setContextMenu(contextMenu);
                 }
@@ -366,15 +383,97 @@ public class MainController implements Initializable {
                 }
             }
         });
-        // Session Browser List Table
+    // Session Overview Chart
+        ProgressTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (ProgressOverviewTypeChoiceBox.getSelectionModel().getSelectedIndex() == -1) {ProgressOverviewTypeChoiceBox.getSelectionModel().select(1);}
+            if (ProgressBalanceTypeChoiceBox.getSelectionModel().getSelectedIndex() == -1) {ProgressBalanceTypeChoiceBox.getSelectionModel().select(1);}
+        });
+        ProgressOverviewTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
+
+            populateprogressoverview(ProgressOverviewTypeChoiceBox.getValue());
+        });
+        final ObservableList<String> items = FXCollections.observableArrayList("All", "Kuji-In", "Elements");
+        ProgressOverviewTypeChoiceBox.setItems(items);
+        ProgressBalanceTypeChoiceBox.getSelectionModel().select(1);
+        ProgressOverviewTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            populateprogressoverview(newValue);
+            ProgressBalanceTypeChoiceBox.getSelectionModel().select(ProgressOverviewTypeChoiceBox.getSelectionModel().getSelectedIndex());
+        });
+        ProgressBalanceTab.selectedProperty().addListener(observable -> populateprogressbalance(ProgressBalanceTypeChoiceBox.getValue()));
+        ProgressBalanceTypeChoiceBox.setItems(items);
+        ProgressBalanceTypeChoiceBox.getSelectionModel().select(1);
+        ProgressBalanceTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            populateprogressbalance(newValue);
+            ProgressOverviewTypeChoiceBox.getSelectionModel().select(ProgressBalanceTypeChoiceBox.getSelectionModel().getSelectedIndex());
+        });
+    // Session Browser List Table
+        PracticedSessionListTable.setRowFactory(tv -> new TableRow<SessionBrowserTableItem>() {
+            private Tooltip tooltip = new Tooltip();
+
+            @Override
+            protected void updateItem(SessionBrowserTableItem item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    Session practicedsession = sessions.get(item.uuid);;
+                    StringBuilder text = new StringBuilder();
+                    if (practicedsession.getDate_Practiced() != null) {text.append("Date Practiced: ").append(practicedsession.getDate_Practiced().format(Util.dateFormat)).append("\n");}
+                    text.append("Practice Time: ").append(Util.formatdurationtoStringDecimalWithColons(practicedsession.getSessionPracticedTime())).append("\n");
+                    text.append("Playback Items: ").append("\n");
+                    int count = 1;
+                    for (PlaybackItem i : practicedsession.getPlaybackItems()) {
+                        if (i.getPracticeTime() > 0.0) {
+                            text.append(" ").append(count).append(". ").append(i.getName()).append(" (");
+                            text.append(Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getPracticeTime()))).append(")");
+                            text.append("\n");
+                            count++;
+                        }
+                    }
+                    tooltip.setText(text.toString());
+                    setTooltip(tooltip);
+                } else { setTooltip(null); }
+            }
+        });
         PracticedSessionListTable_DateColumn.setCellValueFactory(cellData -> cellData.getValue().date);
         PracticedSessionListTable_ItemsColumn.setCellValueFactory(cellData -> cellData.getValue().items);
         PracticedSessionListTable_DurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
-        // Session Browser Details Table
+    // Session Browser Details Table
         SessionBrowser_DetailsTable_NumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asString());
         SessionBrowser_DetailsTable_ItemColumn.setCellValueFactory(cellData -> cellData.getValue().name);
         SessionBrowser_DetailsTable_TimePracticedColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
-        // Goal Overview Table
+    // Goal Overview Table
+        GoalsOverview_Table.setOnMousePressed(event -> {
+            if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
+                int column = GoalsOverview_Table.getSelectionModel().getSelectedCells().get(0).getColumn();
+                switch (column) {
+                    case 0:
+                    case 1:
+                    case 2:
+                        // Set/Edit Goals
+                        break;
+                    case 3:
+                        // Percentage Breakdown Of Practiced And Detail With ProgressIndicator
+                        break;
+                    case 4:
+                        // ListView Of All Goals Completed
+                        break;
+                }
+                // Set New Goal On Current Goal Column
+                // Goals Completed Detail On Goals Completed Column
+                // Handlers
+            }
+            if (event.isSecondaryButtonDown()) {
+                ContextMenu contextMenu = new ContextMenu();
+
+                MenuItem setnewgoal = new MenuItem("Set/Edit Goals");
+
+                MenuItem viewpracticeddetails = new MenuItem("View Practiced Details");
+
+                MenuItem viewcompletedgoals = new MenuItem("View Completed Goals");
+
+
+                // Context Menu
+            }
+        });
         GoalsOverview_ItemColumn.setCellValueFactory(cellData -> cellData.getValue().sessionitem);
         GoalsOverview_PracticedTimeColumn.setCellValueFactory(cellData -> cellData.getValue().practicedtime);
         GoalsOverview_CurrentGoalColumn.setCellValueFactory(cellData -> cellData.getValue().currentgoal);
@@ -395,6 +494,21 @@ public class MainController implements Initializable {
         GoalsIndividual_Table.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.isCompleted()) {GoalsIndividual_DeleteGoalButton.setDisable(true);}
             else {GoalsIndividual_DeleteGoalButton.setDisable(false);}
+        });
+        CreatedTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    // Goal Details Table
+        GoalsIndividual_Table.setRowFactory(tv -> new TableRow<GoalDetailsTableItem>() {
+            @Override
+            protected void updateItem(GoalDetailsTableItem item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    if (item.isCompleted()) { setTextFill(Color.GREEN); }
+                    else { setTextFill(null); }
+                } else {
+                    setText(null);
+                    setTextFill(null);
+                }
+            }
         });
     }
     private void setupIcons() {
@@ -499,9 +613,7 @@ public class MainController implements Initializable {
             setupIcons();
         }
     }
-    public void closeprogram() {
-        new AdjustDuration(null).showAndWait();
-    }
+    public void closeprogram() {}
     public void addmissedsession() {
 
     }
@@ -530,7 +642,7 @@ public class MainController implements Initializable {
                 ambienceEditor_simple.showAndWait();
             }
         }
-        if ((createdsession != null && ! createdsession.getPlaybackItems().isEmpty()) && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
+        if ((createdsession != null && ! createdsession.hasItems()) && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
         createdsession = new Session(availableAmbiences);
         populatecreatedsessiontable();
         displayStatusBarMessage("New Session Created", Duration.seconds(1.0));
@@ -613,11 +725,8 @@ public class MainController implements Initializable {
                 (observable, oldValue, newValue) -> tableselectionchanged());
     }
     private void tableselectionchanged() {
-        int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
-        if (selectedindex != -1) {
-            createdtableselecteditem = createdtableplaybackitems.get(selectedindex);
-            syncbuttons();
-        } else {createdtableselecteditem = null;}
+        ObservableList<Integer> indexes = CreatedTableView.getSelectionModel().getSelectedIndices();
+        if (! indexes.isEmpty()) { syncbuttons(); }
     }
     // Creation Table Methods
     private List<PlaybackItem> quickaddambience(QuickAddAmbienceType quickAddAmbienceType, List<PlaybackItem> items) {
@@ -625,7 +734,7 @@ public class MainController implements Initializable {
         for (PlaybackItem i : items) {
             if (availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {
                 boolean clearambience = true;
-                if (i.getAmbience().hasAmbience()) {
+                if (i.getAmbience().hasPresetAmbience()) {
                     clearambience = new ConfirmationDialog(preferences, "Confirmation", "Ambience Already Exists", "Clear Ambience Before Quick Add?").getResult();
                     if (clearambience) { i.getAmbience().clearPresetambience();}
                 }
@@ -656,14 +765,7 @@ public class MainController implements Initializable {
         if (adjustDuration.isAccepted()) {
             items = adjustDuration.getPlaybackItemList();
             if (adjustDuration.isQuickaddambience()) {
-                switch (adjustDuration.getQuickAddAmbienceType()) {
-                    case 0:
-                        items = quickaddambience(QuickAddAmbienceType.REPEAT, items);
-                        break;
-                    case 1:
-                        items = quickaddambience(QuickAddAmbienceType.SHUFFLE, items);
-                        break;
-                }
+                items = quickaddambience(QuickAddAmbienceType.SHUFFLE, items);
             }
             int startindex;
             if (CreatedTableView.getSelectionModel().getSelectedIndex() != -1) {
@@ -788,72 +890,115 @@ public class MainController implements Initializable {
         }
     }
     public void setramponly() {
-        if (createdtableselecteditem != null) {
-            createdtableselecteditem.setRampOnly(true);
-            createdtableselecteditem.setExpectedDuration(0.0);
+        ObservableList<Integer> indexes = CreatedTableView.getSelectionModel().getSelectedIndices();
+        if (! indexes.isEmpty()) {
+            for (int i : indexes) {
+                PlaybackItem playbackItem = createdtableplaybackitems.get(i);
+                playbackItem.setRampOnly(true);
+                playbackItem.setExpectedDuration(0.0);
+                createdtableplaybackitems.set(i, playbackItem);
+            }
             populatecreatedsessiontable();
             syncbuttons();
         }
     }
     public void editdurations() {
-        int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
-        if (selectedindex != -1 && createdtableselecteditem != null) {
-            updatecompletiontime.stop();
-            SetDurationWithAmbienceOption adjustDuration = new SetDurationWithAmbienceOption(preferences, availableAmbiences, Collections.singletonList(createdtableselecteditem), false);
+        ObservableList<Integer> indexes = CreatedTableView.getSelectionModel().getSelectedIndices();
+        if (! indexes.isEmpty()) {
+            List<PlaybackItem> itemstochange = new ArrayList<>();
+            boolean hasAmbience = false;
+            for (Integer i : indexes) {
+                PlaybackItem x = createdtableplaybackitems.get(i);
+                itemstochange.add(x);
+                if (x.getAmbience().hasPresetAmbience()) {hasAmbience = true;}
+            }
+            if (hasAmbience) {
+                if (! new ConfirmationDialog(preferences, "Confirmation", "Setting Durations For Playback Item(s) With Set Ambience", "This Will Clear Ambience. Is That OK?").getResult()) {
+                    return;
+                } else { for (PlaybackItem i :itemstochange) { i.getAmbience().clearPresetambience(); } }
+            }
+            SetDurationWithAmbienceOption adjustDuration = new SetDurationWithAmbienceOption(preferences, availableAmbiences, itemstochange, false);
             adjustDuration.initOwner(getStage());
             adjustDuration.showAndWait();
             if (adjustDuration.isAccepted()) {
-                createdtableplaybackitems.set(selectedindex, adjustDuration.getPlaybackItemList().get(0));
-                if (createdtableselecteditem.getAmbience().isEnabled() && createdtableselecteditem.getAmbience().getPresetAmbienceDuration().lessThan(new Duration(createdtableplaybackitems.get(selectedindex).getExpectedDuration()))) {
-                    if (new ConfirmationDialog(preferences, "Set Ambience", "Ambience Not Long Enough To Match New Duration", "Please Set More Ambience Or Disable Ambience", "Add Ambience", "Disable Ambience").getResult()) {
-                        customizeambience();
-                        PlaybackItem createdtableselecteditem = createdtableplaybackitems.get(selectedindex);
-                        if (createdtableselecteditem.getAmbience().getPresetAmbienceDuration().lessThan(new Duration(createdtableplaybackitems.get(selectedindex).getExpectedDuration()))) {
-                            createdtableselecteditem.getAmbience().clearPresetambience();
-                            createdtableselecteditem.getAmbience().setEnabled(false);
-                        }
-                    } else {
-                        createdtableselecteditem.getAmbience().clearPresetambience();
-                        createdtableselecteditem.getAmbience().setEnabled(false);
+                List<PlaybackItem> changeditems = createdsession.getPlaybackItems();
+                for (int i : indexes) {
+                    PlaybackItem x = changeditems.get(i);
+                    x.setExpectedDuration(adjustDuration.getDuration());
+                    changeditems.set(i, x);
                     }
-                }
+                createdsession.setPlaybackItems(new ArrayList<>(changeditems));
                 createdsession.calculateexpectedduration();
                 populatecreatedsessiontable();
-                displayStatusBarMessage("Duration Edited", Duration.seconds(1.5));
+                displayStatusBarMessage("Duration Edited", Duration.seconds(1.0));
                 syncbuttons();
-            } else {updatecompletiontime.play();}
+            }
         } else {new InformationDialog(preferences, "Cannot Edit Duration", "Select A Single Table Item To Edit Duration", null, true);}
     }
     public void quickaddambience_repeat() {
-        if (createdtableselecteditem != null) {
-            List<PlaybackItem> items = quickaddambience(QuickAddAmbienceType.REPEAT, Collections.singletonList(createdtableselecteditem));
-            createdtableselecteditem = items.get(0);
+        ObservableList<Integer> indexes = CreatedTableView.getSelectionModel().getSelectedIndices();
+        if (! indexes.isEmpty()) {
+            List<PlaybackItem> itemstoaddambienceto = new ArrayList<>();
+            for (Integer i : indexes) {
+                itemstoaddambienceto.add(createdtableplaybackitems.get(i));
+            }
+            int availableambiencecount = 0;
+            for (PlaybackItem i : itemstoaddambienceto) {
+                if (availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {availableambiencecount++;}
+            }
+            if (availableambiencecount != itemstoaddambienceto.size()) {
+                new InformationDialog(preferences, "Information", "Cannot Quick Add Ambience", itemstoaddambienceto.size() - availableambiencecount + " Items Are Missing Ambience");
+                return;
+            }
+            quickaddambience(QuickAddAmbienceType.REPEAT, itemstoaddambienceto);
             populatecreatedsessiontable();
         }
     }
     public void quickaddambience_shuffle() {
-        if (createdtableselecteditem != null) {
-            List<PlaybackItem> items = quickaddambience(QuickAddAmbienceType.SHUFFLE, Collections.singletonList(createdtableselecteditem));
-            createdtableselecteditem = items.get(0);
+        ObservableList<Integer> indexes = CreatedTableView.getSelectionModel().getSelectedIndices();
+        if (! indexes.isEmpty()) {
+            List<PlaybackItem> itemstoaddambienceto = new ArrayList<>();
+            for (Integer i : indexes) {
+                itemstoaddambienceto.add(createdtableplaybackitems.get(i));
+            }
+            int availableambiencecount = 0;
+            for (PlaybackItem i : itemstoaddambienceto) {
+                if (availableAmbiences.getsessionpartAmbience(i.getCreationindex()).hasAny()) {availableambiencecount++;}
+            }
+            if (availableambiencecount != itemstoaddambienceto.size()) {
+                new InformationDialog(preferences, "Information", "Cannot Quick Add Ambience", itemstoaddambienceto.size() - availableambiencecount + " Items Are Missing Ambience");
+                return;
+            }
+            quickaddambience(QuickAddAmbienceType.SHUFFLE, itemstoaddambienceto);
             populatecreatedsessiontable();
         }
     }
     public void customizeambience() {
-        int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
-        if (selectedindex != -1 && createdtableselecteditem != null) {
-            updatecompletiontime.stop();
-            CustomizeAmbience customizeAmbience = new CustomizeAmbience(preferences, createdtableselecteditem, availableAmbiences);
+        ObservableList<Integer> indexes = CreatedTableView.getSelectionModel().getSelectedIndices();
+        if (! indexes.isEmpty() && indexes.size() == 1) {
+            PlaybackItem x = createdtableplaybackitems.get(indexes.get(0));
+            CustomizeAmbience customizeAmbience = new CustomizeAmbience(preferences, x);
             customizeAmbience.initModality(Modality.APPLICATION_MODAL);
             customizeAmbience.showAndWait();
             if (customizeAmbience.isAccepted()) {
-                createdtableplaybackitems.set(createdtableplaybackitems.indexOf(createdtableselecteditem), customizeAmbience.getPlaybackItem());
+                ArrayList<PlaybackItem> items = createdtableplaybackitems;
+                items.set(createdtableplaybackitems.indexOf(x), customizeAmbience.getPlaybackItem());
+                createdsession.setPlaybackItems(items);
                 populatecreatedsessiontable();
-            } else { updatecompletiontime.play(); }
+            }
         }
     }
     private void clearambience() {
-        createdtableselecteditem.getAmbience().clearPresetambience();
-        populatecreatedsessiontable();
+        ObservableList<Integer> indexes = CreatedTableView.getSelectionModel().getSelectedIndices();
+        if (! indexes.isEmpty()) {
+            for (int i : indexes) {
+                PlaybackItem x = createdtableplaybackitems.get(i);
+                x.getAmbience().clearPresetambience();
+                createdtableplaybackitems.set(indexes.get(0), x);
+            }
+            createdsession.setPlaybackItems(createdtableplaybackitems);
+            populatecreatedsessiontable();
+        }
     }
     public void moveupincreatortable() {
         int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
@@ -897,9 +1042,18 @@ public class MainController implements Initializable {
 
     }
     public void removefromcreatortable() {
-        int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
-        if (selectedindex != -1 && createdtableitems != null) {
-            createdsession.removeplaybackitem(selectedindex);
+        ObservableList<Integer> indexes = CreatedTableView.getSelectionModel().getSelectedIndices();
+        if (! indexes.isEmpty()) {
+            if (indexes.size() > 1) {
+                if (! new ConfirmationDialog(preferences, "Confirmation", "Really Remove " + indexes.size() + " Items?", null).getResult()) { return; }
+            }
+            List<PlaybackItem> items = createdsession.getPlaybackItems();
+            List<PlaybackItem> itemstoremove = new ArrayList<>();
+            for (int i : indexes) {
+                itemstoremove.add(items.get(i));
+            }
+            for (PlaybackItem i :itemstoremove) { items.remove(i); }
+            createdsession.setPlaybackItems(new ArrayList<>(items));
             populatecreatedsessiontable();
         }
     }
@@ -928,13 +1082,12 @@ public class MainController implements Initializable {
                         System.out.println(addambiencechoicedialog.getSelectedItem());
                         switch (addambiencechoicedialog.getSelectedItem()) {
                             case "Quick Add Ambience":
-                                QuickAddAmbience quickAddAmbience = new QuickAddAmbience(preferences, availableAmbiences, Collections.singletonList(item1));
-                                quickAddAmbience.initModality(Modality.APPLICATION_MODAL);
-                                quickAddAmbience.showAndWait();
-                                if (quickAddAmbience.isAccepted()) { item1 = quickAddAmbience.getPlaybackItemList().get(0); }
+                                if (new ConfirmationDialog(preferences, "Quick Add Ambience", "Quick Add Ambience?", null).getResult()) {
+                                    item1 = quickaddambience(QuickAddAmbienceType.SHUFFLE, Collections.singletonList(item1)).get(0);
+                                }
                                 break;
                             case "Customize Ambience":
-                                CustomizeAmbience customizeAmbience = new CustomizeAmbience(preferences, item1, availableAmbiences);
+                                CustomizeAmbience customizeAmbience = new CustomizeAmbience(preferences, item1);
                                 customizeAmbience.showAndWait();
                                 if (customizeAmbience.isAccepted()) { item1 = customizeAmbience.getPlaybackItem(); }
                                 break;
@@ -954,18 +1107,19 @@ public class MainController implements Initializable {
         if (createdsession != null && new ConfirmationDialog(preferences, "Clear Session", "Really Clear Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {
             createdsession = new Session(availableAmbiences);
             populatecreatedsessiontable();
+            displayStatusBarMessage("Session Cleared", Duration.seconds(1.0));
         } else { updatecompletiontime.play(); }
     }
     public void addasmissedsession() {
         updatecompletiontime.stop();
         if (createdsession.hasItems() && new ConfirmationDialog(preferences, "Confirmation", "Really Add As Missed Session? ", "This Will Mark The Session As Practiced And Add To Progress").getResult()) {
-            AddMissedSession addMissedSession = new AddMissedSession(preferences, createdsession);
-            addMissedSession.showAndWait();
-            if (addMissedSession.isAccepted()) {
+            SelectDate selectDate = new SelectDate("Select Missed Session Date");
+            selectDate.showAndWait();
+            if (selectDate.isAccepted()) {
                 Session missedsession = createdsession;
-                missedsession.setDate_Practiced(addMissedSession.getDate());
+                missedsession.setDate_Practiced(selectDate.getDate());
                 missedsession.setasMissedSession();
-                LocalDate sessiondate = addMissedSession.getDate();
+                LocalDate sessiondate = selectDate.getDate();
                 int index = 0;
                 for (int i = 0; i < sessions.getSession().size(); i++) {
                     Session x = sessions.getSession().get(i);
@@ -974,7 +1128,9 @@ public class MainController implements Initializable {
                         break;
                     }
                 }
+                missedsession.newID();
                 sessions.add(index, missedsession);
+                sessions.marshall();
             }
         }
         updatecompletiontime.play();
@@ -993,7 +1149,7 @@ public class MainController implements Initializable {
         }
     }
     public void savecreatedsessionasfile() {
-        if (createdsession != null && ! createdsession.getPlaybackItems().isEmpty()) {
+        if (createdsession != null && ! createdsession.hasItems()) {
             updatecompletiontime.stop();
             FileChooser fileChooser = new FileChooser();
             File savefile = fileChooser.showSaveDialog(getStage());
@@ -1053,7 +1209,7 @@ public class MainController implements Initializable {
         if (createdtableplaybackitems != null) {createdtableplaybackitems.clear();}
         else {createdtableplaybackitems = new ArrayList<>();}
         if (! createdtableitems.isEmpty()) {createdtableitems.clear();}
-        if (createdsession.getPlaybackItems() != null && ! createdsession.getPlaybackItems().isEmpty()) {
+        if (createdsession.hasItems()) {
             createdtableplaybackitems.addAll(createdsession.getPlaybackItems());
             int number = 1;
             for (PlaybackItem i : createdtableplaybackitems) {
@@ -1062,24 +1218,31 @@ public class MainController implements Initializable {
             }
             CreatedTableView.setItems(createdtableitems);
         }
-        createdtableselecteditem = null;
         syncbuttons();
         updatecompletiontime.play();
     }
     private void syncbuttons() {
         boolean nosessionloaded = createdsession == null;
         boolean tableempty = CreatedTableView.getItems().isEmpty();
-        int selectedindex = CreatedTableView.getSelectionModel().getSelectedIndex();
+        ObservableList<Integer> indexes = CreatedTableView.getSelectionModel().getSelectedIndices();
+        boolean singleitemselected = indexes.size() == 1;
         AddItemsMenu.setDisable(nosessionloaded);
-        DurationMenu.setDisable(nosessionloaded || tableempty || selectedindex == -1);
-        AmbienceMenu.setDisable(nosessionloaded || tableempty || selectedindex == -1);
+        DurationMenu.setDisable(nosessionloaded || tableempty || indexes.isEmpty());
+        AmbienceMenu.setDisable(nosessionloaded || tableempty || indexes.isEmpty());
+        AmbienceCustomize.setVisible(singleitemselected);
         PlayButton.setDisable(nosessionloaded || tableempty);
         SaveAsFileButton.setDisable(nosessionloaded || tableempty);
         ExportButton.setDisable(nosessionloaded || tableempty);
-        RemoveButton.setDisable(nosessionloaded || tableempty || selectedindex == -1);
-        MoveUpButton.setDisable(nosessionloaded || tableempty || selectedindex == -1 || selectedindex == 0);
-        MoveDownButton.setDisable(nosessionloaded || tableempty || selectedindex == -1 || selectedindex == CreatedTableView.getItems().size() -1);
-        AddSessionAsMenuButton.setDisable(nosessionloaded || tableempty);
+        RemoveButton.setDisable(nosessionloaded || tableempty || indexes.isEmpty());
+        if (! singleitemselected) {
+            MoveUpButton.setDisable(true);
+            MoveDownButton.setDisable(true);
+        } else {
+            MoveUpButton.setDisable(nosessionloaded || tableempty || indexes.isEmpty() || indexes.get(0) == 0);
+            MoveDownButton.setDisable(nosessionloaded || tableempty || indexes.isEmpty() || indexes.get(0) == CreatedTableView.getItems().size() -1);
+        }
+        FavoriteMenuItem.setDisable(nosessionloaded || tableempty);
+        ClearButton.setDisable(nosessionloaded || tableempty);
         SessionSummary_CompletionTime_Label.setDisable(nosessionloaded || tableempty);
         SessionSummary_CompletionTime.setDisable(nosessionloaded || tableempty);
         SessionSummary_Duration.setDisable(nosessionloaded || tableempty);
@@ -1088,7 +1251,7 @@ public class MainController implements Initializable {
         else {CreatedTableView.setPlaceholder(new Label("Session Is Empty"));}
     }
     private void calculatedurationandestimatedcompletion() {
-        if (createdsession != null && ! createdsession.getPlaybackItems().isEmpty()) {
+        if (createdsession != null && createdsession.hasItems()) {
             SessionSummary_Duration.setText(Util.formatdurationtoStringSpelledOutShort(createdsession.getExpectedSessionDuration(), false));
             SessionSummary_Duration.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(createdsession.getExpectedSessionDuration(), Double.MAX_VALUE)));
             LocalTime now = LocalTime.now();
@@ -1108,49 +1271,88 @@ public class MainController implements Initializable {
 
 // Progress Tab
     // Overview Tab Methods
-    public void populateprogressoverviewchartandbalancepie() {
-        ProgressBalancePieChart.getData().clear();
-        ProgressOverviewBarChart.getData().clear();
-        if (sessions.getSession() != null) {
-            if (sessions.getSession().isEmpty()) {return;}
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            ArrayList<Duration> sessionpartdurations = new ArrayList<>();
-            Duration totaltimepracticed = Duration.ZERO;
-            for (int i = 0; i<15; i++) {sessionpartdurations.add(Duration.ZERO);}
-            for (Session i : sessions.getSession()) {
-                for (PlaybackItem x : i.getPlaybackItems()) {
-                    if (x.getPracticeTime() > 0.0) {
-                        Duration duration = sessionpartdurations.get(x.getCreationindex()).add(new Duration(x.getPracticeTime()));
-                        sessionpartdurations.set(x.getCreationindex(), duration);
+    private Session getTotalProgressSession(String type) {
+        Session testsession = new Session();
+        ArrayList<Integer> indexes = new ArrayList<>();
+        switch (type) {
+            case "All":
+                for (int i = 0; i < 15; i++) { testsession.addplaybackitem(i); indexes.add(i);}
+                break;
+            case "Kuji-In":
+                for (int i = 1; i < 10; i++) { testsession.addplaybackitem(i); indexes.add(i);}
+                break;
+            case "Elements":
+                for (int i = 10; i < 15; i++) { testsession.addplaybackitem(i); indexes.add(i);}
+                break;
+        }
+        for (Session i : sessions.getSession()) {
+            for (PlaybackItem x : i.getPlaybackItems()) {
+                if (x.getPracticeTime() > 0.0 && indexes.contains(x.getCreationindex())) {
+                    int testsessionindex = 0;
+                    for (PlaybackItem t : testsession.getPlaybackItems()) {
+                        if (t.getCreationindex() == x.getCreationindex()) {
+                            testsessionindex = testsession.getPlaybackItems().indexOf(t);
+                        }
                     }
+                    Duration newduration = Duration.millis(testsession.getPlaybackItems().get(testsessionindex).getExpectedDuration()).add(Duration.millis(x.getPracticeTime()));
+                    testsession.getPlaybackItems().get(testsessionindex).setExpectedDuration(newduration.toMillis());
                 }
-                totaltimepracticed = totaltimepracticed.add(i.getSessionPracticedTime());
             }
+        }
+        testsession.calculateexpectedduration();
+        return testsession;
+    }
+    private void populateprogressoverview(String type) {
+        ProgressOverviewBarChart.getData().clear();
+        if (sessions.getSession() != null && ! sessions.getSession().isEmpty() && ProgressOverviewTypeChoiceBox.getValue() != null) {
+            Session testsession = getTotalProgressSession(type);
+//            System.out.println("Test Session Parts: ");
+//            int count = 1;
+//            for (PlaybackItem i : testsession.getPlaybackItems()) {
+//                System.out.println(count + ": " + i.getName());
+//                count++;
+//            }
+            if (testsession == null) {return;}
             boolean displayinhours = false;
-            for (Duration i : sessionpartdurations) {
-                if (i.greaterThanOrEqualTo(Duration.hours(2.5))) { displayinhours = true; break;}
+            for (PlaybackItem i : testsession.getPlaybackItems()) {
+                if (Duration.millis(i.getExpectedDuration()).greaterThanOrEqualTo(Duration.hours(2.5))) {
+                    displayinhours = true;
+                }
             }
-            int count = 0;
-            ObservableList<PieChart.Data> piechartvalues = FXCollections.observableArrayList();
-            for (Duration i : sessionpartdurations) {
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            for (PlaybackItem i : testsession.getPlaybackItems()) {
                 double time;
-                if (displayinhours) {time = i.toHours(); ProgressOverviewNumbersAxis.setLabel("Hours");}
-                else {time = i.toMinutes(); ProgressOverviewNumbersAxis.setLabel("Minutes");}
-                series.getData().add(new XYChart.Data<>(ALLNAMES.get(count), time));
-                if (i.greaterThan(Duration.ZERO)) {piechartvalues.add(new PieChart.Data(ALLNAMES.get(count), time));}
-                count++;
+                if (displayinhours) { time = Duration.millis(i.getExpectedDuration()).toHours(); ProgressOverviewNumbersAxis.setLabel("Hours"); }
+                else { time = Duration.millis(i.getExpectedDuration()).toMinutes(); ProgressOverviewNumbersAxis.setLabel("Minutes"); }
+                series.getData().add(new XYChart.Data<>(i.getName(), time));
             }
-            ProgressBalancePieChart.setData(piechartvalues);
-            double total = 0;
-            for (PieChart.Data d : ProgressBalancePieChart.getData()) {total += d.getPieValue();}
-            for (final PieChart.Data data : ProgressBalancePieChart.getData()) {
-                String name = String.format("%s (%.1f%%)", data.getName(), 100 * data.getPieValue() / total);
-                data.setName(name);
-            }
-            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringSpelledOutShort(totaltimepracticed, true));
-            ProgressOverviewTotalTimePracticed.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(totaltimepracticed, Double.MAX_VALUE)));
+            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringSpelledOutShort(testsession.getExpectedSessionDuration(), true));
+            ProgressOverviewTotalTimePracticed.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(testsession.getExpectedSessionDuration(), Double.MAX_VALUE)));
             ProgressOverviewBarChart.getData().add(series);
             ProgressOverviewBarChart.setLegendVisible(false);
+        }
+    }
+    private void populateprogressbalance(String type) {
+        ProgressBalancePieChart.getData().clear();
+        Session testsession = getTotalProgressSession(type);
+        if (testsession == null) {return;}
+        boolean displayinhours = false;
+        for (PlaybackItem i : testsession.getPlaybackItems()) {
+            if (Duration.millis(i.getExpectedDuration()).greaterThanOrEqualTo(Duration.hours(2.5))) {displayinhours = true;}
+        }
+        ObservableList<PieChart.Data> piechartvalues = FXCollections.observableArrayList();
+        for (PlaybackItem i : testsession.getPlaybackItems()) {
+            double time;
+            if (displayinhours) {time = Duration.millis(i.getExpectedDuration()).toHours();}
+            else {time = Duration.millis(i.getExpectedDuration()).toMinutes();}
+            if (i.getExpectedDuration() > 0.0) {piechartvalues.add(new PieChart.Data(i.getName(), time));}
+        }
+        ProgressBalancePieChart.setData(piechartvalues);
+        double total = 0;
+        for (PieChart.Data d : ProgressBalancePieChart.getData()) {total += d.getPieValue();}
+        for (final PieChart.Data data : ProgressBalancePieChart.getData()) {
+            String name = String.format("%s (%.1f%%)", data.getName(), 100 * data.getPieValue() / total);
+            data.setName(name);
         }
     }
     // Session Browser Tab Methods
@@ -1193,7 +1395,7 @@ public class MainController implements Initializable {
         SessionBrowser_Details_TotalDuration.setDisable(item == null);
         SessionBrowser_DeleteSessionButton.setDisable(item == null);
         if (item != null) {
-            selectedsessionbrowsersession = this.sessions.get(item.uuid);
+            selectedsessionbrowsersession = sessions.get(item.uuid);
             ObservableList<TableItem_Number_Name_Duration> sessionitems = FXCollections.observableArrayList();
             int count = 1;
             for (PlaybackItem i : selectedsessionbrowsersession.getPlaybackItems()) {
@@ -1430,7 +1632,9 @@ public class MainController implements Initializable {
                         percentcompleted = "100%";
                     } else {
                         datecompleted = "Not Completed";
-                        percentcompleted = String.format("%.2f", (sessions.gettotalpracticedtime(playbackItem, false).toMillis() / i.getDuration().toMillis()) * 100);
+                        double percent = (sessions.gettotalpracticedtime(playbackItem, false).toMillis() / i.getDuration().toMillis()) * 100;
+                        if (percent < 100) { percentcompleted = String.format("%.2f%%", percent);}
+                        else {percentcompleted = "100%";}
                     }
                     tableitems.add(new GoalDetailsTableItem(goaltime, i.getCompleted(), datecompleted, percentcompleted));
                 }
