@@ -2,6 +2,7 @@ package kujiin.xml;
 
 import javafx.util.Duration;
 import kujiin.util.enums.FreqType;
+import org.apache.commons.lang3.time.StopWatch;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -283,6 +284,13 @@ public class Session {
 
 
     // Utility Methods
+    public boolean containsPlaybackItem(int creationindex) {
+        boolean value = false;
+        for (PlaybackItem i : getPlaybackItems()) {
+            if (i.getCreationindex() == creationindex && i.getPracticeTime() > 0.0) {value = true; break;}
+        }
+        return value;
+    }
     public void newID() {id = UUID.randomUUID();}
     public boolean hasCuts() {
         for (PlaybackItem i : getPlaybackItems()) {
@@ -310,8 +318,8 @@ public class Session {
         }
         ExpectedSessionDuration = duration.toMillis();
     }
-    public void addelapseduration(Duration duration) {
-        SessionPracticedTime = SessionPracticedTime + duration.toMillis();
+    public void syncelapsedduration(StopWatch stopWatch) {
+        SessionPracticedTime = (double) stopWatch.getTime();
     }
     public boolean isPracticed() {
         return getSessionPracticedTime().greaterThan(Duration.ZERO);

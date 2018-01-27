@@ -74,7 +74,7 @@ public class Util {
                 longtext.append(hours).append(" Hour"); if (hours > 1) {longtext.append("s");}
                 shorttext.append(hours).append(" Hr"); if (hours > 1) {shorttext.append("s");}
                 reallyshorttext.append(hours).append(" H");
-                if (minutes > 0) {longtext.append(" "); shorttext.append(" "); reallyshorttext.append(" ");}
+                if (minutes > 0 || seconds > 0) {longtext.append(" "); shorttext.append(" "); reallyshorttext.append(" ");}
             }
             if (minutes > 0) {
                 longtext.append(minutes).append(" Minute"); if (minutes > 1) {longtext.append("s");}

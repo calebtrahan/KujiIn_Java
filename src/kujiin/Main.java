@@ -9,15 +9,20 @@ import javafx.stage.Stage;
 import kujiin.ui.MainController;
 import kujiin.ui.dialogs.AudioChecksDialog;
 import kujiin.ui.dialogs.alerts.ConfirmationDialog;
-import kujiin.ui.dialogs.alerts.ErrorDialog;
 import kujiin.util.enums.ProgramState;
 import kujiin.xml.*;
 
-import java.io.IOException;
+import static kujiin.xml.Preferences.*;
 
-import static kujiin.xml.Preferences.PROGRAM_ICON;
-import static kujiin.xml.Preferences.USERDIRECTORY;
-import static kujiin.xml.Preferences.XMLDIRECTORY;
+// TODO Set Total Tooltip:
+    // Total Sessions Practiced
+    // Average Session Length
+    // Grand Total $Name Practiced
+
+// TODO Enable/Disable Ambience On Playback Item Play
+    // If Has Available Ambience.....Enable But Don't Play
+    // If Not Has Preset Ambience....Set This Session Ambience Invisible
+    // Turn Ambience Volume On/Off At Will
 
 // TODO Add Calendar App Or The Last Few Days Practiced
 

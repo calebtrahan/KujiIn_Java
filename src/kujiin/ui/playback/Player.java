@@ -4,8 +4,6 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,7 +17,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -38,6 +39,7 @@ import kujiin.util.enums.IconDisplayType;
 import kujiin.util.enums.PlayerState;
 import kujiin.util.enums.ReferenceType;
 import kujiin.xml.*;
+import org.apache.commons.lang3.time.StopWatch;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -125,6 +127,7 @@ public class Player extends Stage {
     private final Duration updateuifrequency = Duration.millis(100);
     private Duration fade_play_value;
     private Duration fade_stop_value;
+    private StopWatch stopWatch;
 // Playback
     private MediaPlayer entrainmentplayer;
     private MediaPlayer ambienceplayer;
@@ -146,6 +149,8 @@ public class Player extends Stage {
     private Preferences Preferences;
     private ReferenceType referenceType;
     private boolean exitprogram = false;
+    private LocalDateTime starttime;
+    private LocalDateTime stoptime;
     // Event Handlers
     private EventHandler<KeyEvent> AmbienceSwitchWithKeyboard = new EventHandler<KeyEvent>() {
         KeyCodeCombination forwardambience = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
@@ -189,6 +194,8 @@ public class Player extends Stage {
 
     public Player(MainController Root, Sessions sessions, AllGoals allGoals, Session sessiontoplay) {
         try {
+            stopWatch = new StopWatch();
+            stopWatch.reset();
             exitprogram = false;
             testingmode = Root.isTestingmode();
             Preferences = Root.getPreferences();
@@ -451,11 +458,10 @@ public class Player extends Stage {
         PlayerState p = playerState;
         if (p == PLAYING || p == FADING_PLAY || p == FADING_PAUSE || p == FADING_RESUME || p == FADING_STOP) {
             try {
-                selectedPlaybackItem.addelapsedtime(updateuifrequency);
-                AllGoals.calculateifPlaybackItemgoalscompleted(selectedPlaybackItem.getCreationindex(), selectedPlaybackItem.getTotalpracticetime());
-                SessionInProgress.addelapseduration(updateuifrequency);
-                totalpracticedtime = totalpracticedtime.add(updateuifrequency);
-                AllGoals.calculateifTotalGoalsCompleted(totalpracticedtime);
+                selectedPlaybackItem.syncelapsedtime(stopWatch);
+                AllGoals.calculateifPlaybackItemgoalscompleted(selectedPlaybackItem.getCreationindex(), selectedPlaybackItem.getTotalpracticetime(stopWatch));
+                SessionInProgress.syncelapsedduration(stopWatch);
+                AllGoals.calculateifTotalGoalsCompleted(totalpracticedtime.add(Duration.millis(stopWatch.getTime())));
                 updateplaylist();
             // Update Total Progress
                 SessionCurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionPracticedTime()));
@@ -496,13 +502,15 @@ public class Player extends Stage {
         AmbiencePreviousButton.setDisable(! playing);
         AmbiencePauseButton.setDisable(! playing);
         AmbienceNextButton.setDisable(! playing);
-        if (AmbiencePresetTab.isSelected()) {
-            AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
-            AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
-            AmbienceShuffleButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() < 3);
-        } else if (AmbienceAvailableTab.isSelected()) {
-            AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
-            AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
+        if (selectedPlaybackItem != null && selectedPlaybackItem.getAmbience().isEnabled()) {
+            if (AmbiencePresetTab.isSelected()) {
+                AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
+                AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
+                AmbienceShuffleButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() < 3);
+            } else if (AmbienceAvailableTab.isSelected()) {
+                AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
+                AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
+            }
         }
         toggleplayervolumecontrols();
     }
@@ -665,6 +673,7 @@ public class Player extends Stage {
         if (! selectedPlaybackItem.isRampOnly()) {entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);}
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
+        stopWatch.start();
         timeline_progresstonextsessionpart = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()), ae -> progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
@@ -737,6 +746,7 @@ public class Player extends Stage {
         volume_unbindentrainment();
         SessionInProgress.endbreak();
         entrainmentplayer.play();
+        stopWatch.resume();
         if (fade_entrainment_resume != null && sessionparttimeleft().greaterThan(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_resume_value()))) {
             entrainmentplayer.setVolume(0.0);
             if (fade_entrainment_resume.getStatus() == Animation.Status.RUNNING) {return;}
@@ -767,6 +777,7 @@ public class Player extends Stage {
     }
     private void pause() {
         volume_unbindentrainment();
+        stopWatch.suspend();
         SessionInProgress.startbreak();
         if (fade_entrainment_pause != null && sessionparttimeleft().greaterThan(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_pause_value()))) {
             if (selectedPlaybackItem.getAmbience().isEnabled() && fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
@@ -780,6 +791,7 @@ public class Player extends Stage {
         toggleplayerbuttons();
     }
     private void pausewithoutanimation() {
+        stopWatch.suspend();
         setPlayerstate(PAUSED);
         entrainmentplayer.pause();
         timeline_progresstonextsessionpart.pause();
@@ -972,7 +984,7 @@ public class Player extends Stage {
         AmbienceVolumePercentage.setText("0%");
     }
     private void endofsession() {
-        System.out.println("Called End Of Session");
+
         setPlayerstate(STOPPED);
         // TODO Prompt For Export
         updategoalsui();
@@ -1016,7 +1028,7 @@ public class Player extends Stage {
     private boolean endsessionprematurely(boolean resetdialogcontrols) {
         pausewithoutanimation();
         updateuitimeline.pause();
-        if (new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
+        if (testingmode || new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
             setPlayerstate(STOPPED);
             if (! testingmode) { sessions.add(SessionInProgress); }
             if (resetdialogcontrols) {

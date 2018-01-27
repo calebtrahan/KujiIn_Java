@@ -3,6 +3,7 @@ package kujiin.xml;
 import javafx.util.Duration;
 import kujiin.util.Util;
 import kujiin.util.enums.ReferenceType;
+import org.apache.commons.lang3.time.StopWatch;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -112,14 +113,13 @@ public class PlaybackItem {
     public void setAmbience(Ambience ambience) {
         this.ambience = ambience;
     }
-    public Duration getTotalpracticetime() {
-        return totalpracticetime;
+    public Duration getTotalpracticetime(StopWatch stopWatch) {
+        return totalpracticetime.add(Duration.millis(stopWatch.getTime()));
     }
 
 // Utility Methods
-    public void addelapsedtime(Duration duration) {
-        PracticeTime = PracticeTime + duration.toMillis();
-        totalpracticetime = totalpracticetime.add(duration);
+    public void syncelapsedtime(StopWatch stopWatch) {
+        PracticeTime = stopWatch.getTime();
     }
     public void addCompletedGoal(Goal Goal) {
         if (GoalsCompletedThisSession == null) {

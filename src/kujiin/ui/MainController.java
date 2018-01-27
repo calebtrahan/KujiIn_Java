@@ -3,8 +3,6 @@ package kujiin.ui;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
@@ -1271,88 +1269,143 @@ public class MainController implements Initializable {
 
 // Progress Tab
     // Overview Tab Methods
-    private Session getTotalProgressSession(String type) {
-        Session testsession = new Session();
-        ArrayList<Integer> indexes = new ArrayList<>();
-        switch (type) {
-            case "All":
-                for (int i = 0; i < 15; i++) { testsession.addplaybackitem(i); indexes.add(i);}
-                break;
-            case "Kuji-In":
-                for (int i = 1; i < 10; i++) { testsession.addplaybackitem(i); indexes.add(i);}
-                break;
-            case "Elements":
-                for (int i = 10; i < 15; i++) { testsession.addplaybackitem(i); indexes.add(i);}
-                break;
-        }
+    private PlaybackItemDetails getTotalDetails(String type) {
+        List<PlaybackItemDetails> items = getSessionItemDetails(type);
+        PlaybackItemDetails totaldetails = new PlaybackItemDetails(15, "Total");
         for (Session i : sessions.getSession()) {
-            for (PlaybackItem x : i.getPlaybackItems()) {
-                if (x.getPracticeTime() > 0.0 && indexes.contains(x.getCreationindex())) {
-                    int testsessionindex = 0;
-                    for (PlaybackItem t : testsession.getPlaybackItems()) {
-                        if (t.getCreationindex() == x.getCreationindex()) {
-                            testsessionindex = testsession.getPlaybackItems().indexOf(t);
-                        }
-                    }
-                    Duration newduration = Duration.millis(testsession.getPlaybackItems().get(testsessionindex).getExpectedDuration()).add(Duration.millis(x.getPracticeTime()));
-                    testsession.getPlaybackItems().get(testsessionindex).setExpectedDuration(newduration.toMillis());
+            for (PlaybackItemDetails x : items) {
+                if (i.containsPlaybackItem(x.getCreationindex())) {
+                    totaldetails.addsessioncount();
+                    break;
                 }
             }
         }
+        return totaldetails;
+    }
+    private List<PlaybackItemDetails> getSessionItemDetails(String type) {
+        if (type == null) {return null;}
+        Session testsession = new Session();
+        switch (type) {
+            case "All":
+                for (int i = 0; i < 15; i++) { testsession.addplaybackitem(i);}
+                break;
+            case "Kuji-In":
+                for (int i = 1; i < 10; i++) { testsession.addplaybackitem(i);}
+                break;
+            case "Elements":
+                for (int i = 10; i < 15; i++) { testsession.addplaybackitem(i);}
+                break;
+        }
         testsession.calculateexpectedduration();
-        return testsession;
+        List<PlaybackItemDetails> itemDetails = new ArrayList<>();
+        List<Integer> sessionindexes = new ArrayList<>();
+        for (PlaybackItem i : testsession.getPlaybackItems()) { itemDetails.add(new PlaybackItemDetails(i.getCreationindex(), i.getName())); sessionindexes.add(i.getCreationindex());}
+        for (Session i : sessions.getSession()) {
+            for (PlaybackItem x : i.getPlaybackItems()) {
+                if (sessionindexes.contains(x.getCreationindex()) && x.getPracticeTime() > 0.0) {
+                    for (PlaybackItemDetails t : itemDetails) {
+                        if (t.getCreationindex() == x.getCreationindex()) {
+                            t.addsessioncount();
+                            t.addtotalDuration(Duration.millis(x.getPracticeTime()));
+                        }
+                    }
+                }
+            }
+        }
+        return itemDetails;
     }
     private void populateprogressoverview(String type) {
         ProgressOverviewBarChart.getData().clear();
-        if (sessions.getSession() != null && ! sessions.getSession().isEmpty() && ProgressOverviewTypeChoiceBox.getValue() != null) {
-            Session testsession = getTotalProgressSession(type);
-//            System.out.println("Test Session Parts: ");
-//            int count = 1;
-//            for (PlaybackItem i : testsession.getPlaybackItems()) {
-//                System.out.println(count + ": " + i.getName());
-//                count++;
-//            }
-            if (testsession == null) {return;}
+        if (sessions.getSession() != null && ! sessions.getSession().isEmpty() && type != null) {
+            List<PlaybackItemDetails> playbackItemDetails = getSessionItemDetails(type);
             boolean displayinhours = false;
-            for (PlaybackItem i : testsession.getPlaybackItems()) {
-                if (Duration.millis(i.getExpectedDuration()).greaterThanOrEqualTo(Duration.hours(2.5))) {
-                    displayinhours = true;
-                }
-            }
+            for (PlaybackItemDetails i : playbackItemDetails) { if (i.getTotalduration().greaterThanOrEqualTo(Duration.hours(2.5))) { displayinhours = true; } }
+
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            for (PlaybackItem i : testsession.getPlaybackItems()) {
+            Duration grandtotalduration = Duration.ZERO;
+            for (PlaybackItemDetails i : playbackItemDetails) {
                 double time;
-                if (displayinhours) { time = Duration.millis(i.getExpectedDuration()).toHours(); ProgressOverviewNumbersAxis.setLabel("Hours"); }
-                else { time = Duration.millis(i.getExpectedDuration()).toMinutes(); ProgressOverviewNumbersAxis.setLabel("Minutes"); }
+                if (displayinhours) { time = i.getTotalduration().toHours(); ProgressOverviewNumbersAxis.setLabel("Hours"); }
+                else { time = i.getTotalduration().toMinutes(); ProgressOverviewNumbersAxis.setLabel("Minutes"); }
                 series.getData().add(new XYChart.Data<>(i.getName(), time));
+                grandtotalduration = grandtotalduration.add(i.getTotalduration());
             }
-            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringSpelledOutShort(testsession.getExpectedSessionDuration(), true));
-            ProgressOverviewTotalTimePracticed.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(testsession.getExpectedSessionDuration(), Double.MAX_VALUE)));
             ProgressOverviewBarChart.getData().add(series);
+            for (final XYChart.Data<String, Number> data : series.getData()) {
+                PlaybackItemDetails pid = playbackItemDetails.get(series.getData().indexOf(data));
+                Tooltip tooltip = new Tooltip();
+                StringBuilder tooltiptext = new StringBuilder();
+                tooltiptext.append("Total Duration: ");
+                if (displayinhours) {tooltiptext.append(Util.formatdurationtoStringSpelledOut(Duration.hours(data.getYValue().doubleValue()), Double.MAX_VALUE));}
+                else {tooltiptext.append(Util.formatdurationtoStringSpelledOut(Duration.minutes(data.getYValue().doubleValue()), Double.MAX_VALUE));}
+                tooltiptext.append("\n");
+
+                tooltiptext.append("Average Practice Length: ");
+                tooltiptext.append(Util.formatdurationtoStringDecimalWithColons(pid.getAverageDuration())).append("\n");
+                tooltiptext.append("# Of Sessions Practiced: ").append(pid.getSessioncount());
+
+                tooltip.setText(tooltiptext.toString());
+                Tooltip.install(data.getNode(), tooltip);
+            }
+        // Set Total Time Practiced
+            PlaybackItemDetails totaldetails = getTotalDetails(type);
+
+            String typename;
+            if (type.equals("All")) {typename = "";}
+            else {typename = type + " ";}
+
+            Tooltip totaltooltip = new Tooltip();
+            StringBuilder tooltiptext = new StringBuilder();
+            tooltiptext.append("Total ").append(typename).append("Duration: ");
+            tooltiptext.append(Util.formatdurationtoStringSpelledOut(grandtotalduration, Double.MAX_VALUE));
+            tooltiptext.append("\n");
+
+            tooltiptext.append("Average ").append(typename).append("Practice Length: ");
+            Duration averageduration = grandtotalduration.divide(totaldetails.getSessioncount());
+            tooltiptext.append(Util.formatdurationtoStringDecimalWithColons(averageduration)).append("\n");
+            tooltiptext.append("# Of ").append(typename).append("Sessions Practiced: ").append(totaldetails.getSessioncount());
+
+            totaltooltip.setText(tooltiptext.toString());
+
+            ProgressOverviewTotalTimePracticed.setText(Util.formatdurationtoStringSpelledOutShort(grandtotalduration, true));
+            ProgressOverviewTotalTimePracticed.setTooltip(totaltooltip);
             ProgressOverviewBarChart.setLegendVisible(false);
         }
     }
     private void populateprogressbalance(String type) {
         ProgressBalancePieChart.getData().clear();
-        Session testsession = getTotalProgressSession(type);
-        if (testsession == null) {return;}
-        boolean displayinhours = false;
-        for (PlaybackItem i : testsession.getPlaybackItems()) {
-            if (Duration.millis(i.getExpectedDuration()).greaterThanOrEqualTo(Duration.hours(2.5))) {displayinhours = true;}
-        }
-        ObservableList<PieChart.Data> piechartvalues = FXCollections.observableArrayList();
-        for (PlaybackItem i : testsession.getPlaybackItems()) {
-            double time;
-            if (displayinhours) {time = Duration.millis(i.getExpectedDuration()).toHours();}
-            else {time = Duration.millis(i.getExpectedDuration()).toMinutes();}
-            if (i.getExpectedDuration() > 0.0) {piechartvalues.add(new PieChart.Data(i.getName(), time));}
-        }
-        ProgressBalancePieChart.setData(piechartvalues);
-        double total = 0;
-        for (PieChart.Data d : ProgressBalancePieChart.getData()) {total += d.getPieValue();}
-        for (final PieChart.Data data : ProgressBalancePieChart.getData()) {
-            String name = String.format("%s (%.1f%%)", data.getName(), 100 * data.getPieValue() / total);
-            data.setName(name);
+        if (sessions.getSession() != null && ! sessions.getSession().isEmpty() && type != null) {
+            List<PlaybackItemDetails> playbackItemDetails = getSessionItemDetails(type);
+            boolean displayinhours = false;
+            for (PlaybackItemDetails i : playbackItemDetails) { if (i.getTotalduration().greaterThanOrEqualTo(Duration.hours(2.5))) { displayinhours = true; } }
+            ObservableList<PieChart.Data> piechartvalues = FXCollections.observableArrayList();
+            for (PlaybackItemDetails i : playbackItemDetails) {
+                double time;
+                if (displayinhours) {time = i.getTotalduration().toHours();}
+                else {time = i.getTotalduration().toMinutes();}
+                if (i.getTotalduration().greaterThan(Duration.ZERO)) {piechartvalues.add(new PieChart.Data(i.getName(), time));}
+            }
+            ProgressBalancePieChart.setData(piechartvalues);
+            double total = 0;
+            for (PieChart.Data d : ProgressBalancePieChart.getData()) {total += d.getPieValue();}
+            for (final PieChart.Data data : ProgressBalancePieChart.getData()) {
+                String name = String.format("%s (%.1f%%)", data.getName(), 100 * data.getPieValue() / total);
+                data.setName(name);
+                PlaybackItemDetails pid = playbackItemDetails.get(ProgressBalancePieChart.getData().indexOf(data));
+                Tooltip tooltip = new Tooltip();
+                StringBuilder tooltiptext = new StringBuilder();
+                tooltiptext.append("Total Duration: ");
+                if (displayinhours) {tooltiptext.append(Util.formatdurationtoStringSpelledOut(Duration.hours(data.getPieValue()), Double.MAX_VALUE));}
+                else {tooltiptext.append(Util.formatdurationtoStringSpelledOut(Duration.minutes(data.getPieValue()), Double.MAX_VALUE));}
+                tooltiptext.append("\n");
+
+                tooltiptext.append("Average Practice Length: ");
+                tooltiptext.append(Util.formatdurationtoStringDecimalWithColons(pid.getAverageDuration())).append("\n");
+                tooltiptext.append("# Of Sessions Practiced: ").append(pid.getSessioncount());
+
+                tooltip.setText(tooltiptext.toString());
+                Tooltip.install(data.getNode(), tooltip);
+            }
         }
     }
     // Session Browser Tab Methods
@@ -1399,7 +1452,11 @@ public class MainController implements Initializable {
             ObservableList<TableItem_Number_Name_Duration> sessionitems = FXCollections.observableArrayList();
             int count = 1;
             for (PlaybackItem i : selectedsessionbrowsersession.getPlaybackItems()) {
-                sessionitems.add(new TableItem_Number_Name_Duration(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(new Duration(i.getPracticeTime()))));
+                String duration = Util.formatdurationtoStringDecimalWithColons(new Duration(i.getPracticeTime()));
+                if (i.getPracticeTime() < i.getExpectedDuration()) {
+                    duration += " (Of " + Util.formatdurationtoStringDecimalWithColons(new Duration(i.getExpectedDuration())) + ")";
+                }
+                sessionitems.add(new TableItem_Number_Name_Duration(count, i.getName(), duration));
                 count++;
             }
             SessionBrowser_DetailsTable.setItems(sessionitems);
@@ -1676,4 +1733,33 @@ public class MainController implements Initializable {
         }
     }
 
+    class PlaybackItemDetails {
+        private String name;
+        private int creationindex;
+        private int sessioncount;
+        private Duration totalduration;
+
+        public PlaybackItemDetails(int creationindex, String name) {
+            this.creationindex = creationindex;
+            this.name = name;
+            sessioncount = 0;
+            totalduration = Duration.ZERO;
+        }
+
+        void addsessioncount() {sessioncount++;}
+        void addtotalDuration(Duration duration) {totalduration = totalduration.add(duration);}
+        int getCreationindex() {
+            return creationindex;
+        }
+        int getSessioncount() {
+            return sessioncount;
+        }
+        Duration getTotalduration() {
+            return totalduration;
+        }
+        String getName() {
+            return name;
+        }
+        Duration getAverageDuration() {return totalduration.divide(sessioncount);}
+    }
 }
