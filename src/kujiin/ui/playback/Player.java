@@ -75,6 +75,7 @@ public class Player extends Stage {
     public TableColumn<PlaylistTableItem, String> PercentColumn;
         // Ambience
     public Tab AmbienceTab;
+    public TabPane AmbiencePlaylistTabPane;
     public Tab AmbiencePresetTab;
     public TableView<AmbiencePlaylistTableItem> AmbiencePlaylistTable_Preset;
     public TableColumn<AmbiencePlaylistTableItem, Integer> AmbiencePlaylistPresetNumberColumn;
@@ -91,6 +92,10 @@ public class Player extends Stage {
     public Button AmbiencePreviousButton;
     public Button AmbiencePauseButton;
     public Button AmbienceNextButton;
+    public HBox AmbienceVolumeControls;
+    public Slider AmbienceVolume;
+    public Label AmbienceVolumePercentage;
+    public Button AmbienceMuteButton;
         // Goals
     public Tab GoalsTab;
     public HBox GoalLabels;
@@ -105,9 +110,7 @@ public class Player extends Stage {
     // Controls
     public Slider EntrainmentVolume;
     public Label EntrainmentVolumePercentage;
-    public HBox AmbienceVolumeControls;
-    public Slider AmbienceVolume;
-    public Label AmbienceVolumePercentage;
+    public Button EntrainmentMuteButton;
     public Button PlayButton;
     public Button PauseButton;
     public Button StopButton;
@@ -220,7 +223,7 @@ public class Player extends Stage {
             setupIcons();
             setOnCloseRequest(event -> closedialog());
             ReferenceTypeChoiceBox.setOnAction(event -> referencetypechanged());
-            ReferenceToggleCheckBox.setOnAction(event -> ReferenceToggleCheckboxtoggled());
+            ReferenceToggleCheckBox.setOnAction(event -> referencetoggled());
             setOnCloseRequest(event -> {
                 PlayerState p = playerState;
                 boolean animationinprogress = p == FADING_PAUSE || p == FADING_PLAY || p == FADING_RESUME || p == FADING_STOP;
@@ -272,8 +275,11 @@ public class Player extends Stage {
         PercentColumn.setCellValueFactory(cellDate -> cellDate.getValue().percentcompleted);
         PlaylistTableView.setOnMouseClicked(Event::consume);
         AmbiencePlaylistPresetNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
+        AmbiencePlaylistPresetNumberColumn.setSortable(false);
         AmbiencePlaylistPresetNameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+        AmbiencePlaylistPresetNameColumn.setSortable(false);
         AmbiencePlaylistPresetDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
+        AmbiencePlaylistPresetDurationColumn.setSortable(false);
         AmbiencePlaylistTable_Preset.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2 && playerState == PLAYING) {
                 int index = AmbiencePlaylistTable_Preset.getSelectionModel().getSelectedIndex();
@@ -282,8 +288,11 @@ public class Player extends Stage {
             }
         });
         AmbiencePlaylistAvailableNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
+        AmbiencePlaylistAvailableNumberColumn.setSortable(false);
         AmbiencePlaylistAvailableNameColumn.setCellValueFactory(cellData -> cellData.getValue().name);
+        AmbiencePlaylistAvailableNameColumn.setSortable(false);
         AmbiencePlaylistAvailableDurationColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
+        AmbiencePlaylistAvailableDurationColumn.setSortable(false);
         AmbiencePlaylistTable_Available.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2 && playerState == PLAYING) {
                 int index = AmbiencePlaylistTable_Available.getSelectionModel().getSelectedIndex();
@@ -291,7 +300,15 @@ public class Player extends Stage {
                 playambience(i);
             }
         });
-        AmbiencePresetTab.selectedProperty().addListener(observable -> {
+        AmbienceTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            boolean hassessionambience = selectedPlaybackItem.getAmbience().hasPresetAmbience();
+            AmbiencePresetTab.setDisable(! hassessionambience);
+            if (! hassessionambience) {
+                AmbiencePlaylistTabPane.getSelectionModel().select(1);
+            }
+        });
+        AmbiencePresetTab.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (AmbiencePresetTab.isDisabled()) {return;}
             AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
             AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
             AmbienceShuffleButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() < 3);
@@ -332,6 +349,8 @@ public class Player extends Stage {
             AmbiencePreviousButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PREVIOUS, 20.0));
             AmbiencePauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PAUSE, 20.0));
             AmbienceShuffleButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_SHUFFLE, 20.0));
+            EntrainmentMuteButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_MUTE, 20.0));
+            AmbienceMuteButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_MUTE, 20.0));
         }
 //        if (dt == IconDisplayType.ICONS_ONLY) {
 //            PlayButton.setText("");
@@ -361,8 +380,6 @@ public class Player extends Stage {
                 updateuitimeline = new Timeline(new KeyFrame(updateuifrequency, ae -> updateplayerui()));
                 updateuitimeline.setCycleCount(Animation.INDEFINITE);
                 selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(0);
-                AmbienceVolumeControls.setVisible(selectedPlaybackItem.getAmbience().isEnabled());
-                AmbienceMenu.setVisible(selectedPlaybackItem.getAmbience().isEnabled());
                 currententrainmentvolume = Preferences.getPlaybackOptions().getEntrainmentvolume();
                 currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume();
                 setupsession();
@@ -381,73 +398,10 @@ public class Player extends Stage {
     }
     public void stopbuttonpressed() {
         if (playerState == PLAYING || playerState == PAUSED) {
-            endsessionprematurely(true);
-        }
-    }
-    public void ReferenceToggleCheckboxtoggled() {
-        if (ReferenceToggleCheckBox.isSelected()) {
-            if (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() == -1) {
-                switch (Preferences.getSessionOptions().getReferencetype()) {
-                    case html:
-                        ReferenceTypeChoiceBox.getSelectionModel().select(0);
-                        break;
-                    case txt:
-                        ReferenceTypeChoiceBox.getSelectionModel().select(1);
-                        break;
-                    default:
-                        ReferenceTypeChoiceBox.getSelectionModel().select(0);
-                        break;
-                }
-            }
-            referencetypechanged();
-        } else {ReferenceContentPane.setContent(null);}
-    }
-    public void referencetypechanged() {
-        int index = ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex();
-        if (index != -1 && ! ReferenceToggleCheckBox.isSelected()) {ReferenceToggleCheckBox.setSelected(true);}
-        switch (index) {
-            case 0: referenceType = ReferenceType.html; loadreference(); return;
-            case 1: referenceType = ReferenceType.txt; loadreference();
-        }
-    }
-    private void loadreference() {
-        try {
-            File referencefile = selectedPlaybackItem.getReferenceFile(referenceType);
-            if (referencefile != null) {
-                switch (referenceType) {
-                    case txt:
-                        StringBuilder sb = new StringBuilder();
-                        try (FileInputStream fis = new FileInputStream(referencefile); BufferedInputStream bis = new BufferedInputStream(fis)) {
-                            while (bis.available() > 0) {
-                                sb.append((char) bis.read());
-                            }
-                        } catch (Exception ignored) {}
-                        TextArea ta = new TextArea();
-                        ta.setText(sb.toString());
-                        ta.setWrapText(true);
-                        ReferenceContentPane.setContent(ta);
-                        break;
-                    case html:
-                        WebView browser = new WebView();
-                        WebEngine webEngine = browser.getEngine();
-                        webEngine.load(referencefile.toURI().toString());
-                        webEngine.setUserStyleSheetLocation(kujiin.xml.Preferences.REFERENCE_THEMEFILE.toURI().toString());
-                        ReferenceContentPane.setContent(browser);
-                        break;
-                    default:
-                        break;
-                }
-            } else {
-                TextArea ta = new TextArea("Reference File Is Empty Or Missing");
-                ta.prefWidthProperty().bind(ReferenceContentPane.widthProperty());
-                ta.prefHeightProperty().bind(ReferenceContentPane.heightProperty());
-                ReferenceContentPane.setContent(ta);
-            }
-        } catch (NullPointerException ignored) {
-            TextArea ta = new TextArea("No Session Playing");
-            ta.prefWidthProperty().bind(ReferenceContentPane.widthProperty());
-            ta.prefHeightProperty().bind(ReferenceContentPane.heightProperty());
-            ReferenceContentPane.setContent(ta);
+            if (playerState == PLAYING) {pausewithoutanimation();}
+            if (new ConfirmationDialog(Preferences, "Confirmation", "End Session Early?", null).getResult()) {
+                endsessionprematurely(true);
+            } else { if (playerState == PLAYING) {resume();} }
         }
     }
 
@@ -502,7 +456,7 @@ public class Player extends Stage {
         AmbiencePreviousButton.setDisable(! playing);
         AmbiencePauseButton.setDisable(! playing);
         AmbienceNextButton.setDisable(! playing);
-        if (selectedPlaybackItem != null && selectedPlaybackItem.getAmbience().isEnabled()) {
+        if (ambienceactive()) {
             if (AmbiencePresetTab.isSelected()) {
                 AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
                 AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
@@ -517,7 +471,7 @@ public class Player extends Stage {
     private void toggleplayervolumecontrols() {
         boolean enabled = playerState == PLAYING;
         EntrainmentVolume.setDisable(! enabled);
-        if (selectedPlaybackItem.getAmbience().isEnabled()) {AmbienceVolume.setDisable(! enabled);}
+        AmbienceVolume.setDisable(! enabled);
     }
         // Playlist
     private void updateplaylist() {
@@ -533,16 +487,19 @@ public class Player extends Stage {
         PlaylistTableView.getSelectionModel().select(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem));
     }
         // Ambience
+    private boolean ambienceactive() {return selectedPlaybackItem != null && selectedPlaybackItem.getAmbience().hasAvailableAmbience() && ambienceplayer != null;}
     private void populateambienceplaylist() {
     // Preset
-        ObservableList<AmbiencePlaylistTableItem> presetitems = FXCollections.observableArrayList();
-        List<SoundFile> presetambience = selectedPlaybackItem.getAmbience().getSessionAmbience();
-        int count = 1;
-        for (SoundFile i : presetambience) {
-            presetitems.add(new AmbiencePlaylistTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getDuration())), i.getFile()));
-            count++;
+        if (selectedPlaybackItem.getAmbience().hasPresetAmbience()) {
+            ObservableList<AmbiencePlaylistTableItem> presetitems = FXCollections.observableArrayList();
+            List<SoundFile> presetambience = selectedPlaybackItem.getAmbience().getSessionAmbience();
+            int count = 1;
+            for (SoundFile i : presetambience) {
+                presetitems.add(new AmbiencePlaylistTableItem(count, i.getName(), Util.formatdurationtoStringDecimalWithColons(Duration.millis(i.getDuration())), i.getFile()));
+                count++;
+            }
+            AmbiencePlaylistTable_Preset.setItems(presetitems);
         }
-        AmbiencePlaylistTable_Preset.setItems(presetitems);
     // Available
         ObservableList<AmbiencePlaylistTableItem> availableitems = FXCollections.observableArrayList();
         List<SoundFile> availableambience = selectedPlaybackItem.getAmbience().getAvailableAmbience();
@@ -554,21 +511,26 @@ public class Player extends Stage {
         AmbiencePlaylistTable_Available.setItems(availableitems);
     // Sync Buttons
         if (AmbiencePresetTab.isSelected()) {
-            AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
-            AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
-            AmbienceShuffleButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() < 3);
+            if (selectedPlaybackItem.getAmbience().hasPresetAmbience()) {
+                AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
+                AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
+                AmbienceShuffleButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() < 3);
+            } else {
+                AmbienceNextButton.setDisable(true);
+                AmbiencePreviousButton.setDisable(true);
+                AmbienceShuffleButton.setDisable(true);
+            }
         } else {
             AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
             AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getAvailableAmbience().size() == 1);
         }
     }
     private void updateambienceui() {
-        if (selectedPlaybackItem == null) {
-            AmbienceTab.setDisable(true);
-            return;
-        }
+        if (selectedPlaybackItem == null) { AmbienceTab.setDisable(true); return; }
+        AmbiencePresetTab.setDisable(! selectedPlaybackItem.getAmbience().hasPresetAmbience());
+        AmbienceTab.setDisable(! selectedPlaybackItem.getAmbience().hasAvailableAmbience());
+        AmbiencePresetTab.setDisable(! selectedPlaybackItem.getAmbience().hasPresetAmbience());
         if (ambienceplayer != null) {
-            AmbienceTab.setDisable(false);
             if (currentambiencesoundfile != null) {
                 double percentage;
                 percentage = ambienceplayer.getCurrentTime().toMillis() / ambienceplayer.getTotalDuration().toMillis();
@@ -591,17 +553,19 @@ public class Player extends Stage {
         playpreviousambience();
     }
     public void pauseambiencebuttonpressed() {
-        if (selectedPlaybackItem != null && currentambiencesoundfile != null) {
-            switch (ambienceplayer.getStatus()) {
-                case PAUSED:
-                    resumeambience();
-                    // TODO Set Play Button Icon Here
-                    break;
-                case PLAYING:
-                    pauseambience();
-                    // TODO Set Pause Button Icon Here
-                    break;
-            }
+        if (selectedPlaybackItem != null) {
+            if (currentambiencesoundfile != null) {
+                switch (ambienceplayer.getStatus()) {
+                    case PAUSED:
+                        resumeambience();
+                        // TODO Set Play Button Icon Here
+                        break;
+                    case PLAYING:
+                        pauseambience();
+                        // TODO Set Pause Button Icon Here
+                        break;
+                }
+            } else { startambience(); }
         }
     }
     public void shuffleambiencebuttonpressed() {
@@ -663,7 +627,8 @@ public class Player extends Stage {
                 fade_stop_value = fade_stop_value.subtract(Duration.seconds(0.5));
             }
         }
-        setupfadeanimations();
+        setupentrainmentfadeanimations();
+        if (selectedPlaybackItem.getAmbience().hasAvailableAmbience()) {setupambiencefadeanimations();}
         ReferenceControls.setDisable(false);
         PlaybackItemEntrainment playbackItemEntrainment = availableEntrainments.getsessionpartEntrainment(selectedPlaybackItem);
         boolean isLastSessionPart = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) == SessionInProgress.getPlaybackItems().size() - 1;
@@ -673,7 +638,7 @@ public class Player extends Stage {
         if (! selectedPlaybackItem.isRampOnly()) {entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);}
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
-        stopWatch.start();
+        if (! stopWatch.isStarted()) {stopWatch.start();}
         timeline_progresstonextsessionpart = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()), ae -> progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
@@ -720,22 +685,24 @@ public class Player extends Stage {
             setPlayerstate(PLAYING);
             volume_bindentrainment();
         }
-        if (selectedPlaybackItem.getAmbience().isEnabled()) {
+        if (selectedPlaybackItem.getAmbience().hasAvailableAmbience()) {
             populateambienceplaylist();
-            if (currentambiencevolume == null) { currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume(); }
-            volume_unbindambience();
-            currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextpresetambienceforplayback(null);
-            ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
-            ambienceplayer.setVolume(0.0);
-            ambienceplayer.setOnEndOfMedia(this::playnextambience);
-            ambienceplayer.setOnError(this::ambienceerror);
-            ambienceplayer.play();
-            if (fade_ambience_play != null) {fade_ambience_play.play();}
-            else {
-                ambienceplayer.setVolume(currentambiencevolume);
-                String percentage = new Double(currentambiencevolume * 100).intValue() + "%";
-                AmbienceVolumePercentage.setText(percentage);
-                volume_bindambience();
+            if (selectedPlaybackItem.getAmbience().hasPresetAmbience()) {
+                if (currentambiencevolume == null) { currentambiencevolume = Preferences.getPlaybackOptions().getAmbiencevolume(); }
+                volume_unbindambience();
+                currentambiencesoundfile = selectedPlaybackItem.getAmbience().getnextpresetambienceforplayback(null);
+                ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
+                ambienceplayer.setVolume(0.0);
+                ambienceplayer.setOnEndOfMedia(this::playnextambience);
+                ambienceplayer.setOnError(this::ambienceerror);
+                ambienceplayer.play();
+                if (fade_ambience_play != null) {fade_ambience_play.play();}
+                else {
+                    ambienceplayer.setVolume(currentambiencevolume);
+                    String percentage = new Double(currentambiencevolume * 100).intValue() + "%";
+                    AmbienceVolumePercentage.setText(percentage);
+                    volume_bindambience();
+                }
             }
         }
         toggleplayerbuttons();
@@ -761,7 +728,7 @@ public class Player extends Stage {
                 timeline_start_ending_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();}
         }
-        if (selectedPlaybackItem.getAmbience().isEnabled()) {
+        if (ambienceactive()) {
             volume_unbindambience();
             ambienceplayer.play();
             if (fade_ambience_resume != null) {
@@ -780,10 +747,10 @@ public class Player extends Stage {
         stopWatch.suspend();
         SessionInProgress.startbreak();
         if (fade_entrainment_pause != null && sessionparttimeleft().greaterThan(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_pause_value()))) {
-            if (selectedPlaybackItem.getAmbience().isEnabled() && fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
+            if (ambienceactive() && fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
             setPlayerstate(FADING_PAUSE);
             fade_entrainment_pause.play();
-            if (selectedPlaybackItem.getAmbience().isEnabled()) {
+            if (ambienceactive()) {
                 volume_unbindambience();
                 fade_ambience_pause.play();
             }
@@ -791,14 +758,13 @@ public class Player extends Stage {
         toggleplayerbuttons();
     }
     private void pausewithoutanimation() {
-        stopWatch.suspend();
         setPlayerstate(PAUSED);
         entrainmentplayer.pause();
         timeline_progresstonextsessionpart.pause();
         if (Preferences.getSessionOptions().getRampenabled() && timeline_start_ending_ramp != null && timeline_start_ending_ramp.getStatus() == Animation.Status.RUNNING) {
             timeline_start_ending_ramp.pause();}
         if (timeline_fadeout_timer != null) {timeline_fadeout_timer.pause();}
-        if (selectedPlaybackItem.getAmbience().isEnabled()) {
+        if (ambienceactive()) {
             volume_unbindambience();
             ambienceplayer.pause();
         }
@@ -809,7 +775,7 @@ public class Player extends Stage {
             if (fade_entrainment_stop.getStatus() == Animation.Status.RUNNING) {return;}
             fade_entrainment_stop.play();
             setPlayerstate(FADING_STOP);
-            if (selectedPlaybackItem.getAmbience().isEnabled()) {
+            if (ambienceactive()) {
                 volume_unbindambience();
                 fade_ambience_stop.play();
             }
@@ -819,7 +785,7 @@ public class Player extends Stage {
             entrainmentplayer.dispose();
             timeline_progresstonextsessionpart.stop();
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
-            if (selectedPlaybackItem.getAmbience().isEnabled()) {
+            if (ambienceactive()) {
                 volume_unbindambience();
                 ambienceplayer.stop();
                 ambienceplayer.dispose();
@@ -836,7 +802,7 @@ public class Player extends Stage {
                         int index = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1;
                         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(index);
                         start();
-                        if (ReferenceToggleCheckBox.isSelected() && ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {loadreferencecontent();}
+                        if (ReferenceToggleCheckBox.isSelected() && ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {loadreference();}
                     } catch (IndexOutOfBoundsException ignored) {
                         cleanupPlayersandAnimations();
                         setPlayerstate(IDLE);
@@ -894,6 +860,11 @@ public class Player extends Stage {
         }
     }
     // Ambience
+    private void startambience() {
+        setupambiencefadeanimations();
+        if (AmbiencePresetTab.isSelected()) { playambience(selectedPlaybackItem.getAmbience().getPreset(0)); }
+        else { playambience(selectedPlaybackItem.getAmbience().getAvailable(0)); }
+    }
     private void pauseambience() {
         if (playerState == PLAYING) {
             AmbiencePauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PLAY, 20.0));
@@ -908,8 +879,7 @@ public class Player extends Stage {
     }
     private void playambience(SoundFile soundFile) {
         volume_unbindambience();
-        ambienceplayer.dispose();
-        ambienceplayer = null;
+        try { ambienceplayer.dispose(); ambienceplayer = null; } catch (NullPointerException ignored) {}
         currentambiencesoundfile = soundFile;
         ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
         ambienceplayer.setOnEndOfMedia(this::playnextambience);
@@ -984,7 +954,8 @@ public class Player extends Stage {
         AmbienceVolumePercentage.setText("0%");
     }
     private void endofsession() {
-
+        if (stopWatch.isStarted()) {stopWatch.stop();}
+        SessionInProgress.setSessionPracticedTime(SessionInProgress.getExpectedSessionDuration().toMillis());
         setPlayerstate(STOPPED);
         // TODO Prompt For Export
         updategoalsui();
@@ -1026,9 +997,11 @@ public class Player extends Stage {
         SessionInProgress = null;
     }
     private boolean endsessionprematurely(boolean resetdialogcontrols) {
+        stopWatch.suspend();
         pausewithoutanimation();
         updateuitimeline.pause();
         if (testingmode || new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
+            if (stopWatch.isStarted()) {stopWatch.stop();}
             setPlayerstate(STOPPED);
             if (! testingmode) { sessions.add(SessionInProgress); }
             if (resetdialogcontrols) {
@@ -1060,7 +1033,7 @@ public class Player extends Stage {
     public void togglevolumebinding() {
         if (selectedPlaybackItem != null && (playerState == IDLE || playerState == STOPPED)) {
             volume_rebindentrainment();
-            if (selectedPlaybackItem.getAmbience().isEnabled()) {volume_rebindambience();}
+            if (ambienceactive()) {volume_rebindambience();}
         }
     }
     private void resetsessionpracticedtime() {
@@ -1068,7 +1041,88 @@ public class Player extends Stage {
         SessionInProgress.resetpracticetime();
     }
     // Animation
-    private void setupfadeanimations() {
+    private void setupambiencefadeanimations() {
+        // PLAY
+        fade_ambience_play = new Transition() {
+            {if (selectedPlaybackItem.isRampOnly()) {setCycleDuration(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
+            else {setCycleDuration(fade_play_value);}}
+
+            @Override
+            protected void interpolate(double frac) {
+                if (ambienceplayer != null && currentambiencevolume > 0.0) {
+                    try {
+                        double ambiencevolume = frac * currentambiencevolume;
+                        String percentage = new Double(ambiencevolume * 100).intValue() + "%";
+                        ambienceplayer.setVolume(ambiencevolume);
+                        AmbienceVolume.setValue(ambiencevolume);
+                        AmbienceVolumePercentage.setText(percentage);
+                    } catch (RuntimeException ignored) {}
+                }
+            }
+        };
+        fade_ambience_play.setOnFinished(event -> volume_bindambience());
+        // RESUME
+        fade_ambience_resume = new Transition() {
+            {setCycleDuration(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_resume_value()));}
+
+            @Override
+            protected void interpolate(double frac) {
+                if (ambienceplayer != null && currentambiencevolume > 0.0) {
+                    try {
+                        double ambiencevolume = frac * currentambiencevolume;
+                        String percentage = new Double(ambiencevolume * 100).intValue() + "%";
+                        ambienceplayer.setVolume(ambiencevolume);
+                        AmbienceVolume.setValue(ambiencevolume);
+                        AmbienceVolumePercentage.setText(percentage);
+                    } catch (RuntimeException ignored) {}
+                }
+            }
+        };
+        fade_ambience_resume.setOnFinished(event -> volume_bindambience());
+        // PAUSE
+        fade_ambience_pause = new Transition() {
+            {
+                setCycleDuration(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_pause_value()));
+            }
+
+            @Override
+            protected void interpolate(double frac) {
+                if (ambienceplayer != null && currentambiencevolume > 0.0) {
+                    try {
+                        double ambiencevolume = currentambiencevolume - (frac * currentambiencevolume);
+                        String percentage = new Double(ambiencevolume * 100).intValue() + "%";
+                        ambienceplayer.setVolume(ambiencevolume);
+                        AmbienceVolume.setValue(ambiencevolume);
+                        AmbienceVolumePercentage.setText(percentage);
+                    } catch (RuntimeException ignored) {}
+                }
+            }
+        };
+        fade_ambience_pause.setOnFinished(event -> ambienceplayer.pause());
+        // STOP
+        fade_ambience_stop = new Transition() {
+            {if (selectedPlaybackItem.isRampOnly()) {setCycleDuration(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
+            else {setCycleDuration(fade_stop_value);}}
+
+            @Override
+            protected void interpolate(double frac) {
+                if (ambienceplayer != null && currentambiencevolume > 0.0) {
+                    try {
+                        double ambiencevolume = currentambiencevolume - (frac * currentambiencevolume);
+                        String percentage = new Double(ambiencevolume * 100).intValue() + "%";
+                        ambienceplayer.setVolume(ambiencevolume);
+                        AmbienceVolume.setValue(ambiencevolume);
+                        AmbienceVolumePercentage.setText(percentage);
+                    } catch (RuntimeException ignored) {}
+                }
+            }
+        };
+        fade_ambience_stop.setOnFinished(event -> {
+            ambienceplayer.stop();
+            ambienceplayer.dispose();
+        });
+    }
+    private void setupentrainmentfadeanimations() {
         // PLAY
         if (selectedPlaybackItem.isRampOnly() || (Preferences.getPlaybackOptions().getAnimation_fade_play_enabled() && Preferences.getPlaybackOptions().getAnimation_fade_play_value() > 0.0)) {
             fade_entrainment_play = new Transition() {
@@ -1093,30 +1147,6 @@ public class Player extends Stage {
                 toggleplayerbuttons();
                 volume_bindentrainment();
             });
-            if (selectedPlaybackItem.getAmbience().isEnabled()) {
-                fade_ambience_play = new Transition() {
-                    {if (selectedPlaybackItem.isRampOnly()) {setCycleDuration(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
-                    else {setCycleDuration(fade_play_value);}}
-
-                    @Override
-                    protected void interpolate(double frac) {
-                        if (ambienceplayer != null && currentambiencevolume > 0.0) {
-                            try {
-                                double ambiencevolume = frac * currentambiencevolume;
-                                String percentage = new Double(ambiencevolume * 100).intValue() + "%";
-                                ambienceplayer.setVolume(ambiencevolume);
-                                AmbienceVolume.setValue(ambiencevolume);
-                                AmbienceVolumePercentage.setText(percentage);
-                            } catch (RuntimeException ignored) {}
-//                            if (referencecurrentlyDisplayed()) {
-//                                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(ambiencevolume);
-//                                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
-//                            }
-                        }
-                    }
-                };
-                fade_ambience_play.setOnFinished(event -> volume_bindambience());
-            }
         }
         // RESUME
         if (Preferences.getPlaybackOptions().getAnimation_fade_resume_enabled() && Preferences.getPlaybackOptions().getAnimation_fade_resume_value() > 0.0) {
@@ -1152,25 +1182,6 @@ public class Player extends Stage {
                 toggleplayerbuttons();
                 volume_bindentrainment();
             });
-            if (selectedPlaybackItem.getAmbience().isEnabled()) {
-                fade_ambience_resume = new Transition() {
-                    {setCycleDuration(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_resume_value()));}
-
-                    @Override
-                    protected void interpolate(double frac) {
-                        if (ambienceplayer != null && currentambiencevolume > 0.0) {
-                            try {
-                                double ambiencevolume = frac * currentambiencevolume;
-                                String percentage = new Double(ambiencevolume * 100).intValue() + "%";
-                                ambienceplayer.setVolume(ambiencevolume);
-                                AmbienceVolume.setValue(ambiencevolume);
-                                AmbienceVolumePercentage.setText(percentage);
-                            } catch (RuntimeException ignored) {}
-                        }
-                    }
-                };
-                fade_ambience_resume.setOnFinished(event -> volume_bindambience());
-            }
         }
         // PAUSE
         if (Preferences.getPlaybackOptions().getAnimation_fade_pause_enabled() && Preferences.getPlaybackOptions().getAnimation_fade_pause_value() > 0.0) {
@@ -1203,31 +1214,6 @@ public class Player extends Stage {
                 setPlayerstate(PAUSED);
                 toggleplayerbuttons();
             });
-            if (selectedPlaybackItem.getAmbience().isEnabled()) {
-                fade_ambience_pause = new Transition() {
-                    {
-                        setCycleDuration(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_pause_value()));
-                    }
-
-                    @Override
-                    protected void interpolate(double frac) {
-                        if (ambienceplayer != null && currentambiencevolume > 0.0) {
-                            try {
-                                double ambiencevolume = currentambiencevolume - (frac * currentambiencevolume);
-                                String percentage = new Double(ambiencevolume * 100).intValue() + "%";
-                                ambienceplayer.setVolume(ambiencevolume);
-                                AmbienceVolume.setValue(ambiencevolume);
-                                AmbienceVolumePercentage.setText(percentage);
-                            } catch (RuntimeException ignored) {}
-//                            if (referencecurrentlyDisplayed()) {
-//                                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(fadeoutvolume);
-//                                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
-//                            }
-                        }
-                    }
-                };
-                fade_ambience_pause.setOnFinished(event -> ambienceplayer.pause());
-            }
         }
         // STOP
         if (selectedPlaybackItem.isRampOnly() || (Preferences.getPlaybackOptions().getAnimation_fade_stop_enabled() && Preferences.getPlaybackOptions().getAnimation_fade_stop_value() > 0.0)) {
@@ -1261,33 +1247,6 @@ public class Player extends Stage {
                 if (timeline_fadeout_timer != null) {timeline_fadeout_timer.stop();}
                 toggleplayerbuttons();
             });
-            if (selectedPlaybackItem.getAmbience().isEnabled()) {
-                fade_ambience_stop = new Transition() {
-                    {if (selectedPlaybackItem.isRampOnly()) {setCycleDuration(Duration.seconds(kujiin.xml.Preferences.DEFAULT_RAMP_ONLY_RAMP_ANIMATION_DURATION));}
-                    else {setCycleDuration(fade_stop_value);}}
-
-                    @Override
-                    protected void interpolate(double frac) {
-                        if (ambienceplayer != null && currentambiencevolume > 0.0) {
-                            try {
-                                double ambiencevolume = currentambiencevolume - (frac * currentambiencevolume);
-                                String percentage = new Double(ambiencevolume * 100).intValue() + "%";
-                                ambienceplayer.setVolume(ambiencevolume);
-                                AmbienceVolume.setValue(ambiencevolume);
-                                AmbienceVolumePercentage.setText(percentage);
-                            } catch (RuntimeException ignored) {}
-//                            if (referencecurrentlyDisplayed()) {
-//                                root.getSessionCreator().getDisplayReference().AmbienceVolumeSlider.setValue(fadeoutvolume);
-//                                root.getSessionCreator().getDisplayReference().AmbienceVolumePercentage.setText(percentage);
-//                            }
-                        }
-                    }
-                };
-                fade_ambience_stop.setOnFinished(event -> {
-                    ambienceplayer.stop();
-                    ambienceplayer.dispose();
-                });
-            }
         }
     }
     private void cleanupPlayersandAnimations() {
@@ -1310,6 +1269,7 @@ public class Player extends Stage {
             toggleplayerbuttons();
         } catch (Exception ignored) {}
     }
+    // Volume Control
     private void volume_bindentrainment() {
         EntrainmentVolume.valueProperty().bindBidirectional(entrainmentplayer.volumeProperty());
         EntrainmentVolume.setDisable(false);
@@ -1381,6 +1341,10 @@ public class Player extends Stage {
     }
     private void volume_rebindambience() {volume_unbindambience(); volume_bindambience();}
     private void volume_rebindentrainment() {volume_unbindentrainment(); volume_bindentrainment();}
+    private void toggleambiencemute() {}
+    private void toggleentrainmentmute() {}
+
+
     private Duration sessionparttimeleft() {
         return new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(new Duration(selectedPlaybackItem.getPracticeTime()));
     }
@@ -1421,40 +1385,77 @@ public class Player extends Stage {
     }
 
 // Reference
-    public void togglereference() {
-        boolean buttontoggled = ReferenceToggleCheckBox.isSelected();
-        if (buttontoggled && selectedPlaybackItem != null) {
-            if (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {loadreferencecontent();}
-            else if (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() == -1) {ReferenceContentPane.setContent(new TextArea("Select Reference Type For " + selectedPlaybackItem.getName()));}
-            else {ReferenceContentPane.setContent(new TextArea(""));}
-        } else {ReferenceContentPane.setContent(new TextArea(""));}
+    public void referencetoggled() {
+    if (ReferenceToggleCheckBox.isSelected()) {
+        if (ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() == -1) {
+            switch (Preferences.getSessionOptions().getReferencetype()) {
+                case html:
+                    ReferenceTypeChoiceBox.getSelectionModel().select(0);
+                    break;
+                case txt:
+                    ReferenceTypeChoiceBox.getSelectionModel().select(1);
+                    break;
+                default:
+                    ReferenceTypeChoiceBox.getSelectionModel().select(0);
+                    break;
+            }
+        }
+        referencetypechanged();
+    } else {ReferenceContentPane.setContent(null);}
+}
+    public void referencetypechanged() {
+        int index = ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex();
+        if (index != -1 && ! ReferenceToggleCheckBox.isSelected()) {ReferenceToggleCheckBox.setSelected(true);}
+        switch (index) {
+            case 0: referenceType = ReferenceType.html; loadreference(); return;
+            case 1: referenceType = ReferenceType.txt; loadreference();
+        }
     }
-    private void loadreferencecontent() {
-        switch (referenceType) {
-            case txt:
-                StringBuilder sb = new StringBuilder();
-                try (FileInputStream fis = new FileInputStream(selectedPlaybackItem.getReferenceFile(referenceType));
-                     BufferedInputStream bis = new BufferedInputStream(fis)) {
-                    while (bis.available() > 0) {sb.append((char) bis.read());}
-                } catch (Exception ignored) {}
-                TextArea ta = new TextArea();
-                ta.setText(sb.toString());
-                ta.setWrapText(true);
+    private void loadreference() {
+        try {
+            File referencefile = selectedPlaybackItem.getReferenceFile(referenceType);
+            if (referencefile != null) {
+                System.out.println("Loading Reference File: " + referencefile.getAbsolutePath());
+                switch (referenceType) {
+                    case txt:
+                        StringBuilder sb = new StringBuilder();
+                        try (FileInputStream fis = new FileInputStream(referencefile); BufferedInputStream bis = new BufferedInputStream(fis)) {
+                            while (bis.available() > 0) {
+                                sb.append((char) bis.read());
+                            }
+                        } catch (Exception ignored) {}
+                        TextArea ta = new TextArea();
+                        ta.setText(sb.toString());
+                        ta.setWrapText(true);
+                        ta.setEditable(false);
+                        ReferenceContentPane.setContent(ta);
+                        break;
+                    case html:
+                        WebView browser = new WebView();
+                        WebEngine webEngine = browser.getEngine();
+                        webEngine.load(referencefile.toURI().toString());
+                        webEngine.setUserStyleSheetLocation(kujiin.xml.Preferences.REFERENCE_THEMEFILE.toURI().toString());
+                        ReferenceContentPane.setContent(browser);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                TextArea ta = new TextArea("Reference File Is Empty Or Missing");
+                ta.prefWidthProperty().bind(ReferenceContentPane.widthProperty());
+                ta.prefHeightProperty().bind(ReferenceContentPane.heightProperty());
+                ta.setEditable(false);
                 ReferenceContentPane.setContent(ta);
-                break;
-            case html:
-                WebView browser = new WebView();
-                WebEngine webEngine = browser.getEngine();
-                webEngine.load(selectedPlaybackItem.getReferenceFile(referenceType).toURI().toString());
-                webEngine.setUserStyleSheetLocation(kujiin.xml.Preferences.REFERENCE_THEMEFILE.toURI().toString());
-                ReferenceContentPane.setContent(browser);
-                break;
-            default:
-                break;
+            }
+        } catch (NullPointerException ignored) {
+            TextArea ta = new TextArea("No Session Playing");
+            ta.setEditable(false);
+            ta.prefWidthProperty().bind(ReferenceContentPane.widthProperty());
+            ta.prefHeightProperty().bind(ReferenceContentPane.heightProperty());
+            ReferenceContentPane.setContent(ta);
         }
     }
     private void closedialog() {close();}
-
 
     public static class PlaylistTableItem {
         StringProperty itemname;

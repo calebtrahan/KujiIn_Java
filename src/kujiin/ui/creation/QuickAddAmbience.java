@@ -73,8 +73,7 @@ public class QuickAddAmbience extends StyledStage {
                 i.getAmbience().clearPresetambience();
                 if (quickAmbienceType == QuickAmbienceType.Repeat) {i.getAmbience().quickadd_repeat(i, true);}
                 else if (quickAmbienceType == QuickAmbienceType.Shuffle) {i.getAmbience().quickadd_shuffle(i, true);}
-                i.getAmbience().setEnabled(true);
-            } else {i.getAmbience().setEnabled(false); missingambiencecount++;}
+            } else {missingambiencecount++;}
         }
         if (missingambiencecount > 0) {
             new InformationDialog(preferences, "Missing Ambience", "Missing Ambience For " + missingambiencecount + " Playback Items",

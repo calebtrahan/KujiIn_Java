@@ -64,7 +64,7 @@
                                  <children>
                                     <HBox fx:id="ReferenceControls" alignment="CENTER_LEFT" maxHeight="25.0" minHeight="30.0">
                                        <children>
-                                          <CheckBox fx:id="ReferenceToggleCheckBox" mnemonicParsing="false" onAction="#ReferenceToggleCheckboxtoggled" text="Reference" textAlignment="CENTER">
+                                          <CheckBox fx:id="ReferenceToggleCheckBox" mnemonicParsing="false" onAction="#referencetoggled" text="Reference" textAlignment="CENTER">
                                              <HBox.margin>
                                                 <Insets right="5.0" />
                                              </HBox.margin></CheckBox>
@@ -135,7 +135,7 @@
                                              <children>
                                                 <VBox prefHeight="276.0" prefWidth="301.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <children>
-                                                      <TabPane VBox.vgrow="ALWAYS">
+                                                      <TabPane fx:id="AmbiencePlaylistTabPane" VBox.vgrow="ALWAYS">
                                                          <tabs>
                                                             <Tab fx:id="AmbiencePresetTab" closable="false" text="This Session">
                                                                <content>
@@ -190,14 +190,29 @@
                                                       </HBox>
                                                       <HBox alignment="CENTER_RIGHT" prefHeight="23.0" prefWidth="301.0">
                                                          <children>
-                                                            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                                                            <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
                                                                <children>
+                                                                  <Button fx:id="AmbiencePreviousButton" mnemonicParsing="false" onAction="#previousambiencebuttonpressed" />
+                                                                  <Button fx:id="AmbiencePauseButton" mnemonicParsing="false" onAction="#pauseambiencebuttonpressed" />
+                                                                  <Button fx:id="AmbienceNextButton" mnemonicParsing="false" onAction="#nextambiencebuttonpressed" />
                                                                   <Button fx:id="AmbienceShuffleButton" mnemonicParsing="false" onAction="#shuffleambiencebuttonpressed" />
                                                                </children>
                                                             </HBox>
-                                                            <Button fx:id="AmbiencePreviousButton" mnemonicParsing="false" onAction="#previousambiencebuttonpressed" />
-                                                            <Button fx:id="AmbiencePauseButton" mnemonicParsing="false" onAction="#pauseambiencebuttonpressed" />
-                                                            <Button fx:id="AmbienceNextButton" mnemonicParsing="false" onAction="#nextambiencebuttonpressed" />
+                                                            <HBox fx:id="AmbienceVolumeControls" alignment="CENTER" maxHeight="25.0" minHeight="25.0" prefHeight="25.0" prefWidth="150.0">
+                                                               <children>
+                                                                  <Slider fx:id="AmbienceVolume" disable="true" max="1.0" prefHeight="14.0" prefWidth="66.0" HBox.hgrow="ALWAYS">
+                                                                     <HBox.margin>
+                                                                        <Insets left="3.0" right="3.0" />
+                                                                     </HBox.margin>
+                                                                  </Slider>
+                                                                  <Label fx:id="AmbienceVolumePercentage" minWidth="35.0" text="0%" HBox.hgrow="NEVER">
+                                                                     <HBox.margin>
+                                                                        <Insets left="2.0" />
+                                                                     </HBox.margin>
+                                                                  </Label>
+                                                                  <Button fx:id="AmbienceMuteButton" mnemonicParsing="false" />
+                                                               </children>
+                                                            </HBox>
                                                          </children>
                                                       </HBox>
                                                    </children>
@@ -296,7 +311,7 @@
                         </HBox>
                         <HBox alignment="CENTER_LEFT">
                            <children>
-                              <HBox minWidth="210.0" prefHeight="25.0">
+                              <HBox prefHeight="25.0">
                                  <children>
                                     <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#playbuttonpressed" />
                                     <Button fx:id="PauseButton" disable="true" mnemonicParsing="false" onAction="#pausebuttonpressed" />
@@ -305,27 +320,9 @@
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" minWidth="350.0" HBox.hgrow="ALWAYS">
                                  <children>
-                                    <HBox fx:id="AmbienceVolumeControls" alignment="CENTER" maxHeight="25.0" minHeight="25.0">
-                                       <children>
-                                          <Label alignment="CENTER_RIGHT" text="Ambience" HBox.hgrow="NEVER">
-                                             <HBox.margin>
-                                                <Insets left="10.0" right="5.0" />
-                                             </HBox.margin>
-                                          </Label>
-                                          <Slider fx:id="AmbienceVolume" disable="true" max="1.0" prefHeight="14.0" prefWidth="66.0" HBox.hgrow="ALWAYS">
-                                             <HBox.margin>
-                                                <Insets right="3.0" />
-                                             </HBox.margin></Slider>
-                                          <Label fx:id="AmbienceVolumePercentage" minWidth="35.0" text="0%" HBox.hgrow="NEVER">
-                                             <HBox.margin>
-                                                <Insets left="2.0" />
-                                             </HBox.margin>
-                                          </Label>
-                                       </children>
-                                    </HBox>
                                     <HBox alignment="CENTER" maxHeight="25.0">
                                        <children>
-                                          <Label alignment="CENTER_RIGHT" text="Entrainment" HBox.hgrow="NEVER">
+                                          <Label alignment="CENTER_RIGHT" prefWidth="75.0" text="Entrainment" HBox.hgrow="NEVER">
                                              <HBox.margin>
                                                 <Insets right="5.0" />
                                              </HBox.margin>
@@ -339,6 +336,7 @@
                                                 <Insets left="2.0" />
                                              </HBox.margin>
                                           </Label>
+                                          <Button fx:id="EntrainmentMuteButton" mnemonicParsing="false" />
                                        </children>
                                        <padding>
                                           <Insets left="10.0" />
@@ -347,8 +345,17 @@
                                  </children>
                               </HBox>
                            </children>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <padding>
+                              <Insets bottom="2.0" />
+                           </padding>
                         </HBox>
                      </children>
+                     <padding>
+                        <Insets bottom="2.0" />
+                     </padding>
                   </VBox>
                </children>
                <padding>

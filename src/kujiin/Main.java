@@ -14,22 +14,34 @@ import kujiin.xml.*;
 
 import static kujiin.xml.Preferences.*;
 
-// TODO Set Total Tooltip:
-    // Total Sessions Practiced
-    // Average Session Length
-    // Grand Total $Name Practiced
+// TODO Ambience Files Found In Directories... (PlaybackItem Folder)...Add?
+
+// TODO Move Ambience/Reference To User's Home Directory
+// TODO Fixing Timing Display On:
+    // Playlist (Shows 1 second Before)
+
+// TODO Reverse Order Practiced Sessions (Most Recent At Top)
+
+// TODO Encapsulate All Things Ambience Into AvailableAmbienceEditor
+    // Redesign Available Ambience Editor
+    // Add A Feature To Remove, Add All From Directory, And Possibly Add Presets?
+
+// TODO After End Of Session -> Return To Player -> Clear And Unselect Reference
 
 // TODO Enable/Disable Ambience On Playback Item Play
     // If Has Available Ambience.....Enable But Don't Play
     // If Not Has Preset Ambience....Set This Session Ambience Invisible
     // Turn Ambience Volume On/Off At Will
 
-// TODO Add Calendar App Or The Last Few Days Practiced
+// Move Ambience Volume Controls Inside Ambience Tab
+// Remove "Entrainment" And "Ambience" Labels From Volume Controls
+
+
+// TODO Add Recent Activity Tab
+
 
 // TODO Change Sessions To Store Online?
-
 // TODO Redesign Goals Completed (Use Bar Chart To Show Completed And Next With Practiced Time)
-
 // TODO On Session Complete Chart, If Less Than Expected Map Out Expected Duration With Different Color
 // TODO Set Tooltips For Playlist Ambience Names & Progress Bar And Buttons
 // TODO Set Up Goal Overview Mouse Pressed Listeners
@@ -108,7 +120,7 @@ public class Main extends Application {
         audioChecksDialog.showAndWait();
         primaryStage.setOnCloseRequest(event -> {
             if (root.getProgramState() == ProgramState.IDLE &&
-                    new ConfirmationDialog(root.getPreferences(), "Exit Kuji-In Program", null, "Really Exit?", "Exit", "Cancel").getResult()) {
+                    new ConfirmationDialog(root.getPreferences(), "Exit Kuji-In Program", "Really Exit?", null, "Exit", "Cancel").getResult()) {
                 root.close();
             } else {event.consume();}
         });

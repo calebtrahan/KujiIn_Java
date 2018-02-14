@@ -633,7 +633,7 @@ public class MainController implements Initializable {
 // Play/Export Tab
     // Create/Open Toolbar Methods
     public void createnewsession() {
-        if (createdsession != null && sessions.getSession().isEmpty() && getAvailableAmbiences().completelyempty()) {
+        if (createdsession != null && sessions.hasSessions() && getAvailableAmbiences().completelyempty()) {
             if (new ConfirmationDialog(getPreferences(), "Add Available Ambience", "There Is No Available Ambience For Any Playback Items", "Open Ambience Editor To Add Ambience?", true).getResult()) {
                 AmbienceEditor_Simple ambienceEditor_simple = new AmbienceEditor_Simple(availableAmbiences, getPreferences());
                 ambienceEditor_simple.initModality(Modality.APPLICATION_MODAL);
@@ -668,7 +668,7 @@ public class MainController implements Initializable {
     }
     public void openrecentsession() {
         updatecompletiontime.stop();
-        if (sessions.getSession() == null || sessions.getSession().isEmpty()) {
+        if (! sessions.hasSessions()) {
             new InformationDialog(preferences, "No Recent Sessions", "No Recent Sessions", "No Sessions Practiced");
             updatecompletiontime.play();
             return;
@@ -738,8 +738,7 @@ public class MainController implements Initializable {
                 }
                 if (quickAddAmbienceType == QuickAddAmbienceType.REPEAT) {i.getAmbience().quickadd_repeat(i, clearambience);}
                 else if (quickAddAmbienceType == QuickAddAmbienceType.SHUFFLE) {i.getAmbience().quickadd_shuffle(i, clearambience);}
-                i.getAmbience().setEnabled(true);
-            } else {i.getAmbience().setEnabled(false); missingambiencecount++;}
+            } else {missingambiencecount++;}
         }
         if (missingambiencecount > 0) {
 //            new InformationDialog(preferences, "Missing Ambience", "Missing Ambience For " + missingambiencecount + " Playback Items",
@@ -1060,16 +1059,15 @@ public class MainController implements Initializable {
             ArrayList<PlaybackItem> itemsinsession = createdsession.getPlaybackItems();
             int item1index = itemsinsession.indexOf(item1);
             itemsinsession.remove(item2);
-            boolean ambiencewasenabled = item1.getAmbience().isEnabled() || item2.getAmbience().isEnabled();
+            boolean ambiencewasenabled = item1.getAmbience().hasPresetAmbience() || item2.getAmbience().hasPresetAmbience();
             Duration newduration = new Duration(item1.getExpectedDuration());
             newduration = newduration.add(new Duration(item2.getExpectedDuration()));
             item1.setExpectedDuration(newduration.toMillis());
             item1.getAmbience().setSessionAmbience(new ArrayList<>());
-            item1.getAmbience().setEnabled(false);
             if (ambiencewasenabled) {
                 Duration ambienceduration = Duration.ZERO;
-                if (item1.getAmbience().isEnabled()) {ambienceduration = ambienceduration.add(item1.getAmbience().getPresetAmbienceDuration());}
-                if (item2.getAmbience().isEnabled()) {ambienceduration = ambienceduration.add(item2.getAmbience().getPresetAmbienceDuration());}
+                if (item1.getAmbience().hasPresetAmbience()) {ambienceduration = ambienceduration.add(item1.getAmbience().getPresetAmbienceDuration());}
+                if (item2.getAmbience().hasPresetAmbience()) {ambienceduration = ambienceduration.add(item2.getAmbience().getPresetAmbienceDuration());}
                 if (ambienceduration.lessThan(newduration)) {
                     String[] options = {"Quick Add Ambience", "Customize Ambience", "Don't Add Ambience"};
                     ChoiceDialog<String> addambiencechoicedialog = new ChoiceDialog<>(options[0], options);
@@ -1316,7 +1314,7 @@ public class MainController implements Initializable {
     }
     private void populateprogressoverview(String type) {
         ProgressOverviewBarChart.getData().clear();
-        if (sessions.getSession() != null && ! sessions.getSession().isEmpty() && type != null) {
+        if (sessions.hasSessions() && type != null) {
             List<PlaybackItemDetails> playbackItemDetails = getSessionItemDetails(type);
             boolean displayinhours = false;
             for (PlaybackItemDetails i : playbackItemDetails) { if (i.getTotalduration().greaterThanOrEqualTo(Duration.hours(2.5))) { displayinhours = true; } }
@@ -1374,7 +1372,7 @@ public class MainController implements Initializable {
     }
     private void populateprogressbalance(String type) {
         ProgressBalancePieChart.getData().clear();
-        if (sessions.getSession() != null && ! sessions.getSession().isEmpty() && type != null) {
+        if (sessions.hasSessions() && type != null) {
             List<PlaybackItemDetails> playbackItemDetails = getSessionItemDetails(type);
             boolean displayinhours = false;
             for (PlaybackItemDetails i : playbackItemDetails) { if (i.getTotalduration().greaterThanOrEqualTo(Duration.hours(2.5))) { displayinhours = true; } }
@@ -1410,7 +1408,7 @@ public class MainController implements Initializable {
     }
     // Session Browser Tab Methods
     public void populatesessionbrowsertable() {
-        if (sessions.getSession() != null) {
+        if (sessions.hasSessions()) {
             List<Session> filteredsessions = new ArrayList<>();
             for (Session i : sessions.getSession()) {
                 if (! SessionBrowser_Filter_ShowMissedSessions.isSelected() && i.isMissedsession()) {continue;}
@@ -1505,7 +1503,7 @@ public class MainController implements Initializable {
         // Filter
     public void populatesessionbrowserfilter() {
         Duration highestduration = Duration.ZERO;
-        if (sessions.getSession() != null) {
+        if (sessions.hasSessions()) {
             for (Session i : sessions.getSession()) {
                 if (i.getSessionPracticedTime().greaterThanOrEqualTo(highestduration)) {
                     highestduration = i.getSessionPracticedTime();
@@ -1569,8 +1567,8 @@ public class MainController implements Initializable {
                 if (event.getDeltaY() < 0) {newvalue -= 1;} else {newvalue += 1;}
                 SessionBrowser_Filter_Duration_To_Minutes.getValueFactory().setValue(newvalue);
             });
-            SessionBrowser_Filter.setDisable(sessions.getSession() == null);
-            if (sessions.getSession() != null) {
+            SessionBrowser_Filter.setDisable(! sessions.hasSessions());
+            if (sessions.hasSessions()) {
                 LocalDate mindate = null;
                 LocalDate maxdate = null;
                 for (Session i : sessions.getSession()) {

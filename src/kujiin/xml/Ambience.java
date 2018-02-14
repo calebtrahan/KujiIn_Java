@@ -15,7 +15,6 @@ public class Ambience {
     private List<SoundFile> SessionAmbience;
     @XmlTransient
     private List<SoundFile> AvailableAmbience;
-    private boolean Enabled;
     private ArrayList<SoundFile> PlaybackHistory;
     @XmlTransient
     private SoundFile CurrentAmbienceSoundfile;
@@ -25,19 +24,12 @@ public class Ambience {
     private AvailableAmbiences availableAmbiences;
 
     public Ambience() {}
-    public Ambience(AvailableAmbiences availableAmbiences) {
-    }
+    public Ambience(AvailableAmbiences availableAmbiences) {}
 
 // Getters And Setters
     public void setSessionAmbience(List<SoundFile> sessionAmbience) {
     SessionAmbience = sessionAmbience;}
     public List<SoundFile> getSessionAmbience() {return SessionAmbience;}
-    public boolean isEnabled() {
-        return Enabled;
-    }
-    public void setEnabled(boolean enabled) {
-        this.Enabled = enabled;
-    }
     public SoundFile getCurrentAmbienceSoundfile() {
         return CurrentAmbienceSoundfile;
     }
@@ -106,8 +98,7 @@ public class Ambience {
     public void removePreset(int index) {
         SessionAmbience.remove(index);
     }
-    public void clearPresetambience() { if (SessionAmbience != null) {
-        SessionAmbience.clear(); setEnabled(false);}}
+    public void clearPresetambience() { if (SessionAmbience != null) SessionAmbience.clear(); }
     // Available
     public boolean hasAvailableAmbience() {return AvailableAmbience != null && ! AvailableAmbience.isEmpty();}
     public SoundFile getAvailable(int index) throws IndexOutOfBoundsException {return AvailableAmbience.get(index);}

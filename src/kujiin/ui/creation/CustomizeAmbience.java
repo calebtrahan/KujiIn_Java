@@ -45,7 +45,6 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     public Label StatusBar;
     public Button AcceptButton;
     public Button CancelButton;
-    public MenuItem QuickAddAmbience;
     private boolean accepted = false;
     private Ambience ambience;
     private Duration playbackitemduration;
@@ -54,7 +53,6 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        QuickAddAmbience.setOnAction(event -> quickaddshuffleambience());
         AddFromAmbienceDirectory.setOnAction(event -> addfromavailableambience());
         AddOpenFiles.setOnAction(event -> addfromfiles());
         RemoveButton.setOnAction(event -> removefromtable());
@@ -90,7 +88,6 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
             setScene(defaultscene);
             setResizable(false);
             boolean hasavailableambience = playbackItem.getAmbience().hasAvailableAmbience();
-            QuickAddAmbience.setDisable(! hasavailableambience);
             AddFromAmbienceDirectory.setDisable(! hasavailableambience);
             AddOrEditAmbienceTable.setPlaceholder(new Label("No Ambience For " + playbackItem.getName()));
             AddOrEditAmbienceTable.setOnMousePressed(event -> {
@@ -252,9 +249,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
         }
     }
     public void accept() {
-        ambience.setEnabled(ambience.hasPresetAmbience());
         playbackItem.getAmbience().setSessionAmbience(ambience.getSessionAmbience());
-        playbackItem.getAmbience().setEnabled(ambience.isEnabled());
         accepted = ambience.hasPresetAmbience();
         close();
     }

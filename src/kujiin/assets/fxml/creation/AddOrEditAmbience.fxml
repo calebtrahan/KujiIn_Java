@@ -23,7 +23,7 @@
          <children>
             <MenuButton fx:id="AddMenu" mnemonicParsing="false" text="Add">
               <items>
-                  <MenuItem fx:id="QuickAddShuffleAmbience" mnemonicParsing="false" text="Quick Add" />
+                <MenuItem fx:id="QuickAddShuffleAmbience" mnemonicParsing="false" text="Quick Add" />
                 <MenuItem fx:id="AddFromAmbienceDirectory" mnemonicParsing="false" text="Available Ambience" />
                 <MenuItem fx:id="AddOpenFiles" mnemonicParsing="false" text="From File(s)" />
               </items>

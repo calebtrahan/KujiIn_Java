@@ -138,10 +138,10 @@ public class PlaybackItem {
     public File getReferenceFile(ReferenceType referenceType) {
         switch (referenceType) {
             case html: {
-                return new File(Preferences.DIRECTORYREFERENCE, "html/" + Name + ".html");
+                return new File(Preferences.DIRECTORYREFERENCE, "html/" + Name.toUpperCase() + ".html");
             }
             case txt: {
-                return new File(Preferences.DIRECTORYREFERENCE, "txt/" + Name + ".txt");
+                return new File(Preferences.DIRECTORYREFERENCE, "txt/" + Name.toUpperCase() + ".txt");
             }
             default:
                 return null;

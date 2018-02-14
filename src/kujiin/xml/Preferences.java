@@ -63,6 +63,7 @@ public class Preferences {
     public static final Image ICON_OPENFILE = new Image(new File(DIRECTORYICONS, "OpenFile.png").toURI().toString());
     public static final Image ICON_EDITDURATION = new Image(new File(DIRECTORYICONS, "EditDuration.png").toURI().toString());
     public static final Image ICON_AMBIENCE = new Image(new File(DIRECTORYICONS, "Ambience.png").toURI().toString());
+    public static final Image ICON_MUTE = new Image(new File(DIRECTORYICONS, "Mute.png").toURI().toString());
     public static final File GOALSXMLFILE = new File(XMLDIRECTORY, "goals.xml");
     public static final File SESSIONSXMLFILE_TESTING = new File(XMLDIRECTORY, "sessions_testing.xml");
     public static final File SESSIONSXMLFILE = new File(XMLDIRECTORY, "sessions.xml");

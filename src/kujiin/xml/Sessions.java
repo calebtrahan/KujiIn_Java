@@ -31,6 +31,7 @@ public class Sessions {
 // Getters And Setters
     public List<kujiin.xml.Session> getSession() {return Session;}
     public void setSession(List<kujiin.xml.Session> session) {Session = session;}
+    public boolean hasSessions() {return Session != null && ! Session.isEmpty();}
 
 // XML Processing
     public void unmarshall() {

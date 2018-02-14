@@ -282,7 +282,6 @@ public class Session {
         return missedsession;
     }
 
-
     // Utility Methods
     public boolean containsPlaybackItem(int creationindex) {
         boolean value = false;
