@@ -31,10 +31,23 @@ public class PlaybackItemAmbience {
     }
 
 // Utility Methods
+    public void add(int index, SoundFile soundFile) {
+        if (Ambience == null) {Ambience = new ArrayList<>();}
+        Ambience.add(index, soundFile);
+    }
+    public void addmultiple(int index, List<SoundFile> files) {
+        if (Ambience == null) {Ambience = new ArrayList<>();}
+        Ambience.addAll(index, files);
+    }
     public void add(SoundFile soundFile) {
         if (Ambience == null) {Ambience = new ArrayList<>();}
         Ambience.add(soundFile);
     }
+    public void addmultiple(List<SoundFile> files) {
+        if (Ambience == null) {Ambience = new ArrayList<>();}
+        Ambience.addAll(files);
+    }
+
     public void remove(int index) {Ambience.remove(index);}
     public Duration gettotalduration() {
         Duration duration = Duration.ZERO;
@@ -49,5 +62,6 @@ public class PlaybackItemAmbience {
     public boolean filealreadyexists(SoundFile soundFile) {
         return Ambience.contains(soundFile);
     }
+    public void clear() {Ambience.clear();}
 
 }

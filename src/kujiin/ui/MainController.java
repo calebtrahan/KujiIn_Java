@@ -71,7 +71,6 @@ public class MainController implements Initializable {
     public MenuBar TopMenuBar;
     public MenuItem PreferenceMenuItem;
     public MenuItem CloseMenuItem;
-    public MenuItem AddMissedSessionMenuItem;
     public MenuItem EditAvailableAmbienceMenuItem;
     public MenuItem EditReferenceFilesMenuItem;
     public MenuItem AboutMenuItem;
@@ -612,12 +611,9 @@ public class MainController implements Initializable {
         }
     }
     public void closeprogram() {}
-    public void addmissedsession() {
-
-    }
     public void editavailableambience() {
         AvailableAmbienceEditor availableAmbienceEditor = new AvailableAmbienceEditor(preferences, availableAmbiences);
-        availableAmbienceEditor.initModality(Modality.APPLICATION_MODAL);
+//        availableAmbienceEditor.initModality(Modality.APPLICATION_MODAL);
         availableAmbienceEditor.showAndWait();
     }
     public void editreferencefiles() {
@@ -626,6 +622,7 @@ public class MainController implements Initializable {
        editReferenceFiles.initModality(Modality.APPLICATION_MODAL);
        editReferenceFiles.showAndWait();
     }
+    public void displaytutorial() {}
     public void aboutthisprogram() {
     }
 

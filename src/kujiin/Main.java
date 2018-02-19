@@ -14,6 +14,10 @@ import kujiin.xml.*;
 
 import static kujiin.xml.Preferences.*;
 
+// TODO Add Concurrent Program Check
+
+// TODO Design Tutorial ( displaytutorial() )
+
 // TODO Ambience Files Found In Directories... (PlaybackItem Folder)...Add?
 
 // TODO Move Ambience/Reference To User's Home Directory
@@ -21,10 +25,6 @@ import static kujiin.xml.Preferences.*;
     // Playlist (Shows 1 second Before)
 
 // TODO Reverse Order Practiced Sessions (Most Recent At Top)
-
-// TODO Encapsulate All Things Ambience Into AvailableAmbienceEditor
-    // Redesign Available Ambience Editor
-    // Add A Feature To Remove, Add All From Directory, And Possibly Add Presets?
 
 // TODO After End Of Session -> Return To Player -> Clear And Unselect Reference
 

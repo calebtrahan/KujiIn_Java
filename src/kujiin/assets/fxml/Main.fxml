@@ -42,13 +42,13 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">
             <items>
-                  <MenuItem fx:id="AddMissedSessionMenuItem" mnemonicParsing="false" onAction="#addmissedsession" text="Add Missed Session" />
-              <MenuItem fx:id="EditAvailableAmbienceMenuItem" mnemonicParsing="false" onAction="#editavailableambience" text="Available Ambience" />
-                  <MenuItem fx:id="EditReferenceFilesMenuItem" mnemonicParsing="false" onAction="#editreferencefiles" text="Reference Files" />
+              <MenuItem fx:id="EditAvailableAmbienceMenuItem" mnemonicParsing="false" onAction="#editavailableambience" text="Ambience" />
+                  <MenuItem fx:id="EditReferenceFilesMenuItem" mnemonicParsing="false" onAction="#editreferencefiles" text="Reference" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
+                  <MenuItem fx:id="TutorialMenuItem" mnemonicParsing="false" onAction="#displaytutorial" text="Tutorial" />
               <MenuItem fx:id="AboutMenuItem" mnemonicParsing="false" onAction="#aboutthisprogram" text="About" />
             </items>
           </Menu>

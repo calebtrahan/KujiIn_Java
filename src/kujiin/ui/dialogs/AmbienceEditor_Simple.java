@@ -80,7 +80,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
         try {
             this.availableAmbiences = availableAmbiences;
             this.preferences = preferences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/availableambience/AmbienceEditor_Simple.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ambience/AmbienceEditor_Simple.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);
@@ -97,7 +97,7 @@ public class AmbienceEditor_Simple extends Stage implements Initializable {
 //            if (! Root.getStage().isIconified()) {Root.getStage().setIconified(true);}
             this.availableAmbiences = availableAmbiences;
             this.preferences = preferences;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/availableambience/AmbienceEditor_Simple.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/ambience/AmbienceEditor_Simple.fxml"));
             fxmlLoader.setController(this);
             Scene defaultscene = new Scene(fxmlLoader.load());
             setScene(defaultscene);

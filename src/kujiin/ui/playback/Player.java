@@ -130,7 +130,8 @@ public class Player extends Stage {
     private final Duration updateuifrequency = Duration.millis(100);
     private Duration fade_play_value;
     private Duration fade_stop_value;
-    private StopWatch stopWatch;
+    private StopWatch sessionStopWatch;
+    private StopWatch playbackItemStopWatch;
 // Playback
     private MediaPlayer entrainmentplayer;
     private MediaPlayer ambienceplayer;
@@ -197,8 +198,9 @@ public class Player extends Stage {
 
     public Player(MainController Root, Sessions sessions, AllGoals allGoals, Session sessiontoplay) {
         try {
-            stopWatch = new StopWatch();
-            stopWatch.reset();
+            sessionStopWatch = new StopWatch();
+            sessionStopWatch.reset();
+            playbackItemStopWatch = null;
             exitprogram = false;
             testingmode = Root.isTestingmode();
             Preferences = Root.getPreferences();
@@ -412,10 +414,10 @@ public class Player extends Stage {
         PlayerState p = playerState;
         if (p == PLAYING || p == FADING_PLAY || p == FADING_PAUSE || p == FADING_RESUME || p == FADING_STOP) {
             try {
-                selectedPlaybackItem.syncelapsedtime(stopWatch);
-                AllGoals.calculateifPlaybackItemgoalscompleted(selectedPlaybackItem.getCreationindex(), selectedPlaybackItem.getTotalpracticetime(stopWatch));
-                SessionInProgress.syncelapsedduration(stopWatch);
-                AllGoals.calculateifTotalGoalsCompleted(totalpracticedtime.add(Duration.millis(stopWatch.getTime())));
+                selectedPlaybackItem.syncelapsedtime(playbackItemStopWatch);
+                AllGoals.calculateifPlaybackItemgoalscompleted(selectedPlaybackItem.getCreationindex(), selectedPlaybackItem.getTotalpracticetime(playbackItemStopWatch));
+                SessionInProgress.syncelapsedduration(sessionStopWatch);
+                AllGoals.calculateifTotalGoalsCompleted(totalpracticedtime.add(Duration.millis(sessionStopWatch.getTime())));
                 updateplaylist();
             // Update Total Progress
                 SessionCurrentTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getSessionPracticedTime()));
@@ -478,9 +480,17 @@ public class Player extends Stage {
         PlaylistTableView.getItems().clear();
         ObservableList<PlaylistTableItem> playlistitems = FXCollections.observableArrayList();
         for (PlaybackItem i : SessionInProgress.getPlaybackItems()) {
-            float totalprogress = (float) i.getPracticeTime() / (float) i.getExpectedDuration();
-            int percentage = new Double(totalprogress * 100).intValue();
-            String progress = Util.formatdurationtoStringDecimalWithColons(new Duration(i.getPracticeTime())) + " > " + Util.formatdurationtoStringDecimalWithColons(new Duration(i.getExpectedDuration()));
+            int percentage;
+            String progress;
+            if (! i.isPracticecompleted()) {
+                float totalprogress = (float) i.getPracticeTime() / (float) i.getExpectedDuration();
+                percentage = new Double(totalprogress * 100).intValue();
+                progress = Util.formatdurationtoStringDecimalWithColons(new Duration(i.getPracticeTime())) + " > " + Util.formatdurationtoStringDecimalWithColons(new Duration(i.getExpectedDuration()));
+            } else {
+                percentage = 100;
+                String expectedduration = Util.formatdurationtoStringDecimalWithColons(new Duration(i.getExpectedDuration()));
+                progress = expectedduration + " > " + expectedduration;
+            }
             playlistitems.add(new PlaylistTableItem(i.getName(), progress, percentage + "%"));
         }
         PlaylistTableView.setItems(playlistitems);
@@ -638,7 +648,9 @@ public class Player extends Stage {
         if (! selectedPlaybackItem.isRampOnly()) {entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);}
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
-        if (! stopWatch.isStarted()) {stopWatch.start();}
+        if (! sessionStopWatch.isStarted()) { sessionStopWatch.start();}
+        playbackItemStopWatch = new StopWatch();
+        playbackItemStopWatch.start();
         timeline_progresstonextsessionpart = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()), ae -> progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
@@ -713,7 +725,8 @@ public class Player extends Stage {
         volume_unbindentrainment();
         SessionInProgress.endbreak();
         entrainmentplayer.play();
-        stopWatch.resume();
+        sessionStopWatch.resume();
+        playbackItemStopWatch.resume();
         if (fade_entrainment_resume != null && sessionparttimeleft().greaterThan(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_resume_value()))) {
             entrainmentplayer.setVolume(0.0);
             if (fade_entrainment_resume.getStatus() == Animation.Status.RUNNING) {return;}
@@ -744,7 +757,8 @@ public class Player extends Stage {
     }
     private void pause() {
         volume_unbindentrainment();
-        stopWatch.suspend();
+        sessionStopWatch.suspend();
+        playbackItemStopWatch.suspend();
         SessionInProgress.startbreak();
         if (fade_entrainment_pause != null && sessionparttimeleft().greaterThan(Duration.seconds(Preferences.getPlaybackOptions().getAnimation_fade_pause_value()))) {
             if (ambienceactive() && fade_ambience_pause.getStatus() == Animation.Status.RUNNING) {return;}
@@ -800,6 +814,7 @@ public class Player extends Stage {
                     try {
                         cleanupPlayersandAnimations();
                         int index = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1;
+                        selectedPlaybackItem.setPracticecompleted(true);
                         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(index);
                         start();
                         if (ReferenceToggleCheckBox.isSelected() && ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {loadreference();}
@@ -954,7 +969,8 @@ public class Player extends Stage {
         AmbienceVolumePercentage.setText("0%");
     }
     private void endofsession() {
-        if (stopWatch.isStarted()) {stopWatch.stop();}
+        if (sessionStopWatch.isStarted()) { sessionStopWatch.stop();}
+        if (playbackItemStopWatch.isStarted()) {playbackItemStopWatch.stop();}
         SessionInProgress.setSessionPracticedTime(SessionInProgress.getExpectedSessionDuration().toMillis());
         setPlayerstate(STOPPED);
         // TODO Prompt For Export
@@ -997,11 +1013,12 @@ public class Player extends Stage {
         SessionInProgress = null;
     }
     private boolean endsessionprematurely(boolean resetdialogcontrols) {
-        stopWatch.suspend();
+        if (sessionStopWatch.isStarted()) {sessionStopWatch.suspend();}
+        if (playbackItemStopWatch.isStarted()) {sessionStopWatch.suspend();}
         pausewithoutanimation();
         updateuitimeline.pause();
         if (testingmode || new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
-            if (stopWatch.isStarted()) {stopWatch.stop();}
+            if (sessionStopWatch.isStarted()) { sessionStopWatch.stop();}
             setPlayerstate(STOPPED);
             if (! testingmode) { sessions.add(SessionInProgress); }
             if (resetdialogcontrols) {

@@ -25,6 +25,7 @@ public class PlaybackItem {
     private Ambience ambience;
     private PlaybackItemEntrainment playbackItemEntrainment;
     private PlaybackItemType playbackItemType;
+    private boolean practicecompleted = false;
     @XmlTransient
     private Duration totalpracticetime;
     @XmlTransient
@@ -46,6 +47,12 @@ public class PlaybackItem {
     }
 
 // Getters And Setters
+    public boolean isPracticecompleted() {
+        return practicecompleted;
+    }
+    public void setPracticecompleted(boolean practicecompleted) {
+        this.practicecompleted = practicecompleted;
+    }
     public PlaybackItemType getPlaybackItemType() {
         return playbackItemType;
     }
