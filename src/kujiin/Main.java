@@ -13,32 +13,20 @@ import kujiin.util.enums.ProgramState;
 import kujiin.xml.*;
 
 import static kujiin.xml.Preferences.*;
-
 // TODO Add Concurrent Program Check
 
-// TODO Design Tutorial ( displaytutorial() )
+// TODO Design Tutorial ( MainController.displaytutorial() )
+// Startup Wizard (Welcome Dialog)
+    // Welcome To The Program ......(Description Of Program). This A Short Tutorial To Teach You About Some Of The Features Of This Program
+    // Session Creation
+    // Ambience & Playback
+    // Ambience
 
-// TODO Ambience Files Found In Directories... (PlaybackItem Folder)...Add?
+// TODO Add Check To Startup Checks
+    // Ambience Files Found In Directories... (PlaybackItem Folder)...Add?
 
 // TODO Move Ambience/Reference To User's Home Directory
-// TODO Fixing Timing Display On:
-    // Playlist (Shows 1 second Before)
-
-// TODO Reverse Order Practiced Sessions (Most Recent At Top)
-
-// TODO After End Of Session -> Return To Player -> Clear And Unselect Reference
-
-// TODO Enable/Disable Ambience On Playback Item Play
-    // If Has Available Ambience.....Enable But Don't Play
-    // If Not Has Preset Ambience....Set This Session Ambience Invisible
-    // Turn Ambience Volume On/Off At Will
-
-// Move Ambience Volume Controls Inside Ambience Tab
-// Remove "Entrainment" And "Ambience" Labels From Volume Controls
-
-
 // TODO Add Recent Activity Tab
-
 
 // TODO Change Sessions To Store Online?
 // TODO Redesign Goals Completed (Use Bar Chart To Show Completed And Next With Practiced Time)
@@ -76,11 +64,6 @@ import static kujiin.xml.Preferences.*;
     // TODO Add Low (And Possibly Medium) Variations Of All Session Parts
     // TODO Add Ramps To Connect Low (And Possibly Medium) Variations Of Session Parts With Each Other
 
-// Startup Wizard (Welcome Dialog)
-    // Welcome To The Program ......(Description Of Program). This A Short Tutorial To Teach You About Some Of The Features Of This Program
-    // Session Creation
-    // Ambience & Playback
-    // Ambience
 
 public class Main extends Application {
 

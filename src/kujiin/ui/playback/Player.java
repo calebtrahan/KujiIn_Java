@@ -48,6 +48,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -263,7 +265,7 @@ public class Player extends Stage {
             SessionProgress.setOnMouseEntered(event -> SessionProgressPercentage.setVisible(true));
             SessionProgress.setOnMouseExited(event -> SessionProgressPercentage.setVisible(false));
             SessionProgress.setOnMouseClicked(event -> SessionProgressPercentage.setVisible(! SessionProgressPercentage.isVisible()));
-            ReferenceTypeChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList("html", "txt")));
+            ReferenceTypeChoiceBox.setItems(FXCollections.observableArrayList(Arrays.asList("html", "text")));
             ReferenceControls.setDisable(true);
             updategoalsui();
             updateambienceui();
@@ -324,9 +326,26 @@ public class Player extends Stage {
     private void setupTooltips() {
         StackedBarChart<String, Integer> barchart;
         PlayButton.setTooltip(new Tooltip("Play"));
+        AmbiencePauseButton.setTooltip(new Tooltip("Play Ambience"));
         PauseButton.setTooltip(new Tooltip("Pause"));
+        AmbienceNextButton.setTooltip(new Tooltip("Next Ambience"));
         StopButton.setTooltip(new Tooltip("Stop"));
+        AmbienceShuffleButton.setTooltip(new Tooltip("Shuffle Ambience"));
         AmbiencePlaylistTable_Preset.setRowFactory(tv -> new TableRow<AmbiencePlaylistTableItem>() {
+            private Tooltip tooltip = new Tooltip();
+            @Override
+            protected void updateItem(AmbiencePlaylistTableItem item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    tooltip.setText(
+                            "Name: " + item.name.get() + "\n" +
+                            "Location: " + item.getFile().getAbsolutePath()
+                    );
+                    setTooltip(tooltip);
+                } else {setTooltip(null);}
+            }
+        });
+        AmbiencePlaylistTable_Available.setRowFactory(tv -> new TableRow<AmbiencePlaylistTableItem>() {
             private Tooltip tooltip = new Tooltip();
             @Override
             protected void updateItem(AmbiencePlaylistTableItem item, boolean empty) {
@@ -429,7 +448,15 @@ public class Player extends Stage {
                 bd = bd.setScale(1, RoundingMode.HALF_UP);
                 SessionProgressPercentage.setText(bd.doubleValue() + "%");
                 Boolean displaynormaltime = true;
-                if (displaynormaltime) {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));}
+                if (displaynormaltime) {
+                    SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration()));
+                    StringBuilder stringBuilder = new StringBuilder();
+                    Duration timeleft = SessionInProgress.getExpectedSessionDuration().subtract(SessionInProgress.getSessionPracticedTime());
+                    LocalTime completiontime = LocalTime.now().plusSeconds((long) timeleft.toSeconds());
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
+                    String completiontext = completiontime.format(formatter);
+                    SessionTotalTime.setTooltip(new Tooltip("Estimated Completion Time: " + completiontext));
+                }
                 else {SessionTotalTime.setText(Util.formatdurationtoStringDecimalWithColons(SessionInProgress.getExpectedSessionDuration().subtract(SessionInProgress.getSessionPracticedTime())));}
                 updategoalsui();
                 updateambienceui();
@@ -491,10 +518,11 @@ public class Player extends Stage {
                 String expectedduration = Util.formatdurationtoStringDecimalWithColons(new Duration(i.getExpectedDuration()));
                 progress = expectedduration + " > " + expectedduration;
             }
-            playlistitems.add(new PlaylistTableItem(i.getName(), progress, percentage + "%"));
+            playlistitems.add(new PlaylistTableItem(i, i.getName(), progress, percentage + "%"));
         }
         PlaylistTableView.setItems(playlistitems);
         PlaylistTableView.getSelectionModel().select(SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem));
+
     }
         // Ambience
     private boolean ambienceactive() {return selectedPlaybackItem != null && selectedPlaybackItem.getAmbience().hasAvailableAmbience() && ambienceplayer != null;}
@@ -1432,7 +1460,6 @@ public class Player extends Stage {
         try {
             File referencefile = selectedPlaybackItem.getReferenceFile(referenceType);
             if (referencefile != null) {
-                System.out.println("Loading Reference File: " + referencefile.getAbsolutePath());
                 switch (referenceType) {
                     case txt:
                         StringBuilder sb = new StringBuilder();
@@ -1478,13 +1505,18 @@ public class Player extends Stage {
         StringProperty itemname;
         StringProperty duration;
         StringProperty percentcompleted;
+        PlaybackItem playbackItem;
 
-        public PlaylistTableItem(String itemname, String duration, String percentcompleted) {
+        public PlaylistTableItem(PlaybackItem playbackItem, String itemname, String duration, String percentcompleted) {
             this.itemname = new SimpleStringProperty(itemname);
             this.duration = new SimpleStringProperty(duration);
             this.percentcompleted = new SimpleStringProperty(percentcompleted);
+            this.playbackItem = playbackItem;
         }
 
+        public PlaybackItem getPlaybackItem() {
+            return playbackItem;
+        }
     }
     class AmbiencePlaylistTableItem {
         public IntegerProperty number;

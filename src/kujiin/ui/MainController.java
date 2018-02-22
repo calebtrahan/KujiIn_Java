@@ -741,6 +741,7 @@ public class MainController implements Initializable {
 //            new InformationDialog(preferences, "Missing Ambience", "Missing Ambience For " + missingambiencecount + " Playback Items",
 //                    "Added " + quickAmbienceType.toString() + " Ambience For " + (playbackItemList.size() - missingambiencecount) + " Playback Items");
         }
+        System.out.println("Made It Out Of Quick Add Ambience Method");
         return items;
     }
     private boolean add(int[] availableambienceindexes) {
@@ -1432,6 +1433,7 @@ public class MainController implements Initializable {
             }
             ObservableList<SessionBrowserTableItem> sessionlist = FXCollections.observableArrayList();
             for (Session i : filteredsessions) {sessionlist.add(new SessionBrowserTableItem(i));}
+            Collections.reverse(sessionlist);
             PracticedSessionListTable.setItems(sessionlist);
         } else {PracticedSessionListTable.setPlaceholder(new Label("No Practiced Sessions"));}
     }

@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -183,7 +184,7 @@ public class Ambience {
             catch (IndexOutOfBoundsException ignored) {indexcount = 0;}
         }
     }
-    public void quickadd_shuffle(PlaybackItem playbackItem, boolean clearambience) {
+    public void quickadd_shuffle_old(PlaybackItem playbackItem, boolean clearambience) {
     // Clear Ambience (If Needed)
         if (clearambience) {clearPresetambience();}
     // Get Current Duration And Existing Ambience Indexes
@@ -219,7 +220,50 @@ public class Ambience {
                 ambiencelist.add(filetoadd);
                 currentduration = currentduration.add(Duration.millis(filetoadd.getDuration()));
                 indexhistory.add(indexcount);
-            } catch (IndexOutOfBoundsException ignored) {}
+            } catch (IndexOutOfBoundsException ignored) {ignored.printStackTrace();}
+        }
+        setSessionAmbience(ambiencelist);
+    }
+    public void quickadd_shuffle(PlaybackItem playbackItem, boolean clearambience) {
+        List<SoundFile> ambiencelist = new ArrayList<>();
+        Duration currentduration = Duration.ZERO;
+    // Clear Ambience (If Needed)
+        if (clearambience) {clearPresetambience();}
+    // Add Existing Preset Ambience
+        else if (hasPresetAmbience()) {
+            ambiencelist.addAll(SessionAmbience);
+            currentduration = getPresetAmbienceDuration();
+        }
+    // Set Max Duration
+        Duration maxduration;
+        if (playbackItem.isRampOnly()) {maxduration = Duration.minutes(1);}
+        else {maxduration = new Duration(playbackItem.getExpectedDuration());}
+    // Add Shuffled Ambience
+        if (AvailableAmbience.size() > 1) {
+            while (currentduration.lessThan(maxduration)) {
+                List<SoundFile> shuffledambiencelist = AvailableAmbience;
+                while (true) {
+                    Collections.shuffle(shuffledambiencelist);
+                    // Test For Duplicate First And Last Item Here
+                    if (ambiencelist.isEmpty() || ! ambiencelist.get(ambiencelist.size() - 1).equals(shuffledambiencelist.get(shuffledambiencelist.size() - 1))) {break;}
+                }
+                for (SoundFile x : shuffledambiencelist) {
+                    ambiencelist.add(x);
+                    currentduration = currentduration.add(Duration.millis(x.getDuration()));
+                    if (currentduration.greaterThanOrEqualTo(maxduration)) { SessionAmbience = ambiencelist; return;}
+                }
+            }
+        } else {
+            while (currentduration.lessThan(maxduration)) {
+                SoundFile file = AvailableAmbience.get(0);
+                ambiencelist.add(file);
+                currentduration = currentduration.add(Duration.millis(file.getDuration()));
+            }
+        }
+        System.out.println("Ambience List Is:");
+        int count = 1;
+        for (SoundFile i : ambiencelist) {
+            System.out.println(count + ": " + i.getName());
         }
         setSessionAmbience(ambiencelist);
     }
