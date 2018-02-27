@@ -4,6 +4,8 @@
       <root url="jar://$PROJECT_DIR$/src/kujiin/assets/lib/commons-lang3-3.7.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ideaLibSources/commons-lang3-3.7-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

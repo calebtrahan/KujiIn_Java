@@ -677,8 +677,7 @@ public class Player extends Stage {
         entrainmentplayer.setOnError(this::entrainmenterror);
         entrainmentplayer.play();
         if (! sessionStopWatch.isStarted()) { sessionStopWatch.start();}
-        playbackItemStopWatch = new StopWatch();
-        playbackItemStopWatch.start();
+        playbackItemStopWatch = StopWatch.createStarted();
         timeline_progresstonextsessionpart = new Timeline(new KeyFrame(new Duration(selectedPlaybackItem.getExpectedDuration()), ae -> progresstonextsessionpart()));
         timeline_progresstonextsessionpart.play();
         if (! selectedPlaybackItem.isRampOnly() && ! isLastSessionPart && Preferences.getSessionOptions().getRampenabled()) {
@@ -1041,8 +1040,8 @@ public class Player extends Stage {
         SessionInProgress = null;
     }
     private boolean endsessionprematurely(boolean resetdialogcontrols) {
-        if (sessionStopWatch.isStarted()) {sessionStopWatch.suspend();}
-        if (playbackItemStopWatch.isStarted()) {sessionStopWatch.suspend();}
+        if (sessionStopWatch.isStarted() && ! playbackItemStopWatch.isSuspended()) {sessionStopWatch.suspend();}
+        if (playbackItemStopWatch.isStarted() && ! playbackItemStopWatch.isSuspended()) {sessionStopWatch.suspend();}
         pausewithoutanimation();
         updateuitimeline.pause();
         if (testingmode || new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {
@@ -1388,7 +1387,6 @@ public class Player extends Stage {
     private void volume_rebindentrainment() {volume_unbindentrainment(); volume_bindentrainment();}
     private void toggleambiencemute() {}
     private void toggleentrainmentmute() {}
-
 
     private Duration sessionparttimeleft() {
         return new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(new Duration(selectedPlaybackItem.getPracticeTime()));

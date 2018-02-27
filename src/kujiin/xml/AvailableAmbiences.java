@@ -176,10 +176,14 @@ public class AvailableAmbiences {
     }
     public boolean completelyempty() {
         boolean completelyempty = true;
-        for (int i = 0; i < 16; i++) {
-            if (getsessionpartAmbience(i).hasAny()) {completelyempty = false;}
+        try {
+            for (int i = 0; i < 16; i++) {
+                if (getsessionpartAmbience(i).hasAny()) {completelyempty = false;}
+            }
+            return completelyempty;
+        } catch (NullPointerException e) {
+            return false;
         }
-        return completelyempty;
     }
 
 }
