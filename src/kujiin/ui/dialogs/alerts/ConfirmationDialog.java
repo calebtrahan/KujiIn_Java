@@ -10,7 +10,9 @@ import java.util.Optional;
 
 public class ConfirmationDialog {
     private boolean result;
+    protected Alert alert;
 
+    public ConfirmationDialog() {}
     public ConfirmationDialog(Preferences preferences, String titletext, String headertext, String contenttext, String yesbuttontext, String nobuttontext, boolean modal) {
         String yestext;
         String notext;

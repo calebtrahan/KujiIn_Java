@@ -30,6 +30,7 @@ import kujiin.ui.dialogs.alerts.InformationDialog;
 import kujiin.ui.goals.SetNewGoalDialog;
 import kujiin.ui.playback.Player;
 import kujiin.ui.progress.EditSessionNotes;
+import kujiin.ui.progress.ImportSessionFile;
 import kujiin.ui.table.*;
 import kujiin.util.Util;
 import kujiin.util.enums.IconDisplayType;
@@ -73,6 +74,7 @@ public class MainController implements Initializable {
     public MenuItem CloseMenuItem;
     public MenuItem EditAvailableAmbienceMenuItem;
     public MenuItem EditReferenceFilesMenuItem;
+    public MenuItem ImportSessionsMenuItem;
     public MenuItem AboutMenuItem;
     // Play/Export Tab
     public Tab PlayExportTab;
@@ -611,6 +613,12 @@ public class MainController implements Initializable {
         }
     }
     public void closeprogram() {}
+    public void importsessions() {
+        ImportSessionFile importSessionFile = new ImportSessionFile(sessions, preferences);
+        importSessionFile.initModality(Modality.APPLICATION_MODAL);
+        importSessionFile.showAndWait();
+        sessions = importSessionFile.getSessions();
+    }
     public void editavailableambience() {
         AvailableAmbienceEditor availableAmbienceEditor = new AvailableAmbienceEditor(preferences, availableAmbiences);
 //        availableAmbienceEditor.initModality(Modality.APPLICATION_MODAL);
@@ -625,7 +633,6 @@ public class MainController implements Initializable {
     public void displaytutorial() {}
     public void aboutthisprogram() {
     }
-
 
 // Play/Export Tab
     // Create/Open Toolbar Methods
@@ -1499,7 +1506,7 @@ public class MainController implements Initializable {
             this.sessions.setSession(sessionlist);
         }
     }
-        // Filter
+    // Filter
     public void populatesessionbrowserfilter() {
         Duration highestduration = Duration.ZERO;
         if (sessions.hasSessions()) {

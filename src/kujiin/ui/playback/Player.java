@@ -1040,8 +1040,8 @@ public class Player extends Stage {
         SessionInProgress = null;
     }
     private boolean endsessionprematurely(boolean resetdialogcontrols) {
-        if (sessionStopWatch.isStarted() && ! playbackItemStopWatch.isSuspended()) {sessionStopWatch.suspend();}
-        if (playbackItemStopWatch.isStarted() && ! playbackItemStopWatch.isSuspended()) {sessionStopWatch.suspend();}
+        if (playbackItemStopWatch.isStarted() && ! playbackItemStopWatch.isSuspended()) {playbackItemStopWatch.suspend();}
+        if (sessionStopWatch.isStarted() && ! sessionStopWatch.isSuspended()) {sessionStopWatch.suspend();}
         pausewithoutanimation();
         updateuitimeline.pause();
         if (testingmode || new ConfirmationDialog(Preferences, "End Session Early", "Session Is Not Completed.", "End Session Prematurely?", "End Session", "Continue").getResult()) {

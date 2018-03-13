@@ -44,6 +44,7 @@
             <items>
               <MenuItem fx:id="EditAvailableAmbienceMenuItem" mnemonicParsing="false" onAction="#editavailableambience" text="Ambience" />
                   <MenuItem fx:id="EditReferenceFilesMenuItem" mnemonicParsing="false" onAction="#editreferencefiles" text="Reference" />
+                  <MenuItem fx:id="ImportSessionsMenuItem" mnemonicParsing="false" onAction="#importsessions" text="Import Sessions" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">

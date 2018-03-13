@@ -81,6 +81,12 @@ public class Sessions {
             marshall();
         }
     }
+    public void add(Sessions sessions) {
+        for (kujiin.xml.Session i : sessions.getSession()) {
+            add(i);
+        }
+        sort();
+    }
     public Session get(UUID uuid) {
         if (Session == null) {return null;}
         else {
@@ -97,7 +103,7 @@ public class Sessions {
             marshall();
         }
     }
-    public void sort() {Session.sort(Comparator.comparing(kujiin.xml.Session::getDate_Practiced));}
+    private void sort() {Session.sort(Comparator.comparing(kujiin.xml.Session::getDate_Practiced));}
 
 // Session Information Getters
     public Duration gettotalpracticedtime(PlaybackItem playbackItem, boolean includeqigong) {
