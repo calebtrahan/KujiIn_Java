@@ -97,7 +97,7 @@ public class Player extends Stage {
     public HBox AmbienceVolumeControls;
     public Slider AmbienceVolume;
     public Label AmbienceVolumePercentage;
-    public Button AmbienceMuteButton;
+    public ToggleButton AmbienceMuteButton;
         // Goals
     public Tab GoalsTab;
     public HBox GoalLabels;
@@ -112,10 +112,10 @@ public class Player extends Stage {
     // Controls
     public Slider EntrainmentVolume;
     public Label EntrainmentVolumePercentage;
-    public Button EntrainmentMuteButton;
-    public Button PlayButton;
-    public Button PauseButton;
-    public Button StopButton;
+    public ToggleButton EntrainmentMuteButton;
+    public Button EntrainmentPlayButton;
+    public Button EntrainmentPauseButton;
+    public Button EntrainmentStopButton;
 // Animation
     private Animation fade_entrainment_play;
     private Animation fade_entrainment_resume;
@@ -140,6 +140,7 @@ public class Player extends Stage {
     private SoundFile currentambiencesoundfile;
     private Double currententrainmentvolume;
     private Double currentambiencevolume;
+    private boolean ambiencepaused = false;
 // Goals
     private Duration totalpracticedtime;
 // Class Objects
@@ -178,7 +179,6 @@ public class Player extends Stage {
 
         @Override
         public void handle(KeyEvent event) {
-            System.out.println("Key Pressed");
             try {
                 if (event.getCode() == KeyCode.SPACE) {
                     switch (playerState) {
@@ -270,7 +270,8 @@ public class Player extends Stage {
             updategoalsui();
             updateambienceui();
             getScene().addEventHandler(KeyEvent.KEY_PRESSED, SpaceBarPressed);
-            new Timeline(new KeyFrame(Duration.millis(100), ae -> {PlayButton.requestFocus();})).play();
+            new Timeline(new KeyFrame(Duration.millis(100), ae -> {
+                EntrainmentPlayButton.requestFocus();})).play();
         } catch (IOException ignored) {ignored.printStackTrace();}
     }
     private void setupTables() {
@@ -287,8 +288,10 @@ public class Player extends Stage {
         AmbiencePlaylistTable_Preset.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2 && playerState == PLAYING) {
                 int index = AmbiencePlaylistTable_Preset.getSelectionModel().getSelectedIndex();
-                SoundFile i = selectedPlaybackItem.getAmbience().getPreset(index);
-                playambience(i);
+                try {
+                    SoundFile i = selectedPlaybackItem.getAmbience().getPreset(index);
+                    playambience(i);
+                } catch (IndexOutOfBoundsException ignored) {}
             }
         });
         AmbiencePlaylistAvailableNumberColumn.setCellValueFactory(cellData -> cellData.getValue().number.asObject());
@@ -325,11 +328,11 @@ public class Player extends Stage {
     }
     private void setupTooltips() {
         StackedBarChart<String, Integer> barchart;
-        PlayButton.setTooltip(new Tooltip("Play"));
+        EntrainmentPlayButton.setTooltip(new Tooltip("Play"));
         AmbiencePauseButton.setTooltip(new Tooltip("Play Ambience"));
-        PauseButton.setTooltip(new Tooltip("Pause"));
+        EntrainmentPauseButton.setTooltip(new Tooltip("Pause"));
         AmbienceNextButton.setTooltip(new Tooltip("Next Ambience"));
-        StopButton.setTooltip(new Tooltip("Stop"));
+        EntrainmentStopButton.setTooltip(new Tooltip("Stop"));
         AmbienceShuffleButton.setTooltip(new Tooltip("Shuffle Ambience"));
         AmbiencePlaylistTable_Preset.setRowFactory(tv -> new TableRow<AmbiencePlaylistTableItem>() {
             private Tooltip tooltip = new Tooltip();
@@ -363,9 +366,9 @@ public class Player extends Stage {
     private void setupIcons() {
         IconDisplayType dt = Preferences.getUserInterfaceOptions().getIconDisplayType();
         if (dt == IconDisplayType.ICONS_AND_TEXT || dt == IconDisplayType.ICONS_ONLY) {
-            PlayButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PLAY, 20.0));
-            PauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PAUSE, 20.0));
-            StopButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_STOP, 20.0));
+            EntrainmentPlayButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PLAY, 20.0));
+            EntrainmentPauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PAUSE, 20.0));
+            EntrainmentStopButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_STOP, 20.0));
             AmbienceNextButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_NEXT, 20.0));
             AmbiencePreviousButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PREVIOUS, 20.0));
             AmbiencePauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PAUSE, 20.0));
@@ -374,13 +377,13 @@ public class Player extends Stage {
             AmbienceMuteButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_MUTE, 20.0));
         }
 //        if (dt == IconDisplayType.ICONS_ONLY) {
-//            PlayButton.setText("");
-//            PauseButton.setText("");
-//            StopButton.setText("");
+//            EntrainmentPlayButton.setText("");
+//            EntrainmentPauseButton.setText("");
+//            EntrainmentStopButton.setText("");
 //        } else {
-//            PlayButton.setText("Play");
-//            PauseButton.setText("Pause");
-//            StopButton.setText("Stop");
+//            EntrainmentPlayButton.setText("Play");
+//            EntrainmentPauseButton.setText("Pause");
+//            EntrainmentStopButton.setText("Stop");
 //        }
     }
     private void setPlayerstate(PlayerState playerstate) {
@@ -474,18 +477,21 @@ public class Player extends Stage {
         boolean fade_pause = playerState == FADING_PAUSE;
         boolean fade_stop = playerState == FADING_STOP;
         boolean transitioning = playerState == TRANSITIONING;
-        PlayButton.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop || transitioning);
-        PlayMenuItem.setDisable(playing || fade_play || fade_resume || fade_pause || fade_stop || transitioning);
-        PauseButton.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
-        PauseMenuItem.setDisable(paused || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
-        StopButton.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
-        StopMenuItem.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
-        AmbienceMenu.setDisable(stopped || fade_play || fade_resume || fade_pause || fade_stop || idle || transitioning);
-        AmbienceShuffleButton.setDisable(! playing);
-        AmbiencePreviousButton.setDisable(! playing);
-        AmbiencePauseButton.setDisable(! playing);
-        AmbienceNextButton.setDisable(! playing);
-        if (ambienceactive()) {
+        boolean fading = fade_play || fade_resume || fade_pause || fade_stop;
+        EntrainmentPlayButton.setDisable(playing || fading || transitioning);
+        PlayMenuItem.setDisable(playing || fading || transitioning);
+        EntrainmentPauseButton.setDisable(paused || fading || idle || transitioning);
+        PauseMenuItem.setDisable(paused || fading || idle || transitioning);
+        EntrainmentStopButton.setDisable(stopped || fading || idle || transitioning);
+        StopMenuItem.setDisable(stopped || fading || idle || transitioning);
+        EntrainmentMuteButton.setDisable(stopped || fading || idle || transitioning);
+        AmbienceMuteButton.setDisable(stopped || fading || idle || transitioning);
+        AmbienceMenu.setDisable(stopped || fading || idle || transitioning);
+        AmbienceShuffleButton.setDisable(paused || fading || idle || transitioning);
+        AmbiencePreviousButton.setDisable(paused || fading || idle || transitioning);
+        AmbiencePauseButton.setDisable(paused || fading || idle || transitioning);
+        AmbienceNextButton.setDisable(paused || fading || idle || transitioning);
+        if (ambienceactive() && playing) {
             if (AmbiencePresetTab.isSelected()) {
                 AmbienceNextButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
                 AmbiencePreviousButton.setDisable(selectedPlaybackItem.getAmbience().getSessionAmbience().size() == 1);
@@ -690,7 +696,11 @@ public class Player extends Stage {
                     entrainmentplayer.dispose();
                     entrainmentplayer = new MediaPlayer(new Media(rampfile.getFile().toURI().toString()));
                     entrainmentplayer.setOnError(this::entrainmenterror);
-                    entrainmentplayer.setVolume(currententrainmentvolume);
+                    if (! EntrainmentMuteButton.isSelected()) {
+                        entrainmentplayer.setVolume(currententrainmentvolume);
+                    } else {
+                        entrainmentplayer.setVolume(0.0);
+                    }
                     entrainmentplayer.play();
                     entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
                 }));
@@ -718,7 +728,11 @@ public class Player extends Stage {
             setPlayerstate(FADING_PLAY);
             fade_entrainment_play.play();
         } else {
-            entrainmentplayer.setVolume(currententrainmentvolume);
+            if (! EntrainmentMuteButton.isSelected()) {
+                entrainmentplayer.setVolume(currententrainmentvolume);
+            } else {
+                entrainmentplayer.setVolume(0.0);
+            }
             String percentage = new Double(currententrainmentvolume * 100).intValue() + "%";
             EntrainmentVolumePercentage.setText(percentage);
             setPlayerstate(PLAYING);
@@ -737,7 +751,11 @@ public class Player extends Stage {
                 ambienceplayer.play();
                 if (fade_ambience_play != null) {fade_ambience_play.play();}
                 else {
-                    ambienceplayer.setVolume(currentambiencevolume);
+                    if (! AmbienceMuteButton.isSelected()) {
+                        ambienceplayer.setVolume(currentambiencevolume);
+                    } else {
+                        ambienceplayer.setVolume(0.0);
+                    }
                     String percentage = new Double(currentambiencevolume * 100).intValue() + "%";
                     AmbienceVolumePercentage.setText(percentage);
                     volume_bindambience();
@@ -760,7 +778,11 @@ public class Player extends Stage {
             setPlayerstate(FADING_RESUME);
             fade_entrainment_resume.play();
         } else {
-            entrainmentplayer.setVolume(currententrainmentvolume);
+            if (! EntrainmentMuteButton.isSelected()) {
+                entrainmentplayer.setVolume(currententrainmentvolume);
+            } else {
+                entrainmentplayer.setVolume(0.0);
+            }
             volume_bindentrainment();
             setPlayerstate(PLAYING);
             timeline_progresstonextsessionpart.play();
@@ -768,7 +790,7 @@ public class Player extends Stage {
                 timeline_start_ending_ramp.play();}
             if (timeline_fadeout_timer != null) {timeline_fadeout_timer.play();}
         }
-        if (ambienceactive()) {
+        if (ambienceactive() && ! ambiencepaused) {
             volume_unbindambience();
             ambienceplayer.play();
             if (fade_ambience_resume != null) {
@@ -776,7 +798,11 @@ public class Player extends Stage {
                 if (fade_ambience_resume.getStatus() == Animation.Status.RUNNING) {return;}
                 fade_ambience_resume.play();
             } else {
-                ambienceplayer.setVolume(currentambiencevolume);
+                if (! AmbienceMuteButton.isSelected()) {
+                    ambienceplayer.setVolume(currentambiencevolume);
+                } else {
+                    ambienceplayer.setVolume(0.0);
+                }
                 volume_bindambience();
             }
         }
@@ -871,9 +897,9 @@ public class Player extends Stage {
             MediaPlayer alertplayer = new MediaPlayer(alertmedia);
             alertplayer.play();
             setPlayerstate(TRANSITIONING);
-            PlayButton.setDisable(true);
-            PauseButton.setDisable(true);
-            StopButton.setDisable(true);
+            EntrainmentPlayButton.setDisable(true);
+            EntrainmentPauseButton.setDisable(true);
+            EntrainmentStopButton.setDisable(true);
             alertplayer.setOnEndOfMedia(() -> {
                 setPlayerstate(TRANSITIONING);
                 toggleplayerbuttons();
@@ -893,7 +919,11 @@ public class Player extends Stage {
             entrainmentplayer = new MediaPlayer(new Media(availableEntrainments.getsessionpartEntrainment(selectedPlaybackItem).getFreq().getFile().toURI().toString()));
             entrainmentplayer.setOnEndOfMedia(this::playnextentrainment);
             entrainmentplayer.setOnError(this::entrainmenterror);
-            entrainmentplayer.setVolume(currententrainmentvolume);
+            if (! EntrainmentMuteButton.isSelected()) {
+                entrainmentplayer.setVolume(currententrainmentvolume);
+            } else {
+                entrainmentplayer.setVolume(0.0);
+            }
             entrainmentplayer.play();
             entrainmentplayer.setOnPlaying(this::volume_bindentrainment);
         } catch (IndexOutOfBoundsException ignored) {
@@ -906,17 +936,20 @@ public class Player extends Stage {
         setupambiencefadeanimations();
         if (AmbiencePresetTab.isSelected()) { playambience(selectedPlaybackItem.getAmbience().getPreset(0)); }
         else { playambience(selectedPlaybackItem.getAmbience().getAvailable(0)); }
+        ambiencepaused = false;
     }
     private void pauseambience() {
         if (playerState == PLAYING) {
             AmbiencePauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PLAY, 20.0));
             ambienceplayer.pause();
+            ambiencepaused = true;
         }
     }
     private void resumeambience() {
         if (playerState == PLAYING) {
             AmbiencePauseButton.setGraphic(new IconImageView(kujiin.xml.Preferences.ICON_PAUSE, 20.0));
             ambienceplayer.play();
+            ambiencepaused = false;
         }
     }
     private void playambience(SoundFile soundFile) {
@@ -926,7 +959,11 @@ public class Player extends Stage {
         ambienceplayer = new MediaPlayer(new Media(currentambiencesoundfile.getFile().toURI().toString()));
         ambienceplayer.setOnEndOfMedia(this::playnextambience);
         ambienceplayer.setOnError(this::ambienceerror);
-        ambienceplayer.setVolume(currentambiencevolume);
+        if (! AmbienceMuteButton.isSelected()) {
+            ambienceplayer.setVolume(currentambiencevolume);
+        } else {
+            ambienceplayer.setVolume(0.0);
+        }
         ambienceplayer.play();
         ambienceplayer.setOnPlaying(() -> {
             volume_bindambience();
@@ -955,7 +992,11 @@ public class Player extends Stage {
             ambienceplayer = new MediaPlayer(new Media(previousambiencefile.getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
-            ambienceplayer.setVolume(currentambiencevolume);
+            if (! AmbienceMuteButton.isSelected()) {
+                ambienceplayer.setVolume(currentambiencevolume);
+            } else {
+                ambienceplayer.setVolume(0.0);
+            }
             ambienceplayer.play();
             ambienceplayer.setOnPlaying(this::volume_bindambience);
         }
@@ -967,22 +1008,26 @@ public class Player extends Stage {
             ambienceplayer = new MediaPlayer(new Media(nextambiencefile.getFile().toURI().toString()));
             ambienceplayer.setOnEndOfMedia(this::playnextambience);
             ambienceplayer.setOnError(this::ambienceerror);
-            ambienceplayer.setVolume(currentambiencevolume);
+            if (! AmbienceMuteButton.isSelected()) {
+                ambienceplayer.setVolume(currentambiencevolume);
+            } else {
+                ambienceplayer.setVolume(0.0);
+            }
             ambienceplayer.play();
             ambienceplayer.setOnPlaying(this::volume_bindambience);
         }
     }
     // End Of Session
     private void reset() {
-        PlayButton.setDisable(false);
-        PlayButton.setTooltip(new Tooltip("Replay"));
+        EntrainmentPlayButton.setDisable(false);
+        EntrainmentPlayButton.setTooltip(new Tooltip("Replay"));
 //        if (Preferences.getUserInterfaceOptions().getIconDisplayType() != IconDisplayType.ICONS_ONLY) {
-//            PlayButton.setText("Replay");
-//            PauseButton.setText("Pause");
-//            StopButton.setText("Stop");
+//            EntrainmentPlayButton.setText("Replay");
+//            EntrainmentPauseButton.setText("Pause");
+//            EntrainmentStopButton.setText("Stop");
 //        }
-        PauseButton.setDisable(true);
-        StopButton.setDisable(true);
+        EntrainmentPauseButton.setDisable(true);
+        EntrainmentStopButton.setDisable(true);
         if (updateuitimeline != null) {updateuitimeline.stop(); updateuitimeline = null;}
         SessionCurrentTime.setText("00:00");
         SessionProgress.setProgress(0.0);
@@ -1093,7 +1138,7 @@ public class Player extends Stage {
 
             @Override
             protected void interpolate(double frac) {
-                if (ambienceplayer != null && currentambiencevolume > 0.0) {
+                if (ambienceplayer != null && currentambiencevolume > 0.0 && ! AmbienceMuteButton.isSelected()) {
                     try {
                         double ambiencevolume = frac * currentambiencevolume;
                         String percentage = new Double(ambiencevolume * 100).intValue() + "%";
@@ -1111,7 +1156,7 @@ public class Player extends Stage {
 
             @Override
             protected void interpolate(double frac) {
-                if (ambienceplayer != null && currentambiencevolume > 0.0) {
+                if (ambienceplayer != null && currentambiencevolume > 0.0 && ! AmbienceMuteButton.isSelected()) {
                     try {
                         double ambiencevolume = frac * currentambiencevolume;
                         String percentage = new Double(ambiencevolume * 100).intValue() + "%";
@@ -1131,7 +1176,7 @@ public class Player extends Stage {
 
             @Override
             protected void interpolate(double frac) {
-                if (ambienceplayer != null && currentambiencevolume > 0.0) {
+                if (ambienceplayer != null && currentambiencevolume > 0.0 && ! AmbienceMuteButton.isSelected()) {
                     try {
                         double ambiencevolume = currentambiencevolume - (frac * currentambiencevolume);
                         String percentage = new Double(ambiencevolume * 100).intValue() + "%";
@@ -1150,7 +1195,7 @@ public class Player extends Stage {
 
             @Override
             protected void interpolate(double frac) {
-                if (ambienceplayer != null && currentambiencevolume > 0.0) {
+                if (ambienceplayer != null && currentambiencevolume > 0.0 && ! AmbienceMuteButton.isSelected()) {
                     try {
                         double ambiencevolume = currentambiencevolume - (frac * currentambiencevolume);
                         String percentage = new Double(ambiencevolume * 100).intValue() + "%";
@@ -1175,7 +1220,7 @@ public class Player extends Stage {
 
                 @Override
                 protected void interpolate(double frac) {
-                    if (entrainmentplayer != null && currententrainmentvolume > 0.0) {
+                    if (entrainmentplayer != null && currententrainmentvolume > 0.0 && ! EntrainmentMuteButton.isSelected()) {
                         try {
                             double entrainmentvolume = frac * currententrainmentvolume;
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
@@ -1199,7 +1244,7 @@ public class Player extends Stage {
 
                 @Override
                 protected void interpolate(double frac) {
-                    if (entrainmentplayer != null && currententrainmentvolume > 0.0) {
+                    if (entrainmentplayer != null && currententrainmentvolume > 0.0 && ! EntrainmentMuteButton.isSelected()) {
                         try {
                             double entrainmentvolume = frac * currententrainmentvolume;
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
@@ -1234,7 +1279,7 @@ public class Player extends Stage {
 
                 @Override
                 protected void interpolate(double frac) {
-                    if (entrainmentplayer != null && currententrainmentvolume > 0.0) {
+                    if (entrainmentplayer != null && currententrainmentvolume > 0.0 && ! EntrainmentMuteButton.isSelected()) {
                         try {
                             double entrainmentvolume = currententrainmentvolume - (frac * currententrainmentvolume);
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
@@ -1267,7 +1312,7 @@ public class Player extends Stage {
 
                 @Override
                 protected void interpolate(double frac) {
-                    if (entrainmentplayer != null && currententrainmentvolume > 0.0) {
+                    if (entrainmentplayer != null && currententrainmentvolume > 0.0 && ! EntrainmentMuteButton.isSelected()) {
                         try {
                             double entrainmentvolume = currententrainmentvolume - (frac * currententrainmentvolume);
                             String percentage = new Double(entrainmentvolume * 100).intValue() + "%";
@@ -1385,8 +1430,30 @@ public class Player extends Stage {
     }
     private void volume_rebindambience() {volume_unbindambience(); volume_bindambience();}
     private void volume_rebindentrainment() {volume_unbindentrainment(); volume_bindentrainment();}
-    private void toggleambiencemute() {}
-    private void toggleentrainmentmute() {}
+    public void toggleambiencemute() {
+        boolean disabled;
+        if (AmbienceMuteButton.isSelected()) {
+            ambienceplayer.setVolume(0.0);
+            disabled = true;
+        } else {
+            ambienceplayer.setVolume(currentambiencevolume);
+            disabled = false;
+        }
+        AmbienceVolumePercentage.setDisable(disabled);
+        AmbienceVolume.setDisable(disabled);
+    }
+    public void toggleentrainmentmute() {
+        boolean disabled;
+        if (EntrainmentMuteButton.isSelected()) {
+            entrainmentplayer.setVolume(0.0);
+            disabled = true;
+        } else {
+            entrainmentplayer.setVolume(currententrainmentvolume);
+            disabled = false;
+        }
+        EntrainmentVolumePercentage.setDisable(disabled);
+        EntrainmentVolume.setDisable(disabled);
+    }
 
     private Duration sessionparttimeleft() {
         return new Duration(selectedPlaybackItem.getExpectedDuration()).subtract(new Duration(selectedPlaybackItem.getPracticeTime()));

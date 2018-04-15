@@ -753,6 +753,18 @@ public class MainController implements Initializable {
     }
     private boolean add(int[] availableambienceindexes) {
         updatecompletiontime.stop();
+        boolean hasCuts = false;
+        ArrayList<PlaybackItem> playbackItems = createdsession.getPlaybackItems();
+        int currentitemsize = playbackItems.size();
+        for (PlaybackItem i : createdsession.getPlaybackItems()) {
+            if (i.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT) {hasCuts = true; break;}
+        }
+        if ((currentitemsize == 0 || hasCuts) && availableambienceindexes.length == 1) {
+            int n = availableambienceindexes[0];
+            if (n > 1 && n < 10) {
+
+            }
+        }
         List<PlaybackItem> items = new ArrayList<>();
         for (int i : availableambienceindexes) {
             PlaybackItem playbackItem = createdsession.getplaybackitemwithambience(i);
@@ -1211,6 +1223,7 @@ public class MainController implements Initializable {
         else {createdtableplaybackitems = new ArrayList<>();}
         if (! createdtableitems.isEmpty()) {createdtableitems.clear();}
         if (createdsession.hasItems()) {
+            System.out.println("Session Has Items");
             createdtableplaybackitems.addAll(createdsession.getPlaybackItems());
             int number = 1;
             for (PlaybackItem i : createdtableplaybackitems) {

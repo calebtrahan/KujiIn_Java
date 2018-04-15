@@ -36,6 +36,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
     public TableColumn<AddOrEditAmbienceTableItem, String> NameColumn;
     public TableColumn<AddOrEditAmbienceTableItem, String> DurationColumn;
     public MenuButton AddMenu;
+    public MenuItem QuickAddShuffleAmbience;
     public MenuItem AddFromAmbienceDirectory;
     public MenuItem AddOpenFiles;
     public Button RemoveButton;
@@ -53,6 +54,7 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        QuickAddShuffleAmbience.setOnAction(event -> quickaddshuffleambience());
         AddFromAmbienceDirectory.setOnAction(event -> addfromavailableambience());
         AddOpenFiles.setOnAction(event -> addfromfiles());
         RemoveButton.setOnAction(event -> removefromtable());

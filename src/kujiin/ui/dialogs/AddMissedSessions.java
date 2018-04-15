@@ -118,7 +118,7 @@
 //        AddItemsMenu.setDisable(nosessionloaded);
 //        DurationMenu.setDisable(nosessionloaded || tableempty || selectedindex == -1);
 //        AmbienceMenu.setDisable(nosessionloaded || tableempty || selectedindex == -1);
-//        PlayButton.setDisable(nosessionloaded || tableempty);
+//        EntrainmentPlayButton.setDisable(nosessionloaded || tableempty);
 //        SaveAsFileButton.setDisable(nosessionloaded || tableempty);
 //        ExportButton.setDisable(nosessionloaded || tableempty);
 //        RemoveButton.setDisable(nosessionloaded || tableempty || selectedindex == -1);

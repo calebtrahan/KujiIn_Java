@@ -23,6 +23,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.ToggleButton?>
 <VBox prefHeight="414.0" prefWidth="640.0" stylesheets="@../../styles/default.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <MenuBar>
@@ -210,7 +211,7 @@
                                                                         <Insets left="2.0" />
                                                                      </HBox.margin>
                                                                   </Label>
-                                                                  <Button fx:id="AmbienceMuteButton" mnemonicParsing="false" />
+                                                                  <ToggleButton fx:id="AmbienceMuteButton" mnemonicParsing="false" onAction="#toggleambiencemute"/>
                                                                </children>
                                                             </HBox>
                                                          </children>
@@ -313,9 +314,9 @@
                            <children>
                               <HBox prefHeight="25.0">
                                  <children>
-                                    <Button fx:id="PlayButton" mnemonicParsing="false" onAction="#playbuttonpressed" />
-                                    <Button fx:id="PauseButton" disable="true" mnemonicParsing="false" onAction="#pausebuttonpressed" />
-                                    <Button fx:id="StopButton" disable="true" mnemonicParsing="false" onAction="#stopbuttonpressed" />
+                                    <Button fx:id="EntrainmentPlayButton" mnemonicParsing="false" onAction="#playbuttonpressed" />
+                                    <Button fx:id="EntrainmentPauseButton" disable="true" mnemonicParsing="false" onAction="#pausebuttonpressed" />
+                                    <Button fx:id="EntrainmentStopButton" disable="true" mnemonicParsing="false" onAction="#stopbuttonpressed" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" minWidth="350.0" HBox.hgrow="ALWAYS">
@@ -336,7 +337,7 @@
                                                 <Insets left="2.0" />
                                              </HBox.margin>
                                           </Label>
-                                          <Button fx:id="EntrainmentMuteButton" mnemonicParsing="false" />
+                                          <ToggleButton fx:id="EntrainmentMuteButton" mnemonicParsing="false" onAction="#toggleentrainmentmute"/>
                                        </children>
                                        <padding>
                                           <Insets left="10.0" />

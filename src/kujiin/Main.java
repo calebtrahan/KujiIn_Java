@@ -13,7 +13,19 @@ import kujiin.util.enums.ProgramState;
 import kujiin.xml.*;
 
 import static kujiin.xml.Preferences.*;
+
+
+// TODO 4/2/18
+    // Timing Error 29:29/30:00
+    // Get Other Sessions Imported
+    // ?? Customize Ambience Does Not Set Ambience Enabled
+
+// TODO If Cut Added, And No Cuts Before, Ask If Like To Add All Cuts Before w/ Duration Or Ramp Only
+    // Confirmation Dialog -> Add Preceding Cuts?
+        // For How Long (Duration) || Ramp Only
+
 // TODO Add Concurrent Program Check
+
 
 // TODO Design Tutorial ( MainController.displaytutorial() )
 // Startup Wizard (Welcome Dialog)
