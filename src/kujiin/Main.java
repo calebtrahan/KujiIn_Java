@@ -16,8 +16,6 @@ import static kujiin.xml.Preferences.*;
 
 
 // TODO 4/2/18
-    // Timing Error 29:29/30:00
-    // Get Other Sessions Imported
     // ?? Customize Ambience Does Not Set Ambience Enabled
 
 // TODO If Cut Added, And No Cuts Before, Ask If Like To Add All Cuts Before w/ Duration Or Ramp Only
@@ -26,9 +24,8 @@ import static kujiin.xml.Preferences.*;
 
 // TODO Add Concurrent Program Check
 
-
 // TODO Design Tutorial ( MainController.displaytutorial() )
-// Startup Wizard (Welcome Dialog)
+// Startup Wizard (Welcome Dialog) (Html Files In /assets/startup/)
     // Welcome To The Program ......(Description Of Program). This A Short Tutorial To Teach You About Some Of The Features Of This Program
     // Session Creation
     // Ambience & Playback
@@ -44,9 +41,6 @@ import static kujiin.xml.Preferences.*;
 // TODO Redesign Goals Completed (Use Bar Chart To Show Completed And Next With Practiced Time)
 // TODO On Session Complete Chart, If Less Than Expected Map Out Expected Duration With Different Color
 // TODO Set Tooltips For Playlist Ambience Names & Progress Bar And Buttons
-// TODO Set Up Goal Overview Mouse Pressed Listeners
-    // Set New Goal On Current Goal Column
-    // Goals Completed Detail On Goals Completed Column
 
 // TODO Style/Color Completed/Not Completed Goals Text On Goal Details Pane
 // TODO Instead Of 100% On Completed Goals, Display √
@@ -58,7 +52,6 @@ import static kujiin.xml.Preferences.*;
 // Rename "Available" Ambience?
 
 // Bugs To Fix
-    // TODO Fix Session Complete Dialog So It Can Exit Program Or Return To Program (Return To Player Works)
 
 // Additional Features To Add
     // TODO Get Merge Logic On Add Items Functional

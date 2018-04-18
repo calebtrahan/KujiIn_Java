@@ -19,7 +19,10 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import kujiin.ui.ambience.AvailableAmbienceEditor;
 import kujiin.ui.boilerplate.IconImageView;
-import kujiin.ui.creation.*;
+import kujiin.ui.creation.CustomizeAmbience;
+import kujiin.ui.creation.NameFavoriteSession;
+import kujiin.ui.creation.SelectASession;
+import kujiin.ui.creation.SetDurationWithAmbienceOption;
 import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.ChangeProgramOptions;
 import kujiin.ui.dialogs.EditReferenceFiles;
@@ -441,6 +444,19 @@ public class MainController implements Initializable {
         SessionBrowser_DetailsTable_TimePracticedColumn.setCellValueFactory(cellData -> cellData.getValue().duration);
     // Goal Overview Table
         GoalsOverview_Table.setOnMousePressed(event -> {
+            int index = GoalsOverview_Table.getSelectionModel().getSelectedIndex();
+            if (index == -1) {return;}
+            if (event.isSecondaryButtonDown()) {
+                // View Goals
+                // View Completed Goals (If Any)
+                ContextMenu goalactionmenu = new ContextMenu();
+                MenuItem addnewgoal = new MenuItem("Set New Goal");
+                addnewgoal.setOnAction(event1 -> setnewgoalfromoverviewtab());
+                MenuItem viewallgoals = new MenuItem("View Details");
+                viewallgoals.setOnAction(event1 -> gotogoaldetails());
+                goalactionmenu.getItems().addAll(addnewgoal, viewallgoals);
+                GoalsOverview_Table.setContextMenu(goalactionmenu);
+            }
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                 int column = GoalsOverview_Table.getSelectionModel().getSelectedCells().get(0).getColumn();
                 switch (column) {
@@ -473,6 +489,19 @@ public class MainController implements Initializable {
                 // Context Menu
             }
         });
+        GoalsIndividual_Table.setOnMousePressed(event ->  {
+            int index = GoalsIndividual_Table.getSelectionModel().getSelectedIndex();
+            if (index == -1) {return;}
+            if (event.isSecondaryButtonDown()) {
+                ContextMenu goalactionmenu = new ContextMenu();
+                MenuItem addnewgoal = new MenuItem("Set New Goal");
+                addnewgoal.setOnAction(event1 -> setnewgoalfromdetailstab());
+                MenuItem deletegoal = new MenuItem("Delete Goal");
+                deletegoal.setOnAction(event1 -> deletegoal());
+                goalactionmenu.getItems().addAll(addnewgoal, deletegoal);
+                GoalsIndividual_Table.setContextMenu(goalactionmenu);
+            }
+        });
         GoalsOverview_ItemColumn.setCellValueFactory(cellData -> cellData.getValue().sessionitem);
         GoalsOverview_PracticedTimeColumn.setCellValueFactory(cellData -> cellData.getValue().practicedtime);
         GoalsOverview_CurrentGoalColumn.setCellValueFactory(cellData -> cellData.getValue().currentgoal);
@@ -488,7 +517,7 @@ public class MainController implements Initializable {
         });
         GoalsIndividual_SelectedSessionItemChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldvalue, newvalue) -> {
             GoalsIndividual_SetNewGoalButton.setDisable(newvalue == null);
-            GoalsIndividual_ShowCompletedGoalsCheckbox.setDisable(newvalue == null);
+//            GoalsIndividual_ShowCompletedGoalsCheckbox.setDisable(newvalue == null);
         });
         GoalsIndividual_Table.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.isCompleted()) {GoalsIndividual_DeleteGoalButton.setDisable(true);}
@@ -1688,13 +1717,11 @@ public class MainController implements Initializable {
             PlaybackItem playbackItem = dummysession.getplaybackitem(index);
             Duration duration = sessions.gettotalpracticedtime(playbackItem, false);
             GoalsIndividual_PracticedTime.setText(Util.formatdurationtoStringDecimalWithColons(duration));
-            GoalsIndividual_PracticedTime.setTooltip(new Tooltip(Util.formatdurationtoStringDecimalWithColons(duration)));
+            GoalsIndividual_PracticedTime.setTooltip(new Tooltip(Util.formatdurationtoStringSpelledOut(duration, Double.MAX_VALUE)));
             ObservableList<GoalDetailsTableItem> tableitems = FXCollections.observableArrayList();
             List<Goal> goalList = allGoals.getplaybackItemGoals(index).getGoals();
             boolean hascompletedgoals = allGoals.getplaybackItemGoals(index).hasCompletedGoals();
             GoalsIndividual_ShowCompletedGoalsCheckbox.setDisable(! hascompletedgoals);
-            if (hascompletedgoals) { GoalsIndividual_ShowCompletedGoalsCheckbox.setTooltip(null); }
-            else {GoalsIndividual_ShowCompletedGoalsCheckbox.setTooltip(new Tooltip("No Completed Goals For " + GoalsIndividual_SelectedSessionItemChoiceBox.getValue()));}
             if (goalList != null && ! goalList.isEmpty()) {
                 for (Goal i :goalList) {
                     if (! GoalsIndividual_ShowCompletedGoalsCheckbox.isSelected() && i.getCompleted()) {continue;}

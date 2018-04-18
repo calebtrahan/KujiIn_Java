@@ -110,6 +110,7 @@ public class Player extends Stage {
     public Label SessionProgressPercentage;
     public Label SessionTotalTime;
     // Controls
+    public Label EntrainmentLabel;
     public Slider EntrainmentVolume;
     public Label EntrainmentVolumePercentage;
     public ToggleButton EntrainmentMuteButton;
@@ -866,8 +867,8 @@ public class Player extends Stage {
                 case TRANSITIONING:
                     try {
                         cleanupPlayersandAnimations();
-                        int index = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1;
                         selectedPlaybackItem.setPracticecompleted(true);
+                        int index = SessionInProgress.getPlaybackItems().indexOf(selectedPlaybackItem) + 1;
                         selectedPlaybackItem = SessionInProgress.getPlaybackItems().get(index);
                         start();
                         if (ReferenceToggleCheckBox.isSelected() && ReferenceTypeChoiceBox.getSelectionModel().getSelectedIndex() != -1) {loadreference();}
@@ -1451,6 +1452,7 @@ public class Player extends Stage {
             entrainmentplayer.setVolume(currententrainmentvolume);
             disabled = false;
         }
+        EntrainmentLabel.setDisable(disabled);
         EntrainmentVolumePercentage.setDisable(disabled);
         EntrainmentVolume.setDisable(disabled);
     }

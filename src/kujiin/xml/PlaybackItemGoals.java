@@ -59,6 +59,7 @@ public class PlaybackItemGoals {
         return PlaybackItemName;
     }
     public boolean hasCompletedGoals() {
+        if (Goals == null) {return false;}
         boolean hascompletedgoals = false;
         for (Goal i : getGoals()) {
             if (i.getCompleted()) {hascompletedgoals = true; break;}

@@ -52,6 +52,7 @@ public class PlaybackItem {
     }
     public void setPracticecompleted(boolean practicecompleted) {
         this.practicecompleted = practicecompleted;
+        if (practicecompleted) {PracticeTime = ExpectedDuration;}
     }
     public PlaybackItemType getPlaybackItemType() {
         return playbackItemType;
