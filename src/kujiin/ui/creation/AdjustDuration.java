@@ -59,6 +59,24 @@ public class AdjustDuration extends StyledStage {
             setListeners();
         } catch (IOException e) {e.printStackTrace();}
     }
+    public AdjustDuration(String titletext) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../../assets/fxml/creation/AdjustDuration.fxml"));
+            fxmlLoader.setController(this);
+            Scene defaultscene = new Scene(fxmlLoader.load());
+            setScene(defaultscene);
+            setResizable(false);
+            setTitle(titletext);
+            HoursSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 50, 0));
+            MinutesSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0));
+            SecondsSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 0, 5));
+            RampOnlyCheckbox.setVisible(false);
+            setListeners();
+        } catch (IOException e) {e.printStackTrace();}
+
+}
+
+
     private void setListeners() {
         HoursSpinner.setOnScroll(event -> {
             Integer value = HoursSpinner.getValue();
@@ -86,14 +104,17 @@ public class AdjustDuration extends StyledStage {
     }
 
 // Button Actions
+
     public void accept() {
         Duration tempduration = Duration.ZERO;
         tempduration = tempduration.add(Duration.hours(HoursSpinner.getValue()));
         tempduration = tempduration.add(Duration.minutes(MinutesSpinner.getValue()));
         tempduration = tempduration.add(Duration.seconds(SecondsSpinner.getValue()));
-        newduration = tempduration;
-        accepted = true;
-        close();
+        if (tempduration.greaterThan(Duration.ZERO)) {
+            newduration = tempduration;
+            accepted = true;
+            close();
+        }
     }
     public void cancel() {
         accepted = false;

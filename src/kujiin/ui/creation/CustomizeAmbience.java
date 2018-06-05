@@ -114,10 +114,6 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
                     if (event.isPrimaryButtonDown() && event.getClickCount() == 2) { preview(); }
                 }
             });
-            if (playbackItem.getAmbience().getSessionAmbience() != null) {
-                for (SoundFile i : playbackItem.getAmbience().getSessionAmbience()) {ambience.addPreset(i);}
-                populatetable();
-            }
             if (ambience.getSessionAmbience() == null || ambience.getSessionAmbience().isEmpty()) {setTitle("Add Ambience"); updatestatusbar();}
             else {setTitle("Customize Ambience"); populatetable();}
 //            NumberColumn.prefWidthProperty().bind(AddOrEditAmbienceTable.widthProperty().multiply(1 / 5));
@@ -251,8 +247,8 @@ public class CustomizeAmbience extends StyledStage implements Initializable {
         }
     }
     public void accept() {
-        playbackItem.getAmbience().setSessionAmbience(ambience.getSessionAmbience());
         accepted = ambience.hasPresetAmbience();
+        if (accepted) {playbackItem.setAmbience(ambience);}
         close();
     }
 

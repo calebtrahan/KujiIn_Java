@@ -1,5 +1,6 @@
 package kujiin.ui;
 
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -19,10 +20,7 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import kujiin.ui.ambience.AvailableAmbienceEditor;
 import kujiin.ui.boilerplate.IconImageView;
-import kujiin.ui.creation.CustomizeAmbience;
-import kujiin.ui.creation.NameFavoriteSession;
-import kujiin.ui.creation.SelectASession;
-import kujiin.ui.creation.SetDurationWithAmbienceOption;
+import kujiin.ui.creation.*;
 import kujiin.ui.dialogs.AmbienceEditor_Simple;
 import kujiin.ui.dialogs.ChangeProgramOptions;
 import kujiin.ui.dialogs.EditReferenceFiles;
@@ -673,7 +671,7 @@ public class MainController implements Initializable {
                 ambienceEditor_simple.showAndWait();
             }
         }
-        if ((createdsession != null && ! createdsession.hasItems()) && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
+        if ((createdsession != null && createdsession.hasItems()) && ! new ConfirmationDialog(preferences, "Overwrite Session", "Really Load New Session?", "This will clear any unsaved changes you made to this session", true).getResult()) {return;}
         createdsession = new Session(availableAmbiences);
         populatecreatedsessiontable();
         displayStatusBarMessage("New Session Created", Duration.seconds(1.0));
@@ -780,22 +778,48 @@ public class MainController implements Initializable {
         System.out.println("Made It Out Of Quick Add Ambience Method");
         return items;
     }
-    private boolean add(int[] availableambienceindexes) {
+    private boolean add(int[] playbackitemindex) {
         updatecompletiontime.stop();
-        boolean hasCuts = false;
         ArrayList<PlaybackItem> playbackItems = createdsession.getPlaybackItems();
-        int currentitemsize = playbackItems.size();
-        for (PlaybackItem i : createdsession.getPlaybackItems()) {
-            if (i.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT) {hasCuts = true; break;}
-        }
-        if ((currentitemsize == 0 || hasCuts) && availableambienceindexes.length == 1) {
-            int n = availableambienceindexes[0];
-            if (n > 1 && n < 10) {
+//        if (checkprecedingcuts && ! playbackItems.isEmpty()) {
+        if (! playbackItems.isEmpty()) {
+            PlaybackItem previousitem = playbackItems.get(playbackItems.size() - 1);
+            if (previousitem.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT && previousitem.getCreationindex() > 1) {
+                // Ask User If Want To Add Preceding Cuts
+                boolean answer = new ConfirmationDialog(preferences, "Confirmation", "Add Preceding Cuts?", null).getResult();
+                // A. Get Duration For Cuts
+                AdjustDuration adjustDuration = new AdjustDuration("Set Durations For " + playbackitemindex.length + " Items");
+                if (adjustDuration.isAccepted()) {
+                    Duration duration = adjustDuration.getNewduration();
 
+                }
+                // B. Customize Each Duration If More Than One Cut To Add
+
+
+                boolean firstitemtoaddiscut = playbackitemindex[0] > 0 && playbackitemindex[0] < 10;
+                if (firstitemtoaddiscut) {
+
+
+                    boolean hasCuts = false;
+
+                    int currentitemsize = playbackItems.size();
+                    for (PlaybackItem i : createdsession.getPlaybackItems()) {
+                        if (i.getPlaybackItemType() == PlaybackItem.PlaybackItemType.CUT) {
+                            hasCuts = true;
+                            break;
+                        }
+                    }
+                    if ((currentitemsize == 0 || hasCuts) && playbackitemindex.length == 1) {
+                        int n = playbackitemindex[0];
+                        if (n > 1 && n < 10) {
+
+                        }
+                    }
+                }
             }
         }
         List<PlaybackItem> items = new ArrayList<>();
-        for (int i : availableambienceindexes) {
+        for (int i : playbackitemindex) {
             PlaybackItem playbackItem = createdsession.getplaybackitemwithambience(i);
             if (i == 0) {playbackItem.setPlaybackItemType(PlaybackItem.PlaybackItemType.QIGONG);}
             else if (i > 0 && i < 10) {playbackItem.setPlaybackItemType(PlaybackItem.PlaybackItemType.CUT);}
@@ -1027,6 +1051,7 @@ public class MainController implements Initializable {
                 ArrayList<PlaybackItem> items = createdtableplaybackitems;
                 items.set(createdtableplaybackitems.indexOf(x), customizeAmbience.getPlaybackItem());
                 createdsession.setPlaybackItems(items);
+                System.out.println("Created Session Has " + createdsession.getPlaybackItems().size() + " Items");
                 populatecreatedsessiontable();
             }
         }
@@ -1246,14 +1271,13 @@ public class MainController implements Initializable {
     }
     // Utility Methods
     private void populatecreatedsessiontable() {
-        updatecompletiontime.stop();
+        ArrayList<PlaybackItem> items = createdsession.getPlaybackItems();
+        if (updatecompletiontime.getStatus() == Animation.Status.RUNNING) {updatecompletiontime.stop();}
         calculatedurationandestimatedcompletion();
-        if (createdtableplaybackitems != null) {createdtableplaybackitems.clear();}
-        else {createdtableplaybackitems = new ArrayList<>();}
-        if (! createdtableitems.isEmpty()) {createdtableitems.clear();}
-        if (createdsession.hasItems()) {
-            System.out.println("Session Has Items");
-            createdtableplaybackitems.addAll(createdsession.getPlaybackItems());
+        createdtableplaybackitems = new ArrayList<>();
+        createdtableitems = FXCollections.observableArrayList();
+        if (! items.isEmpty()) {
+            createdtableplaybackitems.addAll(items);
             int number = 1;
             for (PlaybackItem i : createdtableplaybackitems) {
                 createdtableitems.add(new TableItem_Number_Name_Duration_Ambience(number, i.getName(), i.getdurationasString(), i.getAmbienceasString()));

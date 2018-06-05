@@ -14,10 +14,6 @@ import kujiin.xml.*;
 
 import static kujiin.xml.Preferences.*;
 
-
-// TODO 4/2/18
-    // ?? Customize Ambience Does Not Set Ambience Enabled
-
 // TODO If Cut Added, And No Cuts Before, Ask If Like To Add All Cuts Before w/ Duration Or Ramp Only
     // Confirmation Dialog -> Add Preceding Cuts?
         // For How Long (Duration) || Ramp Only

@@ -141,8 +141,16 @@ public class PlaybackItem {
     public void resetpracticetime() {
         PracticeTime = 0.0;
     }
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Playback Item Details: \n");
+        stringBuilder.append("  Name: ").append(getName());
+        stringBuilder.append("  Duration: ");
+        return stringBuilder.toString();
+    }
 
-// Reference
+    // Reference
     public File getReferenceFile(ReferenceType referenceType) {
         switch (referenceType) {
             case html: {

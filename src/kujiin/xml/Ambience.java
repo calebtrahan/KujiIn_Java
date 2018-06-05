@@ -57,6 +57,10 @@ public class Ambience {
         if (SessionAmbience == null) SessionAmbience = new ArrayList<>();
         SessionAmbience.add(soundFile);
     }
+    public void addPreset(List<SoundFile> soundFiles) {
+        if (SessionAmbience == null) SessionAmbience = new ArrayList<>();
+        SessionAmbience.addAll(soundFiles);
+    }
     public boolean hasPresetAmbience() {return SessionAmbience != null && ! SessionAmbience.isEmpty();}
     public SoundFile getPreset(int index) throws IndexOutOfBoundsException {return SessionAmbience.get(index);}
     public SoundFile getPreset(String name) {

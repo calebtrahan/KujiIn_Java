@@ -350,6 +350,7 @@ public class Session {
         currentbreak = new Break(LocalDate.now());
     }
     public void endbreak() {
+        if (breaks == null) {breaks = new ArrayList<>();}
         breaks.add(currentbreak);
         currentbreak = null;
     }
